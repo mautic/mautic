@@ -225,21 +225,6 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function togglePanelAction(Request $request)
-    {
-        $panel     = InputHelper::clean($request->request->get("panel", "left"));
-        $status    = $this->get("session")->get("{$panel}-panel", "default");
-        $newStatus = ($status == "unpinned") ? "default" : "unpinned";
-        $this->get("session")->set("{$panel}-panel", $newStatus);
-        $dataArray = array('success' => 1);
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     protected function togglePublishStatusAction(Request $request)
     {
         $dataArray = array('success' => 0);
@@ -261,13 +246,26 @@ class AjaxController extends CommonController
         $entity = $model->getEntity($id);
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
+            $security = $this->factory->getSecurity();
+            $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
-            if ($this->factory->getSecurity()->hasEntityAccess(
-                $permissionBase . ':publishown',
-                $permissionBase . ':publishother',
-                $entity->getCreatedBy()
-            )
-            ) {
+            if ($security->checkPermissionExists($permissionBase.':publishown')) {
+                $hasPermission = $security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
+            } elseif ($security->checkPermissionExists($permissionBase.':publish')) {
+                $hasPermission = $security->isGranted($permissionBase.':publish');
+            } elseif ($security->checkPermissionExists($permissionBase.':manage')) {
+                $hasPermission = $security->isGranted($permissionBase.':manage');
+            } elseif ($security->checkPermissionExists($permissionBase.':full')) {
+                $hasPermission = $security->isGranted($permissionBase.':full');
+            } elseif ($security->checkPermissionExists($permissionBase.':editown')) {
+                $hasPermission = $security->hasEntityAccess($permissionBase.':editown', $permissionBase.':editother', $createdBy);
+            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
+                $hasPermission = $security->isGranted($permissionBase.':edit');
+            } else {
+                $hasPermission = false;
+            }
+
+            if ($hasPermission) {
                 $dataArray['success'] = 1;
                 //toggle permission state
                 $model->togglePublishStatus($entity);

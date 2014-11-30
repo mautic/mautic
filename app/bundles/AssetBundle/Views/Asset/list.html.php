@@ -73,31 +73,26 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                 <tr>
                     <td class="visible-md visible-lg">
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                            'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                $permissions['asset:assets:editown'],
-                                $permissions['asset:assets:editother'],
-                                $item->getCreatedBy()
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
+                            'item'       => $item,
+                            'templateButtons' => array(
+                                'edit'       => $security->hasEntityAccess($permissions['asset:assets:editown'], $permissions['asset:assets:editother'], $item->getCreatedBy()),
+                                'delete'     => $security->hasEntityAccess($permissions['asset:assets:deleteown'], $permissions['asset:assets:deleteother'], $item->getCreatedBy()),
                             ),
-                            'delete'    => $security->hasEntityAccess(
-                                $permissions['asset:assets:deleteown'],
-                                $permissions['asset:assets:deleteother'],
-                                $item->getCreatedBy()),
-                            'routeBase' => 'asset',
-                            'menuLink'  => 'mautic_asset_index',
-                            'langVar'   => 'asset.asset',
+                            'routeBase'  => 'asset',
+                            'langVar'    => 'asset.asset',
                             'nameGetter' => 'getTitle',
-                            'custom'    => array(array(
-                                'attr' => array(
-                                    'id' => 'campaignEvent_' . str_replace('.', '', $k),
-                                    'data-toggle' => 'ajaxmodal',
-                                    'data-target' => '#AssetLeadModal',
-                                    'href' => $view['router']->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $item->getId(), 'tmpl' => 'preview'))
-                                ),
-                                'label' => 'Preview',
-                                'icon' => 'fa-image'
-                            ))
+                            'customButtons' => array(
+                                array(
+                                    'attr' => array(
+                                        'data-toggle' => 'ajaxmodal',
+                                        'data-target' => '#AssetPreviewModal',
+                                        'href' => $view['router']->generate('mautic_asset_action', array('objectAction' => 'preview', 'objectId' => $item->getId()))
+                                    ),
+                                    'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
+                                    'iconClass' => 'fa fa-image'
+                                )
+                            )
                         ));
                         ?>
                     </td>
@@ -143,6 +138,6 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 <?php endif; ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'AssetLeadModal',
+    'id'     => 'AssetPreviewModal',
     'header' => false
 ));

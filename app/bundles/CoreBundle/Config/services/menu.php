@@ -51,14 +51,6 @@ $container->setDefinition('mautic.menu_main',
     ->setFactoryMethod('mainMenu')
     ->addTag('knp_menu.menu', array('alias' => 'main'));
 
-//Breacrumbs menu
-$container->setDefinition('mautic.menu_breadcrumbs',
-    new Definition('Knp\Menu\MenuItem')
-)
-    ->setFactoryService('mautic.menu_builder')
-    ->setFactoryMethod('breadcrumbsMenu')
-    ->addTag('knp_menu.menu', array('alias' => 'breadcrumbs'));
-
 //Admin menu
 $container->setDefinition('mautic.menu_admin',
     new Definition('Knp\Menu\MenuItem')

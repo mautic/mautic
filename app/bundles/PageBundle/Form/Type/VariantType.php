@@ -78,7 +78,7 @@ class VariantType extends AbstractType
                 )
             ));
 
-            $data = (isset($options['data'])) ? $options['data']['winnerCriteria'] : '';
+            $data = (isset($options['data']) && !(empty($options['data']['winnerCriteria']))) ? $options['data']['winnerCriteria'] : '';
             if (!empty($criteria[$data]['formType'])) {
                 $builder->add('properties', $criteria[$data]['formType'], array(
                     'required' => false,

@@ -62,13 +62,14 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $permissions['point:triggers:edit'],
-                        'clone'     => $permissions['point:triggers:create'],
-                        'delete'    => $permissions['point:triggers:delete'],
+                        'templateButtons' => array(
+                            'edit'      => $permissions['point:triggers:edit'],
+                            'clone'     => $permissions['point:triggers:create'],
+                            'delete'    => $permissions['point:triggers:delete'],
+                        ),
                         'routeBase' => 'pointtrigger',
-                        'menuLink'  => 'mautic_pointtrigger_index',
                         'langVar'   => 'point.trigger'
                     ));
                     ?>

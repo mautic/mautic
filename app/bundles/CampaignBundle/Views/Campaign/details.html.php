@@ -10,33 +10,17 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set("headerTitle", $campaign->getName());
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'      => $campaign,
+    'templateButtons' => array(
+        'edit'      => $permissions['campaign:campaigns:edit'],
+        'clone'     => $permissions['campaign:campaigns:create'],
+        'delete'    => $permissions['campaign:campaigns:delete'],
+    ),
+    'routeBase' => 'campaign'
+)));
 ?>
-<?php
-$view['slots']->start('actions');
-if ($permissions['campaign:campaigns:edit']): ?>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $campaign->getId())); ?>"
-       data-toggle="ajax"
-       data-menu-link="#mautic_campaign_index"
-       class="btn btn-default">
-        <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-    </a>
-<?php endif; ?>
-<?php if ($permissions['campaign:campaigns:delete']): ?><a href="javascript:void(0);"
-   onclick="Mautic.showConfirmation(
-       '<?php echo $view->escape($view["translator"]->trans("mautic.campaign.confirmdelete",
-       array("%name%" => $campaign->getName() . " (" . $campaign->getId() . ")")), 'js'); ?>',
-       '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-       'executeAction',
-       ['<?php echo $view['router']->generate('mautic_campaign_action',
-       array("objectAction" => "delete", "objectId" => $campaign->getId())); ?>',
-       '#mautic_campaign_index'],
-       '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"
-    class="btn btn-default">
-    <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-</a>
-<?php endif; ?>
-<?php $view['slots']->stop(); ?>
 
 <!-- start: box layout -->
 <div class="box-layout">

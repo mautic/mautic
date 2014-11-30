@@ -183,20 +183,10 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target,
-                ajax: {
-                    beforeSend: function () {
-                        MauticVars.showLoadingBar = false;
-                    }
-                }
+                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target
             },
             remote: {
-                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target + "&filter=%QUERY",
-                ajax: {
-                    beforeSend: function () {
-                        MauticVars.showLoadingBar = false;
-                    }
-                }
+                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target + "&filter=%QUERY"
             },
             dupDetector: function (remoteMatch, localMatch) {
                 return (remoteMatch.value == localMatch.value);
@@ -239,20 +229,10 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: {
-            url: mauticAjaxUrl + "?action=lead:userList",
-            ajax: {
-                beforeSend: function () {
-                    MauticVars.showLoadingBar = false;
-                }
-            }
+            url: mauticAjaxUrl + "?action=lead:userList"
         },
         remote: {
-            url: mauticAjaxUrl + "?action=lead:userList&filter=%QUERY",
-            ajax: {
-                beforeSend: function () {
-                    MauticVars.showLoadingBar = false;
-                }
-            }
+            url: mauticAjaxUrl + "?action=lead:userList&filter=%QUERY"
         },
         dupDetector: function (remoteMatch, localMatch) {
             return (remoteMatch.label == localMatch.label);

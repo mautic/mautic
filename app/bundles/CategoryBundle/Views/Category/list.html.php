@@ -60,33 +60,21 @@ if ($tmpl == 'index')
                     <tr>
                         <td class="visible-md visible-lg">
                             <?php
-                            echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                            echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                                 'item'      => $item,
-                                'edit'      => false,
-                                'delete'    => $permissions[$bundle.':categories:delete'],
-                                'routeBase' => 'category',
-                                'menuLink'  => 'mautic_category_index',
-                                'langVar'   => 'category',
-                                'nameGetter' => 'getTitle',
-                                'extra'      => array(
-                                    'bundle' => $bundle
+                                'templateButtons' => array(
+                                    'edit'      => $permissions[$bundle.':categories:edit'],
+                                    'delete'    => $permissions[$bundle.':categories:delete'],
                                 ),
-                                'customTop'    => array(
-                                    array(
-                                        'attr' => array(
-                                            'data-toggle' => 'ajaxmodal',
-                                            'data-target' => '#CategoryFormModal',
-                                            'data-ignore-removemodal' => 'true',
-                                            'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
-                                            'href'        => $view['router']->generate('mautic_category_action', array(
-                                                'objectAction' => 'edit',
-                                                'objectId' => $item->getId(),
-                                                'bundle'   => $bundle
-                                            )),
-                                        ),
-                                        'icon' => 'fa-pencil-square-o',
-                                        'label' => 'mautic.core.form.edit'
-                                    )
+                                'editMode'  => 'ajaxmodal',
+                                'editAttr'  => array(
+                                    'data-target' => '#CategoryFormModal',
+                                    'data-ignore-removemodal' => 'true',
+                                    'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
+                                ),
+                                'routeBase' => 'category',
+                                'query'      => array(
+                                    'bundle' => $bundle
                                 )
                             ));
                             ?>
@@ -98,7 +86,7 @@ if ($tmpl == 'index')
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                                 'item'  => $item,
                                 'model' => 'category',
-                                'extra' => 'bundle=' . $bundle
+                                'query' => 'bundle=' . $bundle
                             )); ?>
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
                         </td>

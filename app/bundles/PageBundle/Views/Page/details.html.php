@@ -12,43 +12,20 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $activePage->getTitle());
-$view['slots']->start('actions');
 
 $showVariants = (count($variants['children']));
 
-if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
-    $activePage->getCreatedBy())): ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>" data-toggle="ajax" data-menu-link="#mautic_page_index">
-        <i class="fa fa-fw fa-pencil-square-o"></i>
-        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-    </a>
-<?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['page:pages:deleteown'], $permissions['page:pages:deleteother'],
-    $activePage->getCreatedBy())): ?>
-    <a class="btn btn-default" href="javascript:void(0);"
-       onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.page.confirmdelete",
-           array("%name%" => $activePage->getTitle() . " (" . $activePage->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_page_action',
-           array("objectAction" => "delete", "objectId" => $activePage->getId())); ?>',
-           '#mautic_page_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <i class="fa fa-fw fa-trash-o text-danger"></i>
-        <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
-    </a>
-<?php endif; ?>
-<?php if ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
-    <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_page_action',
-           array("objectAction" => "abtest", "objectId" => $activePage->getId())); ?>"
-        data-toggle="ajax"
-        data-menu-link="mautic_page_index">
-        <i class="fa fa-sitemap"></i>
-        <?php echo $view['translator']->trans('mautic.page.form.abtest'); ?>
-    </a>
-<?php endif; ?>
-<?php $view['slots']->stop(); ?>
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'            => $activePage,
+    'templateButtons' => array(
+        'edit'   => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
+        'clone'  => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
+        'delete' => $permissions['page:pages:create'],
+        'abtest' => ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create'])
+    ),
+    'routeBase' => 'page'
+)));
+?>
 
 <!-- start: box layout -->
 <div class="box-layout">

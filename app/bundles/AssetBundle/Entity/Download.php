@@ -36,7 +36,7 @@ class Download
 
     /**
      * @ORM\ManyToOne(targetEntity="Asset")
-     * @ORM\JoinColumn(name="asset_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="asset_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     private $asset;
 

@@ -24,10 +24,9 @@ class ConfigController extends FormController
      */
     public function editAction()
     {
-        // Set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array('config:config:full'), "RETURN_ARRAY");
 
-        if (!$permissions['config:config:full']) {
+        //admin only allowed
+        if ($this->factory->getUser()->isAdmin()) {
             return $this->accessDenied();
         }
 

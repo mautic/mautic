@@ -37,15 +37,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'      => $item,
-                            'delete'    => $security->hasEntityAccess(
-                                true,
-                                $permissions['lead:lists:deleteother'],
-                                $item->getCreatedBy()
+                            'templateButtons' => array(
+                                'delete'    => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                             ),
                             'routeBase' => 'leadlist',
-                            'menuLink'  => 'mautic_leadlist_index',
                             'langVar'   => 'lead.list',
                             'custom'    => array(
                                 array(
@@ -59,7 +56,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                     'label' => 'mautic.lead.list.view_leads'
                                 )
                             )
-                        ))  ;
+                        ));
                         ?>
                     </td>
                     <td>

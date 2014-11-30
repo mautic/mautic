@@ -32,16 +32,8 @@ class ApiSubscriber extends CommonSubscriber
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
             ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0),
-            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
+            //CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
         );
-    }
-
-    /**
-     * @param MauticEvents\RouteEvent $event
-     */
-    public function onBuildRoute(MauticEvents\RouteEvent $event)
-    {
-        $this->buildRoute($event, 'apidocs');
     }
 
     /**

@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 
@@ -66,6 +65,11 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
+     * @var \Mautic\AddonBundle\Helper\AddonHelper
+     */
+    protected $addonHelper;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
@@ -79,6 +83,7 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->params          = $factory->getSystemParameters();
         $this->dispatcher      = $factory->getDispatcher();
         $this->translator      = $factory->getTranslator();
+        $this->addonHelper     = $factory->getHelper('addon');
     }
 
     /**
@@ -99,8 +104,10 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     protected function buildMenu(MauticEvents\MenuEvent $event, $name)
     {
+        //for easy access in menu files
         $security = $event->getSecurity();
-        $request  = $this->factory->getRequest();
+        $request  = $event->getRequest();
+        $user     = $event->getUser();
 
         $bundles   = $this->factory->getParameter('bundles');
         $addons    = $this->factory->getParameter('addon.bundles');
@@ -119,6 +126,10 @@ class CommonSubscriber implements EventSubscriberInterface
         }
 
         foreach ($addons as $bundle) {
+            if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
+                continue;
+            }
+
             //check common place
             $path = $bundle['directory'] . "/Config/menu/$name.php";
 
@@ -188,6 +199,10 @@ class CommonSubscriber implements EventSubscriberInterface
         }
 
         foreach ($addons as $bundle) {
+            if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
+                continue;
+            }
+
             //check common place
             $path = $bundle['directory'] . "/Config/menu/main.php";
 
@@ -235,6 +250,10 @@ class CommonSubscriber implements EventSubscriberInterface
         }
 
         foreach ($addons as $bundle) {
+            if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
+                continue;
+            }
+
             $routing = $bundle['directory'] . "/Config/routing/$name.php";
             if (file_exists($routing)) {
                 $event->addRoutes($routing);

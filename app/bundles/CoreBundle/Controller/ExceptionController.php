@@ -25,9 +25,25 @@ class ExceptionController extends CommonController
      */
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
+        $env            = $this->factory->getEnvironment();
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $code           = $exception->getStatusCode();
-        $layout         = $this->factory->getEnvironment() == 'prod' ? 'Error' : 'Exception';
+        $layout         = $env == 'prod' ? 'Error' : 'Exception';
+
+        if ($request->isXmlHttpRequest()) {
+            if ($request->query->get('ignoreAjax', false)) {
+                return $exception->getMessage();
+            } else {
+                return new JsonResponse(array(
+                    'error' => array(
+                        'code'      => $code,
+                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                        'exception' => $exception->getMessage(),
+                        'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+                    )
+                ), $code);
+            }
+        }
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -43,21 +59,6 @@ class ExceptionController extends CommonController
                 'mauticContent'  => 'dashboard'
             )
         ));
-
-        /*if ($request->isXmlHttpRequest()) {
-            if ($request->query->get('ignoreAjax', false)) {
-                return $exception->getMessage();
-            } else {
-                return new JsonResponse(array(
-                    'error' => array(
-                        'code'      => $code,
-                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                        'exception' => $exception->getMessage(),
-                        'trace'     => ($this->debug) ? $exception->getTrace() : ''
-                    )
-                ), $code);
-            }
-        }*/
     }
 
     /**

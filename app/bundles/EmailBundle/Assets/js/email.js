@@ -173,7 +173,6 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
 
     var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
 
-    MauticVars.showLoadingBar = false;
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",

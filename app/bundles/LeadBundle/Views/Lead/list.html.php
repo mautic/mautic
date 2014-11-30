@@ -87,15 +87,13 @@ if ($tmpl == 'index')
                         );
                     }
 
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $hasEditAccess,
-                        'delete'    => $security->hasEntityAccess(
-                            $permissions['lead:leads:deleteown'],
-                            $permissions['lead:leads:deleteother'],
-                            $item->getOwner()),
+                        'templateButtons' => array(
+                            'edit'      => $hasEditAccess,
+                            'delete'    => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $item->getOwner()),
+                        ),
                         'routeBase' => 'lead',
-                        'menuLink'  => 'mautic_lead_index',
                         'langVar'   => 'lead.lead',
                         'custom'    => $custom
                     ));

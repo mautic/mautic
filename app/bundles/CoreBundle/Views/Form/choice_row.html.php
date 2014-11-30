@@ -1,6 +1,7 @@
 <?php
 $hasErrors = count($form->vars['errors']);
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? ' has-error' : '';
+
 ?>
 <div class="row">
     <div class="form-group col-xs-12 <?php echo $feedbackClass; ?>">
@@ -12,8 +13,19 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors
         </span>
         <?php endif; ?>
         <div class="choice-wrapper">
-            <?php echo $view['form']->widget($form) ?>
-            <?php echo $view['form']->errors($form) ?>
+            <?php if ($expanded && $multiple): ?>
+            <?php foreach ($form->children as $child): ?>
+                <div class="checkbox">
+                    <label>
+                        <?php echo $view['form']->widget($child); ?>
+                        <?php echo $view['translator']->trans($child->vars['label']); ?>
+                    </label>
+                </div>
+            <?php endforeach; ?>
+            <?php else: ?>
+            <?php echo $view['form']->widget($form); ?>
+            <?php endif; ?>
+            <?php echo $view['form']->errors($form); ?>
         </div>
     </div>
 </div>

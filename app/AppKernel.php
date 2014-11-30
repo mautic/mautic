@@ -59,7 +59,7 @@ class AppKernel extends Kernel
 
         // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
         foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\CoreBundle\Bundle\IntegrationBundleBase) {
+            if ($bundle instanceof \Mautic\CoreBundle\Bundle\AddonBundleBase) {
                 if (!$bundle->isEnabled()) {
                     unset($this->bundles[$name]);
                     unset($this->bundleMap[$name]);
@@ -121,6 +121,7 @@ class AppKernel extends Kernel
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->in($searchPath)
+            ->depth('1')
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
@@ -145,6 +146,7 @@ class AppKernel extends Kernel
         $searchPath = dirname(__DIR__) . '/addons';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
+            ->depth('1')
             ->in($searchPath)
             ->name('*Bundle.php');
 

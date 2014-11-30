@@ -16,7 +16,6 @@ Mautic.pointTriggerOnLoad = function (container) {
             items: '.trigger-event-row',
             handle: '.reorder-handle',
             stop: function(i) {
-                MauticVars.showLoadingBar = false;
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=point:reorderTriggerEvents",

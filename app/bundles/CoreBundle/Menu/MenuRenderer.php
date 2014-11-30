@@ -83,11 +83,7 @@ class MenuRenderer implements RendererInterface
             $this->matcher->clear();
         }
         $manipulator = new MenuManipulator();
-        if ($options["menu"] == "breadcrumbs") {
-            $html = $this->engine->render("MauticCoreBundle:Menu:breadcrumbs.html.php", array(
-                "crumbs"  => $manipulator->getBreadcrumbsArray($item)
-            ));
-        } elseif ($options["menu"] == "admin") {
+        if ($options["menu"] == "admin") {
             //render html
             $html = $this->engine->render("MauticCoreBundle:Menu:admin.html.php", array(
                 "item"    => $item,

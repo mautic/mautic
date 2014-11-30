@@ -51,6 +51,11 @@ class MenuBuilder
     private $request;
 
     /**
+     * @var \Mautic\UserBundle\Entity\User
+     */
+    private $user;
+
+    /**
      * @param FactoryInterface $knpFactory
      * @param MatcherInterface $matcher
      * @param MauticFactory    $factory
@@ -62,6 +67,7 @@ class MenuBuilder
         $this->security   = $factory->getSecurity();
         $this->dispatcher = $factory->getDispatcher();
         $this->request    = $factory->getRequest();
+        $this->user       = $factory->getUser(true);
     }
 
     /**
@@ -77,7 +83,7 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->security);
+            $event = new MenuEvent($this->security, $this->user, $this->request);
             $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems = $event->getMenuItems();
             $menu      = $loader->load($menuItems);
@@ -99,41 +105,13 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->security);
+            $event = new MenuEvent($this->security, $this->user, $this->request);
             $this->dispatcher->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
             $menuItems = $event->getMenuItems();
             $adminMenu = $loader->load($menuItems);
         }
 
         return $adminMenu;
-    }
-
-    /**
-     * Converts navigation object into breadcrumbs
-     *
-     * @return \Knp\Menu\ItemInterface|null
-     */
-    public function breadcrumbsMenu()
-    {
-        $menu = $this->mainMenu();
-
-        //check for overrideRoute in request from an ajax content request
-        $forRouteUri  = $this->request->get("overrideRouteUri", "current");
-        $forRouteName = $this->request->get("overrideRouteName", '');
-        $current      = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
-
-        //if empty, check the admin menu
-        if (empty($current)) {
-            $admin   = $this->adminMenu();
-            $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
-        }
-
-        //if still empty, default to root
-        if (empty($current)) {
-            $current = $menu->getRoot();
-        }
-
-        return $current;
     }
 
     /**

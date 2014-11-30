@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$extra  = (!isset($extra)) ? '' : $extra;
+$query  = (!isset($query)) ? '' : $query;
 $status = $item->getPublishStatus();
 $size   = (!isset($size)) ? 'fa-lg' : $size;
 switch ($status) {
@@ -37,4 +37,4 @@ $clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-
 $idClass     = str_replace('.', '-', $model) . '-publish-icon' . $item->getId();
 ?>
 
-<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" data-original-title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $extra; ?>');"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" data-original-title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>');"<?php endif; ?>></i>

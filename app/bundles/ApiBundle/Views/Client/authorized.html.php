@@ -18,10 +18,16 @@
         <?php foreach ($clients as $k): ?>
         <tr>
             <td>
-                <button class="btn btn-danger btn-xs"
-                        onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.api.client.form.confirmrevoke", array("%name%" => $k->getName())), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.api.client.form.revoke"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_client_action',array("objectAction" => "revoke", "objectId" => $k->getId())); ?>'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-                    <i class="fa fa-trash-o"></i><span><?php echo $view["translator"]->trans("mautic.api.client.form.revoke"); ?></span>
-                </button>
+                <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php',
+                    array(
+                        'btnClass'      => 'btn btn-danger btn-xs',
+                        'message'       => $view["translator"]->trans("mautic.api.client.form.confirmrevoke", array("%name%" => $k->getName())),
+                        'confirmText'   => $view["translator"]->trans("mautic.api.client.form.revoke"),
+                        'confirmAction' => $view['router']->generate('mautic_client_action',array("objectAction" => "revoke", "objectId" => $k->getId())),
+                        'iconClass'     => 'fa fa-trash-o',
+                        'btnText'       => $view["translator"]->trans("mautic.api.client.form.revoke")
+                    )
+                ); ?>
             </td>
             <td><?php echo $k->getName(); ?></td>
         </tr>

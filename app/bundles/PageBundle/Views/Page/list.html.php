@@ -78,21 +78,14 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     <tr>
                         <td>
                             <?php
-                            echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                            echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                                 'item'      => $item,
-                                'edit'      => $security->hasEntityAccess(
-                                    $permissions['page:pages:editown'],
-                                    $permissions['page:pages:editother'],
-                                    $item->getCreatedBy()
+                                'templateButtons' => array(
+                                    'edit'      => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $item->getCreatedBy()),
+                                    'clone'     => $permissions['page:pages:create'],
+                                    'delete'    => $security->hasEntityAccess($permissions['page:pages:deleteown'], $permissions['page:pages:deleteother'], $item->getCreatedBy()),
                                 ),
-                                'clone'     => $permissions['page:pages:create'],
-                                'delete'    => $security->hasEntityAccess(
-                                    $permissions['page:pages:deleteown'],
-                                    $permissions['page:pages:deleteother'],
-                                    $item->getCreatedBy()),
                                 'routeBase' => 'page',
-                                'menuLink'  => 'mautic_page_index',
-                                'langVar'   => 'page.page',
                                 'nameGetter' => 'getTitle'
                             ));
                             ?>

@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
-use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 

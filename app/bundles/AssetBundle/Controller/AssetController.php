@@ -169,14 +169,9 @@ class AssetController extends FormController
                     )
                 )
             ));
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy()
-        )
-        ) {
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             return $this->accessDenied();
         }
-
-        $properties = array();
 
         // Download stats per time period
         $timeStats = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($activeAsset->getId());
@@ -219,6 +214,34 @@ class AssetController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset'
+            )
+        ));
+    }
+
+    /**
+     * Show a preview of the file
+     *
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function previewAction($objectId)
+    {
+        $model      = $this->factory->getModel('asset.asset');
+        $activeAsset = $model->getEntity($objectId);
+
+        if ($activeAsset === null || !$this->factory->getSecurity()->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+            return $this->modalAccessDenied();
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'activeAsset'   => $activeAsset,
+                'baseUrl'       => $this->request->getScheme() . '://' . $this->request->getHttpHost() . $this->request->getBasePath() . '/'
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Asset:preview.html.php',
+            'passthroughVars' => array(
+                'route' => false
             )
         ));
     }

@@ -177,21 +177,27 @@ class FormModel extends CommonModel
      */
     public function togglePublishStatus($entity)
     {
-        $status = $entity->getPublishStatus();
+        if (method_exists($entity, 'setIsPublished')) {
+            $status = $entity->getPublishStatus();
 
-        switch ($status) {
-            case 'unpublished':
-                $entity->setIsPublished(true);
-                break;
-            case 'published':
-            case 'expired':
-            case 'pending':
-                $entity->setIsPublished(false);
-                break;
+            switch ($status) {
+                case 'unpublished':
+                    $entity->setIsPublished(true);
+                    break;
+                case 'published':
+                case 'expired':
+                case 'pending':
+                    $entity->setIsPublished(false);
+                    break;
+            }
+
+            //set timestamp changes
+            $this->setTimestamps($entity, false, false);
+        } elseif (method_exists($entity, 'setIsEnabled')) {
+            $enabled    = $entity->getIsEnabled();
+            $newSetting = ($enabled) ? false : true;
+            $entity->setIsEnabled($newSetting);
         }
-
-        //set timestamp changes
-        $this->setTimestamps($entity, false, false);
 
         //hit up event listeners
         $event = $this->dispatchEvent("pre_save", $entity, false);

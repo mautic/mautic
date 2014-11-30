@@ -10,17 +10,14 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'client');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.api.client.header.index'));
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'templateButtons' => array(
+        'new' => $permissions['create']
+    ),
+    'routeBase' => 'client',
+    'langVar'   => 'api.client'
+)));
+
+$view['slots']->output('_content');
 ?>
-
-<?php if ($permissions['create']): ?>
-<?php $view['slots']->start("actions"); ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_client_action', array('objectAction' => 'new')); ?>"
-       data-toggle="ajax">
-       <i class="fa fa-plus"></i>
-       <?php echo $view["translator"]->trans("mautic.api.client.menu.new"); ?>
-    </a>
-<?php $view['slots']->stop(); ?>
-<?php endif; ?>
-
-<?php $view['slots']->output('_content'); ?>

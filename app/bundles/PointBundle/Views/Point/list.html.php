@@ -62,14 +62,14 @@ $view->extend('MauticPointBundle:Point:index.html.php');
             <tr>
                 <td class="visible-md visible-lg">
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $permissions['point:points:edit'],
-                        'clone'     => $permissions['point:points:create'],
-                        'delete'    => $permissions['point:points:delete'],
-                        'routeBase' => 'point',
-                        'menuLink'  => 'mautic_point_index',
-                        'langVar'   => 'point'
+                        'templateButtons' => array(
+                            'edit'      => $permissions['point:points:edit'],
+                            'clone'     => $permissions['point:points:create'],
+                            'delete'    => $permissions['point:points:delete'],
+                        ),
+                        'routeBase' => 'point'
                     ));
                     ?>
                 </td>

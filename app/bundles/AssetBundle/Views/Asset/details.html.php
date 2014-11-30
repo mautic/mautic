@@ -9,39 +9,19 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
-$view['slots']->set("headerTitle", $activeAsset->getTitle());?>
+$view['slots']->set("headerTitle", $activeAsset->getTitle());
 
-<?php
-$view['slots']->start('actions');
-if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permissions['asset:assets:editother'],
-    $activeAsset->getCreatedBy())): ?>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_asset_action', array("objectAction" => "edit", "objectId" => $activeAsset->getId())); ?>"
-       data-toggle="ajax"
-       class="btn btn-default"
-       data-menu-link="#mautic_asset_index">
-        <i class="fa fa-fw fa-pencil-square-o"></i>
-        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-    </a>
-<?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['asset:assets:deleteown'], $permissions['asset:assets:deleteother'],
-    $activeAsset->getCreatedBy())): ?>
-    <a href="javascript:void(0);"
-       class="btn btn-default"
-       onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.asset.asset.confirmdelete",
-           array("%name%" => $activeAsset->getTitle() . " (" . $activeAsset->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_asset_action',
-           array("objectAction" => "delete", "objectId" => $activeAsset->getId())); ?>',
-           '#mautic_asset_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-    </a>
-<?php endif; ?>
-
-<?php $view['slots']->stop(); ?>
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'       => $activeAsset,
+    'templateButtons' => array(
+        'edit'       => $security->hasEntityAccess($permissions['asset:assets:editown'], $permissions['asset:assets:editother'], $activeAsset->getCreatedBy()),
+        'delete'     => $security->hasEntityAccess($permissions['asset:assets:deleteown'], $permissions['asset:assets:deleteother'], $activeAsset->getCreatedBy())
+    ),
+    'routeBase'  => 'asset',
+    'langVar'    => 'asset.asset',
+    'nameGetter' => 'getTitle'
+)));
+?>
 
 <!-- start: box layout -->
 <div class="box-layout">

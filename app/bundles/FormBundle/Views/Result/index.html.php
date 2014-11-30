@@ -12,35 +12,51 @@ $view['slots']->set('mauticContent', 'formresult');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
     '%name%' => $form->getName()
 )));
+
+$buttons = array(
+    array(
+        'attr' => array(
+            'target' => '_new',
+            'href'   => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'html'))
+        ),
+        'btnText' => $view['translator']->trans('mautic.form.result.export.html'),
+        'iconClass' => 'fa fa-file-code-o'
+    ),
+);
+
+if (class_exists('mPDF')) {
+    $buttons[] = array(
+        'attr' => array(
+            'data-toggle' => 'download',
+            'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'pdf'))
+        ),
+        'btnText' => $view['translator']->trans('mautic.form.result.export.pdf'),
+        'iconClass' => 'fa fa-file-pdf-o'
+    );
+}
+
+$buttons[] = array(
+    'attr' => array(
+        'data-toggle' => 'download',
+        'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'csv'))
+    ),
+    'btnText' => $view['translator']->trans('mautic.form.result.export.csv'),
+    'iconClass' => 'fa fa-file-text-o'
+);
+
+if (class_exists('PHPExcel')) {
+    $buttons[] = array(
+        'attr' => array(
+            'data-toggle' => 'download',
+            'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'xlsx'))
+        ),
+        'btnText' => $view['translator']->trans('mautic.form.result.export.xlsx'),
+        'iconClass' => 'fa fa-file-excel-o'
+    );
+}
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array('customButtons' => $buttons)));
 ?>
-
-<?php $view['slots']->start("actions"); ?>
-<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-    'mautic_form_export', array("objectId" => $form->getId(), "format" => "csv")); ?>"
-   data-toggle="download">
-    <?php echo $view["translator"]->trans("mautic.form.result.export.csv"); ?>
-</a>
-<?php if (class_exists('PHPExcel')): ?>
-<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-    'mautic_form_export', array("objectId" => $form->getId(), "format" => "xlsx")); ?>"
-   data-toggle="download">
-    <?php echo $view["translator"]->trans("mautic.form.result.export.xlsx"); ?>
-</a>
-<?php endif; ?>
-<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-    'mautic_form_export', array("objectId" => $form->getId(), "format" => "html")); ?>"
-   target="_blank">
-    <?php echo $view["translator"]->trans("mautic.form.result.export.html"); ?>
-</a>
-<?php if (class_exists('mPDF')): ?>
-<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-    'mautic_form_export', array("objectId" => $form->getId(), "format" => "pdf")); ?>"
-   target="_blank">
-    <?php echo $view["translator"]->trans("mautic.form.result.export.pdf"); ?>
-</a>
-<?php endif; ?>
-<?php $view['slots']->stop(); ?>
-
 
 <div class="page-list">
     <?php $view['slots']->output('_content'); ?>

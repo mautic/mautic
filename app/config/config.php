@@ -4,11 +4,12 @@ $buildBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'Mautic\\') !== false) {
         $bundleBase = str_replace('Mautic', '', $bundle);
         $v = array(
-            "base"      => str_replace('Bundle', '', $bundleBase),
-            "bundle"    => $bundleBase,
-            "namespace" => preg_replace('#\\\[^\\\]*$#', '', $namespace),
-            "relative"  => basename($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase,
-            "directory" => $container->getParameter('kernel.root_dir').'/bundles/'.$bundleBase
+            "base"        => str_replace('Bundle', '', $bundleBase),
+            "bundle"      => $bundleBase,
+            "namespace"   => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            "bundleClass" => $namespace,
+            "relative"    => basename($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase,
+            "directory"   => $container->getParameter('kernel.root_dir').'/bundles/'.$bundleBase
         );
         return $v;
     }
@@ -19,11 +20,12 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 $buildAddonBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'MauticAddon\\') !== false) {
         $v = array(
-            "base"      => str_replace('Bundle', '', $bundle),
-            "bundle"    => $bundle,
-            "namespace" => preg_replace('#\\\[^\\\]*$#', '', $namespace),
-            "relative"  => 'addons/'.$bundle,
-            "directory" => dirname($container->getParameter('kernel.root_dir')).'/addons/'.$bundle
+            "base"        => str_replace('Bundle', '', $bundle),
+            "bundle"      => $bundle,
+            "namespace"   => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            "bundleClass" => $namespace,
+            "relative"    => 'addons/'.$bundle,
+            "directory"   => dirname($container->getParameter('kernel.root_dir')).'/addons/'.$bundle
         );
         return $v;
     }
@@ -31,6 +33,7 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
 };
 
 $symfonyBundles = $container->getParameter('kernel.bundles');
+
 $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }

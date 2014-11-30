@@ -1,6 +1,5 @@
 //CalendarBundle
 Mautic.calendarOnLoad = function (container) {
-    MauticVars.showLoadingBar = false;
     mQuery('#calendar').fullCalendar({
         events: mauticAjaxUrl + "?action=calendar:generateData",
         eventRender: function(event, element) {

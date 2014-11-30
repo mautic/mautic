@@ -18,48 +18,28 @@ foreach ($activeForm->getActions() as $action) {
     $type                    = explode('.', $action->getType());
     $activeFormActions[$type[0]][] = $action;
 }
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'      => $activeForm,
+    'templateButtons' => array(
+        'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $activeForm->getCreatedBy()),
+        'clone'     => $permissions['form:forms:create'],
+        'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy())
+    ),
+    'routeBase' => 'form',
+    'langVar'   => 'form.form',
+    'customButtons'    => array(
+        array(
+            'attr' => array(
+                'data-toggle' => 'ajax',
+                'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $activeForm->getId())),
+            ),
+            'iconClass' => 'fa fa-database',
+            'btnText'   => 'mautic.form.form.results'
+        )
+    )
+)));
 ?>
-
-<?php $view['slots']->start("actions"); ?>
-  <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_form_action', array(
-        'objectAction' => 'results', 'objectId' => $activeForm->getId())); ?>"
-       data-toggle="ajax"
-       data-menu-link="mautic_form_index">
-        <span>
-            <i class="fa fa-fw fa-database"></i> <?php echo $view['translator']->trans('mautic.form.form.results'); ?>
-        </span>
-    </a>
-    <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_form_action',
-        array('objectAction' => 'preview', 'objectId' => $activeForm->getId())); ?>"
-        target="_blank">
-        <i class="fa fa-fw fa-camera"></i> <?php echo $view['translator']->trans('mautic.form.form.preview'); ?>
-    </a>
-<?php if ($security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'],
-    $activeForm->getCreatedBy())): ?>
-        <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-            'mautic_form_action', array("objectAction" => "edit", "objectId" => $activeForm->getId())); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_form_index">
-            <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-        </a>
-<?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'],
-    $activeForm->getCreatedBy())): ?>
-    <a href="javascript:void(0);" class="btn btn-default"
-       onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.form.form.confirmdelete",
-           array("%name%" => $activeForm->getName() . " (" . $activeForm->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_form_action',
-           array("objectAction" => "delete", "objectId" => $activeForm->getId())); ?>',
-           '#mautic_form_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <span><i class="fa fa-fw fa-trash-o text-danger"></i> <?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-    </a>
-<?php endif; ?>
-<?php $view['slots']->stop(); ?>
-
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
