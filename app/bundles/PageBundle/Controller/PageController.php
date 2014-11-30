@@ -571,7 +571,7 @@ class PageController extends FormController
             $clone->setUniqueHits(0);
             $clone->setRevision(0);
             $clone->setVariantStartDate(null);
-            $clone->setVariantHits(null);
+            $clone->setVariantHits(0);
             $clone->setIsPublished(false);
             $model->saveEntity($clone);
             $objectId = $clone->getId();
