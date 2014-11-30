@@ -250,10 +250,6 @@ class CommonSubscriber implements EventSubscriberInterface
         }
 
         foreach ($addons as $bundle) {
-            if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
-                continue;
-            }
-
             $routing = $bundle['directory'] . "/Config/routing/$name.php";
             if (file_exists($routing)) {
                 $event->addRoutes($routing);
