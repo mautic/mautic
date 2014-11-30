@@ -84,7 +84,6 @@ $contentMode = $form['contentMode']->vars['data'];
             else:
             echo $view['form']->row($form['category']);
             echo $view['form']->row($form['language']);
-            echo $view['form']->row($form['translationParent_lookup']);
             echo $view['form']->row($form['translationParent']);
             endif;
 

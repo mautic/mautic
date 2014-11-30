@@ -11,11 +11,6 @@ Mautic.emailOnLoad = function (container) {
     Mautic.initializeEmailFilters(container);
 };
 
-Mautic.emailUnLoad = function() {
-    //remove email builder from body
-    mQuery('.builder').remove();
-};
-
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
