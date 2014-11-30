@@ -44,9 +44,9 @@ class IntegrationController extends FormController
             ),
             'contentTemplate' => 'MauticAddonBundle:Integration:grid.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_integration_integration_index',
+                'activeLink'     => '#mautic_addon_integration_index',
                 'mauticContent'  => 'integration',
-                'route'          => $this->generateUrl('mautic_integration_integration_index')
+                'route'          => $this->generateUrl('mautic_addon_integration_index')
             )
         ));
     }
@@ -101,7 +101,7 @@ class IntegrationController extends FormController
             'integration'  => $integrationObject->getIntegrationSettings()->getName(),
             'lead_fields' => $leadFields,
             'integration_object' => $integrationObject,
-            'action'      => $this->generateUrl('mautic_integration_integration_edit', array('name' => $name))
+            'action'      => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
         ));
 
         if ($this->request->getMethod() == 'POST') {
@@ -158,9 +158,9 @@ class IntegrationController extends FormController
             ),
             'contentTemplate' => 'MauticAddonBundle:Integration:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_integration_integration_index',
+                'activeLink'    => '#mautic_addon_integration_index',
                 'mauticContent' => 'integration',
-                'route'         => $this->generateUrl('mautic_integration_integration_edit', array('name' => $name))
+                'route'         => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
             )
         ));
     }

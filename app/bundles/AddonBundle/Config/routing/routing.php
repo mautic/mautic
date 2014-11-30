@@ -21,15 +21,15 @@ $collection->add('mautic_integration_oauth_postauth', new Route('/addons/integra
     array('_controller' => 'MauticAddonBundle:Auth:oAuthStatus')
 ));
 
-$collection->add('mautic_integration_integration_index', new Route('/addons/integrations',
+$collection->add('mautic_addon_integration_index', new Route('/addons/integrations',
     array('_controller' => 'MauticAddonBundle:Integration:index')
 ));
 
-$collection->add('mautic_integration_integration_edit', new Route('/addons/integrations/edit/{name}',
+$collection->add('mautic_addon_integration_edit', new Route('/addons/integrations/edit/{name}',
     array('_controller' => 'MauticAddonBundle:Integration:edit')
 ));
 
-$collection->add('mautic_integration_index', new Route('/addons/{page}',
+$collection->add('mautic_addon_index', new Route('/addons/{page}',
     array(
         '_controller' => 'MauticAddonBundle:Addon:index',
         'page'        => 1,
@@ -38,7 +38,7 @@ $collection->add('mautic_integration_index', new Route('/addons/{page}',
     )
 ));
 
-$collection->add('mautic_integration_action', new Route('/addons/{objectAction}/{objectId}',
+$collection->add('mautic_addon_action', new Route('/addons/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticAddonBundle:Addon:execute',
         "objectId"    => 0

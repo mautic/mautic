@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'integration');
+$view['slots']->set('mauticContent', 'addon');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.addon.header.index'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
@@ -16,7 +16,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         array(
             'attr' => array(
                 'data-toggle' => 'ajax',
-                'href'        => $view['router']->generate('mautic_integration_action', array('objectAction' => 'reload'))
+                'href'        => $view['router']->generate('mautic_addon_action', array('objectAction' => 'reload'))
             ),
             'btnText' => $view["translator"]->trans('mautic.addon.reload.addons'),
             'iconClass' => 'fa fa-plus'
@@ -29,7 +29,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
-        'routeBase'   => 'integration',
+        'routeBase'   => 'addon',
         'templateButtons' => array()
     )); ?>
     <div class="page-list">

@@ -63,14 +63,14 @@ class AddonController extends FormController
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.addon.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_integration_index', array('page' => $lastPage));
+            $returnUrl   = $this->generateUrl('mautic_addon_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $lastPage),
                 'contentTemplate' => 'MauticAddonBundle:Addon:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_integration_index',
+                    'activeLink'    => '#mautic_addon_index',
                     'mauticContent' => 'integration'
                 )
             ));
@@ -92,9 +92,9 @@ class AddonController extends FormController
             ),
             'contentTemplate' => 'MauticAddonBundle:Addon:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_integration_index',
+                'activeLink'     => '#mautic_addon_index',
                 'mauticContent'  => 'integration',
-                'route'          => $this->generateUrl('mautic_integration_index', array('page' => $page))
+                'route'          => $this->generateUrl('mautic_addon_index', array('page' => $page))
             )
         ));
     }
@@ -142,11 +142,11 @@ class AddonController extends FormController
 
         // Refresh the index contents
         return $this->postActionRedirect(array(
-            'returnUrl'       => $this->generateUrl('mautic_integration_index', $viewParameters),
+            'returnUrl'       => $this->generateUrl('mautic_addon_index', $viewParameters),
             'viewParameters'  => $viewParameters,
             'contentTemplate' => 'MauticAddonBundle:Addon:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_integration_index',
+                'activeLink'    => '#mautic_addon_index',
                 'mauticContent' => 'integration'
             )
         ));

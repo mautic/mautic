@@ -22,7 +22,7 @@ if ($tmpl == 'index') {
             <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
-                        <a href="<?php echo $view['router']->generate('mautic_integration_integration_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal">
+                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal">
                             <?php echo $item['name']; ?>
                         </a>
                     </td>

@@ -1,14 +1,10 @@
-.col-integration-actions {
+.col-addon-actions {
     width: 25px;
 }
 
 /* Social Media */
 .symbol-hashtag:before {
     content: '#';
-}
-
-.symbol-at:before {
-    content: '@';
 }
 
 .shuffle-item.integration {

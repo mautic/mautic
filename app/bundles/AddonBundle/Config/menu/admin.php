@@ -15,14 +15,14 @@ return array(
     'priority' => 50,
     'items'    => array(
         'mautic.addon.menu.root' => array(
-            'id'        => 'mautic_integration_root',
+            'id'        => 'mautic_addon_root',
             'iconClass' => 'fa-plus-circle',
             'children'  => array(
                 'mautic.addon.menu.index'           => array(
-                    'route' => 'mautic_integration_index',
+                    'route' => 'mautic_addon_index',
                 ),
                 'mautic.addon.integration.menu.index' => array(
-                    'route' => 'mautic_integration_integration_index'
+                    'route' => 'mautic_addon_integration_index'
                 ),
             )
         )

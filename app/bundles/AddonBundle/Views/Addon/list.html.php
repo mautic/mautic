@@ -12,31 +12,31 @@ if ($tmpl == 'index') {
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive panel-collapse pull out page-list">
-        <table class="table table-hover table-striped table-bordered integration-list" id="integrationTable">
+        <table class="table table-hover table-striped table-bordered addon-list" id="addonTable">
             <thead>
                 <tr>
-                    <th class="col-integration-actions pl-20">
+                    <th class="col-addon-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
-                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#integrationTable">
+                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#addonTable">
                                 <span></span>
                             </label>
                         </div>
                     </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'integration',
+                        'sessionVar' => 'addon',
                         'orderBy'    => 'i.name',
                         'text'       => 'mautic.addon.thead.name',
-                        'class'      => 'col-integration-name',
+                        'class'      => 'col-addon-name',
                         'default'    => true
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'integration',
+                        'sessionVar' => 'addon',
                         'orderBy'    => 'i.id',
                         'text'       => 'mautic.addon.thead.id',
-                        'class'      => 'col-integration-id'
+                        'class'      => 'col-addon-id'
                     ));
                     ?>
                 </tr>
@@ -51,16 +51,16 @@ if ($tmpl == 'index') {
                             'templateButtons' => array(
                                 'edit' => true
                             ),
-                            'routeBase'  => 'integration'
+                            'routeBase'  => 'addon'
                         ));
                         ?>
                     </td>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
-                            'model'      => 'integration'
+                            'model'      => 'addon'
                         )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_integration_action',
+                        <a href="<?php echo $view['router']->generate('mautic_addon_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                            data-toggle="ajax">
                             <?php echo $item->getName(); ?>
@@ -76,8 +76,8 @@ if ($tmpl == 'index') {
             "totalItems"      => count($items),
             "page"            => $page,
             "limit"           => $limit,
-            "menuLinkId"      => 'mautic_integration_index',
-            "baseUrl"         => $view['router']->generate('mautic_integration_index'),
+            "menuLinkId"      => 'mautic_addon_index',
+            "baseUrl"         => $view['router']->generate('mautic_addon_index'),
             'sessionVar'      => 'page'
         )); ?>
         </div>
