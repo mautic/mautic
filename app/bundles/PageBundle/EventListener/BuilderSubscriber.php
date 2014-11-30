@@ -101,7 +101,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = "";
 
         if (empty($content)) {
-            $shareButtons = $this->factory->getHelper('connector')->getShareButtons();
+            $shareButtons = $this->factory->getHelper('integration')->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
             foreach ($shareButtons as $network => $content) {
