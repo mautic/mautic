@@ -54,7 +54,12 @@ class MenuEvent extends Event
      */
     public function addMenuItems(array $items)
     {
-        if (isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin')) {
+        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
+        if (!$isRoot) {
+            $this->createMenuStructure($items);
+        }
+
+        if ($isRoot) {
             //make sure the root does not override the children
             if (isset($this->menuItems['children'])) {
                 if (isset($items['children'])) {
@@ -77,5 +82,44 @@ class MenuEvent extends Event
     public function getMenuItems()
     {
         return $this->menuItems;
+    }
+
+    /**
+     * Converts menu config into something KNP menus expects
+     *
+     * @param $items
+     */
+    private function createMenuStructure(&$items)
+    {
+        foreach ($items as &$i) {
+
+            //Set ID to route name
+            if (!isset($i['id']) && isset($i['route'])) {
+                $i['id'] = $i['route'];
+            }
+
+            //Set link attributes
+            $i['linkAttributes'] = array(
+                'data-menu-link' => $i['id'],
+                'id'             => $i['id']
+            );
+
+            $i['extras'] = array();
+
+            //Set the icon class for the menu item
+            if (!empty($i['iconClass'])) {
+                $i['extras']['iconClass'] = $i['iconClass'];
+            }
+
+            //Set the actual route name so that it's available to the menu template
+            if (isset($i['route'])) {
+                $i['extras']['routeName'] = $i['route'];
+            }
+
+            //Repeat for sub items
+            if (isset($i['children'])) {
+                $this->createMenuStructure($i['children']);
+            }
+        }
     }
 }

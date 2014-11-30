@@ -22,40 +22,14 @@ class MenuHelper
      */
     public static function addCategoryMenuItems(&$items, $bundleName, CorePermissions $security)
     {
+        if (!$security->isGranted($bundleName . ':categories:view')) {
+            return;
+        }
+
         $items['mautic.category.menu.index'] = array(
-            'route'    => 'mautic_category_index',
+            'route'           => 'mautic_category_index',
+            'id'              => "mautic_{$bundleName}category_index",
             'routeParameters' => array("bundle"  => $bundleName),
-            'extras'  => array(
-                'routeName' => 'mautic_category_index'
-            ),
-            'linkAttributes' => array(
-                'data-toggle' => 'ajax'
-            ),
-            'display' => $security->isGranted($bundleName . ':categories:view') ? true : false,
-            'children' => array(
-                'mautic.category.menu.new' => array(
-                    'route'    => 'mautic_category_action',
-                    'routeParameters' => array(
-                        "objectAction"  => "new",
-                        "bundle"        => $bundleName
-                    ),
-                    'extras'  => array(
-                        'routeName' => 'mautic_category_action|'.$bundleName.'|new'
-                    ),
-                    'display' => false //only used for breadcrumb generation
-                ),
-                'mautic.category.menu.edit' => array(
-                    'route'           => 'mautic_category_action',
-                    'routeParameters' => array(
-                        "objectAction"  => "edit",
-                        "bundle"        => $bundleName
-                    ),
-                    'extras'  => array(
-                        'routeName' => 'mautic_category_action|'.$bundleName.'|edit'
-                    ),
-                    'display' => false //only used for breadcrumb generation
-                )
-            )
         );
     }
 }

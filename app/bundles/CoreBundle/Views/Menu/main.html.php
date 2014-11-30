@@ -8,97 +8,86 @@
  */
 
 
-?>
+if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()) {
 
-<?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
-    <?php if ($item->isRoot()): ?>
-        <ul class="nav mt-10" data-toggle="menu">
-    <?php else: ?>
-        <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); ?>>
-    <?php endif; ?>
-        <?php foreach ($item->getChildren() as $child):
-            if (!$child->isDisplayed()) continue;
+    /** Top menu level start */
+    if ($item->isRoot()) {
+        echo '<ul class="nav mt-10" data-toggle="menu">' . "\n";
+    } else {
+        echo "<ul{$view["menu_helper"]->parseAttributes($item->getChildrenAttributes())}>\n";
+    }
 
-            //builds the class attributes based on options
-            $view["menu_helper"]->buildClasses($child, $matcher, $options);
+    /** Submenu levels  start*/
+    foreach ($item->getChildren() as $child) {
+        if (!$child->isDisplayed()) {
+            continue;
+        }
 
-            $showChildren = ($child->hasChildren() && $child->getDisplayChildren());
-            $liAttributes = $child->getAttributes();
-            $isAncestor   = $matcher->isAncestor($child, $options["matchingDepth"]);
+        //builds the class attributes based on options
+        $view["menu_helper"]->buildClasses($child, $matcher, $options);
 
-            $liAttributes['class'] = (isset($liAttributes['class'])) ? $liAttributes['class'] . ' nav-group' : 'nav-group';
-        ?>
+        $showChildren = ($child->hasChildren() && $child->getDisplayChildren());
+        $liAttributes = $child->getAttributes();
+        $isAncestor   = $matcher->isAncestor($child, $options["matchingDepth"]);
 
-            <li<?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
+        $liAttributes['class'] = (isset($liAttributes['class'])) ? $liAttributes['class'] . ' nav-group' : 'nav-group';
 
-            <?php
+        /** Menu item start */
+        echo "<li{$view["menu_helper"]->parseAttributes($liAttributes)}>\n";
 
+        $linkAttributes = $child->getLinkAttributes();
+        $extras         = $child->getExtras();
 
-            $linkAttributes = $child->getLinkAttributes();
-            $extras         = $child->getExtras();
+        /** Menu link start */
+        if ($showChildren) {
+            //Main item
+            echo '<a href="javascript:void(0);" data-target="#' . $linkAttributes['id'] . '_child" data-toggle="submenu" data-parent=".nav" ' . $view["menu_helper"]->parseAttributes($linkAttributes) . ">\n";
+            echo '<span class="arrow pull-right text-right"></span>' . "\n";
+        } else {
+            //Submenu item
+            $url = $child->getUri();
+            $url = (empty($url)) ? 'javascript:void(0);' : $url;
+            echo "<a href=\"$url\" data-toggle=\"ajax\"{$view["menu_helper"]->parseAttributes($linkAttributes)}>";
+        }
 
-            if (!isset($linkAttributes['id']) && isset($extras['routeName'])):
-                $linkAttributes['id'] = $extras['routeName'];
-            endif;
+        if (!empty($extras["iconClass"])) {
+            echo "<span class=\"icon fa {$extras["iconClass"]}\"></span>";
+        }
 
-            $onclick = (isset($linkAttributes['id'])) ? "onclick=\"Mautic.toggleSubMenu('#{$linkAttributes['id']}', event);\" " : "";
+        $labelAttributes = $child->getLabelAttributes();
+        if (!isset($labelAttributes['class'])) {
+            $labelAttributes['class'] = 'nav-item-name';
+        }
+        $labelAttributes['class'] .= ' text';
 
-            if (isset($linkAttributes['data-toggle']) && $linkAttributes['data-toggle'] == 'ajax'
-                && !isset($linkAttributes['data-menu-link']) && isset($linkAttributes['id'])):
-                $linkAttributes['data-menu-link'] = $linkAttributes['id'];
-            endif;
-            ?>
+        echo "<span{$view["menu_helper"]->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";
 
-            <?php if ($showChildren): ?>
-                <a href="javascript:void(0);" data-target="#<?php echo $linkAttributes['id']; ?>_child" data-toggle="submenu" data-parent=".nav" <?php echo $view["menu_helper"]->parseAttributes($linkAttributes); ?>>
-                <span class="arrow pull-right text-right"></span>
-            <?php else: ?>
-                <?php
-                $url = $child->getUri();
-                $url = (empty($url)) ? 'javascript:void(0);' : $url;
-                ?>
-                <a href="<?php echo $url; ?>"<?php echo $view["menu_helper"]->parseAttributes($linkAttributes); ?>>
-            <?php endif; ?>
+        echo "</a>\n";
+        /** Menu link end */
 
-            <?php if ($icon = ($child->getExtra("iconClass"))): ?>
-                <span class="icon fa <?php echo $icon; ?>"></span>
-            <?php endif; ?>
+        /** Submenu items start */
+        if ($showChildren) {
+            $options["depth"]         = ($options["depth"]) ? $options["depth"]-- : "";
+            $options["matchingDepth"] = ($options["matchingDepth"]) ? $options["matchingDepth"]-- : "";
 
-                <?php
-                $labelAttributes = $child->getLabelAttributes();
-                if (!isset($labelAttributes['class'])):
-                    $labelAttributes['class'] = 'nav-item-name';
-                endif;
-                $labelAttributes['class'] .= ' text';
-                ?>
+            $levelClass = $isAncestor ? "nav-submenu collapse in" : "nav-submenu collapse";
 
-                <span <?php echo $view["menu_helper"]->parseAttributes($labelAttributes); ?> >
-                    <?php echo $view['translator']->trans($child->getLabel());?>
-                </span>
+            //set the class
+            $child->setChildrenAttribute("class", $levelClass);
+            $child->setChildrenAttribute("id", $linkAttributes['id'] . '_child');
+            echo $view->render('MauticCoreBundle:Menu:main.html.php', array(
+                "item"    => $child,
+                "options" => $options,
+                "matcher" => $matcher
+            ));
+        }
+        /** Submenu items end */
 
-                <!--<span class="arrow"></span>-->
-            </a>
+        /** Menu item end */
+        echo "</li>\n";
+    }
+    /** Submenu items end */
 
-            <?php
-            //parse children/next level(s)
-            if ($showChildren):
-                $options["depth"]         = ($options["depth"]) ? $options["depth"]-- : "";
-                $options["matchingDepth"] = ($options["matchingDepth"]) ? $options["matchingDepth"]-- : "";
-
-                $levelClass = $isAncestor? "nav-submenu collapse in" : "nav-submenu collapse";
-
-                //set the class
-                $child->setChildrenAttribute("class", $levelClass);
-                $child->setChildrenAttribute("id", $linkAttributes['id'] . '_child');
-                echo $view->render('MauticCoreBundle:Menu:main.html.php',
-                    array( "item"             => $child,
-                           "options"          => $options,
-                           "matcher"          => $matcher
-                    )
-                );
-            endif;
-            ?>
-        </li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+    /** Top menu level end*/
+    echo "</ul>\n";
+}

@@ -13,6 +13,6 @@ $items = array(
 );
 
 return array(
-    'priority' => -1000,
+    'priority' => -255,
     'items'    => $items
 );

@@ -7,24 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$security = $event->getSecurity();
 
-$items    = array();
-
-if ($security->isGranted('config:config:full')) {
-    $items['mautic.config.config.menu.index'] = array(
-        'route'           => 'mautic_config_action',
-        'routeParameters' => array('objectAction' => 'edit'),
-        'linkAttributes'  => array(
-            'data-toggle'    => 'ajax',
-            'data-menu-link' => '#mautic_config_index',
-            'id'             => 'mautic_config_index'
-        ),
-        'extras'          => array(
-            'iconClass' => 'fa-cogs',
-            'routeName' => 'mautic_config_index'
-        )
-    );
+if (!$security->isGranted('config:config:full')) {
+    return array();
 }
 
-return $items;
+
+return array(
+    'items' => array(
+        'mautic.config.config.menu.index' => array(
+            'route'           => 'mautic_config_action',
+            'routeParameters' => array('objectAction' => 'edit'),
+            'iconClass'       => 'fa-cogs',
+            'id'              => 'mautic_config_index'
+        )
+    )
+);

@@ -109,34 +109,6 @@ class MenuBuilder
     }
 
     /**
-     * Converts navigation object into breadcrumbs
-     *
-     * @return \Knp\Menu\ItemInterface|null
-     */
-    public function breadcrumbsMenu()
-    {
-        $menu = $this->mainMenu();
-
-        //check for overrideRoute in request from an ajax content request
-        $forRouteUri  = $this->request->get("overrideRouteUri", "current");
-        $forRouteName = $this->request->get("overrideRouteName", '');
-        $current      = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
-
-        //if empty, check the admin menu
-        if (empty($current)) {
-            $admin   = $this->adminMenu();
-            $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
-        }
-
-        //if still empty, default to root
-        if (empty($current)) {
-            $current = $menu->getRoot();
-        }
-
-        return $current;
-    }
-
-    /**
      * Used by breadcrumbs to determine active link
      *
      * @param \Knp\Menu\ItemInterface $menu
