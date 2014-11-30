@@ -432,7 +432,7 @@ var Mautic = {
      */
     loadContent: function (route, link, method, target, showPageLoading) {
         mQuery.ajax({
-            showLoadingBar: (showPageLoading) ? true : false,
+            showLoadingBar: (typeof showPageLoading == 'undefined' || showPageLoading) ? true : false,
             url: route,
             type: method,
             dataType: "json",
@@ -1226,6 +1226,7 @@ var Mautic = {
                 }
 
                 mQuery.ajax({
+                    showLoadingBar: true,
                     url: route,
                     type: "GET",
                     data: searchName + "=" + encodeURIComponent(value) + '&tmpl=list',
