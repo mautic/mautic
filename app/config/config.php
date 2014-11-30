@@ -33,6 +33,7 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
 };
 
 $symfonyBundles = $container->getParameter('kernel.bundles');
+
 $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }

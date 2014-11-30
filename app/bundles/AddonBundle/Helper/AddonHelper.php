@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Helper;
+namespace Mautic\AddonBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 

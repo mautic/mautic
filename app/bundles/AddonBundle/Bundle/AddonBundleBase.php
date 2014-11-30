@@ -7,11 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Bundle;
+namespace Mautic\AddonBundle\Bundle;
 
 use Mautic\AddonBundle\Entity\Addon;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\AddonHelper;
+use Mautic\AddonBundle\Helper\AddonHelper;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -26,10 +26,7 @@ abstract class AddonBundleBase extends Bundle
      */
     public function isEnabled()
     {
-        $name   = str_replace('Mautic', '', $this->getName());
-        $helper = new AddonHelper($this->container->get('mautic.factory'));
-
-        return $helper->isEnabled($name);
+        return $this->container->get('mautic.factory')->getHelper('addon')->isEnabled($this->getName());
     }
 
     /**

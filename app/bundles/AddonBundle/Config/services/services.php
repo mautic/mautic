@@ -15,3 +15,9 @@ $container->setDefinition('mautic.helper.integration', new Definition(
     'Mautic\AddonBundle\Helper\IntegrationHelper',
     array(new Reference('mautic.factory'))
 ));
+
+$container->setDefinition('mautic.helper.addon', new Definition(
+    'Mautic\AddonBundle\Helper\AddonHelper',
+    array(new Reference('mautic.factory'))
+));
+

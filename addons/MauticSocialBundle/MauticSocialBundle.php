@@ -9,8 +9,7 @@
 
 namespace MauticAddon\MauticSocialBundle;
 
-use Mautic\CoreBundle\Bundle\AddonBundleBase;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Mautic\AddonBundle\Bundle\AddonBundleBase;
 
 /**
  * Class MauticSocialBundle
