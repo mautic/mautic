@@ -32,8 +32,8 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
-        if (defined('MAUTIC_INSTALLER') && !defined('MAUTIC_TABLE_PREFIX')) {
-            //only run this after the installer has set the MAUTIC_TABLE_PREFIX
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            //cache is being built or in the installer and hasn't been set yet
             return;
         }
 
