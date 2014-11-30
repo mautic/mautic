@@ -65,7 +65,7 @@ class TwitterIntegration extends AbstractIntegration
      */
     public function getOAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('network' => $this->getName()));
+        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
     }
 
     /**

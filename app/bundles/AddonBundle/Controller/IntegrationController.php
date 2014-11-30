@@ -156,7 +156,7 @@ class IntegrationController extends FormController
             'viewParameters'  =>  array(
                 'form'        => $form->createView()
             ),
-            'contentTemplate' => 'MauticAddonBundle:Integration:form.html.php',
+            'contentTemplate' => $integrationObject->getFormTemplate(),
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_addon_integration_index',
                 'mauticContent' => 'integration',

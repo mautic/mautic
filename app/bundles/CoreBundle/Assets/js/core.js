@@ -801,6 +801,18 @@ var Mautic = {
             }
         });
 
+        //clean slate upon close
+        mQuery(target).on('hide.bs.modal', function () {
+            mQuery(target + " .modal-title").html('');
+            mQuery(target + " .modal-body-content").html('');
+            if (mQuery(target + " .modal-form-buttons").length) {
+                mQuery(target + " .modal-form-buttons").html('');
+            }
+            if (mQuery(target + " loading-placeholder").length) {
+                mQuery(target + " loading-placeholder").removeClass('hide');
+            }
+        });
+
         mQuery(target).modal('show');
 
         mQuery.ajax({

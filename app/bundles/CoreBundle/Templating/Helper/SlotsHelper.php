@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
 
 /**

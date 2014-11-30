@@ -19,7 +19,9 @@ class IntegrationRepository extends CommonRepository
 
     public function getIntegrations()
     {
-        $services = $this->createQueryBuilder('s')
+        $services = $this->createQueryBuilder('i')
+            ->join('i.addon', 'a')
+            ->where('a.isEnabled = true')
             ->getQuery()
             ->getResult();
 

@@ -66,6 +66,14 @@ abstract class AbstractIntegration
     abstract public function getIdentifierFields();
 
     /**
+     * @return string
+     */
+    public function getFormTemplate()
+    {
+        return 'MauticAddonBundle:Integration:form.html.php';
+    }
+
+    /**
      * Set the social integration entity
      *
      * @param Integration $settings

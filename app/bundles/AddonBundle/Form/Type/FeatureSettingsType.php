@@ -53,10 +53,6 @@ class FeatureSettingsType extends AbstractType
         $fields        = $integrationHelper->getAvailableFields($options['integration']);
 
         if (!empty($fields)) {
-            $builder->add('shareBtnMsg', 'spacer', array(
-                'text' => 'mautic.integration.form.profile'
-            ));
-
             $builder->add('leadFields', 'integration_fields', array(
                 'label'            => 'mautic.integration.leadfield_matches',
                 'required'         => false,
