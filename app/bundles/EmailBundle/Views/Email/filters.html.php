@@ -6,6 +6,7 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$filtersEmpty = true;
 ?>
 
 <div class="col-md-3 bg-white height-auto">
@@ -19,6 +20,7 @@
                 <?php if (isset($filters) && $filters) : ?>
                     <?php foreach ($filters as $filter) : ?>
                         <?php if (isset($filter['items']) && $filter['items']) : ?>
+                            <?php $filtersEmpty = false; ?>
                             <?php if (isset($filter['name']) && $filter['name']) : ?>
                                 <h5 class="pb-10 pt-15"><?php echo $view['translator']->trans($filter['name']); ?></h5>
                             <?php endif; ?>
@@ -39,6 +41,11 @@
                             <div class="clearfix"></div>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                <?php endif; ?>
+                <?php if ($filtersEmpty) : ?>
+                    <div class="alert alert-warning" role="alert">
+                        <?php echo $view['translator']->trans('mautic.email.filter.options.empty'); ?>
+                    </div>
                 <?php endif; ?>
             </form>
         </div>
