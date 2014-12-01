@@ -39,11 +39,28 @@ class MiscStep implements StepInterface
     public $log_path   = '%kernel.root_dir%/logs';
 
     /**
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     *
+     * @var
+     */
+    public $site_url;
+
+    /**
+     * @var
+     */
+    private $request_url;
+
+    public function __construct($url)
+    {
+        $this->request_url = $url;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return new MiscStepType();
+        return new MiscStepType($this->request_url);
     }
 
     /**

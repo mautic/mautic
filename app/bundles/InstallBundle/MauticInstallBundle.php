@@ -36,6 +36,8 @@ class MauticInstallBundle extends Bundle
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new UserStep());
         $configurator->addStep(new EmailStep());
-        $configurator->addStep(new MiscStep());
+
+        $request = $this->container->get('mautic.factory')->getRequest();
+        $configurator->addStep(new MiscStep($request->getSchemeAndHttpHost().$request->getBasePath()));
     }
 }

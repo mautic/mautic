@@ -8,6 +8,7 @@
  */
 
 $parameters = array(
+    'site_url'                     => '',
     'send_server_data'             => false,
     'cache_path'                   => '%kernel.root_dir%/cache',
     'log_path'                     => '%kernel.root_dir%/logs',
