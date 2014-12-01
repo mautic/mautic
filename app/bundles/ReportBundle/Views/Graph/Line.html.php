@@ -64,7 +64,7 @@
     </div>
     <div class="pt-0 pl-15 pb-10 pr-15">
         <div>
-            <canvas class="graph graph-line" id="<?php echo str_replace('.', '-', $graph['name']); ?>" height="80"></canvas>
+            <canvas class="graph graph-line" id="<?php echo str_replace('.', '-', $graph['name']); ?>" height="300"></canvas>
         </div>
     </div>
     <div id="<?php echo str_replace('.', '-', $graph['name']); ?>-data" class="hide"><?php echo json_encode($graph); ?></div>

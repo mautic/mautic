@@ -56,6 +56,7 @@ mQuery.ajaxSetup({
 if (typeof Chart != 'undefined') {
     // configure global Chart options
     Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
 }
 
 var Mautic = {
