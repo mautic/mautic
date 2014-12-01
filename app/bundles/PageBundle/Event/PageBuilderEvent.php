@@ -94,6 +94,7 @@ class PageBuilderEvent extends Event
             return strnatcasecmp(
                 $a['group'], $b['group']);
         });
+
         $array = array('criteria' => $this->abTestWinnerCriteria);
 
         $choices = array();
