@@ -49,7 +49,7 @@ class AssetsHelper extends CoreAssetsHelper
         $addScripts = function ($s) use ($location, &$assets) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
-                $assets['headDeclarations']['script'][] = $s;
+                $assets['headDeclarations'][] = array('script' => $s);
             } else {
                 if (!isset($assets['scripts'][$location])) {
                     $assets['scripts'][$location] = array();
@@ -82,7 +82,7 @@ class AssetsHelper extends CoreAssetsHelper
     {
         if ($location == 'head') {
             //special place for these so that declarations and scripts can be mingled
-            $this->assets['headDeclarations']['declaration'][] = $script;
+            $this->assets['headDeclarations'][] = array('declaration' => $script);
         } else {
             if (!isset($this->assets['scriptDeclarations'][$location])) {
                 $this->assets['scriptDeclarations'][$location] = array();
@@ -135,8 +135,8 @@ class AssetsHelper extends CoreAssetsHelper
         if (empty($editorLoaded)) {
             $editorLoaded = true;
             $this->addScript(array(
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js',
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js'
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js',
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js'
             ));
         }
     }
@@ -170,7 +170,7 @@ class AssetsHelper extends CoreAssetsHelper
     public function addCustomDeclaration($declaration, $location = 'head')
     {
         if ($location == 'head') {
-            $this->assets['headDeclarations']['custom'][] = $declaration;
+            $this->assets['headDeclarations'][] = array('custom' => $declaration);
         } else {
             if (!isset($this->assets['customDeclarations'][$location])) {
                 $this->assets['customDeclarations'][$location] = array();
@@ -243,27 +243,40 @@ class AssetsHelper extends CoreAssetsHelper
     public function outputHeadDeclarations()
     {
         $this->outputStyles();
+        $headOutput = '';
+        if (!empty($this->assets['headDeclarations'])) {
+            $scriptOpen = false;
+            foreach ($this->assets['headDeclarations'] as $declaration) {
+                $type   = key($declaration);
+                $output = $declaration[$type];
 
+                switch ($type) {
+                    case 'script':
+                        if ($scriptOpen) {
+                            $headOutput .= "\n</script>";
+                            $scriptOpen = false;
+                        }
+                        $headOutput .= "\n".'<script src="' . $this->getUrl($output) . '"></script>';
+                        break;
+                    case 'custom':
+                    case 'declaration':
+                        if ($type == 'custom' && $scriptOpen) {
+                            $headOutput .= "\n</script>";
+                            $scriptOpen = false;
+                        } elseif ($type == 'declaration' && !$scriptOpen) {
+                            $headOutput .= "\n<script>";
+                            $scriptOpen = true;
+                        }
+                        $headOutput .= "\n$output";
+                        break;
 
-        if (!empty($this->assets['headDeclarations']['script'])) {
-            foreach (array_reverse($this->assets['headDeclarations']['script']) as $script) {
-                echo '<script src="' . $this->getUrl($script) . '"></script>' . "\n";
+                }
+            }
+            if ($scriptOpen) {
+                $headOutput .= "\n</script>\n\n";
             }
         }
-
-        if (!empty($this->assets['headDeclarations']['declaration'])) {
-            echo "\n<script>";
-            foreach (array_reverse($this->assets['headDeclarations']['declaration']) as $script) {
-                echo "\n$script";
-            }
-            echo "\n</script>\n\n";
-        }
-
-        if (!empty($this->assets['headDeclarations']['custom'])) {
-            foreach (array_reverse($this->assets['headDeclarations']['custom']) as $custom) {
-                echo "\n$custom";
-            }
-        }
+        echo $headOutput;
     }
 
     /**
@@ -287,9 +300,14 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @return void
      */
-    public function outputSystemScripts()
+    public function outputSystemScripts($includeEditor = false)
     {
         $assets = $this->assetHelper->getAssets();
+
+        if ($includeEditor) {
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js';
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js';
+        }
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
@@ -305,9 +323,14 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @return array|string
      */
-    public function getSystemScripts($render = false)
+    public function getSystemScripts($render = false, $includeEditor = false)
     {
         $assets = $this->assetHelper->getAssets();
+
+        if ($includeEditor) {
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js';
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js';
+        }
 
         if ($render) {
             $js = '';

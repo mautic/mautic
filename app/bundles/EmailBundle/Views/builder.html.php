@@ -11,9 +11,7 @@
 $view->extend(":$template:email.html.php");
 
 $view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
-$view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true));
-
-$view['assets']->loadEditor();
+$view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, true));
 
 $custom = <<<CUSTOM
 mQuery(document).ready( function() {
