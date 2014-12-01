@@ -78,14 +78,19 @@ $view['slots']->set("headerTitle", $header);
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <?php foreach ($events as $k => $e): ?>
-                                    <li id="event_<?php echo $k; ?>">
-                                        <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
-                                            <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                                <span><?php echo $e['label']; ?></span>
-                                            </div>
-                                        </a>
+                                <?php foreach ($events as $group => $event): ?>
+                                    <li role="presentation" class="dropdown-header">
+                                        <?php echo $group; ?>
                                     </li>
+                                    <?php foreach ($event as $k => $e): ?>
+                                        <li id="event_<?php echo $k; ?>">
+                                            <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
+                                                <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                                    <span><?php echo $e['label']; ?></span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
                                 <?php endforeach; ?>
                             </ul>
                         </div>

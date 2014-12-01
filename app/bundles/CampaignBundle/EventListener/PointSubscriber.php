@@ -35,6 +35,7 @@ class PointSubscriber extends CommonSubscriber
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $changeLists = array(
+            'group'       => 'mautic.campaign.point.trigger',
             'label'       => 'mautic.campaign.point.trigger.changecampaigns',
             'callback'    => array('\\Mautic\\CampaignBundle\\Helper\\PointEventHelper', 'changeCampaigns'),
             'formType'    => 'campaignevent_addremovelead'

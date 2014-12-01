@@ -51,6 +51,7 @@ class PointSubscriber extends CommonSubscriber
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $sendEvent = array(
+            'group'       => 'mautic.crm.point.trigger',
             'label'       => 'mautic.crm.point.trigger.syncdata',
             'callback'    => array('\\Mautic\\MauticCrmBundle\\Helper\\PointEventHelper', 'syncData')
         );
