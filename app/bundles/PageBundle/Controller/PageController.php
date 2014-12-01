@@ -86,7 +86,7 @@ class PageController extends FormController
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
             ));
-
+//die(Var_Dump($pages->getIterator(), $filter));
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page

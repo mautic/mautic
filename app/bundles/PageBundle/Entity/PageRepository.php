@@ -150,6 +150,8 @@ class PageRepository extends CommonRepository
         if ($topLevel == 'translation') {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
+            //translations cannot be assigned to a/b tests
+            $q->andWhere($q->expr()->isNull('p.variantParent'));
         } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }

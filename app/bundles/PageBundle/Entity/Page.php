@@ -12,7 +12,9 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -227,6 +229,29 @@ class Page extends FormEntity
         $metadata->addPropertyConstraint('title', new NotBlank(array(
             'message' => 'mautic.page.title.notblank'
         )));
+
+        $metadata->addConstraint(new Callback(array(
+            'callback' => 'translationParentValidation'
+        )));
+    }
+
+    /**
+     * Callback constraint to ensure that a translation parent is not an a/b test
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function translationParentValidation(ExecutionContextInterface $context)
+    {
+        $translationParent = $this->getTranslationParent();
+
+        if ($translationParent !== null) {
+            $parentsVariantParent = $translationParent->getVariantParent();
+            if ($parentsVariantParent !== null) {
+                $context->buildViolation('mautic.page.translationparent.notallowed')
+                    ->atPath('translationParent')
+                    ->addViolation();
+            }
+        }
     }
 
     /**
