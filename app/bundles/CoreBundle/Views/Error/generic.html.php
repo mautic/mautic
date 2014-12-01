@@ -14,7 +14,7 @@ if ($tmpl == 'index') {
 $view['slots']->set('pageHeader', $status_code . ' ' . $status_text);
 ?>
 <h3>Oops! An Error Occurred</h3>
-<div>It seems we were unable to find the page you were looking for.  Sorry about that.</div>
+<div>It seems there was an error while processing the request.  Sorry about that.</div>
 <a href="<?php echo $view['router']->generate('mautic_dashboard_index'); ?>" role="button" class="btn btn-primary pull-right mt-20">
     <?php echo $view['translator']->trans('Return to Dashboard'); ?>
 </a>

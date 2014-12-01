@@ -45,6 +45,14 @@ class ExceptionController extends CommonController
             }
         }
 
+        // If our template doesn't exist, fallback on the generic version
+        $templating = $this->get('templating');
+        $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
+
+        if (!$templating->exists($template)) {
+            $template = "MauticCoreBundle:{$layout}:generic.html.php";
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'status_code'    => $code,
@@ -52,8 +60,9 @@ class ExceptionController extends CommonController
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
+                'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ),
-            'contentTemplate' => "MauticCoreBundle:{$layout}:{$code}.html.php",
+            'contentTemplate' => $template,
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_dashboard_index',
                 'mauticContent'  => 'dashboard'
