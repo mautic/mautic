@@ -288,10 +288,7 @@ class PageModel extends FormModel
             );
         }
 
-        $pageUrl = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
-        $pageUrl .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
-
-        return $pageUrl;
+        return $this->buildUrl('mautic_page_public', $slugs, $absolute, $clickthrough);
     }
 
     /**

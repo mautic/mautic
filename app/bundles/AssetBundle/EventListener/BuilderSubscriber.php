@@ -99,6 +99,7 @@ class BuilderSubscriber extends CommonSubscriber
                 }
 
                 $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
+
                 $content = str_ireplace('{assetlink=' . $match . '}', $url, $content);
             }
         }

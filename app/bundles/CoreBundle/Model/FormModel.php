@@ -387,28 +387,4 @@ class FormModel extends CommonModel
 
         return false;
     }
-
-    /**
-     * Encode an array to append to a URL
-     *
-     * @param $array
-     *
-     * @return string
-     */
-    public function encodeArrayForUrl($array)
-    {
-        return urlencode(base64_encode(serialize($array)));
-    }
-
-    /**
-     * Decode a string appended to URL into an array
-     *
-     * @param $string
-     *
-     * @return mixed
-     */
-    public function decodeArrayFromUrl($string)
-    {
-        return unserialize(base64_decode(urldecode($string)));
-    }
 }
