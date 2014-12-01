@@ -3,7 +3,7 @@ $hasErrors = count($form->vars['errors']);
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? " has-error" : "";
 ?>
 <div id="filterSelectorContainer" class="row">
-    <div class="form-group col-xs-12 col-sm-8 col-md-6<?php echo $feedbackClass; ?>">
+    <div class="form-group col-md-12<?php echo $feedbackClass; ?>">
         <?php echo $view['form']->label($form, $view['translator']->trans($form->vars['label'])) ?>
         <?php if (!empty($form->vars['attr']['tooltip'])): ?>
             <span data-toggle="tooltip" data-container="body" data-placement="top"

@@ -11,3 +11,8 @@
 .columnSelectorButtons div:not(:last-child) {
 	margin-bottom: 10px;
 }
+
+/* Fix of ChosenJS zero width */
+#report_columns_chosen {
+	width: 100% !important;
+}
