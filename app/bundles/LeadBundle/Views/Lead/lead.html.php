@@ -187,7 +187,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
-                                    <canvas class="chart" id="chart-engagement" height="50"></canvas>
+                                    <canvas class="chart" id="chart-engagement" height="250"></canvas>
                                 </div>
                             </div>
                             <div id="chart-engagement-data" class="hide"><?php echo json_encode($pointStats); ?></div>

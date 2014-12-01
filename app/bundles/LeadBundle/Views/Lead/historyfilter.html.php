@@ -12,28 +12,17 @@
 <form action="" class="panel" id="timeline-filters">
     <div class="form-control-icon pa-xs">
         <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>">
-        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-    </div>
-    <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
-        <div class="panel-footer text-muted">
+        <span class="the-icon fa fa-search text-muted mt-xs"></span>
+        <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
+            <select name="eventFilters[]" multiple class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.placeholder'); ?>">
             <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
-            <?php
-                $typeHelper = explode('.', $typeKey);
-                $bundleName = $typeHelper[0];
-                if ($bundleName == 'point') $bundleName = 'points';
-                if ($bundleName == 'campaign') $bundleName = 'campaigns';
-            ?>
-            <div class="checkbox-inline custom-primary">
-                <label class="mb-0">
-                    <input name="eventFilters[]" type="checkbox" value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $eventFilter) ? ' checked' : ''; ?> />
-                    <span class="mr-0"></span>
-                    <i class="fa <?php echo isset($icons[$bundleName]) ? $icons[$bundleName] : 'page'; ?>"></i>
+                <option value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $eventFilter) ? ' selected' : ''; ?> />
                     <?php echo $typeName; ?>
-                </label>
-            </div>
+                </option>
             <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+            </select>
+        <?php endif; ?>
+    </div>
     <input type="hidden" name="leadId" id="leadId" value="<?php echo $lead->getId(); ?>" />
 </form>
 <!--/ filter form -->
