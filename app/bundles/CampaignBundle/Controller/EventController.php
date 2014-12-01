@@ -28,12 +28,13 @@ class EventController extends CommonFormController
         $valid   = $cancelled = false;
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
-
         if ($method == 'POST') {
             $event      = $this->request->request->get('campaignevent');
             $type       = $event['type'];
             $eventType  = $event['eventType'];
             $campaignId = $event['campaignId'];
+
+            $event['triggerDate'] = (!empty($event['triggerDate'])) ? $this->factory->getDate($event['triggerDate'])->getDateTime() : null;
         } else {
             $type       = $this->request->query->get('type');
             $eventType  = $this->request->query->get('eventType');
