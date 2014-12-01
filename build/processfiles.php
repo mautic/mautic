@@ -279,16 +279,6 @@ system('rm vendor/monolog/monolog/composer.json');
 system('rm vendor/monolog/monolog/phpunit.xml.dist');
 system('rm vendor/monolog/monolog/README.mdown');
 
-// mpdf/mpdf
-system('rm -rf vendor/mpdf/mpdf/examples');
-system('rm vendor/mpdf/mpdf/ttfonts/*');
-system('rm vendor/mpdf/mpdf/ADDED\ INFO\ FONTS.txt');
-system('rm vendor/mpdf/mpdf/CHANGELOG.txt');
-system('rm vendor/mpdf/mpdf/composer.json');
-system('rm vendor/mpdf/mpdf/CREDITS.txt');
-system('rm vendor/mpdf/mpdf/FONT\ INFO.txt');
-system('rm vendor/mpdf/mpdf/README.txt');
-
 // nelmio/api-doc-bundle
 system('rm -rf vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/Tests');
 system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/.gitignore');

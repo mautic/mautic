@@ -339,28 +339,6 @@ class SubmissionModel extends CommonFormModel
                 )->getContent();
 
                 return new Response($content);
-            case 'pdf':
-                $factory  = $this->factory;
-                $response = new StreamedResponse(function () use ($results, $form, $translator, $name, $factory) {
-                    $mpdf    = new \mPDF('c');
-                    $content = $factory->getTemplating()->renderResponse(
-                        'MauticFormBundle:Result:export.html.php',
-                        array(
-                            'form'      => $form,
-                            'results'   => $results,
-                            'pageTitle' => $name
-                        )
-                    )->getContent();
-                    $mpdf->WriteHTML($content);
-                    $mpdf->Output();
-                });
-                $response->headers->set('Content-Type', 'application/pdf');
-                $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.pdf"');
-                $response->headers->set('Expires', 0);
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
-
-                return $response;
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
