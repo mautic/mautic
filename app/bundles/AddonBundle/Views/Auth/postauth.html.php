@@ -12,3 +12,11 @@ $view['slots']->set('mauticContent', 'social');
 
 //just display the flashes
 ?>
+
+<div class="row">
+    <div class="col-sm-12 text-center">
+        <a class="btn btn-lg btn-success" href="javascript:void(0);" onclick="window.close();">
+            <?php echo $view['translator']->trans('mautic.integration.closewindow'); ?>
+        </a>
+    </div>
+</div>
