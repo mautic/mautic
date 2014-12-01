@@ -21,11 +21,11 @@
                 <?php endif; ?>
 
                 <div class="row">
-                    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php', array('noGrowl' => true)); ?>
                     <?php $view['slots']->output('_content'); ?>
                 </div>
             </div>
         </section>
+        <?php $view['assets']->outputScripts("bodyClose"); ?>
     </body>
-    <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
 </html>

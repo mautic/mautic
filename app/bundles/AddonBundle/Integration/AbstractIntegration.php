@@ -63,7 +63,10 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    abstract public function getIdentifierFields();
+    public function getIdentifierFields()
+    {
+        return array();
+    }
 
     /**
      * @return string

@@ -36,7 +36,7 @@ class ClientController extends FormController
     {
         $session = $this->factory->getSession();
 
-        if ($this->factory->getSecurity()->isGranted('integration:int')) {
+        if ($this->factory->getSecurity()->isGranted('addon:addon:manage')) {
             return $this->accessDenied();
         }
 

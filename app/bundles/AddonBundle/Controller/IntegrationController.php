@@ -32,8 +32,11 @@ class IntegrationController extends FormController
         $integrations     = array();
 
         foreach ($integrationObjects as $name => $object) {
-            $integrations[] = array('name' => $name, 'icon' => $integrationHelper->getIconPath($object));
+            $integrations[$name] = array('name' => $name, 'icon' => $integrationHelper->getIconPath($object));
         }
+
+        //sort by name
+        ksort($integrations);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 

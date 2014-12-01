@@ -13,9 +13,9 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Class OAuthController
+ * Class AuthController
  */
-class OAuthController extends FormController
+class AuthController extends FormController
 {
     /**
      * @param string $integration
@@ -63,19 +63,21 @@ class OAuthController extends FormController
             //redirected from SM site with code so obtain access_token via ajax
 
             return $this->render('MauticAddonBundle:Auth:auth.html.php', array(
-                'integration'     => $integration,
+                'integration' => $integration,
                 'csrfToken'   => $state,
                 'code'        => $this->request->get('code'),
-                'callbackUrl' => $this->generateUrl('mautic_integration_oauth_callback', array('integration' => $integration), true)
+                'callbackUrl' => $this->generateUrl('mautic_integration_oauth_callback', array('integration' => $integration), true),
+                'cookiesSet'  => $this->request->get('cookiesSet', 0)
             ));
         }
 
+        $clientId     = $this->request->cookies->get('mautic_integration_clientid');
+        $clientSecret = $this->request->cookies->get('mautic_integration_clientsecret');
+
         //access token obtained so now get it and save it
         $session->remove($integration . '_csrf_token');
-
-        //make the callback to the service to get the access code
-        $clientId     = $this->request->request->get('clientId');
-        $clientSecret = $this->request->request->get('clientSecret');
+        $session->remove('mautic_integration_clientid');
+        $session->remove('mautic_integration_clientsecret');
 
         list($entity, $error) = $integrationObjects[$integration]->oAuthCallback($clientId, $clientSecret);
 
