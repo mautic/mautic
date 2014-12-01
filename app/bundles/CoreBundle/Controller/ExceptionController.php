@@ -30,33 +30,39 @@ class ExceptionController extends CommonController
         $code           = $exception->getStatusCode();
         $layout         = $env == 'prod' ? 'Error' : 'Exception';
 
-        if ($request->isXmlHttpRequest()) {
-            if ($request->query->get('ignoreAjax', false)) {
-                return $exception->getMessage();
-            } else {
-                return new JsonResponse(array(
-                    'error' => array(
-                        'code'      => $code,
-                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                        'exception' => $exception->getMessage(),
-                        'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
-                    )
-                ), $code);
-            }
+        if ($forceProd = $request->get('prod')) {
+            $layout = 'Error';
         }
 
+        $anonymous     = $this->factory->getSecurity()->isAnonymous();
+        if ($anonymous || $forceProd) {
+            $baseTemplate  = 'MauticCoreBundle:Default:slim.html.php';
+            if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
+                $baseTemplate = $templatePage;
+            }
+        } else{
+            $baseTemplate  = 'MauticCoreBundle:Default:content.html.php';
+        }
+
+        $request->query->set('ignoreAjax', false);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'status_code'    => $code,
-                'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception'      => $exception,
-                'logger'         => $logger,
-                'currentContent' => $currentContent,
+                'baseTemplate'    => $baseTemplate,
+                'status_code'     => $code,
+                'status_text'     => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'exception'       => $exception,
+                'logger'          => $logger,
+                'currentContent'  => $currentContent,
+                'isPublicPage'    => $anonymous
             ),
             'contentTemplate' => "MauticCoreBundle:{$layout}:{$code}.html.php",
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_dashboard_index',
-                'mauticContent'  => 'dashboard'
+                'error' => array(
+                    'code'      => $code,
+                    'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'exception' => $exception->getMessage(),
+                    'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+                )
             )
         ));
     }

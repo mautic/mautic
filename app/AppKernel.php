@@ -172,7 +172,7 @@ class AppKernel extends Kernel
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
             $bundles[] = new Nelmio\ApiDocBundle\NelmioApiDocBundle();
-            //$bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
+            $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
         }
 
         if (in_array($this->getEnvironment(), array('test'))) {

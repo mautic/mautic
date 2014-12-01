@@ -46,7 +46,8 @@
         "nelmio/api-doc-bundle": "2.7.*@dev",
         "sensio/distribution-bundle": "~2.3",
         "sensio/generator-bundle": "~2.3",
-	    "babdev/transifex": "~1.0"
+	    "babdev/transifex": "~1.0",
+        "webfactory/exceptions-bundle": "@stable"
     },
     "scripts": {
         "post-install-cmd": [

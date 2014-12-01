@@ -465,7 +465,7 @@ var Mautic = {
                 MauticVars.routeInProgress = '';
             },
             error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
+                Mautic.processAjaxError(request, textStatus, errorThrown, true);
 
                 //clear routeInProgress
                 MauticVars.routeInProgress = '';
@@ -1363,12 +1363,17 @@ var Mautic = {
      * @param textStatus
      * @param errorThrown
      */
-    processAjaxError: function (request, textStatus, errorThrown) {
-        if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
+    processAjaxError: function (request, textStatus, errorThrown, mainContent) {
+        var response = typeof request.responseJSON !== 'undefined' ? request.responseJSON : {};
+
+        if (response.newContent && mainContent) {
+            //an error page was returned
+            mQuery('#app-content .content-body').html(response.newContent);
+        } else if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
             console.log(request);
 
-            if (typeof request.responseJSON !== 'undefined' && typeof request.responseJSON.error !== 'undefined') {
-                var error = request.responseJSON.error.code + ': ' + errorThrown + '; ' + request.responseJSON.error.exception;
+            if (response.error) {
+                var error = response.error.code + ': ' + errorThrown + '; ' + response.error.exception;
                 alert(error);
             } else if (typeof request.responseText !== 'undefined') {
                 var regex = /{(.+?)}}/g //g flag so the regex is global

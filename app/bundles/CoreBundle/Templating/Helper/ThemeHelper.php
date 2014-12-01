@@ -111,4 +111,21 @@ class ThemeHelper
     {
         return ($relative) ? $this->themeDir : $this->themePath;
     }
+
+    /**
+     * Returns template
+     *
+     * @param $code
+     *
+     * @return bool|string
+     */
+    public function getErrorPageTemplate($code)
+    {
+        $errorPage = $this->getThemePath()."/error_{$code}.html.php";
+        if (file_exists($errorPage)) {
+            return ":{$this->theme}:error_{$code}.html.php";
+        } else {
+            return false;
+        }
+    }
 }

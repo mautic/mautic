@@ -7,7 +7,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view['slots']->set('mautibot', 'openMouth');
-$view['slots']->set('message', 'mautic.core.error.404');
+$view['slots']->set('message', 'mautic.core.error.403');
 $view->extend('MauticCoreBundle:Exception:base.html.php');
 ?>

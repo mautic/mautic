@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>An Error Occurred: <?php echo $status_text; ?></title>
-    </head>
-    <body>
-        <h1>Oops! An Error Occurred</h1>
-        <h2>The server returned a "<?php echo $status_code; ?> <?php echo $status_text; ?>".</h2>
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
-        <div>
-            Something is broken. Please let us know what you were doing when this error occurred.
-            We will fix it as soon as possible. Sorry for any inconvenience caused.
-        </div>
-    </body>
-</html>
+$view['slots']->set('mautibot', 'openMouth');
+$view['slots']->set('message', 'mautic.core.error.404');
+$view->extend('MauticCoreBundle:Error:base.html.php');
+?>

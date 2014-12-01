@@ -172,7 +172,7 @@ class CommonController extends Controller implements MauticController
         if ($forward) {
             //the content is from another controller action so we must retrieve the response from it instead of
             //directly parsing the template
-            $query = array("ignoreAjax" => true, 'request' => $this->request);
+            $query = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
             $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
             $newContent         = $newContentResponse->getContent();
         } else {
@@ -268,30 +268,18 @@ class CommonController extends Controller implements MauticController
      */
     public function accessDenied($batch = false, $msg = 'mautic.core.error.accessdenied')
     {
-        $user = $this->factory->getUser();
+        $anonymous = $this->factory->getSecurity()->isAnonymous();
 
-        if (!$user instanceof User && !$user->getId()) {
-            throw new AccessDeniedHttpException($this->get('translator')->trans('mautic.core.url.error.401'));
+        if ($anonymous || !$batch) {
+            throw new AccessDeniedHttpException($this->get('translator')->trans($msg, array(), 'flashes'));
         }
-
-        $flash = array(
-            'type' => 'error',
-            'msg'  => $msg
-        );
 
         if ($batch) {
-            return $flash;
+            return array(
+                'type' => 'error',
+                'msg'  => $msg
+            );
         }
-
-        return $this->postActionRedirect(array(
-            'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-            'contentTemplate' => 'MauticDashboardBundle:Default:index',
-            'passthroughVars' => array(
-                'activeLink' => '#mautic_dashboard_index',
-                'route'      => $this->generateUrl('mautic_dashboard_index')
-            ),
-            'flashes'         => array($flash)
-        ));
     }
 
     /**
