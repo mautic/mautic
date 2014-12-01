@@ -91,7 +91,7 @@ $contentMode = $form['contentMode']->vars['data'];
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
             ?>
-            <div id="metaDescriptionContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>">
+            <div id="metaDescriptionContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
             <?php echo $view['form']->rest($form); ?>
