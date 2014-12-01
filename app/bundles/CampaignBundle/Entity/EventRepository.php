@@ -241,7 +241,7 @@ class EventRepository extends CommonRepository
         );
 
         $expr->add(
-            $q->expr()->gte('o.triggerDate', ':now')
+            $q->expr()->lte('o.triggerDate', ':now')
         );
 
         if (!empty($campaignId)) {

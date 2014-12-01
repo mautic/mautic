@@ -138,7 +138,7 @@ class UserType extends AbstractType
             'label'       => 'mautic.user.user.form.timezone',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
-                'class'   => 'form-control'
+                'class'   => 'form-control chosen'
             ),
             'multiple'    => false,
             'empty_value' => 'mautic.user.user.form.defaulttimezone'
@@ -149,7 +149,7 @@ class UserType extends AbstractType
             'label'       => 'mautic.user.user.form.locale',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
-                'class'   => 'form-control'
+                'class'   => 'form-control chosen'
             ),
             'multiple'    => false,
             'empty_value' => 'mautic.user.user.form.defaultlocale'

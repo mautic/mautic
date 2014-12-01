@@ -56,6 +56,7 @@ mQuery.ajaxSetup({
 if (typeof Chart != 'undefined') {
     // configure global Chart options
     Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
 }
 
 var Mautic = {
@@ -432,7 +433,7 @@ var Mautic = {
      */
     loadContent: function (route, link, method, target, showPageLoading) {
         mQuery.ajax({
-            showLoadingBar: (showPageLoading) ? true : false,
+            showLoadingBar: (typeof showPageLoading == 'undefined' || showPageLoading) ? true : false,
             url: route,
             type: method,
             dataType: "json",
@@ -867,6 +868,9 @@ var Mautic = {
                 //activate content specific stuff
                 Mautic.onPageLoad(target, response, true);
             }
+
+            //stop loading bar
+            Mautic.stopPageLoadingBar();
         }
     },
 
@@ -1226,6 +1230,7 @@ var Mautic = {
                 }
 
                 mQuery.ajax({
+                    showLoadingBar: true,
                     url: route,
                     type: "GET",
                     data: searchName + "=" + encodeURIComponent(value) + '&tmpl=list',
@@ -1284,13 +1289,14 @@ var Mautic = {
             extra = '&' + extra;
         }
         mQuery.ajax({
+            showLoadingBar: true,
             url: mauticAjaxUrl,
             type: "POST",
             data: "action=togglePublishStatus&model=" + model + '&id=' + id + extra,
             dataType: "json",
             success: function (response) {
                 Mautic.stopIconSpinPostEvent();
-
+                Mautic.stopPageLoadingBar();
                 if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
@@ -1377,6 +1383,7 @@ var Mautic = {
                 }
             }
         }
+        Mautic.stopPageLoadingBar();
     },
 
     /**

@@ -39,6 +39,11 @@ class PageType extends AbstractType
     private $defaultTheme;
 
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    private $em;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
@@ -46,6 +51,7 @@ class PageType extends AbstractType
         $this->translator   = $factory->getTranslator();
         $this->themes       = $factory->getInstalledThemes('page');
         $this->defaultTheme = $factory->getParameter('theme');
+        $this->em           = $factory->getEntityManager();
     }
 
     /**
@@ -195,24 +201,24 @@ class PageType extends AbstractType
                 'disabled'   => $isVariant
             ));
 
-            $builder->add('translationParent_lookup', 'text', array(
-                'label'      => 'mautic.page.form.translationparent',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.translationparent.help'
-                ),
-                'mapped'     => false,
-                'required'   => false,
-                'disabled'   => $isVariant
-            ));
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+            $builder->add(
+                $builder->create('translationParent', 'page_list', array(
+                    'label'      => 'mautic.page.form.translationparent',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control chosen',
+                        'tooltip' => 'mautic.page.form.translationparent.help'
+                    ),
+                    'required'   => false,
+                    'multiple'   => false,
+                    'empty_value' => 'mautic.page.form.translationparent.empty',
+                    'disabled'   => $isVariant,
+                    'top_level'  => 'translation',
+                    'ignore_ids' => array((int) $options['data']->getId())
+                ))->addModelTransformer($transformer)
+            );
 
-            $builder->add('translationParent', 'hidden_entity', array(
-                'required'       => false,
-                'repository'     => 'MauticPageBundle:Page',
-                'error_bubbling' => false,
-                'disabled'   => $isVariant
-            ));
         }
 
         $builder->add('buttons', 'form_buttons');

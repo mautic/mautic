@@ -123,4 +123,50 @@ class CommonModel
 
         return array();
     }
+
+    /**
+     * Encode an array to append to a URL
+     *
+     * @param $array
+     *
+     * @return string
+     */
+    public function encodeArrayForUrl($array)
+    {
+        return urlencode(base64_encode(serialize($array)));
+    }
+
+    /**
+     * Decode a string appended to URL into an array
+     *
+     * @param $string
+     *
+     * @return mixed
+     */
+    public function decodeArrayFromUrl($string)
+    {
+        return unserialize(base64_decode(urldecode($string)));
+    }
+
+    /**
+     * @param       $route
+     * @param array $routeParams
+     * @param array $clickthrough
+     * @param bool  $absolute
+     */
+    public function buildUrl($route, $routeParams = array(), $clickthrough = array(), $absolute = true)
+    {
+        if ($absolute && php_sapi_name() == 'cli') {
+            $siteUrl = $this->factory->getParameter('site_url');
+            $baseUrl = $this->factory->getRouter()->generate($route, $routeParams);
+            $url     = $siteUrl . $baseUrl;
+        } else {
+            $url = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
+        }
+
+        $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
+
+        return $url;
+    }
+
 }

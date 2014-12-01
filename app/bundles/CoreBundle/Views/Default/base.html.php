@@ -65,6 +65,9 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                     if (mQuery('[id*="sfTool"]').length) {
                         mQuery('[id*="sfTool"]').remove();
                     }
+                    if (mQuery('[id*="sfMini"]').length) {
+                        mQuery('[id*="sfMini"]').remove();
+                    }
                     mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
                         mQuery('body').append(data);
                     });

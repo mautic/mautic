@@ -285,9 +285,6 @@ class AssetModel extends FormModel
             'slug' => $assetSlug
         );
 
-        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_download', $slugs, $absolute);
-        $assetUrl .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
-
-        return $assetUrl;
+        return $this->buildUrl('mautic_asset_download', $slugs, $absolute, $clickthrough);
     }
 }

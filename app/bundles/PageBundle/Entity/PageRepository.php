@@ -128,10 +128,11 @@ class PageRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param bool   $topLevel
+     * @param array $ignoreIds
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false)
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = array())
     {
         $q = $this->createQueryBuilder('p');
         $q->select('partial p.{id, title, language, alias}');
@@ -149,10 +150,16 @@ class PageRepository extends CommonRepository
         if ($topLevel == 'translation') {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
+            //translations cannot be assigned to a/b tests
+            $q->andWhere($q->expr()->isNull('p.variantParent'));
         } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
+        if (!empty($ignoreIds)) {
+            $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
+                ->setParameter('pageIds', $ignoreIds);
+        }
         $q->orderBy('p.title');
 
         if (!empty($limit)) {

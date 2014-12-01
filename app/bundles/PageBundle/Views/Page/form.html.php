@@ -61,14 +61,11 @@ $contentMode = $form['contentMode']->vars['data'];
                     <div id="builderHtmlContainer" class="row <?php echo ($contentMode == 'custom') ? 'hide"' : ''; ?>">
                         <div class="col-md-6">
                             <?php echo $view['form']->row($form['template']); ?>
+                            <button type="button" class="btn btn-primary" onclick="Mautic.launchPageEditor();">
+                                <i class="fa fa-cube text-mautic "></i><?php echo $view['translator']->trans('mautic.page.launch.builder'); ?>
+                            </button>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mt-20 pt-2">
-                                <button type="button" class="btn btn-primary" onclick="Mautic.launchPageEditor();">
-                                    <i class="fa fa-cube text-mautic "></i><?php echo $view['translator']->trans('mautic.page.launch.builder'); ?>
-                                </button>
-                            </div>
-                        </div>
+                        <div class="col-md-6"></div>
                     </div>
 
                     <div id="customHtmlContainer"<?php echo ($contentMode == 'builder') ? ' class="hide"' : ''; ?>>
@@ -87,7 +84,6 @@ $contentMode = $form['contentMode']->vars['data'];
             else:
             echo $view['form']->row($form['category']);
             echo $view['form']->row($form['language']);
-            echo $view['form']->row($form['translationParent_lookup']);
             echo $view['form']->row($form['translationParent']);
             endif;
 
@@ -95,7 +91,7 @@ $contentMode = $form['contentMode']->vars['data'];
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
             ?>
-            <div id="metaDescriptionContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>">
+            <div id="metaDescriptionContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
             <?php echo $view['form']->rest($form); ?>

@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class UTCDateTimeType
@@ -38,6 +39,11 @@ class UTCDateTimeType extends DateTimeType
 
         if (!self::$utc)
             self::$utc = new \DateTimeZone('UTC');
+
+        if (!is_object($value)) {
+            $dateHelper = new DateTimeHelper($value);
+            $value      = $dateHelper->getDateTime();
+        }
 
         $tz = $value->getTimeZone();
         $utcDatetime = new \DateTime($value->format($platform->getDateTimeFormatString()), $tz);

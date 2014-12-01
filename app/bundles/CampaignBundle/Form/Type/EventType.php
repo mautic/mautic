@@ -57,33 +57,28 @@ class EventType extends AbstractType
                 'data'        => $triggerMode
             ));
 
-            $attr = array(
-                'class'    => 'form-control',
-                'preaddon' => 'fa fa-calendar',
-                'data-toggle' => 'datetime'
-            );
-
-            $builder->add('triggerDate', 'text', array(
+            $builder->add('triggerDate', 'datetime', array(
                 'label'      => false,
-                'attr'       => $attr
+                'attr'       => array(
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-calendar',
+                    'data-toggle' => 'datetime'
+                ),
+                'widget'     => 'single_text',
+                'format'     => 'yyyy-MM-dd HH:mm'
             ));
 
             $data = (empty($options['data']['triggerInterval'])) ? 1 : $options['data']['triggerInterval'];
-            $attr = array(
-                'class'    => 'form-control',
-                'preaddon' => 'symbol-hashtag'
-            );
-
             $builder->add('triggerInterval', 'number', array(
                 'label'      => false,
-                'attr'       => $attr,
+                'attr'       => array(
+                    'class'    => 'form-control',
+                    'preaddon' => 'symbol-hashtag'
+                ),
                 'data'       => $data
             ));
 
-            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
-            $attr = array(
-                'class' => 'form-control'
-            );
+            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';;
 
             $builder->add('triggerIntervalUnit', 'choice', array(
                 'choices'     => array(
@@ -96,7 +91,9 @@ class EventType extends AbstractType
                 'multiple'    => false,
                 'label_attr'  => array('class' => 'control-label'),
                 'label'       => false,
-                'attr'        => $attr,
+                'attr'        => array(
+                    'class' => 'form-control'
+                ),
                 'empty_value' => false,
                 'required'    => false,
                 'data'        => $data

@@ -373,6 +373,7 @@ class EventModel extends CommonFormModel
 
             //trigger the action
             if ($this->invokeEventCallback($event, $settings, $lead, null, true)) {
+                $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $lead->getId(), 'event' => $event['id']));
                 $e->setTriggerDate(null);
                 $e->setIsScheduled(false);
                 $e->setDateTriggered(new \DateTime());

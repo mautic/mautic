@@ -60,33 +60,32 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $content  = $event->getContent();
         $idHash   = $event->getIdHash();
-        $router   = $this->factory->getRouter();
-
+        $model    = $this->factory->getModel('email');
         if (strpos($content, '{unsubscribe_text}') !== false) {
             $content = str_ireplace('{unsubscribe_text}',
                 $this->translator->trans('mautic.email.unsubscribe.text', array(
-                    '%link%' => $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
+                    '%link%' => $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
                 ))
             , $content);
         }
 
         if (strpos($content, '{unsubscribe_url}') !== false) {
             $content = str_ireplace('{unsubscribe_url}',
-                $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
+                $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
             , $content);
         }
 
         if (strpos($content, '{webview_text}') !== false) {
             $content = str_ireplace('{webview_text}',
                 $this->translator->trans('mautic.email.webview.text', array(
-                    '%link%' => $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
+                    '%link%' => $model->buildUrl('mautic_email_webview', array('idHash' => $idHash))
                 ))
                 , $content);
         }
 
         if (strpos($content, '{webview_url}') !== false) {
             $content = str_ireplace('{webview_url}',
-                $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
+                $model->buildUrl('mautic_email_webview', array('idHash' => $idHash))
                 , $content);
         }
 

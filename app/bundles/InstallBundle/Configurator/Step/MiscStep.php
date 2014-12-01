@@ -10,6 +10,7 @@
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\MiscStepType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Misc Step.
@@ -25,6 +26,7 @@ class MiscStep implements StepInterface
      * Absolute path to cache directory
      *
      * @var string
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $cache_path = '%kernel.root_dir%/cache';
 
@@ -32,15 +34,33 @@ class MiscStep implements StepInterface
      * Absolute path to log directory
      *
      * @var string
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $log_path   = '%kernel.root_dir%/logs';
+
+    /**
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     *
+     * @var
+     */
+    public $site_url;
+
+    /**
+     * @var
+     */
+    private $request_url;
+
+    public function __construct($url)
+    {
+        $this->request_url = $url;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return new MiscStepType();
+        return new MiscStepType($this->request_url);
     }
 
     /**

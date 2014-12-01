@@ -279,7 +279,7 @@ class LeadController extends FormController
         $upcomingEvents = $leadEventLogRepository->getUpcomingEvents(array('lead' => $lead, 'scheduled' => 1, 'eventType' => 'action'));
 
         $fields            = $lead->getFields();
-        $integrationHelper = $this->factory->getHelper('connector');
+        $integrationHelper = $this->factory->getHelper('integration');
         $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 

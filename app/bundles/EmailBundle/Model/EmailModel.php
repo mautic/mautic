@@ -697,8 +697,6 @@ class EmailModel extends FormModel
             $leads = array($leads['id'] => $leads);
         }
 
-        $templating   = $this->factory->getTemplating();
-        $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
         $statRepo     = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */

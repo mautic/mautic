@@ -13,6 +13,19 @@ if ($tmpl == 'index') {
 $view['slots']->set('pageHeader', 'mautic.install.heading.misc.configuration');
 ?>
 <?php echo $view['form']->start($form); ?>
+<div class="panel panel-primary">
+    <div class="panel-heading pa-10">
+        <h4><?php echo $view['translator']->trans('mautic.install.misc.header.url'); ?></h4>
+        <h6><?php echo $view['translator']->trans('mautic.install.misc.subheader.url'); ?></h6>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <?php echo $view['form']->row($form['site_url']); ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="panel panel-primary">
     <div class="panel-heading pa-10">

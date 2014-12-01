@@ -42,7 +42,12 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignPostSave(Events\CampaignEvent $event)
     {
         $campaign = $event->getCampaign();
-        if ($details = $event->getChanges()) {
+        $details = $event->getChanges();
+
+        //don't set leads
+        unset($details['leads']);
+
+        if (!empty($details)) {
             $log = array(
                 "bundle"    => "campaign",
                 "object"    => "campaign",

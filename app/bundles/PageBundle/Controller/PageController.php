@@ -86,7 +86,7 @@ class PageController extends FormController
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
             ));
-
+//die(Var_Dump($pages->getIterator(), $filter));
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -571,7 +571,7 @@ class PageController extends FormController
             $clone->setUniqueHits(0);
             $clone->setRevision(0);
             $clone->setVariantStartDate(null);
-            $clone->setVariantHits(null);
+            $clone->setVariantHits(0);
             $clone->setIsPublished(false);
             $model->saveEntity($clone);
             $objectId = $clone->getId();

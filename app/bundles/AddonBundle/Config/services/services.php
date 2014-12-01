@@ -20,4 +20,3 @@ $container->setDefinition('mautic.helper.addon', new Definition(
     'Mautic\AddonBundle\Helper\AddonHelper',
     array(new Reference('mautic.factory'))
 ));
-

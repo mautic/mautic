@@ -10,6 +10,7 @@
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\EmailStepType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Email Step.
@@ -21,6 +22,7 @@ class EmailStep implements StepInterface
      * From name for email sent from Mautic
      *
      * @var string
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     var $mailer_from_name;
 
@@ -28,6 +30,8 @@ class EmailStep implements StepInterface
      * From email sent from Mautic
      *
      * @var string
+     * @Assert\NotBlank(message = "mautic.install.notblank")
+     * @Assert\Email(message = "mautic.install.invalidemail")
      */
     var $mailer_from_email;
 

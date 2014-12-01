@@ -145,7 +145,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                               </div>
                               <div class="pt-0 pl-15 pb-10 pr-15">
                                   <div>
-                                      <canvas id="submission-chart" height="80"></canvas>
+                                      <canvas id="submission-chart" height="300"></canvas>
                                   </div>
                               </div>
                               <div id="submission-chart-data" class="hide"><?php echo json_encode($stats['submissionsInTime']); ?></div>

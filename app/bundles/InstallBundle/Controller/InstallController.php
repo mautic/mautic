@@ -244,6 +244,13 @@ class InstallController extends CommonController
                     ));
                 }
             }
+        } else {
+            //redirect back to last step if the user advanced ahead via the URL
+            $last = (int) end($completedSteps) + 1;
+            if ($index > $last) {
+                return $this->redirect($this->generateUrl('mautic_installer_step', array('index' => (int) $last)));
+            }
+
         }
 
         return $this->delegateView(array(

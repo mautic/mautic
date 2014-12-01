@@ -12,11 +12,6 @@ Mautic.pageOnLoad = function (container) {
     }
 };
 
-Mautic.pageUnLoad = function() {
-    //remove page builder from body
-    mQuery('.builder').remove();
-};
-
 Mautic.pageOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.pageViewsBarChartObject;

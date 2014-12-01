@@ -53,13 +53,13 @@ class AddonHelper
     {
         // Populate our addon cache if not present
         if (!static::$loaded) {
-            $db = $this->factory->getDatabase();
-            $sm = $db->getSchemaManager();
-
-            if ($sm->tablesExist(MAUTIC_TABLE_PREFIX.'addons')) {
-                /** @var \Mautic\AddonBundle\Entity\IntegrationRepository $repo */
-                $repo = $this->factory->getModel('addon')->getRepository();
+            /** @var \Mautic\AddonBundle\Entity\IntegrationRepository $repo */
+            try {
+                $repo           = $this->factory->getModel('addon')->getRepository();
                 static::$addons = $repo->getBundleStatus();
+            } catch (\Exception $exception) {
+                //database is probably not installed or there was an issue connecting
+                return false;
             }
 
             static::$loaded = true;

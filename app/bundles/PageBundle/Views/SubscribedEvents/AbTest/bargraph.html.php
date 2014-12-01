@@ -75,8 +75,7 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
             var barGraph = new Chart(canvas.getContext("2d")).Bar(barData, {
                 responsive: true,
                 animation: false,
-                tooltipTitleFontSize: 10,
-                tooltipTitleFontStyle: '',
+                tooltipTitleFontSize: 0,
                 scaleOverride: true,
                 <?php if (isset($support['step_width'])) : ?>
                 scaleSteps: <?php echo ($support['step_width'] > 10) ? 11 : 10; ?>,

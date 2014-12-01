@@ -18,11 +18,38 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class MiscStepType extends AbstractType
 {
+
+    /**
+     * @var
+     */
+    private $url;
+
+    /**
+     * @param $url
+     */
+    public function __construct($url)
+    {
+        $this->url = $url;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $data = (empty($options['data']->site_url)) ? $this->url : $options['data']->site_url;
+        $builder->add('site_url', 'text', array(
+            'label'      => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'placeholder' => 'http://'
+            ),
+            'required'   => true,
+            'data'       => $data
+        ));
+
+
         $builder->add('cache_path', 'text', array(
             'label'      => 'mautic.install.form.cache_path',
             'label_attr' => array('class' => 'control-label'),

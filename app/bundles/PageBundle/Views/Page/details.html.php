@@ -13,7 +13,8 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $activePage->getTitle());
 
-$showVariants = (count($variants['children']));
+$showVariants     = (count($variants['children']) || (!empty($variants['parent']) && isset($variant['parent']) && $variant['parent']->getId() != $activePage->getId()));
+$showTranslations = (count($translations['children']) || (!empty($translations['parent']) && $translations['parent']->getId() != $activePage->getId()));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'            => $activePage,
@@ -175,11 +176,13 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     </a>
                 </li>
                 <?php endif; ?>
+                <?php if ($showTranslations): ?>
                 <li class="<?php echo ($showVariants) ? '' : 'active'; ?>">
                     <a href="#translation-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.page.translations'); ?>
                     </a>
                 </li>
+                <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -330,6 +333,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <?php endif; ?>
             <!--/ #variants-container -->
             <!-- #translation-container -->
+            <?php if ($showTranslations): ?>
             <div class="tab-pane <?php echo ($showVariants) ? '' : 'active '; ?>fade in bdr-w-0" id="translation-container">
 
                 <!-- start: related translations list -->
@@ -399,6 +403,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <?php endif; ?>
                 <!--/ end: related translations list -->
             </div>
+            <?php endif; ?>
             <!--/ #translation-container -->
         </div>
         <!--/ end: tab-content -->

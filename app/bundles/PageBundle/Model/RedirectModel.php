@@ -36,11 +36,9 @@ class RedirectModel extends FormModel
      */
     public function generateRedirectUrl(Redirect $redirect, $clickthrough = array())
     {
-        $router = $this->factory->getRouter();
-
-        $url  = $router->generate('mautic_page_redirect', array('redirectId' => $redirect->getRedirectId()), true);
+        $url  = $this->buildUrl('mautic_page_redirect', array('redirectId' => $redirect->getRedirectId()), true, $clickthrough);
         $r    = urlencode($redirect->getUrl());
-        $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) . '&r=' . $r : '?r=' . $r;
+        $url .= (!empty($clickthrough)) ? '&r=' . $r : '?r=' . $r;
 
         return $url;
     }
