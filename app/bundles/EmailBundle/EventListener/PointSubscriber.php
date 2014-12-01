@@ -68,6 +68,7 @@ class PointSubscriber extends CommonSubscriber
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $sendEvent = array(
+            'group'       => 'mautic.email.point.trigger',
             'label'       => 'mautic.email.point.trigger.sendemail',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'),
             'formType'    => 'emailsend_list'

@@ -242,6 +242,21 @@ class TriggerModel extends CommonFormModel
         return $events;
     }
 
+    /**
+     * Gets array of custom events from bundles inside groups
+     *
+     * @return mixed
+     */
+    public function getEventGroups()
+    {
+        $events = $this->getEvents();
+        $groups = array();
+        foreach ($events as $key => $event) {
+            $groups[$event['group']][$key] = $event;
+        }
+        return $groups;
+    }
+
 
     /**
      * Triggers a specific event

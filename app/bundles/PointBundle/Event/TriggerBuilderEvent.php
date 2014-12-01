@@ -66,12 +66,13 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label', 'callback'),
+            array('group', 'label', 'callback'),
             array('callback'),
             $event
         );
 
         $event['label']       = $this->translator->trans($event['label']);
+        $event['group']       = $this->translator->trans($event['group']);
         $event['description'] = (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
 
         $this->events[$key] = $event;

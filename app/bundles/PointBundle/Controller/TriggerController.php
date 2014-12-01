@@ -277,7 +277,7 @@ class TriggerController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'        => $model->getEvents(),
+                'events'        => $model->getEventGroups(),
                 'triggerEvents' => $addEvents,
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
@@ -452,7 +452,7 @@ class TriggerController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'        => $model->getEvents(),
+                'events'        => $model->getEventGroups(),
                 'triggerEvents' => $triggerEvents,
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
