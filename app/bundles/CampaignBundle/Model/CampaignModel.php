@@ -690,6 +690,8 @@ class CampaignModel extends CommonFormModel
         }
 
         $campaign->leadsRebuilt = true;
+        //prevent another update entry in audit log
+        $campaign->resetChanges();
         $this->saveEntity($campaign, false);
     }
 

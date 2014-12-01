@@ -104,7 +104,7 @@ class FormEntity
     /**
      * @var array
      */
-    protected $changes;
+    protected $changes = array();
 
     /**
      * Wrapper function for isProperty methods
@@ -178,6 +178,14 @@ class FormEntity
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    /**
+     * Reset changes
+     */
+    public function resetChanges()
+    {
+        $this->changes = array();
     }
 
     /**
