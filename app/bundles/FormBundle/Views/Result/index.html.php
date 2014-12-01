@@ -24,17 +24,6 @@ $buttons = array(
     ),
 );
 
-if (class_exists('mPDF')) {
-    $buttons[] = array(
-        'attr' => array(
-            'data-toggle' => 'download',
-            'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'pdf'))
-        ),
-        'btnText' => $view['translator']->trans('mautic.form.result.export.pdf'),
-        'iconClass' => 'fa fa-file-pdf-o'
-    );
-}
-
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'download',

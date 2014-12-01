@@ -6,20 +6,43 @@
     "autoload": {
         "psr-4": {
             "Mautic\\": "app/bundles/",
-	        "MauticAddon\\": "addons/"
+            "MauticAddon\\": "addons/"
         }
     },
     "require": {
         "php": ">=5.3.7",
-        "symfony/symfony": "2.5.*",
+
+	    "symfony/class-loader": "2.5.*",
+        "symfony/config": "2.5.*",
+        "symfony/console": "2.5.*",
+        "symfony/debug": "2.5.*",
+        "symfony/dependency-injection": "2.5.*",
+        "symfony/event-dispatcher": "2.5.*",
+        "symfony/finder": "2.3.*",
+        "symfony/form": "2.5.*",
+        "symfony/http-foundation": "2.5.*",
+        "symfony/http-kernel": "2.5.*",
         "symfony/icu": "1.0.*",
-        "symfony/swiftmailer-bundle": "~2.3",
+        "symfony/intl": "2.5.*",
+        "symfony/options-resolver": "2.5.*",
+        "symfony/process": "2.5.*",
+        "symfony/routing": "2.5.*",
+        "symfony/security": "2.5.*",
+        "symfony/templating": "2.5.*",
+        "symfony/translation": "2.5.*",
+        "symfony/validator": "2.5.*",
+	    "symfony/yaml": "2.5.*",
+
+        "symfony/framework-bundle": "2.5.*",
         "symfony/monolog-bundle": "~2.4",
+        "symfony/security-bundle": "2.5.*",
+        "symfony/swiftmailer-bundle": "~2.3",
+
+        "symfony/doctrine-bridge": "2.5.*",
+        "symfony/monolog-bridge": "2.5.*",
+
         "sensio/distribution-bundle": "~2.3",
         "sensio/framework-extra-bundle": "~3.0",
-
-        "symfony/event-dispatcher": "2.5.*@dev",
-        "symfony/finder": "2.3.*@dev",
 
         "doctrine/orm": "~2.3",
         "doctrine/doctrine-bundle": "~1.2",
@@ -35,18 +58,17 @@
         "friendsofsymfony/rest-bundle": "1.3.*",
 
         "ircmaxell/password-compat": "~1.0",
-        "mpdf/mpdf": "v5.7.2",
         "phpoffice/phpexcel": "1.8.0",
-	    "joomla/http": "~1.1",
+        "joomla/http": "~1.1",
         "mrclay/minify": "2.2.0"
-
     },
     "require-dev": {
+        "symfony/twig-bundle": "2.5.*",
+        "symfony/web-profiler-bundle": "2.5.*",
         "liip/functional-test-bundle": "dev-master",
         "nelmio/api-doc-bundle": "2.7.*@dev",
-        "sensio/distribution-bundle": "~2.3",
         "sensio/generator-bundle": "~2.3",
-	    "babdev/transifex": "~1.0"
+        "babdev/transifex": "~1.0"
     },
     "scripts": {
         "post-install-cmd": [

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "73011e64726f5aace77b5ea0855bac21",
+    "hash": "fe44e6ad1fbe7a70d2346f38871e9507",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1722,49 +1722,6 @@
             "time": "2014-09-30 13:30:58"
         },
         {
-            "name": "mpdf/mpdf",
-            "version": "v5.7.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/finwe/mpdf.git",
-                "reference": "1627f9e7d2ef0f635a886f611079216ed2929717"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/finwe/mpdf/zipball/1627f9e7d2ef0f635a886f611079216ed2929717",
-                "reference": "1627f9e7d2ef0f635a886f611079216ed2929717",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=4.3.10"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "mpdf.php",
-                    "classes"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-1.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Ian Back"
-                }
-            ],
-            "description": "A PHP class to generate PDF files from HTML with Unicode/UTF-8 and CJK support",
-            "homepage": "http://www.mpdf1.com/mpdf/index.php",
-            "keywords": [
-                "pdf",
-                "php",
-                "utf-8"
-            ],
-            "time": "2014-05-16 07:18:10"
-        },
-        {
             "name": "mrclay/minify",
             "version": "2.2.0",
             "source": {
@@ -2153,17 +2110,17 @@
         },
         {
             "name": "symfony/finder",
-            "version": "2.3.x-dev",
+            "version": "v2.3.22",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "879b140c3374f4ab73ea516e5c6b088aa2f20cb8"
+                "reference": "414c1ab217ea8584dbf111cd6839ade524caaffb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/879b140c3374f4ab73ea516e5c6b088aa2f20cb8",
-                "reference": "879b140c3374f4ab73ea516e5c6b088aa2f20cb8",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/414c1ab217ea8584dbf111cd6839ade524caaffb",
+                "reference": "414c1ab217ea8584dbf111cd6839ade524caaffb",
                 "shasum": ""
             },
             "require": {
@@ -2196,7 +2153,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2014-11-30 13:33:44"
+            "time": "2014-10-26 07:30:58"
         },
         {
             "name": "symfony/icu",
@@ -2960,8 +2917,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "symfony/event-dispatcher": 20,
-        "symfony/finder": 20,
         "doctrine/doctrine-fixtures-bundle": 20,
         "doctrine/migrations": 20,
         "doctrine/doctrine-migrations-bundle": 20,
