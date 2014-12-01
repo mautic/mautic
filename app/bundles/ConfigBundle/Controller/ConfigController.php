@@ -24,9 +24,8 @@ class ConfigController extends FormController
      */
     public function editAction()
     {
-
         //admin only allowed
-        if ($this->factory->getUser()->isAdmin()) {
+        if (!$this->factory->getUser()->isAdmin()) {
             return $this->accessDenied();
         }
 
@@ -105,7 +104,6 @@ class ConfigController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'params'      => $params,
-                'permissions' => $permissions,
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
                 'form'        => $form->createView()
