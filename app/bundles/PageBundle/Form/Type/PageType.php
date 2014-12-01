@@ -212,6 +212,7 @@ class PageType extends AbstractType
                     ),
                     'required'   => false,
                     'multiple'   => false,
+                    'empty_value' => 'mautic.page.form.translationparent.empty',
                     'disabled'   => $isVariant,
                     'top_level'  => 'translation',
                     'ignore_ids' => array((int) $options['data']->getId())

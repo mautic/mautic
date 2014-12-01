@@ -13,7 +13,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $activePage->getTitle());
 
-$showVariants     = (count($variants['children']) || (!empty($variants['parent']) && $variant['parent']->getId() != $activePage->getId()));
+$showVariants     = (count($variants['children']) || (!empty($variants['parent']) && isset($variant['parent']) && $variant['parent']->getId() != $activePage->getId()));
 $showTranslations = (count($translations['children']) || (!empty($translations['parent']) && $translations['parent']->getId() != $activePage->getId()));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
