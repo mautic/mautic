@@ -232,6 +232,12 @@ class MauticFactory
      */
     public function getTemplating()
     {
+        if (php_sapi_name() == 'cli') {
+            //enter the request scope in order to be use the templating.helper.assets service
+            $this->container->enterScope('request');
+            $this->container->set('request', new Request(), 'request');
+        }
+
         return $this->container->get('templating');
     }
 
