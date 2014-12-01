@@ -867,6 +867,9 @@ var Mautic = {
                 //activate content specific stuff
                 Mautic.onPageLoad(target, response, true);
             }
+
+            //stop loading bar
+            Mautic.stopPageLoadingBar();
         }
     },
 
