@@ -18,11 +18,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class MiscStep implements StepInterface
 {
     /**
-     * Send server stats?
-     */
-    public $send_server_data = true;
-
-    /**
      * Absolute path to cache directory
      *
      * @var string

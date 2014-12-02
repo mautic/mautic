@@ -38,6 +38,7 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = array(
+            'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.pagehit',
             'description' => 'mautic.page.point.action.pagehit_descr',
             'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'validatePageHit'),

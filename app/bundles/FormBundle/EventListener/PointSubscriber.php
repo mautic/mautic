@@ -38,6 +38,7 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = array(
+            'group'       => 'mautic.form.point.action',
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
             'callback'    => array('\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'validateFormSubmit'),

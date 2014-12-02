@@ -129,6 +129,7 @@ class PointModel extends CommonFormModel
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
+            $actions['choices'] = $event->getActionChoices();
         }
 
         return $actions;

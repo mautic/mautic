@@ -44,20 +44,6 @@ $view['slots']->set('pageHeader', 'mautic.install.heading.misc.configuration');
     </div>
 </div>
 
-<div class="panel panel-primary">
-    <div class="panel-heading pa-10">
-        <h4><?php echo $view['translator']->trans('mautic.install.misc.header.stats'); ?></h4>
-        <h6><?php echo $view['translator']->trans('mautic.install.misc.subheader.stats'); ?></h6>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-sm-12">
-                <?php echo $view['form']->row($form['send_server_data']); ?>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="row mt-20">
     <div class="col-sm-9">
         <div class="hide" id="waitMessage">

@@ -109,7 +109,7 @@ class UpdateHelper
             $data = array(
                 'application' => 'Mautic',
                 'version'     => $this->factory->getVersion(),
-                'phpVerison'  => PHP_VERSION,
+                'phpVersion'  => PHP_VERSION,
                 'dbDriver'    => $this->factory->getParameter('db_driver'),
                 'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
                 'instanceId'  => $instanceId
@@ -127,6 +127,7 @@ class UpdateHelper
                 'phpVersion' => PHP_VERSION,
                 'stability'  => $this->factory->getParameter('update_stability')
             );
+
             // TODO - Whenever I get the router hooked up on the component, change this URL
             $data    = $connector->post('http://mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);

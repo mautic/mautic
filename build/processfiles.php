@@ -29,9 +29,14 @@ echo "Removing extra files\n";
 chdir($baseDir . '/packaging');
 system('rm app/phpunit.*');
 system('rm app/tests.bootstrap*');
-system('rm app/config/config_local.php*');
-system('rm app/config/local.php*');
+system('rm -rf app/bundles/*/Tests');
+system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache');
+system('rm app/config/config_dev.php');
+system('rm app/config/config_test.php');
+system('rm app/config/local*.php');
+system('rm app/config/routing_dev.php');
+system('rm app/config/security_test.php');
 system('rm -rf app/logs');
 
 // babdev/transifex
@@ -93,18 +98,17 @@ system('rm vendor/doctrine/dbal/README.md');
 system('rm vendor/doctrine/dbal/UPGRADE');
 
 // doctrine/doctrine-bundle
-system('rm -rf vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/Tests');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/.gitignore');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/.travis.yml');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/Changelog.md');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/composer.json');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/phpunit.xml.dist');
-system('rm vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/README.md');
+system('rm -rf vendor/doctrine/doctrine-bundle/Tests');
+system('rm vendor/doctrine/doctrine-bundle/.gitignore');
+system('rm vendor/doctrine/doctrine-bundle/.travis.yml');
+system('rm vendor/doctrine/doctrine-bundle/Changelog.md');
+system('rm vendor/doctrine/doctrine-bundle/composer.json');
+system('rm vendor/doctrine/doctrine-bundle/phpunit.xml.dist');
+system('rm vendor/doctrine/doctrine-bundle/README.md');
 
 // doctrine/doctrine-fixtures-bundle
 system('rm vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle/.gitignore');
 system('rm vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle/composer.json');
-system('rm vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle/composer.lock');
 system('rm vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle/phpunit.xml.dist');
 system('rm vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle/README.markdown');
 
@@ -169,11 +173,7 @@ system('rm vendor/friendsofsymfony/rest-bundle/FOS/RestBundle/README.md');
 system('rm vendor/friendsofsymfony/rest-bundle/FOS/RestBundle/UPGRADING.md');
 
 // ircmaxell/password-compat
-system('rm -rf vendor/ircmaxell/password-compat/test');
-system('rm vendor/ircmaxell/password-compat/.travis.yml');
 system('rm vendor/ircmaxell/password-compat/composer.json');
-system('rm vendor/ircmaxell/password-compat/phpunit.xml.dist');
-system('rm vendor/ircmaxell/password-compat/README.md');
 system('rm vendor/ircmaxell/password-compat/version-test.php');
 
 // jdorn/sql-formatter
@@ -238,7 +238,6 @@ system('rm vendor/joomla/http/README.md');
 // joomla/uri
 system('rm -rf vendor/joomla/uri/Tests');
 system('rm vendor/joomla/uri/composer.json');
-system('rm vendor/joomla/uri/phpunit.travis.xml');
 system('rm vendor/joomla/uri/phpunit.xml.dist');
 system('rm vendor/joomla/uri/README.md');
 
@@ -279,16 +278,6 @@ system('rm vendor/monolog/monolog/CHANGELOG.mdown');
 system('rm vendor/monolog/monolog/composer.json');
 system('rm vendor/monolog/monolog/phpunit.xml.dist');
 system('rm vendor/monolog/monolog/README.mdown');
-
-// mpdf/mpdf
-system('rm -rf vendor/mpdf/mpdf/examples');
-system('rm vendor/mpdf/mpdf/ttfonts/*');
-system('rm vendor/mpdf/mpdf/ADDED\ INFO\ FONTS.txt');
-system('rm vendor/mpdf/mpdf/CHANGELOG.txt');
-system('rm vendor/mpdf/mpdf/composer.json');
-system('rm vendor/mpdf/mpdf/CREDITS.txt');
-system('rm vendor/mpdf/mpdf/FONT\ INFO.txt');
-system('rm vendor/mpdf/mpdf/README.txt');
 
 // nelmio/api-doc-bundle
 system('rm -rf vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/Tests');
@@ -370,22 +359,40 @@ system('rm vendor/swiftmailer/swiftmailer/composer.json');
 system('rm vendor/swiftmailer/swiftmailer/phpunit.xml.dist');
 system('rm vendor/swiftmailer/swiftmailer/README');
 
-// symfony/finder
-system('rm -rf vendor/symfony/finder/Symfony/Component/Finder/Tests');
-system('rm vendor/symfony/finder/Symfony/Component/Finder/.gitignore');
-system('rm vendor/symfony/finder/Symfony/Component/Finder/CHANGELOG.md');
-system('rm vendor/symfony/finder/Symfony/Component/Finder/composer.json');
-system('rm vendor/symfony/finder/Symfony/Component/Finder/phpunit.xml.dist');
-system('rm vendor/symfony/finder/Symfony/Component/Finder/README.md');
+// symfony
+system('rm -rf vendor/symfony/*/Symfony/*/*/Tests');
+system('rm vendor/symfony/*/Symfony/*/*/.gitignore');
+system('rm vendor/symfony/*/Symfony/*/*/.travis.yml');
+system('rm vendor/symfony/*/Symfony/*/*/CHANGELOG.md');
+system('rm vendor/symfony/*/Symfony/*/*/composer.json');
+system('rm vendor/symfony/*/Symfony/*/*/phpunit.xml.dist');
+system('rm vendor/symfony/*/Symfony/*/*/README.md');
+system('rm -rf vendor/symfony/console/Symfony/Console/Resources');
+system('rm -rf vendor/symfony/doctrine-bridge/Symfony/Bridge/Doctrine/Test');
+system('rm -rf vendor/symfony/form/Symfony/Component/Form/Test');
+system('rm -rf vendor/symfony/framework-bundle/Symfony/Bundle/FrameworkBundle/Test');
+system('rm -rf vendor/symfony/security/Symfony/Component/Security/Acl/Tests');
+system('rm vendor/symfony/security/Symfony/Component/Security/Acl/.gitignore');
+system('rm vendor/symfony/security/Symfony/Component/Security/Acl/composer.json');
+system('rm vendor/symfony/security/Symfony/Component/Security/Acl/phpunit.xml.dist');
+system('rm vendor/symfony/security/Symfony/Component/Security/Acl/README.md');
+system('rm -rf vendor/symfony/security/Symfony/Component/Security/Core/Tests');
+system('rm vendor/symfony/security/Symfony/Component/Security/Core/.gitignore');
+system('rm vendor/symfony/security/Symfony/Component/Security/Core/composer.json');
+system('rm vendor/symfony/security/Symfony/Component/Security/Core/phpunit.xml.dist');
+system('rm vendor/symfony/security/Symfony/Component/Security/Core/README.md');
+system('rm -rf vendor/symfony/security/Symfony/Component/Security/Csrf/Tests');
+system('rm vendor/symfony/security/Symfony/Component/Security/Csrf/.gitignore');
+system('rm vendor/symfony/security/Symfony/Component/Security/Csrf/composer.json');
+system('rm vendor/symfony/security/Symfony/Component/Security/Csrf/phpunit.xml.dist');
+system('rm vendor/symfony/security/Symfony/Component/Security/Csrf/README.md');
+system('rm -rf vendor/symfony/security/Symfony/Component/Security/Http/Tests');
+system('rm vendor/symfony/security/Symfony/Component/Security/Http/.gitignore');
+system('rm vendor/symfony/security/Symfony/Component/Security/Http/composer.json');
+system('rm vendor/symfony/security/Symfony/Component/Security/Http/phpunit.xml.dist');
+system('rm vendor/symfony/security/Symfony/Component/Security/Http/README.md');
 
-// symfony/icu
-system('rm -rf vendor/symfony/icu/Symfony/Component/Icu/Tests');
-system('rm vendor/symfony/icu/Symfony/Component/Icu/.gitignore');
-system('rm vendor/symfony/icu/Symfony/Component/Icu/composer.json');
-system('rm vendor/symfony/icu/Symfony/Component/Icu/phpunit.xml.dist');
-system('rm vendor/symfony/icu/Symfony/Component/Icu/README.md');
-
-// symfony/monolog-bundle
+// syfmony/monolog-bundle
 system('rm -rf vendor/symfony/monolog-bundle/Tests');
 system('rm vendor/symfony/monolog-bundle/.gitignore');
 system('rm vendor/symfony/monolog-bundle/.travis.yml');
@@ -393,53 +400,7 @@ system('rm vendor/symfony/monolog-bundle/composer.json');
 system('rm vendor/symfony/monolog-bundle/phpunit.xml.dist');
 system('rm vendor/symfony/monolog-bundle/README.md');
 
-// symfony/swiftmailer-bundle
-system('rm -rf vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/Tests');
-system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/.gitignore');
-system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/.travis.yml');
-system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/composer.json');
-system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/phpunit.xml.dist');
-
-// symfony/symfony
-system('rm vendor/symfony/symfony/*.md');
-system('rm vendor/symfony/symfony/.editorconfig');
-system('rm vendor/symfony/symfony/.gitignore');
-system('rm vendor/symfony/symfony/.travis.yml');
-system('rm vendor/symfony/symfony/autoload.php.dist');
-system('rm vendor/symfony/symfony/composer.json');
-system('rm vendor/symfony/symfony/phpunit.xml.dist');
-
-// symfony/symfony/src/Symfony/Bridge
-chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Bridge');
-system('rm -rf Doctrine/Test');
-system('rm -rf */Tests');
-system('rm */.gitignore');
-system('rm */CHANGELOG.md');
-system('rm */composer.json');
-system('rm */phpunit.xml.dist');
-system('rm */README.md');
-
-// symfony/symfony/src/Symfony/Bundle
-chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Bundle');
-system('rm -rf FrameworkBundle/Test');
-system('rm -rf */Tests');
-system('rm */.gitignore');
-system('rm */CHANGELOG.md');
-system('rm */composer.json');
-system('rm */phpunit.xml.dist');
-
-// symfony/symfony/src/Symfony/Component
-chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Component');
-system('rm -rf */Tests');
-system('rm */.gitignore');
-system('rm */CHANGELOG.md');
-system('rm */composer.json');
-system('rm */phpunit.xml.dist');
-system('rm */README.md');
-system('rm -rf Console/Resources');
-
 // twig/twig
-chdir($baseDir . '/packaging');
 system('rm -rf vendor/twig/twig/doc');
 system('rm -rf vendor/twig/twig/ext');
 system('rm -rf vendor/twig/twig/test');

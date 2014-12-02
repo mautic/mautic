@@ -71,12 +71,15 @@ class PointBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label'),
+            array('group', 'label'),
             array('callback'),
             $action
         );
 
+        //translate the label and group
         $action['label'] = $this->translator->trans($action['label']);
+        $action['group'] = $this->translator->trans($action['group']);
+
         $this->actions[$key] = $action;
     }
 
@@ -107,6 +110,16 @@ class PointBuilderEvent extends Event
             $list[$k] = $a['label'];
         }
         return $list;
+    }
+
+    public function getActionChoices()
+    {
+        $choices = array();
+        $actions = $this->getActions();
+        foreach ($this->actions as $k => $c) {
+            $choices[$c['group']][$k] = $c['label'];
+        }
+        return $choices;
     }
 
     /**

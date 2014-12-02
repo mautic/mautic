@@ -11,7 +11,6 @@ namespace Mautic\InstallBundle\Configurator;
 
 use Mautic\InstallBundle\Configurator\Step\StepInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Configurator.
