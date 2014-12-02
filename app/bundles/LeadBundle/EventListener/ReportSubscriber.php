@@ -208,7 +208,7 @@ class ReportSubscriber extends CommonSubscriber
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.top.events';
-            $graphData['iconClass'] = 'fa-paw';
+            $graphData['iconClass'] = 'fa-calendar';
             $event->setGraph('table', $graphData);
         }
 
@@ -224,7 +224,7 @@ class ReportSubscriber extends CommonSubscriber
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.top.actions';
-            $graphData['iconClass'] = 'fa-space-shuttle';
+            $graphData['iconClass'] = 'fa-bolt';
             $event->setGraph('table', $graphData);
         }
     }
