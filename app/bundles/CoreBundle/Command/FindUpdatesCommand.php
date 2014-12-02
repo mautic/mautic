@@ -50,7 +50,7 @@ EOT
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
-        $updateData   = $updateHelper->fetchData($this->getContainer()->getParameter('kernel.root_dir'), true);
+        $updateData   = $updateHelper->fetchData(true);
 
         if ($updateData['error']) {
             $output->writeln('<error>' . $translator->trans($updateData['message']) . '</error>');
