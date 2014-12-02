@@ -15,9 +15,6 @@ if (!$app->getRequest()->isXmlHttpRequest()) {
     $view['slots']->set('pageTitle', $status_text);
 
     $header = "<strong>$status_code</strong> $status_text";
-    if ($message = $exception->getMessage()) {
-        $header .= " - $message";
-    }
     $view['slots']->set('headerTitle', $header);
 }
 
