@@ -96,24 +96,6 @@ Mautic.leadOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('NoteFilter', 'lead.note');
     }
 
-    if (mQuery('shuffle-grid').length) {
-        var grid = mQuery("#shuffle-grid");
-
-        grid.shuffle({
-            itemSelector: ".shuffle"
-        });
-
-
-        // Update shuffle on sidebar minimize/maximize
-        mQuery("html")
-            .on("fa.sidebar.minimize", function () {
-                grid.shuffle("update");
-            })
-            .on("fa.sidebar.maximize", function () {
-                grid.shuffle("update");
-            });
-    }
-
     if (typeof Mautic.leadEngagementChart === 'undefined') {
         Mautic.renderEngagementChart();
     }

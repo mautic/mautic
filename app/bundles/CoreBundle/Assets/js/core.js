@@ -316,6 +316,25 @@ var Mautic = {
             }
         });
 
+        //activate shuffles
+
+        if (mQuery('.shuffle-grid').length) {
+            var grid = mQuery(".shuffle-grid");
+
+            grid.shuffle({
+                itemSelector: ".shuffle"
+            });
+
+            // Update shuffle on sidebar minimize/maximize
+            mQuery("html")
+                .on("fa.sidebar.minimize", function () {
+                    grid.shuffle("update");
+                })
+                .on("fa.sidebar.maximize", function () {
+                    grid.shuffle("update");
+                });
+        }
+
         //run specific on loads
         var contentSpecific = false;
         if (response && response.mauticContent) {

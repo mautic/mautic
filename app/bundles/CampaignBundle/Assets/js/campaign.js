@@ -47,10 +47,6 @@ Mautic.campaignOnLoad = function (container) {
             });
     }
 
-    if (mQuery("#shuffle-grid").length) {
-        Mautic.campaignLeadsOnLoad(container);
-    }
-
     Mautic.renderCampaignViewsBarChart();
     Mautic.renderCampaignEmailSentPie();
     Mautic.renderCampaignLeadsBarChart();
@@ -549,24 +545,4 @@ Mautic.renderCampaignEmailSentPie = function () {
     timesOnSiteData = Mautic.emulateNoDataForPieChart(timesOnSiteData);
     var ctx = document.getElementById("emails-sent-rate").getContext("2d");
     Mautic.campaignEmailSentPie = new Chart(ctx).Pie(timesOnSiteData, options);
-};
-
-Mautic.campaignLeadsOnLoad = function () {
-    if (mQuery('shuffle-grid').length) {
-        var grid = mQuery("#shuffle-grid");
-
-        grid.shuffle({
-            itemSelector: ".shuffle"
-        });
-
-
-        // Update shuffle on sidebar minimize/maximize
-        mQuery("html")
-            .on("fa.sidebar.minimize", function () {
-                grid.shuffle("update");
-            })
-            .on("fa.sidebar.maximize", function () {
-                grid.shuffle("update");
-            });
-    }
 };

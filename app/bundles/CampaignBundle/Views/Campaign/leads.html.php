@@ -9,7 +9,7 @@
 ?>
 
 <div class="pa-md bg-auto">
-    <div class="shuffle grid row scrollable" id="shuffle-grid">
+    <div class="shuffle-grid row">
         <?php if (count($items)): ?>
             <?php foreach ($items as $item): ?>
                 <?php

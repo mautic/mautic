@@ -11,7 +11,7 @@ if ($tmpl == 'index')
 ?>
 
 <div class="pa-md bg-auto">
-    <div class="shuffle grid row scrollable" id="shuffle-grid">
+    <div class="row shuffle-grid">
         <?php if (count($items)): ?>
             <?php foreach ($items as $item): ?>
                 <?php
