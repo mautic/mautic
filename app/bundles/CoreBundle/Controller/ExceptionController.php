@@ -29,6 +29,10 @@ class ExceptionController extends CommonController
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $layout         = $env == 'prod' ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
+        if ($code === 0) {
+            //thrown exception that didn't set a code
+            $code = 500;
+        }
 
         if ($forceProd = $request->get('prod')) {
             $layout = 'Error';
@@ -44,6 +48,12 @@ class ExceptionController extends CommonController
             $baseTemplate  = 'MauticCoreBundle:Default:content.html.php';
         }
 
+        $template = "MauticCoreBundle:{$layout}:{$code}.html.php";
+        $templating = $this->factory->getTemplating();
+        if (!$templating->exists($template)) {
+            $template = "MauticCoreBundle:{$layout}:base.html.php";
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'baseTemplate'    => $baseTemplate,
@@ -54,7 +64,7 @@ class ExceptionController extends CommonController
                 'currentContent'  => $currentContent,
                 'isPublicPage'    => $anonymous
             ),
-            'contentTemplate' => "MauticCoreBundle:{$layout}:{$code}.html.php",
+            'contentTemplate' => $template,
             'passthroughVars' => array(
                 'error' => array(
                     'code'      => $code,

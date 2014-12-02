@@ -38,7 +38,7 @@ echo '<div class="well well-sm ma-md">'."\n";
 echo "<ol>\n";
 foreach($traces as $trace) {
     echo "<li class=\"pt-3 break-word\">";
-    echo $trace['file'];
+    echo "<strong>{$trace['file']}</strong>";
     if ($trace['line']) {
         echo " (line #" .$trace['line']."): ";
     }

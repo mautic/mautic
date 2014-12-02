@@ -50,12 +50,14 @@ $previousExceptions = $exception->getAllPrevious();
                 <h4><strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?> - <?php echo $exception->getMessage(); ?></h4>
                 <footer class="text-right">Mautibot</footer>
             </blockquote>
-
-            <div class="ml-lg text-danger"><?php echo $exception->getClass(); ?></div>
-            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
-                'traces' => $exception->getTrace()
-            )); ?>
         </div>
+    </div>
+
+    <div class="row mt-20">
+        <h5 class="ml-lg text-danger"><?php echo $exception->getClass(); ?></h5>
+        <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
+            'traces' => $exception->getTrace()
+        )); ?>
     </div>
 
     <?php if (count($previousExceptions)): ?>

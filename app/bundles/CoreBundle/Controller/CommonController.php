@@ -172,7 +172,7 @@ class CommonController extends Controller implements MauticController
         }
 
         //keep from outputting content in case sub renderings hit an error
-        ob_start();
+        //ob_start();
         try {
             //Ajax call so respond with json
             if ($forward) {
@@ -193,7 +193,7 @@ class CommonController extends Controller implements MauticController
                 $this->request->query->set('ignoreAjax', false);
             }
         }
-        ob_end_clean();
+      //  ob_end_clean();
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json
@@ -263,11 +263,10 @@ class CommonController extends Controller implements MauticController
      */
     public function renderException(\Exception $e)
     {
-        $exception  = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
-        $query      = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
-        $subrequest = $this->request->duplicate($query);
-
-        return $this->forward('MauticCoreBundle:Exception:show', array($subrequest, $exception, $this->factory->getLogger(true)), $query);
+        $exception   = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
+        $parameters  = array('request' => $this->request, 'exception' => $exception);
+        $query       = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
     }
 
     /**
