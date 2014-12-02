@@ -440,5 +440,15 @@ system('rm vendor/willdurand/oauth-server-bundle/composer.lock');
 system('rm vendor/willdurand/oauth-server-bundle/phpunit.xml.dist');
 system('rm vendor/willdurand/oauth-server-bundle/README.markdown');
 
+// webfactory/exceptions-bundle
+system('rm -rf vendor/webfactory/exceptions-bundle/Tests');
+system('rm vendor/webfactory/exceptions-bundle/.gitignore');
+system('rm vendor/webfactory/exceptions-bundle/.hgtags');
+system('rm vendor/webfactory/exceptions-bundle/.travis.yml');
+system('rm vendor/webfactory/exceptions-bundle/composer.json');
+system('rm vendor/webfactory/exceptions-bundle/phpunit.xml.dist');
+system('rm vendor/webfactory/exceptions-bundle/README.md');
+system('rm vendor/webfactory/exceptions-bundle/UPGRADING.md');
+
 // Find any .git directories and nuke them
 system('find . -type d -name .git -exec rm -rf {} \\;');
