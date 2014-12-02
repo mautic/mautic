@@ -1390,7 +1390,22 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        var response = typeof request.responseJSON !== 'undefined' ? request.responseJSON : {};
+        console.log(request);
+        if (typeof request.responseJSON !== 'undefined') {
+            response = request.responseJSON;
+        } else {
+            //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
+            //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
+            var errorStart =  request.responseText.indexOf('{"newContent');
+            var jsonString = request.responseText.slice(errorStart);
+
+            if (jsonString) {
+                var response = mQuery.parseJSON(jsonString);
+                console.log(response);
+            } else {
+                response = {};
+            }
+        }
 
         if (response.newContent && mainContent) {
             //an error page was returned
@@ -1409,17 +1424,6 @@ var Mautic = {
             if (response.error) {
                 var error = response.error.code + ': ' + errorThrown + '; ' + response.error.exception;
                 alert(error);
-            } else if (typeof request.responseText !== 'undefined') {
-                var regex = /{(.+?)}}/g //g flag so the regex is global
-
-                //check to see if the error is embedded in html
-                var match = request.responseText.match(regex);
-
-                if (match) {
-                    var errorObj = mQuery.parseJSON(match);
-                    var error = errorObj.error.code + ': ' + errorThrown + '; ' + errorObj.error.exception;
-                    alert(error);
-                }
             }
         }
         Mautic.stopPageLoadingBar();

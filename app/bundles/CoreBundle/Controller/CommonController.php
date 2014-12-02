@@ -9,10 +9,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Exception\AjaxErrorException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -171,30 +169,15 @@ class CommonController extends Controller implements MauticController
             $passthrough["route"] = $args["returnUrl"];
         }
 
-        //keep from outputting content in case sub renderings hit an error
-        ob_start();
-        try {
-            //Ajax call so respond with json
-            if ($forward) {
-                //the content is from another controller action so we must retrieve the response from it instead of
-                //directly parsing the template
-                $query              = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
-                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
-                $newContent         = $newContentResponse->getContent();
-            } else {
-                $newContent = $this->renderView($contentTemplate, $parameters);
-            }
-        } catch (\Exception $e) {
-            $newResponse = $this->renderException($e);
-            if ($forward) {
-                return $newResponse;
-            } else {
-                $newContent = $newResponse->getContent();
-                $this->request->query->set('ignoreAjax', false);
-            }
-        }
-        if (ob_get_length()) {
-            ob_end_clean();
+        //Ajax call so respond with json
+        if ($forward) {
+            //the content is from another controller action so we must retrieve the response from it instead of
+            //directly parsing the template
+            $query              = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+            $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+            $newContent         = $newContentResponse->getContent();
+        } else {
+            $newContent = $this->renderView($contentTemplate, $parameters);
         }
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
@@ -252,7 +235,7 @@ class CommonController extends Controller implements MauticController
             $response = new JsonResponse($dataArray, $code);
         }
 
-        $response->headers->set('Content-Length', strlen($response->getContent()));
+        //$response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }
 
@@ -375,6 +358,10 @@ class CommonController extends Controller implements MauticController
     protected function setFormTheme(Form $form, $template, $theme)
     {
         $formView = $form->createView();
+
+        if (empty($theme)) {
+            return $formView;
+        }
 
         $templating = $this->factory->getTemplating();
 
