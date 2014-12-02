@@ -68,16 +68,6 @@ class MiscStepType extends AbstractType
             'required'   => true
         ));
 
-        $builder->add('send_server_data', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'label'       => 'mautic.install.form.stats.send_stats',
-            'expanded'    => true,
-            'empty_value' => false
-        ));
-
         $builder->add('buttons', 'form_buttons', array(
             'pre_extra_buttons' => array(
                 array(

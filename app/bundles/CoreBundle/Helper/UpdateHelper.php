@@ -102,24 +102,22 @@ class UpdateHelper
         $connector = HttpFactory::getHttp();
 
         // Before processing the update data, send up our metrics
-        if ($this->factory->getParameter('send_server_data')) {
-            try {
-                // Generate a unique instance ID for the site
-                $instanceId = hash('sha1', $this->factory->getParameter('secret') . 'Mautic' . $this->factory->getParameter('db_driver'));
+        try {
+            // Generate a unique instance ID for the site
+            $instanceId = hash('sha1', $this->factory->getParameter('secret') . 'Mautic' . $this->factory->getParameter('db_driver'));
 
-                $data = array(
-                    'application' => 'Mautic',
-                    'version'     => $this->factory->getVersion(),
-                    'phpVerison'  => PHP_VERSION,
-                    'dbDriver'    => $this->factory->getParameter('db_driver'),
-                    'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
-                    'instanceId'  => $instanceId
-                );
+            $data = array(
+                'application' => 'Mautic',
+                'version'     => $this->factory->getVersion(),
+                'phpVerison'  => PHP_VERSION,
+                'dbDriver'    => $this->factory->getParameter('db_driver'),
+                'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
+                'instanceId'  => $instanceId
+            );
 
-                $connector->post('http://mautic.org/stats/send', $data);
-            } catch (\Exception $exception) {
-                // Not so concerned about failures here, move along
-            }
+            $connector->post('http://mautic.org/stats/send', $data);
+        } catch (\Exception $exception) {
+            // Not so concerned about failures here, move along
         }
 
         // Get the update data
