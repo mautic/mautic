@@ -128,6 +128,8 @@ class CampaignController extends FormController
             return $this->forward('MauticCampaignBundle:Campaign:leads', array('objectId' => $objectId, 'page' => $page, $query));
         }
 
+        $page  = $this->factory->getSession()->get('mautic.campaign.page', 1);
+
         $model    = $this->factory->getModel('campaign');
         $security = $this->factory->getSecurity();
         $entity   = $model->getEntity($objectId);
