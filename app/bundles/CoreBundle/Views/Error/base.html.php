@@ -31,10 +31,10 @@ $message = $view['slots']->get('message', 'mautic.core.error.generic');
 ?>
 <div class="pa-20 mautibot-error">
     <div class="row mt-lg pa-md">
-        <div class="mautibot-image col-xs-4 col-md-2 col-lg-2">
+        <div class="mautibot-image col-xs-4 col-md-3">
             <img class="img-responsive" src="<?php echo $src; ?>" />
         </div>
-        <div class="mautibot-content col-xs-8 col-md-10 col-lg-10">
+        <div class="mautibot-content col-xs-8 col-md-9">
             <blockquote class="np break-word">
                 <h1><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans($message, array('%code%' => $status_code)); ?> <i class="fa fa-quote-right"></i></h1>
                 <h4 class="mt-5"><strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?></h4>

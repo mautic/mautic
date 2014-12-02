@@ -34,17 +34,21 @@ switch ($img) {
 
 $message            = $view['slots']->get('message', 'mautic.core.error.generic');
 $previousExceptions = $exception->getAllPrevious();
+
+$exceptionMessage = $exception->getMessage();
+if ($exceptionMessage) {
+    $exceptionMessage = ' - ' . $exceptionMessage;
+}
 ?>
 
 <div class="pa-20 mautibot-error">
     <div class="row">
-        <div class="mautibot-image col-xs-4 col-md-2 col-lg-2">
+        <div class="mautibot-image col-xs-4 col-md-3">
             <img class="img-responsive" src="<?php echo $src; ?>" />
         </div>
-        <div class="mautibot-content col-xs-8 col-md-10 col-lg-10">
+        <div class="mautibot-content col-xs-8 col-md-9">
             <blockquote class="np break-word">
-                <h1><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans($message, array('%code%' => $status_code)); ?> <i class="fa fa-quote-right"></i></h1>
-                <h4><strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?> - <?php echo $exception->getMessage(); ?></h4>
+                <h2><i class="fa fa-quote-left"></i> <strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?><?php echo $exceptionMessage; ?> <i class="fa fa-quote-right"></i></h2>
                 <footer class="text-right">Mautibot</footer>
             </blockquote>
         </div>

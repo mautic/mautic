@@ -4095,5 +4095,6 @@ lesshat-selector {
 }
 .mautibot-error {
   max-width: 1000px;
-  margin: auto 0;
+  margin-left: auto;
+  margin-right: auto;
 }
