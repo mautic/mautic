@@ -40,7 +40,7 @@ $container->setDefinition ('mautic.tblprefix_subscriber',
 $container->setDefinition(
     'mautic.exception.listener',
     new Definition(
-        'Symfony\Component\HttpKernel\EventListener\ExceptionListener',
+        'Mautic\CoreBundle\EventListener\ExceptionListener',
         array(
             'MauticCoreBundle:Exception:show',
             new Reference('monolog.logger.mautic')
