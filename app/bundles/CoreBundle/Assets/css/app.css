@@ -4093,3 +4093,7 @@ lesshat-selector {
 .has-click-event {
   cursor: pointer;
 }
+.mautibot-error {
+  max-width: 1000px;
+  margin: auto 0;
+}
