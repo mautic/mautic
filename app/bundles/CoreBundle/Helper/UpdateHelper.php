@@ -109,7 +109,7 @@ class UpdateHelper
             $data = array(
                 'application' => 'Mautic',
                 'version'     => $this->factory->getVersion(),
-                'phpVerison'  => PHP_VERSION,
+                'phpVersion'  => PHP_VERSION,
                 'dbDriver'    => $this->factory->getParameter('db_driver'),
                 'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
                 'instanceId'  => $instanceId
