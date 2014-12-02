@@ -36,9 +36,16 @@ class MiscStep implements StepInterface
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
      *
-     * @var
+     * @var string
      */
     public $site_url;
+
+    /**
+     * Set the update stability (used when non-stable packages are installed)
+     *
+     * @var string
+     */
+    public $update_stability = 'stable';
 
     /**
      * @var
