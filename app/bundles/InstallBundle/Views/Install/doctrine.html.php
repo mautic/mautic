@@ -31,8 +31,8 @@ $view['assets']->addScriptDeclaration("var test = {};");
 </div>
 <div class="panel-body">
     <?php echo $view['form']->start($form); ?>
-    <div>
-        <?php echo $view['translator']->trans('mautic.install.database.introtext'); ?>
+    <div class="alert alert-mautic">
+        <h6><?php echo $view['translator']->trans('mautic.install.database.introtext'); ?></h6>
     </div>
 
     <?php echo $view['form']->row($form['driver']); ?>

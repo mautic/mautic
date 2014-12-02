@@ -4692,6 +4692,17 @@ a.thumbnail.active {
 .alert-danger .alert-link {
   color: #843534;
 }
+.alert-mautic {
+  background-color: #4e5d9d;
+  border-color: rgba(0, 0, 0, 0.03);
+  color: #ffffff;
+}
+.alert-mautic hr {
+  border-top-color: rgba(0, 0, 0, 0.03);
+}
+.alert-mautic .alert-link {
+  color: #e6e6e6;
+}
 @-webkit-keyframes progress-bar-stripes {
   from {
     background-position: 40px 0;
