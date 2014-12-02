@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -25,55 +24,60 @@ class ExceptionController extends CommonController
      */
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
-        $env            = $this->factory->getEnvironment();
-        $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
-        $layout         = $env == 'prod' ? 'Error' : 'Exception';
-        $code           = $exception->getStatusCode();
-        if ($code === 0) {
-            //thrown exception that didn't set a code
-            $code = 500;
-        }
+        $class = $exception->getClass();
 
-        if ($forceProd = $request->get('prod')) {
-            $layout = 'Error';
-        }
-
-        $anonymous     = $this->factory->getSecurity()->isAnonymous();
-        if ($anonymous || $forceProd) {
-            $baseTemplate  = 'MauticCoreBundle:Default:slim.html.php';
-            if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
-                $baseTemplate = $templatePage;
+        //ignore authentication exceptions
+        if (strpos($class, 'Authentication') === false) {
+            $env            = $this->factory->getEnvironment();
+            $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
+            $layout         = $env == 'prod' ? 'Error' : 'Exception';
+            $code           = $exception->getStatusCode();
+            if ($code === 0) {
+                //thrown exception that didn't set a code
+                $code = 500;
             }
-        } else{
-            $baseTemplate  = 'MauticCoreBundle:Default:content.html.php';
-        }
 
-        $template = "MauticCoreBundle:{$layout}:{$code}.html.php";
-        $templating = $this->factory->getTemplating();
-        if (!$templating->exists($template)) {
-            $template = "MauticCoreBundle:{$layout}:base.html.php";
-        }
+            if ($forceProd = $request->get('prod')) {
+                $layout = 'Error';
+            }
 
-        return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'baseTemplate'    => $baseTemplate,
-                'status_code'     => $code,
-                'status_text'     => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception'       => $exception,
-                'logger'          => $logger,
-                'currentContent'  => $currentContent,
-                'isPublicPage'    => $anonymous
-            ),
-            'contentTemplate' => $template,
-            'passthroughVars' => array(
-                'error' => array(
-                    'code'      => $code,
-                    'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                    'exception' => $exception->getMessage(),
-                    'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+            $anonymous = $this->factory->getSecurity()->isAnonymous();
+            if ($anonymous || $forceProd) {
+                $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+                if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
+                    $baseTemplate = $templatePage;
+                }
+            } else {
+                $baseTemplate = 'MauticCoreBundle:Default:content.html.php';
+            }
+
+            $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
+            $templating = $this->factory->getTemplating();
+            if (!$templating->exists($template)) {
+                $template = "MauticCoreBundle:{$layout}:base.html.php";
+            }
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'baseTemplate'   => $baseTemplate,
+                    'status_code'    => $code,
+                    'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'exception'      => $exception,
+                    'logger'         => $logger,
+                    'currentContent' => $currentContent,
+                    'isPublicPage'   => $anonymous
+                ),
+                'contentTemplate' => $template,
+                'passthroughVars' => array(
+                    'error' => array(
+                        'code'      => $code,
+                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                        'exception' => $exception->getMessage(),
+                        'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+                    )
                 )
-            )
-        ));
+            ));
+        }
     }
 
     /**
