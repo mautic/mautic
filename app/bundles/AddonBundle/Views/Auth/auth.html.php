@@ -7,8 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:slim.html.php');
-
 $js = <<<JS
-Mautic.handleIntegrationCallback("$cookiesSet", "$integration", "$csrfToken", "$code", "$callbackUrl", "{$view['translator']->trans('mautic.integration.oauth.popupblocked')}");
+Mautic.handleIntegrationCallback("$integration", "$csrfToken", "$code", "$callbackUrl", "$clientIdKey", "$clientSecretKey");
 JS;
 $view['assets']->addScriptDeclaration($js, 'bodyClose');

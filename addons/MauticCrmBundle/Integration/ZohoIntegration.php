@@ -8,12 +8,11 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class ZohoIntegration
  */
-class ZohoIntegration extends AbstractIntegration
+class ZohoIntegration extends CrmAbstractIntegration
 {
 
     /**
@@ -27,70 +26,141 @@ class ZohoIntegration extends AbstractIntegration
     }
 
     /**
-     * @return string
-     */
-    public function getFormTemplate()
-    {
-        return 'MauticAddonBundle:Integration:form.html.php';
-    }
-
-    /**
-     * Get a list of available fields from the connecting API
-     *
-     * @return array
-     */
-    public function getAvailableFields()
-    {
-        return array();
-    }
-
-    /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     * {@inheritdoc}
      *
      * @return array
      */
     public function getRequiredKeyFields()
     {
-        return array();
+        return array(
+            'email_id' => 'mautic.zoho.form.email',
+            'password' => 'mautic.zoho.form.password'
+        );
     }
 
     /**
-     * Get a list of supported features for this integration
+     * @param array  $parameters
+     * @param string $authMethod
      *
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     */
+    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
+    {
+        $zohoSettings = $this->settings->getApiKeys();
+
+        parent::createApiAuth($zohoSettings);
+    }
+
+    /**
+     * Check API Authentication
+     */
+    public function checkApiAuth()
+    {
+        try {
+            if (!$this->auth->isAuthorized()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (ErrorException $exception) {
+            return false;
+        }
+    }
+
+    /**
      * @return array
      */
-    public function getSupportedFeatures()
+    public function getAvailableFields()
     {
-        return array();
+        $zohoFields = array();
+
+        if ($this->checkApiAuth()) {
+            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getFields('Leads');
+
+            if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
+                return array();
+            }
+
+            //@todo need to set array("type" => "string");
+            $zohoFields = array();
+            foreach ($leadObject['Leads']['section'] as $optgroup) {
+                $zohoFields[$optgroup['dv']] = array();
+                if (!array_key_exists(0, $optgroup['FL']))
+                    $optgroup['FL'] = array($optgroup['FL']);
+                foreach ($optgroup['FL'] as $field) {
+                    $zohoFields[$optgroup['dv']][$field['dv']] = $field['dv'];
+                }
+            }
+        }
+
+        return $zohoFields;
     }
 
     /**
-     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
-     *
-     * @return string
+     * @param $data
+     * @return mixed|void
      */
-    public function getAuthenticationType()
+    public function create(MauticFactory $factory, $data)
     {
-        return 'none';
-    }
+        try {
+            $this->factory = $factory;
+            $router = $this->factory->getRouter();
+            $request = $this->factory->getRequest();
+            $modelClient = $this->factory->getModel('mapper.ApplicationClient');
+            $application = 'zoho';
+            $request->set('application', $application);
+            $entityClient = $modelClient->loadByApplication($application);
+            $client = $entityClient->getAlias();
+            $request->set('client', $client);
 
-    /**
-     * Get the URL required to obtain an oauth2 access token
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
-    {
-        return '';
-    }
+            $this->checkApiAuth();
 
-    /**
-     * Get the authentication/login URL for oauth2 access
-     *
-     * @return string
-     */
-    protected function getAuthenticationUrl()
-    {
-        return '';
+            $modelMapper = $this->factory->getModel('mapper.ApplicationObjectMapper');
+            $mapperEntity = $modelMapper->getByClientAndObject($entityClient->getId(),$this->getBaseName());
+
+            $mappedFields = array();
+
+            $xmlData = '<Leads>';
+            $xmlData .= '<row no="1">';
+            foreach ($mappedFields as $field) {
+                $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $field['name'], $field['value']);
+            }
+            $xmlData .= '</row>';
+            $xmlData .= '</Leads>';
+
+            $zohoSettings = $entityClient->getApiKeys();
+
+            $zohoAuth = ApiAuth::initiate($zohoSettings);
+            $leadObject = CrmApi::getContext('Zoho', "object", $zohoAuth)->insert('Leads', $xmlData);
+
+            if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
+                throw new ErrorException($leadObject['response']['error']['message'],$leadObject['response']['error']['code']);
+            }
+
+
+        } catch (ErrorException $exception) {
+            //remove keys and try again
+            if ($exception->getCode() == 1) {
+                $zohoSettings = $entityClient->getApiKeys();
+                unset($zohoSettings['accessToken']);
+                unset($zohoSettings['accessTokenExpires']);
+                $entityClient->setApiKeys($zohoSettings);
+                $modelClient->saveEntity($entityClient);
+            }
+            $this->factory->getSession()->getFlashBag()->add('error',
+                $this->factory->getTranslator()->trans(
+                    $exception->getMessage(),
+                    (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
+                    'flashes'
+                ));
+
+            $url = $router->generate('mautic_crm_client_objects_index', array(
+                'client'      => $client,
+                'application' => $application
+            ));
+
+            $redirect = new RedirectResponse($url);
+            $redirect->send();
+        }
     }
 }

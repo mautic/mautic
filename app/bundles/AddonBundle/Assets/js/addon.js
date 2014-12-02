@@ -1,5 +1,6 @@
 /* AddonBundle */
 
+
 Mautic.loadIntegrationAuthWindow = function(url, keyType, network, popupMsg) {
     //get the key needed if required
     var base = '#integration_details_apiKeys_';
@@ -8,7 +9,7 @@ Mautic.loadIntegrationAuthWindow = function(url, keyType, network, popupMsg) {
         var apiKey = mQuery(base+keyType).val();
 
         //replace the placeholder
-        url = url.replace('{'+keyType+'}', apiKey);
+        url = url.replace('{'+keyType+'}', encodeURIComponent(apiKey));
     }
 
     var generator = window.open(url, 'socialauth','height=400,width=500');
@@ -25,19 +26,23 @@ Mautic.loadIntegrationAuthWindow = function(url, keyType, network, popupMsg) {
  * @param code
  * @param callbackUrl
  */
-Mautic.handleIntegrationCallback = function (cookieSet, network, token, code, callbackUrl) {
+Mautic.handleIntegrationCallback = function (network, token, code, callbackUrl, clientIdKey, clientSecretKey) {
     //get the keys
     var base = '#integration_details_apiKeys_';
 
-    var clientId = window.opener.mQuery(base + 'clientId').val();
-    var clientSecret = window.opener.mQuery(base + 'clientSecret').val();
-
-    if (!cookieSet) {
-        mQuery.cookie('mautic_integration_clientid', clientId, {path: '/'});
-        mQuery.cookie('mautic_integration_clientsecret', clientSecret, {path: '/'});
-        //reload to make the cookie available
-        window.location.href = window.location.href + "&cookiesSet=1";
+    if (typeof clientIdKey == 'undefined') {
+        clientIdKey = 'clientId';
     }
+
+    if (typeof clientSecretKey == 'undefined') {
+        clientSecretKey = 'clientSecret';
+    }
+
+    var clientId = window.opener.mQuery(base + clientIdKey).val();
+    var clientSecret = window.opener.mQuery(base + clientSecretKey).val();
+
+    mQuery.cookie('mautic_integration_clientid', clientId, {path: '/'});
+    mQuery.cookie('mautic_integration_clientsecret', clientSecret, {path: '/'});
 
     //perform callback
     var query =

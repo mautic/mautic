@@ -22,7 +22,7 @@ class AuthController extends FormController
      *
      * @return JsonResponse
      */
-    public function oAuth2CallbackAction($integration)
+    public function oAuth2CallbackAction ($integration)
     {
         $isAjax = $this->request->isXmlHttpRequest();
 
@@ -49,6 +49,7 @@ class AuthController extends FormController
 
         $session    = $this->factory->getSession();
         $state      = $session->get($integration . '_csrf_token', false);
+
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
             $this->request->getSession()->getFlashBag()->add('error', 'Invalid CSRF token!');
@@ -61,13 +62,13 @@ class AuthController extends FormController
 
         if (!$isAjax) {
             //redirected from SM site with code so obtain access_token via ajax
-
             return $this->render('MauticAddonBundle:Auth:auth.html.php', array(
-                'integration' => $integration,
-                'csrfToken'   => $state,
-                'code'        => $this->request->get('code'),
-                'callbackUrl' => $this->generateUrl('mautic_integration_oauth_callback', array('integration' => $integration), true),
-                'cookiesSet'  => $this->request->get('cookiesSet', 0)
+                'integration'     => $integration,
+                'csrfToken'       => $state,
+                'code'            => $this->request->get('code'),
+                'callbackUrl'     => $this->generateUrl('mautic_integration_oauth_callback', array('integration' => $integration), true),
+                'clientIdKey'     => $integrationObjects[$integration]->getClientIdKey(),
+                'clientSecretKey' => $integrationObjects[$integration]->getClientSecretKey()
             ));
         }
 
@@ -83,13 +84,13 @@ class AuthController extends FormController
 
         //check for error
         if ($error) {
-            $type = 'error';
+            $type    = 'error';
             $message = 'mautic.integration.error.oauthfail';
-            $params = array('%error%' => $error);
+            $params  = array('%error%' => $error);
         } else {
-            $type = 'notice';
+            $type    = 'notice';
             $message = 'mautic.integration.notice.oauthsuccess';
-            $params = array();
+            $params  = array();
         }
 
         $this->request->getSession()->getFlashBag()->add(
@@ -103,7 +104,7 @@ class AuthController extends FormController
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function oAuthStatusAction()
+    public function oAuthStatusAction ()
     {
         return $this->render('MauticAddonBundle:Auth:postauth.html.php');
     }

@@ -47,7 +47,8 @@ class DetailsType extends AbstractType
             'data'           => $options['data']->getApiKeys()
         ));
 
-        if ($options['integration_object']->getAuthenticationType() == 'oauth2') {
+        $authType = $options['integration_object']->getAuthenticationType();
+        if (in_array($authType, array('oauth2', 'callback'))) {
             $url      = $options['integration_object']->getOAuthLoginUrl();
             $keys     = $options['data']->getApiKeys();
             $disabled = false;
@@ -86,21 +87,24 @@ class DetailsType extends AbstractType
                 'label'       => 'mautic.integration.form.features',
                 'required'    => false
             ));
-        }
 
-        $builder->add('featureSettings', 'integration_featuresettings', array(
-            'label'          => 'mautic.integration.form.feature.settings',
-            'required'       => false,
-            'data'           => $options['data']->getFeatureSettings(),
-            'label_attr'     => array('class' => 'control-label'),
-            'integration'        => $options['integration'],
-            'integration_object' => $options['integration_object'],
-            'lead_fields'    => $options['lead_fields']
-        ));
+            $builder->add('featureSettings', 'integration_featuresettings', array(
+                'label'              => 'mautic.integration.form.feature.settings',
+                'required'           => false,
+                'data'               => $options['data']->getFeatureSettings(),
+                'label_attr'         => array('class' => 'control-label'),
+                'integration'        => $options['integration'],
+                'integration_object' => $options['integration_object'],
+                'lead_fields'        => $options['lead_fields']
+            ));
+        };
 
         $builder->add('name', 'hidden', array('data' => $options['integration']));
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', 'form_buttons', array(
+            'apply_text'      => false,
+            'save_text'       => 'mautic.core.form.save'
+        ));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

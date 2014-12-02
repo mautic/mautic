@@ -167,12 +167,15 @@ class IntegrationHelper
         static $fields = array();
 
         if (empty($fields)) {
-            $integrations = $this->getIntegrationObjects();
+            $integrations = $this->getIntegrationObjects($service);
             $translator   = $this->factory->getTranslator();
             foreach ($integrations as $s => $object) {
+                /** @var $object \Mautic\AddonBundle\Integration\AbstractIntegration */
                 $fields[$s] = array();
                 $available  = $object->getAvailableFields();
-
+                if (empty($available) || !is_array($available)) {
+                    continue;
+                }
                 foreach ($available as $field => $details) {
                     $fn = $object->matchFieldName($field);
                     switch ($details['type']) {

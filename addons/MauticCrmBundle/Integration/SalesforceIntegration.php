@@ -8,16 +8,16 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
+use MauticAddon\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class SalesforceIntegration
  */
-class SalesforceIntegration extends AbstractIntegration
+class SalesforceIntegration extends CrmAbstractIntegration
 {
 
     /**
-     * Returns the name of the social integration that must match the name of the file
+     * {@inheritdoc}
      *
      * @return string
      */
@@ -27,70 +27,115 @@ class SalesforceIntegration extends AbstractIntegration
     }
 
     /**
+     * Get the array key for clientId
+     *
      * @return string
      */
-    public function getFormTemplate()
+    public function getClientIdKey()
     {
-        return 'MauticAddonBundle:Integration:form.html.php';
+        return 'clientKey';
     }
 
     /**
-     * Get a list of available fields from the connecting API
+     * Get the array key for client secret
      *
-     * @return array
+     * @return string
      */
-    public function getAvailableFields()
+    public function getClientSecretKey()
     {
-        return array();
+        return 'clientSecret';
     }
 
     /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     * {@inheritdoc}
      *
      * @return array
      */
     public function getRequiredKeyFields()
     {
-        return array();
+        return array(
+            'clientKey'     => 'mautic.integration.keyfield.consumerid',
+            'clientSecret'  => 'mautic.integration.keyfield.consumersecret'
+        );
     }
 
     /**
-     * Get a list of supported features for this integration
-     *
-     * @return array
-     */
-    public function getSupportedFeatures()
-    {
-        return array();
-    }
-
-    /**
-     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
-    {
-        return 'none';
-    }
-
-    /**
-     * Get the URL required to obtain an oauth2 access token
+     * {@inheritdoc}
      *
      * @return string
      */
     public function getAccessTokenUrl()
     {
-        return '';
+        return 'https://login.salesforce.com/services/oauth2/token';
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
+     * {@inheritdoc}
      *
      * @return string
      */
-    protected function getAuthenticationUrl()
+    public function getAuthenticationUrl()
     {
-        return '';
+        return 'https://login.salesforce.com/services/oauth2/authorize';
+    }
+
+    /**
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     */
+    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
+    {
+        $salesForceSettings                     = $this->settings->getApiKeys();
+        $salesForceSettings['callback']         = $this->getOauthCallbackUrl();
+        $salesForceSettings['accessTokenUrl']   = 'https://login.salesforce.com/services/oauth2/token';
+        $salesForceSettings['authorizationUrl'] = 'https://login.salesforce.com/services/oauth2/authorize';
+
+        parent::createApiAuth($salesForceSettings);
+    }
+
+    /**
+     * Check API Authentication
+     */
+    public function checkApiAuth()
+    {
+        try {
+            if (!$this->auth->isAuthorized()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (ErrorException $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getAvailableFields()
+    {
+        $salesFields = array();
+
+        if ($this->checkApiAuth()) {
+            $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth, 'v20.0')->getInfo('lead');
+
+            if (isset($leadObject['fields'])) {
+                foreach ($leadObject['fields'] as $fieldInfo) {
+                    if (!isset($fieldInfo['name']))
+                        continue;
+                    $salesFields[$fieldInfo['name']] = array("type" => "string");
+                }
+            }
+        }
+
+        return $salesFields;
+    }
+
+    /**
+     * @param $data
+     * @return mixed|void
+     */
+    public function create(MauticFactory $factory, $data)
+    {
+
     }
 }

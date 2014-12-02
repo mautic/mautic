@@ -20,7 +20,7 @@ class IntegrationController extends FormController
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction ()
     {
         if (!$this->factory->getSecurity()->isGranted('addon:addons:manage')) {
             return $this->accessDenied();
@@ -29,7 +29,7 @@ class IntegrationController extends FormController
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-        $integrations     = array();
+        $integrations       = array();
 
         foreach ($integrationObjects as $name => $object) {
             $integrations[$name] = array('name' => $name, 'icon' => $integrationHelper->getIconPath($object));
@@ -41,15 +41,15 @@ class IntegrationController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'items'       => $integrations,
-                'tmpl'        => $tmpl
+            'viewParameters'  => array(
+                'items' => $integrations,
+                'tmpl'  => $tmpl
             ),
             'contentTemplate' => 'MauticAddonBundle:Integration:grid.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_addon_integration_index',
-                'mauticContent'  => 'integration',
-                'route'          => $this->generateUrl('mautic_addon_integration_index')
+                'activeLink'    => '#mautic_addon_integration_index',
+                'mauticContent' => 'integration',
+                'route'         => $this->generateUrl('mautic_addon_integration_index')
             )
         ));
     }
@@ -59,7 +59,7 @@ class IntegrationController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction($name)
+    public function editAction ($name)
     {
         if (!$this->factory->getSecurity()->isGranted('addon:addons:manage')) {
             return $this->accessDenied();
@@ -89,7 +89,7 @@ class IntegrationController extends FormController
         $leadFields = array();
 
         foreach ($fields as $f) {
-            $leadFields['mautic.lead.field.group.'. $f->getGroup()][$f->getId()] = $f->getLabel();
+            $leadFields['mautic.lead.field.group.' . $f->getGroup()][$f->getId()] = $f->getLabel();
         }
 
         // Sort the groups
@@ -101,10 +101,10 @@ class IntegrationController extends FormController
         }
 
         $form = $this->createForm('integration_details', $integrationObject->getIntegrationSettings(), array(
-            'integration'  => $integrationObject->getIntegrationSettings()->getName(),
-            'lead_fields' => $leadFields,
+            'integration'        => $integrationObject->getIntegrationSettings()->getName(),
+            'lead_fields'        => $leadFields,
             'integration_object' => $integrationObject,
-            'action'      => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
+            'action'             => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
         ));
 
         if ($this->request->getMethod() == 'POST') {
@@ -112,7 +112,7 @@ class IntegrationController extends FormController
                 if ($this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
                     $entity      = $integrationObject->getIntegrationSettings();
-                    $integration     = $entity->getName();
+                    $integration = $entity->getName();
                     $currentKeys = $entity->getApiKeys();
 
                     // Check to make sure secret keys were not wiped out
@@ -125,9 +125,9 @@ class IntegrationController extends FormController
                     }
 
                     $features = $entity->getSupportedFeatures();
-                    if (in_array('public_profile', $features)) {
+                    if (in_array('public_profile', $features) || in_array('lead_push', $features)) {
                         //make sure now non-existent aren't saved
-                        $featureSettings               = $entity->getFeatureSettings();
+                        $featureSettings = $entity->getFeatureSettings();
                         if (isset($featureSettings['leadFields'])) {
                             $fields                        = $integrationHelper->getAvailableFields($integration);
                             $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
@@ -156,8 +156,8 @@ class IntegrationController extends FormController
         }
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'form'        => $form->createView()
+            'viewParameters'  => array(
+                'form' => $form->createView()
             ),
             'contentTemplate' => $integrationObject->getFormTemplate(),
             'passthroughVars' => array(

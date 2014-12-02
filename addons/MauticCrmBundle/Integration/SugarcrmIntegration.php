@@ -8,12 +8,11 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class SugarcrmIntegration
  */
-class SugarcrmIntegration extends AbstractIntegration
+class SugarcrmIntegration extends CrmAbstractIntegration
 {
 
     /**
@@ -26,71 +25,103 @@ class SugarcrmIntegration extends AbstractIntegration
         return 'Sugarcrm';
     }
 
-    /**
-     * @return string
-     */
-    public function getFormTemplate()
+    public function getClientIdKey()
     {
-        return 'MauticAddonBundle:Integration:form.html.php';
+        return 'client_key';
+    }
+
+    public function getClientSecreteKey()
+    {
+        return 'clientSecret';
     }
 
     /**
-     * Get a list of available fields from the connecting API
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getAvailableFields()
+    public function getOAuthLoginUrl()
     {
-        return array();
+        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
     }
 
     /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     * {@inheritdoc}
      *
      * @return array
      */
     public function getRequiredKeyFields()
     {
-        return array();
+        return array(
+            'url'           => 'mautic.sugarcrm.form.url',
+            'client_key'    => 'mautic.sugarcrm.form.clientkey',
+            'client_secret' => 'mautic.sugarcrm.form.clientsecret',
+            'username'      => 'mautic.sugarcrm.form.username',
+            'password'      => 'mautic.sugarcrm.form.password'
+        );
     }
 
     /**
-     * Get a list of supported features for this integration
+     * @param array  $parameters
+     * @param string $authMethod
      *
-     * @return array
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
      */
-    public function getSupportedFeatures()
+    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        return array();
+        $sugarCRMSettings                    = $this->settings->getApiKeys();
+        $sugarCRMSettings['callback']        = $this->getOauthCallbackUrl();
+        if (isset($sugarCRMSettings['url'])) {
+            $sugarCRMSettings['requestTokenUrl'] = sprintf('%s/rest/v10/oauth2/token', $sugarCRMSettings['url']);
+        }
+
+        parent::createApiAuth($sugarCRMSettings);
     }
 
     /**
-     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
-     *
-     * @return string
+     * Check API Authentication
      */
-    public function getAuthenticationType()
+    public function checkApiAuth()
     {
-        return 'none';
+        $sugarCRMSettings = $this->settings->getApiKeys();
+        if (!isset($sugarCRMSettings['url'])) {
+            return false;
+        }
+
+        try {
+            if (!$this->auth->isAuthorized()) {
+                return false;
+            }
+            return true;
+        } catch (ErrorException $exception) {
+            return false;
+        }
     }
 
     /**
-     * Get the URL required to obtain an oauth2 access token
-     *
-     * @return string
+     * @return array|mixed
      */
-    public function getAccessTokenUrl()
+    public function getAvailableFields()
     {
-        return '';
+        $sugarFields = array();
+
+        if ($this->checkApiAuth()) {
+            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo("Leads");
+            $sugarFields = array();
+            foreach ($leadObject['fields'] as $fieldInfo) {
+                if (!isset($fieldInfo['name']))
+                    continue;
+                $sugarFields[$fieldInfo['name']] = array("type" => "string");
+            }
+        }
+
+        return $sugarFields;
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
-     *
-     * @return string
+     * @param $data
+     * @return mixed|void
      */
-    protected function getAuthenticationUrl()
+    public function create(MauticFactory $factory, $data)
     {
-        return '';
+
     }
 }

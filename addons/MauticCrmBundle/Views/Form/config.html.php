@@ -7,9 +7,4 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'name'        => 'CRM Integrations',
-    'description' => 'Enables integration with Mautic supported CRMs.',
-    'version'     => '1.0',
-    'author'      => 'Mautic'
-);
+echo $view['form']->form($form);

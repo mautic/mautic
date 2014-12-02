@@ -29,16 +29,21 @@ abstract class AbstractIntegration
     protected $settings;
 
     /**
-     * @var bool
-     */
-    private $isCore;
-
-    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
+
+        $this->init();
+    }
+
+    /**
+     * Called on construct
+     */
+    public function init()
+    {
+
     }
 
     /**
@@ -103,20 +108,38 @@ abstract class AbstractIntegration
      */
     public function getOAuthLoginUrl()
     {
-        $callback = $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
-            array('integration' => $this->getName()),
-            true //absolute
-        );
+        $callback = $this->getOauthCallbackUrl();
 
         $state = hash('sha1', uniqid(mt_rand()));
+        $clientIdKey = $this->getClientIdKey();
         $url = $this->getAuthenticationUrl()
-            . '?client_id={clientId}' //placeholder to be replaced by whatever is the field
+            . '?client_id={'.$clientIdKey.'}' //placeholder to be replaced by whatever is the field
             . '&response_type=code'
             . '&redirect_uri=' . urlencode($callback)
             . '&state=' . $state; //set a state to protect against CSRF attacks
         $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
 
         return $url;
+    }
+
+    /**
+     * Get the array key for clientId
+     *
+     * @return string
+     */
+    public function getClientIdKey()
+    {
+        return 'clientId';
+    }
+
+    /**
+     * Get the array key for client secret
+     *
+     * @return string
+     */
+    public function getClientSecretKey()
+    {
+        return 'clientSecret';
     }
 
     /**
@@ -132,10 +155,7 @@ abstract class AbstractIntegration
         $request  = $this->factory->getRequest();
         $url      = $this->getAccessTokenUrl();
         $keys     = $this->settings->getApiKeys();
-        $callback = $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
-            array('integration' => $this->getName()),
-            true //absolute
-        );
+        $callback = $this->getOauthCallbackUrl();
 
         if (!empty($clientId)) {
             //callback from JS
@@ -204,6 +224,20 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Gets the URL for the built in oauth callback
+     *
+     * @return string
+     */
+    public function getOauthCallbackUrl()
+    {
+        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
+            array('integration' => $this->getName()),
+            true //absolute
+        );
+    }
+
+
+    /**
      * Extract the tokens returned by the oauth2 callback
      *
      * @param string $data
@@ -267,7 +301,8 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
+     * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
+     * (will call $this->authenticationTypeCallback)
      *
      * @return string
      */

@@ -49,6 +49,7 @@ class FeatureSettingsType extends AbstractType
             ));
         }
 
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
         $fields        = $integrationHelper->getAvailableFields($options['integration']);
 

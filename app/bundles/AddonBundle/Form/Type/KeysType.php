@@ -28,7 +28,8 @@ class KeysType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         foreach ($options['integration_keys'] as $key => $label) {
-            $builder->add($key, 'text', array(
+            $type = (strpos(strtolower($key), 'secret') !== false || strpos(strtolower($key), 'password') !== false) ? 'password' : 'text';
+            $builder->add($key, $type, array(
                 'label'        => $label,
                 'label_attr'   => array('class' => 'control-label'),
                 'attr'         => array(

@@ -1393,6 +1393,14 @@ var Mautic = {
         if (response.newContent && mainContent) {
             //an error page was returned
             mQuery('#app-content .content-body').html(response.newContent);
+        } else if (response.newContent && mQuery('.modal.in').length) {
+            //assume a modal was the recipient of the information
+            mQuery('.modal.in .modal-body-content').html(response.newContent);
+            mQuery('.modal.in .modal-body-content').removeClass('hide');
+            if (mQuery('.modal.in  .loading-placeholder').length) {
+                mQuery('.modal.in  .loading-placeholder').addClass('hide');
+            }
+
         } else if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
             console.log(request);
 

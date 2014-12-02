@@ -7,12 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$leadField = (isset($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$leadField = (isset($form['featureSettings']) && isset($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$hasFeatures = (isset($form['supportedFeatures']));
 ?>
 
 <ul class="nav nav-tabs pr-md pl-md">
     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.details'); ?></a></li>
+    <?php if ($hasFeatures): ?>
     <li class=""><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.features'); ?></a></li>
+    <?php endif; ?>
     <?php if ($leadField): ?>
     <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.fieldmapping'); ?></a></li>
     <?php endif; ?>
@@ -29,9 +32,11 @@ $leadField = (isset($form['featureSettings']['leadFields'])) ? $view['form']->ro
         <?php endif; ?>
     </div>
 
+    <?php if ($hasFeatures): ?>
     <div class="tab-pane fade bdr-w-0" id="features-container">
         <?php echo $view['form']->row($form['supportedFeatures']); ?>
         <?php echo $view['form']->row($form['featureSettings']); ?>
+        <?php endif; ?>
     </div>
 
     <?php if ($leadField): ?>

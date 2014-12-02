@@ -193,7 +193,9 @@ class CommonController extends Controller implements MauticController
                 $this->request->query->set('ignoreAjax', false);
             }
         }
-        ob_end_clean();
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json

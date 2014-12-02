@@ -8,14 +8,12 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class VtigerIntegration
  */
-class VtigerIntegration extends AbstractIntegration
+class VtigerIntegration extends CrmAbstractIntegration
 {
-
     /**
      * Returns the name of the social integration that must match the name of the file
      *
@@ -27,45 +25,21 @@ class VtigerIntegration extends AbstractIntegration
     }
 
     /**
-     * @return string
-     */
-    public function getFormTemplate()
-    {
-        return 'MauticAddonBundle:Integration:form.html.php';
-    }
-
-    /**
-     * Get a list of available fields from the connecting API
-     *
-     * @return array
-     */
-    public function getAvailableFields()
-    {
-        return array();
-    }
-
-    /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     * {@inheritdoc}
      *
      * @return array
      */
     public function getRequiredKeyFields()
     {
-        return array();
+        return array(
+            'url'           => 'mautic.vtiger.form.url',
+            'username'      => 'mautic.vtiger.form.username',
+            'access_key'    => 'mautic.vtiger.form.password'
+        );
     }
 
     /**
-     * Get a list of supported features for this integration
-     *
-     * @return array
-     */
-    public function getSupportedFeatures()
-    {
-        return array();
-    }
-
-    /**
-     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
+    {@inheritdoc}
      *
      * @return string
      */
@@ -75,22 +49,59 @@ class VtigerIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the URL required to obtain an oauth2 access token
+     * @param array  $parameters
+     * @param string $authMethod
      *
-     * @return string
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
      */
-    public function getAccessTokenUrl()
+    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        return '';
+        $vtigerSettings = $this->settings->getApiKeys();
+
+        parent::createApiAuth($vtigerSettings);
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
-     *
-     * @return string
+     * Check API Authentication
      */
-    protected function getAuthenticationUrl()
+    public function checkApiAuth()
     {
-        return '';
+        try {
+            if (!$this->isAuthorized()) {
+                return false;
+            }
+            return true;
+        } catch (ErrorException $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @return mixed|void
+     */
+    public function getAvailableFields()
+    {
+        $vtigerFields = array();
+
+        if ($this->checkApiAuth()) {
+            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe("Leads");
+
+            foreach ($leadObject['fields'] as $fieldInfo) {
+                if (!isset($fieldInfo['name']))
+                    continue;
+                $vtigerFields[$fieldInfo['name']] = array("type" => "string");
+            }
+        }
+
+        return $vtigerFields;
+    }
+
+    /**
+     * @param $data
+     * @return mixed|void
+     */
+    public function create(MauticFactory $factory, $data)
+    {
+
     }
 }
