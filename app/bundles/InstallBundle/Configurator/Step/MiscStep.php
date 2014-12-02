@@ -97,7 +97,10 @@ class MiscStep implements StepInterface
         $parameters = array();
 
         foreach ($data as $key => $value) {
-            $parameters[$key] = $value;
+            // Exclude backup params from the config
+            if ($key != 'request_url') {
+                $parameters[$key] = $value;
+            }
         }
 
         return $parameters;
