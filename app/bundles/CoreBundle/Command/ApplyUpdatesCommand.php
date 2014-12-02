@@ -103,7 +103,7 @@ EOT
         $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
 
         // Fetch the update package
-        $package = $updateHelper->fetchPackage($this->getContainer()->getParameter('kernel.root_dir'), $update['package']);
+        $package = $updateHelper->fetchPackage($update['package']);
 
         if ($package['error']) {
             $output->writeln('<error>' . $translator->trans($package['message']) . '</error>');

@@ -34,12 +34,11 @@ class UpdateHelper
     /**
      * Fetches a download package from the remote server
      *
-     * @param string $kernelRoot
      * @param string $package
      *
      * @return array
      */
-    public function fetchPackage($kernelRoot, $package)
+    public function fetchPackage($package)
     {
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
@@ -62,7 +61,7 @@ class UpdateHelper
         }
 
         // Set the filesystem target
-        $target = $kernelRoot . '/cache/' . basename($package);
+        $target = $this->factory->getParameter('cache_path') . '/' . basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -76,14 +75,13 @@ class UpdateHelper
     /**
      * Retrieves the update data from our home server
      *
-     * @param string $kernelRoot
-     * @param bool   $overrideCache
+     * @param bool $overrideCache
      *
      * @return array
      */
-    public function fetchData($kernelRoot, $overrideCache = false)
+    public function fetchData($overrideCache = false)
     {
-        $cacheFile = $kernelRoot . '/cache/lastUpdateCheck.txt';
+        $cacheFile = $this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt';
 
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($cacheFile)) {
@@ -129,7 +127,7 @@ class UpdateHelper
             );
 
             // TODO - Whenever I get the router hooked up on the component, change this URL
-            $data    = $connector->post('http://mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
+            $data    = $connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(

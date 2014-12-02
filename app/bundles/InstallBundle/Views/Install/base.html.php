@@ -40,7 +40,7 @@ $view['assets']->addScriptDeclaration("var MauticInstaller = {
                     </div>
 
                     <div class="mt-20 col-lg-6 col-lg-offset-3">
-                        <div id="app-content" class="panel">
+                        <div id="app-content" class="panel panel-default">
                             <?php $view['slots']->output('_content'); ?>
                         </div>
                     </div>
