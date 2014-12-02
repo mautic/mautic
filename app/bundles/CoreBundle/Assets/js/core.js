@@ -321,9 +321,13 @@ var Mautic = {
         if (mQuery('.shuffle-grid').length) {
             var grid = mQuery(".shuffle-grid");
 
-            grid.shuffle({
-                itemSelector: ".shuffle"
-            });
+            //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
+            setTimeout(function() {
+                grid.shuffle({
+                    itemSelector: ".shuffle",
+                    sizer: false
+                });
+            }, 1000);
 
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
@@ -333,6 +337,7 @@ var Mautic = {
                 .on("fa.sidebar.maximize", function () {
                     grid.shuffle("update");
                 });
+
         }
 
         //run specific on loads
