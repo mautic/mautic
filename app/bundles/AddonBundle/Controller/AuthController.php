@@ -11,6 +11,7 @@ namespace Mautic\AddonBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Class AuthController
@@ -60,27 +61,7 @@ class AuthController extends FormController
             }
         }
 
-        if (!$isAjax) {
-            //redirected from SM site with code so obtain access_token via ajax
-            return $this->render('MauticAddonBundle:Auth:auth.html.php', array(
-                'integration'     => $integration,
-                'csrfToken'       => $state,
-                'code'            => $this->request->get('code'),
-                'callbackUrl'     => $this->generateUrl('mautic_integration_oauth_callback', array('integration' => $integration), true),
-                'clientIdKey'     => $integrationObjects[$integration]->getClientIdKey(),
-                'clientSecretKey' => $integrationObjects[$integration]->getClientSecretKey()
-            ));
-        }
-
-        $clientId     = $this->request->cookies->get('mautic_integration_clientid');
-        $clientSecret = $this->request->cookies->get('mautic_integration_clientsecret');
-
-        //access token obtained so now get it and save it
-        $session->remove($integration . '_csrf_token');
-        $session->remove('mautic_integration_clientid');
-        $session->remove('mautic_integration_clientsecret');
-
-        list($entity, $error) = $integrationObjects[$integration]->oAuthCallback($clientId, $clientSecret);
+        list($entity, $error) = $integrationObjects[$integration]->oAuthCallback();
 
         //check for error
         if ($error) {
@@ -98,7 +79,7 @@ class AuthController extends FormController
             $this->get('translator')->trans($message, $params, 'flashes')
         );
 
-        return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
+        return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
     }
 
     /**

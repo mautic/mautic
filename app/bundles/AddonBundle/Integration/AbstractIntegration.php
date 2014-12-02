@@ -110,10 +110,12 @@ abstract class AbstractIntegration
     {
         $callback = $this->getOauthCallbackUrl();
 
-        $state = hash('sha1', uniqid(mt_rand()));
+        $keys = $this->settings->getApiKeys();
         $clientIdKey = $this->getClientIdKey();
+        $clientId = $keys[$clientIdKey];
+        $state = hash('sha1', uniqid(mt_rand()));
         $url = $this->getAuthenticationUrl()
-            . '?client_id={'.$clientIdKey.'}' //placeholder to be replaced by whatever is the field
+            . '?client_id='.$clientId //placeholder to be replaced by whatever is the field
             . '&response_type=code'
             . '&redirect_uri=' . urlencode($callback)
             . '&state=' . $state; //set a state to protect against CSRF attacks

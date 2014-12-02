@@ -65,6 +65,8 @@ class IntegrationController extends FormController
             return $this->accessDenied();
         }
 
+        $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
+
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
@@ -124,19 +126,33 @@ class IntegrationController extends FormController
                         }
                     }
 
-                    $features = $entity->getSupportedFeatures();
-                    if (in_array('public_profile', $features) || in_array('lead_push', $features)) {
-                        //make sure now non-existent aren't saved
-                        $featureSettings = $entity->getFeatureSettings();
-                        if (isset($featureSettings['leadFields'])) {
-                            $fields                        = $integrationHelper->getAvailableFields($integration);
-                            $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
-                            $entity->setFeatureSettings($featureSettings);
+                    if (!$authorize) {
+                        $features = $entity->getSupportedFeatures();
+                        if (in_array('public_profile', $features) || in_array('lead_push', $features)) {
+                            //make sure now non-existent aren't saved
+                            $featureSettings = $entity->getFeatureSettings();
+                            if (isset($featureSettings['leadFields'])) {
+                                $fields                        = $integrationHelper->getAvailableFields($integration);
+                                $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
+                                $entity->setFeatureSettings($featureSettings);
+                            }
                         }
                     }
 
                     $em->persist($entity);
                     $em->flush();
+
+                    if ($authorize) {
+                        //redirect to the oauth URL
+                        /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integrationObject */
+                        $oauthUrl = $integrationObject->getOAuthLoginUrl();
+                        return new JsonResponse(array(
+                            'integration' => $integration,
+                            'authUrl' => $oauthUrl,
+                            'authorize' => 1,
+                            'popupBlockerMessage' => $this->factory->getTranslator('mautic.integration.oauth.popupblocked')
+                        ));
+                    }
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
