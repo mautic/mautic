@@ -12,7 +12,7 @@ namespace MauticAddon\MauticCrmBundle\Integration;
 /**
  * Class VtigerIntegration
  */
-class VtigerIntegration extends CrmAbstractIntegration
+abstract class VtigerIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file

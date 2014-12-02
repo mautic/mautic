@@ -12,7 +12,7 @@ namespace MauticAddon\MauticCrmBundle\Integration;
 /**
  * Class ZohoIntegration
  */
-class ZohoIntegration extends CrmAbstractIntegration
+abstract class ZohoIntegration extends CrmAbstractIntegration
 {
 
     /**
