@@ -9,10 +9,10 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -27,8 +27,8 @@ class ExceptionController extends CommonController
     {
         $env            = $this->factory->getEnvironment();
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
-        $code           = $exception->getStatusCode();
         $layout         = $env == 'prod' ? 'Error' : 'Exception';
+        $code           = $exception->getStatusCode();
 
         if ($forceProd = $request->get('prod')) {
             $layout = 'Error';
@@ -44,7 +44,6 @@ class ExceptionController extends CommonController
             $baseTemplate  = 'MauticCoreBundle:Default:content.html.php';
         }
 
-        $request->query->set('ignoreAjax', false);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'baseTemplate'    => $baseTemplate,

@@ -37,7 +37,7 @@ $formatArgs = function($args) use (&$formatArgs) {
 echo '<div class="well well-sm ma-md">'."\n";
 echo "<ol>\n";
 foreach($traces as $trace) {
-    echo "<li class=\"pt-3\" style=\"word-break: break-all;\">";
+    echo "<li class=\"pt-3 break-word\">";
     echo $trace['file'];
     if ($trace['line']) {
         echo " (line #" .$trace['line']."): ";

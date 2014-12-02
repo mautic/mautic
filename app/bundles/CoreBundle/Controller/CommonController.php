@@ -9,12 +9,14 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\AjaxErrorException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -91,6 +93,7 @@ class CommonController extends Controller implements MauticController
 
         $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : array();
         $template   = $args['contentTemplate'];
+
         return $this->render($template, $parameters);
     }
 
@@ -168,16 +171,29 @@ class CommonController extends Controller implements MauticController
             $passthrough["route"] = $args["returnUrl"];
         }
 
-        //Ajax call so respond with json
-        if ($forward) {
-            //the content is from another controller action so we must retrieve the response from it instead of
-            //directly parsing the template
-            $query = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
-            $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
-            $newContent         = $newContentResponse->getContent();
-        } else {
-            $newContent  = $this->renderView($contentTemplate, $parameters);
+        //keep from outputting content in case sub renderings hit an error
+        ob_start();
+        try {
+            //Ajax call so respond with json
+            if ($forward) {
+                //the content is from another controller action so we must retrieve the response from it instead of
+                //directly parsing the template
+                $query              = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+                $newContent         = $newContentResponse->getContent();
+            } else {
+                $newContent = $this->renderView($contentTemplate, $parameters);
+            }
+        } catch (\Exception $e) {
+            $newResponse = $this->renderException($e);
+            if ($forward) {
+                return $newResponse;
+            } else {
+                $newContent = $newResponse->getContent();
+                $this->request->query->set('ignoreAjax', false);
+            }
         }
+        ob_end_clean();
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json
@@ -236,6 +252,22 @@ class CommonController extends Controller implements MauticController
 
         $response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
+    }
+
+    /**
+     * Get's the content of error page
+     *
+     * @param \Exception $e
+     *
+     * @return Response
+     */
+    public function renderException(\Exception $e)
+    {
+        $exception  = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
+        $query      = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+        $subrequest = $this->request->duplicate($query);
+
+        return $this->forward('MauticCoreBundle:Exception:show', array($subrequest, $exception, $this->factory->getLogger(true)), $query);
     }
 
     /**

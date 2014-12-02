@@ -37,6 +37,7 @@ class CoreSubscriber extends CommonSubscriber
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
             KernelEvents::REQUEST             => array('onKernelRequest', 0),
+            KernelEvents::EXCEPTION           => array('onKernelException'),
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ADMIN_MENU      => array('onBuildAdminMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),

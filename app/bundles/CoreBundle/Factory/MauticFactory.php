@@ -511,9 +511,13 @@ class MauticFactory
      *
      * @return \Symfony\Bridge\Monolog\Logger
      */
-    public function getLogger()
+    public function getLogger($system = false)
     {
-        return $this->container->get('monolog.logger.mautic');
+        if ($system) {
+            return $this->container->get('logger');
+        } else {
+            return $this->container->get('monolog.logger.mautic');
+        }
     }
 
     /**
