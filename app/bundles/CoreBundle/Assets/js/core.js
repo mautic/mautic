@@ -579,7 +579,9 @@ var Mautic = {
             showLoadingBar: showLoading,
             success: function (data) {
                 MauticVars.formSubmitInProgress = false;
-                callback(data);
+                if (callback) {
+                    Mautic[callback](data);
+                }
             },
             error: function (request, textStatus, errorThrown) {
                 MauticVars.formSubmitInProgress = false;
