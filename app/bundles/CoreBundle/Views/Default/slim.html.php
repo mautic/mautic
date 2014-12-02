@@ -12,18 +12,10 @@
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body>
         <?php $view['assets']->outputScripts("bodyOpen"); ?>
-        <section id="main" role="main">
-            <div class="container-fluid" id="main-content">
-                <?php if ($view['slots']->has("headerTitle")): ?>
-                    <div class="row">
-                        <h2><?php $view['slots']->output("headerTitle"); ?></h2>
-                    </div>
-                <?php endif; ?>
-
-                <div class="row">
-                    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php', array('noGrowl' => true)); ?>
-                    <?php $view['slots']->output('_content'); ?>
-                </div>
+        <section id="app-content" class="container">
+            <div class="row">
+                <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php', array('noGrowl' => true)); ?>
+                <?php $view['slots']->output('_content'); ?>
             </div>
         </section>
         <?php $view['assets']->outputScripts("bodyClose"); ?>

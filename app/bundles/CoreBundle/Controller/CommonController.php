@@ -172,7 +172,7 @@ class CommonController extends Controller implements MauticController
         }
 
         //keep from outputting content in case sub renderings hit an error
-        //ob_start();
+        ob_start();
         try {
             //Ajax call so respond with json
             if ($forward) {
@@ -193,7 +193,7 @@ class CommonController extends Controller implements MauticController
                 $this->request->query->set('ignoreAjax', false);
             }
         }
-      //  ob_end_clean();
+        ob_end_clean();
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json

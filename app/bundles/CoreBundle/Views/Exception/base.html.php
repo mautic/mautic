@@ -11,7 +11,7 @@
 /** @var $logger    \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
 
 if (!$app->getRequest()->isXmlHttpRequest()) {
-    $view->extend('MauticCoreBundle:Default:content.html.php');
+    $view->extend('MauticCoreBundle:Default:slim.html.php');
     $view['slots']->set('pageTitle', $status_text);
 
     $header = "<strong>$status_code</strong> $status_text";
@@ -36,12 +36,12 @@ $message            = $view['slots']->get('message', 'mautic.core.error.generic'
 $previousExceptions = $exception->getAllPrevious();
 ?>
 
-<div class="pa-20">
+<div class="pa-20 ma-20 container">
     <div class="row">
-        <div class="col-sm-offset-1 col-sm-3 col-xs-3">
+        <div class="col-xs-4 col-md-2 col-sm-offset-1 col-sm-4 col-md-offset-2 col-md-2 col-lg-3">
             <img class="img-responsive" src="<?php echo $src; ?>" />
         </div>
-        <div class="col-sm-7 pa-lg">
+        <div class="col-xs-8 col-sm-6 col-md-6 col-lg-5">
             <blockquote class="break-word">
                 <h1><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans($message, array('%code%' => $status_code)); ?> <i class="fa fa-quote-right"></i></h1>
                 <h4><strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?> - <?php echo $exception->getMessage(); ?></h4>
@@ -66,7 +66,7 @@ $previousExceptions = $exception->getAllPrevious();
                 <div class="panel-heading" role="tab" id="previous_heading_<?php echo $key; ?>">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#previous" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            <?php echo $e->getMessage(); ?>
+                            <?php echo $e->getClass(); ?>
                         </a>
                     </h4>
                 </div>

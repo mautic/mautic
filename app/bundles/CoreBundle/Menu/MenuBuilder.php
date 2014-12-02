@@ -125,22 +125,26 @@ class MenuBuilder
      */
     public function getCurrentMenuItem($menu, $forRouteUri, $forRouteName)
     {
-        /** @var \Knp\Menu\ItemInterface $item */
-        foreach ($menu as $item) {
-            if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
-                //current match
-                return $item;
-            } else if ($forRouteUri != "current" && $item->getUri() == $forRouteUri) {
-                //route uri match
-                return $item;
-            } else if (!empty($forRouteName) && $forRouteName == $item->getExtra("routeName")) {
-                //route name match
-                return $item;
-            }
+        try {
+            /** @var \Knp\Menu\ItemInterface $item */
+            foreach ($menu as $item) {
+                if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
+                    //current match
+                    return $item;
+                } else if ($forRouteUri != "current" && $item->getUri() == $forRouteUri) {
+                    //route uri match
+                    return $item;
+                } else if (!empty($forRouteName) && $forRouteName == $item->getExtra("routeName")) {
+                    //route name match
+                    return $item;
+                }
 
-            if ($item->getChildren() && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
-                return $current_child;
+                if ($item->getChildren() && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
+                    return $current_child;
+                }
             }
+        } catch (\Exception $e) {
+            //do nothing
         }
 
         return null;

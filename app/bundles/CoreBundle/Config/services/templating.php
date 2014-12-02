@@ -26,6 +26,7 @@ $container->setDefinition('mautic.core.template.helper.date',
     ->addTag('templating.helper', array('alias' => 'date'))
     ->setScope('request');
 
+
 $container->setDefinition('mautic.core.template.helper.exception',
     new Definition(
         'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
