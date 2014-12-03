@@ -1,9 +1,9 @@
 <?php
 namespace MauticAddon\MauticCrmBundle\Crm\Vtiger\Api\Auth;
 
-use MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface;
+use MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth;
 
-class Auth implements AuthInterface
+class Auth extends AbstractAuth
 {
     /**
      * @var string Unique Identifier for the session
@@ -68,16 +68,6 @@ class Auth implements AuthInterface
         $this->_session_id  = $session_id;
         $this->_api_version = $api_version;
         $this->_user_id     = $user_id;
-    }
-
-    /**
-     * Check to see if the access token was updated from a refresh token
-     *
-     * @return bool
-     */
-    public function accessTokenUpdated ()
-    {
-        return $this->_access_token_updated;
     }
 
     /**

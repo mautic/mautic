@@ -11,6 +11,7 @@ namespace MauticAddon\MauticCrmBundle\Integration;
 
 use Mautic\AddonBundle\Entity\Integration;
 use Mautic\AddonBundle\Integration\AbstractIntegration;
+use MauticAddon\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class CrmAbstractIntegration
@@ -36,11 +37,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         //build auth object
         $this->createApiAuth();
     }
-
-    /**
-     * @return mixed
-     */
-    abstract public function checkApiAuth($silenceExceptions = true);
 
     /**
      * {@inheritdoc}
@@ -107,7 +103,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param array  $parameters
      * @param string $authMethod
      *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
@@ -160,7 +156,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $fields = $lead->getFields(true);
 
-
         $leadFields = $featureSettings['leadFields'];
 
         $matched = array();
@@ -172,4 +167,67 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         return $matched;
     }
+
+    /**
+     * Check API Authentication
+     */
+    public function checkApiAuth($silenceExceptions = true)
+    {
+        try {
+            if (!$this->auth->isAuthorized()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (ErrorException $exception) {
+            if (!$silenceExceptions) {
+                throw $exception;
+            } else {
+                $this->logIntegrationError($exception);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * @param $lead
+     */
+    public function pushLead($lead)
+    {
+        $mappedData = $this->populateLeadData($lead);
+        try {
+            if ($this->checkApiAuth(false)) {
+                return CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientIdKey()
+    {
+        return 'client_key';
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientSecreteKey()
+    {
+        return 'client_secret';
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sortFieldsAlphabetically()
+    {
+        return false;
+    }
+
 }

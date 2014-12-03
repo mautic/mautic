@@ -28,6 +28,10 @@ $hasFeatures = (isset($form['supportedFeatures']));
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php if (isset($form['authButton'])): ?>
+        <div class="well well-sm">
+            <?php echo $view['translator']->trans('mautic.integration.callbackuri', array('%url%' => $callbackUri)); ?><br />
+            <input type="text" readonly value="<?php echo $callbackUri; ?>" class="form-control" />
+        </div>
         <?php echo $view['form']->row($form['authButton']); ?>
         <?php endif; ?>
     </div>

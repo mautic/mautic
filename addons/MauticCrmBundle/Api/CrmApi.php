@@ -2,7 +2,7 @@
 
 namespace MauticAddon\MauticCrmBundle\Api;
 
-use MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface;
+use MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth;
 use MauticAddon\MauticCrmBundle\Api\Exception\ContextNotFoundException;
 
 class CrmApi
@@ -12,22 +12,18 @@ class CrmApi
      */
     protected $auth;
 
-    protected $version;
-
-    public function __construct($auth, $version)
+    public function __construct($auth)
     {
         $this->auth = $auth;
-        $this->version = $version;
     }
 
     /**
      * Get an API context object
      *
      * @param string        $apiContext     API context (leads, forms, etc)
-     * @param AuthInterface $auth           API Auth object
-     @ param  string|null   $apiVersion     API version if applicable
+     * @param AbstractAuth $auth           API Auth object
      */
-    static function getContext($crm, $apiContext, AuthInterface $auth, $apiVersion = null)
+    static function getContext($crm, $apiContext, AbstractAuth $auth)
     {
         $apiContext = ucfirst($apiContext);
 
@@ -36,7 +32,7 @@ class CrmApi
         if (!isset($context[$apiContext])) {
             $class = 'MauticAddon\\MauticCrmBundle\\Crm\\'.$crm.'\\Api\\Object\\' . $apiContext;
             if (class_exists($class)) {
-                $contexts[$apiContext] = new $class($auth, $apiVersion);
+                $contexts[$apiContext] = new $class($auth);
             } else {
                 throw new ContextNotFoundException("A context of '$apiContext' was not found.");
             }

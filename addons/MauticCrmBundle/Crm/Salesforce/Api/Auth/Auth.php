@@ -1,10 +1,10 @@
 <?php
 namespace MauticAddon\MauticCrmBundle\Crm\Salesforce\Api\Auth;
 
-use MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface;
+use MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth;
 use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
-class Auth implements AuthInterface
+class Auth extends AbstractAuth
 {
     /**
      * @var string Consumer or client key
@@ -42,24 +42,9 @@ class Auth implements AuthInterface
     protected $_access_token;
 
     /**
-     * @var string Access token secret returned by OAuth server
-     */
-    protected $_access_token_secret;
-
-    /**
      * @var string Instance Url return by OAuth server
      */
     protected $_instance_url;
-
-    /**
-     * @var string Unix timestamp for when token expires
-     */
-    protected $_expires;
-
-    /**
-     * @var string OAuth2 refresh token
-     */
-    protected $_refresh_token;
 
     /**
      * @var string OAuth2 token type
@@ -84,7 +69,7 @@ class Auth implements AuthInterface
     /**
      * @var string OAuth2 response
      */
-    protected $_id_token;
+    protected $_id;
 
     /**
      * @var string OAuth2 response
@@ -96,10 +81,6 @@ class Auth implements AuthInterface
      */
     protected $_scope = array();
 
-    /**
-     * @var bool Set to true if a refresh token was used to update an access token
-     */
-    protected $_access_token_updated = false;
 
     /**
      * @param null $clientKey
@@ -116,44 +97,34 @@ class Auth implements AuthInterface
      *
      * @oaran null   $instance_url
      */
-    public function setup ($clientKey = null, $clientSecret = null, $access_token = null, $accessTokenSecret = null,
-                           $expires = null, $callback = null, $accessTokenUrl = null,
-                           $authorizationUrl = null, $requestTokenUrl = null, $scope = null, $refreshToken = null, $instance_url = null, $tokenType = null)
+    public function setup ($id = null, $client_key = null, $client_secret = null, $access_token = null,
+                           $callback = null, $accessTokenUrl = null,
+                           $authorizationUrl = null, $requestTokenUrl = null, $scope = null, $instance_url = null, $tokenType = null)
     {
-        $this->_client_id           = $clientKey;
-        $this->_client_secret       = $clientSecret;
+        $this->_client_id           = $client_key;
+        $this->_client_secret       = $client_secret;
         $this->_access_token        = $access_token;
-        $this->_access_token_secret = $accessTokenSecret;
         $this->_callback            = $callback;
         $this->_access_token_url    = $accessTokenUrl;
         $this->_request_token_url   = $requestTokenUrl;
         $this->_authorize_url       = $authorizationUrl;
         $this->_instance_url        = $instance_url;
         $this->_token_type          = $tokenType;
+        $this->_id                  = $id;
 
         if (!empty($scope)) {
             $this->setScope($scope);
         }
-
-        if (!empty($access_token)) {
-            $this->setAccessTokenDetails(array(
-                'access_token'        => $access_token,
-                'access_token_secret' => $accessTokenSecret,
-                'expires'             => $expires,
-                'refresh_token'       => $refreshToken
-            ));
-        }
     }
 
     /**
-     * Redirect
+     * Set an existing/already retrieved access token
      *
-     * @param $url
+     * @param array $accessTokenDetails
      */
-    private function redirect ($url)
+    public function setAccessTokenDetails (array $accessTokenDetails)
     {
-        header('Location: ' . $url);
-        exit();
+        $this->_access_token = isset($accessTokenDetails['access_token']) ? $accessTokenDetails['access_token'] : null;
     }
 
     /**
@@ -172,7 +143,29 @@ class Auth implements AuthInterface
 
             return false;
         } else {
-            $this->requestAccessToken($_REQUEST['code']);
+            $code = $_REQUEST['code'];
+
+            $parameters = array(
+                'code'          => $code,
+                'grant_type'    => $this->_grant_type,
+                'client_id'     => $this->_client_id,
+                'client_secret' => $this->_client_secret,
+                'redirect_uri'  => $this->_callback,
+            );
+
+            $request = $this->makeRequest($this->_access_token_url, $parameters, 'POST');
+
+            if (!empty($request['error'])) {
+                throw new ErrorException($request['error_description']);
+            }
+
+            $this->_id           = $request['id'];
+            $this->_access_token = $request['access_token'];
+            $this->_token_type   = $request['token_type'];
+            $this->_scope        = $request['scope'];
+            $this->_signature    = $request['signature'];
+            $this->_instance_url = $request['instance_url'];
+
             $this->_access_token_updated = true;
         }
 
@@ -194,107 +187,17 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Request access token
-     */
-    protected function requestAccessToken ($code)
-    {
-        $parameters = array(
-            'code'          => $code,
-            'grant_type'    => $this->_grant_type,
-            'client_id'     => $this->_client_id,
-            'client_secret' => $this->_client_secret,
-            'redirect_uri'  => $this->_callback,
-        );
-
-        $request = $this->makeRequest($this->_access_token_url, $parameters, 'POST');
-
-        if (($request['info']['http_code'] < 200) || ($request['info']['http_code'] >= 300) || empty($request)) {
-            $msg = (!empty($request['response']['error_description'])) ? $request['response']['error_description'] : "Request access token failed.";
-            throw new ErrorException($msg);
-        }
-
-        $this->_access_token = $request['response']['access_token'];
-        $this->_token_type   = $request['response']['token_type'];
-        $this->_scope        = $request['response']['scope'];
-        if (isset($request['response']['id_token'])) {
-            $this->_id_token     = $request['response']['id_token'];
-        }
-        $this->_signature    = $request['response']['signature'];
-        $this->_instance_url = $request['response']['instance_url'];
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function isAuthorized ()
-    {
-        //Check for existing access token
-        if (!empty($this->_request_token_url)) {
-            if (strlen($this->_access_token) > 0 && strlen($this->_access_token_secret) > 0) {
-                return true;
-            }
-        } else {
-            //Check to see if token in session has expired
-            if (!empty($this->_expires) && $this->_expires < time()) {
-                return false;
-            } elseif (strlen($this->_access_token) > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Set OAuth2 scope
-     *
-     * @param array|string $scope
-     */
-    public function setScope ($scope)
-    {
-        if (!is_array($scope)) {
-            $this->_scope = explode(',', $scope);
-        } else {
-            $this->_scope = $scope;
-        }
-    }
-
-    /**
-     * Set an existing/already retrieved access token
-     *
-     * @param array $accessTokenDetails
-     */
-    public function setAccessTokenDetails (array $accessTokenDetails)
-    {
-        $this->_access_token        = isset($accessTokenDetails['access_token']) ? $accessTokenDetails['access_token'] : null;
-        $this->_access_token_secret = isset($accessTokenDetails['access_token_secret']) ? $accessTokenDetails['access_token_secret'] : null;
-        $this->_expires             = isset($accessTokenDetails['expires']) ? $accessTokenDetails['expires'] : null;
-        $this->_refresh_token       = isset($accessTokenDetails['refresh_token']) ? $accessTokenDetails['refresh_token'] : null;
-    }
-
-    /**
-     * Check to see if the access token was updated from a refresh token
-     *
-     * @return bool
-     */
-    public function accessTokenUpdated ()
-    {
-        return $this->_access_token_updated;
-    }
-
-    /**
      * Returns access token data
      */
     public function getAccessTokenData ()
     {
         return array(
+            "id"            => $this->_id,
             "access_token"  => $this->_access_token,
-            "expires"       => $this->_expires,
             "token_type"    => $this->_token_type,
-            "refresh_token" => $this->_refresh_token,
-            "instance_url"  => $this->_instance_url
+            "signature"     => $this->_signature,
+            "instance_url"  => $this->_instance_url,
+            "scope"         => $this->_scope
         );
     }
 
@@ -313,12 +216,6 @@ class Auth implements AuthInterface
         //make sure $method is capitalized for congruency
         $method = strtoupper($method);
 
-        if (!empty($this->_access_token)) {
-            $parameters['access_token'] = $this->_access_token;
-        }
-
-        $headers = array();
-
         //Create a querystring for GET/DELETE requests
         if (count($parameters) > 0 && in_array($method, array('GET', 'DELETE')) && strpos($url, '?') === false) {
             $url = $url . '?' . http_build_query($parameters);
@@ -331,10 +228,12 @@ class Auth implements AuthInterface
             CURLOPT_FOLLOWLOCATION => true
         );
 
-        if ($this->_access_token) {
-            //$headers[] = sprintf();
+        $ch = curl_init();
+
+        if (!empty($parameters) && $method !== 'GET') {
+            //encode the arguments as JSON
+            $parameters = json_encode($parameters);
         }
-        $options[CURLOPT_HTTPHEADER] = $headers;
 
         //Set post fields for POST/PUT/PATCH requests
         if (in_array($method, array('POST', 'PUT', 'PATCH'))) {
@@ -342,18 +241,22 @@ class Auth implements AuthInterface
             $options[CURLOPT_POSTFIELDS] = $parameters;
         }
 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "Authorization: OAuth {$this->_access_token}",
+            "Content-Type: application/json"
+        ));
+
         //Make CURL request
-        $ch = curl_init();
         curl_setopt_array($ch, $options);
         $response = curl_exec($ch);
-        $info     = curl_getinfo($ch);
         curl_close($ch);
 
         $parsed = json_decode($response, true);
 
-        return array(
-            'info'     => $info,
-            'response' => $parsed
-        );
+        if (!empty($parsed[0]['errorCode'])) {
+            throw new ErrorException($parsed[0]['message']);
+        }
+
+        return $parsed;
     }
 }

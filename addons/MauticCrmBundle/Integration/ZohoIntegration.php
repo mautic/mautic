@@ -43,7 +43,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
      * @param array  $parameters
      * @param string $authMethod
      *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {

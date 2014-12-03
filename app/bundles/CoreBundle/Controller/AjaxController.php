@@ -298,12 +298,16 @@ class AjaxController extends CommonController
         $model       = $this->factory->getModel($name);
         $entity      = $model->getEntity($id);
         $currentUser = $this->factory->getUser();
-        $checkedOut  = $entity->getCheckedOutBy();
 
-        if ($entity !== null && !empty($checkedOut) && $checkedOut->getId() === $currentUser->getId()) {
-            //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
-            $model->unlockEntity($entity, $extra);
-            $dataArray['success'] = 1;
+        if (method_exists($entity, 'getCheckedOutBy')) {
+
+            $checkedOut = $entity->getCheckedOutBy();
+
+            if ($entity !== null && !empty($checkedOut) && $checkedOut->getId() === $currentUser->getId()) {
+                //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                $model->unlockEntity($entity, $extra);
+                $dataArray['success'] = 1;
+            }
         }
 
         return $this->sendJsonResponse($dataArray);

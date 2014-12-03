@@ -34,7 +34,12 @@ class IntegrationController extends FormController
         $integrations       = array();
 
         foreach ($integrationObjects as $name => $object) {
-            $integrations[$name] = array('name' => $name, 'icon' => $integrationHelper->getIconPath($object));
+            $settings = $object->getIntegrationSettings();
+            $integrations[$name] = array(
+                'name' => $name,
+                'icon' => $integrationHelper->getIconPath($object),
+                'enabled' => $settings->isPublished()
+            );
         }
 
         //sort by name
@@ -189,6 +194,7 @@ class IntegrationController extends FormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form' => $this->setFormTheme($form, $template, $themes),
+                'callbackUri' => $integrationObject->getOauthCallbackUrl()
             ),
             'contentTemplate' => $template,
             'passthroughVars' => array(
