@@ -488,8 +488,15 @@ class Lead extends FormEntity
     /**
      * @return array
      */
-    public function getFields()
+    public function getFields($ungroup = false)
     {
+        if ($ungroup && isset($this->fields['core'])) {
+            $return = array();
+            foreach ($this->fields as $group => $fields) {
+                $return += $fields;
+            }
+            return $return;
+        }
         return $this->fields;
     }
 

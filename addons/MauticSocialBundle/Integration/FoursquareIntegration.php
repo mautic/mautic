@@ -273,7 +273,7 @@ class FoursquareIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         return array(
             "profileHandle" => array("type" => "string"),

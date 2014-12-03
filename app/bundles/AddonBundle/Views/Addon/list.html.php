@@ -15,6 +15,7 @@ if ($tmpl == 'index') {
         <table class="table table-hover table-striped table-bordered addon-list" id="addonTable">
             <thead>
                 <tr>
+                    <!--
                     <th class="col-addon-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
@@ -23,6 +24,7 @@ if ($tmpl == 'index') {
                             </label>
                         </div>
                     </th>
+                    -->
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'addon',
@@ -44,25 +46,22 @@ if ($tmpl == 'index') {
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
+                    <!--
                     <td>
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'       => $item,
-                            'templateButtons' => array(
-                                'edit' => true
-                            ),
                             'routeBase'  => 'addon'
                         ));
                         ?>
                     </td>
+                    -->
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
                             'model'      => 'addon'
                         )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_addon_action',
-                            array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax">
+                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_index', array("addon" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                         </a>
                     </td>

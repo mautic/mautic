@@ -64,7 +64,7 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
     /**
      * Check API Authentication
      */
-    public function checkApiAuth()
+    public function checkApiAuth($silenceExceptions = true)
     {
         try {
             if (!$this->isAuthorized()) {
@@ -72,6 +72,10 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
             }
             return true;
         } catch (ErrorException $exception) {
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
             return false;
         }
     }
@@ -79,18 +83,27 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return mixed|void
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         $vtigerFields = array();
 
-        if ($this->checkApiAuth()) {
-            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe("Leads");
+        try {
+            if ($this->checkApiAuth($silenceExceptions)) {
+                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe("Leads");
 
-            foreach ($leadObject['fields'] as $fieldInfo) {
-                if (!isset($fieldInfo['name']))
-                    continue;
-                $vtigerFields[$fieldInfo['name']] = array("type" => "string");
+                foreach ($leadObject['fields'] as $fieldInfo) {
+                    if (!isset($fieldInfo['name']))
+                        continue;
+                    $vtigerFields[$fieldInfo['name']] = array("type" => "string");
+                }
             }
+        } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
+            return false;
         }
 
         return $vtigerFields;

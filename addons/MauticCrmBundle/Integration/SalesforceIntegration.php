@@ -9,6 +9,7 @@
 
 namespace MauticAddon\MauticCrmBundle\Integration;
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
+use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 /**
  * Class SalesforceIntegration
@@ -95,7 +96,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Check API Authentication
      */
-    public function checkApiAuth()
+    public function checkApiAuth($silenceExceptions = true)
     {
         try {
             if (!$this->auth->isAuthorized()) {
@@ -104,6 +105,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 return true;
             }
         } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
             return false;
         }
     }
@@ -111,20 +117,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array|mixed
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         $salesFields = array();
 
-        if ($this->checkApiAuth()) {
-            $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth, 'v20.0')->getInfo('lead');
+        try {
+            if ($this->checkApiAuth($silenceExceptions)) {
+                $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth, 'v20.0')->getInfo('lead');
 
-            if (isset($leadObject['fields'])) {
-                foreach ($leadObject['fields'] as $fieldInfo) {
-                    if (!isset($fieldInfo['name']))
-                        continue;
-                    $salesFields[$fieldInfo['name']] = array("type" => "string");
+                if (isset($leadObject['fields'])) {
+                    foreach ($leadObject['fields'] as $fieldInfo) {
+                        if (!isset($fieldInfo['name']))
+                            continue;
+                        $salesFields[$fieldInfo['name']] = array("type" => "string");
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            $logger = $this->factory->getLogger();
+            $logger->addError('INTEGRATION CONNECT ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
         }
 
         return $salesFields;

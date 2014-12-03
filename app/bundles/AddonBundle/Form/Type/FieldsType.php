@@ -27,13 +27,14 @@ class FieldsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['integration_fields'] as $field => $label) {
+        foreach ($options['integration_fields'] as $field => $details) {
+            $label = (is_array($details)) ? $details['label'] : $details;
             $builder->add($field, 'choice', array(
                 'choices'    => $options['lead_fields'],
                 'label'      => $label,
                 'required'   => false,
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class'   => 'form-control')
+                'attr'       => array('class'   => 'form-control chosen', 'data-placeholder' => ' ')
             ));
         }
     }

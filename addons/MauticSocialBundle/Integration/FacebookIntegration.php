@@ -195,7 +195,7 @@ class FacebookIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         return array(
             'first_name' => array('type' => 'string'),

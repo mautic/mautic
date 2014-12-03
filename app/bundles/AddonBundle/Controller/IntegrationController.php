@@ -26,9 +26,11 @@ class IntegrationController extends FormController
             return $this->accessDenied();
         }
 
+        $addonFilter = $this->request->get('addon');
+
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
+        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true, $addonFilter);
         $integrations       = array();
 
         foreach ($integrationObjects as $name => $object) {
@@ -91,7 +93,7 @@ class IntegrationController extends FormController
         $leadFields = array();
 
         foreach ($fields as $f) {
-            $leadFields['mautic.lead.field.group.' . $f->getGroup()][$f->getId()] = $f->getLabel();
+            $leadFields['mautic.lead.field.group.' . $f->getGroup()][$f->getAlias()] = $f->getLabel();
         }
 
         // Sort the groups
@@ -102,41 +104,51 @@ class IntegrationController extends FormController
             uasort($fieldGroup, 'strnatcmp');
         }
 
-        $form = $this->createForm('integration_details', $integrationObject->getIntegrationSettings(), array(
-            'integration'        => $integrationObject->getIntegrationSettings()->getName(),
+        /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integrationObject */
+        $entity = $integrationObject->getIntegrationSettings();
+
+        $form = $this->createForm('integration_details', $entity, array(
+            'integration'        => $entity->getName(),
             'lead_fields'        => $leadFields,
             'integration_object' => $integrationObject,
             'action'             => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
         ));
 
+        $currentKeys = $entity->getApiKeys();
+        $currentFeatureSettings = $entity->getFeatureSettings();
+
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
-                    $entity      = $integrationObject->getIntegrationSettings();
                     $integration = $entity->getName();
-                    $currentKeys = $entity->getApiKeys();
 
-                    // Check to make sure secret keys were not wiped out
-                    if (!empty($currentKeys['clientId'])) {
-                        $newKeys = $entity->getApiKeys();
-                        if (!empty($currentKeys[$integration]['clientSecret']) && empty($newKeys['clientSecret'])) {
-                            $newKeys['clientSecret'] = $currentKeys['clientSecret'];
-                            $entity->setApiKeys($newKeys);
-                        }
-                    }
-
+                    //merge keys
+                    $keys = $form['apiKeys']->getData();
+                    //restore original keys then merge the new ones to keep the form from wiping out empty secrets
+                    $mergedKeys = $integrationObject->mergeApiKeys($keys, $currentKeys, true);
+                    $entity->setApiKeys($mergedKeys);
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
-                        if (in_array('public_profile', $features) || in_array('lead_push', $features)) {
+                        if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
                             if (isset($featureSettings['leadFields'])) {
                                 $fields                        = $integrationHelper->getAvailableFields($integration);
-                                $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
-                                $entity->setFeatureSettings($featureSettings);
+                                if (!empty($fields)) {
+                                    $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
+                                    foreach ($featureSettings['leadFields'] as $f => $v) {
+                                        if (empty($v)) {
+                                            unset($featureSettings['leadFields'][$f]);
+                                        }
+                                    }
+                                    $entity->setFeatureSettings($featureSettings);
+                                }
                             }
                         }
+                    } else {
+                        //make sure they aren't overwritten because of API connection issues
+                        $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
                     $em->persist($entity);
@@ -153,13 +165,6 @@ class IntegrationController extends FormController
                             'popupBlockerMessage' => $this->factory->getTranslator('mautic.integration.oauth.popupblocked')
                         ));
                     }
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.addon.notice.saved', array(
-                            '%name%' => $integration
-                        ), 'flashes')
-                    );
                 }
             }
 
@@ -171,11 +176,21 @@ class IntegrationController extends FormController
             return $response;
         }
 
+        $template   = $integrationObject->getFormTemplate();
+        $objectTheme = $integrationObject->getFormTheme();
+        $default = 'MauticAddonBundle:FormTheme\Integration';
+        $themes   = array($default);
+        if (is_array($objectTheme)) {
+            $themes = array_merge($themes, $objectTheme);
+        } else if ($objectTheme !== $default) {
+            $themes[] = $objectTheme;
+        }
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form' => $form->createView()
+                'form' => $this->setFormTheme($form, $template, $themes),
             ),
-            'contentTemplate' => $integrationObject->getFormTemplate(),
+            'contentTemplate' => $template,
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_addon_integration_index',
                 'mauticContent' => 'integration',

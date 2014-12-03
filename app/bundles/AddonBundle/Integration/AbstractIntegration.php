@@ -74,11 +74,23 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Allows integration to set a custom form template
+     *
      * @return string
      */
     public function getFormTemplate()
     {
         return 'MauticAddonBundle:Integration:form.html.php';
+    }
+
+    /**
+     * Allows integration to set a custom theme folder
+     *
+     * @return string
+     */
+    public function getFormTheme()
+    {
+        return 'MauticAddonBundle:FormTheme\Integration';
     }
 
     /**
@@ -99,6 +111,40 @@ abstract class AbstractIntegration
     public function getIntegrationSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * Merge api keys
+     *
+     * @param $mergeKeys
+     * @param $withKeys
+     * @param $return   Returns the key array rather than setting them
+     *
+     */
+    public function mergeApiKeys($mergeKeys, $withKeys = array(), $return = false)
+    {
+        $settings = $this->settings;
+        if (empty($withKeys)) {
+            $withKeys = $settings->getApiKeys();
+        }
+
+        foreach ($withKeys as $k => $v) {
+            if (!empty($mergeKeys[$k])) {
+                $withKeys[$k] = $mergeKeys[$k];
+            }
+            unset($mergeKeys[$k]);
+        }
+
+        //merge remaining new keys
+        $withKeys = array_merge($withKeys, $mergeKeys);
+
+        if ($return) {
+            return $withKeys;
+        } else {
+            $settings->setApiKeys($withKeys);
+            //reset for events that depend on rebuilding auth objects
+            $this->setIntegrationSettings($settings);
+        }
     }
 
     /**
@@ -277,9 +323,17 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         return array();
+    }
+
+    /**
+     * Sets whether fields should be sorted alphabetically or by the order the integration feeds
+     */
+    public function sortFieldsAlphabetically()
+    {
+        return true;
     }
 
     /**
@@ -511,5 +565,14 @@ abstract class AbstractIntegration
         curl_close($ch);
 
         return ($retcode == 200);
+    }
+
+    /**
+     * @param \Exception $e
+     */
+    public function logIntegrationError(\Exception $e)
+    {
+        $logger = $this->factory->getLogger();
+        $logger->addError('INTEGRATION ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
     }
 }

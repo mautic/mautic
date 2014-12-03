@@ -12,6 +12,9 @@ namespace Mautic\AddonBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -51,9 +54,15 @@ class FeatureSettingsType extends AbstractType
 
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
-        $fields        = $integrationHelper->getAvailableFields($options['integration']);
+        try {
+            $fields = $integrationHelper->getAvailableFields($options['integration'], false);
+            $error = '';
+        } catch (\Exception $e) {
+            $fields = array();
+            $error = $e->getMessage();
+        }
 
-        if (!empty($fields)) {
+        if (!empty($fields) || $error) {
             $builder->add('leadFields', 'integration_fields', array(
                 'label'            => 'mautic.integration.leadfield_matches',
                 'required'         => false,
@@ -61,6 +70,14 @@ class FeatureSettingsType extends AbstractType
                 'data'             => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : array(),
                 'integration_fields' => $fields
             ));
+
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
+                $form = $event->getForm();
+
+                if ($error) {
+                    $form['leadFields']->addError(new FormError($error));
+                }
+            });
         }
     }
 

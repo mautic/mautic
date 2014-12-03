@@ -205,11 +205,15 @@ var Mautic = {
 
         //convert multiple selects into chosen
         mQuery("select[multiple]").chosen({
-            placeholder_text_multiple: ' '
+            placeholder_text_multiple: ' ',
+            width: "100%"
         });
 
         //convert single selects that have opted in into chosen
-        mQuery(".chosen").chosen();
+        mQuery(".chosen").chosen({
+            width: "100%",
+            allow_single_deselect: true
+        });
 
         //spin icons on button click
         mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function (event) {
@@ -565,7 +569,7 @@ var Mautic = {
      * @param form
      * @param callback
      */
-    postForm: function (form, callback) {
+    postForm: function (form, callback, inMain) {
         var form = mQuery(form);
         var action = form.attr('action');
 
@@ -580,13 +584,17 @@ var Mautic = {
             success: function (data) {
                 MauticVars.formSubmitInProgress = false;
                 if (callback) {
-                    Mautic[callback](data);
+                    if (typeof callback == 'function') {
+                        callback(data);
+                    } else if (typeof Mautic[callback] == 'function') {
+                        Mautic[callback](data);
+                    }
                 }
             },
             error: function (request, textStatus, errorThrown) {
                 MauticVars.formSubmitInProgress = false;
 
-                Mautic.processAjaxError(request, textStatus, errorThrown);
+                Mautic.processAjaxError(request, textStatus, errorThrown, inMain);
             }
         });
     },
@@ -725,16 +733,18 @@ var Mautic = {
                 MauticVars.formSubmitInProgress = true;
             }
 
+            var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
+            var isInModal = modalParent.length > 0 ? true : false;
+
             Mautic.postForm(mQuery(this), function (response) {
-                var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
-                var isInModal = modalParent.length > 0 ? true : false;
+
                 if (!isInModal) {
                     Mautic.processPageContent(response);
                 } else {
                     var target = '#' + modalParent.attr('id');
                     Mautic.processModalContent(response, target);
                 }
-            });
+            }, !isInModal);
 
             return false;
         }));

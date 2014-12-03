@@ -103,7 +103,7 @@ class EventController extends CommonFormController
             $closeModal = true;
         } else {
             $closeModal                = false;
-            $formView                  = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', 'MauticCampaignBundle:EventForm');
+            $formView                  = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', 'MauticCampaignBundle:FormTheme\Event');
             $viewParams['form']        = $formView;
             $header                    = $event['settings']['label'];
             $viewParams['eventHeader'] = $this->get('translator')->trans($header);

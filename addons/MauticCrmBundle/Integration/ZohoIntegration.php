@@ -8,6 +8,7 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 /**
  * Class ZohoIntegration
@@ -54,7 +55,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
     /**
      * Check API Authentication
      */
-    public function checkApiAuth()
+    public function checkApiAuth($silenceExceptions = true)
     {
         try {
             if (!$this->auth->isAuthorized()) {
@@ -63,6 +64,11 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
                 return true;
             }
         } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
             return false;
         }
     }
@@ -70,27 +76,36 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         $zohoFields = array();
 
-        if ($this->checkApiAuth()) {
-            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getFields('Leads');
+        try {
+            if ($this->checkApiAuth($silenceExceptions)) {
+                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getFields('Leads');
 
-            if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
-                return array();
-            }
+                if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
+                    return array();
+                }
 
-            //@todo need to set array("type" => "string");
-            $zohoFields = array();
-            foreach ($leadObject['Leads']['section'] as $optgroup) {
-                $zohoFields[$optgroup['dv']] = array();
-                if (!array_key_exists(0, $optgroup['FL']))
-                    $optgroup['FL'] = array($optgroup['FL']);
-                foreach ($optgroup['FL'] as $field) {
-                    $zohoFields[$optgroup['dv']][$field['dv']] = $field['dv'];
+                //@todo need to set array("type" => "string");
+                $zohoFields = array();
+                foreach ($leadObject['Leads']['section'] as $optgroup) {
+                    $zohoFields[$optgroup['dv']] = array();
+                    if (!array_key_exists(0, $optgroup['FL']))
+                        $optgroup['FL'] = array($optgroup['FL']);
+                    foreach ($optgroup['FL'] as $field) {
+                        $zohoFields[$optgroup['dv']][$field['dv']] = $field['dv'];
+                    }
                 }
             }
+        } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
+            return false;
         }
 
         return $zohoFields;

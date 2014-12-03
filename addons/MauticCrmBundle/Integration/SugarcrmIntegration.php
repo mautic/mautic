@@ -8,12 +8,18 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+use MauticAddon\MauticCrmBundle\Api\CrmApi;
+use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 /**
  * Class SugarcrmIntegration
  */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
+    /**
+     * @var \MauticAddon\MauticCrmBundle\Crm\Sugarcrm\Api\Auth\Auth
+     */
+    protected $auth;
 
     /**
      * Returns the name of the social integration that must match the name of the file
@@ -79,7 +85,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Check API Authentication
      */
-    public function checkApiAuth()
+    public function checkApiAuth($silenceExceptions = true)
     {
         $sugarCRMSettings = $this->settings->getApiKeys();
         if (!isset($sugarCRMSettings['url'])) {
@@ -89,9 +95,17 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         try {
             if (!$this->auth->isAuthorized()) {
                 return false;
+            } elseif ($this->auth->accessTokenUpdated()) {
+                $accessTokenDetails = $this->auth->getAccessTokenData();
+                $this->mergeApiKeys($accessTokenDetails);
             }
             return true;
         } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
+
+            if (!$silenceExceptions) {
+                throw $exception;
+            }
             return false;
         }
     }
@@ -99,17 +113,25 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @return array|mixed
      */
-    public function getAvailableFields()
+    public function getAvailableFields($silenceExceptions = true)
     {
         $sugarFields = array();
 
-        if ($this->checkApiAuth()) {
-            $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo("Leads");
-            $sugarFields = array();
-            foreach ($leadObject['fields'] as $fieldInfo) {
-                if (!isset($fieldInfo['name']))
-                    continue;
-                $sugarFields[$fieldInfo['name']] = array("type" => "string");
+        try {
+            if ($this->checkApiAuth($silenceExceptions)) {
+                $leadObject  = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo("Leads");
+                $sugarFields = array();
+                foreach ($leadObject['fields'] as $fieldInfo) {
+                    if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
+                        $sugarFields[$fieldInfo['name']] = array('type' => 'string', 'label' => $fieldInfo['comment']);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+
+            if (!$silenceExceptions) {
+                throw $e;
             }
         }
 
@@ -117,11 +139,26 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @return mixed|void
+     * {@inheritdoc}
      */
-    public function create(MauticFactory $factory, $data)
+    public function sortFieldsAlphabetically()
     {
+        return false;
+    }
 
+    /**
+     * @param $lead
+     */
+    public function pushLead($lead)
+    {
+        $mappedData = $this->populateLeadData($lead);
+        try {
+            if ($this->checkApiAuth(false)) {
+                CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
     }
 }

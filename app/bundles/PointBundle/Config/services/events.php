@@ -21,7 +21,6 @@ $container->setDefinition(
 )
     ->addTag('kernel.event_subscriber');
 
-
 $container->setDefinition(
     'mautic.point.leadbundle.subscriber',
     new Definition(

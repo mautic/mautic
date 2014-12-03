@@ -24,6 +24,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     public function setIntegrationSettings(Integration $settings)
     {
+        //make sure URL does not have ending /
+        $keys = $settings->getApiKeys();
+        if (isset($keys['url']) && substr($keys['url'], -1) == '/') {
+            $keys['url'] = substr($keys['url'], 0, -1);
+            $settings->setApiKeys($keys);
+        }
+
         parent::setIntegrationSettings($settings);
 
         //build auth object
@@ -33,14 +40,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @return mixed
      */
-    abstract public function checkApiAuth();
-
-    /**
-     * @param MauticFactory $factory
-     * @param $data
-     * @return mixed
-     */
-    abstract public function create(MauticFactory $factory, $data);
+    abstract public function checkApiAuth($silenceExceptions = true);
 
     /**
      * {@inheritdoc}
@@ -57,7 +57,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return array('lead_push');
+        return array('push_lead');
     }
 
     /**
@@ -76,16 +76,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $entity->setName($this->getName());
         }
 
-        $keys = $entity->getApiKeys();
-        $keys[$this->getClientIdKey()] = $clientId;
-        $keys[$this->getClientSecretKey()] = $clientSecret;
-        $entity->setApiKeys($keys);
+        if (!empty($clientId)) {
+            $keys = $entity->getApiKeys();
 
-        $this->setIntegrationSettings($entity);
+            $keys[$this->getClientIdKey()]     = $clientId;
+            $keys[$this->getClientSecretKey()] = $clientSecret;
+            $entity->setApiKeys($keys);
+
+            $this->setIntegrationSettings($entity);
+        }
 
         $error  = '';
         try {
-            $this->authorizeApi();
+            if (!$this->authorizeApi()) {
+                $error = 'authorization failed';
+            }
         } catch (\Exception $e) {
             $error = $e->getMessage() . " (" . $e->getCode() . ")";
         }
@@ -130,11 +135,41 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if ($this->auth->validateAccessToken()) {
             if ($this->auth->accessTokenUpdated()) {
                 $accessTokenData = $this->auth->getAccessTokenData();
-                $this->settings->setApiKeys($accessTokenData);
+                $this->mergeApiKeys($accessTokenData);
             }
 
             return true;
         }
         return false;
+    }
+
+    /**
+     * Match lead data with CRM fields
+     *
+     * @param $lead
+     *
+     * @return array
+     */
+    public function populateLeadData($lead)
+    {
+        $featureSettings = $this->settings->getFeatureSettings();
+
+        if (empty($featureSettings['leadFields'])) {
+            return false;
+        }
+
+        $fields = $lead->getFields(true);
+
+
+        $leadFields = $featureSettings['leadFields'];
+
+        $matched = array();
+        foreach ($leadFields as $crm => $mautic) {
+            if (isset($fields[$mautic]) && !empty($fields[$mautic]['value'])) {
+                $matched[$crm] = $fields[$mautic]['value'];
+            }
+        }
+
+        return $matched;
     }
 }

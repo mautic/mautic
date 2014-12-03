@@ -7,7 +7,8 @@ Mautic.initiateIntegrationAuthorization = function() {
 };
 
 Mautic.loadIntegrationAuthWindow = function(response) {
-
+    Mautic.stopPageLoadingBar();
+    Mautic.stopIconSpinPostEvent();
     if (response.authUrl) {
         var generator = window.open(response.authUrl, 'integraitonauth','height=400,width=500');
 

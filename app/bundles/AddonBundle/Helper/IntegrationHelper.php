@@ -41,10 +41,11 @@ class IntegrationHelper
      * @param array|string $services
      * @param array        $withFeatures
      * @param bool         $alphabetical
+     * @param null|int     $addonFilter
      *
      * @return mixed
      */
-    public function getIntegrationObjects($services = null, $withFeatures = null, $alphabetical = false)
+    public function getIntegrationObjects($services = null, $withFeatures = null, $alphabetical = false, $addonFilter = null)
     {
         static $integrations, $available;
 
@@ -92,6 +93,9 @@ class IntegrationHelper
 
             // Get all the addon integrations
             foreach ($available as $id => $a) {
+                if ($addonFilter && $a['addon']->getId() != $addonFilter) {
+                    continue;
+                }
                 if (!isset($integrations[$a['integration']])) {
                     $class = "\\MauticAddon\\{$a['namespace']}\\Integration\\{$a['integration']}Integration";
                     $reflectionClass = new \ReflectionClass($class);
@@ -137,6 +141,10 @@ class IntegrationHelper
                 throw new MethodNotAllowedHttpException($available);
             }
         } elseif (!empty($withFeatures)) {
+            if (!is_array($withFeatures)) {
+                $withFeatures = array($withFeatures);
+            }
+
             $specific = array();
             foreach ($integrations as $n => $d) {
                 $settings = $d->getIntegrationSettings();
@@ -162,7 +170,7 @@ class IntegrationHelper
      *
      * @return mixed
      */
-    public function getAvailableFields($service = null)
+    public function getAvailableFields($service = null, $silenceExceptions = true)
     {
         static $fields = array();
 
@@ -172,25 +180,26 @@ class IntegrationHelper
             foreach ($integrations as $s => $object) {
                 /** @var $object \Mautic\AddonBundle\Integration\AbstractIntegration */
                 $fields[$s] = array();
-                $available  = $object->getAvailableFields();
+                $available  = $object->getAvailableFields($silenceExceptions);
                 if (empty($available) || !is_array($available)) {
                     continue;
                 }
                 foreach ($available as $field => $details) {
+                    $label = (!empty($details['label'])) ? $details['label'] : false;
                     $fn = $object->matchFieldName($field);
                     switch ($details['type']) {
                         case 'string':
                         case 'boolean':
-                            $fields[$s][$fn] = $translator->trans("mautic.integration.{$s}.{$fn}");
+                            $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
                             break;
                         case 'object':
                             if (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
                                     $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = $translator->trans("mautic.integration.{$s}.{$fn}");
+                                    $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}"): $label;
                                 }
                             } else {
-                                $fields[$s][$field] = $translator->trans("mautic.integration.{$s}.{$fn}");
+                                $fields[$s][$field] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
                             }
                             break;
                         case 'array_object':
@@ -198,23 +207,25 @@ class IntegrationHelper
                                 //create social profile fields
                                 $socialProfileUrls = $this->getSocialProfileUrlRegex();
                                 foreach ($socialProfileUrls as $p => $d) {
-                                    $fields[$s]["{$p}ProfileHandle"] = $translator->trans("mautic.integration.{$s}.{$p}ProfileHandle");
+                                    $fields[$s]["{$p}ProfileHandle"] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$p}ProfileHandle") : $label;
                                 }
                                 foreach ($details['fields'] as $f) {
-                                    $fields[$s]["{$f}Urls"] = $translator->trans("mautic.integration.{$s}.{$f}Urls");
+                                    $fields[$s]["{$f}Urls"] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$f}Urls") : $label;
                                 }
                             } elseif (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
                                     $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = $translator->trans("mautic.integration.{$s}.{$fn}");
+                                    $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
                                 }
                             } else {
-                                $fields[$s][$fn] = $translator->trans("mautic.integration.{$s}.{$fn}");
+                                $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
                             }
                             break;
                     }
                 }
-                uasort($fields[$s], "strnatcmp");
+                if ($object->sortFieldsAlphabetically()) {
+                    uasort($fields[$s], "strnatcmp");
+                }
             }
         }
 

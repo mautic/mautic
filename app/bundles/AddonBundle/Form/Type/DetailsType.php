@@ -65,7 +65,9 @@ class DetailsType extends AbstractType
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
                     'class'   => 'btn btn-primary',
-                    'onclick' => 'Mautic.initiateIntegrationAuthorization()'
+                    'onclick' => 'Mautic.initiateIntegrationAuthorization()',
+                    'icon'    => 'fa fa-key'
+
                 ),
                 'label'    => 'mautic.integration.form.' . $label,
                 'disabled' => $disabled
