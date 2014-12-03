@@ -16,6 +16,10 @@ use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
+    /**
+     * @var \MauticAddon\MauticCrmBundle\Crm\Salesforce\Api\Auth\Auth
+     */
+    protected $auth;
 
     /**
      * {@inheritdoc}
@@ -55,8 +59,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return array(
-            'clientKey'     => 'mautic.integration.keyfield.consumerid',
-            'clientSecret'  => 'mautic.integration.keyfield.consumersecret'
+            'client_key'     => 'mautic.integration.keyfield.consumerid',
+            'client_secret'  => 'mautic.integration.keyfield.consumersecret'
         );
     }
 
@@ -81,7 +85,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
@@ -93,26 +97,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         parent::createApiAuth($salesForceSettings);
     }
 
-    /**
-     * Check API Authentication
-     */
-    public function checkApiAuth($silenceExceptions = true)
-    {
-        try {
-            if (!$this->auth->isAuthorized()) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (ErrorException $exception) {
-            $this->logIntegrationError($exception);
-
-            if (!$silenceExceptions) {
-                throw $exception;
-            }
-            return false;
-        }
-    }
 
     /**
      * @return array|mixed
@@ -123,30 +107,30 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth, 'v20.0')->getInfo('lead');
+                $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth)->getInfo();
 
                 if (isset($leadObject['fields'])) {
                     foreach ($leadObject['fields'] as $fieldInfo) {
-                        if (!isset($fieldInfo['name']))
+                        if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], array('reference', 'boolean'))) {
                             continue;
-                        $salesFields[$fieldInfo['name']] = array("type" => "string");
+                        }
+
+                        $salesFields[$fieldInfo['name']] = array(
+                            'type' => 'string',
+                            'label' => $fieldInfo['label']
+                        );
                     }
                 }
             }
         } catch (\Exception $e) {
             $logger = $this->factory->getLogger();
             $logger->addError('INTEGRATION CONNECT ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
+
+            if (!$silenceExceptions) {
+                throw $e;
+            }
         }
 
         return $salesFields;
-    }
-
-    /**
-     * @param $data
-     * @return mixed|void
-     */
-    public function create(MauticFactory $factory, $data)
-    {
-
     }
 }

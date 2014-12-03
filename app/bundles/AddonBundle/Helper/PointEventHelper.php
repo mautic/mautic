@@ -33,6 +33,11 @@ class PointEventHelper
         $success = false;
 
         foreach ($services as $name => $s) {
+            $settings = $s->getIntegrationSettings();
+            if (!$settings->isPublished()) {
+                continue;
+            }
+
             if (method_exists($s, 'pushLead')) {
                 if ($s->pushLead($lead)) {
                     $success = true;

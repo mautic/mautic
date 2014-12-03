@@ -12,7 +12,7 @@ class Lead extends CrmApi
      * @return mixed
      * @todo Replace this request later
      */
-    public function getInfo ($Object)
+    public function getInfo ()
     {
         $tokenData   = $this->auth->getAccessTokenData();
         $parameters  = array(
@@ -38,7 +38,7 @@ class Lead extends CrmApi
     public function create (array $fields)
     {
         $tokenData   = $this->auth->getAccessTokenData();
-        $request_url = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], 'Leads');
+        $request_url = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], 'Lead');
         $response    = $this->auth->makeRequest($request_url, $fields, 'POST');
 
         if (isset($response['error'])) {

@@ -31,16 +31,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return 'Sugarcrm';
     }
 
-    public function getClientIdKey()
-    {
-        return 'client_key';
-    }
-
-    public function getClientSecreteKey()
-    {
-        return 'clientSecret';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -69,7 +59,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array  $parameters
      * @param string $authMethod
      *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
@@ -92,22 +82,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             return false;
         }
 
-        try {
-            if (!$this->auth->isAuthorized()) {
-                return false;
-            } elseif ($this->auth->accessTokenUpdated()) {
-                $accessTokenDetails = $this->auth->getAccessTokenData();
-                $this->mergeApiKeys($accessTokenDetails);
-            }
-            return true;
-        } catch (ErrorException $exception) {
-            $this->logIntegrationError($exception);
-
-            if (!$silenceExceptions) {
-                throw $exception;
-            }
-            return false;
-        }
+        return parent::checkApiAuth($silenceExceptions);
     }
 
     /**
@@ -119,7 +94,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject  = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo("Leads");
+                $leadObject  = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo();
                 $sugarFields = array();
                 foreach ($leadObject['fields'] as $fieldInfo) {
                     if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
@@ -136,29 +111,5 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         return $sugarFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
-    {
-        return false;
-    }
-
-    /**
-     * @param $lead
-     */
-    public function pushLead($lead)
-    {
-        $mappedData = $this->populateLeadData($lead);
-        try {
-            if ($this->checkApiAuth(false)) {
-                CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-        }
     }
 }

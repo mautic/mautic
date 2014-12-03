@@ -5,6 +5,8 @@ use MauticAddon\MauticCrmBundle\Api\CrmApi;
 
 class Lead extends CrmApi
 {
+    protected $object = "Leads";
+
     /**
      * List types
      *
@@ -47,11 +49,10 @@ class Lead extends CrmApi
     }
 
     /**
-     * @param $type
      * @param array $data
      * @return mixed
      */
-    public function create($type, array $data)
+    public function create(array $data)
     {
         $tokenData = $this->auth->getAccessTokenData();
 
@@ -59,7 +60,7 @@ class Lead extends CrmApi
         $parameters = array(
             'operation' => 'create',
             'sessionName' => $tokenData['session_id'],
-            'elementType' => $type,
+            'elementType' => $this->object,
             'element' => json_encode($data)
         );
 

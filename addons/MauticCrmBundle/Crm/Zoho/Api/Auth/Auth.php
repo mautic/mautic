@@ -1,9 +1,9 @@
 <?php
 namespace MauticAddon\MauticCrmBundle\Crm\Zoho\Api\Auth;
 
-use MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface;
+use MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth;
 
-class Auth implements AuthInterface
+class Auth extends AbstractAuth
 {
     /**
      * @var string Username or Email
@@ -49,16 +49,6 @@ class Auth implements AuthInterface
         $this->_email_id = $email_id;
         $this->_password = $password;
         $this->_authtoken = $authtoken;
-    }
-
-    /**
-     * Check to see if the access token was updated from a refresh token
-     *
-     * @return bool
-     */
-    public function accessTokenUpdated()
-    {
-        return $this->_access_token_updated;
     }
 
     /**

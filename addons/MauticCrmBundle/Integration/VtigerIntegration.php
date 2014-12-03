@@ -52,7 +52,7 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
      * @param array  $parameters
      * @param string $authMethod
      *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AuthInterface|void
+     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
@@ -89,7 +89,7 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe("Leads");
+                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe();
 
                 foreach ($leadObject['fields'] as $fieldInfo) {
                     if (!isset($fieldInfo['name']))
