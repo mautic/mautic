@@ -8,9 +8,10 @@ Mautic.dashboardOnLoad = function (container) {
 
 Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
-    mQuery('.jqvmap-label').remove();
+    mQuery('.jvectormap-tip').remove();
     if (id === '#app-content') {
         delete Mautic.dashboardMapData;
+        Mautic.dashboardMap.remove();
         delete Mautic.dashboardClickRateDoughnutObject;
         delete Mautic.dashboardOpenRateDoughnutObject;
         delete Mautic.ActiveVisitorsCount;
@@ -24,23 +25,41 @@ Mautic.renderDashboardMap = function () {
     }
 
     Mautic.dashboardMapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
-    jQuery('#dashboard-map').vectorMap({
-        map: 'world_en',
-        backgroundColor: null,
-        color: '#ffffff',
-        hoverOpacity: 0.7,
-        selectedColor: '#666666',
-        enableZoom: true,
-        showTooltip: true,
-        values: Mautic.dashboardMapData,
-        scaleColors: ['#C8EEFF', '#006491'],
-        normalizeFunction: 'polynomial',
-        onLabelShow: function (event, label, code) {
-            if(Mautic.dashboardMapData[code] > 0) {
-                label.append(': '+Mautic.dashboardMapData[code]+' Leads');
+    var element = mQuery('#dashboard-map');
+    element.vectorMap({
+        backgroundColor: 'transparent',
+        zoomOnScroll: false,
+        regionStyle: {
+            initial: {
+                fill: '#dce0e5',
+                "fill-opacity": 1,
+                stroke: 'none',
+                "stroke-width": 0,
+                "stroke-opacity": 1
+            },
+            hover: {
+                "fill-opacity": 0.7,
+                cursor: 'pointer'
+            }
+        },
+        map: 'world_mill_en',
+        series: {
+            regions: [{
+                values: Mautic.dashboardMapData,
+                scale: ['#C8EEFF', '#006491'],
+                normalizeFunction: 'polynomial'
+            }]
+        },
+        onRegionTipShow: function (event, label, index) {
+            if(Mautic.dashboardMapData[index] > 0) {
+                label.html(
+                    '<b>'+label.html()+'</b></br>'+
+                    Mautic.dashboardMapData[index]+' Leads'
+                );
             }
         }
     });
+    Mautic.dashboardMap = element.vectorMap('get', 'mapObject');
 }
 
 Mautic.renderOpenRateDoughnut = function () {

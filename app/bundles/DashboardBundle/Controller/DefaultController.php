@@ -61,7 +61,7 @@ class DefaultController extends CommonController
         // Convert country names to 2-char code
         foreach ($leadCountries as $leadCountry) {
             if (isset($countries[$leadCountry['country']])) {
-                $mapData[strtolower($countries[$leadCountry['country']])] = $leadCountry['quantity'];
+                $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
             }
         }
 
