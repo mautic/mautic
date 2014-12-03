@@ -41,6 +41,7 @@ class FormSubscriber extends CommonSubscriber
         // Add form submit actions
         // Send email to admin user
         $action = array(
+            'group'        => 'mautic.email.form.action',
             'label'        => 'mautic.email.form.action.sendemail.admin',
             'description'  => 'mautic.email.form.action.sendemail.admin.descr',
             'formType'     => 'email_submitaction_sendemail_admin',
@@ -51,6 +52,7 @@ class FormSubscriber extends CommonSubscriber
 
         // Send email to lead
         $action = array(
+            'group'        => 'mautic.email.form.action',
             'label'        => 'mautic.email.form.action.sendemail.lead',
             'description'  => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'     => 'emailsend_list',

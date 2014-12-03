@@ -75,7 +75,7 @@ class FormBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label', 'formType', 'callback'),
+            array('group', 'label', 'formType', 'callback'),
             array('callback'),
             $action
         );
@@ -96,6 +96,21 @@ class FormBuilderEvent extends Event
                 $a['label'], $b['label']);
         });
         return $this->actions;
+    }
+
+    /**
+     * Get submit actions by groups
+     *
+     * @return array
+     */
+    public function getSubmitActionGroups()
+    {
+        $actions = $this->getSubmitActions();
+        $groups = array();
+        foreach ($actions as $key => $action) {
+            $groups[$action['group']][$key] = $action;
+        }
+        return $groups;
     }
 
     /**

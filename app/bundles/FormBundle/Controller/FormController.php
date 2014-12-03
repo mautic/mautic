@@ -330,7 +330,7 @@ class FormController extends CommonFormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'fields'         => $fieldHelper->getList($customComponents['fields']),
-                'actions'        => $customComponents['actions'],
+                'actions'        => $customComponents['choices'],
                 'formFields'     => $modifiedFields,
                 'formActions'    => $modifiedActions,
                 'deletedFields'  => $deletedFields,
@@ -545,7 +545,7 @@ class FormController extends CommonFormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'fields'         => $fieldHelper->getList($customComponents['fields']),
-                'actions'        => $customComponents['actions'],
+                'actions'        => $customComponents['choices'],
                 'formFields'     => $modifiedFields,
                 'formActions'    => $modifiedActions,
                 'deletedFields'  => $deletedFields,
