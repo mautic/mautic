@@ -74,3 +74,11 @@ $container->setDefinition('mautic.helper.cookie',
         array(
             new Reference('mautic.factory'))
     ));
+
+//Update helper
+$container->setDefinition('mautic.helper.update',
+    new Definition(
+        'Mautic\CoreBundle\Helper\UpdateHelper',
+        array(
+            new Reference('mautic.factory'))
+    ));

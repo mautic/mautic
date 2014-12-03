@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\CoreBundle\Helper\UpdateHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -100,7 +99,7 @@ EOT
 
         $update = (array) json_decode(file_get_contents($cacheFile));
 
-        $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
+        $updateHelper = $this->getContainer()->get('mautic.helper.update');
 
         // Fetch the update package
         $package = $updateHelper->fetchPackage($update['package']);

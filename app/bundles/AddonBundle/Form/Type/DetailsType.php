@@ -49,18 +49,9 @@ class DetailsType extends AbstractType
 
         $authType = $options['integration_object']->getAuthenticationType();
         if (in_array($authType, array('oauth2', 'callback'))) {
-            $url      = $options['integration_object']->getOAuthLoginUrl();
             $keys     = $options['data']->getApiKeys();
             $disabled = false;
             $label    = (isset($keys['access_token'])) ? 'reauthorize' : 'authorize';
-
-            //find what key is needed from the URL and pass it to the JS function
-            preg_match('/{(.*)}/', $url, $match);
-            if (!empty($match[1])) {
-                $key = $match[1];
-            } else {
-                $key = '';
-            }
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
