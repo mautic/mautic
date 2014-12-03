@@ -7,24 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view['assets']->addScriptDeclaration("var MauticInstaller = {
-    showWaitMessage: function(event) {
-        event.preventDefault();
-
-        if (mQuery('#waitMessage').length) {
-            mQuery('#stepNavigation').addClass('hide');
-            mQuery('#waitMessage').removeClass('hide');
-        }
-
-        mQuery('.btn-next').prop('disabled', true);
-        mQuery('.btn-next').html('<i class=\"fa fa-spin fa-spinner fa-fw\"></i>{$view['translator']->trans('mautic.install.please.wait')}');
-
-        setTimeout(function() {
-            mQuery('form').submit();
-        }, 10);
-    }
-};");
-
+$view['assets']->addScript('app/bundles/InstallBundle/Assets/install/install.js');
 ?>
 <!DOCTYPE html>
 <html>

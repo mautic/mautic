@@ -10,18 +10,6 @@ if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 
-$js = <<<JS
-MauticInstaller.toggleBackupPrefix = function() {
-    if (mQuery('#install_doctrine_step_backup_tables_0').prop('checked')) {
-        mQuery('#backupPrefix').addClass('hide');
-    } else {
-        mQuery('#backupPrefix').removeClass('hide');
-    }
-};
-JS;
-$view['assets']->addScriptDeclaration($js);
-
-$view['assets']->addScriptDeclaration("var test = {};");
 ?>
 
 <div class="panel-heading">

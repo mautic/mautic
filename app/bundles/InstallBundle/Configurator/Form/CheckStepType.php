@@ -40,6 +40,10 @@ class CheckStepType extends AbstractType
             'cancel_text'       => ''
         ));
 
+        $builder->add('site_url', 'hidden');
+        $builder->add('cache_path', 'hidden');
+        $builder->add('log_path', 'hidden');
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }

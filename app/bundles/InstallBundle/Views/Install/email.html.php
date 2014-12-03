@@ -9,44 +9,6 @@
 if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
-
-$js = <<<JS
-MauticInstaller.toggleSpoolQueue = function() {
-    if (mQuery('#install_email_step_mailer_spool_type_0').prop('checked')) {
-        mQuery('#spoolPath').addClass('hide');
-    } else {
-        mQuery('#spoolPath').removeClass('hide');
-    }
-};
-
-MauticInstaller.toggleTransportDetails = function (mailer) {
-    if (mailer == 'smtp') {
-        mQuery('#smtpSettings').removeClass('hide');
-        if (mQuery('#install_email_step_mailer_auth_mode').val()) {
-            mQuery('#authDetails').removeClass('hide');
-        } else {
-            mQuery('#authDetails').addClass('hide');
-        }
-    } else {
-        mQuery('#smtpSettings').addClass('hide');
-
-        if (mailer == 'mail' || mailer == 'sendmail') {
-            mQuery('#authDetails').addClass('hide');
-        } else {
-            mQuery('#authDetails').removeClass('hide');
-        }
-    }
-};
-
-MauticInstaller.toggleAuthDetails = function(auth) {
-    if (!auth) {
-        mQuery('#authDetails').addClass('hide');
-    } else {
-        mQuery('#authDetails').removeClass('hide');
-    }
-};
-JS;
-$view['assets']->addScriptDeclaration($js);
 ?>
 
 <div class="panel-heading">
@@ -57,7 +19,9 @@ $view['assets']->addScriptDeclaration($js);
 <div class="panel-body">
     <?php echo $view['form']->start($form); ?>
     <h4><?php echo $view['translator']->trans('mautic.install.email.header.emailfrom'); ?></h4>
-    <h6><?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?></h6>
+    <div class=" well well-sm text-muted">
+        <?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?>
+    </div>
     <div class="row">
         <div class="col-sm-6">
             <?php echo $view['form']->row($form['mailer_from_name']); ?>
@@ -67,7 +31,9 @@ $view['assets']->addScriptDeclaration($js);
         </div>
     </div>
     <h4><?php echo $view['translator']->trans('mautic.install.email.header.spooler'); ?></h4>
-    <h6><?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?></h6>
+    <div class=" well well-sm text-muted">
+        <?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?>
+    </div>
     <div class="row">
         <div class="col-sm-5">
             <?php echo $view['form']->row($form['mailer_spool_type']); ?>
@@ -78,7 +44,9 @@ $view['assets']->addScriptDeclaration($js);
         </div>
     </div>
     <h4><?php echo $view['translator']->trans('mautic.install.email.header.smtp'); ?></h4>
-    <h6><?php echo $view['translator']->trans('mautic.install.email.subheader.smtp'); ?></h6>
+    <div class=" well well-sm text-muted">
+        <?php echo $view['translator']->trans('mautic.install.email.subheader.smtp'); ?>
+    </div>
     <div class="row">
         <div class="col-sm-12">
             <?php echo $view['form']->row($form['mailer_transport']); ?>

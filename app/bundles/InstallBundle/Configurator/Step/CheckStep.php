@@ -32,15 +32,37 @@ class CheckStep implements StepInterface
     private $kernelRoot;
 
     /**
+     * Absolute path to cache directory
+     *
+     * @var string
+     */
+    public $cache_path = '%kernel.root_dir%/cache';
+
+    /**
+     * Absolute path to log directory
+     *
+     * @var string
+     */
+    public $log_path   = '%kernel.root_dir%/logs';
+
+    /**
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     *
+     * @var string
+     */
+    public $site_url;
+
+    /**
      * Constructor
      *
      * @param boolean $configIsWritable Flag if the configuration file is writable
      * @param string  $kernelRoot       Kernel root path
      */
-    public function __construct($configIsWritable, $kernelRoot)
+    public function __construct($configIsWritable, $kernelRoot, $baseUrl)
     {
         $this->configIsWritable = $configIsWritable;
         $this->kernelRoot       = $kernelRoot;
+        $this->site_url         = $baseUrl;
     }
 
     /**
@@ -294,6 +316,15 @@ class CheckStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        return array();
+        $parameters = array();
+
+        foreach ($data as $key => $value) {
+            // Exclude backup params from the config
+            if (!in_array($key, array('configIsWritable', 'kernelRoot'))) {
+                $parameters['db_' . $key] = $value;
+            }
+        }
+
+        return $parameters;
     }
 }
