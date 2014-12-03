@@ -22,7 +22,6 @@
         "symfony/form": "2.5.*",
         "symfony/http-foundation": "2.5.*",
         "symfony/http-kernel": "2.5.*",
-        "symfony/icu": "1.0.*",
         "symfony/intl": "2.5.*",
         "symfony/options-resolver": "2.5.*",
         "symfony/process": "2.5.*",
