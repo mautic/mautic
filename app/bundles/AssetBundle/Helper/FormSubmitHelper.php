@@ -36,12 +36,14 @@ class FormSubmitHelper
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model  = $factory->getModel('asset');
         $asset  = $model->getEntity($assetId);
+        $form   = $action->getForm();
 
         //make sure the asset still exists and is published
         if ($asset != null && $asset->isPublished()) {
             //register a callback after the other actions have been fired
             return array(
                 'callback' => '\Mautic\AssetBundle\Helper\FormSubmitHelper::downloadFile',
+                'form'     => $form,
                 'asset'    => $asset,
                 'message'  => $properties['message']
             );

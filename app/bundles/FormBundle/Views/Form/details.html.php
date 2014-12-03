@@ -31,6 +31,15 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons'    => array(
         array(
             'attr' => array(
+                'data-toggle' => '',
+                'target'      => '_blank',
+                'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $activeForm->getId())),
+            ),
+            'iconClass' => 'fa fa-camera',
+            'btnText'   => 'mautic.form.form.preview'
+        ),
+        array(
+            'attr' => array(
                 'data-toggle' => 'ajax',
                 'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $activeForm->getId())),
             ),

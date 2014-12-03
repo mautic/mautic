@@ -31,3 +31,7 @@
 #dashboard-map {
 	height: 350px;
 }
+.jvectormap-container {
+    height:100%;
+    width:100%;
+}
