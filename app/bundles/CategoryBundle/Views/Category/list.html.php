@@ -80,7 +80,7 @@ if ($tmpl == 'index')
                             ?>
                         </td>
                         <td>
-                            <span class="label label-default pa-10" style="background: <?php echo $item->getColor(); ?>;"> </span>
+                            <span class="label label-default pa-10" style="background: #<?php echo $item->getColor(); ?>;"> </span>
                         </td>
                         <td>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
