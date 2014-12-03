@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\CoreBundle\Helper\UpdateHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -49,7 +48,7 @@ EOT
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
-        $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
+        $updateHelper = $this->getContainer()->get('mautic.helper.update');
         $updateData   = $updateHelper->fetchData(true);
 
         if ($updateData['error']) {
