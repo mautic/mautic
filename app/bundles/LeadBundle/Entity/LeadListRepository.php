@@ -83,7 +83,7 @@ class LeadListRepository extends CommonRepository
      * @param string $id
      * @param bool $withLeads
      * @param bool $withFilters
-
+     *
      * @return array
      */
     public function getLists($user = false, $alias = '', $id = '', $withLeads = false, $withFilters = false)
@@ -328,7 +328,7 @@ class LeadListRepository extends CommonRepository
                 $return[$id] = $currentOnlyLeads[$id];
 
             } else {
-                if (!isset($leads[$id])) {
+                if (!isset($leads[$id]) && $filters) {
                     $q          = $this->_em->getConnection()->createQueryBuilder();
                     $parameters = array();
                     $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
@@ -342,6 +342,7 @@ class LeadListRepository extends CommonRepository
                     }
 
                     $results    = $q->execute()->fetchAll();
+
                     $leads[$id] = array();
                     foreach ($results as $r) {
                         if ($idOnly) {
@@ -352,6 +353,8 @@ class LeadListRepository extends CommonRepository
 
                     }
                     unset($filters, $parameters, $q, $expr);
+                } else {
+                    $leads[$id] = array();
                 }
                 $return[$id] = $leads[$id];
             }
