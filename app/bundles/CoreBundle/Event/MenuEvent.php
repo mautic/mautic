@@ -33,7 +33,7 @@ class MenuEvent extends Event
     protected $security;
 
     /**
-     * @var User
+     * @var User|string
      */
     protected $user;
 
@@ -45,7 +45,7 @@ class MenuEvent extends Event
     /**
      * @param CorePermissions $security
      */
-    public function __construct(CorePermissions $security, User $user, Request $request)
+    public function __construct(CorePermissions $security, $user, Request $request)
     {
         $this->security = $security;
         $this->user     = $user;
