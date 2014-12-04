@@ -71,18 +71,21 @@ class AuditLogSubscriber extends CommonSubscriber
         foreach ($rows as $row) {
             $eventTypeKey      = 'lead.' . $row->getAction();
             $eventFilterExists = in_array($eventTypeKey, $filter);
+            $eventLabel        = $this->translator->trans('mautic.lead.event.'. $row->getAction());
 
             if (!$loadAllEvents && !$eventFilterExists) {
                 continue;
             }
 
             $event->addEvent(array(
-                'event'     => $eventTypeKey,
+                'event'      => $eventTypeKey,
+                'eventLabel' => $eventLabel,
                 'timestamp' => $row->getDateAdded(),
                 'extra'     => array(
                     'details' => $row->getDetails(),
                     'editor'  => $row->getUserName()
-                )
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
             ));
         }
     }
