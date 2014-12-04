@@ -9,6 +9,12 @@
 
 $form = $event['extra']['form'];
 $page = $event['extra']['page'];
+$submission = $event['extra']['submission'];
+$results = $submission->getResults();
+
+if ($page->getId()) {
+	$link = '<a href="' . $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $page->getId())) . '" data-toggle="ajax">' . $page->getTitle() . '</a>';
+}
 
 ?>
 
@@ -27,13 +33,26 @@ $page = $event['extra']['page'];
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
-	        	<?php if ($page->getId()) : ?>
-                <?php $link = '<a href="' . $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $page->getId())) . '" data-toggle="ajax">' . $page->getTitle() . '</a>'; ?>
-	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.submitted', array('%link%' => $link)); ?></p>
+	        	<dl class="dl-horizontal">
+        		<?php if (isset($link)) : ?>
+					<dt><?php echo $view['translator']->trans('mautic.core.source'); ?></dt>
+					<dd><?php echo $link; ?></dd>
 				<?php endif; ?>
-				<?php if (isset($event['extra'])) : ?>
-	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $form->getDescription())); ?></p>
+				<?php if ($form->getDescription()) : ?>
+					<dt><?php echo $view['translator']->trans('mautic.core.description'); ?></dt>
+					<dd><?php echo $form->getDescription(); ?></dd>
 				<?php endif; ?>
+					<dt><?php echo $view['translator']->trans('mautic.form.result.thead.referrer'); ?></dt>
+					<dd><?php echo $view['assets']->makeLinks($submission->getReferer()); ?></dd>
+				<?php if (is_array($results)) : ?>
+					<?php foreach ($form->getFields() as $field) : ?>
+						<?php if (array_key_exists($field->getAlias(), $results)) : ?>
+							<dt><?php echo $field->getLabel(); ?></dt>
+							<dd><?php echo $results[$field->getAlias()]; ?></dd>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+				</dl>
 	        </div>
 	    <?php endif; ?>
 	</div>
