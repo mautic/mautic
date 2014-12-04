@@ -71,7 +71,8 @@ class LeadSubscriber extends CommonSubscriber
                 'eventLabel' => $eventTypeName,
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
-                    'page' => $model->getEntity($hit['page_id'])
+                    'page' => $model->getEntity($hit['page_id']),
+                    'hit'  => $hit
                 ),
                 'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
             ));
