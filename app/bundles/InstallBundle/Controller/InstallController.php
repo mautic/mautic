@@ -371,6 +371,9 @@ class InstallController extends CommonController
         $dbName             = $dbParams['dbname'];
         $dbParams['dbname'] = null;
 
+        //suppress display of errors as we know its going to happen while testing the connection
+        ini_set('display_errors', 0);
+
         //test credentials
         try {
             $db = DriverManager::getConnection($dbParams);
@@ -389,9 +392,6 @@ class InstallController extends CommonController
 
         //test database existence
         $dbParams['dbname'] = $dbName;
-
-        //suppress display of errors as we know its going to happen while testing the connection
-        ini_set('display_errors', 0);
 
         $db = DriverManager::getConnection($dbParams);
         if ($db->isConnected()) {
