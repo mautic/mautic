@@ -126,7 +126,6 @@ class UpdateHelper
                 'stability'  => $this->factory->getParameter('update_stability')
             );
 
-            // TODO - Whenever I get the router hooked up on the component, change this URL
             $data    = $connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
