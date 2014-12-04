@@ -42,14 +42,6 @@ textarea.form-html {
     height: 200px;
 }
 
-#form-preview .modal-dialog{
-    height: 85%;
-}
-
-#form-preview .modal-content, #form-preview .modal-body {
-    height: 90%;
-}
-
 .col-form-actions {
     width: 25px;
 }
