@@ -104,7 +104,7 @@ class SubmissionModel extends CommonFormModel
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
-                    $msg = $this->get('translator')->trans('mautic.form.field.generic.validationfailed', array(
+                    $msg = $this->translator->trans('mautic.form.field.generic.validationfailed', array(
                         '%label%' => $f->getLabel()
                     ));
                 }
