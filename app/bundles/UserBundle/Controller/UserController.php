@@ -438,7 +438,7 @@ class UserController extends FormController
                         'objectId'  => $entityId,
                         'action'    => 'communication',
                         'details'   => $details,
-                        'ipAddress' => $this->request->server->get('REMOTE_ADDR')
+                        'ipAddress' => $this->factory->getIpAddressFromRequest()
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 

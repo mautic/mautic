@@ -152,7 +152,7 @@ class LeadSubscriber extends CommonSubscriber
                     "objectId"  => $lead->getId(),
                     "action"    => ($event->isNew()) ? "create" : "update",
                     "details"   => $details,
-                    "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    "ipAddress" => $this->factory->getIpAddressFromRequest()
                 );
                 $this->factory->getModel('core.auditLog')->writeToLog($log);
 
@@ -179,7 +179,7 @@ class LeadSubscriber extends CommonSubscriber
                         "objectId"  => $lead->getId(),
                         "action"    => "identified",
                         "details"   => $details,
-                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                        "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
@@ -206,7 +206,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $lead->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $lead->getPrimaryIdentifier()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -226,7 +226,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $field->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -246,7 +246,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $field->deletedId,
             "action"     => "delete",
             "details"    => array('name', $field->getLabel()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -309,7 +309,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $note->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -329,7 +329,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $note->deletedId,
             "action"     => "delete",
             "details"    => array('text', $note->getText()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

@@ -149,7 +149,7 @@ class UserSubscriber extends CommonSubscriber
                 "objectId"  => $user->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -169,7 +169,7 @@ class UserSubscriber extends CommonSubscriber
             "objectId"   => $user->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $user->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -189,7 +189,7 @@ class UserSubscriber extends CommonSubscriber
                 "objectId"  => $role->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -209,7 +209,7 @@ class UserSubscriber extends CommonSubscriber
             "objectId"   => $role->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $role->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

@@ -123,7 +123,7 @@ class FormSubscriber extends CommonSubscriber
                 "objectId"  => $form->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -143,7 +143,7 @@ class FormSubscriber extends CommonSubscriber
             "objectId"   => $form->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $form->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

@@ -51,7 +51,7 @@ class PointSubscriber extends CommonSubscriber
                 "objectId"  => $point->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -71,7 +71,7 @@ class PointSubscriber extends CommonSubscriber
             "objectId"   => $point->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $point->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -91,7 +91,7 @@ class PointSubscriber extends CommonSubscriber
                 "objectId"  => $trigger->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -111,7 +111,7 @@ class PointSubscriber extends CommonSubscriber
             "objectId"   => $trigger->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $trigger->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

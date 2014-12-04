@@ -47,7 +47,7 @@ class AssetSubscriber extends CommonSubscriber
                 "objectId"  => $asset->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -67,7 +67,7 @@ class AssetSubscriber extends CommonSubscriber
             "objectId"   => $asset->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $asset->getTitle()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
