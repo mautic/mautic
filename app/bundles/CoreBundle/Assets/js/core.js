@@ -1469,7 +1469,6 @@ var Mautic = {
      * @param container
      */
     startUpdate: function(container) {
-
         // startUpdate runs in two steps, the first step is to update the layout
         mQuery.ajax({
             showLoadingBar: true,
@@ -1508,9 +1507,10 @@ var Mautic = {
             }
         });
 
-        if (nextStep) {
-        }
+        if (!nextStep) {
+	        Mautic.stopPageLoadingBar();
 
-        Mautic.stopPageLoadingBar();
+	        return;
+        }
     }
 };

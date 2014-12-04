@@ -78,28 +78,14 @@ EOT
             }
         }
 
-        $cacheFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/lastUpdateCheck.txt';
-
-        // First things first, check to make sure cached update data exists as we pull the version info from it, otherwise run the fetch routine
-        if (!is_readable($cacheFile)) {
-            $command = $this->getApplication()->find('mautic:update:find');
-            $input = new ArrayInput(array(
-                'command' => 'mautic:update:find',
-                '--env'   => $options['env']
-            ));
-            $command->run($input, $output);
-
-            // If the cache file still doesn't exist, there's nothing else we can do
-            if (!is_readable($cacheFile)) {
-                $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
-
-                return 1;
-            }
-        }
-
-        $update = (array) json_decode(file_get_contents($cacheFile));
-
         $updateHelper = $this->getContainer()->get('mautic.helper.update');
+        $update       = $updateHelper->fetchData();
+
+        if (!isset($update['package'])) {
+            $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
+
+            return 1;
+        }
 
         // Fetch the update package
         $package = $updateHelper->fetchPackage($update['package']);
@@ -110,20 +96,20 @@ EOT
             return 1;
         }
 
-        $zipFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/' . basename($update['package']);
+        $zipFile = $this->getContainer()->getParameter('mautic.cache_path') . '/' . basename($update['package']);
 
         $zipper = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
-            $zipper->close();
             $output->writeln('<error>' . $translator->trans('mautic.core.update.could_not_open_archive') . '</error>');
 
             return 1;
         }
 
         // Extract the archive file now in place
-        $zipper->extractTo(dirname($this->getContainer()->getParameter('kernel.root_dir')));
+        $zipper->extractTo(dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/upgrade');
+        $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
         $command = $this->getApplication()->find('cache:clear');
@@ -154,7 +140,7 @@ EOT
         }
 
         // Clear the cached update data and the download package now that we've updated
-        @unlink($cacheFile);
+        @unlink($this->getContainer()->getParameter('mautic.cache_path') . '/lastUpdateCheck.txt');
         @unlink($zipFile);
 
         // Update successful
