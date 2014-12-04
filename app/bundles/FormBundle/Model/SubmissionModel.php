@@ -106,7 +106,7 @@ class SubmissionModel extends CommonFormModel
                 if (empty($msg)) {
                     $msg = $this->translator->trans('mautic.form.field.generic.validationfailed', array(
                         '%label%' => $f->getLabel()
-                    ));
+                    ), 'validators');
                 }
 
                 return array('errors' => array($msg));
