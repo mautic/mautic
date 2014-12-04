@@ -1467,50 +1467,75 @@ var Mautic = {
      * Executes the first step in the update cycle
      *
      * @param container
+     * @param step
      */
-    startUpdate: function(container) {
-        // startUpdate runs in two steps, the first step is to update the layout
-        mQuery.ajax({
-            showLoadingBar: true,
-            url: mauticAjaxUrl + '?action=core:updateSetUpdateLayout',
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    mQuery('div[id=' + container + ']').html(response.content);
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+    processUpdate: function(container, step) {
+        switch (step) {
+            // Set the update page layout
+            case 1:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl + '?action=core:updateSetUpdateLayout',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            mQuery('div[id=' + container + ']').html(response.content);
+                            Mautic.processUpdate(container, step + 1);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
 
-        var nextStep = false;
+            // Download the update package
+            case 2:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl + '?action=core:updateDownloadPackage',
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-downloading-status]').html(response.stepStatus);
 
-        // Now we will download the update package
-        mQuery.ajax({
-            showLoadingBar: true,
-            url: mauticAjaxUrl + '?action=core:updateDownloadPackage',
-            dataType: 'json',
-            success: function (response) {
-                mQuery('td[id=update-step-downloading-status]').html(response.stepStatus);
+                        if (response.success) {
+                            mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status">' + response.nextStepStatus + '</td></tr>');
+                            Mautic.processUpdate(container, step + 1);
+                        } else {
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
 
-                if (response.success) {
-                    // TODO - Add the next update step to the table
-                    var nextStep = true;
-                } else {
-                    mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
-                    mQUery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+            // Extract the update package
+            case 3:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl + '?action=core:updateExtractPackage',
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-extracting-status]').html(response.stepStatus);
 
-        if (!nextStep) {
-	        Mautic.stopPageLoadingBar();
-
-	        return;
+                        if (response.success) {
+                            mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status">' + response.nextStepStatus + '</td></tr>');
+                            //Mautic.processUpdate(container, step + 1);
+                        } else {
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
         }
+
+        Mautic.stopPageLoadingBar();
     }
 };

@@ -353,8 +353,49 @@ class AjaxController extends CommonController
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $package['message']));
         } else {
-            $dataArray['success']    = 1;
-            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.success');
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.extracting.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Extracts the update package
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateExtractPackageAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->factory->getHelper('update');
+
+        // Fetch the package data
+        $update  = $updateHelper->fetchData();
+        $zipFile = $this->factory->getParameter('cache_path') . '/' . basename($update['package']);
+
+        $zipper = new \ZipArchive();
+        $archive = $zipper->open($zipFile);
+
+        if ($archive !== true) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.could_not_open_archive'));
+        } else {
+            // Extract the archive file now
+            $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
+            $zipper->close();
+
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
         }
 
         return $this->sendJsonResponse($dataArray);
