@@ -25,7 +25,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                         <?php echo $view['translator']->trans('mautic.core.update.available'); ?>
                     </h2>
                 <div class="panel-body">
-                    <table class="table table-hover table-striped table-bordered addon-list" id="addonTable">
+                    <table class="table table-hover table-striped table-bordered addon-list" id="updateTable">
                         <tbody>
                             <tr>
                                 <td><?php echo $view['translator']->trans('mautic.core.update.current.version'); ?></td>
@@ -41,7 +41,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                             </tr>
                         </tbody>
                     </table>
-                    <a class="btn btn-primary" href="#"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></a>
+                    <button class="btn btn-primary" onclick="Mautic.startUpdate('update-panel');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
                 </div>
             </div>
             <?php endif; ?>

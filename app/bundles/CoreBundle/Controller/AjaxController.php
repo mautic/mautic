@@ -312,4 +312,51 @@ class AjaxController extends CommonController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Sets the page layout to the update layout
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateSetUpdateLayoutAction(Request $request)
+    {
+        $dataArray = array(
+            'success' => 1,
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php')
+        );
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Downloads the update package
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateDownloadPackageAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->factory->getHelper('update');
+
+        // Fetch the update package
+        $update  = $updateHelper->fetchData();
+        $package = $updateHelper->fetchPackage($update['package']);
+
+        if ($package['error']) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $package['message']));
+        } else {
+            $dataArray['success']    = 1;
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.success');
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

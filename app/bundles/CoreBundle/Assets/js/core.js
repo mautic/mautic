@@ -1461,5 +1461,56 @@ var Mautic = {
             }];
         }
         return data;
+    },
+
+    /**
+     * Executes the first step in the update cycle
+     *
+     * @param container
+     */
+    startUpdate: function(container) {
+
+        // startUpdate runs in two steps, the first step is to update the layout
+        mQuery.ajax({
+            showLoadingBar: true,
+            url: mauticAjaxUrl + '?action=core:updateSetUpdateLayout',
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    mQuery('div[id=' + container + ']').html(response.content);
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            }
+        });
+
+        var nextStep = false;
+
+        // Now we will download the update package
+        mQuery.ajax({
+            showLoadingBar: true,
+            url: mauticAjaxUrl + '?action=core:updateDownloadPackage',
+            dataType: 'json',
+            success: function (response) {
+                mQuery('td[id=update-step-downloading-status]').html(response.stepStatus);
+
+                if (response.success) {
+                    // TODO - Add the next update step to the table
+                    var nextStep = true;
+                } else {
+                    mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                    mQUery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            }
+        });
+
+        if (nextStep) {
+        }
+
+        Mautic.stopPageLoadingBar();
     }
 };
