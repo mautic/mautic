@@ -224,7 +224,7 @@ class InstallController extends CommonController
                     }
 
                     // Clear the cache one final time with the updated config
-                    $this->clearCache();
+                    $this->clearCacheFile();
 
                     $session->remove('mautic.install.completedsteps');
 
@@ -307,27 +307,6 @@ class InstallController extends CommonController
                 'route'         => $this->generateUrl('mautic_installer_final')
             )
         ));
-    }
-
-    /**
-     * Fetches the message to check if the database does not exist
-     *
-     * @param string $driver   Database driver
-     * @param string $database Database name
-     *
-     * @return string
-     */
-    private function checkDatabaseNotExistsMessage ($driver, $database)
-    {
-        switch ($driver) {
-            case 'pdo_mysql':
-                return "Unknown database '$database'";
-
-            case 'pdo_pgsql':
-                return 'database "' . $database . '" does not exist';
-        }
-
-        return '';
     }
 
     /**
