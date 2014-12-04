@@ -216,6 +216,10 @@ class SubmissionRepository extends CommonRepository
             $query->where('fs.ip_id IN (' . implode(',', $options['ipIds']) . ')');
         }
 
+        if (!empty($options['leadId'])) {
+            $query->andWhere('fs.lead_id = ' . (int)$options['leadId']);
+        }
+
         if (!empty($options['id'])) {
             $query->andWhere($query->expr()->eq('fs.form_id', ':id'))
             ->setParameter('id', $options['id']);

@@ -68,6 +68,7 @@ class AuditLogSubscriber extends CommonSubscriber
 
         // Add the entries to the event array
         /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
+        $IpAddresses = $lead->getIpAddresses();
         foreach ($rows as $row) {
             $eventTypeKey      = 'lead.' . $row->getAction();
             $eventFilterExists = in_array($eventTypeKey, $filter);
@@ -77,15 +78,17 @@ class AuditLogSubscriber extends CommonSubscriber
                 continue;
             }
 
+            $details = $row->getDetails();
             $event->addEvent(array(
                 'event'      => $eventTypeKey,
                 'eventLabel' => $eventLabel,
                 'timestamp' => $row->getDateAdded(),
                 'extra'     => array(
-                    'details' => $row->getDetails(),
-                    'editor'  => $row->getUserName()
+                    'details'   => $details,
+                    'editor'    => $row->getUserName(),
+                    'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$details[1]] : array()
                 ),
-                'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticLeadBundle:Timeline:' . (($eventTypeKey == 'lead.ipadded') ? 'ip' : 'index') . '.html.php'
             ));
         }
     }

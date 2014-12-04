@@ -52,12 +52,14 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
+        $options = array('ipIds' => array(), 'leadId' => $lead->getId(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        /*
         foreach ($lead->getIpAddresses() as $ip) {
             $options['ipIds'][] = $ip->getId();
         }
+        */
 
         /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
         $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');

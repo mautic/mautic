@@ -68,9 +68,11 @@ class LeadSubscriber extends CommonSubscriber
         $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        /*
         foreach ($lead->getIpAddresses() as $ip) {
             $options['ipIds'][] = $ip->getId();
         }
+        */
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');

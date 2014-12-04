@@ -32,7 +32,9 @@ $page = $event['extra']['page'];
 	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.submitted', array('%link%' => $link)); ?></p>
 				<?php endif; ?>
 				<?php if (isset($event['extra'])) : ?>
-	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $form->getDescription())); ?></p>
+                <?php if ($descr = $form->getDescription()): ?>
+	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $descr)); ?></p>
+                <?php endif; ?>
 				<?php endif; ?>
 	        </div>
 	    <?php endif; ?>

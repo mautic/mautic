@@ -188,6 +188,19 @@ class LeadSubscriber extends CommonSubscriber
                         $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
                     }
                 }
+
+                //add if an ip was added
+                if (isset($details['ipAddresses'])) {
+                    $log = array(
+                        "bundle"    => "lead",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "ipadded",
+                        "details"   => $details['ipAddresses'][1],
+                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                }
             }
         }
     }
@@ -259,8 +272,9 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
         $eventTypes = array(
-            'lead.created'    => 'mautic.lead.event.created',
-            'lead.identified' => 'mautic.lead.event.identified'
+            'lead.created'    => 'mautic.lead.event.create',
+            'lead.identified' => 'mautic.lead.event.identified',
+            'lead.ipadded'    => 'mautic.lead.event.ip'
         );
 
         foreach ($eventTypes as $type => $label) {
