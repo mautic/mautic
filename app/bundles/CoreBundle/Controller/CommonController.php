@@ -321,12 +321,33 @@ class CommonController extends Controller implements MauticController
     {
         ini_set('memory_limit', '128M');
 
+        //attempt to squash command output
+        ob_start();
+
         $env = $this->factory->getEnvironment();
         $noDebug = ($env == 'prod') ? ' --no-debug' : '';
         $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $env . $noDebug));
         $application = new Application($this->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input);
+
+        if (ob_get_length() > 0) {
+            ob_end_clean();
+        }
+    }
+
+    /**
+     * Delete's the file Symfony caches settings in
+     */
+    public function clearCacheFile()
+    {
+        $env      = $this->factory->getEnvironment();
+        $cacheDir = $this->factory->getSystemPath('cache', true);
+
+        $cacheFile = "$cacheDir/$env/app" . ucfirst($env) . "ProjectContainer.php";
+        if (file_exists($cacheDir)) {
+            unlink($cacheFile);
+        }
     }
 
     /**
