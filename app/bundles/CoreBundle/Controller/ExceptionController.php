@@ -37,18 +37,16 @@ class ExceptionController extends CommonController
                 $code = 500;
             }
 
-            if ($forceProd = $request->get('prod')) {
+            if ($request->get('prod')) {
                 $layout = 'Error';
             }
 
-            $anonymous = $this->factory->getSecurity()->isAnonymous();
-            if ($anonymous || $forceProd) {
-                $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+            $anonymous    = $this->factory->getSecurity()->isAnonymous();
+            $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+            if ($anonymous) {
                 if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
                     $baseTemplate = $templatePage;
                 }
-            } else {
-                $baseTemplate = 'MauticCoreBundle:Default:content.html.php';
             }
 
             $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
