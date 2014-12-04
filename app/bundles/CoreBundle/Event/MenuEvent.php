@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
@@ -70,7 +71,7 @@ class MenuEvent extends Event
     {
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
         if (!$isRoot) {
-            $this->createMenuStructure($items);
+            MenuHelper::createMenuStructure($items);
         }
 
         if ($isRoot) {
@@ -96,45 +97,6 @@ class MenuEvent extends Event
     public function getMenuItems()
     {
         return $this->menuItems;
-    }
-
-    /**
-     * Converts menu config into something KNP menus expects
-     *
-     * @param $items
-     */
-    private function createMenuStructure(&$items)
-    {
-        foreach ($items as &$i) {
-
-            //Set ID to route name
-            if (!isset($i['id']) && isset($i['route'])) {
-                $i['id'] = $i['route'];
-            }
-
-            //Set link attributes
-            $i['linkAttributes'] = array(
-                'data-menu-link' => $i['id'],
-                'id'             => $i['id']
-            );
-
-            $i['extras'] = array();
-
-            //Set the icon class for the menu item
-            if (!empty($i['iconClass'])) {
-                $i['extras']['iconClass'] = $i['iconClass'];
-            }
-
-            //Set the actual route name so that it's available to the menu template
-            if (isset($i['route'])) {
-                $i['extras']['routeName'] = $i['route'];
-            }
-
-            //Repeat for sub items
-            if (isset($i['children'])) {
-                $this->createMenuStructure($i['children']);
-            }
-        }
     }
 
     /**

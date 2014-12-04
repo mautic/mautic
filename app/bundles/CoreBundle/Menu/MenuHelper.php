@@ -98,4 +98,46 @@ class MenuHelper extends Helper
 
         return false;
     }
+
+    /**
+     * Converts menu config into something KNP menus expects
+     *
+     * @param $items
+     */
+    static public function createMenuStructure(&$items)
+    {
+        foreach ($items as &$i) {
+            if (!is_array($i) || empty($i)) {
+                continue;
+            }
+
+            //Set ID to route name
+            if (!isset($i['id']) && isset($i['route'])) {
+                $i['id'] = $i['route'];
+            }
+
+            //Set link attributes
+            $i['linkAttributes'] = array(
+                'data-menu-link' => $i['id'],
+                'id'             => $i['id']
+            );
+
+            $i['extras'] = array();
+
+            //Set the icon class for the menu item
+            if (!empty($i['iconClass'])) {
+                $i['extras']['iconClass'] = $i['iconClass'];
+            }
+
+            //Set the actual route name so that it's available to the menu template
+            if (isset($i['route'])) {
+                $i['extras']['routeName'] = $i['route'];
+            }
+
+            //Repeat for sub items
+            if (isset($i['children'])) {
+                self::createMenuStructure($i['children']);
+            }
+        }
+    }
 }

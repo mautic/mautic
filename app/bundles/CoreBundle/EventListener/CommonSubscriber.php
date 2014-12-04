@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 
@@ -171,60 +172,39 @@ class CommonSubscriber implements EventSubscriberInterface
         $request  = $this->factory->getRequest();
         $bundles  = $this->factory->getParameter('bundles');
         $addons   = $this->factory->getParameter('addon.bundles');
-        $icons    = array();
 
-        foreach ($bundles as $bundle) {
+        $fetchIcons = function($bundle) use (&$event, $security, $request) {
             //check common place
             $path = $bundle['directory'] . "/Config/menu/main.php";
 
             if (file_exists($path)) {
                 $config = include $path;
                 $items  = (!isset($config['items']) ? $config : $config['items']);
-                if ($items) {
+                    MenuHelper::createMenuStructure($items);
                     foreach ($items as $item) {
-                        $icons[] = $item;
-                        if (isset($item['extras']['iconClass']) && isset($item['linkAttributes']['id'])) {
-                            $id = explode('_', $item['linkAttributes']['id']);
+                        if (isset($item['iconClass']) && isset($item['id'])) {
+                            $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
                                 if (substr($id[1], -1) == 's') {
-                                    $event->addIcon(rtrim($id[1], 's'), $item['extras']['iconClass']);
+                                    $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
-                                $event->addIcon($id[1], $item['extras']['iconClass']);
+                                $event->addIcon($id[1], $item['iconClass']);
                             }
                         }
                     }
                 }
-            }
+        };
+
+        foreach ($bundles as $bundle) {
+            $fetchIcons($bundle);
         }
 
         foreach ($addons as $bundle) {
             if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
                 continue;
             }
-
-            //check common place
-            $path = $bundle['directory'] . "/Config/menu/main.php";
-
-            if (file_exists($path)) {
-                $config = include $path;
-                $items  = (!isset($config['items']) ? $config : $config['items']);
-                if ($items) {
-                    foreach ($items as $item) {
-                        $icons[] = $item;
-                        if (isset($item['extras']['iconClass']) && isset($item['linkAttributes']['id'])) {
-                            $id = explode('_', $item['linkAttributes']['id']);
-                            if (isset($id[1])) {
-                                // some bundle names are in plural, create also singular item
-                                if (substr($id[1], -1) == 's') {
-                                    $event->addIcon(rtrim($id[1], 's'), $item['extras']['iconClass']);
-                                }
-                                $event->addIcon($id[1], $item['extras']['iconClass']);
-                            }
-                        }
-                    }
-                }
-            }
+            $fetchIcons($bundle);
         }
     }
 
