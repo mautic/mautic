@@ -168,7 +168,6 @@ class SubmissionModel extends CommonFormModel
             $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
             if ($page != null) {
                 $submission->setPage($page);
-
             }
         }
 
