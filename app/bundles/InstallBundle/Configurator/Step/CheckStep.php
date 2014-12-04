@@ -319,9 +319,9 @@ class CheckStep implements StepInterface
         $parameters = array();
 
         foreach ($data as $key => $value) {
-            // Exclude backup params from the config
+            // Exclude keys from the config
             if (!in_array($key, array('configIsWritable', 'kernelRoot'))) {
-                $parameters['db_' . $key] = $value;
+                $parameters[$key] = $value;
             }
         }
 
