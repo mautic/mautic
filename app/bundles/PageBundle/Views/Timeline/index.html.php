@@ -43,6 +43,16 @@ if ($event['extra']['hit']['dateLeft']) {
 					<dd><?php echo $timeOnPage; ?></dd>
 					<dt><?php echo $view['translator']->trans('mautic.page.referrer'); ?>:</dt>
 					<dd><?php echo $event['extra']['hit']['referer'] ? $view['assets']->makeLinks($event['extra']['hit']['referer']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
+					<?php if (isset($event['extra']['hit']['sourceName'])) : ?>
+					<dt><?php echo $view['translator']->trans('mautic.core.source'); ?>:</dt>
+					<dd>
+						<a href="<?php echo $view['router']->generate('mautic_' . $event['extra']['hit']['source'] . '_action',
+						    array("objectAction" => "view", "objectId" => $event['extra']['hit']['sourceId'])); ?>"
+						   data-toggle="ajax">
+						    <?php echo $event['extra']['hit']['sourceName']; ?>
+						</a>
+					</dd>
+					<?php endif; ?>
 				</dl>
 	        </div>
 	    <?php endif; ?>
