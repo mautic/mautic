@@ -202,7 +202,7 @@ function move_mautic_bundles(array $status)
                 // Sanity checks
                 if (!$directory->isDot() && $directory->isDir()) {
                     // Don't process this bundle if we've already tried it
-                    if (isset($state['completedBundles'][$directory->getFilename()])) {
+                    if (isset($status['updateState']['completedBundles'][$directory->getFilename()])) {
                         continue;
                     }
 
@@ -225,7 +225,7 @@ function move_mautic_bundles(array $status)
                         $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
                     }
 
-                    $state['completedBundles'][$directory->getFilename()] = true;
+                    $status['updateState']['completedBundles'][$directory->getFilename()] = true;
                     $count++;
                 }
             }
@@ -398,7 +398,7 @@ function send_response(array $status)
 }
 
 // Fetch the update state out of the request
-$state = json_decode(base64_decode(getVar('updateState', 'W10=')));
+$state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
 
 // Prime the state if it's empty
 if (empty($state)) {
@@ -434,5 +434,8 @@ switch ($task) {
         $status['stepStatus'] = 'Failed';
         break;
 }
+
+// Encode the state for the next request
+$status['updateState'] = base64_encode(json_encode($status['updateState']));
 
 send_response($status);
