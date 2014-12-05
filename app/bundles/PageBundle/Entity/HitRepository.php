@@ -189,54 +189,19 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get new, unique and returning visitors
-     *
-     * @param array $args
-     *
-     * @return array
-     */
-    public function getNewReturningVisitorsCount($args = array())
-    {
-        $results = array();
-        $results['returning'] = $this->getReturningCount($args);
-        $results['unique'] = $this->getUniqueCount($args);
-        $results['new'] = $results['unique'] - $results['returning'];
-
-        return $results;
-    }
-
-    /**
-     * Count returning visitors
+     * Count returning IP addresses
      *
      * @return int
      */
-    public function getReturningCount()
+    public function countReturningIp()
     {
         $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(h.trackingId) as returning')
-            ->groupBy('h.trackingId')
-            ->having($q->expr()->gt('COUNT(h.trackingId)', 1));
+        $q->select('COUNT(h.ipAddress) as returning')
+            ->groupBy('h.ipAddress')
+            ->having($q->expr()->gt('COUNT(h.ipAddress)', 1));
         $results = $q->getQuery()->getResult();
 
         return count($results);
-    }
-
-    /**
-     * Count how many unique visitors hit pages
-     *
-     * @return int
-     */
-    public function getUniqueCount()
-    {
-        $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(DISTINCT h.trackingId) as unique');
-        $results = $q->getQuery()->getSingleResult();
-
-        if (!isset($results['unique'])) {
-            return 0;
-        }
-
-        return (int) $results['unique'];
     }
 
     /**
