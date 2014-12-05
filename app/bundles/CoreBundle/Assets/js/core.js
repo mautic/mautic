@@ -1468,8 +1468,12 @@ var Mautic = {
      *
      * @param container
      * @param step
+     * @param state
      */
-    processUpdate: function(container, step) {
+    processUpdate: function(container, step, state) {
+        // Edge case but do it anyway, remove the /index_dev.php from mauticBaseUrl to make sure we can always correctly call the standalone upgrader
+        var baseUrl = mauticBaseUrl.replace('/index_dev.php', '');
+
         switch (step) {
             // Set the update page layout
             case 1:
@@ -1523,10 +1527,100 @@ var Mautic = {
 
                         if (response.success) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status">' + response.nextStepStatus + '</td></tr>');
-                            //Mautic.processUpdate(container, step + 1);
+                            Mautic.processUpdate(container, step + 1);
                         } else {
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Move the updated bundles into production
+            case 4:
+                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
+                var updateState = typeof state !== 'undefined' ? state : 'W10=';
+
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveBundles&updateState=' + updateState,
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+
+                        if (response.error) {
+                            // If an error state, we cannot move on
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        } else if (response.complete) {
+                            // If complete then we go into the next step
+                            Mautic.processUpdate(container, step + 1, response.updateState);
+                        } else {
+                            // In this section, the step hasn't completed yet so we repeat it
+                            Mautic.processUpdate(container, step, response.updateState);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Move the rest of core into production
+            case 5:
+                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
+                var updateState = typeof state !== 'undefined' ? state : 'W10=';
+
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveCore&updateState=' + updateState,
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+
+                        if (response.error) {
+                            // If an error state, we cannot move on
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        } else if (response.complete) {
+                            // If complete then we go into the next step
+                            Mautic.processUpdate(container, step + 1, response.updateState);
+                        } else {
+                            // In this section, the step hasn't completed yet so we repeat it
+                            Mautic.processUpdate(container, step, response.updateState);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Move the vendors into production
+            case 6:
+                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
+                var updateState = typeof state !== 'undefined' ? state : 'W10=';
+
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveVendors&updateState=' + updateState,
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+
+                        if (response.error) {
+                            // If an error state, we cannot move on
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        } else if (response.complete) {
+                            // If complete then we go into the next step
+                            Mautic.processUpdate(container, step + 1, response.updateState);
+                        } else {
+                            // In this section, the step hasn't completed yet so we repeat it
+                            Mautic.processUpdate(container, step, response.updateState);
                         }
                     },
                     error: function (request, textStatus, errorThrown) {
