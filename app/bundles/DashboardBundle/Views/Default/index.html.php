@@ -120,7 +120,6 @@ $colspan = 12/$cols;
                                         <thead>
                                             <tr>
                                                 <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
-                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.lang'); ?></th>
                                                 <th><?php echo $view['translator']->trans('mautic.dashboard.label.hits'); ?></th>
                                             </tr>
                                         </thead>
@@ -128,12 +127,20 @@ $colspan = 12/$cols;
                                         <?php foreach ($popularPages as $page) : ?>
                                             <tr>
                                                 <td>
+                                                <?php if ($page['page_id']) : ?>
                                                     <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['page_id'])); ?>" data-toggle="ajax">
                                                         <?php echo $page['title']; ?>
                                                     </a>
-                                                </td>
-                                                <td>
-                                                    <?php echo $page['lang']; ?>
+                                                <?php else : ?>
+                                                    <a href="<?php echo $page['url']; ?>" title="<?php echo $page['url']; ?>">
+                                                        <?php $pageUrl = str_replace(array('http://', 'https://'), '', $page['url']); ?>
+                                                        <?php if (strlen($pageUrl) > 30) : ?>
+                                                            <?php echo substr($pageUrl, 0, 30); ?>...
+                                                        <?php else : ?>
+                                                            <?php echo $pageUrl; ?>
+                                                        <?php endif; ?>
+                                                    </a>
+                                                <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <?php echo $page['hits']; ?>

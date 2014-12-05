@@ -51,7 +51,7 @@ class PageRepository extends CommonRepository
     {
         $q  = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(h.id) as hits, p.id AS page_id, p.title, p.lang')
+        $q->select('count(h.id) as hits, p.id AS page_id, p.title, h.url')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
             ->orderBy('hits', 'DESC')
