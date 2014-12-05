@@ -1484,7 +1484,7 @@ var Mautic = {
                     success: function (response) {
                         if (response.success) {
                             mQuery('div[id=' + container + ']').html(response.content);
-                            Mautic.processUpdate(container, step + 1);
+                            Mautic.processUpdate(container, step + 1, state);
                         }
                     },
                     error: function (request, textStatus, errorThrown) {
@@ -1504,7 +1504,7 @@ var Mautic = {
 
                         if (response.success) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status">' + response.nextStepStatus + '</td></tr>');
-                            Mautic.processUpdate(container, step + 1);
+                            Mautic.processUpdate(container, step + 1, state);
                         } else {
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
@@ -1527,7 +1527,7 @@ var Mautic = {
 
                         if (response.success) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status">' + response.nextStepStatus + '</td></tr>');
-                            Mautic.processUpdate(container, step + 1);
+                            Mautic.processUpdate(container, step + 1, state);
                         } else {
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
@@ -1541,12 +1541,9 @@ var Mautic = {
 
             // Move the updated bundles into production
             case 4:
-                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
-                var updateState = typeof state !== 'undefined' ? state : 'W10=';
-
                 mQuery.ajax({
                     showLoadingBar: true,
-                    url: baseUrl + 'upgrade/upgrade.php?task=moveBundles&updateState=' + updateState,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveBundles&updateState=' + state,
                     dataType: 'json',
                     success: function (response) {
                         mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
@@ -1571,12 +1568,9 @@ var Mautic = {
 
             // Move the rest of core into production
             case 5:
-                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
-                var updateState = typeof state !== 'undefined' ? state : 'W10=';
-
                 mQuery.ajax({
                     showLoadingBar: true,
-                    url: baseUrl + 'upgrade/upgrade.php?task=moveCore&updateState=' + updateState,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveCore&updateState=' + state,
                     dataType: 'json',
                     success: function (response) {
                         mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
@@ -1601,12 +1595,9 @@ var Mautic = {
 
             // Move the vendors into production
             case 6:
-                // Make sure we have a state or set it, the app uses a base64 encoded value so our default cooresponds to an empty JSON encoded array
-                var updateState = typeof state !== 'undefined' ? state : 'W10=';
-
                 mQuery.ajax({
                     showLoadingBar: true,
-                    url: baseUrl + 'upgrade/upgrade.php?task=moveVendors&updateState=' + updateState,
+                    url: baseUrl + 'upgrade/upgrade.php?task=moveVendors&updateState=' + state,
                     dataType: 'json',
                     success: function (response) {
                         mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
