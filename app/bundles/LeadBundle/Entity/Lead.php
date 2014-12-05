@@ -546,8 +546,11 @@ class Lead extends FormEntity
      */
     public function isAnonymous ()
     {
-        $primary = $this->getPrimaryIdentifier();
-        return ($primary == 'mautic.lead.lead.anonymous') ? true : false;
+        if ($name = $this->getName() || !empty($this->fields['core']['company']['value']) || !empty($this->fields['core']['email']['value'])) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
