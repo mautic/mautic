@@ -88,7 +88,7 @@ class AuditLogSubscriber extends CommonSubscriber
                     'editor'    => $row->getUserName(),
                     'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$details[1]] : array()
                 ),
-                'contentTemplate' => 'MauticLeadBundle:Timeline:' . (($eventTypeKey == 'lead.ipadded') ? 'ip' : 'index') . '.html.php'
+                'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:' . (($eventTypeKey == 'lead.identified') ? 'ip' : 'index') . '.html.php'
             ));
         }
     }

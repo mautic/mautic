@@ -86,7 +86,7 @@ class LeadSubscriber extends CommonSubscriber
                     'page' => $model->getEntity($hit['page_id']),
                     'hit'  => $hit
                 ),
-                'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
     }

@@ -78,7 +78,7 @@ class LeadSubscriber extends CommonSubscriber
                 'extra'     => array(
                     'asset' => $model->getEntity($download['asset_id'])
                 ),
-                'contentTemplate' => 'MauticAssetBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
     }
