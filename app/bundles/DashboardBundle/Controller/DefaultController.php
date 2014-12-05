@@ -29,9 +29,13 @@ class DefaultController extends CommonController
     {
         $hitRepo        = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $emailStatRepo  = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        $ipAddressRepo  = $this->factory->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
 
         $sentReadCount        = $this->factory->getModel('email')->getRepository()->getSentReadCount();
-        $newReturningVisitors = $hitRepo->getNewReturningVisitorsCount();
+        $newReturningVisitors = array(
+            'returning' => $hitRepo->countReturningIp(),
+            'unique'    => $ipAddressRepo->countIpAddresses()
+        );
         $weekVisitors         = $hitRepo->countVisitors(604800);
         $allTimeVisitors      = $hitRepo->countVisitors(0);
         $allSentEmails        = $emailStatRepo->getSentCount();

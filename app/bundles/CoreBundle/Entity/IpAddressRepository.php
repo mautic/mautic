@@ -14,4 +14,21 @@ namespace Mautic\CoreBundle\Entity;
  */
 class IpAddressRepository extends CommonRepository
 {
+    /**
+     * Count how many unique IP addresses is there
+     *
+     * @return int
+     */
+    public function countIpAddresses()
+    {
+        $q = $this->createQueryBuilder('i');
+        $q->select('COUNT(DISTINCT i.id) as unique');
+        $results = $q->getQuery()->getSingleResult();
+
+        if (!isset($results['unique'])) {
+            return 0;
+        }
+
+        return (int) $results['unique'];
+    }
 }
