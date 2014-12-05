@@ -385,6 +385,16 @@ class MauticFactory
     }
 
     /**
+     * Returns if Symfony is in debug mode
+     *
+     * @return mixed
+     */
+    public function getDebugMode()
+    {
+        return $this->container->getParameter('kernel.debug');
+    }
+
+    /**
      * returns a ThemeHelper instance for the given theme
      *
      * @param string $theme

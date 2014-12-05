@@ -341,10 +341,11 @@ class CommonController extends Controller implements MauticController
      */
     public function clearCacheFile()
     {
-        $env      = $this->factory->getEnvironment();
+        $env      = ucfirst($this->factory->getEnvironment());
+        $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
         $cacheDir = $this->factory->getSystemPath('cache', true);
 
-        $cacheFile = "$cacheDir/$env/app" . ucfirst($env) . "ProjectContainer.php";
+        $cacheFile = "$cacheDir/$env/app{$env}{$debug}ProjectContainer.php";
         if (file_exists($cacheDir)) {
             unlink($cacheFile);
         }

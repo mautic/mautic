@@ -90,6 +90,7 @@ class RoleController extends FormController
 
         $parameters = array(
             'items'       => $items,
+            'searchValue' => $filter,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
