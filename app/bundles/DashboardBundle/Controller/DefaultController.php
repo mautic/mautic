@@ -32,6 +32,7 @@ class DefaultController extends CommonController
         $ipAddressRepo  = $this->factory->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
 
         $sentReadCount        = $this->factory->getModel('email')->getRepository()->getSentReadCount();
+        $clickthroughCount    = $hitRepo->countEmailClickthrough();
         $newReturningVisitors = array(
             'returning' => $hitRepo->countReturningIp(),
             'unique'    => $ipAddressRepo->countIpAddresses()
@@ -52,7 +53,7 @@ class DefaultController extends CommonController
         $clickRate = 0;
 
         if ($sentReadCount['readCount']) {
-            $clickRate = round($sentReadCount['clickCount'] / $sentReadCount['readCount'] * 100);
+            $clickRate = round($clickthroughCount / $sentReadCount['readCount'] * 100);
         }
 
         $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
@@ -115,6 +116,7 @@ class DefaultController extends CommonController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
+                'clickthroughCount' => $clickthroughCount,
                 'openRate'          => $openRate,
                 'clickRate'         => $clickRate,
                 'newReturningVisitors' => $newReturningVisitors,

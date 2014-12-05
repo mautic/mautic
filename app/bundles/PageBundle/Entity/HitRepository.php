@@ -205,6 +205,20 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Count email clickthrough
+     *
+     * @return int
+     */
+    public function countEmailClickthrough()
+    {
+        $q = $this->createQueryBuilder('h');
+        $q->select('COUNT(h.email) as clicks');
+        $results = $q->getQuery()->getResult();
+
+        return count($results);
+    }
+
+    /**
      * Count how many visitors hit some page in last X $seconds
      *
      * @param int  $seconds
