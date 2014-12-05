@@ -58,6 +58,11 @@ class AuditLogSubscriber extends CommonSubscriber
                         'value'  => 'lead'
                     ),
                     array(
+                        'column' => 'e.action',
+                        'expr'   => 'neq',
+                        'value'  => 'update'
+                    ),
+                    array(
                         'column' => 'e.objectId',
                         'expr'   => 'eq',
                         'value'  => $lead->getId()
@@ -70,7 +75,9 @@ class AuditLogSubscriber extends CommonSubscriber
         /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
         $IpAddresses = $lead->getIpAddresses();
         foreach ($rows as $row) {
-            $eventTypeKey      = 'lead.' . $row->getAction();
+            $action            = $row->getAction();
+
+            $eventTypeKey      = 'lead.' . $action;
             $eventFilterExists = in_array($eventTypeKey, $filter);
             $eventLabel        = $this->translator->trans('mautic.lead.event.'. $row->getAction());
 
@@ -88,7 +95,7 @@ class AuditLogSubscriber extends CommonSubscriber
                     'editor'    => $row->getUserName(),
                     'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$details[1]] : array()
                 ),
-                'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:' . (($eventTypeKey == 'lead.identified') ? 'ip' : 'index') . '.html.php'
+                'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:' . $action . '.html.php'
             ));
         }
     }
