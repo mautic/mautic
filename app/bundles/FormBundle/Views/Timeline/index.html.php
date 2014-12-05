@@ -41,10 +41,11 @@ if ($page->getId()) {
 				<?php if ($form->getDescription()) : ?>
 					<dt><?php echo $view['translator']->trans('mautic.core.description'); ?></dt>
 					<dd><?php echo $form->getDescription(); ?></dd>
-				<?php if (isset($event['extra'])) : ?>
-                <?php if ($descr = $form->getDescription()): ?>
-	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $descr)); ?></p>
-                <?php endif; ?>
+				    <?php if (isset($event['extra'])) : ?>
+                        <?php if ($descr = $form->getDescription()): ?>
+	                    <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $descr)); ?></p>
+                    <?php endif; ?>
+                    <?php endif; ?>
 				<?php endif; ?>
 					<dt><?php echo $view['translator']->trans('mautic.form.result.thead.referrer'); ?></dt>
 					<dd><?php echo $view['assets']->makeLinks($submission->getReferer()); ?></dd>
