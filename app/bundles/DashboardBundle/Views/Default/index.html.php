@@ -47,7 +47,7 @@ $colspan = 12/$cols;
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
     			            <div class="text-center doughnut-wrapper">
-                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
+                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $clickthroughCount ?>"></canvas>
                                 <div class="doughnut-inner-text doughnut-click-rate">
                                     <?php echo $view['translator']->trans('mautic.dashboard.label.click.rate'); ?>
                                     <br><?php echo $clickRate ?>%
@@ -60,7 +60,7 @@ $colspan = 12/$cols;
                                 </li>
                                 <li class="list-group-item">
                                     <?php echo $view['translator']->trans('mautic.dashboard.label.total.click'); ?>
-                                    <span class="badge pull-right"><?php echo $sentReadCount['clickCount'] ?></span>
+                                    <span class="badge pull-right"><?php echo $clickthroughCount ?></span>
                                 </li>
     			            </ul>
     			        </div>
