@@ -428,7 +428,22 @@ class AssetsHelper extends CoreAssetsHelper
                 $text
             );
         }
+    }
 
+    /**
+     * Returns only first $charCount chars of the $text and adds "..." if it is shortened.
+     *
+     * @param string $text
+     * @param integer $charCount
+     * @return string
+     */
+    public function shortenText($text, $charCount = null)
+    {
+        if ($charCount && strlen($text) > $charCount) {
+            return substr($text, 0, $charCount) . '...';
+        }
+
+        return $text;
     }
 
     /**
