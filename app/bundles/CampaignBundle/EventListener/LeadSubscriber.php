@@ -97,9 +97,11 @@ class LeadSubscriber extends CommonSubscriber
         $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        /*
         foreach ($lead->getIpAddresses() as $ip) {
             $options['ipIds'][] = $ip->getId();
         }
+        */
 
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
         $logRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');

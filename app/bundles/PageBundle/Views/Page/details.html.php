@@ -423,7 +423,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                 value="<?php echo $pageUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
+                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>

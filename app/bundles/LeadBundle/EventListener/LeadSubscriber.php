@@ -188,6 +188,19 @@ class LeadSubscriber extends CommonSubscriber
                         $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
                     }
                 }
+
+                //add if an ip was added
+                if (isset($details['ipAddresses'])) {
+                    $log = array(
+                        "bundle"    => "lead",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "ipadded",
+                        "details"   => $details['ipAddresses'][1],
+                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                }
             }
         }
     }
@@ -258,29 +271,15 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
-        // Set available event types
-        $eventTypeKey = 'lead.created';
-        $eventTypeName = $this->translator->trans('mautic.lead.event.created');
-        $event->addEventType($eventTypeKey, $eventTypeName);
+        $eventTypes = array(
+            'lead.created'    => 'mautic.lead.event.create',
+            'lead.identified' => 'mautic.lead.event.identified',
+            'lead.ipadded'    => 'mautic.lead.event.ip'
+        );
 
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
+        foreach ($eventTypes as $type => $label) {
+            $event->addEventType($type, $this->translator->trans($label));
         }
-
-        $lead = $event->getLead();
-
-        // Add the lead's creation time to the timeline
-        $event->addEvent(array(
-            'event'     => $eventTypeKey,
-            'eventLabel' => $eventTypeName,
-            'timestamp' => $lead->getDateAdded(),
-            'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
-        ));
     }
 
     /**

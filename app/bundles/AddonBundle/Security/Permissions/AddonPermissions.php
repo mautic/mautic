@@ -33,7 +33,7 @@ class AddonPermissions extends AbstractPermissions
      */
     public function getName()
     {
-        return 'integration';
+        return 'addon';
     }
 
     /**
