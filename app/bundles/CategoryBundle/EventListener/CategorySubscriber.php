@@ -47,7 +47,7 @@ class CategorySubscriber extends CommonSubscriber
                 "objectId"  => $category->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -67,7 +67,7 @@ class CategorySubscriber extends CommonSubscriber
             "objectId"   => $category->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $category->getTitle()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

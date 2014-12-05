@@ -105,7 +105,7 @@ class PublicController extends CommonFormController
 
         if (!empty($error)) {
             if ($return) {
-                return $this->redirect($return . $query . 'mauticError=' . rawurlencode($error));
+                return $this->redirect($return . $query . 'mauticError=' . rawurlencode($error) . '#' . $form->getAlias());
             } else {
                 $msg     = $error;
                 $msgType = 'error';

@@ -165,6 +165,8 @@ class SubmissionRepository extends CommonRepository
             unset($results[0]['submission_id']);
             $entity->setResults($results[0]);
         }
+
+        return $entity;
     }
 
     /**
@@ -209,7 +211,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = array())
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->select('fs.form_id, fs.page_id, fs.date_submitted AS dateSubmitted')
+        $query->select('fs.id, fs.form_id, fs.page_id, fs.date_submitted AS dateSubmitted')
             ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
 
         if (!empty($options['ipIds'])) {

@@ -68,12 +68,23 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the hits to the event array
         foreach ($hits as $hit) {
+            if ($hit['source'] && $hit['sourceId']) {
+                $sourceModel = $this->factory->getModel($hit['source'] . '.' . $hit['source']);
+                $sourceEntity = $sourceModel->getEntity($hit['sourceId']);
+                if (method_exists($sourceEntity, 'getName')) {
+                    $hit['sourceName'] = $sourceEntity->getName();
+                }
+                if (method_exists($sourceEntity, 'getTitle')) {
+                    $hit['sourceName'] = $sourceEntity->getTitle();
+                }
+            }
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
-                    'page' => $model->getEntity($hit['page_id'])
+                    'page' => $model->getEntity($hit['page_id']),
+                    'hit'  => $hit
                 ),
                 'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
             ));

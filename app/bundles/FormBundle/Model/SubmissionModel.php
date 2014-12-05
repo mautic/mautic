@@ -104,9 +104,9 @@ class SubmissionModel extends CommonFormModel
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
-                    $msg = $this->get('translator')->trans('mautic.form.field.generic.validationfailed', array(
+                    $msg = $this->translator->trans('mautic.form.field.generic.validationfailed', array(
                         '%label%' => $f->getLabel()
-                    ));
+                    ), 'validators');
                 }
 
                 return array('errors' => array($msg));
@@ -168,7 +168,6 @@ class SubmissionModel extends CommonFormModel
             $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
             if ($page != null) {
                 $submission->setPage($page);
-
             }
         }
 

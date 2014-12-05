@@ -71,11 +71,13 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the submissions to the event array
         foreach ($rows as $row) {
+            $submission = $submissionRepository->getEntity($row['id']);
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
                 'timestamp' => new \DateTime($row['dateSubmitted']),
                 'extra'     => array(
+                    'submission' => $submission,
                     'form'  => $formModel->getEntity($row['form_id']),
                     'page'  => $pageModel->getEntity($row['page_id'])
                 ),

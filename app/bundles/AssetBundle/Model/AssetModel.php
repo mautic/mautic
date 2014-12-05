@@ -133,7 +133,7 @@ class AssetModel extends FormModel
         }
 
         //check for existing IP
-        $ip = $request->server->get('REMOTE_ADDR');
+        $ip = $this->factory->getIpAddressFromRequest();
         $ipAddress = $this->em->getRepository('MauticCoreBundle:IpAddress')
             ->findOneByIpAddress($ip);
 

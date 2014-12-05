@@ -622,7 +622,7 @@ class FormController extends CommonFormController
         }
 
         $response = new Response();
-        $response->setContent('<html><body>'.$html.'</body></html>');
+        $response->setContent('<html><head><title>' . $form->getName() . '</title></head><body>' . $html . '</body></html>');
         $response->setStatusCode(Response::HTTP_OK);
         $response->headers->set('Content-Type', 'text/html');
         return $response;
