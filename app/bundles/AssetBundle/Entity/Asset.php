@@ -501,11 +501,12 @@ class Asset extends FormEntity
         // move takes the target directory and then the
         // target filename to move to
         $this->getFile()->move($this->getUploadRootDir(), $this->path);
+        $filePath = $this->getUploadRootDir() . '/' . $this->temp;
 
         // check if we have an old asset
-        if (isset($this->temp)) {
+        if (isset($this->temp) && file_exists($filePath)) {
             // delete the old asset
-            unlink($this->getUploadRootDir() . '/' . $this->temp);
+            unlink($filePath);
             // clear the temp asset path
             $this->temp = null;
         }
