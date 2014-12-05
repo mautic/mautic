@@ -456,9 +456,35 @@ class AssetsHelper extends CoreAssetsHelper
         $this->factory = $factory;
     }
 
+    /**
+     * @param AssetGenerationHelper $helper
+     */
     public function setAssetHelper(AssetGenerationHelper $helper)
     {
         $this->assetHelper = $helper;
+    }
+
+    /**
+     * @param $country
+     */
+    public function getCountryFlag($country, $urlOnly = true, $class = '')
+    {
+        $flagPath = $this->factory->getSystemPath('assets', true) . '/images/flags/';
+        $relpath  = $this->factory->getSystemPath('assets') . '/images/flags/';
+        $country = ucwords(str_replace(' ', '-', $country));
+        $flagImg = '';
+        if (file_exists($flagPath . $country . '.png')) {
+            if (file_exists($flagPath . $country . '.png')) {
+                $flagImg = $this->getUrl($relpath . $country . '.png');
+            }
+        }
+
+        if ($urlOnly) {
+            return $flagImg;
+        } else {
+            return '<img src="' . $flagImg . '" class="'.$class.'" />';
+        }
+
     }
 
     /**

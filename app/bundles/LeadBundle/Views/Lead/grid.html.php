@@ -75,6 +75,14 @@ if ($tmpl == 'index')
                                     <div class="text-muted mb-1">
                                         <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
                                     </div>
+                                    <?php $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : ''; ?>
+
+                                    <?php if (!empty($flag)): ?>
+                                        <div style="position: absolute; right: 30px; bottom: 30px">
+                                            <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="ml-sm" />
+                                        </div>
+                                    <?php endif; ?>
+
                                 </div>
                             </div>
                         </div>

@@ -111,7 +111,14 @@ if ($tmpl == 'index')
                     </a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $fields['core']['email']['value']; ?></td>
-                <td class="visible-md visible-lg"><?php
+                <td class="visible-md visible-lg">
+                    <?php
+                    $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
+                    if (!empty($flag)):
+                    ?>
+                    <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="mr-sm" />
+                    <?php
+                    endif;
                     if (!empty($fields['core']['city']) && !empty($fields['core']['state']))
                         echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
                     elseif (!empty($fields['core']['city']))
@@ -119,6 +126,7 @@ if ($tmpl == 'index')
                     elseif (!empty($fields['core']['state']))
                         echo $fields['core']['state']['value'];
                     ?>
+                    <div class="clearfix"></div>
                 </td>
                 <td class="text-center">
                     <?php
