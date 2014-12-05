@@ -68,7 +68,9 @@ class PermissionsType extends AbstractType
 
         //build forms
         foreach ($panels as $bundle => $label) {
+
             $class =& $permissionClasses[$bundle];
+
             //convert the permission bits from the db into readable names
             $data    = $class->convertBitsToPermissionNames($options['permissions']);
             //get the ratio of granted/total

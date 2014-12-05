@@ -34,8 +34,8 @@ $colspan = 12/$cols;
     			            </div>
                             <ul class="list-group">
     			                <li class="list-group-item">
-                                    <?php echo $view['translator']->trans('mautic.dashboard.label.new.visitors'); ?>
-                                    <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span>
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.unique.visitors'); ?>
+                                    <span class="badge pull-right"><?php echo $newReturningVisitors['unique']; ?></span>
                                 </li>
     			                <li class="list-group-item">
                                     <?php echo $view['translator']->trans('mautic.dashboard.label.returning.visitors'); ?>

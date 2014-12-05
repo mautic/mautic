@@ -54,7 +54,7 @@ class CampaignSubscriber extends CommonSubscriber
                 "objectId"  => $campaign->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -74,7 +74,7 @@ class CampaignSubscriber extends CommonSubscriber
             "objectId"   => $campaign->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $campaign->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

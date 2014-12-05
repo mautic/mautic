@@ -110,7 +110,7 @@ class ApiSubscriber extends CommonSubscriber
                 'objectId'  => $client->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
-                'ipAddress' => $this->request->server->get('REMOTE_ADDR')
+                'ipAddress' => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -130,7 +130,7 @@ class ApiSubscriber extends CommonSubscriber
             'objectId'   => $client->deletedId,
             'action'     => 'delete',
             'details'    => array('name' => $client->getName()),
-            'ipAddress'  => $this->request->server->get('REMOTE_ADDR')
+            'ipAddress'  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

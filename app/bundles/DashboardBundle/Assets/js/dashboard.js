@@ -4,6 +4,12 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.renderOpenRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
+
+    // Refresh page visits every 5 sec
+    Mautic.ActiveVisitorsLoop = setInterval(function() {
+        Mautic.updateActiveVisitorCount();
+    }, 5000);
+
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -15,6 +21,7 @@ Mautic.dashboardOnUnload = function(id) {
         delete Mautic.dashboardClickRateDoughnutObject;
         delete Mautic.dashboardOpenRateDoughnutObject;
         delete Mautic.ActiveVisitorsCount;
+        clearInterval(Mautic.ActiveVisitorsLoop);
     }
 };
 

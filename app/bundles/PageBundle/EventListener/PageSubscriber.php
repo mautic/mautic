@@ -118,7 +118,7 @@ class PageSubscriber extends CommonSubscriber
                 "objectId"  => $page->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -138,7 +138,7 @@ class PageSubscriber extends CommonSubscriber
             "objectId"   => $page->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $page->getTitle()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

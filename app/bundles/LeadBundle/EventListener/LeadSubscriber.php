@@ -152,7 +152,7 @@ class LeadSubscriber extends CommonSubscriber
                     "objectId"  => $lead->getId(),
                     "action"    => ($event->isNew()) ? "create" : "update",
                     "details"   => $details,
-                    "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    "ipAddress" => $this->factory->getIpAddressFromRequest()
                 );
                 $this->factory->getModel('core.auditLog')->writeToLog($log);
 
@@ -179,7 +179,7 @@ class LeadSubscriber extends CommonSubscriber
                         "objectId"  => $lead->getId(),
                         "action"    => "identified",
                         "details"   => $details,
-                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                        "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
@@ -187,6 +187,19 @@ class LeadSubscriber extends CommonSubscriber
                     if ($this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
                         $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
                     }
+                }
+
+                //add if an ip was added
+                if (isset($details['ipAddresses'])) {
+                    $log = array(
+                        "bundle"    => "lead",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "ipadded",
+                        "details"   => $details['ipAddresses'][1],
+                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
                 }
             }
         }
@@ -206,7 +219,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $lead->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $lead->getPrimaryIdentifier()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -226,7 +239,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $field->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -246,7 +259,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $field->deletedId,
             "action"     => "delete",
             "details"    => array('name', $field->getLabel()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -258,29 +271,15 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
-        // Set available event types
-        $eventTypeKey = 'lead.created';
-        $eventTypeName = $this->translator->trans('mautic.lead.event.created');
-        $event->addEventType($eventTypeKey, $eventTypeName);
+        $eventTypes = array(
+            'lead.created'    => 'mautic.lead.event.create',
+            'lead.identified' => 'mautic.lead.event.identified',
+            'lead.ipadded'    => 'mautic.lead.event.ip'
+        );
 
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
+        foreach ($eventTypes as $type => $label) {
+            $event->addEventType($type, $this->translator->trans($label));
         }
-
-        $lead = $event->getLead();
-
-        // Add the lead's creation time to the timeline
-        $event->addEvent(array(
-            'event'     => $eventTypeKey,
-            'eventLabel' => $eventTypeName,
-            'timestamp' => $lead->getDateAdded(),
-            'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
-        ));
     }
 
     /**
@@ -309,7 +308,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $note->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                "ipAddress" => $this->factory->getIpAddressFromRequest()
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -329,7 +328,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $note->deletedId,
             "action"     => "delete",
             "details"    => array('text', $note->getText()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

@@ -417,16 +417,33 @@ class PageModel extends FormModel
             $pageURL = $page->getUrl();
         } else {
             //use current URL
-            $pageURL = 'http';
-            if ($request->server->get('HTTPS') == 'on') {
-                $pageURL .= 's';
-            }
-            $pageURL .= '://';
-            if ($request->server->get('SERVER_PORT') != '80') {
-                $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
-                    $request->server->get('REQUEST_URI');
+
+            // Tracking pixel is used
+            if (strpos($request->server->get('REQUEST_URI'), '/p/mtracking.gif')) {
+                $pageURL = $request->server->get('HTTP_REFERER');
+
+                // if additional data were sent with the tracking pixel
+                if ($request->server->get('QUERY_STRING')) {
+                    parse_str($request->server->get('QUERY_STRING'), $query);
+                    if (isset($query['referrer'])) {
+                        $hit->setReferer($query['referrer']);
+                    }
+                    if (isset($query['language'])) {
+                        $hit->setPageLanguage($query['language']);
+                    }
+                }
             } else {
-                $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
+                $pageURL = 'http';
+                if ($request->server->get('HTTPS') == 'on') {
+                    $pageURL .= 's';
+                }
+                $pageURL .= '://';
+                if ($request->server->get('SERVER_PORT') != '80') {
+                    $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
+                        $request->server->get('REQUEST_URI');
+                } else {
+                    $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
+                }
             }
         }
 

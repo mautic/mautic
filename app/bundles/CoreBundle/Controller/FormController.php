@@ -149,7 +149,7 @@ class FormController extends CommonController
                         "objectId"  => $id,
                         "action"    => "update",
                         "details"   => $details,
-                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                        "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 

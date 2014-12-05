@@ -460,6 +460,34 @@ class MauticFactory
     }
 
     /**
+     * Guess the IP address from current session.
+     *
+     * @return string
+     */
+    public function getIpAddressFromRequest()
+    {
+        $request = $this->getRequest();
+        $ipHolders = array(
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR'
+        );
+
+        foreach ($ipHolders as $key) {
+            if ($request->server->get($key)) {
+                return $request->server->get($key);
+            }
+        }
+
+        // if everything else failes
+        return '127.0.0.1';
+    }
+
+    /**
      * Get an IpAddress entity for current session or for passed in IP address
      *
      * @param string $ip
@@ -471,8 +499,7 @@ class MauticFactory
         static $ipAddresses = array();
 
         if ($ip === null) {
-            $request = $this->getRequest();
-            $ip      = $request->server->get('REMOTE_ADDR');
+            $ip = $this->getIpAddressFromRequest();
         }
 
         if (empty($ip)) {

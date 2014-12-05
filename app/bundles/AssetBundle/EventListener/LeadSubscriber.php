@@ -54,11 +54,13 @@ class LeadSubscriber extends CommonSubscriber
         $lead    = $event->getLead();
         $options = array('ipIds' => array(), 'filters' => $filter);
 
+
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        /*
         foreach ($lead->getIpAddresses() as $ip) {
             $options['ipIds'][] = $ip->getId();
         }
-
+        */
         /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
         $downloadRepository = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
