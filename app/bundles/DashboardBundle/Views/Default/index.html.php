@@ -134,11 +134,7 @@ $colspan = 12/$cols;
                                                 <?php else : ?>
                                                     <a href="<?php echo $page['url']; ?>" title="<?php echo $page['url']; ?>">
                                                         <?php $pageUrl = str_replace(array('http://', 'https://'), '', $page['url']); ?>
-                                                        <?php if (strlen($pageUrl) > 30) : ?>
-                                                            <?php echo substr($pageUrl, 0, 30); ?>...
-                                                        <?php else : ?>
-                                                            <?php echo $pageUrl; ?>
-                                                        <?php endif; ?>
+                                                        <?php echo $view['assets']->shortenText($pageUrl, 30); ?>
                                                     </a>
                                                 <?php endif; ?>
                                                 </td>
@@ -173,8 +169,8 @@ $colspan = 12/$cols;
                                     <?php foreach ($popularAssets as $asset) : ?>
                                         <tr>
                                             <td>
-                                                <a href="<?php echo $view['router']->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id'])); ?>" data-toggle="ajax">
-                                                    <?php echo $asset['title']; ?>
+                                                <a href="<?php echo $view['router']->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id'])); ?>" data-toggle="ajax" title="<?php echo $asset['title'] ?>">
+                                                    <?php echo $view['assets']->shortenText($asset['title'], 30); ?>
                                                 </a>
                                             </td>
                                             <td>
@@ -208,8 +204,8 @@ $colspan = 12/$cols;
                                             <?php foreach ($popularCampaigns as $campaign) : ?>
                                                 <tr>
                                                     <td>
-                                                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
-                                                            <?php echo $campaign['name']; ?>
+                                                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax" title="<?php echo $campaign['name'] ?>">
+                                                            <?php echo $view['assets']->shortenText($campaign['name'], 30); ?>
                                                         </a>
                                                     </td>
                                                     <td>
