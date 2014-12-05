@@ -524,7 +524,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns absolut path to the file.
+     * Returns absolute path to the file.
      *
      * @return string
      */

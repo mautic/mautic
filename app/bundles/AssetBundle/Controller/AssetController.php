@@ -255,6 +255,7 @@ class AssetController extends FormController
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model   = $this->factory->getModel('asset.asset');
+        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
@@ -282,6 +283,9 @@ class AssetController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
+
+                    //remove the asset from request
+                    $this->request->files->remove('asset');
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
@@ -367,7 +371,7 @@ class AssetController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticAssetBundle:Page:index',
+            'contentTemplate' => 'MauticAssetBundle:Asset:index',
             'passthroughVars' => array(
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset'
@@ -411,6 +415,9 @@ class AssetController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    //remove the asset from request
+                    $this->request->files->remove('asset');
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
