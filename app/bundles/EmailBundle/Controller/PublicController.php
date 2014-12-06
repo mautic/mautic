@@ -14,9 +14,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 class PublicController extends CommonFormController
 {
@@ -46,7 +44,7 @@ class PublicController extends CommonFormController
             }
 
             //all the checks pass so display the content
-            $model->hitEmail($entity, $idHash, $this->request, true);
+            $model->hitEmail($idHash, $this->request, true);
 
             if ($entity->getContentMode() == 'builder') {
                 $template   = $entity->getTemplate();
@@ -92,21 +90,8 @@ class PublicController extends CommonFormController
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
-        $stat     = $model->getEmailStatus($idHash);
-        $logger = $this->factory->getLogger();
-        if (!empty($stat)) {
-            $entity = $stat->getEmail();
-            if ($entity !== null) {
-                $request = $this->request;
-                //register after response returned for performance
-                $dispatcher = $this->get('event_dispatcher');
-                $dispatcher->addListener(KernelEvents::TERMINATE,
-                    function(PostResponseEvent $event) use ($entity, $model, $idHash, $request){
-                        $model->hitEmail($entity, $idHash, $request);
-                    }
-                );
-            }
-        }
+        $model->hitEmail($idHash, $this->request);
+
         $size = strlen($response->getContent());
         $response->headers->set('Content-Length', $size);
         $response->headers->set('Connection', 'close');

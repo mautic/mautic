@@ -14,9 +14,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Class PublicController
@@ -271,15 +269,7 @@ class PublicController extends CommonFormController
         //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page');
-        $request = $this->request;
-
-        //register after response returned for performance
-        $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->addListener(KernelEvents::TERMINATE,
-            function(PostResponseEvent $event) use ($model, $request){
-                $model->hitPage(null, $request);
-            }
-        );
+        $model->hitPage(null, $this->request);
 
         return $response;
     }
