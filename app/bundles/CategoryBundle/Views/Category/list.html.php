@@ -41,13 +41,6 @@ if ($tmpl == 'index')
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
-                        'orderBy'    => 'c.description',
-                        'text'       => 'mautic.category.thead.description',
-                        'class'      => 'visible-md visible-lg col-category-description'
-                    ));
-
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'category',
                         'orderBy'    => 'c.id',
                         'text'       => 'mautic.category.thead.id',
                         'class'      => 'visible-md visible-lg col-page-id'
@@ -89,9 +82,9 @@ if ($tmpl == 'index')
                                 'query' => 'bundle=' . $bundle
                             )); ?>
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                        </td>
-                        <td class="visible-md visible-lg">
-                            <?php echo $item->getDescription(); ?>
+                            <?php if ($description = $item->getDescription()): ?>
+                                <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                            <?php endif; ?>
                         </td>
                         <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                     </tr>

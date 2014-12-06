@@ -419,9 +419,11 @@ var Mautic = {
             });
 
             mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-                if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
-                    var target = mQuery(this).attr('data-target');
+                var target = mQuery(this).attr('data-target');
+                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(this).attr('id') != 'MauticCommonModal') {
                     mQuery(target).remove();
+                } else {
+                    Mautic.resetModal(target);
                 }
             });
 
@@ -814,13 +816,19 @@ var Mautic = {
             method = 'GET'
         }
 
+        var header = mQuery(el).attr('data-header');
+
+        Mautic.loadAjaxModal(target, route, method, header);
+    },
+
+    loadAjaxModal: function (target, route, method, header) {
+
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
             mQuery(target + ' .loading-placeholder').removeClass('hide');
             mQuery(target + ' .modal-body-content').addClass('hide');
         }
 
-        var header = mQuery(el).attr('data-header');
         if (header) {
             mQuery(target + " .modal-title").html(header);
         }
@@ -835,14 +843,7 @@ var Mautic = {
 
         //clean slate upon close
         mQuery(target).on('hide.bs.modal', function () {
-            mQuery(target + " .modal-title").html('');
-            mQuery(target + " .modal-body-content").html('');
-            if (mQuery(target + " .modal-form-buttons").length) {
-                mQuery(target + " .modal-form-buttons").html('');
-            }
-            if (mQuery(target + " loading-placeholder").length) {
-                mQuery(target + " loading-placeholder").removeClass('hide');
-            }
+            Mautic.resetModal(target);
         });
 
         mQuery(target).modal('show');
@@ -863,6 +864,27 @@ var Mautic = {
                 Mautic.stopIconSpinPostEvent();
             }
         });
+    },
+
+    resetModal: function (target) {
+        if (typeof MauticVars.modalsReset == 'undefined') {
+            MauticVars.modalsReset = {};
+        }
+
+        if (typeof MauticVars.modalsReset[target] != 'undefined') {
+            return;
+        }
+
+        MauticVars.modalsReset[target] = target;
+
+        mQuery(target + " .modal-title").html('');
+        mQuery(target + " .modal-body-content").html('');
+        if (mQuery(target + " .modal-form-buttons").length) {
+            mQuery(target + " .modal-form-buttons").html('');
+        }
+        if (mQuery(target + " loading-placeholder").length) {
+            mQuery(target + " loading-placeholder").removeClass('hide');
+        }
     },
 
     processModalContent: function (response, target) {
