@@ -48,7 +48,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-beta2';
+    const EXTRA_VERSION = '-beta3-dev';
 
     /**
      * {@inheritdoc}
