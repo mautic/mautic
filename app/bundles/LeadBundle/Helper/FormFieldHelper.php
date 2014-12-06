@@ -92,6 +92,14 @@ class FormFieldHelper
         'country' => array(
             'label'       => 'mautic.lead.field.type.country',
             'properties'  => array()
+        ),
+        'region' => array(
+            'label'       => 'mautic.lead.field.type.region',
+            'properties'  => array()
+        ),
+        'timezone' => array(
+            'label'       => 'mautic.lead.field.type.timezone',
+            'properties'  => array()
         )
     );
 
@@ -144,5 +152,44 @@ class FormFieldHelper
             }
         }
         return array(true, '');
+    }
+
+    /**
+     * @return array
+     */
+    static public function getCountryChoices()
+    {
+        $countryJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/countries.json');
+        $countries = json_decode($countryJson);
+
+        $choices = array_combine($countries, $countries);
+        return $choices;
+    }
+
+    /**
+     * @return array
+     */
+    static public function getRegionChoices()
+    {
+        $regionJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/regions.json');
+        $regions = json_decode($regionJson);
+
+        $choices = array();
+        foreach ($regions as $country => &$regionGroup) {
+            $choices[$country] = array_combine($regionGroup, $regionGroup);
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array
+     */
+    static public function getTimezonesChoices()
+    {
+        $tz        = new \Symfony\Component\Form\Extension\Core\Type\TimezoneType();
+        $timezones = $tz->getTimezones();
+
+        return $timezones;
     }
 }

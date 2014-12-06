@@ -296,7 +296,9 @@ Mautic.addLeadListFilter = function (elId) {
         .addClass('filter-container')
         .appendTo(li);
 
-    if (fieldType == 'country' || fieldType == 'timezone') {
+    var isSpecial = (fieldType == 'country' || fieldType == 'timezone' || fieldType == 'region');
+
+    if (isSpecial) {
         container.html(mQuery('#filter-' + fieldType + '-template').html());
     } else {
         container.html(mQuery('#filter-template').html());
@@ -317,11 +319,18 @@ Mautic.addLeadListFilter = function (elId) {
 
     //give the value element a unique id
     var uniqid = "id_" + Date.now();
-    var filter = mQuery(container).find("input[name='leadlist[filters][filter][]']");
+    var filterEl = (isSpecial) ? "select[name='leadlist[filters][filter][]']" : "input[name='leadlist[filters][filter][]']";
+    var filter   =  mQuery(container).find(filterEl);
     filter.attr('id', uniqid);
 
     //activate fields
-    if (fieldType == 'lookup' || fieldType == 'select') {
+    if (isSpecial) {
+        filter.attr('data-placeholder', label);
+        filter.chosen({
+            width: "100%",
+            allow_single_deselect: true
+        });
+    } else if (fieldType == 'lookup' || fieldType == 'select') {
         var fieldCallback = mQuery(filterId).data("field-callback");
         if (fieldCallback) {
             var fieldOptions = mQuery(filterId).data("field-list");
