@@ -54,7 +54,7 @@ class ReportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
 
         // Only add these fields if we're in edit mode
@@ -65,6 +65,13 @@ class ReportType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => true
+            ));
+
+            $builder->add('description', 'textarea', array(
+                'label'      => 'mautic.report.report.form.description',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control editor'),
+                'required'   => false
             ));
 
             $builder->add('isPublished', 'button_group', array(

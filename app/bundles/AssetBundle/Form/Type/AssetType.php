@@ -76,7 +76,6 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
-
         $builder->add('category', 'category', array(
             'bundle' => 'asset'
         ));

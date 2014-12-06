@@ -35,23 +35,51 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!-- report detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($report->getDateAdded()); ?></p>
+                    <div class="col-xs-10 va-m">
+                        <p class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></p>
                     </div>
-                    <!-- <div class="col-xs-6 va-m text-right">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default">Export As</button>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="#"><span class="fa fa-file-excel-o fs-14 mr-2"></span> MS Excel</a></li>
-                                <li><a href="#"><span class="fa fa-file-pdf-o fs-14 mr-2"></span> PDF</a></li>
-                                <li><a href="#"><span class="fa fa-file-word-o fs-14 mr-2"></span> MS Word</a></li>
-                            </ul>
-                        </div>
-                    </div> -->
+                    <div class="col-xs-2 text-right">
+                        <?php switch ($report->getPublishStatus()) {
+                            case 'published':
+                                $labelColor = "success";
+                                break;
+                            case 'unpublished':
+                            case 'expired'    :
+                                $labelColor = "danger";
+                                break;
+                            case 'pending':
+                                $labelColor = "warning";
+                                break;
+                        } ?>
+                        <?php $labelText = strtoupper($view['translator']->trans('mautic.core.form.' . $report->getPublishStatus())); ?>
+                        <h4 class="fw-sb"><span class="label label-<?php echo $labelColor; ?>"><?php echo $labelText; ?></span></h4>
+                    </div>
                 </div>
             </div>
             <!--/ report detail header -->
+            <!-- report detail collapseable -->
+            <div class="collapse" id="report-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $report)); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ report detail collapseable -->
+        </div>
+
+        <div class="bg-auto bg-dark-xs">
+            <!-- report detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#report-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                </span>
+            </div>
+            <!--/ report detail collapseable toggler -->
         </div>
 
         <div class="bg-auto bg-dark-xs">

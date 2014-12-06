@@ -34,10 +34,10 @@ $formId = $form['sessionId']->vars['data'];
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
                         <div class="row">
                             <div class="col-md-6">
-                                    <?php
-                                    echo $view['form']->row($form['name']);
-                                    echo $view['form']->row($form['description']);
-                                    ?>
+                                <?php
+                                echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['description']);
+                                ?>
                             </div>
                             <div class="col-md-6">
                                 <?php

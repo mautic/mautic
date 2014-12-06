@@ -54,7 +54,7 @@ $view['slots']->set("headerTitle", $header);
                         </div>
                     </div>
 
-                    <div class="tab-pane fade active bdr-w-0" id="events-container">
+                    <div class="tab-pane fade bdr-w-0" id="events-container">
                         <div id="triggerEvents">
                             <div class="mb-md">
                                 <p><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
