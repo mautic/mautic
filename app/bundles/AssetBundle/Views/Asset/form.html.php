@@ -40,6 +40,11 @@ $view['slots']->set('mauticContent', 'asset');
 					<?php echo $view['form']->row($form['alias']); ?>
 				</div>
 			</div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <?php echo $view['form']->row($form['description']); ?>
+                </div>
+            </div>
 		</div>
 	</div>
  	<div class="col-md-3 bg-white height-auto">

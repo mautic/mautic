@@ -42,7 +42,7 @@ class AssetType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'file' => 'raw')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html', 'file' => 'raw')));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
 
@@ -68,6 +68,14 @@ class AssetType extends AbstractType
             ),
             'required'   => false
         ));
+
+        $builder->add('description', 'textarea', array(
+            'label'      => 'mautic.asset.asset.form.description',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control editor'),
+            'required'   => false
+        ));
+
 
         $builder->add('category', 'category', array(
             'bundle' => 'asset'

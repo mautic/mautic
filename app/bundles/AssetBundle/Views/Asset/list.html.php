@@ -40,20 +40,6 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
-                    'orderBy'    => 'a.createdByUser',
-                    'text'       => 'mautic.asset.asset.thead.author',
-                    'class'      => 'visible-md visible-lg col-asset-author'
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
-                    'orderBy'    => 'a.language',
-                    'text'       => 'mautic.asset.asset.thead.language',
-                    'class'      => 'visible-md visible-lg col-asset-lang'
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
                     'orderBy'    => 'a.downloadCount',
                     'text'       => 'mautic.asset.asset.thead.download.count',
                     'class'      => 'visible-md visible-lg col-asset-download-count'
@@ -97,24 +83,29 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                         ?>
                     </td>
                     <td>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'       => $item,
-                            'model'      => 'asset.asset'
-                        )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_asset_action',
-                            array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax">
-                            <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                        </a>
-                        <i class="<?php echo $item->getIconClass(); ?>"></i>
+                        <div>
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                                'item'       => $item,
+                                'model'      => 'asset.asset'
+                            )); ?>
+                            <a href="<?php echo $view['router']->generate('mautic_asset_action',
+                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                               data-toggle="ajax">
+                                <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
+                            </a>
+                            <i class="<?php echo $item->getIconClass(); ?>"></i>
+                        </div>
+                        <?php if ($description = $item->getDescription()): ?>
+                            <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                        <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
-                            $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                        <?php $category = $item->getCategory(); ?>
+                        <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                        <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                        <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
                         <span><?php echo $catName; ?></span>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getDownloadCount(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
