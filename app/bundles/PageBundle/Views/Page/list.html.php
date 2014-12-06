@@ -41,20 +41,6 @@ $view->extend('MauticPageBundle:Page:index.html.php');
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
-                        'orderBy'    => 'p.createdByUser',
-                        'text'       => 'mautic.page.thead.author',
-                        'class'      => 'visible-md visible-lg col-page-author'
-                    ));
-
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'page',
-                        'orderBy'    => 'p.language',
-                        'text'       => 'mautic.page.thead.language',
-                        'class'      => 'visible-md visible-lg col-page-lang'
-                    ));
-
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'page',
                         'orderBy'    => 'p.hits',
                         'text'       => 'mautic.page.thead.hits',
                         'class'      => 'col-page-hits'
@@ -115,12 +101,12 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                         <?php endif; ?>
                         </td>
                         <td class="visible-md visible-lg">
-                            <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
-                                $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                            <?php $category = $item->getCategory(); ?>
+                            <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                            <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                            <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
                             <span><?php echo $catName; ?></span>
                         </td>
-                        <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
-                        <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                         <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
                         <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                     </tr>

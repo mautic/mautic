@@ -35,20 +35,6 @@ if ($tmpl == 'index') {
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
-                'orderBy'    => 'e.createdByUser',
-                'text'       => 'mautic.email.thead.author',
-                'class'      => 'visible-md visible-lg col-email-author'
-            ));
-
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'email',
-                'orderBy'    => 'e.language',
-                'text'       => 'mautic.email.thead.language',
-                'class'      => 'visible-md visible-lg col-email-lang'
-            ));
-
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'email',
                 'orderBy'    => 'e.sendCount',
                 'text'       => 'mautic.email.thead.sentcount',
                 'class'      => 'col-email-sendcount'
@@ -60,7 +46,6 @@ if ($tmpl == 'index') {
                 'text'       => 'mautic.email.thead.readcount',
                 'class'      => 'col-email-readcount'
             )); ?>
-            <td><?php echo $view['translator']->trans('mautic.email.thead.listcount'); ?></td>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
@@ -122,15 +107,14 @@ if ($tmpl == 'index') {
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
-                        $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $category = $item->getCategory(); ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
                     <span><?php echo $catName; ?></span>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
-                <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getSentCount(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getReadCount(); ?></td>
-                <td class="visible-md visible-lg"><?php echo count($item->getLists()); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>

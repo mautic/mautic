@@ -34,13 +34,6 @@ if ($tmpl == 'index') {
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
-                    'orderBy'    => 'f.description',
-                    'text'       => 'mautic.form.form.thead.description',
-                    'class'      => 'visible-md visible-lg col-form-description'
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'form',
                     'orderBy'    => 'c.title',
                     'text'       => 'mautic.form.form.thead.category',
                     'class'      => 'visible-md visible-lg col-form-category'
@@ -64,15 +57,16 @@ if ($tmpl == 'index') {
         </thead>
         <tbody>
         <?php foreach ($items as $i): ?>
+        <?php $item = $i[0]; ?>
             <tr>
                 <td class="visible-md visible-lg">
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                        'item'      => $i[0],
+                        'item'      => $item,
                         'templateButtons' => array(
-                            'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $i[0]->getCreatedBy()),
+                            'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $item->getCreatedBy()),
                             'clone'     => $permissions['form:forms:create'],
-                            'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $i[0]->getCreatedBy()),
+                            'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $item->getCreatedBy()),
                         ),
                         'routeBase' => 'form',
                         'customButtons'    => array(
@@ -80,7 +74,7 @@ if ($tmpl == 'index') {
                                 'attr' => array(
                                     'data-toggle' => '',
                                     'target'      => '_blank',
-                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $i[0]->getId())),
+                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $item->getId())),
                                 ),
                                 'iconClass' => 'fa fa-camera',
                                 'btnText'   => 'mautic.form.form.preview'
@@ -88,7 +82,7 @@ if ($tmpl == 'index') {
                             array(
                                 'attr' => array(
                                     'data-toggle' => 'ajax',
-                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())),
+                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())),
                                 ),
                                 'iconClass' => 'fa fa-database',
                                 'btnText'   => 'mautic.form.form.results'
@@ -98,34 +92,30 @@ if ($tmpl == 'index') {
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $i[0],
-                        'model'      => 'form.form'
-                    )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_form_action',
-                        array(
-                            'objectAction' => 'view',
-                            'objectId' => $i[0]->getId()
-                        )); ?>"
-                       data-toggle="ajax"
-                       data-menu-link="mautic_form_index">
-                        <?php echo $i[0]->getName() . ' (' . $i[0]->getAlias() . ')'; ?>
-                    </a>
+                    <div>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            'item'       => $item,
+                            'model'      => 'form.form'
+                        )); ?>
+                        <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
+                            <?php echo $item->getName() . ' (' . $item->getAlias() . ')'; ?>
+                        </a>
+                    </div>
+                    <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                    <?php endif; ?>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $i[0]->getDescription(); ?></td>
                 <td class="visible-md visible-lg">
-                    <?php $catName = ($category = $i[0]->getCategory()) ? $category->getTitle() :
-                        $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $category = $item->getCategory(); ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
                     <span><?php echo $catName; ?></span>
                 </td>
                 <td class="visible-md visible-lg">
-                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())); ?>"
-                       data-toggle="ajax"
-                       data-menu-link="mautic_form_index">
-                        <?php echo $i['submissionCount']; ?>
-                    </a>
+                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index"><?php echo $i['submissionCount']; ?></a>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $i[0]->getId(); ?></td>
+                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

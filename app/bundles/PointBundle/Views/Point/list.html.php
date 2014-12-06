@@ -34,9 +34,9 @@ $view->extend('MauticPointBundle:Point:index.html.php');
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'point',
-                'orderBy'    => 'p.description',
-                'text'       => 'mautic.point.thead.description',
-                'class'      => 'visible-md visible-lg col-point-description'
+                'orderBy'    => 'c.title',
+                'text'       => 'mautic.point.thead.category',
+                'class'      => 'visible-md visible-lg col-point-category'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -74,13 +74,24 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $item,
-                        'model'      => 'point'
-                    )); ?>
-                    <?php echo $item->getName(); ?>
+                    <div>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            'item'       => $item,
+                            'model'      => 'point'
+                        )); ?>
+                        <?php echo $item->getName(); ?>
+                    </div>
+                    <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                    <?php endif; ?>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg">
+                    <?php $category = $item->getCategory(); ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
+                    <span><?php echo $catName; ?></span>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDelta(); ?></td>
                 <?php
                 $type   = $item->getType();

@@ -33,9 +33,9 @@ if ($tmpl == 'index')
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
-                    'orderBy'    => 'c.description',
-                    'text'       => 'mautic.campaign.thead.description',
-                    'class'      => 'visible-md visible-lg col-campaign-description'
+                    'orderBy'    => 'cat.title',
+                    'text'       => 'mautic.campaign.thead.category',
+                    'class'      => 'visible-md visible-lg col-campaign-category'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -64,17 +64,26 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $item,
-                        'model'      => 'campaign'
-                    )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_campaign_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getName(); ?>
-                    </a>
+                    <div>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            'item'       => $item,
+                            'model'      => 'campaign'
+                        )); ?>
+                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $item->getName(); ?>
+                        </a>
+                    </div>
+                    <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                    <?php endif; ?>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg">
+                    <?php $category = $item->getCategory(); ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
+                    <span><?php echo $catName; ?></span>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
