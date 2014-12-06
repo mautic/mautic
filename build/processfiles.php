@@ -37,6 +37,7 @@ system('rm app/config/config_test.php');
 system('rm app/config/local*.php');
 system('rm app/config/routing_dev.php');
 system('rm app/config/security_test.php');
+system('rm app/migrations/Version20141102181850.php');
 system('rm -rf app/logs');
 
 // babdev/transifex
