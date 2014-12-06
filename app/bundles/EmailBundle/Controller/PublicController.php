@@ -14,7 +14,9 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class PublicController extends CommonFormController
 {
@@ -22,6 +24,7 @@ class PublicController extends CommonFormController
     {
         //find the email
         $security   = $this->factory->getSecurity();
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
@@ -87,16 +90,26 @@ class PublicController extends CommonFormController
     {
         $response = TrackingPixelHelper::getResponse($this->request);
 
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
         $stat     = $model->getEmailStatus($idHash);
-
+        $logger = $this->factory->getLogger();
         if (!empty($stat)) {
             $entity = $stat->getEmail();
             if ($entity !== null) {
-                $entity->setReadInBrowser(true);
-                $model->hitEmail($entity, $idHash, $this->request);
+                $request = $this->request;
+                //register after response returned for performance
+                $dispatcher = $this->get('event_dispatcher');
+                $dispatcher->addListener(KernelEvents::TERMINATE,
+                    function(PostResponseEvent $event) use ($entity, $model, $idHash, $request){
+                        $model->hitEmail($entity, $idHash, $request);
+                    }
+                );
             }
         }
+        $size = strlen($response->getContent());
+        $response->headers->set('Content-Length', $size);
+        $response->headers->set('Connection', 'close');
 
         //generate image
         return $response;
