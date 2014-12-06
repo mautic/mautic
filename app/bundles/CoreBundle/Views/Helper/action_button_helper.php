@@ -72,13 +72,13 @@ $buildCustom = function($c, $buttonCount) use ($menuLink, $view, $wrapOpeningTag
     $buttons = '';
 
     //Wrap links in a tag
-    if ($groupType == 'dropdown' && $buttonCount > 0) {
+    if ($groupType == 'dropdown' || ($groupType == 'button-dropdown' && $buttonCount > 0)) {
         $wrapOpeningTag = "<li>\n";
         $wrapClosingTag = "</li>\n";
     }
 
     if (isset($c['confirm'])) {
-        if ($groupType == 'dropdown' && !isset($c['confirm']['btnClass'])) {
+        if (in_array($groupType, array('button-dropdown', 'dropdown')) && !isset($c['confirm']['btnClass'])) {
             $c['confirm']['btnClass'] = "";
         }
         $buttons .= $wrapOpeningTag.$view->render('MauticCoreBundle:Helper:confirm.html.php', $c['confirm'])."$wrapClosingTag\n";
@@ -89,7 +89,7 @@ $buildCustom = function($c, $buttonCount) use ($menuLink, $view, $wrapOpeningTag
             $c['attr'] = array();
         }
 
-        if(($groupType == 'group' || ($groupType == 'dropdown' && $buttonCount === 0)) && !isset($c['attr']['class'])) {
+        if(($groupType == 'group' || ($groupType == 'button-dropdown' && $buttonCount === 0)) && !isset($c['attr']['class'])) {
             $c['attr']['class'] = 'btn btn-default';
         }
 
@@ -117,7 +117,7 @@ $renderPreCustomButtons = function(&$buttonCount, $dropdownHtml = '') use ($preC
     $preCustomButtonContent = '';
 
     foreach ($preCustomButtons as $c) {
-        if ($groupType == 'dropdown' && $buttonCount === 1) {
+        if ($groupType == 'button-dropdown' && $buttonCount === 1) {
             $preCustomButtonContent .= $dropdownHtml;
         }
         $preCustomButtonContent .= $buildCustom($c, $buttonCount);
@@ -138,7 +138,7 @@ $renderPostCustomButtons = function(&$buttonCount, $dropdownHtml = '') use ($pos
 
     if (!empty($postCustomButtons)) {
         foreach ($postCustomButtons as $c) {
-            if ($groupType == 'dropdown' && $buttonCount === 1) {
+            if ($groupType == 'button-dropdown' && $buttonCount === 1) {
                 $postCustomButtonContent .= $dropdownHtml;
             }
             $postCustomButtonContent .= $buildCustom($c, $buttonCount);
