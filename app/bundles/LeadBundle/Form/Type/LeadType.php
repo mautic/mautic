@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -144,9 +145,9 @@ class LeadType extends AbstractType
             } elseif ($type == 'select' || $type == 'boolean') {
                 $choices = array();
                 if ($type == 'select' && !empty($properties['list'])) {
-                    $list    = explode('|', $properties['list']);
+                    $list = explode('|', $properties['list']);
                     foreach ($list as $l) {
-                        $l = trim($l);
+                        $l           = trim($l);
                         $choices[$l] = $l;
                     }
                     $expanded = false;
@@ -172,6 +173,30 @@ class LeadType extends AbstractType
                         'constraints' => $constraints
                     ));
                 }
+            } elseif ($type == 'country' || $type == 'region' || $type == 'timezone') {
+                if ($type == 'country') {
+                    $choices = FormFieldHelper::getCountryChoices();
+                } elseif ($type == 'region') {
+                    $choices = FormFieldHelper::getRegionChoices();
+                } else {
+                    $choices = FormFieldHelper::getTimezonesChoices();
+                }
+
+                $builder->add($alias, 'choice', array(
+                    'choices'     => $choices,
+                    'required'    => $required,
+                    'label'       => $field['label'],
+                    'label_attr'  => array('class' => 'control-label'),
+                    'data'        => $value,
+                    'attr'        => array(
+                        'class' => 'form-control chosen',
+                        'data-placeholder' => $field['label']
+                    ),
+                    'mapped'      => false,
+                    'multiple'    => false,
+                    'expanded'    => false,
+                    'constraints' => $constraints
+                ));
             } else {
                 if ($type == 'lookup') {
                     $type                = "text";

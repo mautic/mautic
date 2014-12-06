@@ -9,9 +9,13 @@
 
 /** @var \Mautic\LeadBundle\Entity\Lead $lead */
 /** @var array $fields */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$leadName = ($lead->isAnonymous()) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+
+$isAnonymous = $lead->isAnonymous();
+
+$flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
+
+$leadName = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
 
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
@@ -88,6 +92,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <div class="box-layout">
                     <div class="col-xs-6 va-m">
                         <div class="media">
+                            <?php if (!empty($flag)): ?>
+                            <span class="pull-left img-wrapper img-rounded" style="width:38px">
+                                <img src="<?php echo $flag; ?>" alt="" />
+                            </span>
+                            <?php endif; ?>
+                            <?php if (!$isAnonymous): ?>
                             <span class="pull-left img-wrapper img-rounded" style="width:38px">
                                 <?php $preferred = $lead->getPreferredProfileImage(); ?>
                                 <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
@@ -96,8 +106,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <?php $socialData = $lead->getSocialCache(); ?>
                                     <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
                                 <?php endif; ?>
-                                <img src="<?php echo $img; ?>" alt="">
+                                <img src="<?php echo $img; ?>" alt="" />
                             </span>
+                            <?php endif; ?>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?></h4>
                                     <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ? '' :  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
@@ -171,6 +182,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <!--/ lead detail collapseable toggler -->
 
+            <?php if (!$isAnonymous): ?>
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
@@ -195,9 +207,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     </div>
                 </div>
             </div>
-
+            <?php endif; ?>
             <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs pr-md pl-md mt-10">
                 <li class="active">
                     <a href="#history-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="HistoryCount">
@@ -214,6 +226,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?>
                     </a>
                 </li>
+                <?php if (!$isAnonymous): ?>
                 <li class="">
                     <a href="#social-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="SocialCount">
@@ -222,6 +235,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?>
                     </a>
                 </li>
+                <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -230,7 +244,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="tab-content pa-md">
             <!-- #history-container -->
             <div class="tab-pane fade in active bdr-w-0" id="history-container">
-                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('eventTypes' => $eventTypes, 'eventFilter' => $eventFilter, 'lead' => $lead, 'icons' => $icons)); ?>
+                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('eventTypes' => $eventTypes, 'eventFilters' => $eventFilters, 'lead' => $lead, 'icons' => $icons)); ?>
                 <div id="timeline-container">
                     <?php echo $view->render('MauticLeadBundle:Lead:history.html.php', array('events' => $events, 'icons' => $icons)); ?>
                 </div>
@@ -244,9 +258,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!--/ #notes-container -->
 
             <!-- #social-container -->
+            <?php if (!$isAnonymous): ?>
             <div class="tab-pane fade bdr-w-0" id="social-container">
                 <?php echo $view->render('MauticLeadBundle:Social:index.html.php', array('socialProfiles' => $socialProfiles, 'lead' => $lead, 'socialProfileUrls' => $socialProfileUrls)); ?>
             </div>
+            <?php endif; ?>
             <!--/ #social-container -->
         </div>
         <!--/ end: tab-content -->

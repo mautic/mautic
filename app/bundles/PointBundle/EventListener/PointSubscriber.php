@@ -14,8 +14,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class PointSubscriber

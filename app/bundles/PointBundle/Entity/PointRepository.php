@@ -10,6 +10,7 @@
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -18,6 +19,32 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class PointRepository extends CommonRepository
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this->_em
+            ->createQueryBuilder()
+            ->select($this->getTableAlias() . ', cat')
+            ->from('MauticPointBundle:Point', $this->getTableAlias())
+            ->leftJoin($this->getTableAlias().'.category', 'cat');
+
+        $this->buildClauses($q, $args);
+
+        $query = $q->getQuery();
+
+        if (isset($args['hydration_mode'])) {
+            $mode = strtoupper($args['hydration_mode']);
+            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+        }
+
+        $results = new Paginator($query);
+
+        return $results;
+    }
+
     /**
      * {@inheritdoc}
      */

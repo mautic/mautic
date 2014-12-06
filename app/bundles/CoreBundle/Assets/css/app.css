@@ -1311,6 +1311,9 @@ blockquote > p:after {
   z-index: 100000;
   border: 1px solid #000;
 }
+.sidebar-open-rtl .alert-growl {
+  top: 65px;
+}
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
 .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {

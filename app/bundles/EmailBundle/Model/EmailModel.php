@@ -273,14 +273,19 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param      $email
      * @param      $trackingHash
      * @param      $request
      * @param bool $viaBrowser
      */
-    public function hitEmail($email, $trackingHash, $request, $viaBrowser = false)
+    public function hitEmail($trackingHash, $request, $viaBrowser = false)
     {
         $stat = $this->getEmailStatus($trackingHash);
+
+        if (!$stat) {
+            return;
+        }
+
+        $email = $stat->getEmail();
 
         if (!empty($stat) && (int) $stat->isRead()) {
             if ($viaBrowser && !$stat->getViewedInBrowser()) {
@@ -315,14 +320,15 @@ class EmailModel extends FormModel
 
         //save the IP to the lead
         $lead = $stat->getLead();
+
         if ($lead !== null) {
+
             $leadModel = $this->factory->getModel('lead');
+
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
                 $leadModel->saveEntity($lead, true);
             }
-
-            $leadModel->setLeadCookie($lead->getId());
         }
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {

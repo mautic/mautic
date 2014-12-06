@@ -18,9 +18,8 @@ if ($tmpl == 'index') {
 </div>
 <div class="panel-body">
     <?php echo $view['form']->start($form); ?>
-    <h4><?php echo $view['translator']->trans('mautic.install.email.header.emailfrom'); ?></h4>
-    <div class=" well well-sm text-muted">
-        <?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?>
+    <div class="alert alert-mautic">
+        <?php echo $view['translator']->trans('mautic.install.email.header.emailfrom'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?>"></i>
     </div>
     <div class="row">
         <div class="col-sm-6">
@@ -30,9 +29,8 @@ if ($tmpl == 'index') {
             <?php echo $view['form']->row($form['mailer_from_email']); ?>
         </div>
     </div>
-    <h4><?php echo $view['translator']->trans('mautic.install.email.header.spooler'); ?></h4>
-    <div class=" well well-sm text-muted">
-        <?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?>
+    <div class="alert alert-mautic mt-20">
+        <?php echo $view['translator']->trans('mautic.install.email.header.spooler'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?>"></i>
     </div>
     <div class="row">
         <div class="col-sm-5">
@@ -43,9 +41,8 @@ if ($tmpl == 'index') {
             <?php echo $view['form']->row($form['mailer_spool_path']); ?>
         </div>
     </div>
-    <h4><?php echo $view['translator']->trans('mautic.install.email.header.smtp'); ?></h4>
-    <div class=" well well-sm text-muted">
-        <?php echo $view['translator']->trans('mautic.install.email.subheader.smtp'); ?>
+    <div class="alert alert-mautic mt-20">
+        <?php echo $view['translator']->trans('mautic.install.email.header.smtp'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.smtp'); ?>"></i>
     </div>
     <div class="row">
         <div class="col-sm-12">

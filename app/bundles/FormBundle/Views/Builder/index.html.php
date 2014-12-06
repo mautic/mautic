@@ -20,34 +20,30 @@ $formId = $form['sessionId']->vars['data'];
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
-    <div class="col-md-9 bg-auto height-auto">
+    <div class="col-md-9 height-auto bg-white">
         <div class="row">
             <div class="col-xs-12">
                 <!-- tabs controls -->
-                <ul class="nav nav-tabs pr-md pl-md">
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.form.tab.details'); ?></a></li>
                     <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.form.tab.fields'); ?></a></li>
                     <li class=""><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.form.tab.actions'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
-                <div class="tab-content pa-md bg-white">
+                <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="pa-md">
-                                    <?php
-                                    echo $view['form']->row($form['name']);
-                                    echo $view['form']->row($form['description']);
-                                    ?>
-                                </div>
+                                <?php
+                                echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['description']);
+                                ?>
                             </div>
                             <div class="col-md-6">
-                                <div class="pa-md">
                                 <?php
                                 echo $view['form']->row($form['postAction']);
                                 echo $view['form']->row($form['postActionProperty']);
                                 ?>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -159,6 +155,7 @@ $formId = $form['sessionId']->vars['data'];
             ?>
         </div>
     </div>
+</div>
 <?php echo $view['form']->end($form); ?>
 
 <?php

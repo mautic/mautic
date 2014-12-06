@@ -24,18 +24,27 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class CategoryListType extends AbstractType
 {
 
-    private $factory;
+    private $em;
+
+    private $model;
+
+    private $translator;
+
+    private $router;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $this->factory = $factory;
+        $this->em         = $factory->getEntityManager();
+        $this->translator = $factory->getTranslator();
+        $this->model      = $factory->getModel('category');
+        $this->router     = $factory->getRouter();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $transformer = new IdToEntityModelTransformer($this->factory->getEntityManager(), 'MauticCategoryBundle:Category', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
         $builder->addModelTransformer($transformer);
     }
 
@@ -44,25 +53,35 @@ class CategoryListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $model = $this->factory->getModel('category');
-
+        $model = $this->model;
+        $createNew = $this->translator->trans('mautic.category.createnew');
+        $modalHeader = $this->translator->trans('mautic.category.header.new');
+        $router     = $this->router;
         $resolver->setDefaults(array(
-            'choices'    =>  function (Options $options) use ($model) {
+            'choices'    =>  function (Options $options) use ($model, $createNew, $modalHeader) {
                 $categories = $model->getLookupResults($options['bundle'], '', 0);
                 $choices = array();
                 foreach ($categories as $l) {
                     $choices[$l['id']] = $l['title'];
                 }
-
+                $choices['new'] = $createNew;
                 return $choices;
             },
             'label'      => 'mautic.category.form.category',
             'label_attr' => array('class' => 'control-label'),
             'multiple'   => false,
             'empty_value'=> 'mautic.core.form.uncategorized',
-            'attr'       => array(
-                'class'       => 'form-control chosen',
-            ),
+            'attr'       => function (Options $options) use ($modalHeader, $router) {
+                $newUrl    = $router->generate('mautic_category_action', array(
+                    'objectAction' => 'new',
+                    'bundle'       => $options['bundle'],
+                    'inForm'       => 1
+                ));
+                return array(
+                    'class'     => 'form-control chosen category-select',
+                    'onchange'  => "Mautic.onCategoryChange(this, '{$newUrl}', '{$modalHeader}');"
+                );
+            },
             'required'   => false
         ));
 

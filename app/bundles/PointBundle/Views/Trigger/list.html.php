@@ -34,9 +34,9 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'pointtrigger',
-                'orderBy'    => 't.description',
-                'text'       => 'mautic.point.trigger.thead.description',
-                'class'      => 'col-pointtrigger-description'
+                'orderBy'    => 'c.title',
+                'text'       => 'mautic.point.trigger.thead.category',
+                'class'      => 'col-pointtrigger-category'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -75,20 +75,30 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $item,
-                        'model'      => 'point.trigger'
-                    )); ?>
-                    <?php if ($permissions['point:triggers:edit']): ?>
-                    <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                    <div>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            'item'       => $item,
+                            'model'      => 'point.trigger'
+                        )); ?>
+                        <?php if ($permissions['point:triggers:edit']): ?>
+                        <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $item->getName(); ?>
+                        </a>
+                        <?php else: ?>
                         <?php echo $item->getName(); ?>
-                    </a>
-                    <?php else: ?>
-                    <?php echo $item->getName(); ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
-
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg">
+                    <?php $category = $item->getCategory(); ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
+                    <span><?php echo $catName; ?></span>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getPoints(); ?></td>
                 <?php
                 $color = $item->getColor();

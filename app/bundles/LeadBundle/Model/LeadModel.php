@@ -160,6 +160,35 @@ class LeadModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param Lead $entity
+     * @param bool   $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        $fields = $entity->getFields();
+
+        //check to see if we can glean information from ip address
+        if (count($ips = $entity->getIpAddresses())) {
+            $details = $ips->first()->getIpDetails();
+            if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
+                $entity->addUpdatedField('city', $details['city']);
+            }
+
+            if (!empty($details['region']) && empty($fields['core']['state']['value'])) {
+                $entity->addUpdatedField('state', $details['region']);
+            }
+
+            if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
+                $entity->addUpdatedField('country', $details['country']);
+            }
+        }
+
+        parent::saveEntity($entity, $unlock);
+    }
+
+    /**
      * Populates custom field values for updating the lead. Also retrieves social media data
      *
      * @param Lead  $lead

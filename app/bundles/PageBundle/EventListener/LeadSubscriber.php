@@ -40,17 +40,14 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
+        $filters = $event->getEventFilters();
 
-        if (!$loadAllEvents && !$eventFilterExists) {
+        if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
+        $options = array('ipIds' => array(), 'filters' => $filters);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -86,7 +83,7 @@ class LeadSubscriber extends CommonSubscriber
                     'page' => $model->getEntity($hit['page_id']),
                     'hit'  => $hit
                 ),
-                'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
     }

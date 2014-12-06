@@ -30,7 +30,7 @@ class Report extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $id;
 
@@ -38,15 +38,23 @@ class Report extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $title;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
+     */
+    private $description;
 
     /**
      * @ORM\Column(type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"reportDetails"})
      */
     private $system = false;
 
@@ -54,7 +62,7 @@ class Report extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"reportDetails"})
      */
     private $source;
 
@@ -62,7 +70,7 @@ class Report extends FormEntity
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"reportDetails"})
      */
     private $columns = array();
 
@@ -70,7 +78,7 @@ class Report extends FormEntity
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"reportDetails"})
      */
     private $filters = array();
 
@@ -217,5 +225,21 @@ class Report extends FormEntity
     public function getFilters()
     {
         return $this->filters;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription ()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription ($description)
+    {
+        $this->description = $description;
     }
 }

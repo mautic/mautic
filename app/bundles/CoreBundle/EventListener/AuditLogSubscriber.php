@@ -37,10 +37,7 @@ class AuditLogSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        $lead = $event->getLead();
-
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
+        $lead    = $event->getLead();
 
         /** @var \Mautic\CoreBundle\Model\AuditLogModel $model */
         $model = $this->factory->getModel('core.auditLog');
@@ -58,6 +55,11 @@ class AuditLogSubscriber extends CommonSubscriber
                         'value'  => 'lead'
                     ),
                     array(
+                        'column' => 'e.action',
+                        'expr'   => 'neq',
+                        'value'  => 'update'
+                    ),
+                    array(
                         'column' => 'e.objectId',
                         'expr'   => 'eq',
                         'value'  => $lead->getId()
@@ -66,17 +68,21 @@ class AuditLogSubscriber extends CommonSubscriber
             )
         ));
 
+        $filters = $event->getEventFilters();
+
         // Add the entries to the event array
         /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
         $IpAddresses = $lead->getIpAddresses();
         foreach ($rows as $row) {
-            $eventTypeKey      = 'lead.' . $row->getAction();
-            $eventFilterExists = in_array($eventTypeKey, $filter);
-            $eventLabel        = $this->translator->trans('mautic.lead.event.'. $row->getAction());
+            $action       = $row->getAction();
+            $eventTypeKey = 'lead.' . $action;
 
-            if (!$loadAllEvents && !$eventFilterExists) {
+            //don't include if type is not applicable or if there is a search string as there is nothing to search for this
+            if (!$event->isApplicable($eventTypeKey) || !empty($filters['search'])) {
                 continue;
             }
+
+            $eventLabel = $this->translator->trans('mautic.lead.event.'. $row->getAction());
 
             $details = $row->getDetails();
             $event->addEvent(array(
@@ -88,7 +94,7 @@ class AuditLogSubscriber extends CommonSubscriber
                     'editor'    => $row->getUserName(),
                     'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$details[1]] : array()
                 ),
-                'contentTemplate' => 'MauticLeadBundle:Timeline:' . (($eventTypeKey == 'lead.ipadded') ? 'ip' : 'index') . '.html.php'
+                'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:' . $action . '.html.php'
             ));
         }
     }

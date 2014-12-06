@@ -87,7 +87,9 @@ $container->loadFromExtension('security', array(
         'main'                 => array(
             'pattern'     => "^/",
             'form_login'  => array(
-                'csrf_provider' => 'form.csrf_provider'
+                'csrf_provider' => 'form.csrf_provider',
+                'success_handler' => 'mautic.security.authentication_handler',
+                'failure_handler' => 'mautic.security.authentication_handler'
             ),
             'logout'      => array(),
             'remember_me' => array(

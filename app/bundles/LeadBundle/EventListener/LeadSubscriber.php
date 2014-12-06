@@ -272,9 +272,9 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
         $eventTypes = array(
-            'lead.created'    => 'mautic.lead.event.create',
+            'lead.create'     => 'mautic.lead.event.create',
             'lead.identified' => 'mautic.lead.event.identified',
-            'lead.ipadded'    => 'mautic.lead.event.ip'
+            'lead.ipadded'    => 'mautic.lead.event.ipadded'
         );
 
         foreach ($eventTypes as $type => $label) {

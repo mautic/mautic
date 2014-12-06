@@ -22,6 +22,7 @@ class PublicController extends CommonFormController
     {
         //find the email
         $security   = $this->factory->getSecurity();
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
@@ -43,7 +44,7 @@ class PublicController extends CommonFormController
             }
 
             //all the checks pass so display the content
-            $model->hitEmail($entity, $idHash, $this->request, true);
+            $model->hitEmail($idHash, $this->request, true);
 
             if ($entity->getContentMode() == 'builder') {
                 $template   = $entity->getTemplate();
@@ -87,16 +88,13 @@ class PublicController extends CommonFormController
     {
         $response = TrackingPixelHelper::getResponse($this->request);
 
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
-        $stat     = $model->getEmailStatus($idHash);
+        $model->hitEmail($idHash, $this->request);
 
-        if (!empty($stat)) {
-            $entity = $stat->getEmail();
-            if ($entity !== null) {
-                $entity->setReadInBrowser(true);
-                $model->hitEmail($entity, $idHash, $this->request);
-            }
-        }
+        $size = strlen($response->getContent());
+        $response->headers->set('Content-Length', $size);
+        $response->headers->set('Connection', 'close');
 
         //generate image
         return $response;

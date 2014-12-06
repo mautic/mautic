@@ -33,11 +33,14 @@ class LeadTimelineEvent extends Event
     private $eventTypes = array();
 
     /**
-     * Container of filtered event types. If empty, all events will be loaded.
+     * Array of filters
+     *  search => (string) search term
+     *  includeEvents => (array) event types to include
+     *  excludeEvents => (array) event types to exclude
      *
      * @var array
      */
-    private $eventFilter = array();
+    private $filters = array();
 
     /**
      * Lead entity for the lead the timeline is being generated for
@@ -50,12 +53,12 @@ class LeadTimelineEvent extends Event
      * Constructor
      *
      * @param Lead $lead Lead entity for the lead the timeline is being generated for
-     * @param array $eventFilter contains all event types which should be loaded. Empty == all.
+     * @param array $filters  Array of filter string, include filter types and exclude filter types
      */
-    public function __construct(Lead $lead, array $eventFilter = array())
+    public function __construct(Lead $lead, array $filters = array())
     {
-        $this->lead = $lead;
-        $this->eventFilter = $eventFilter;
+        $this->lead    = $lead;
+        $this->filters = $filters;
     }
 
     /**
@@ -123,9 +126,9 @@ class LeadTimelineEvent extends Event
      *
      * @return array of wanted filteres. Empty == all.
      */
-    public function getEventFilter()
+    public function getEventFilters()
     {
-        return $this->eventFilter;
+        return $this->filters;
     }
 
     /**
@@ -136,5 +139,27 @@ class LeadTimelineEvent extends Event
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * Determine if an event type should be included
+     *
+     * @param $eventType
+     *
+     * @return bool
+     */
+    public function isApplicable($eventType)
+    {
+        if (in_array($eventType, $this->filters['excludeEvents'])) {
+            return false;
+        }
+
+        if (!empty($this->filters['includeEvents'])) {
+            if (!in_array($eventType, $this->filters['includeEvents'])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

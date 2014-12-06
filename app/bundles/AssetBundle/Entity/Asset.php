@@ -47,6 +47,14 @@ class Asset extends FormEntity
     private $title;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $description;
+
+    /**
      * @ORM\Column(name="path", type="string", nullable=true)
      */
     private $path;
@@ -524,7 +532,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns absolut path to the file.
+     * Returns absolute path to the file.
      *
      * @return string
      */
@@ -785,6 +793,22 @@ class Asset extends FormEntity
     public function getFileContents()
     {
         return file_get_contents($this->getAbsolutePath());
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription ()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription ($description)
+    {
+        $this->description = $description;
     }
 
     /**

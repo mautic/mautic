@@ -147,11 +147,13 @@ class CategoryController extends FormController
      */
     public function newAction ($bundle)
     {
-        $session = $this->factory->getSession();
-        $model   = $this->factory->getModel('category');
-        $entity  = $model->getEntity();
-        $success = $closeModal = 0;
+        $session   = $this->factory->getSession();
+        $model     = $this->factory->getModel('category');
+        $entity    = $model->getEntity();
+        $success   = $closeModal = 0;
         $cancelled = $valid = false;
+        $method    = $this->request->getMethod();
+        $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
 
         //not found
        if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
@@ -163,9 +165,9 @@ class CategoryController extends FormController
             'bundle'       => $bundle
         ));
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
-
+        $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ($method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -182,6 +184,16 @@ class CategoryController extends FormController
         $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
 
         if ($closeModal) {
+            if ($inForm) {
+                return new JsonResponse(array(
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1,
+                    'inForm'        => 1,
+                    'categoryName'  => $entity->getName(),
+                    'categoryId'    => $entity->getId()
+                ));
+            }
+
             $viewParameters = array(
                 'page'   => $session->get('mautic.category.page'),
                 'bundle' => $bundle

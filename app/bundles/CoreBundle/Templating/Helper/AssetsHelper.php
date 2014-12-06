@@ -428,7 +428,22 @@ class AssetsHelper extends CoreAssetsHelper
                 $text
             );
         }
+    }
 
+    /**
+     * Returns only first $charCount chars of the $text and adds "..." if it is shortened.
+     *
+     * @param string $text
+     * @param integer $charCount
+     * @return string
+     */
+    public function shortenText($text, $charCount = null)
+    {
+        if ($charCount && strlen($text) > $charCount) {
+            return substr($text, 0, $charCount) . '...';
+        }
+
+        return $text;
     }
 
     /**
@@ -441,9 +456,35 @@ class AssetsHelper extends CoreAssetsHelper
         $this->factory = $factory;
     }
 
+    /**
+     * @param AssetGenerationHelper $helper
+     */
     public function setAssetHelper(AssetGenerationHelper $helper)
     {
         $this->assetHelper = $helper;
+    }
+
+    /**
+     * @param $country
+     */
+    public function getCountryFlag($country, $urlOnly = true, $class = '')
+    {
+        $flagPath = $this->factory->getSystemPath('assets', true) . '/images/flags/';
+        $relpath  = $this->factory->getSystemPath('assets') . '/images/flags/';
+        $country = ucwords(str_replace(' ', '-', $country));
+        $flagImg = '';
+        if (file_exists($flagPath . $country . '.png')) {
+            if (file_exists($flagPath . $country . '.png')) {
+                $flagImg = $this->getUrl($relpath . $country . '.png');
+            }
+        }
+
+        if ($urlOnly) {
+            return $flagImg;
+        } else {
+            return '<img src="' . $flagImg . '" class="'.$class.'" />';
+        }
+
     }
 
     /**

@@ -76,5 +76,8 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <?php endif; ?>
         </script>
         <?php $view['assets']->outputScripts("bodyClose"); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+        'id' => 'MauticCommonModal'
+    )); ?>
     </body>
 </html>

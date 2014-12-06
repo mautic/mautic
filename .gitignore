@@ -8,7 +8,7 @@
 !/app/bundles/CoreBundle/Assets/css/*.css
 /app/cache/*
 /app/logs/*
-/app/config/local.php
+/app/config/local*.php
 /app/config/config_local.php
 /app/Resources/SensioGeneratorBundle
 /app/phpunit.xml

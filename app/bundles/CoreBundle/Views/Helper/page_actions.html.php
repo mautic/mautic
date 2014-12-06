@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$buttonGroupTypes = array('group', 'dropdown');
+$buttonGroupTypes = array('group', 'button-dropdown');
 foreach ($buttonGroupTypes as $groupType) {
     $buttonCount = 0;
     if ($groupType == 'group') {
@@ -32,7 +32,7 @@ foreach ($buttonGroupTypes as $groupType) {
             echo $dropdownOpenHtml;
         }
 
-        if ($groupType == 'dropdown' && $buttonCount > 0) {
+        if ($groupType == 'button-dropdown' && $buttonCount > 0) {
             $wrapOpeningTag = "<li>\n";
             $wrapClosingTag = "</li>\n";
         }
@@ -67,7 +67,7 @@ foreach ($buttonGroupTypes as $groupType) {
                     'message'       => $view["translator"]->trans("mautic." . $langVar . ".form.confirmdelete", array("%name%" => $item->$nameGetter() . " (" . $item->getId() . ")")),
                     'confirmAction' => $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $query)),
                     'template'      => 'delete',
-                    'btnClass'      => ($groupType == 'dropdown') ? '' : $btnClass
+                    'btnClass'      => ($groupType == 'button-dropdown') ? '' : $btnClass
                 ));
                 break;
         }

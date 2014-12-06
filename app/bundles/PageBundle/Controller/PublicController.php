@@ -267,7 +267,9 @@ class PublicController extends CommonFormController
         $response = TrackingPixelHelper::getResponse($this->request);
 
         //Create page entry
-        $this->factory->getModel('page')->hitPage(null, $this->request);
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model   = $this->factory->getModel('page');
+        $model->hitPage(null, $this->request);
 
         return $response;
     }

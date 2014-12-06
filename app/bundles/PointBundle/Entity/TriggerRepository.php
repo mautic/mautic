@@ -10,6 +10,7 @@
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -17,6 +18,32 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class TriggerRepository extends CommonRepository
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this->_em
+            ->createQueryBuilder()
+            ->select($this->getTableAlias() . ', cat')
+            ->from('MauticPointBundle:Trigger', $this->getTableAlias())
+            ->leftJoin($this->getTableAlias().'.category', 'cat');
+
+        $this->buildClauses($q, $args);
+
+        $query = $q->getQuery();
+
+        if (isset($args['hydration_mode'])) {
+            $mode = strtoupper($args['hydration_mode']);
+            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+        }
+
+        $results = new Paginator($query);
+
+        return $results;
+    }
+
     /**
      * Get a list of published triggers with color and points
      *

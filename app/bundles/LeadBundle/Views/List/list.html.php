@@ -27,7 +27,6 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     </div>
                 </th>
                 <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
-                <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-leadcount"><?php echo $view['translator']->trans('mautic.lead.list.thead.leadcount'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
             </tr>
@@ -60,23 +59,27 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         ?>
                     </td>
                     <td>
-                        <?php if ($item->isGlobal()): ?>
-                        <i class="fa fa-fw fa-globe"></i>
-                        <?php endif; ?>
-                        <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
-                            <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"
-                               data-toggle="ajax">
+                        <div>
+                            <?php if ($item->isGlobal()): ?>
+                            <i class="fa fa-fw fa-globe"></i>
+                            <?php endif; ?>
+                            <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
+                                <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"
+                                   data-toggle="ajax">
+                                    <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
+                                </a>
+                            <?php else : ?>
                                 <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
-                            </a>
-                        <?php else : ?>
-                            <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
-                        <?php endif; ?>
-                        <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
-                        <br />
-                        <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                            <?php endif; ?>
+                            <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
+                            <br />
+                            <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                     <td class="visible-md visible-lg"><?php echo count($item->getIncludedLeads()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

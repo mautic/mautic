@@ -68,17 +68,13 @@ $container->setDefinition(
 );
 
 
-/*
 $container->setDefinition(
-    'mautic_user.example',
+    'mautic.security.authentication_handler',
     new Definition(
-        'Mautic\UserBundle\Example',
+        'Mautic\UserBundle\Security\Authentication\AuthenticationHandler',
         array(
-            new Reference('service_id'),
-            "plain_value",
-            new Parameter('parameter_name'),
+            new Reference('router'),
+            new Reference('session')
         )
     )
 );
-
-*/

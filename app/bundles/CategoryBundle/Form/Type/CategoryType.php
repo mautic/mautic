@@ -91,6 +91,10 @@ class CategoryType extends AbstractType
             'data' => $options['bundle']
         ));
 
+        $builder->add('inForm', 'hidden', array(
+            'mapped' => false
+        ));
+
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {

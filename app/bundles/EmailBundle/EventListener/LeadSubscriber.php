@@ -46,18 +46,12 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeNameRead = $this->translator->trans('mautic.email.read');
         $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
 
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $sentEventFilterExists = in_array($eventTypeKeySent, $filter);
-        $readEventFilterExists = in_array($eventTypeKeyRead, $filter);
 
-        if (!$loadAllEvents && !($sentEventFilterExists || $readEventFilterExists)) {
-            return;
-        }
+        // Decide if those events are filtered
+        $filters = $event->getEventFilters();
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
+        $options = array('ipIds' => array(), 'filters' => $filters);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -74,20 +68,20 @@ class LeadSubscriber extends CommonSubscriber
         // Add the events to the event array
         foreach ($stats as $stat) {
             // Email Sent
-            if (($loadAllEvents || $sentEventFilterExists) && $stat['dateSent']) {
+            if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
                 $event->addEvent(array(
-                    'event'     => $eventTypeKeySent,
-                    'eventLabel' => $eventTypeNameSent,
-                    'timestamp' => $stat['dateSent'],
-                    'extra'     => array(
+                    'event'           => $eventTypeKeySent,
+                    'eventLabel'      => $eventTypeNameSent,
+                    'timestamp'       => $stat['dateSent'],
+                    'extra'           => array(
                         'stats' => $stat
                     ),
-                    'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
+                    'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
                 ));
             }
 
             // Email read
-            if (($loadAllEvents || $readEventFilterExists) && $stat['dateRead']) {
+            if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead)) {
                 $event->addEvent(array(
                     'event'     => $eventTypeKeyRead,
                     'eventLabel' => $eventTypeNameRead,

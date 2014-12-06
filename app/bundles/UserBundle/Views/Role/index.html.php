@@ -20,4 +20,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 )));
 ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
+    'searchValue' => $searchValue,
+    'action'      => $currentRoute,
+    'langVar'     => 'user.role',
+    'routeBase'   => 'role',
+    'templateButtons' => array(
+        'delete' => $permissions['delete']
+    )
+)); ?>
+
+<div class="page-list">
+    <?php $view['slots']->output('_content'); ?>
+</div>

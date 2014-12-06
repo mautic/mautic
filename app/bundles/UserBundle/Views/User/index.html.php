@@ -9,6 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.user.header.index'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(
@@ -19,17 +20,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 )));
 ?>
 
-<div class="panel panel-default bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
-    </div>
+<?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
+    'searchValue' => $searchValue,
+    'action'      => $currentRoute,
+    'langVar'     => 'user.user',
+    'routeBase'   => 'user',
+    'templateButtons' => array(
+        'delete' => $permissions['delete']
+    )
+)); ?>
+
+<div class="page-list">
 	<?php $view['slots']->output('_content'); ?>
 </div>
