@@ -67,9 +67,9 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             if (in_array($name, array('title', 'company', 'city', 'zipcode'))) {
                 $type = 'lookup';
             } elseif ($name == 'country') {
-                $type = 'countrylist';
+                $type = 'country';
             } elseif ($name == 'state') {
-                $type = 'regionlist';
+                $type = 'region';
             } elseif (in_array($name, array('phone', 'mobile'))) {
                 $type = 'tel';
             } elseif ($name == 'email') {
