@@ -78,6 +78,15 @@ if ($tmpl == 'index') {
                         'customButtons'    => array(
                             array(
                                 'attr' => array(
+                                    'data-toggle' => '',
+                                    'target'      => '_blank',
+                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $i[0]->getId())),
+                                ),
+                                'iconClass' => 'fa fa-camera',
+                                'btnText'   => 'mautic.form.form.preview'
+                            ),
+                            array(
+                                'attr' => array(
                                     'data-toggle' => 'ajax',
                                     'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())),
                                 ),
