@@ -108,7 +108,7 @@ class AjaxController extends CommonAjaxController
                         'lead'              => $lead,
                         'socialProfileUrls' => $socialProfileUrls
                     ));
-                    $dataArray['socialCount'] = $socialCount;
+                    $dataArray['socialCount']     = $socialCount;
                 } else {
                     foreach ($socialProfiles as $name => $details) {
                         $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
@@ -147,10 +147,10 @@ class AjaxController extends CommonAjaxController
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
-                $dataArray['success']  = 1;
+                $dataArray['success'] = 1;
 
-                $socialProfiles    = IntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
-                $socialCount       = count($socialProfiles);
+                $socialProfiles = IntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
+                $socialCount    = count($socialProfiles);
 
                 if (empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
@@ -176,10 +176,11 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateTimelineAction (Request $request)
     {
-        $dataArray = array('success' => 0);
-        $filters   = InputHelper::clean($request->request->get('eventFilters'));
-        $search    = InputHelper::clean($request->request->get('search'));
-        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $dataArray     = array('success' => 0);
+        $includeEvents = InputHelper::clean($request->request->get('includeEvents', array()));
+        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', array()));
+        $search        = InputHelper::clean($request->request->get('search'));
+        $leadId        = InputHelper::int($request->request->get('leadId'));
 
         if (!empty($leadId)) {
             //find the lead
@@ -190,15 +191,17 @@ class AjaxController extends CommonAjaxController
 
                 $session = $this->factory->getSession();
 
-                $eventFilter = ($filters) ? $filters : array();
+                $filter = array(
+                    'search'        => $search,
+                    'includeEvents' => $includeEvents,
+                    'excludeEvents' => $excludeEvents
+                );
 
-                $session->set('mautic.lead.' . $leadId . '.timeline.filter', $eventFilter);
-
-                $eventFilter['search'] = $search;
+                $session->set('mautic.lead.' . $leadId . '.timeline.filters', $filter);
 
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->factory->getDispatcher();
-                $event      = new LeadTimelineEvent($lead, $eventFilter);
+                $event      = new LeadTimelineEvent($lead, $filter);
                 $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
                 $events     = $event->getEvents();
@@ -209,11 +212,11 @@ class AjaxController extends CommonAjaxController
                 $icons = $event->getIcons();
 
                 $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
-                        'events'      => $events,
-                        'eventTypes'  => $eventTypes,
-                        'eventFilter' => $eventFilter,
-                        'icons'       => $icons,
-                        'lead'        => $lead)
+                        'events'       => $events,
+                        'eventTypes'   => $eventTypes,
+                        'eventFilters' => $filter,
+                        'icons'        => $icons,
+                        'lead'         => $lead)
                 );
 
                 $dataArray['success']      = 1;

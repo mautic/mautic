@@ -261,12 +261,15 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        // Set which events to load. Empty array == all.
-        $eventFilter = $this->factory->getSession()->get('mautic.lead.' . $lead->getId() . '.timeline.filter', array());
+        $filters = $this->factory->getSession()->get('mautic.lead.' . $lead->getId() . '.timeline.filters', array(
+            'search'        => '',
+            'includeEvents' => array(),
+            'excludeEvents' => array()
+        ));
 
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
         $dispatcher = $this->factory->getDispatcher();
-        $event      = new LeadTimelineEvent($lead, $eventFilter);
+        $event      = new LeadTimelineEvent($lead, $filters);
         $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
         $events     = $event->getEvents();
@@ -305,14 +308,14 @@ class LeadController extends FormController
                 'permissions'       => $permissions,
                 'events'            => $events,
                 'eventTypes'        => $eventTypes,
-                'eventFilter'       => $eventFilter,
+                'eventFilters'      => $filters,
                 'upcomingEvents'    => $upcomingEvents,
                 'icons'             => $icons,
                 'pointStats'        => $pointStats,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                 'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                 'leadNotes'         => $this->forward('MauticLeadBundle:Note:index', array(
-                    'leadId' => $lead->getId(),
+                    'leadId'     => $lead->getId(),
                     'ignoreAjax' => 1
                 ))->getContent()
             ),
@@ -335,8 +338,8 @@ class LeadController extends FormController
      */
     public function newAction ()
     {
-        $model       = $this->factory->getModel('lead.lead');
-        $lead        = $model->getEntity();
+        $model = $this->factory->getModel('lead.lead');
+        $lead  = $model->getEntity();
 
         if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
             return $this->accessDenied();
@@ -553,6 +556,7 @@ class LeadController extends FormController
                     'objectAction' => 'view',
                     'objectId'     => $lead->getId()
                 );
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $this->generateUrl('mautic_lead_action', $viewParameters),

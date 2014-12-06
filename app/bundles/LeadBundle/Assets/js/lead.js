@@ -492,12 +492,14 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
 Mautic.refreshLeadTimeline = function(form) {
     var formData = form.serialize()
     mQuery.ajax({
+        showLoadingBar: true,
         url: mauticAjaxUrl,
         type: "POST",
         data: "action=lead:updateTimeline&" + formData,
         dataType: "json",
         success: function (response) {
             if (response.success) {
+                Mautic.stopPageLoadingBar();
                 mQuery('#timeline-container').html(response.timeline);
                 mQuery('#HistoryCount').html(response.historyCount);
             }

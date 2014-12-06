@@ -244,7 +244,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="tab-content pa-md">
             <!-- #history-container -->
             <div class="tab-pane fade in active bdr-w-0" id="history-container">
-                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('eventTypes' => $eventTypes, 'eventFilter' => $eventFilter, 'lead' => $lead, 'icons' => $icons)); ?>
+                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('eventTypes' => $eventTypes, 'eventFilters' => $eventFilters, 'lead' => $lead, 'icons' => $icons)); ?>
                 <div id="timeline-container">
                     <?php echo $view->render('MauticLeadBundle:Lead:history.html.php', array('events' => $events, 'icons' => $icons)); ?>
                 </div>
