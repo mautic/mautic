@@ -291,7 +291,7 @@ function move_mautic_core(array $status)
         /** @var FilesystemIterator $file */
         foreach ($iterator as $file) {
             // Sanity checks
-            if (!$file->isDot() && $file->isFile()) {
+            if ($file->isFile()) {
                 $src  = $file->getPath() . '/' . $file->getFilename();
                 $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
@@ -316,7 +316,7 @@ function move_mautic_core(array $status)
         /** @var FilesystemIterator $file */
         foreach ($iterator as $file) {
             // Sanity checks
-            if (!$file->isDot() && $file->isFile()) {
+            if ($file->isFile()) {
                 $src  = $file->getPath() . '/' . $file->getFilename();
                 $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
@@ -341,7 +341,7 @@ function move_mautic_core(array $status)
         /** @var FilesystemIterator $file */
         foreach ($iterator as $file) {
             // Sanity checks
-            if (!$file->isDot() && $file->isFile()) {
+            if ($file->isFile()) {
                 $src  = $file->getPath() . '/' . $file->getFilename();
                 $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
@@ -439,7 +439,7 @@ function move_mautic_core(array $status)
     /** @var FilesystemIterator $file */
     foreach ($iterator as $file) {
         // Sanity checks
-        if (!$file->isDot() && $file->isFile() && !in_array($file->getFilename(), array('deleted_files.txt', 'upgrade.php'))) {
+        if ($file->isFile() && !in_array($file->getFilename(), array('deleted_files.txt', 'upgrade.php'))) {
             $src  = $file->getPath() . '/' . $file->getFilename();
             $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
@@ -520,6 +520,9 @@ function move_mautic_vendors(array $status)
                     $src  = $directory->getPath() . '/' . $directory->getFilename();
                     $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
+                    // We'll need to completely remove the existing vendor first
+                    recursive_remove_directory($dest);
+
                     $result = copy_directory($src, $dest);
 
                     if ($result !== true) {
@@ -588,6 +591,9 @@ function move_mautic_vendors(array $status)
 
                 $src  = $directory->getPath() . '/' . $directory->getFilename();
                 $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+                // We'll need to completely remove the existing vendor first
+                recursive_remove_directory($dest);
 
                 $result = copy_directory($src, $dest);
 
