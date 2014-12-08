@@ -1366,6 +1366,42 @@ var Mautic = {
         });
     },
 
+    togglePublishedButtonClass: function (changedId) {
+        changedId = '#' + changedId;
+
+        var isPublishButton = mQuery(changedId).parent().hasClass('btn-publish');
+
+        //change the other
+        var otherButton = isPublishButton ? '.btn-unpublish' : '.btn-publish';
+        var otherLabel  = mQuery(changedId).parent().parent().find(otherButton);
+
+        console.log(changedId, isPublishButton, otherButton, otherLabel);
+
+        if (mQuery(changedId).prop('checked')) {
+            var thisRemove = 'btn-default',
+                otherAdd = 'btn-default';
+            if (isPublishButton) {
+                var thisAdd = 'btn-success',
+                    otherRemove = 'btn-danger';
+            } else {
+                var thisAdd = 'btn-danger',
+                    otherRemove = 'btn-success';
+            }
+        } else {
+            var thisAdd = 'btn-default';
+            if (isPublishButton) {
+                var thisAdd = 'btn-success',
+                    otherRemove = 'btn-danger';
+            } else {
+                var thisAdd = 'btn-danger',
+                    otherRemove = 'btn-success';
+            }
+        }
+        console.log(isPublishButton, thisAdd, thisRemove, otherAdd, otherRemove);
+        mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
+        mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
+    },
+
     /**
      * Apply filter
      * @param list

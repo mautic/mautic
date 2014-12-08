@@ -173,17 +173,7 @@ class UserType extends AbstractType
                     )
                 ));
 
-            $builder->add('isPublished', 'button_group', array(
-                'choice_list' => new ChoiceList(
-                    array(false, true),
-                    array('mautic.core.form.no', 'mautic.core.form.yes')
-                ),
-                'expanded'    => true,
-                'multiple'    => false,
-                'label'       => 'mautic.core.form.ispublished',
-                'empty_value' => false,
-                'required'    => false
-            ));
+            $builder->add('isPublished', 'published_button_group');
 
             $builder->add('buttons', 'form_buttons');
 

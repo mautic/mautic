@@ -54,7 +54,6 @@ $container->setDefinition('mautic.form.type.tel', new Definition(
         'alias' => 'tel',
     ));
 
-
 $container->setDefinition('mautic.form.type.button_group', new Definition(
     'Mautic\CoreBundle\Form\Type\ButtonGroupType'
 ))
@@ -62,6 +61,12 @@ $container->setDefinition('mautic.form.type.button_group', new Definition(
         'alias' => 'button_group',
     ));
 
+$container->setDefinition('mautic.form.type.published_button_group', new Definition(
+    'Mautic\CoreBundle\Form\Type\PublishedButtonGroupType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'published_button_group',
+    ));
 
 $container->setDefinition('mautic.form.type.standalone_button', new Definition(
     'Mautic\CoreBundle\Form\Type\StandAloneButtonType'

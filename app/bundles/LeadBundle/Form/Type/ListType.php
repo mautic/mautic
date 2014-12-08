@@ -83,18 +83,7 @@ class ListType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('isPublished', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'label_attr'    => array('class' => 'control-label'),
-            'multiple'      => false,
-            'label'         => 'mautic.core.form.ispublished',
-            'empty_value'   => false,
-            'required'      => false
-        ));
+        $builder->add('isPublished', 'published_button_group');
 
         $filterTransformer      = new FieldTypeTransformer();
         $filterModalTransformer = new FieldDateTimeTransformer();
