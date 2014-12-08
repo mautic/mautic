@@ -24,3 +24,5 @@
 /build/packages/*
 !/build/packages/.placeholder
 /mockup
+/upgrade
+/upgrade_errors.txt
