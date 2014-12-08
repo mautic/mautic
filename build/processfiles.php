@@ -11,19 +11,6 @@
  * Common file for preparing an installation package
  */
 
-// Copy files to packaging space
-echo "Copying files\n";
-system('cp -r ../addons packaging/');
-system('cp -r ../app packaging/');
-system('cp -r ../bin packaging/');
-system('cp -r ../media packaging/');
-system('cp -r ../themes packaging/');
-system('cp -r ../vendor packaging/');
-system('cp ../.htaccess packaging/');
-system('cp ../index.php packaging/');
-system('cp ../LICENSE.txt packaging/');
-system('cp ../robots.txt packaging/');
-
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
 chdir($baseDir . '/packaging');

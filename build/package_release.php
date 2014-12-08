@@ -8,7 +8,8 @@
  */
 
 /*
- * Build a "production" package from the current development HEAD, this should be run after a 'composer install'
+ * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
+ * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
  */
 
 $baseDir = __DIR__;
@@ -28,36 +29,69 @@ system('rm -rf packaging');
 // Preparation - Provision packaging space
 mkdir(__DIR__ . '/packaging');
 
-// Common steps
-include_once __DIR__ . '/processfiles.php';
-
-// Uncomment this at 1.0.1
-/*// In this step, we'll compile a list of files that may have been deleted so our update script can remove them
+// Grab the system git path so we can process git commands
 ob_start();
 passthru('which git', $systemGit);
 $systemGit = trim(ob_get_clean());
 
+// Checkout the version tag into the packaging space
+chdir(dirname(__DIR__));
+system($systemGit . ' archive ' . $version . ' | tar -x -C ' . __DIR__ . '/packaging');
+chdir(__DIR__);
+system('cd ' . __DIR__ . '/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
+
+// Common steps
+include_once __DIR__ . '/processfiles.php';
+
+// In this step, we'll compile a list of files that may have been deleted so our update script can remove them
 // First, get a list of git tags
 ob_start();
 passthru($systemGit . ' tag -l', $tags);
 $tags = explode("\n", trim(ob_get_clean()));
 
 // Get the list of modified files from the initial tag
+// TODO - Hardcode this to the 1.0.0 tag when we're there
 ob_start();
 passthru($systemGit . ' diff tags/' . $tags[0] . ' tags/' . $version . ' --name-status', $fileDiff);
 $fileDiff = explode("\n", trim(ob_get_clean()));
 
 // Only add deleted files to our list; new and modified files will be covered by the archive
-$deletedFiles = array();
+$deletedFiles  = array();
+$modifiedFiles = array();
 
-foreach ($fileDiff as $file)
-{
-	if (substr($file, 0, 1) == 'D')
-	{
-		$deletedFiles[] = substr($file, 2);
-	}
-}*/
+// Build an array of paths which we won't ever distro, this is used for the update packages
+$doNotPackage  = array('.gitignore', 'app/phpunit.xml.dist', 'build', 'composer.json', 'composer.lock', 'Gruntfile.js', 'index_dev.php', 'package.json', 'upgrade.php');
+
+foreach ($fileDiff as $file) {
+    $filename = substr($file, 2);
+    $folderPath = explode('/', $file);
+    $folderName = $folderPath[0];
+
+    if (!in_array($filename, $doNotPackage) && !in_array($folderName, $doNotPackage)) {
+        if (substr($file, 0, 1) == 'D') {
+            $deletedFiles[] = $filename;
+        } else {
+            $modifiedFiles[$filename] = true;
+        }
+    }
+}
+
+// Add our update files to the $modifiedFiles array so they get packaged
+$modifiedFiles['deleted_files.txt'] = true;
+$modifiedFiles['upgrade.php'] = true;
+
+$filePut = array_keys($modifiedFiles);
+sort($filePut);
+
+// Write our files arrays into text files
+file_put_contents(__DIR__ . '/packaging/deleted_files.txt', json_encode($deletedFiles));
+file_put_contents(__DIR__ . '/packaging/modified_files.txt', implode("\n", $filePut));
 
 // Post-processing - ZIP it up
-echo "Packaging Mautic\n";
+chdir(__DIR__ . '/packaging');
+
+echo "Packaging Mautic Full Installation\n";
 system('zip -r ../packages/' . $version . '.zip addons/ app/ bin/ media/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+
+echo "Packaging Mautic Update Package\n";
+system('zip -r ../packages/' . $version . '-update.zip -@ < modified_files.txt > /dev/null');
