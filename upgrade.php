@@ -17,6 +17,32 @@ define('MAUTIC_UPGRADE_ROOT',      __DIR__);
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 
 /**
+ * Clears the application cache
+ *
+ * Since this script is being executed via web requests and standalone from the Mautic application, we don't have access to Symfony's
+ * CLI suite.  So we'll go with Option B in this instance and just nuke the entire production cache and let Symfony rebuild it on the next
+ * application cycle.
+ *
+ * @param array $status
+ *
+ * @return array
+ */
+function clear_mautic_cache(array $status)
+{
+    if (!recursive_remove_directory(MAUTIC_ROOT . '/app/cache/prod')) {
+        process_error_log(array('Could not remove the application cache.  You will need to manually delete app/cache/prod.'));
+    }
+
+    $status['complete']                      = true;
+    $status['stepStatus']                    = 'Success';
+    $status['nextStep']                      = 'Processing Database Updates';
+    $status['nextStepStatus']                = 'In Progress';
+    $status['updateState']['vendorComplete'] = true;
+
+    return $status;
+}
+
+/**
  * Copy a folder.
  *
  * This function is based on \Joomla\Filesystem\Folder:copy()
@@ -442,7 +468,172 @@ function move_mautic_core(array $status)
  */
 function move_mautic_vendors(array $status)
 {
+    $errorLog = array();
+
+    // If there isn't even a vendor directory, just skip this step
+    if (!is_dir(MAUTIC_UPGRADE_ROOT . '/vendor')) {
+        $status['complete']                      = true;
+        $status['stepStatus']                    = 'Success';
+        $status['nextStep']                      = 'Clearing Application Cache';
+        $status['nextStepStatus']                = 'In Progress';
+        $status['updateState']['vendorComplete'] = true;
+
+        return $status;
+    }
+
+    // Initialize the vendor state if it isn't
+    if (!isset($status['updateState']['completedVendors'])) {
+        $status['updateState']['completedVendors'] = array();
+    }
+
+    // Symfony is the largest of our vendors, we will process it first
+    if (is_dir(MAUTIC_UPGRADE_ROOT . '/vendor/symfony') && !isset($status['updateState']['completedVendors']['symfony'])) {
+        // Initialize the Symfony state if it isn't, this step will recurse
+        if (!isset($status['updateState']['completedSymfony'])) {
+            $status['updateState']['completedSymfony'] = array();
+        }
+
+        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
+
+        // Sanity check, make sure there are actually directories here to process
+        $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/symfony/*', GLOB_ONLYDIR);
+
+        if (count($dirs)) {
+            $count     = 0;
+            $completed = true;
+
+            /** @var DirectoryIterator $directory */
+            foreach ($iterator as $directory) {
+                // Exit the loop if the count has reached 5
+                if ($count === 5) {
+                    $completed = false;
+                    break;
+                }
+
+                // Sanity checks
+                if (!$directory->isDot() && $directory->isDir()) {
+                    // Don't process this directory if we've already tried it
+                    if (isset($status['updateState']['completedSymfony'][$directory->getFilename()])) {
+                        continue;
+                    }
+
+                    $src  = $directory->getPath() . '/' . $directory->getFilename();
+                    $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+                    $result = copy_directory($src, $dest);
+
+                    if ($result !== true) {
+                        if (is_array($result)) {
+                            $errorLog += $result;
+                        } else {
+                            $errorLog[] = $result;
+                        }
+                    }
+
+                    $deleteDir = recursive_remove_directory($src);
+
+                    if (!$deleteDir) {
+                        $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+                    }
+
+                    $status['updateState']['completedSymfony'][$directory->getFilename()] = true;
+                    $count++;
+                }
+            }
+        }
+
+        if ($completed) {
+            $status['updateState']['completedVendors']['symfony'] = true;
+
+            // At this point, there shouldn't be any Symfony code remaining; nuke the folder
+            $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
+
+            if (!$deleteDir) {
+                $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/vendor/symfony');
+            }
+        }
+
+        process_error_log($errorLog);
+
+        // If we haven't finished Symfony yet, throw a response back to repeat the step
+        if (!isset($status['updateState']['completedVendors']['symfony'])) {
+            return $status;
+        }
+    }
+
+    // Once we've gotten here, we can safely iterate through the rest of the vendor directory; the rest of the contents are rather small in size
+    $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor');
+
+    // Sanity check, make sure there are actually directories here to process
+    $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/*', GLOB_ONLYDIR);
+
+    if (count($dirs)) {
+        $count     = 0;
+        $completed = true;
+
+        /** @var DirectoryIterator $directory */
+        foreach ($iterator as $directory) {
+            // Exit the loop if the count has reached 5
+            if ($count === 5) {
+                $completed = false;
+                break;
+            }
+
+            // Sanity checks
+            if (!$directory->isDot() && $directory->isDir()) {
+                // Don't process this directory if we've already tried it
+                if (isset($status['updateState']['completedVendors'][$directory->getFilename()])) {
+                    continue;
+                }
+
+                $src  = $directory->getPath() . '/' . $directory->getFilename();
+                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+                $result = copy_directory($src, $dest);
+
+                if ($result !== true) {
+                    if (is_array($result)) {
+                        $errorLog += $result;
+                    } else {
+                        $errorLog[] = $result;
+                    }
+                }
+
+                $deleteDir = recursive_remove_directory($src);
+
+                if (!$deleteDir) {
+                    $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+                }
+
+                $status['updateState']['completedVendors'][$directory->getFilename()] = true;
+                $count++;
+            }
+        }
+    }
+
+    if ($completed) {
+        $status['updateState']['vendorComplete'] = true;
+
+        // At this point, there shouldn't be any vendors remaining; nuke the folder
+        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/vendor');
+
+        if (!$deleteDir) {
+            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/vendor');
+        }
+    }
+
+    process_error_log($errorLog);
+
+    // If we haven't finished the vendors yet, throw a response back to repeat the step
+    if (!$status['updateState']['vendorComplete']) {
+        return $status;
+    }
+
+    // Once we get here, we have finished the moving files step; notifiy Mautic of this
     $status['complete']                      = true;
+    $status['stepStatus']                    = 'Success';
+    $status['nextStep']                      = 'Clearing Application Cache';
+    $status['nextStepStatus']                = 'In Progress';
     $status['updateState']['vendorComplete'] = true;
 
     return $status;
@@ -556,11 +747,11 @@ function remove_mautic_deleted_files(array $status)
             $path = MAUTIC_ROOT . '/' . $file;
 
             // Try setting the permissions to 777 just to make sure we can get rid of the file
-            @chmod($file, 0777);
+            @chmod($path, 0777);
 
-            if (!@unlink($file)) {
+            if (!@unlink($path)) {
                 // Failed to delete, reset the permissions to 644 for safety
-                @chmod($file, 0644);
+                @chmod($path, 0644);
 
                 $errorLog[] = sprintf(
                     'Failed removing the file at %s from the production path.  As this is a deleted file, you can manually remove this file.',
@@ -601,6 +792,7 @@ $state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
 if (empty($state)) {
     $state['addonComplete']  = false;
     $state['bundleComplete'] = false;
+    $state['cacheComplete']  = false;
     $state['coreComplete']   = false;
     $state['vendorComplete'] = false;
 }
@@ -623,6 +815,10 @@ switch ($task) {
 
     case 'moveVendors':
         $status = move_mautic_vendors($status);
+        break;
+
+    case 'clearCache':
+        $status = clear_mautic_cache($status);
         break;
 
     default:

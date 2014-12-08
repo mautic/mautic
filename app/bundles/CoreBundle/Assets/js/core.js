@@ -1630,7 +1630,36 @@ var Mautic = {
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         } else if (response.complete) {
                             // If complete then we go into the next step
+                            mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-cache-status">' + response.nextStepStatus + '</td></tr>');
                             Mautic.processUpdate(container, step + 1, response.updateState);
+                        } else {
+                            // In this section, the step hasn't completed yet so we repeat it
+                            Mautic.processUpdate(container, step, response.updateState);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Clear the application cache
+            case 7:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: baseUrl + 'upgrade/upgrade.php?task=clearCache&updateState=' + state,
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('td[id=update-step-cache-status]').html(response.stepStatus);
+
+                        if (response.error) {
+                            // If an error state, we cannot move on
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                        } else if (response.complete) {
+                            // If complete then we go into the next step
+                            mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-database-status">' + response.nextStepStatus + '</td></tr>');
+                            //Mautic.processUpdate(container, step + 1, response.updateState);
                         } else {
                             // In this section, the step hasn't completed yet so we repeat it
                             Mautic.processUpdate(container, step, response.updateState);

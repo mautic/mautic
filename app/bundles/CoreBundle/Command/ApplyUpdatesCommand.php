@@ -56,6 +56,7 @@ EOT
     {
         $options = $input->getOptions();
         $force   = $options['force'];
+        $appRoot = dirname($this->getContainer()->getParameter('kernel.root_dir'));
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
@@ -108,7 +109,7 @@ EOT
         }
 
         // Extract the archive file now in place
-        $zipper->extractTo(dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/upgrade');
+        $zipper->extractTo($appRoot);
         $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
@@ -124,7 +125,45 @@ EOT
         ));
         $command->run($input, $output);
 
-        // TODO - Updates will include a list of deleted files, process those
+        // Make sure we have a deleted_files list otherwise we can't process this step
+        if (file_exists(__DIR__ . '/deleted_files.txt')) {
+            $deletedFiles = json_decode(file_get_contents(__DIR__ . '/deleted_files.txt'), true);
+            $errorLog     = array();
+
+            // Before looping over the deleted files, add in our upgrade specific files
+            $deletedFiles += array('deleted_files.txt', 'upgrade.php');
+
+            foreach ($deletedFiles as $file) {
+                $path = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/' . $file;
+
+                // Try setting the permissions to 777 just to make sure we can get rid of the file
+                @chmod($path, 0777);
+
+                if (!@unlink($path)) {
+                    // Failed to delete, reset the permissions to 644 for safety
+                    @chmod($path, 0644);
+
+                    $errorLog[] = sprintf(
+                        'Failed removing the file at %s.  As this is a deleted file, you can manually remove this file.',
+                        $file
+                    );
+                }
+            }
+
+            // If there were any errors, add them to the error log
+            if (count($errorLog)) {
+                // Check if the error log exists first
+                if (file_exists($appRoot . '/upgrade_errors.txt')) {
+                    $errors = file_get_contents($appRoot . '/upgrade_errors.txt');
+                } else {
+                    $errors = '';
+                }
+
+                $errors .= implode(PHP_EOL, $errorLog);
+
+                @file_put_contents($appRoot . '/upgrade_errors.txt', $errors);
+            }
+        }
 
         // Migrate the database to the current version
         $command = $this->getApplication()->find('doctrine:migrations:migrate');
