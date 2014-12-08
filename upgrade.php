@@ -359,6 +359,31 @@ function move_mautic_core(array $status)
         }
     }
 
+    // Move bin folder contents now
+    if (is_dir(MAUTIC_UPGRADE_ROOT . '/bin')) {
+        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . '/bin');
+
+        /** @var FilesystemIterator $file */
+        foreach ($iterator as $file) {
+            // Sanity checks
+            if ($file->isFile()) {
+                $src  = $file->getPath() . '/' . $file->getFilename();
+                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+                if (!@rename($src, $dest)) {
+                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+                }
+            }
+        }
+
+        // At this point, we can remove the app directory
+        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/bin');
+
+        if (!$deleteDir) {
+            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/bin');
+        }
+    }
+
     // Move media files if any
     if (is_dir(MAUTIC_UPGRADE_ROOT . '/media')) {
         $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/media');
@@ -620,6 +645,11 @@ function move_mautic_vendors(array $status)
     if ($completed) {
         $status['updateState']['vendorComplete'] = true;
 
+        // Move the autoload.php file over now
+        if (!@rename(MAUTIC_UPGRADE_ROOT . '/vendor/autoload.php', MAUTIC_ROOT . '/vendor/autoload.php')) {
+            $errorLog[] = 'Could not move file /vendor/autoload.php to production.';
+        }
+
         // At this point, there shouldn't be any vendors remaining; nuke the folder
         $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/vendor');
 
@@ -752,17 +782,20 @@ function remove_mautic_deleted_files(array $status)
         foreach ($deletedFiles as $file) {
             $path = MAUTIC_ROOT . '/' . $file;
 
-            // Try setting the permissions to 777 just to make sure we can get rid of the file
-            @chmod($path, 0777);
+            // If it doesn't exist, don't even bother
+            if (file_exists($path)) {
+                // Try setting the permissions to 777 just to make sure we can get rid of the file
+                @chmod($path, 0777);
 
-            if (!@unlink($path)) {
-                // Failed to delete, reset the permissions to 644 for safety
-                @chmod($path, 0644);
+                if (!@unlink($path)) {
+                    // Failed to delete, reset the permissions to 644 for safety
+                    @chmod($path, 0644);
 
-                $errorLog[] = sprintf(
-                    'Failed removing the file at %s from the production path.  As this is a deleted file, you can manually remove this file.',
-                    $file
-                );
+                    $errorLog[] = sprintf(
+                        'Failed removing the file at %s from the production path.  As this is a deleted file, you can manually remove this file.',
+                        $file
+                    );
+                }
             }
         }
     } else {
