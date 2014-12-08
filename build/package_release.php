@@ -62,10 +62,17 @@ $modifiedFiles = array();
 // Build an array of paths which we won't ever distro, this is used for the update packages
 $doNotPackage  = array('.gitignore', 'app/phpunit.xml.dist', 'build', 'composer.json', 'composer.lock', 'Gruntfile.js', 'index_dev.php', 'package.json', 'upgrade.php');
 
+// Create a flag to check if the vendors changed
+$vendorsChanged = false;
+
 foreach ($fileDiff as $file) {
     $filename = substr($file, 2);
     $folderPath = explode('/', $file);
     $folderName = $folderPath[0];
+
+    if (!$vendorsChanged && $filename == 'composer.lock') {
+        $vendorsChanged = true;
+    }
 
     if (!in_array($filename, $doNotPackage) && !in_array($folderName, $doNotPackage)) {
         if (substr($file, 0, 1) == 'D') {
@@ -79,6 +86,11 @@ foreach ($fileDiff as $file) {
 // Add our update files to the $modifiedFiles array so they get packaged
 $modifiedFiles['deleted_files.txt'] = true;
 $modifiedFiles['upgrade.php'] = true;
+
+// Package the vendor folder if the lock changed
+if ($vendorsChanged) {
+    $modifiedFiles['vendor/'] = true;
+}
 
 $filePut = array_keys($modifiedFiles);
 sort($filePut);
