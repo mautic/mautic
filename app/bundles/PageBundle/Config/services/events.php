@@ -64,3 +64,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.page.calendarbundle.subscriber',
+    new Definition(
+        'Mautic\PageBundle\EventListener\CalendarSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
