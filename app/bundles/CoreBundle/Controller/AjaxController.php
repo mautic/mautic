@@ -416,6 +416,22 @@ class AjaxController extends CommonController
         $translator = $this->factory->getTranslator();
         $result     = 0;
 
+        // Also do the last bit of filesystem cleanup from the upgrade here
+        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
+            $iterator = new \FilesystemIterator(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade', \FilesystemIterator::SKIP_DOTS);
+
+            /** @var \FilesystemIterator $file */
+            foreach ($iterator as $file) {
+                // Sanity checks
+                if ($file->isFile()) {
+                    @unlink($file->getPath() . '/' . $file->getFilename());
+                }
+            }
+
+            // Should be empty now, nuke the folder
+            @rmdir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
+        }
+
         $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
