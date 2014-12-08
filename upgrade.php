@@ -377,6 +377,46 @@ function recursive_remove_directory($directory)
  */
 function remove_mautic_deleted_files(array $status)
 {
+    $errorLog = array();
+
+    // Make sure we have a deleted_files list otherwise we can't process this step
+    if (file_exists(__DIR__ . '/deleted_files.txt')) {
+        $deletedFiles = json_decode(file_get_contents(__DIR__ . '/deleted_files.txt'), true);
+
+        foreach ($deletedFiles as $file) {
+            $path = MAUTIC_ROOT . '/' . $file;
+
+            // Try setting the permissions to 777 just to make sure we can get rid of the file
+            @chmod($file, 0777);
+
+            if (!@unlink($file)) {
+                // Failed to delete, reset the permissions to 644 for safety
+                @chmod($file, 0644);
+
+                $errorLog[] = sprintf(
+                    'Failed removing the file at %s from the production path.  As this is a deleted file, you can manually remove this file.',
+                    $file
+                );
+            }
+        }
+    } else {
+        $errorLog[] = 'The file containing the list of deleted files was not found, could not process the deleted file list.';
+    }
+
+    // If there were any errors, add them to the error log
+    if (count($errorLog)) {
+        // Check if the error log exists first
+        if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
+            $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
+        } else {
+            $errors = '';
+        }
+
+        $errors .= implode(PHP_EOL, $errorLog);
+
+        @file_put_contents(MAUTIC_UPGRADE_ERROR_LOG, $errors);
+    }
+
     $status['complete']                    = true;
     $status['updateState']['coreComplete'] = true;
 
