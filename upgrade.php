@@ -155,19 +155,7 @@ function move_mautic_bundles(array $status)
             $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/addons');
         }
 
-        // If there were any errors, add them to the error log
-        if (count($errorLog)) {
-            // Check if the error log exists first
-            if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
-                $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
-            } else {
-                $errors = '';
-            }
-
-            $errors .= implode(PHP_EOL, $errorLog);
-
-            @file_put_contents(MAUTIC_UPGRADE_ERROR_LOG, $errors);
-        }
+        process_error_log($errorLog);
 
         $status['updateState']['addonComplete'] = true;
 
@@ -242,19 +230,7 @@ function move_mautic_bundles(array $status)
             }
         }
 
-        // If there were any errors, add them to the error log
-        if (count($errorLog)) {
-            // Check if the error log exists first
-            if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
-                $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
-            } else {
-                $errors = '';
-            }
-
-            $errors .= implode(PHP_EOL, $errorLog);
-
-            @file_put_contents(MAUTIC_UPGRADE_ERROR_LOG, $errors);
-        }
+        process_error_log($errorLog);
 
         // If we haven't finished the bundles yet, throw a response back to repeat the step
         if (!$status['updateState']['bundleComplete']) {
@@ -280,6 +256,8 @@ function move_mautic_bundles(array $status)
  */
 function move_mautic_core(array $status)
 {
+    $errorLog = array();
+
     // In this step, we'll also go ahead and remove deleted files, return the results from that
     return remove_mautic_deleted_files($status);
 }
@@ -301,6 +279,30 @@ function move_mautic_vendors(array $status)
     $status['updateState']['vendorComplete'] = true;
 
     return $status;
+}
+
+/**
+ * Processes the error log for each step
+ *
+ * @param array $errorLog
+ *
+ * @return void
+ */
+function process_error_log(array $errorLog)
+{
+    // If there were any errors, add them to the error log
+    if (count($errorLog)) {
+        // Check if the error log exists first
+        if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
+            $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
+        } else {
+            $errors = '';
+        }
+
+        $errors .= implode(PHP_EOL, $errorLog);
+
+        @file_put_contents(MAUTIC_UPGRADE_ERROR_LOG, $errors);
+    }
 }
 
 /**
@@ -403,19 +405,7 @@ function remove_mautic_deleted_files(array $status)
         $errorLog[] = 'The file containing the list of deleted files was not found, could not process the deleted file list.';
     }
 
-    // If there were any errors, add them to the error log
-    if (count($errorLog)) {
-        // Check if the error log exists first
-        if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
-            $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
-        } else {
-            $errors = '';
-        }
-
-        $errors .= implode(PHP_EOL, $errorLog);
-
-        @file_put_contents(MAUTIC_UPGRADE_ERROR_LOG, $errors);
-    }
+    process_error_log($errorLog);
 
     $status['complete']                    = true;
     $status['updateState']['coreComplete'] = true;
