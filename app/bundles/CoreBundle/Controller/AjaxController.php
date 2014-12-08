@@ -13,6 +13,8 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -396,6 +398,36 @@ class AjaxController extends CommonController
             $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
             $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
             $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Migrate the database to the latest version
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateDatabaseMigrationAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        $env         = $this->factory->getEnvironment();
+        $noDebug     = ($env == 'prod') ? ' --no-debug' : '';
+        $input       = new ArgvInput(array('console', 'doctrine:migrations:migrate', '--no-interaction --env=' . $env . $noDebug));
+        $application = new Application($this->get('kernel'));
+        $application->setAutoExit(false);
+        $result = $application->run($input);
+
+        if ($result !== 0) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.error_performing_migration'));
+        } else {
+            $dataArray['success'] = 1;
+            $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
         }
 
         return $this->sendJsonResponse($dataArray);

@@ -1659,10 +1659,30 @@ var Mautic = {
                         } else if (response.complete) {
                             // If complete then we go into the next step
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-database-status">' + response.nextStepStatus + '</td></tr>');
-                            //Mautic.processUpdate(container, step + 1, response.updateState);
+                            Mautic.processUpdate(container, step + 1, response.updateState);
                         } else {
                             // In this section, the step hasn't completed yet so we repeat it
                             Mautic.processUpdate(container, step, response.updateState);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Migrate the database
+            case 8:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl + '?action=core:updateDatabaseMigration',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            mQuery('div[id=' + container + ']').html('<div class="alert alert-mautic">' + response.message + '</div>');
+                        } else {
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         }
                     },
                     error: function (request, textStatus, errorThrown) {
