@@ -165,17 +165,21 @@ EOT
             }
         }
 
-        // Migrate the database to the current version
-        $command = $this->getApplication()->find('doctrine:migrations:migrate');
-        $input = new ArrayInput(array(
-            'command'          => 'doctrine:migrations:migrate',
-            '--env'            => $options['env'],
-            '--no-interaction' => true
-        ));
-        $exitCode = $command->run($input, $output);
+        // Migrate the database to the current version if migrations exist
+        $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
 
-        if ($exitCode !== 0) {
-            $output->writeln('<error>' . $translator->trans('mautic.core.update.error_performing_migration') . '</error>');
+        if (iterator_count($iterator)) {
+            $command = $this->getApplication()->find('doctrine:migrations:migrate');
+            $input = new ArrayInput(array(
+                'command'          => 'doctrine:migrations:migrate',
+                '--env'            => $options['env'],
+                '--no-interaction' => true
+            ));
+            $exitCode = $command->run($input, $output);
+
+            if ($exitCode !== 0) {
+                $output->writeln('<error>' . $translator->trans('mautic.core.update.error_performing_migration') . '</error>');
+            }
         }
 
         // Clear the cached update data and the download package now that we've updated

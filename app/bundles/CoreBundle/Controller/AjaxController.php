@@ -414,13 +414,18 @@ class AjaxController extends CommonController
     {
         $dataArray  = array('success' => 0);
         $translator = $this->factory->getTranslator();
+        $result     = 0;
 
-        $env         = $this->factory->getEnvironment();
-        $noDebug     = ($env == 'prod') ? ' --no-debug' : '';
-        $input       = new ArgvInput(array('console', 'doctrine:migrations:migrate', '--no-interaction --env=' . $env . $noDebug));
-        $application = new Application($this->get('kernel'));
-        $application->setAutoExit(false);
-        $result = $application->run($input);
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+
+        if (iterator_count($iterator)) {
+            $env         = $this->factory->getEnvironment();
+            $noDebug     = ($env == 'prod') ? ' --no-debug' : '';
+            $input       = new ArgvInput(array('console', 'doctrine:migrations:migrate', '--no-interaction --env=' . $env . $noDebug));
+            $application = new Application($this->get('kernel'));
+            $application->setAutoExit(false);
+            $result = $application->run($input);
+        }
 
         if ($result !== 0) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
