@@ -420,8 +420,13 @@ class AjaxController extends CommonController
 
         if (iterator_count($iterator)) {
             $env         = $this->factory->getEnvironment();
-            $noDebug     = ($env == 'prod') ? ' --no-debug' : '';
-            $input       = new ArgvInput(array('console', 'doctrine:migrations:migrate', '--no-interaction --env=' . $env . $noDebug));
+            $args        = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=' . $env);
+
+            if ($env == 'prod') {
+                $args[] = '--no-debug';
+            }
+
+            $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
             $result = $application->run($input);

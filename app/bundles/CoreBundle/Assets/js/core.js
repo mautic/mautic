@@ -1681,6 +1681,7 @@ var Mautic = {
                         if (response.success) {
                             mQuery('div[id=' + container + ']').html('<div class="alert alert-mautic">' + response.message + '</div>');
                         } else {
+                            mQuery('td[id=update-step-database-status]').html(response.stepStatus);
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         }
