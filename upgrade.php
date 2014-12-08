@@ -38,12 +38,12 @@ function copy_directory($src, $dest)
     // Make sure the destination exists
     if (!is_dir($dest)) {
         if (!@mkdir($dest, 0755)) {
-            return sprintf('Could not copy files from %s to production since the folder could not be created.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+            return sprintf('Could not move files from %s to production since the folder could not be created.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
         }
     }
 
     if (!($dh = @opendir($src))) {
-        return sprintf('Could not read directory %s to copy files.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+        return sprintf('Could not read directory %s to move files.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
     }
 
     // Walk through the directory copying files and recursing into folders.
@@ -67,8 +67,8 @@ function copy_directory($src, $dest)
                 break;
 
             case 'file':
-                if (!@copy($sfid, $dfid)) {
-                    $errorLog[] = sprintf('Could not copy file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $sfid));
+                if (!@rename($sfid, $dfid)) {
+                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $sfid));
                 }
                 break;
         }
@@ -257,6 +257,9 @@ function move_mautic_bundles(array $status)
 function move_mautic_core(array $status)
 {
     $errorLog = array();
+
+    //
+    process_error_log($errorLog);
 
     // In this step, we'll also go ahead and remove deleted files, return the results from that
     return remove_mautic_deleted_files($status);
