@@ -40,6 +40,9 @@ system($systemGit . ' archive ' . $version . ' | tar -x -C ' . __DIR__ . '/packa
 chdir(__DIR__);
 system('cd ' . __DIR__ . '/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
 
+// Generate the bootstrap.php.cache file
+system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
+
 // Common steps
 include_once __DIR__ . '/processfiles.php';
 
@@ -90,6 +93,7 @@ $modifiedFiles['upgrade.php'] = true;
 // Package the vendor folder if the lock changed
 if ($vendorsChanged) {
     $modifiedFiles['vendor/'] = true;
+    $modifiedFiles['app/bootstrap.php.cache'] = true;
 }
 
 $filePut = array_keys($modifiedFiles);
