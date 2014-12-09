@@ -150,6 +150,14 @@ class UpdateHelper
             );
         }
 
+        // Last sanity check, if the $update->version is older than our current version
+        if (version_compare($this->factory->getVersion(), $update->version, 'ge')) {
+            return array(
+                'error'   => false,
+                'message' => 'mautic.core.updater.running.latest.version'
+            );
+        }
+
         // The user is able to update to the latest version, cache the data first
         $data = array(
             'error'        => false,
