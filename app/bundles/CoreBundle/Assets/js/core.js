@@ -1375,8 +1375,6 @@ var Mautic = {
         var otherButton = isPublishButton ? '.btn-unpublish' : '.btn-publish';
         var otherLabel  = mQuery(changedId).parent().parent().find(otherButton);
 
-        console.log(changedId, isPublishButton, otherButton, otherLabel);
-
         if (mQuery(changedId).prop('checked')) {
             var thisRemove = 'btn-default',
                 otherAdd = 'btn-default';
@@ -1397,7 +1395,6 @@ var Mautic = {
                     otherRemove = 'btn-success';
             }
         }
-        console.log(isPublishButton, thisAdd, thisRemove, otherAdd, otherRemove);
         mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
         mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
     },
@@ -1458,7 +1455,12 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        console.log(request);
+        var inDevMode = typeof mauticEnv !== 'undefined' && mauticEnv == 'dev';
+
+        if (inDevMode) {
+            console.log(request);
+        }
+
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
         } else {
@@ -1485,10 +1487,7 @@ var Mautic = {
             if (mQuery('.modal.in  .loading-placeholder').length) {
                 mQuery('.modal.in  .loading-placeholder').addClass('hide');
             }
-
-        } else if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
-            console.log(request);
-
+        } else if (inDevMode) {
             if (response.error) {
                 var error = response.error.code + ': ' + errorThrown + '; ' + response.error.exception;
                 alert(error);

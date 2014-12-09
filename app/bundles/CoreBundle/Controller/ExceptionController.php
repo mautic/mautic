@@ -55,11 +55,12 @@ class ExceptionController extends CommonController
                 $template = "MauticCoreBundle:{$layout}:base.html.php";
             }
 
+            $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
             return $this->delegateView(array(
                 'viewParameters'  => array(
                     'baseTemplate'   => $baseTemplate,
                     'status_code'    => $code,
-                    'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'status_text'    => $statusText,
                     'exception'      => $exception,
                     'logger'         => $logger,
                     'currentContent' => $currentContent,
@@ -69,8 +70,8 @@ class ExceptionController extends CommonController
                 'passthroughVars' => array(
                     'error' => array(
                         'code'      => $code,
-                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                        'exception' => $exception->getMessage(),
+                        'text'      => $statusText,
+                        'exception' => ($env == 'dev') ? $statusText : '',
                         'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
                     )
                 )
