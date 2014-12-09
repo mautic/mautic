@@ -1530,7 +1530,7 @@ var Mautic = {
      */
     processUpdate: function(container, step, state) {
         // Edge case but do it anyway, remove the /index_dev.php from mauticBaseUrl to make sure we can always correctly call the standalone upgrader
-        var baseUrl = mauticBaseUrl.replace('/index_dev.php', '');
+        var baseUrl = mauticBasePath + '/';
 
         switch (step) {
             // Set the update page layout
