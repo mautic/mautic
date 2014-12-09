@@ -39,13 +39,15 @@ $view['slots']->set("headerTitle", $header);
 
 			<div class="form-group mb-0">
 			    <div class="row">
-			        <div class="col-sm-6">
+			        <div class="col-sm-6<?php echo (count($form['role']->vars['errors'])) ? ' has-error' : ''; ?>">
 			        	<label class="control-label mb-xs"><?php echo $view['form']->label($form['role']); ?></label>
 			            <?php echo $view['form']->widget($form['role'], array('attr' => array('placeholder' => $form['role']->vars['label']))); ?>
+                        <?php echo $view['form']->errors($form['role']); ?>
 			        </div>
-			        <div class="col-sm-6">
+			        <div class="col-sm-6<?php echo (count($form['position']->vars['errors'])) ? ' has-error' : ''; ?>">
 				    	<label class="control-label mb-xs"><?php echo $view['form']->label($form['position']); ?></label>
 			            <?php echo $view['form']->widget($form['position'], array('attr' => array('placeholder' => $form['position']->vars['label']))); ?>
+                        <?php echo $view['form']->errors($form['position']); ?>
 			        </div>
 			    </div>
 			</div>
@@ -55,13 +57,15 @@ $view['slots']->set("headerTitle", $header);
 				<div class="panel-body">
 				    <div class="row">
 				        <div class="col-sm-6">
-				        	<div class="form-group col-xs-12">
+				        	<div class="form-group col-xs-12<?php echo (count($form['username']->vars['errors'])) ? ' has-error' : ''; ?>">
 				        		<label class="control-label mb-xs"><?php echo $view['form']->label($form['username']); ?></label>
 				            	<?php echo $view['form']->widget($form['username'], array('attr' => array('placeholder' => $form['username']->vars['label']))); ?>
+                                <?php echo $view['form']->errors($form['username']); ?>
 				            </div>
-							<div class="form-group col-xs-12">
+							<div class="form-group col-xs-12<?php echo (count($form['email']->vars['errors'])) ? ' has-error' : ''; ?>">
 					    		<label class="control-label mb-xs"><?php echo $view['form']->label($form['email']); ?></label>
 				            	<?php echo $view['form']->widget($form['email'], array('attr' => array('placeholder' => $form['email']->vars['label']))); ?>
+                                <?php echo $view['form']->errors($form['email']); ?>
 				            </div>
 				        </div>
 				        <div class="col-sm-6">
