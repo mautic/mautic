@@ -432,6 +432,15 @@ class AjaxController extends CommonController
             @rmdir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
         }
 
+        // Cleanup the update cache data now too
+        if (file_exists($this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt')) {
+            @unlink($this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt');
+        }
+
+        if (file_exists($this->factory->getParameter('cache_path') . '/' . $this->factory->getVersion() . '.zip')) {
+            @unlink($this->factory->getParameter('cache_path') . '/' . $this->factory->getVersion() . '.zip');
+        }
+
         $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
