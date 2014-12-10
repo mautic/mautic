@@ -78,6 +78,7 @@ class InstallController extends CommonController
                             'majors'  => $majors,
                             'minors'  => $minors,
                             'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                            'configFile' => $this->factory->getLocalConfigFile()
                         ),
                         'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
                         'contentTemplate'   => $step->getTemplate(),
@@ -170,6 +171,7 @@ class InstallController extends CommonController
                                 'majors'  => $majors,
                                 'minors'  => $minors,
                                 'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                'configFile' => $this->factory->getLocalConfigFile()
                             ),
                             'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
                             'contentTemplate'   => $step->getTemplate(),
@@ -198,6 +200,7 @@ class InstallController extends CommonController
                                 'majors'  => $majors,
                                 'minors'  => $minors,
                                 'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                'configFile' => $this->factory->getLocalConfigFile()
                             ),
                             'returnUrl'         => $action,
                             'contentTemplate'   => $nextStep->getTemplate(),
@@ -232,7 +235,7 @@ class InstallController extends CommonController
                         'viewParameters'    => array(
                             'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
                             'parameters'  => $configurator->render(),
-                            'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
+                            'config_path' => $this->factory->getLocalConfigFile(),
                             'is_writable' => $configurator->isFileWritable(),
                             'version'     => $this->factory->getVersion(),
                             'tmpl'        => $tmpl,
@@ -263,6 +266,7 @@ class InstallController extends CommonController
                 'majors'  => $majors,
                 'minors'  => $minors,
                 'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                'configFile' => $this->factory->getLocalConfigFile(),
                 'completedSteps' => $completedSteps
             ),
             'contentTemplate' => $step->getTemplate(),
@@ -295,7 +299,7 @@ class InstallController extends CommonController
             'viewParameters'  => array(
                 'welcome_url' => $welcomeUrl,
                 'parameters'  => $configurator->render(),
-                'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
+                'config_path' => $this->factory->getLocalConfigFile(),
                 'is_writable' => $configurator->isFileWritable(),
                 'version'     => $this->factory->getVersion(),
                 'tmpl'        => $tmpl,
@@ -317,7 +321,8 @@ class InstallController extends CommonController
     private function checkIfInstalled ()
     {
         // If the config file doesn't even exist, no point in checking further
-        if (file_exists($this->container->getParameter('kernel.root_dir') . '/config/local.php')) {
+        $localConfigFile = $this->factory->getLocalConfigFile();
+        if (file_exists($localConfigFile)) {
             /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
             $configurator = $this->container->get('mautic.configurator');
             $params       = $configurator->getParameters();

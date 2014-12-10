@@ -132,7 +132,11 @@ class ConfigController extends FormController
             $doNotChange = array_merge($doNotChange, array('transifex_username', 'transifex_password'));
         }
         // Import the current local configuration, $parameters is defined in this file
-        require $this->container->getParameter('kernel.root_dir') . '/config/local.php';
+        $localConfigFile = $this->factory->getLocalConfigFile();
+
+        /** @var $parameters */
+        include $localConfigFile;
+
         $localParams = $parameters;
 
         $params = array();

@@ -345,7 +345,8 @@ class CommonController extends Controller implements MauticController
         $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
         $cacheDir = $this->factory->getSystemPath('cache', true);
 
-        $cacheFile = "$cacheDir/$env/app".ucfirst($env)."{$debug}ProjectContainer.php";
+        $cacheFile = "$cacheDir/app".ucfirst($env)."{$debug}ProjectContainer.php";
+
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
         }

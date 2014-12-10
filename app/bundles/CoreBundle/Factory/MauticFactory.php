@@ -350,7 +350,8 @@ class MauticFactory
     }
 
     /**
-     * Get the full path to specified area
+     * Get the path to specified area.  Returns relative by default with the exception of cache and log
+     * which will be absolute regardless of $fullPath setting
      *
      * @param string $name
      * @param bool   $fullPath
@@ -365,6 +366,9 @@ class MauticFactory
         if ($name == 'currentTheme') {
             $theme = $this->getParameter('theme');
             $path  = $paths['themes'] . "/$theme";
+        } elseif ($name == 'cache' || $name == 'log') {
+            //these are absolute regardless as they are configurable
+            return $this->container->getParameter("kernel.{$name}_dir");
         } elseif (isset($paths[$name])) {
             $path  = $paths[$name];
         } else {
@@ -372,6 +376,20 @@ class MauticFactory
         }
 
         return ($fullPath) ? $paths['root'] . '/' . $path : $path;
+    }
+
+    /**
+     * Returns local config file path
+     *
+     * @param bool $checkExists If true, returns false if file doesn't exist
+     *
+     * @return bool
+     */
+    public function getLocalConfigFile($checkExists = true)
+    {
+        /** @var \AppKernel $kernel */
+        $kernel = $this->container->get('kernel');
+        return $kernel->getLocalConfigFile($checkExists);
     }
 
     /**
