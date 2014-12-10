@@ -443,4 +443,4 @@ system('rm vendor/webfactory/exceptions-bundle/UPGRADING.md');
 system('find . -type d -name .git -exec rm -rf {} \\;');
 
 // Find any .DS_Store files and nuke them
-system('find . -type d -name .DS_Store -exec rm -rf {} \\;');
+system('find . -name .DS_Store -exec rm -rf {} \\;');
