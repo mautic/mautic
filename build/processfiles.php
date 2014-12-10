@@ -22,6 +22,7 @@ system('rm -rf app/cache');
 system('rm app/config/config_dev.php');
 system('rm app/config/config_test.php');
 system('rm app/config/local*.php');
+system('rm app/config/*_local.php');
 system('rm app/config/routing_dev.php');
 system('rm app/config/security_test.php');
 system('rm app/migrations/Version20141102181850.php');
@@ -440,3 +441,6 @@ system('rm vendor/webfactory/exceptions-bundle/UPGRADING.md');
 
 // Find any .git directories and nuke them
 system('find . -type d -name .git -exec rm -rf {} \\;');
+
+// Find any .DS_Store files and nuke them
+system('find . -type d -name .DS_Store -exec rm -rf {} \\;');
