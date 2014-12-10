@@ -486,16 +486,22 @@ class Asset extends FormEntity
 
     public function preUpload()
     {
-        if (null !== $this->getFile()) {
-            $this->setOriginalFileName($this->getFile()->getClientOriginalName());
+        if (null !== $this->file) {
+            $this->setOriginalFileName($this->file->getClientOriginalName());
 
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
-                $this->setTitle($this->getFile()->getClientOriginalName());
+                $this->setTitle($this->file->getClientOriginalName());
             }
 
             $filename   = sha1(uniqid(mt_rand(), true));
-            $this->path = $filename . '.' . $this->getFile()->guessExtension();
+            $extension  = $this->getFile()->guessExtension();
+
+            if (empty($extension)) {
+                //get it from the original name
+                $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
+            }
+            $this->path = $filename . '.' . $extension;
         }
     }
 
@@ -508,8 +514,8 @@ class Asset extends FormEntity
 
         // move takes the target directory and then the
         // target filename to move to
-        $this->getFile()->move($this->getUploadRootDir(), $this->path);
-        $filePath = $this->getUploadRootDir() . '/' . $this->temp;
+        $this->getFile()->move($this->getUploadDir(), $this->path);
+        $filePath = $this->getUploadDir() . '/' . $this->temp;
 
         // check if we have an old asset
         if (isset($this->temp) && file_exists($filePath)) {
@@ -540,33 +546,11 @@ class Asset extends FormEntity
     {
         return null === $this->path
             ? null
-            : $this->getUploadRootDir() . '/' . $this->path;
-    }
-
-    /**
-     * Returns relative path to the file.
-     *
-     * @return string
-     */
-    public function getWebPath()
-    {
-        return null === $this->path
-            ? null
             : $this->getUploadDir() . '/' . $this->path;
     }
 
     /**
      * Returns absolute path to upload dir.
-     *
-     * @return string
-     */
-    protected function getUploadRootDir()
-    {
-        return __DIR__ . '/../../../../' . $this->getUploadDir();
-    }
-
-    /**
-     * Returns relative path to upload dir.
      *
      * @return string
      */

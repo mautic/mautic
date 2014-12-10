@@ -8,7 +8,7 @@
  */
 
 $parameters = array(
-    'upload_dir'  => 'media/files'
+    'upload_dir'  => '%kernel.root_dir%/../media/files'
 );
 
 return $parameters;
