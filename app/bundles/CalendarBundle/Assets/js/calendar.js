@@ -1,5 +1,13 @@
 //CalendarBundle
 Mautic.calendarOnLoad = function (container) {
+    Mautic.loadCalendarEvents(container);
+};
+
+Mautic.calendarModalOnLoad = function (container, response) {
+    mQuery('#calendar').fullCalendar( 'refetchEvents' );
+};
+
+Mautic.loadCalendarEvents = function (container) {
     mQuery('#calendar').fullCalendar({
         events: mauticAjaxUrl + "?action=calendar:generateData",
         eventRender: function(event, element) {
@@ -7,13 +15,13 @@ Mautic.calendarOnLoad = function (container) {
             if (event.iconClass) {
                 element.find('.fc-title').before(mQuery('<i />').addClass(event.iconClass));
             }
-        	if (event.attr) {
-        		element.attr(event.attr);
-        	}
-        	if (event.description) {
-        		element.tooltip({'title': event.description});
-        	}
-	    },
+            if (event.attr) {
+                element.attr(event.attr);
+            }
+            if (event.description) {
+                element.tooltip({'title': event.description});
+            }
+        },
         loading: function(bool) {
             // if calendar events are loaded
             if (!bool) {
@@ -26,15 +34,4 @@ Mautic.calendarOnLoad = function (container) {
             }
         }
     });
-};
-
-Mautic.calendarModalOnLoad = function (container, response) {
-    // Modal form submit
-    // var modalForm = mQuery(container + ' form');
-    // if (modalForm.length) {
-    //     modalForm.on('submit', function(e) {
-    //         mQuery(container).modal('toggle');
-    //         Mautic.calendarOnLoad('body');
-    //     });
-    // }
-};
+}
