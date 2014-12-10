@@ -261,21 +261,30 @@ class AppKernel extends Kernel
      */
     private function getLocalParams()
     {
-        static $parameters;
+        static $localParameters;
 
-        if (!is_array($parameters)) {
+        if (!is_array($localParameters)) {
             /** @var $paths */
             $root = $this->getRootDir();
             include $root . '/config/paths.php';
 
             if ($configFile = $this->getLocalConfigFile()) {
+                /** @var $parameters */
                 include $configFile;
+                $localParameters = $parameters;
             } else {
-                $parameters = array();
+                $localParameters = array();
+            }
+
+            //check for parameter overrides
+            if (file_exists($root . '/config/parameters_local.php')) {
+                /** @var $parameters */
+                include $root . '/config/parameters_local.php';
+                $localParameters = array_merge($localParameters, $parameters);
             }
         }
 
-        return $parameters;
+        return $localParameters;
     }
 
     /**

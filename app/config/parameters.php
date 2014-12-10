@@ -62,6 +62,14 @@ if (isset($paths['local_config'])) {
     }
 }
 
+//force local specific params
+if (file_exists(__DIR__ . '/parameters_local.php')) {
+    include __DIR__ . '/parameters_local.php';
+
+    //override default with forced
+    $mauticParams = array_merge($mauticParams, $parameters);
+}
+
 //Set the paths
 $mauticParams['paths'] = $paths;
 
