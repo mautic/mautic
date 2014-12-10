@@ -119,7 +119,9 @@ class CoreSubscriber extends CommonSubscriber
             $session->remove('mautic.user');
         }
 
+        //set a couple variables used by Ckeditor's filemanager
         $session->set('mautic.basepath', $event->getRequest()->getBasePath());
+        $session->set('mautic.imagepath', $this->factory->getParameter('image_path'));
     }
 
     /**

@@ -44,8 +44,21 @@ function auth() {
 // 	$fm = new Filemanager($config);
 // }
 
+$userDir = $_SESSION['_sf2_attributes']['mautic.imagepath'];
+$baseDir = $_SESSION['_sf2_attributes']['mautic.basepath'];
 
-// we instantiate the Filemanager
+if (substr($userDir, -1) !== '/') {
+    $userDir .= '/';
+}
+
+if (substr($userDir, 0, 1) !== '/') {
+    $userDir = '/' . $userDir;
+}
+
+if ($baseDir) {
+    $userDir = $baseDir . $userDir;
+}
+
 $fm = new Filemanager();
-$fm->setFileRoot($_SESSION['_sf2_attributes']['mautic.basepath']);
+$fm->setFileRoot($userDir);
 ?>

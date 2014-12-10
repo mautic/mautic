@@ -11,6 +11,7 @@ $parameters = array(
     'site_url'                     => '',
     'cache_path'                   => '%kernel.root_dir%/cache',
     'log_path'                     => '%kernel.root_dir%/logs',
+    'image_path'                   => 'media/images',
     'theme'                        => 'Mauve',
     'db_driver'                    => 'mysqli',
     'db_host'                      => 'localhost',
