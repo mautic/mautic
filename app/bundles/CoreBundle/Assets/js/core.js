@@ -1480,6 +1480,11 @@ var Mautic = {
         if (response.newContent && mainContent) {
             //an error page was returned
             mQuery('#app-content .content-body').html(response.newContent);
+            if (response.route) {
+                //update URL in address bar
+                MauticVars.manualStateChange = false;
+                History.pushState(null, "Mautic", response.route);
+            }
         } else if (response.newContent && mQuery('.modal.in').length) {
             //assume a modal was the recipient of the information
             mQuery('.modal.in .modal-body-content').html(response.newContent);

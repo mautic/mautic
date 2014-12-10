@@ -56,6 +56,10 @@ class ExceptionController extends CommonController
             }
 
             $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+
+            $url = $request->getRequestUri();
+            $urlParts = parse_url($url);
+
             return $this->delegateView(array(
                 'viewParameters'  => array(
                     'baseTemplate'   => $baseTemplate,
@@ -73,7 +77,8 @@ class ExceptionController extends CommonController
                         'text'      => $statusText,
                         'exception' => ($env == 'dev') ? $statusText : '',
                         'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
-                    )
+                    ),
+                    'route' => $urlParts['path']
                 )
             ));
         }
