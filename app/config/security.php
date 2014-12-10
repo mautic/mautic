@@ -107,3 +107,23 @@ $container->loadFromExtension('security', array(
 ));
 
 $this->import('security_api.php');
+
+// List config keys we do not want the user to change via the config UI
+$restrictedConfigFields = array(
+    'db_driver',
+    'db_host',
+    'db_table_prefix',
+    'db_name',
+    'db_user',
+    'db_password',
+    'db_path',
+    'db_port',
+    'secret'
+);
+
+// List config keys that are dev mode only
+if ($container->getParameter('kernel.environment') == 'prod') {
+    $restrictedConfigFields = array_merge($restrictedConfigFields, array('transifex_username', 'transifex_password'));
+}
+
+$container->setParameter('mautic.security.restrictedConfigFields', $restrictedConfigFields);

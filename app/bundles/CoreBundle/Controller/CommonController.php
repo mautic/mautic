@@ -212,8 +212,9 @@ class CommonController extends Controller implements MauticController
             }
 
             $updatedContent = array();
-            if (!empty($newContent))
+            if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
+            }
 
             $dataArray = array_merge(
                 $updatedContent,
@@ -251,6 +252,7 @@ class CommonController extends Controller implements MauticController
         $exception   = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
         $parameters  = array('request' => $this->request, 'exception' => $exception);
         $query       = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+
         return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
     }
 
