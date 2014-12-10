@@ -8,7 +8,8 @@
  */
 
 /*
- * Build a "production" package from the current development HEAD, this should be run after a 'composer install'
+ * Build a "production" package from the current development HEAD, this should be run after a 'composer install --no-dev --no-scripts --optimize-autoloader'
+ * to emulate a proper release package
  */
 
 $baseDir = __DIR__;
@@ -22,6 +23,19 @@ system('rm -rf packaging');
 
 // Preparation - Provision packaging space
 mkdir(__DIR__ . '/packaging');
+
+// Copy working files to packaging space
+echo "Copying files\n";
+system('cp -r ../addons packaging/');
+system('cp -r ../app packaging/');
+system('cp -r ../bin packaging/');
+system('cp -r ../media packaging/');
+system('cp -r ../themes packaging/');
+system('cp -r ../vendor packaging/');
+system('cp ../.htaccess packaging/');
+system('cp ../index.php packaging/');
+system('cp ../LICENSE.txt packaging/');
+system('cp ../robots.txt packaging/');
 
 // Common steps
 include_once __DIR__ . '/processfiles.php';

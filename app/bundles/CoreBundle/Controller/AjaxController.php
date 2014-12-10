@@ -13,6 +13,8 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -308,6 +310,159 @@ class AjaxController extends CommonController
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
             }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Sets the page layout to the update layout
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateSetUpdateLayoutAction(Request $request)
+    {
+        $dataArray = array(
+            'success' => 1,
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php')
+        );
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Downloads the update package
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateDownloadPackageAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->factory->getHelper('update');
+
+        // Fetch the update package
+        $update  = $updateHelper->fetchData();
+        $package = $updateHelper->fetchPackage($update['package']);
+
+        if ($package['error']) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $package['message']));
+        } else {
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.extracting.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Extracts the update package
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateExtractPackageAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->factory->getHelper('update');
+
+        // Fetch the package data
+        $update  = $updateHelper->fetchData();
+        $zipFile = $this->factory->getParameter('cache_path') . '/' . basename($update['package']);
+
+        $zipper = new \ZipArchive();
+        $archive = $zipper->open($zipFile);
+
+        if ($archive !== true) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.could_not_open_archive'));
+        } else {
+            // Extract the archive file now
+            $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
+            $zipper->close();
+
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Migrate the database to the latest version
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateDatabaseMigrationAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+        $result     = 0;
+
+        // Also do the last bit of filesystem cleanup from the upgrade here
+        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
+            $iterator = new \FilesystemIterator(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade', \FilesystemIterator::SKIP_DOTS);
+
+            /** @var \FilesystemIterator $file */
+            foreach ($iterator as $file) {
+                // Sanity checks
+                if ($file->isFile()) {
+                    @unlink($file->getPath() . '/' . $file->getFilename());
+                }
+            }
+
+            // Should be empty now, nuke the folder
+            @rmdir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
+        }
+
+        // Cleanup the update cache data now too
+        if (file_exists($this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt')) {
+            @unlink($this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt');
+        }
+
+        if (file_exists($this->factory->getParameter('cache_path') . '/' . $this->factory->getVersion() . '.zip')) {
+            @unlink($this->factory->getParameter('cache_path') . '/' . $this->factory->getVersion() . '.zip');
+        }
+
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+
+        if (iterator_count($iterator)) {
+            $env         = $this->factory->getEnvironment();
+            $args        = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=' . $env);
+
+            if ($env == 'prod') {
+                $args[] = '--no-debug';
+            }
+
+            $input       = new ArgvInput($args);
+            $application = new Application($this->get('kernel'));
+            $application->setAutoExit(false);
+            $result = $application->run($input);
+        }
+
+        if ($result !== 0) {
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.error_performing_migration'));
+        } else {
+            $dataArray['success'] = 1;
+            $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
         }
 
         return $this->sendJsonResponse($dataArray);

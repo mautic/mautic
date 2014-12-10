@@ -56,6 +56,7 @@ EOT
     {
         $options = $input->getOptions();
         $force   = $options['force'];
+        $appRoot = dirname($this->getContainer()->getParameter('kernel.root_dir'));
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
@@ -78,28 +79,14 @@ EOT
             }
         }
 
-        $cacheFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/lastUpdateCheck.txt';
-
-        // First things first, check to make sure cached update data exists as we pull the version info from it, otherwise run the fetch routine
-        if (!is_readable($cacheFile)) {
-            $command = $this->getApplication()->find('mautic:update:find');
-            $input = new ArrayInput(array(
-                'command' => 'mautic:update:find',
-                '--env'   => $options['env']
-            ));
-            $command->run($input, $output);
-
-            // If the cache file still doesn't exist, there's nothing else we can do
-            if (!is_readable($cacheFile)) {
-                $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
-
-                return 1;
-            }
-        }
-
-        $update = (array) json_decode(file_get_contents($cacheFile));
-
         $updateHelper = $this->getContainer()->get('mautic.helper.update');
+        $update       = $updateHelper->fetchData();
+
+        if (!isset($update['package'])) {
+            $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
+
+            return 1;
+        }
 
         // Fetch the update package
         $package = $updateHelper->fetchPackage($update['package']);
@@ -110,20 +97,20 @@ EOT
             return 1;
         }
 
-        $zipFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/' . basename($update['package']);
+        $zipFile = $this->getContainer()->getParameter('mautic.cache_path') . '/' . basename($update['package']);
 
         $zipper = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
-            $zipper->close();
             $output->writeln('<error>' . $translator->trans('mautic.core.update.could_not_open_archive') . '</error>');
 
             return 1;
         }
 
         // Extract the archive file now in place
-        $zipper->extractTo(dirname($this->getContainer()->getParameter('kernel.root_dir')));
+        $zipper->extractTo($appRoot);
+        $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
         $command = $this->getApplication()->find('cache:clear');
@@ -138,23 +125,65 @@ EOT
         ));
         $command->run($input, $output);
 
-        // TODO - Updates will include a list of deleted files, process those
+        // Make sure we have a deleted_files list otherwise we can't process this step
+        if (file_exists(__DIR__ . '/deleted_files.txt')) {
+            $deletedFiles = json_decode(file_get_contents(__DIR__ . '/deleted_files.txt'), true);
+            $errorLog     = array();
 
-        // Migrate the database to the current version
-        $command = $this->getApplication()->find('doctrine:migrations:migrate');
-        $input = new ArrayInput(array(
-            'command'          => 'doctrine:migrations:migrate',
-            '--env'            => $options['env'],
-            '--no-interaction' => true
-        ));
-        $exitCode = $command->run($input, $output);
+            // Before looping over the deleted files, add in our upgrade specific files
+            $deletedFiles += array('deleted_files.txt', 'upgrade.php');
 
-        if ($exitCode !== 0) {
-            $output->writeln('<error>' . $translator->trans('mautic.core.update.error_performing_migration') . '</error>');
+            foreach ($deletedFiles as $file) {
+                $path = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/' . $file;
+
+                // Try setting the permissions to 777 just to make sure we can get rid of the file
+                @chmod($path, 0777);
+
+                if (!@unlink($path)) {
+                    // Failed to delete, reset the permissions to 644 for safety
+                    @chmod($path, 0644);
+
+                    $errorLog[] = sprintf(
+                        'Failed removing the file at %s.  As this is a deleted file, you can manually remove this file.',
+                        $file
+                    );
+                }
+            }
+
+            // If there were any errors, add them to the error log
+            if (count($errorLog)) {
+                // Check if the error log exists first
+                if (file_exists($appRoot . '/upgrade_errors.txt')) {
+                    $errors = file_get_contents($appRoot . '/upgrade_errors.txt');
+                } else {
+                    $errors = '';
+                }
+
+                $errors .= implode(PHP_EOL, $errorLog);
+
+                @file_put_contents($appRoot . '/upgrade_errors.txt', $errors);
+            }
+        }
+
+        // Migrate the database to the current version if migrations exist
+        $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+
+        if (iterator_count($iterator)) {
+            $command = $this->getApplication()->find('doctrine:migrations:migrate');
+            $input = new ArrayInput(array(
+                'command'          => 'doctrine:migrations:migrate',
+                '--env'            => $options['env'],
+                '--no-interaction' => true
+            ));
+            $exitCode = $command->run($input, $output);
+
+            if ($exitCode !== 0) {
+                $output->writeln('<error>' . $translator->trans('mautic.core.update.error_performing_migration') . '</error>');
+            }
         }
 
         // Clear the cached update data and the download package now that we've updated
-        @unlink($cacheFile);
+        @unlink($this->getContainer()->getParameter('mautic.cache_path') . '/lastUpdateCheck.txt');
         @unlink($zipFile);
 
         // Update successful

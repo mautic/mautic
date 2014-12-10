@@ -22,6 +22,18 @@ $colspan = 12/$cols;
     <div class="np col-md-9 height-auto bg-white">
     	<div class="bg-auto bg-dark-xs">
     		<div class="pa-md mb-lg">
+                <?php if ($updateMessage) : ?>
+                <div class="alert alert-mautic">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h4><?php echo $updateMessage; ?></h4>
+                        </div>
+                        <div class="col-md-2 pull-right">
+                            <a class="btn btn-danger" href="<?php echo $view['router']->generate('mautic_core_update'); ?>" data-toggle="ajax">Update Now</a>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
     			<div class="row">
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
