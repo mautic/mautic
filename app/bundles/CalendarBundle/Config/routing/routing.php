@@ -16,4 +16,10 @@ $collection->add('mautic_calendar_index', new Route('/calendar', array(
     '_controller' => 'MauticCalendarBundle:Default:index'
 )));
 
+$collection->add('mautic_calendar_action', new Route('/calendar/{objectAction}',
+    array(
+        '_controller' => 'MauticCalendarBundle:Default:execute'
+    )
+));
+
 return $collection;

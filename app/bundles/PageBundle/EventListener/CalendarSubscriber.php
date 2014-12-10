@@ -10,6 +10,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
+use Mautic\CalendarBundle\Event\EventGeneratorEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -27,7 +28,8 @@ class CalendarSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
+            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0),
+            CalendarEvents::CALENDAR_EVENT_ON_GENERATE => array('onCalendarEventGenerate', 0)
         );
     }
 
@@ -69,14 +71,57 @@ class CalendarSubscriber extends CommonSubscriber
             // We need to convert the date to a ISO8601 compliant string
             foreach ($results as &$object) {
                 $date = new DateTimeHelper($object['start']);
+                $eventTitle = $this->translator->trans('mautic.page.event.' . $eventKey, array('%page%' => $object['title']));
                 $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-                $object['url']   = $router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $object['page_id']), true);
-                $object['attr']  = 'data-toggle="ajax"';
+                $object['url']   = $router->generate('mautic_calendar_action', array(
+                    'objectAction' => 'edit',
+                    'source' => 'page',
+                    'objectId' => $object['page_id'],
+                    'startDate' => $date->toLocalString()
+                ), true);
+                $object['viewUrl']   = $router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $object['page_id']), true);
+                $object['attr']  = array(
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#CalendarEditModal',
+                    'data-header' => $eventTitle
+                );
                 $object['description'] = $this->translator->trans('mautic.page.event.' . $eventKey . '.description', array('%page%' => $object['title']));
-                $object['title'] = $this->translator->trans('mautic.page.event.' . $eventKey, array('%page%' => $object['title']));
+                $object['title'] = $eventTitle;
             }
 
             $event->addEvents($results);
         }
+    }
+
+    /**
+     * Let the calendar to edit / create new entities
+     *
+     * @param EventGeneratorEvent $event
+     *
+     * @return void
+     */
+    public function onCalendarEventGenerate(EventGeneratorEvent $event)
+    {
+        $source     = $event->getSource();
+
+        if ($source != 'page') {
+            return;
+        }
+
+
+        $startDate  = $event->getStartDate();
+        $entityId   = $event->getEntityId();
+
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model   = $this->factory->getModel('page.page');
+        $entity  = $model->getEntity($entityId);
+
+        $event->setModel($model);
+        $event->setEntity($entity);
+        $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
+
+        // $result = array();
+
+        // $event->addEvent($result);
     }
 }

@@ -11,6 +11,7 @@ namespace Mautic\CalendarBundle\Model;
 
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
+use Mautic\CalendarBundle\Event\EventGeneratorEvent;
 use Mautic\CoreBundle\Model\FormModel;
 
 /**
@@ -32,5 +33,22 @@ class CalendarModel extends FormModel
         $this->dispatcher->dispatch(CalendarEvents::CALENDAR_ON_GENERATE, $event);
 
         return $event->getEvents();
+    }
+
+    /**
+     * Collects data for the calendar display
+     *
+     * @param string    $bundle
+     * @param date      $date
+     * @param integer   $id
+     *
+     * @return array
+     */
+    public function editCalendarEvent($bundle, $date, $id)
+    {
+        $event = new EventGeneratorEvent($bundle, $date, $id);
+        $this->dispatcher->dispatch(CalendarEvents::CALENDAR_EVENT_ON_GENERATE, $event);
+
+        return $event;
     }
 }
