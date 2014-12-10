@@ -136,7 +136,8 @@ class DefaultController extends CommonController
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_dashboard_index',
-                'mauticContent'  => 'dashboard'
+                'mauticContent'  => 'dashboard',
+                'route'          => $this->generateUrl('mautic_dashboard_index')
             )
         ));
     }
