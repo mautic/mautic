@@ -124,13 +124,8 @@ class ConfigController extends FormController
      */
     private function getBundleParams()
     {
-        // List config keys we do not want the user to change via the UI
-        $doNotChange = array('db_driver', 'db_host', 'db_table_prefix', 'db_name', 'db_user', 'db_password', 'db_path', 'db_port', 'secret');
+       $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
 
-        // List config keys that are dev mode only
-        if ($this->factory->getEnvironment() == 'prod') {
-            $doNotChange = array_merge($doNotChange, array('transifex_username', 'transifex_password'));
-        }
         // Import the current local configuration, $parameters is defined in this file
         $localConfigFile = $this->factory->getLocalConfigFile();
 
