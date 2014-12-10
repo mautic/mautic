@@ -68,6 +68,6 @@ if (!isset($wrapOpeningTag)) {
     $wrapOpeningTag = $wrapClosingTag = '';
 }
 ?>
-<?php echo $wrapOpeningTag; ?><<?php echo $tag; ?><?php echo $buttonType; ?> class="<?php echo $btnClass; ?>" href="<?php echo $confirmAction; ?>" data-toggle="confirmation" data-message="<?php echo $view->escape($message); ?>" data-confirm-text="<?php echo $view->escape($confirmText); ?>"<?php echo $attr; ?>>
+<?php echo $wrapOpeningTag; ?><<?php echo $tag; ?><?php echo $buttonType; ?> class="<?php echo $btnClass; ?>" href="<?php echo $confirmAction; ?>" data-toggle="tooltip confirmation" data-placement="left" title="<?php echo $view["translator"]->trans("mautic.core.form.tooltip.remove"); ?>" data-message="<?php echo $view->escape($message); ?>" data-confirm-text="<?php echo $view->escape($confirmText); ?>"<?php echo $attr; ?>>
     <?php if (isset($iconClass)):?><i class="<?php echo $iconClass; ?>"></i> <?php endif; ?><?php if (isset($btnText)):?><span class="<?php echo $btnTextClass; ?>"><?php echo $btnText; ?></span><?php endif; ?>
 </<?php echo $tag; ?>><?php echo $wrapClosingTag; ?>

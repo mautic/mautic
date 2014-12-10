@@ -17,14 +17,6 @@ var MauticInstaller = {
         }, 10);
     },
 
-    toggleSpoolQueue: function () {
-        if (mQuery('#install_email_step_mailer_spool_type_0').prop('checked')) {
-            mQuery('#spoolPath').addClass('hide');
-        } else {
-            mQuery('#spoolPath').removeClass('hide');
-        }
-    },
-
     toggleTransportDetails: function (mailer) {
         if (mailer == 'smtp') {
             mQuery('#smtpSettings').removeClass('hide');

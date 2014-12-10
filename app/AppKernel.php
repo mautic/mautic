@@ -207,8 +207,7 @@ class AppKernel extends Kernel
      */
     private function isInstalled()
     {
-        // If the config file doesn't even exist, no point in checking further
-        if (file_exists(__DIR__ . '/config/local.php')) {
+        if ($localConfig = $this->getLocalConfigFile()) {
             /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
             $configurator = $this->getContainer()->get('mautic.configurator');
             $params       = $configurator->getParameters();
@@ -265,14 +264,40 @@ class AppKernel extends Kernel
         static $parameters;
 
         if (!is_array($parameters)) {
-            $localConfig = $this->rootDir . '/config/local.php';
-            if (file_exists($localConfig)) {
-                include $localConfig;
+            /** @var $paths */
+            $root = $this->getRootDir();
+            include $root . '/config/paths.php';
+
+            if ($configFile = $this->getLocalConfigFile()) {
+                include $configFile;
             } else {
                 $parameters = array();
             }
         }
 
         return $parameters;
+    }
+
+    /**
+     * Get local config file
+     *
+     * @param $checkExists If true, then return false if the file doesn't exist
+     *
+     * @return bool
+     */
+    public function getLocalConfigFile($checkExists = true)
+    {
+        /** @var $paths */
+        $root = $this->getRootDir();
+        include $root . '/config/paths.php';
+
+        if (isset($paths['local_config'])) {
+            $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+            if (!$checkExists || file_exists($paths['local_config'])) {
+                return $paths['local_config'];
+            }
+        }
+
+        return false;
     }
 }

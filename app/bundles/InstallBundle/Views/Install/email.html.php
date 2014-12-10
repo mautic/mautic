@@ -18,9 +18,8 @@ if ($tmpl == 'index') {
 </div>
 <div class="panel-body">
     <?php echo $view['form']->start($form); ?>
-    <div class="alert alert-mautic">
-        <?php echo $view['translator']->trans('mautic.install.email.header.emailfrom'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?>"></i>
-    </div>
+    <h4 class="mb-10"><?php echo $view['translator']->trans('mautic.install.email.header.emailfrom'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.emailfrom'); ?>"></i></h4>
+
     <div class="row">
         <div class="col-sm-6">
             <?php echo $view['form']->row($form['mailer_from_name']); ?>
@@ -29,23 +28,16 @@ if ($tmpl == 'index') {
             <?php echo $view['form']->row($form['mailer_from_email']); ?>
         </div>
     </div>
-    <div class="alert alert-mautic mt-20">
+
+    <h4 class="mb-10 mt-10">
         <?php echo $view['translator']->trans('mautic.install.email.header.spooler'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?>"></i>
-    </div>
+    </h4>
     <div class="row">
-        <div class="col-sm-5">
+        <div class="col-sm-6">
             <?php echo $view['form']->row($form['mailer_spool_type']); ?>
         </div>
-        <?php $hide = ($form['mailer_spool_type']->vars['data'] == 'queue') ? '' : ' hide'; ?>
-        <div class="col-sm-7<?php echo $hide; ?>" id="spoolPath">
-            <?php echo $view['form']->row($form['mailer_spool_path']); ?>
-        </div>
-    </div>
-    <div class="alert alert-mautic mt-20">
-        <?php echo $view['translator']->trans('mautic.install.email.header.smtp'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.smtp'); ?>"></i>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
+
+        <div class="col-sm-6">
             <?php echo $view['form']->row($form['mailer_transport']); ?>
         </div>
     </div>

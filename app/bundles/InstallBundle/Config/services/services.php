@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
 //Configurator object
 $container->setDefinition('mautic.configurator', new Definition(
     'Mautic\InstallBundle\Configurator\Configurator', array(
-        '%kernel.root_dir%'
+        '%kernel.root_dir%',
+        new Reference('mautic.factory')
     )
 ));

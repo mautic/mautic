@@ -66,7 +66,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
-                                <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
+                                <td><?php echo $assetDownloadUrl; ?></td>
                             </tr>
                             </tbody>
                         </table>
@@ -153,7 +153,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
-            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
+            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl)); ?>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -168,8 +168,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
-                <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                value="<?php echo $assetDownloadUrl; ?>" />
+                <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $assetDownloadUrl; ?>" />
                 <span class="input-group-btn">
                     <button class="btn btn-default" onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>

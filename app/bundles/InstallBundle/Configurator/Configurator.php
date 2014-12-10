@@ -9,6 +9,7 @@
 
 namespace Mautic\InstallBundle\Configurator;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\InstallBundle\Configurator\Step\StepInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -46,12 +47,11 @@ class Configurator
      * Constructor.
      *
      * @param string $kernelDir
+     * @param MauticFactory $factory
      */
-    public function __construct($kernelDir)
+    public function __construct($kernelDir, MauticFactory $factory)
     {
-        $this->kernelDir = $kernelDir;
-        $this->filename  = $kernelDir . '/config/local.php';
-
+        $this->filename  = $factory->getLocalConfigFile(false);
         $this->steps      = array();
         $this->parameters = $this->read();
     }

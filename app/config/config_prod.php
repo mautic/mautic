@@ -1,6 +1,11 @@
 <?php
 $loader->import("config.php");
-$loader->import("security.php");
+
+if (file_exists(__DIR__ . '/security_local.php')) {
+    $loader->import("security_local.php");
+} else {
+    $loader->import("security.php");
+}
 
 /*
 $container->loadFromExtension("framework", array(

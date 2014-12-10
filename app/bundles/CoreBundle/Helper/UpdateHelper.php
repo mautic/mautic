@@ -126,7 +126,6 @@ class UpdateHelper
                 'stability'  => $this->factory->getParameter('update_stability')
             );
 
-            // TODO - Whenever I get the router hooked up on the component, change this URL
             $data    = $connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
@@ -145,6 +144,14 @@ class UpdateHelper
 
         // If the user's up-to-date, go no further
         if ($update->latest_version) {
+            return array(
+                'error'   => false,
+                'message' => 'mautic.core.updater.running.latest.version'
+            );
+        }
+
+        // Last sanity check, if the $update->version is older than our current version
+        if (version_compare($this->factory->getVersion(), $update->version, 'ge')) {
             return array(
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version'

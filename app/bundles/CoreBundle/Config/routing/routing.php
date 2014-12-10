@@ -26,6 +26,10 @@ $collection->add('mautic_remove_trailing_slash', new Route( '/{url}',
     )
 ));
 
+$collection->add('mautic_core_update', new Route('/update', array(
+    '_controller' => 'MauticCoreBundle:Update:index'
+)));
+
 $collection->add('mautic_core_form_action', new Route( '/action/{objectAction}/{objectModel}/{objectId}', array(
         '_controller' => 'MauticCoreBundle:Form:execute',
         'objectId'    => 0,

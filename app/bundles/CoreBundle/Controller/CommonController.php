@@ -324,9 +324,14 @@ class CommonController extends Controller implements MauticController
         //attempt to squash command output
         ob_start();
 
-        $env = $this->factory->getEnvironment();
-        $noDebug = ($env == 'prod') ? ' --no-debug' : '';
-        $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $env . $noDebug));
+        $env  = $this->factory->getEnvironment();
+        $args = array('console', 'cache:clear', '--env=' . $env);
+
+        if ($env == 'prod') {
+            $args[] = '--no-debug';
+        }
+
+        $input       = new ArgvInput($args);
         $application = new Application($this->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input);
@@ -345,7 +350,8 @@ class CommonController extends Controller implements MauticController
         $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
         $cacheDir = $this->factory->getSystemPath('cache', true);
 
-        $cacheFile = "$cacheDir/$env/app".ucfirst($env)."{$debug}ProjectContainer.php";
+        $cacheFile = "$cacheDir/app".ucfirst($env)."{$debug}ProjectContainer.php";
+
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
         }

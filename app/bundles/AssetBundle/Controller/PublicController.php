@@ -33,15 +33,14 @@ class PublicController extends CommonFormController
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->factory->getModel('asset.asset');
         $translator = $this->get('translator');
+        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
             $published    = $entity->isPublished();
 
             //make sure the asset is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess(
-                    'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))
-            ) {
+            if ((!$published) && (!$security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
                 $model->trackDownload($entity, $this->request, 401);
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
@@ -72,6 +71,8 @@ class PublicController extends CommonFormController
             }
 
             try {
+                //set the uploadDir
+                $entity->setUploadDir($this->factory->getParameter('upload_dir'));
                 $contents = $entity->getFileContents();
                 $model->trackDownload($entity, $this->request, 200);
             } catch (\Exception $e) {
@@ -81,7 +82,11 @@ class PublicController extends CommonFormController
 
             $response = new Response();
             $response->headers->set('Content-Type', $entity->getFileMimeType());
-            $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
+
+            $stream = $this->request->get('stream', 0);
+            if (!$stream) {
+                $response->headers->set('Content-Disposition', 'attachment;filename="' . $entity->getOriginalFileName());
+            }
             $response->setContent($contents);
 
             return $response;

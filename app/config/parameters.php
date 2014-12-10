@@ -34,19 +34,42 @@ $mauticParams['supported_languages'] = array(
     'en_US' => 'English - United States'
 );
 
-//load parameters array from local configuration
-if (file_exists(__DIR__ . '/local.php')) {
-    include 'local.php';
+//include path settings
+$root  = $container->getParameter('kernel.root_dir');
 
-    //override default with local
-    $mauticParams = array_merge($mauticParams, $parameters);
+//Closure to replace %kernel_root_dir% placeholders
+$replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder) {
+    if (is_array($value)) {
+        foreach ($value as &$v) {
+            $replaceRootPlaceholder($v);
+        }
+    } elseif (strpos($value, '%kernel.root_dir%') !== false) {
+        $value = str_replace('%kernel.root_dir%', $root, $value);
+    }
+};
+
+//Include local paths
+require 'paths.php';
+$replaceRootPlaceholder($paths);
+
+//load parameters array from local configuration
+if (isset($paths['local_config'])) {
+    if (file_exists($paths['local_config'])) {
+        include $paths['local_config'];
+
+        //override default with local
+        $mauticParams = array_merge($mauticParams, $parameters);
+    }
 }
 
-//include path settings
-require 'paths.php';
+//Set the paths
 $mauticParams['paths'] = $paths;
 
-foreach ($mauticParams as $k => $v) {
+//Add to the container
+foreach ($mauticParams as $k => &$v) {
+    //update the file paths in case $factory->getParameter() is used
+    $replaceRootPlaceholder($v);
+
     //add to the container
     $container->setParameter("mautic.{$k}", $v);
 }
