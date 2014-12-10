@@ -56,3 +56,10 @@ $container->setDefinition('mautic.form.type.page_abtest_settings', new Definitio
     ->addTag('form.type', array(
         'alias' => 'page_abtest_settings',
     ));
+
+$container->setDefinition('mautic.form.type.page_publish_dates', new Definition(
+    'Mautic\PageBundle\Form\Type\PagePublishDatesType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'page_publish_dates',
+    ));
