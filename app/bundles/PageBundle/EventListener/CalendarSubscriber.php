@@ -119,9 +119,5 @@ class CalendarSubscriber extends CommonSubscriber
         $event->setModel($model);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
-
-        // $result = array();
-
-        // $event->addEvent($result);
     }
 }

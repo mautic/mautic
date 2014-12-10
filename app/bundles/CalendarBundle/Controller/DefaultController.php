@@ -92,7 +92,7 @@ class DefaultController extends CommonController
 
         //Create the form
         $action = $this->generateUrl('mautic_' . $source . '_action', array('objectAction' => 'edit', 'objectId' => $entityId));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('formName' => 'page_publish_dates'));
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -132,7 +132,7 @@ class DefaultController extends CommonController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = array(
-                    'objectAction' => 'view',
+                    'objectAction' => 'edit',
                     'objectId'     => $entity->getId()
                 );
                 // todo let the template be set in the event
@@ -160,7 +160,7 @@ class DefaultController extends CommonController
             'contentTemplate' => $event->getContentTemplate(),
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_calendar_index',
-                'mauticContent' => $source,
+                'mauticContent' => 'calendarModal',
                 'route'         => $this->generateUrl('mautic_' . $source . '_action', array(
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId()

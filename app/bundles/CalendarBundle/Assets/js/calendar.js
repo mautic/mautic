@@ -26,5 +26,15 @@ Mautic.calendarOnLoad = function (container) {
             }
         }
     });
-    
+};
+
+Mautic.calendarModalOnLoad = function (container, response) {
+    // Modal form submit
+    // var modalForm = mQuery(container + ' form');
+    // if (modalForm.length) {
+    //     modalForm.on('submit', function(e) {
+    //         mQuery(container).modal('toggle');
+    //         Mautic.calendarOnLoad('body');
+    //     });
+    // }
 };

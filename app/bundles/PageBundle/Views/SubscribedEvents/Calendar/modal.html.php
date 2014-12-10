@@ -8,7 +8,8 @@
  */
 
 ?>
-
 <?php echo $view['form']->start($form); ?>
-<?php echo $view['form']->row($form['title']); ?>
+<?php echo $view['form']->errors($form) ?>
+<?php echo $view['form']->row($form['publishUp']); ?>
+<?php echo $view['form']->row($form['publishDown']); ?>
 <?php echo $view['form']->end($form); ?>
