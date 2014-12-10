@@ -9,12 +9,13 @@
 
 namespace Mautic\CalendarBundle\Controller;
 
-use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class DefaultController
  */
-class DefaultController extends CommonController
+class DefaultController extends FormController
 {
 
     /**
@@ -90,8 +91,14 @@ class DefaultController extends CommonController
             return $this->isLocked($postActionVars, $entity, $source. '.' . $source);
         }
 
+        // TODO form name from event
         //Create the form
-        $action = $this->generateUrl('mautic_' . $source . '_action', array('objectAction' => 'edit', 'objectId' => $entityId));
+        $action = $this->generateUrl('mautic_calendar_action', array(
+            'objectAction' => 'edit',
+            'objectId'     => $entity->getId(),
+            'source'       => $source,
+            'startDate'    => $startDate->format('Y-m-d H:i:s')
+        ));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('formName' => 'page_publish_dates'));
 
         ///Check for a submitted form and process it
@@ -116,7 +123,7 @@ class DefaultController extends CommonController
                         $this->get('translator')->trans('mautic.core.notice.updated', array(
                             '%name%'      => $entity->getTitle(),
                             '%menu_link%' => 'mautic_calendar_index',
-                            '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                            '%url%'       => $this->generateUrl('mautic_calendar_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -131,18 +138,10 @@ class DefaultController extends CommonController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                $viewParameters = array(
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId()
-                );
-                // todo let the template be set in the event
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'returnUrl'       => $this->generateUrl('mautic_calendar_action', $viewParameters),
-                        'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticCalendarBundle:Default:index.html.php'
-                    ))
-                );
+                return new JsonResponse(array(
+                    'mauticContent' => 'calendarModal',
+                    'closeModal'    => 1,
+                ));
             }
         } else {
             //lock the entity
@@ -161,9 +160,11 @@ class DefaultController extends CommonController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_calendar_index',
                 'mauticContent' => 'calendarModal',
-                'route'         => $this->generateUrl('mautic_' . $source . '_action', array(
+                'route'         => $this->generateUrl('mautic_calendar_action', array(
                     'objectAction' => 'edit',
-                    'objectId'     => $entity->getId()
+                    'objectId'     => $entity->getId(),
+                    'source'       => $source,
+                    'startDate'    => $startDate->format('Y-m-d H:i:s')
                 ))
             )
         ));
