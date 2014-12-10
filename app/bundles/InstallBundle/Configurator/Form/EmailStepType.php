@@ -146,14 +146,7 @@ class EmailStepType extends AbstractType
             )
         ));
 
-        $builder->add('mailer_spool_path', 'text', array(
-            'label'      => 'mautic.install.form.email.spool_path',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.install.form.email.spool_path_descr'
-            )
-        ));
+        $builder->add('mailer_spool_path', 'hidden');
 
         $builder->add('buttons', 'form_buttons', array(
             'pre_extra_buttons' => array(
