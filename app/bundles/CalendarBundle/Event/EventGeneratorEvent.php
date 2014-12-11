@@ -23,11 +23,6 @@ class EventGeneratorEvent extends Event
     private $source;
 
     /**
-     * @var \DateTime
-     */
-    private $startDate;
-
-    /**
      * @var integer
      */
     private $entityId;
@@ -59,13 +54,11 @@ class EventGeneratorEvent extends Event
 
     /**
      * @param string    $source
-     * @param \DateTime $startDate
      * @param integer   $id
      */
-    public function __construct($source, \DateTime $startDate, $entityId)
+    public function __construct($source, $entityId)
     {
         $this->source    = $source;
-        $this->startDate = $startDate;
         $this->entityId  = $entityId;
     }
 
@@ -79,16 +72,6 @@ class EventGeneratorEvent extends Event
     public function setContentTemplate($contentTemplate)
     {
         $this->contentTemplate = $contentTemplate;
-    }
-
-    /**
-     * Fetches the event start date
-     *
-     * @return \DateTime
-     */
-    public function getStartDate()
-    {
-        return $this->startDate;
     }
 
     /**

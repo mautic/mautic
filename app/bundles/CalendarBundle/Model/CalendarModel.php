@@ -44,9 +44,9 @@ class CalendarModel extends FormModel
      *
      * @return array
      */
-    public function editCalendarEvent($bundle, $date, $id)
+    public function editCalendarEvent($bundle, $id)
     {
-        $event = new EventGeneratorEvent($bundle, $date, $id);
+        $event = new EventGeneratorEvent($bundle, $id);
         $this->dispatcher->dispatch(CalendarEvents::CALENDAR_EVENT_ON_GENERATE, $event);
 
         return $event;

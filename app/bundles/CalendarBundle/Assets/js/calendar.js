@@ -5,7 +5,6 @@ Mautic.calendarOnLoad = function (container) {
 
 Mautic.calendarModalOnLoad = function (container, response) {
     mQuery('#calendar').fullCalendar( 'refetchEvents' );
-
     mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
     mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
         event.preventDefault();
@@ -13,6 +12,14 @@ Mautic.calendarModalOnLoad = function (container, response) {
         return Mautic.ajaxifyLink(this, event);
     });
 };
+
+Mautic.initializeCalendarModals = function (container) {
+    mQuery(container + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
+    mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        event.preventDefault();
+        Mautic.ajaxifyModal(this, event);
+    });
+}
 
 Mautic.loadCalendarEvents = function (container) {
     mQuery('#calendar').fullCalendar({
@@ -33,12 +40,26 @@ Mautic.loadCalendarEvents = function (container) {
             // if calendar events are loaded
             if (!bool) {
                 //initialize ajax'd modals
-                mQuery(container + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
-                mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
-                    event.preventDefault();
-                    Mautic.ajaxifyModal(this, event);
-                });
+                Mautic.initializeCalendarModals(container);
             }
+        },
+        eventDrop: function(event, delta, revertFunc) {
+            mQuery.ajax({
+                url: mauticAjaxUrl + "?action=calendar:updateEvent",
+                data: 'entityId=' + event.entityId + '&entityType=' + event.entityType + '&setter=' + event.setter + '&startDate=' + event.start.format(),
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    if (!response.success) {
+                        revertFunc();
+                    }
+                    Mautic.initializeCalendarModals(container);
+                },
+                error: function (response, textStatus, errorThrown) {
+                    revertFunc();
+                    Mautic.processAjaxError(response, textStatus, errorThrown, true);
+                }
+            });
         }
     });
 }

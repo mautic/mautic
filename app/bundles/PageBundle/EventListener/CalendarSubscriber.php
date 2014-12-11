@@ -48,8 +48,8 @@ class CalendarSubscriber extends CommonSubscriber
 
         $commonSelect = 'p.title, p.id as page_id';
         $eventTypes = array(
-            'publish.up'   => array('dateName' => 'p.publish_up'),
-            'publish.down' => array('dateName' => 'p.publish_down')
+            'publish.up'   => array('dateName' => 'publish_up', 'setter' => 'PublishUp'),
+            'publish.down' => array('dateName' => 'publish_down', 'setter' => 'PublishDown')
         );
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
@@ -62,8 +62,8 @@ class CalendarSubscriber extends CommonSubscriber
         foreach ($eventTypes as $eventKey => $eventType) {
             $query->select($commonSelect . ', ' . $eventType['dateName'] . ' AS start')
                 ->where($query->expr()->andX(
-                    $query->expr()->gte($eventType['dateName'], ':start'),
-                    $query->expr()->lte($eventType['dateName'], ':end')
+                    $query->expr()->gte('p.' . $eventType['dateName'], ':start'),
+                    $query->expr()->lte('p.' . $eventType['dateName'], ':end')
                 ));
 
             $results = $query->execute()->fetchAll();
@@ -73,6 +73,10 @@ class CalendarSubscriber extends CommonSubscriber
                 $date = new DateTimeHelper($object['start']);
                 $eventTitle = $this->translator->trans('mautic.page.event.' . $eventKey, array('%page%' => $object['title']));
                 $object['start'] = $date->toLocalString(\DateTime::ISO8601);
+                $object['setter'] = $eventType['setter'];
+                $object['entityId'] = $object['page_id'];
+                $object['entityType'] = 'page';
+                $object['editable'] = true;
                 $object['url']   = $router->generate('mautic_calendar_action', array(
                     'objectAction' => 'edit',
                     'source' => 'page',
@@ -108,13 +112,12 @@ class CalendarSubscriber extends CommonSubscriber
             return;
         }
 
-        $startDate  = $event->getStartDate();
         $entityId   = $event->getEntityId();
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
         $entity  = $model->getEntity($entityId);
-// echo "<pre>";\Doctrine\Common\Util\Debug::dump($this->factory->getSecurity());die("</pre>");
+
         $event->setModel($model);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');

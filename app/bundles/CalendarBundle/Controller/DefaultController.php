@@ -48,7 +48,7 @@ class DefaultController extends FormController
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
         $calendarModel  = $this->factory->getModel('calendar');
-        $event          = $calendarModel->editCalendarEvent($source, $startDate, $entityId);
+        $event          = $calendarModel->editCalendarEvent($source, $entityId);
 
         $model   = $event->getModel();
         $entity  = $event->getEntity();
@@ -118,8 +118,8 @@ class DefaultController extends FormController
                         'notice',
                         $this->get('translator')->trans('mautic.core.notice.updated', array(
                             '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_calendar_index',
-                            '%url%'       => $this->generateUrl('mautic_calendar_action', array(
+                            '%menu_link%' => 'mautic_' . $source . '_index',
+                            '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))

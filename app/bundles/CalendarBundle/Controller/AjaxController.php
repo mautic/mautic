@@ -39,4 +39,42 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($events);
     }
 
+    /**
+     * Updates an event on dragging the event around the calendar
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function updateEventAction(Request $request)
+    {
+        $entityId   = $request->request->get('entityId');
+        $source     = $request->request->get('entityType');
+        $setter     = 'set' . $request->request->get('setter');
+        $dateValue  = new \DateTime($request->request->get('startDate'));
+        $response   = array('success' => false);
+
+        /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
+        $calendarModel  = $this->factory->getModel('calendar');
+        $event          = $calendarModel->editCalendarEvent($source, $entityId);
+
+        $model   = $event->getModel();
+        $entity  = $event->getEntity();
+
+        //not found
+        if ($entity === null) {
+            // TODO - it would be maybe nice to display a flash message
+        } elseif (!$event->hasAccess()) {
+            // TODO - it would be maybe nice to display a flash message
+        } elseif ($model->isLocked($entity)) {
+            // TODO - it would be maybe nice to display a flash message
+        }elseif ($this->request->getMethod() == 'POST') {
+            $entity->$setter($dateValue);
+            $model->saveEntity($entity);
+            $response['success'] = true;
+            // TODO - it would be maybe nice to display a flash message
+        }
+
+        return $this->sendJsonResponse($response);
+    }
 }
