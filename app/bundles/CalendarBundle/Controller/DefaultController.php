@@ -96,7 +96,7 @@ class DefaultController extends FormController
             'source'       => $source,
             'startDate'    => $startDate->format('Y-m-d H:i:s')
         ));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('formName' => 'page_publish_dates'));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('formName' => $event->getFormName()));
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {

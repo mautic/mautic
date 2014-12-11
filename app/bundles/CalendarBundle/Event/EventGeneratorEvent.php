@@ -53,6 +53,11 @@ class EventGeneratorEvent extends Event
     private $access = false;
 
     /**
+     * @var string
+     */
+    private $formName;
+
+    /**
      * @param string    $source
      * @param \DateTime $startDate
      * @param integer   $id
@@ -168,5 +173,23 @@ class EventGeneratorEvent extends Event
     public function setAccess($access)
     {
         $this->access = $access;
+    }
+
+    /**
+     * Fetches the name of the form which should be loaded in the modal.
+     *
+     * @return string
+     */
+    public function getFormName()
+    {
+        return $this->formName;
+    }
+
+    /**
+     * Set the event formName
+     */
+    public function setFormName($formName)
+    {
+        $this->formName = $formName;
     }
 }

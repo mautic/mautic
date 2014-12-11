@@ -118,6 +118,7 @@ class CalendarSubscriber extends CommonSubscriber
         $event->setModel($model);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
+        $event->setFormName('page_publish_dates');
         $event->setAccess($this->factory->getSecurity()->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()));
     }
