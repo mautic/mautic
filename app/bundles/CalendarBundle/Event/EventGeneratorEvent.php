@@ -48,6 +48,11 @@ class EventGeneratorEvent extends Event
     private $contentTemplate;
 
     /**
+     * @var boolean
+     */
+    private $access = false;
+
+    /**
      * @param string    $source
      * @param \DateTime $startDate
      * @param integer   $id
@@ -145,5 +150,23 @@ class EventGeneratorEvent extends Event
     public function getContentTemplate()
     {
         return $this->contentTemplate;
+    }
+
+    /**
+     * Confirmes that user can access the entity
+     *
+     * @return boolean
+     */
+    public function hasAccess()
+    {
+        return $this->access;
+    }
+
+    /**
+     * Set the event access
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
     }
 }

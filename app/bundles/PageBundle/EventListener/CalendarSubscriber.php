@@ -108,16 +108,17 @@ class CalendarSubscriber extends CommonSubscriber
             return;
         }
 
-
         $startDate  = $event->getStartDate();
         $entityId   = $event->getEntityId();
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
         $entity  = $model->getEntity($entityId);
-
+// echo "<pre>";\Doctrine\Common\Util\Debug::dump($this->factory->getSecurity());die("</pre>");
         $event->setModel($model);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
+        $event->setAccess($this->factory->getSecurity()->hasEntityAccess(
+            'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()));
     }
 }

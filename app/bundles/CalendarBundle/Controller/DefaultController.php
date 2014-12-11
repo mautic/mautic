@@ -81,10 +81,7 @@ class DefaultController extends FormController
                     )
                 ))
             );
-        // TODO access has to be changed to be generic
-        }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
-        )) {
+        } elseif (!$event->hasAccess()) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
