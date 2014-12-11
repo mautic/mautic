@@ -5,6 +5,13 @@ Mautic.calendarOnLoad = function (container) {
 
 Mautic.calendarModalOnLoad = function (container, response) {
     mQuery('#calendar').fullCalendar( 'refetchEvents' );
+
+    mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
+    mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
+        event.preventDefault();
+        mQuery('.modal').modal('hide');
+        return Mautic.ajaxifyLink(this, event);
+    });
 };
 
 Mautic.loadCalendarEvents = function (container) {

@@ -149,7 +149,8 @@ class DefaultController extends FormController
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, $event->getContentTemplate()),
                 'tokens'      => $builderComponents[$source . 'Tokens'],
-                'entity'      => $entity
+                'entity'      => $entity,
+                'model'       => $model
             ),
             'contentTemplate' => $event->getContentTemplate(),
             'passthroughVars' => array(
