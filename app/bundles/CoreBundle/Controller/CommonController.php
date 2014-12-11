@@ -385,7 +385,7 @@ class CommonController extends Controller implements MauticController
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function setFormTheme(Form $form, $template, $theme)
+    protected function setFormTheme(Form $form, $template, $theme = null)
     {
         $formView = $form->createView();
 

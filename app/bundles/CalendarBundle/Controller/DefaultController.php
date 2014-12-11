@@ -88,7 +88,6 @@ class DefaultController extends FormController
             return $this->isLocked($postActionVars, $entity, $source. '.' . $source);
         }
 
-        // TODO form name from event
         //Create the form
         $action = $this->generateUrl('mautic_calendar_action', array(
             'objectAction' => 'edit',
@@ -145,12 +144,11 @@ class DefaultController extends FormController
             $model->lockEntity($entity);
         }
 
-        // todo let the template be set in the event
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'tokens'      => $builderComponents['pageTokens'],
+                'form'        => $this->setFormTheme($form, $event->getContentTemplate()),
+                'tokens'      => $builderComponents[$source . 'Tokens'],
                 'entity'      => $entity
             ),
             'contentTemplate' => $event->getContentTemplate(),
