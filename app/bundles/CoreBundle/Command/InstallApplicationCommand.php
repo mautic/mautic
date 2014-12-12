@@ -53,7 +53,7 @@ EOT
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         // Load up the pre-loaded data
-        $data = unserialize(file_get_contents($cacheDir . '/install_data.txt'));
+        $data = unserialize(file_get_contents($cacheDir . '/../install_data.txt'));
 
         // Extract out the user data
         $userData = array(

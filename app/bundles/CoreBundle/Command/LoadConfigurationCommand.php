@@ -48,14 +48,14 @@ EOT
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->getContainer()->get('mautic.configurator');
-        $cacheDir     = $this->getContainer()->get('kernel.cache_dir');
+        $cacheDir     = $this->getContainer()->getParameter('kernel.cache_dir');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale('en_US');
 
         // Load up the pre-loaded data
-        $data = unserialize(file_get_contents($cacheDir . '/install_data.txt'));
+        $data = unserialize(file_get_contents($cacheDir . '/../install_data.txt'));
 
         // Extract out the user data that won't be part of the configuration
         unset($data['username']);
