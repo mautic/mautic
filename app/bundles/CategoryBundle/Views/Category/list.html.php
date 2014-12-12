@@ -81,7 +81,13 @@ if ($tmpl == 'index')
                                 'model' => 'category',
                                 'query' => 'bundle=' . $bundle
                             )); ?>
-                            <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
+                            <?php if ($permissions[$bundle.':categories:edit']): ?>
+                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#CategoryFormModal" data-ignore-removemodal="true" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
+                           <?php endif; ?>
+                            <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
+                            <?php if ($permissions[$bundle.':categories:edit']): ?>
+                            </a>
+                            <?php endif; ?>
                             <?php if ($description = $item->getDescription()): ?>
                                 <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                             <?php endif; ?>

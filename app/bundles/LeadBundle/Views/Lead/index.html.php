@@ -16,10 +16,8 @@ if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
             'class'       => 'btn btn-default btn-nospin',
-            'data-toggle' => 'tooltip modal',
+            'data-toggle' => 'modal',
             'data-target' => '#lead-quick-add',
-            'title'       => $view["translator"]->trans("mautic.core.form.tooltip.quick.add"),
-            'data-placement' => "left"
         ),
         'iconClass' => 'fa fa-bolt',
         'btnText'   => 'mautic.lead.lead.menu.quickadd'
@@ -28,8 +26,8 @@ if ($permissions['lead:leads:create']) {
 
 $extraHtml = <<<button
 <div class="btn-group ml-5">
-    <a id="table-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list'))}" data-placement="left" data-toggle="tooltip ajax" title="{$view["translator"]->trans("mautic.core.form.tooltip.list")}" data-placement="left" class="btn btn-default"><i class="fa fa-fw fa-table"></i></a>
-    <a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-placement="left" data-toggle="tooltip ajax" title="{$view["translator"]->trans("mautic.core.form.tooltip.grid")}" data-placement="left" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
+    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.list')}" data-placement="left"><a id="table-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></span></a>
+    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
 </div>
 button;
 

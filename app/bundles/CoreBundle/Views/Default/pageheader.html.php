@@ -31,5 +31,3 @@
         </div>
     </div>
 </div>
-
-<?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>

@@ -188,6 +188,9 @@ class CommonController extends Controller implements MauticController
             return $response;
         }
 
+        //render flashes
+        $passthrough['flashes'] = $this->getFlashContent();
+
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
             if (!empty($passthrough["route"])) {
@@ -402,5 +405,15 @@ class CommonController extends Controller implements MauticController
         }
 
         return $formView;
+    }
+
+    /**
+     * Renders flashes' HTML
+     *
+     * @return string
+     */
+    protected function getFlashContent()
+    {
+        return $this->renderView('MauticCoreBundle:Default:flashes.html.php');
     }
 }

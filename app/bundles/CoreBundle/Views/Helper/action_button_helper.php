@@ -69,6 +69,15 @@ if (!isset($wrapOpeningTag)) {
 //Builder for custom buttons
 $menuLink  = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
 $buildCustom = function($c, $buttonCount) use ($menuLink, $view, $wrapOpeningTag, $wrapClosingTag, $groupType) {
+    //Add tooltip stuff
+    $tooltipAttr = '';
+    if (isset($tooltip)) {
+        if (!isset($tooltipPosition)) {
+            $tooltipPosition = 'left';
+        }
+        $tooltipAttr = ' data-toggle="tooltip" title="'.$tooltip.'" data-placement="'.$tooltipPosition.'"';
+    }
+
     $buttons = '';
 
     //Wrap links in a tag
@@ -103,7 +112,7 @@ $buildCustom = function($c, $buttonCount) use ($menuLink, $view, $wrapOpeningTag
 
         $buttonContent  = (isset($c['iconClass'])) ? '<i class="' . $c['iconClass'] . '"></i> ' : '';
         $buttonContent .= $view['translator']->trans($c['btnText']);
-        $buttons       .= "$wrapOpeningTag<a{$attr}>{$buttonContent}</a>$wrapClosingTag\n";
+        $buttons       .= "$wrapOpeningTag<a{$attr}><span{$tooltipAttr}>{$buttonContent}</span></a>$wrapClosingTag\n";
     }
 
     return $buttons;
