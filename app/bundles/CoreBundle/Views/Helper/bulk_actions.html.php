@@ -24,7 +24,8 @@ include 'action_button_helper.php';
                 <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php', array(
                     'message'         => $view['translator']->trans('mautic.' . $langVar . '.form.confirmbatchdelete'),
                     'confirmAction'   => $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array('objectAction' => 'batchDelete'), $query)),
-                    'template'        => 'batchdelete'
+                    'template'        => 'batchdelete',
+                    'tooltip'         => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete')
                 )); ?>
             <?php endif; ?>
 

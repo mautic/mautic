@@ -15,7 +15,7 @@ foreach ($buttonGroupTypes as $groupType) {
         $dropdownOpenHtml = '';
     } else {
         echo '<div class="btn-group hidden-md hidden-lg">';
-        $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
+        $dropdownOpenHtml  = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
         $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">' . "\n";
     }
 
@@ -45,7 +45,7 @@ foreach ($buttonGroupTypes as $groupType) {
             case 'clone':
             case 'abtest':
                 $icon = ($action == 'clone') ? 'copy' : 'sitemap';
-                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => $action), $query)) . '" data-placement="left" title="' . $view['translator']->trans('mautic.core.form.tooltip.' . $action) . '" data-toggle="tooltip ajax"' . $menuLink . ">\n";
+                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => $action), $query)) . '" data-toggle="ajax"' . $menuLink . ">\n";
                 echo '  <i class="fa fa-'.$icon.'"></i> ' . $view['translator']->trans('mautic.core.form.' . $action) . "\n";
                 echo "</a>\n";
                 break;
@@ -58,7 +58,7 @@ foreach ($buttonGroupTypes as $groupType) {
                     $query['objectId'] = $item->getId();
                 }
 
-                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => $action), $query)) . '" data-placement="left" title="' . $view['translator']->trans('mautic.core.form.tooltip.' . $action) . '" data-toggle="tooltip ' . $editMode . '"' . $editAttr . $menuLink . ">\n";
+                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => $action), $query)) . '" data-toggle="' . $editMode . '"' . $editAttr . $menuLink . ">\n";
                 echo '  <i class="fa fa-'.$icon.'"></i> ' . $view['translator']->trans('mautic.core.form.' . $action) . "\n";
                 echo "</a>\n";
                 break;
