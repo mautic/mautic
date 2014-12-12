@@ -32,7 +32,7 @@ $filtersEmpty = true;
                                         <input class="mr-3" name="emailFilters[<?php echo $filter['column']; ?>][]" type="checkbox" value="<?php echo $item['id']; ?>" />
                                         <?php echo $item['title']; ?>
                                         <?php if (isset($item['color']) && $item['color']) : ?>
-                                            <i class="fa fa-square mr5 pull-right" style="color:<?php echo $item['color']; ?>"></i>
+                                            <i class="fa fa-square mr5 pull-right" style="color:#<?php echo $item['color']; ?>"></i>
                                         <?php endif; ?>
                                     </label>
                                     <?php endif; ?>
