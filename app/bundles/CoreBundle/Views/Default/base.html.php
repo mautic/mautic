@@ -32,6 +32,8 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <!-- start: app-header -->
             <header id="app-header" class="navbar">
                <?php echo $view->render('MauticCoreBundle:Default:navbar.html.php'); ?>
+
+               <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
             </header>
             <!--/ end: app-header -->
 

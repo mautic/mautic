@@ -175,6 +175,13 @@ class CategoryController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.category.notice.created', array(
+                            '%name%'      => $entity->getName()
+                        ), 'flashes')
+                    );
                 }
             } else {
                 $success = 1;
@@ -265,6 +272,13 @@ class CategoryController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.category.notice.updated', array(
+                            '%name%'      => $entity->getName()
+                        ), 'flashes')
+                    );
                 }
             } else {
                 $success = 1;

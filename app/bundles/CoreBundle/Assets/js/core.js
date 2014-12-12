@@ -423,7 +423,7 @@ var Mautic = {
                 if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(this).attr('id') != 'MauticCommonModal') {
                     mQuery(target).remove();
                 } else {
-                    Mautic.resetModal(target);
+                    Mautic.resetModal(target, true);
                 }
             });
 
@@ -621,6 +621,10 @@ var Mautic = {
                 } else {
                     mQuery(response.target).html(response.newContent);
                 }
+            }
+
+            if (response.flashes) {
+                mQuery('#flashes').replaceWith(response.flashes);
             }
 
             if (response.route) {
@@ -866,12 +870,12 @@ var Mautic = {
         });
     },
 
-    resetModal: function (target) {
+    resetModal: function (target, firstLoad) {
         if (typeof MauticVars.modalsReset == 'undefined') {
             MauticVars.modalsReset = {};
         }
 
-        if (typeof MauticVars.modalsReset[target] != 'undefined') {
+        if (firstLoad && typeof MauticVars.modalsReset[target] != 'undefined') {
             return;
         }
 
@@ -896,6 +900,10 @@ var Mautic = {
 
             alert(response.error);
             return;
+        }
+
+        if (response.flashes) {
+            mQuery('#flashes').replaceWith(response.flashes);
         }
 
         if (response.closeModal && response.newContent) {

@@ -5,7 +5,7 @@ Mautic.categoryOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'category');
     }
 
-    if (response.inForm) {
+    if (response && response.inForm) {
         var newOption = mQuery('<option />').val(response.categoryId);
         newOption.html(response.categoryName);
 
@@ -13,10 +13,6 @@ Mautic.categoryOnLoad = function (container, response) {
         newOption.prop('selected', true);
 
         mQuery('.category-select').trigger("chosen:updated");
-    }
-
-    if (response && response.closeModal) {
-        mQuery(container + ' .modal-form-buttons').html('');
     }
 };
 

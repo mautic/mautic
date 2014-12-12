@@ -13,7 +13,7 @@ $alertsClasses = (empty($noGrowl)) ?
     array('notice' => 'alert-success', 'warning' => 'alert-warning', 'error' => 'alert-danger');
 
 ?>
-<div class="page-header-block" id="flashes">
+<div id="flashes">
     <?php foreach ($view['session']->getFlash('notice') as $message): ?>
     <div class="alert <?php echo $alertsClasses['notice'].$dismissable; ?>">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
