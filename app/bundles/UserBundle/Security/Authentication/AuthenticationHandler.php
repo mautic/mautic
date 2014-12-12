@@ -50,7 +50,7 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     {
         $format  = $request->request->get('format');
 
-        if ($format == 'json' && $request->isXmlHttpRequest() ) {
+        if ($format == 'json') {
             $array = array( 'success' => true );
             $response = new Response( json_encode( $array ) );
             $response->headers->set( 'Content-Type', 'application/json' );
@@ -75,7 +75,7 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     {
         $format  = $request->request->get('format');
 
-        if ($format == 'json' && $request->isXmlHttpRequest() ) {
+        if ($format == 'json') {
             $array = array( 'success' => false, 'message' => $exception->getMessage() );
             $response = new Response( json_encode( $array ) );
             $response->headers->set( 'Content-Type', 'application/json' );
