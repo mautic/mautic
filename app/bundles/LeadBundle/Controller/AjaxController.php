@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\AddonBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Event\IconEvent;
