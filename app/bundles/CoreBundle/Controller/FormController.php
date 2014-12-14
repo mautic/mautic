@@ -26,9 +26,19 @@ class FormController extends CommonController
      */
     protected function isFormCancelled(Form &$form)
     {
-        $name   = $form->getName();
-        $cancel = $this->request->request->get($name . '[buttons][cancel]', false, true);
-        return ($cancel !== false);
+        $name = $form->getName();
+        return $this->request->request->get($name . '[buttons][cancel]', false, true) !== false;
+    }
+
+    /**
+     * Checks to see if the form was applied or saved
+     *
+     * @return bool
+     */
+    protected function isFormApplied($form)
+    {
+        $name = $form->getName();
+        return $this->request->request->get($name . '[buttons][apply]', false, true) !== false;
     }
 
     /**
