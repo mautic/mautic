@@ -624,7 +624,7 @@ var Mautic = {
             }
 
             if (response.flashes) {
-                mQuery('#flashes').replaceWith(response.flashes);
+                Mautic.setFlashes(response.flashes);
             }
 
             if (response.route) {
@@ -639,11 +639,7 @@ var Mautic = {
                     mauticContent = response.mauticContent;
                 }
 
-                window.setTimeout(function () {
-                    mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
-                        mQuery(this).remove();
-                    });
-                }, 7000);
+                Mautic.hideFlashes();
 
                 if (response.activeLink) {
                     var link = response.activeLink;
@@ -891,6 +887,18 @@ var Mautic = {
         }
     },
 
+    setFlashes: function (flashes) {
+        mQuery('#flashes').replaceWith(flashes);
+    },
+
+    hideFlashes: function () {
+        window.setTimeout(function () {
+            mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
+                mQuery(this).remove();
+            });
+        }, 7000);
+    },
+
     processModalContent: function (response, target) {
         if (response.error) {
             Mautic.stopIconSpinPostEvent();
@@ -903,7 +911,7 @@ var Mautic = {
         }
 
         if (response.flashes) {
-            mQuery('#flashes').replaceWith(response.flashes);
+            Mautic.setFlashes(response.flashes);
         }
 
         if (response.closeModal && response.newContent) {

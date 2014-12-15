@@ -54,6 +54,10 @@ Mautic.loadCalendarEvents = function (container) {
                         revertFunc();
                     }
                     Mautic.initializeCalendarModals(container);
+                    if (response.flashes) {
+                        Mautic.setFlashes(response.flashes);
+                        Mautic.hideFlashes();
+                    }
                 },
                 error: function (response, textStatus, errorThrown) {
                     revertFunc();

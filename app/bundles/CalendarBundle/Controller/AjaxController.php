@@ -86,6 +86,9 @@ class AjaxController extends CommonAjaxController
             );
         }
 
+        //render flashes
+        $response['flashes'] = $this->getFlashContent();
+
         return $this->sendJsonResponse($response);
     }
 }
