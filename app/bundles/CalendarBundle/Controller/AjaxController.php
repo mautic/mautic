@@ -59,15 +59,31 @@ class AjaxController extends CommonAjaxController
         $event          = $calendarModel->editCalendarEvent($source, $entityId);
 
         $model   = $event->getModel();
-        $entity  = $event->getEntity();
+        $entity  = null;//$event->getEntity();
 
         //not found
         if ($entity === null) {
-            // TODO - it would be maybe nice to display a flash message
+            $this->request->getSession()->getFlashBag()->add(
+                'notice',
+                $this->get('translator')->trans('mautic.core.error.notfound', array(), 'flashes')
+            );
         } elseif (!$event->hasAccess()) {
-            // TODO - it would be maybe nice to display a flash message
+            $this->request->getSession()->getFlashBag()->add(
+                'notice',
+                $this->get('translator')->trans('mautic.core.error.accessdenied', array(), 'flashes')
+            );
         } elseif ($model->isLocked($entity)) {
-            // TODO - it would be maybe nice to display a flash message
+            $this->request->getSession()->getFlashBag()->add(
+                'notice',
+                $this->get('translator')->trans('mautic.core.error.locked', array(
+                    '%name%'      => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_' . $source . '_index',
+                    '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId()
+                    ))
+                ), 'flashes')
+            );
         }elseif ($this->request->getMethod() == 'POST') {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
