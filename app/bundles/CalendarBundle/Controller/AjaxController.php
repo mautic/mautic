@@ -59,7 +59,7 @@ class AjaxController extends CommonAjaxController
         $event          = $calendarModel->editCalendarEvent($source, $entityId);
 
         $model   = $event->getModel();
-        $entity  = null;//$event->getEntity();
+        $entity  = $event->getEntity();
 
         //not found
         if ($entity === null) {
