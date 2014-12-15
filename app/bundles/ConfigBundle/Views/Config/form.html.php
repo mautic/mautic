@@ -11,28 +11,47 @@ if ($tmpl == 'index') {
 }
 ?>
 <?php if (!empty($params)) : ?>
-<?php echo $view['form']->start($form); ?>
+
 <div class="panel panel-default page-list bdr-t-wdh-0">
     <div class="panel-body">
-        <div class="row">
+        <div role="tabpanel">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+            <?php $i = 0; ?>
             <?php foreach ($params as $key => $paramArray) : ?>
-            <div class="col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                    	<h3 class="panel-title"><?php echo $key; ?></h3>
-                    </div>
-                    <div class="panel-body">
-                        <?php foreach ($paramArray as $paramKey => $paramValue) : ?>
-                        <?php echo $view['form']->row($form[$paramKey]); ?>
-                        <?php endforeach; ?>
+                <li role="presentation" class="<?php echo $i == 0 ? 'in active' : ''; ?>">
+                    <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab">
+                        <?php echo $key; ?>
+                    </a>
+                </li>
+                <?php $i++; ?>
+            <?php endforeach; ?>
+            </ul>
+
+            <!-- Tab panes -->
+            <?php echo $view['form']->start($form); ?>
+            <div class="tab-content">
+                <?php $i = 0; ?>
+                <?php foreach ($params as $key => $paramArray) : ?>
+                <div role="tabpanel" class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
+                    <div class="pt-md pr-md pl-md pb-md">
+                    <?php foreach ($paramArray as $paramKey => $paramValue) : ?>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form[$paramKey]); ?>
+                        </div>
+                    <?php endforeach; ?>
                     </div>
                 </div>
+                <?php $i++; ?>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
+            <?php echo $view['form']->end($form); ?>
+
         </div>
     </div>
 </div>
-<?php echo $view['form']->end($form); ?>
+
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>
