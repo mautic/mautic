@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ChatBundle\Controller;
+namespace MauticAddon\MauticChatBundle\Controller;
 
-use Mautic\ChatBundle\Entity\Chat;
+use MauticAddon\MauticChatBundle\Entity\Chat;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;

@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ChatBundle\Model;
+namespace MauticAddon\MauticChatBundle\Model;
 
-use Mautic\ChatBundle\Entity\Channel;
+use MauticAddon\MauticChatBundle\Entity\Channel;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ChatBundle\Model;
+namespace MauticAddon\MauticChatBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\User;

@@ -7,16 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ChatBundle;
+namespace MauticAddon\MauticChatBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Mautic\AddonBundle\Bundle\AddonBundleBase;
 
 /**
  * Class MauticChatBundle
  *
  * @package Mautic\ChatBundle
  */
-class MauticChatBundle extends Bundle
+class MauticChatBundle extends AddonBundleBase
 {
 
 }

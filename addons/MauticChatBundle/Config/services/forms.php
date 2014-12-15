@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Definition;
 $container->setDefinition(
     'mautic.form.type.chatchannel',
     new Definition(
-        'Mautic\ChatBundle\Form\Type\ChannelType'
+        'MauticAddon\MauticChatBundle\Form\Type\ChannelType'
     )
 )
     ->addTag('form.type', array(
