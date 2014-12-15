@@ -14,14 +14,6 @@ date_default_timezone_set ('UTC');
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\HttpFoundation\Request;
 
-// Cannot function on PHP 5.6 properly due to a Doctrine bug which is included in Doctrine 2.5
-// See http://www.doctrine-project.org/jira/browse/DDC-3120 for more
-if (version_compare(PHP_VERSION, '5.6', 'ge')) {
-    echo "Mautic will not function properly on PHP 5.6 due to an issue with a third party dependency.\n";
-    echo "Please downgrade to PHP 5.4 or 5.5.";
-    exit;
-}
-
 $loader = require_once __DIR__ . '/app/bootstrap.php.cache';
 
 // Use APC for autoloading to improve performance.

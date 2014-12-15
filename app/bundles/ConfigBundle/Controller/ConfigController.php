@@ -91,7 +91,7 @@ class ConfigController extends FormController
             }
 
             // If the form is saved or cancelled, redirect back to the dashboard
-            if ($cancelled || !$this->isFormApplied()) {
+            if ($cancelled || !$this->isFormApplied($form)) {
                 return $this->redirect($this->generateUrl('mautic_dashboard_index'));
             }
 
@@ -144,7 +144,7 @@ class ConfigController extends FormController
 
             if (file_exists($paramsFile)) {
                 // Import the bundle configuration, $parameters is defined in this file
-                require_once $paramsFile;
+                include $paramsFile;
 
                 // Merge the bundle params with the local params
                 foreach ($parameters as $key => $value) {
@@ -166,7 +166,7 @@ class ConfigController extends FormController
 
             if (file_exists($paramsFile)) {
                 // Import the bundle configuration, $parameters is defined in this file
-                require_once $paramsFile;
+                include $paramsFile;
 
                 // Merge the bundle params with the local params
                 foreach ($parameters as $key => $value) {
@@ -183,15 +183,5 @@ class ConfigController extends FormController
         }
 
         return $params;
-    }
-
-    /**
-     * Checks to see if the form was applied or saved
-     *
-     * @return bool
-     */
-    protected function isFormApplied()
-    {
-        return $this->request->request->get('config[buttons][apply]', false, true) !== false;
     }
 }
