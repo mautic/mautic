@@ -72,7 +72,18 @@ class AjaxController extends CommonAjaxController
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
-            // TODO - it would be maybe nice to display a flash message
+
+            $this->request->getSession()->getFlashBag()->add(
+                'notice',
+                $this->get('translator')->trans('mautic.core.notice.updated', array(
+                    '%name%'      => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_' . $source . '_index',
+                    '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId()
+                    ))
+                ), 'flashes')
+            );
         }
 
         return $this->sendJsonResponse($response);
