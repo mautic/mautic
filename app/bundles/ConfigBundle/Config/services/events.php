@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
+/**
 //Mautic event listener
 $container->setDefinition(
     'mautic.config.subscriber',
@@ -20,3 +21,4 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+**/
