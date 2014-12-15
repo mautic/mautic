@@ -24,6 +24,9 @@ Mautic.initializeCalendarModals = function (container) {
 Mautic.loadCalendarEvents = function (container) {
     mQuery('#calendar').fullCalendar({
         events: mauticAjaxUrl + "?action=calendar:generateData",
+        lang: 'en',
+        eventLimit: true,
+        eventLimitText: "more",
         eventRender: function(event, element) {
             element = mQuery(element);
             if (event.iconClass) {
