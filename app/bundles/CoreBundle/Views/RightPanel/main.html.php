@@ -9,24 +9,8 @@
 ?>
 
 <div class="offcanvas-main" id="OffCanvasMain">
-    <!-- start: sidebar header -->
-    <div class="sidebar-header box-layout"  id="OffCanvasMainHeader">
-        <div class="text-center mt-20">
-            <h4><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></h4>
-        </div>
-    </div>
-    <!--/ end: sidebar header -->
-
-    <!-- start: sidebar content -->
-    <div class="sidebar-content">
-        <!-- scroll-content -->
-        <div class="scroll-content slimscroll" id="OffCanvasMainCanvas">
-            <!-- start: navigation -->
-            <nav class="nav-sidebar">
-                <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
-            </nav>
-        </div>
-    </div>
-    <!--/ end: sidebar content -->
+    <?php if ($canvasContent): ?>
+    <?php echo $view->render('MauticCoreBundle:RightPanel:content.html.php', array('canvasContent' => $canvasContent, 'canvas' => 'Main', 'hasLeft' => $hasLeft, 'hasRight' => $hasRight)); ?>
+    <?php endif; ?>
 </div>
 <!--/ Offcanvas Main -->

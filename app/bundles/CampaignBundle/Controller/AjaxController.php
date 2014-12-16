@@ -62,7 +62,7 @@ class AjaxController extends CommonAjaxController
                     ));
                 } elseif ($event['triggerMode'] == 'date') {
                     /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                    $dh    = $this->container->get('mautic.core.template.helper.date');
+                    $dh    = $this->container->get('mautic.helper.template.date');
                     $label = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
                         '%full%' => $dh->toFull($event['triggerDate']),
                         '%time%' => $dh->toTime($event['triggerDate']),

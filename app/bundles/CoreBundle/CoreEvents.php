@@ -87,4 +87,13 @@ final class CoreEvents
      * @var string
      */
     const FETCH_ICONS = 'mautic.on_fetch_icons';
+
+    /**
+     * The mautic.build_canvas_content event is dispatched to populate the content for the right panel
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\SidebarCanvasEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
 }

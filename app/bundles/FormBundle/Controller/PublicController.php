@@ -56,7 +56,7 @@ class PublicController extends CommonFormController
 
                //check to ensure the form is published
                 $status = $form->getPublishStatus();
-                $dateTemplateHelper = $this->get('mautic.core.template.helper.date');
+                $dateTemplateHelper = $this->get('mautic.helper.template.date');
                 if ($status == 'pending') {
                     $error = $translator->trans('mautic.form.submit.error.pending', array(
                         '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())

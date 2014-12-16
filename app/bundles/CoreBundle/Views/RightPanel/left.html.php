@@ -9,23 +9,8 @@
 ?>
 
 <div class="offcanvas-left" id="OffCanvasLeft">
-    <!-- start: sidebar header -->
-    <div class="sidebar-header box-layout"  id="OffCanvasLeftHeader">
-        <div class="col-xs-6 va-m">
-            <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
-        </div>
-        <div class="col-xs-6 va-m text-right">
-
-        </div>
-    </div>
-    <!--/ end: sidebar header -->
-
-    <!-- start: sidebar content -->
-    <div class="sidebar-content">
-        <!-- scroll-content -->
-        <div class="scroll-content slimscroll" id="OffCanvasLeftCanvas">
-        </div>
-    </div>
-    <!--/ end: sidebar content -->
+    <?php if ($canvasContent): ?>
+        <?php echo $view->render('MauticCoreBundle:RightPanel:content.html.php', array('canvasContent' => $canvasContent, 'canvas' => 'Left')); ?>
+    <?php endif; ?>
 </div>
 <!--/ Offcanvas Left -->

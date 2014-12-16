@@ -16,7 +16,7 @@ $container->setParameter('templating.helper.slots.class', 'Mautic\CoreBundle\Tem
 $container->setParameter('templating.name_parser.class', 'Mautic\CoreBundle\Templating\TemplateNameParser');
 
 //Template helpers
-$container->setDefinition('mautic.core.template.helper.date',
+$container->setDefinition('mautic.helper.template.date',
     new Definition(
         'Mautic\CoreBundle\Templating\Helper\DateHelper',
         array(
@@ -26,8 +26,7 @@ $container->setDefinition('mautic.core.template.helper.date',
     ->addTag('templating.helper', array('alias' => 'date'))
     ->setScope('request');
 
-
-$container->setDefinition('mautic.core.template.helper.exception',
+$container->setDefinition('mautic.helper.template.exception',
     new Definition(
         'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
         array(
@@ -37,7 +36,7 @@ $container->setDefinition('mautic.core.template.helper.exception',
     ->addTag('templating.helper', array('alias' => 'exception'))
     ->setScope('request');
 
-$container->setDefinition('mautic.core.template.helper.gravatar',
+$container->setDefinition('mautic.helper.template.gravatar',
     new Definition(
         'Mautic\CoreBundle\Templating\Helper\GravatarHelper',
         array(
@@ -64,3 +63,13 @@ $container->setDefinition('mautic.helper.assetgeneration',
         )
     )
 );
+
+$container->setDefinition('mautic.helper.template.canvas',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\SidebarCanvasHelper',
+        array(
+            new Reference('mautic.factory')
+        )
+    ))
+    ->addTag('templating.helper', array('alias' => 'canvas'))
+    ->setScope('request');
