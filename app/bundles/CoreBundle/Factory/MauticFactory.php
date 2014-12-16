@@ -69,11 +69,18 @@ class MauticFactory
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
 
+            if ($parts[0] == 'addon' && $parts[1] != 'addon') {
+                $namespace = 'MauticAddon';
+                array_shift($parts);
+            } else {
+                $namespace = 'Mautic';
+            }
+
             if (count($parts) !== 2) {
                 throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
             }
 
-            $modelClass = '\\Mautic\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
+            $modelClass = '\\'.$namespace.'\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
 
             if (!class_exists($modelClass)) {
                 throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
