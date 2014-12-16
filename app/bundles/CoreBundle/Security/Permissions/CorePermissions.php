@@ -231,14 +231,21 @@ class CorePermissions
 
         $permissions = array();
         foreach ($requestedPermission as $permission) {
-            $permission = strtolower($permission);
-
             if (isset($grantedPermissions[$permission])) {
                 $permissions[$permission] = $grantedPermissions[$permission];
                 continue;
             }
 
             $parts = explode(':', $permission);
+
+            if ($parts[0] == 'addon' && count($parts) == 4) {
+                $isAddon = true;
+                array_shift($parts);
+            } else {
+                $isAddon = false;
+                $permission = strtolower($permission);
+            }
+
             if (count($parts) != 3) {
                 throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.badformat',
                     array("%permission%" => $permission))
@@ -248,7 +255,7 @@ class CorePermissions
             $activePermissions =  ($userEntity instanceof User) ? $userEntity->getActivePermissions() : array();
 
             //check against bundle permissions class
-            $permissionObject = $this->getPermissionClass($parts[0]);
+            $permissionObject = $this->getPermissionClass($parts[0], true, $isAddon);
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
