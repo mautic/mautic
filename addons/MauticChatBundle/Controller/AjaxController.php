@@ -41,7 +41,7 @@ class AjaxController extends CommonAjaxController
         $user        = $userModel->getEntity($userId);
 
         if ($user instanceof User && $userId !== $currentUser->getId()) {
-            $chatModel = $this->factory->getModel('chat.chat');
+            $chatModel = $this->factory->getModel('addon.mauticChat.chat');
             $messages  = $chatModel->getDirectMessages($user);
 
             //get the HTML
@@ -80,7 +80,7 @@ class AjaxController extends CommonAjaxController
 
         $currentUser = $this->factory->getUser();
         $channelId   = InputHelper::int($request->request->get('chatId', $channelId));
-        $model       = $this->factory->getModel('chat.channel');
+        $model       = $this->factory->getModel('addon.mauticChat.channel');
         $channel     = $model->getEntity($channelId);
 
         if ($channel !== null) {
@@ -143,7 +143,7 @@ class AjaxController extends CommonAjaxController
                     $entity->setToUser($recipient);
                 }
             } elseif ($chatType == 'channel') {
-                $channelModel = $this->factory->getModel('chat.channel');
+                $channelModel = $this->factory->getModel('addon.mauticChat.channel');
                 $recipient    = $channelModel->getEntity($chatId);
                 if ($recipient !== null) {
                     $repo = $channelModel->getRepository();
@@ -183,7 +183,7 @@ class AjaxController extends CommonAjaxController
                 $recipient = null;
             }
         } elseif ($chatType == 'channel') {
-            $channelModel = $this->factory->getModel('chat.channel');
+            $channelModel = $this->factory->getModel('addon.mauticChat.channel');
             $recipient    = $channelModel->getEntity($chatId);
         }
 
@@ -214,12 +214,12 @@ class AjaxController extends CommonAjaxController
             if ($chatId !== $currentUser->getId()) {
                 $userModel = $this->factory->getModel('user.user');
                 $recipient = $userModel->getEntity($chatId);
-                $chatModel = $this->factory->getModel('chat.chat');
+                $chatModel = $this->factory->getModel('addon.mauticChat.chat');
                 $chatModel->markMessagesRead($recipient, $lastId);
                 $dataArray['success'] = 1;
             }
         } elseif ($chatType == 'channel') {
-            $channelModel = $this->factory->getModel('chat.channel');
+            $channelModel = $this->factory->getModel('addon.mauticChat.channel');
             $recipient    = $channelModel->getEntity($chatId);
             $channelModel->markMessagesRead($recipient, $lastId);
             $dataArray['success'] = 1;
@@ -264,10 +264,10 @@ class AjaxController extends CommonAjaxController
         $startId  = ($groupId && $groupId <= $lastId) ? $groupId - 1 : $lastId;
 
         if ($chatType == 'user') {
-            $chatModel = $this->factory->getModel('chat.chat');
+            $chatModel = $this->factory->getModel('addon.mauticChat.chat');
             $messages  = $chatModel->getDirectMessages($recipient, $startId);
         } else {
-            $channelModel = $this->factory->getModel('chat.channel');
+            $channelModel = $this->factory->getModel('addon.mauticChat.channel');
             $messages     = $channelModel->getGroupMessages($recipient, $startId);
 
             $lastRead = $channelModel->getUserChannelStats($recipient);

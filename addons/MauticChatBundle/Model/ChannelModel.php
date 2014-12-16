@@ -25,7 +25,7 @@ class ChannelModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\ChatBundle\Entity\ChannelRepository
+     * @return \MauticAddon\MauticChatBundle\Entity\ChannelRepository
      */
     public function getRepository()
     {

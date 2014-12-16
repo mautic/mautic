@@ -23,7 +23,7 @@ class ChannelController extends FormController
     public function indexAction($channelId)
     {
         $currentUser = $this->factory->getUser();
-        $model       = $this->factory->getModel('chat.channel');
+        $model       = $this->factory->getModel('addon.mauticChat.channel');
         $entity      = $model->getEntity($channelId);
 
         if ($entity === null) {
@@ -67,11 +67,11 @@ class ChannelController extends FormController
 
     public function newAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('chat:channels:create')) {
+        if (!$this->factory->getSecurity()->isGranted('addon:mauticChat:channels:create')) {
             return $this->modalAccessDenied();
         }
 
-        $model  = $this->factory->getModel('chat.channel');
+        $model  = $this->factory->getModel('addon.mauticChat.channel');
         $entity = $model->getEntity();
 
         $action = $this->generateUrl('mautic_chatchannel_action', array('objectAction' => 'new'));
@@ -122,14 +122,14 @@ class ChannelController extends FormController
 
     public function editAction($objectId = 0)
     {
-        $model  = $this->factory->getModel('chat.channel');
+        $model  = $this->factory->getModel('addon.mauticChat.channel');
         $entity = $model->getEntity($objectId);
 
         //not found
         if ($entity === null) {
             return $this->forward('MauticChatBundle:Default:index');
         }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            true, 'chat:channels:editother', $entity->getCreatedBy()
+            true, 'addon:mauticChat:channels:editother', $entity->getCreatedBy()
         )) {
             return $this->modalAccessDenied();
         }
@@ -185,12 +185,12 @@ class ChannelController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('chat.channel');
+            $model  = $this->factory->getModel('addon.mauticChat.channel');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                true, 'chat:channels:archiveother', $entity->getCreatedBy()
+                true, 'addon:mauticChat:channels:archiveother', $entity->getCreatedBy()
             )) {
                 return $this->accessDenied();
             }

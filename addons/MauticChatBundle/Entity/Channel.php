@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Channel
  * @ORM\Table(name="chat_channels")
- * @ORM\Entity(repositoryClass="Mautic\ChatBundle\Entity\ChannelRepository")
+ * @ORM\Entity(repositoryClass="MauticAddon\MauticChatBundle\Entity\ChannelRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 

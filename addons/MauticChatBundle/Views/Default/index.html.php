@@ -12,6 +12,7 @@ if (!empty($inPopup)) {
 }
 
 if (empty($contentOnly)) {
+    $view['assets']->addScript('addons/MauticChatBundle/Assets/js/chats.js', 'bodyClose');
     $view['assets']->addScriptDeclaration('Mautic.activateChatListUpdate();', 'bodyClose');
 }
 ?>

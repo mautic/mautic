@@ -9,15 +9,15 @@
 
 namespace MauticAddon\MauticChatBundle\Security\Permissions;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ChatPermissions
+ * Class MauticChatPermissions
  *
  * @package Mautic\CoreBundle\Security\AbstractPermissions
  */
-class ChatPermissions extends AbstractPermissions
+class MauticChatPermissions extends AbstractPermissions
 {
 
     /**
@@ -42,7 +42,7 @@ class ChatPermissions extends AbstractPermissions
      * @return string|void
      */
     public function getName() {
-        return 'chat';
+        return 'mauticChat';
     }
 
     /**

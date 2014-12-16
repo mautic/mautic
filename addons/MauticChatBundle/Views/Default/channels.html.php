@@ -11,7 +11,7 @@
     <li class="media-heading">
         <h5 class="fw-sb">
             <span><?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?></span>
-            <?php if ($permissions['chat:channels:create']): ?>
+            <?php if ($permissions['addon:mauticChat:channels:create']): ?>
             <span> - <a data-toggle="ajaxmodal" data-target="#channelModal" data-header="<?php echo $view['translator']->trans('mautic.chat.channel.header.new'); ?>" data-ignore-removemodal="true" href="<?php echo $view['router']->generate('mautic_chatchannel_action', array('objectAction' => 'new')); ?>"><?php echo $view['translator']->trans('mautic.chat.channel.new'); ?></a></span>
             <?php endif; ?>
         </h5>

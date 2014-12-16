@@ -14,7 +14,7 @@ use Mautic\AddonBundle\Bundle\AddonBundleBase;
 /**
  * Class MauticChatBundle
  *
- * @package Mautic\ChatBundle
+ * @package MauticAddon\MauticChatBundle
  */
 class MauticChatBundle extends AddonBundleBase
 {

@@ -23,7 +23,7 @@ class DefaultController extends FormController
     public function indexAction()
     {
         //get a list of channels
-        $channelModel = $this->factory->getModel('chat.channel');
+        $channelModel = $this->factory->getModel('addon.mauticChat.channel');
         $unsorted     = $channelModel->getMyChannels();
 
         $withUnread    = array();
@@ -48,7 +48,7 @@ class DefaultController extends FormController
         $channels = array_merge($withUnread, $withoutUnread);
 
         //get a list of  users
-        $chatModel = $this->factory->getModel('chat');
+        $chatModel = $this->factory->getModel('addon.mauticChat.chat');
         $unsorted  = $chatModel->getUserList();
 
         $withUnread    = array();
@@ -79,9 +79,9 @@ class DefaultController extends FormController
                 'channels'    => $channels,
                 'users'       => $users,
                 'permissions' => $security->isGranted(array(
-                    'chat:channels:create',
-                    'chat:channels:editother',
-                    'chat:channels:archiveother'
+                    'addon:mauticChat:channels:create',
+                    'addon:mauticChat:channels:editother',
+                    'addon:mauticChat:channels:archiveother'
                 ), 'RETURN_ARRAY'),
                 'ignoreModal' => $this->request->get('ignoreModal', false)
             ),
@@ -101,7 +101,7 @@ class DefaultController extends FormController
             $user        = $userModel->getEntity($chattingWith);
 
             if ($user instanceof User && $chattingWith !== $currentUser->getId()) {
-                $chatModel = $this->factory->getModel('chat.chat');
+                $chatModel = $this->factory->getModel('addon.mauticChat.chat');
                 $messages  = $chatModel->getDirectMessages($user);
 
                 //get the HTML

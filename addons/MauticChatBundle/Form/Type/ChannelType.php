@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * Class FormType
  *
- * @package Mautic\ChatBundle\Form\Type
+ * @package MauticAddon\MauticChatBundle\Form\Type
  */
 class ChannelType extends AbstractType
 {

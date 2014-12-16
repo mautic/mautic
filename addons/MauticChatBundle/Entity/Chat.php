@@ -16,7 +16,7 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Class Chat
  * @ORM\Table(name="chats")
- * @ORM\Entity(repositoryClass="Mautic\ChatBundle\Entity\ChatRepository")
+ * @ORM\Entity(repositoryClass="MauticAddon\MauticChatBundle\Entity\ChatRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 
