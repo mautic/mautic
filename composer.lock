@@ -1452,16 +1452,16 @@
         },
         {
             "name": "joomla/http",
-            "version": "1.1.4",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/http.git",
-                "reference": "e3b88785aa42de2ee8290a14ee4ee6652508a0d0"
+                "reference": "71bc4adf7592f11ac684d163eb3cb530375d6d41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/e3b88785aa42de2ee8290a14ee4ee6652508a0d0",
-                "reference": "e3b88785aa42de2ee8290a14ee4ee6652508a0d0",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/71bc4adf7592f11ac684d163eb3cb530375d6d41",
+                "reference": "71bc4adf7592f11ac684d163eb3cb530375d6d41",
                 "shasum": ""
             },
             "require": {
@@ -1475,6 +1475,11 @@
                 "joomla/registry": "Registry can be used as an alternative to using an array for the package options."
             },
             "type": "joomla-package",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Joomla\\Http\\": "src/",
@@ -1492,7 +1497,7 @@
                 "http",
                 "joomla"
             ],
-            "time": "2014-08-23 19:15:18"
+            "time": "2014-12-16 17:34:09"
         },
         {
             "name": "joomla/uri",

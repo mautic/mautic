@@ -19,6 +19,11 @@ class UpdateHelper
 {
 
     /**
+     * @var \Joomla\Http\Http
+     */
+    private $connector;
+
+    /**
      * @var MauticFactory
      */
     private $factory;
@@ -29,6 +34,10 @@ class UpdateHelper
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
+
+        $options = array('transport.curl' => array(CURLOPT_SSL_VERIFYPEER => false));
+
+        $this->connector = HttpFactory::getHttp($options);
     }
 
     /**
@@ -40,12 +49,9 @@ class UpdateHelper
      */
     public function fetchPackage($package)
     {
-        // Get our HTTP client
-        $connector = HttpFactory::getHttp();
-
         // GET the update data
         try {
-            $data = $connector->get($package);
+            $data = $this->connector->get($package);
         } catch (\Exception $exception) {
             return array(
                 'error'   => true,
@@ -96,9 +102,6 @@ class UpdateHelper
             }
         }
 
-        // Get our HTTP client
-        $connector = HttpFactory::getHttp();
-
         // Before processing the update data, send up our metrics
         try {
             // Generate a unique instance ID for the site
@@ -113,7 +116,7 @@ class UpdateHelper
                 'instanceId'  => $instanceId
             );
 
-            $connector->post('http://mautic.org/stats/send', $data);
+            $this->connector->post('https://www.mautic.org/stats/send', $data);
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
         }
@@ -126,7 +129,7 @@ class UpdateHelper
                 'stability'  => $this->factory->getParameter('update_stability')
             );
 
-            $data    = $connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
+            $data    = $this->connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(
