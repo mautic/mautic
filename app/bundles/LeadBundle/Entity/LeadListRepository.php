@@ -260,8 +260,12 @@ class LeadListRepository extends CommonRepository
         $parameters = array();
         $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $list);
         $q->select('count(*) as recipientCount')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where($expr);
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        if ($expr->count()) {
+            $q->where($expr);
+        }
+
         foreach ($parameters as $k => $v) {
             $q->setParameter($k, $v);
         }
