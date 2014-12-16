@@ -53,12 +53,24 @@ class AjaxController extends CommonController
             if (strpos($action, ":") !== false) {
                 //call the specified bundle's ajax action
                 $parts = explode(":", $action);
+                $namespace = 'Mautic';
+                $isAddon = false;
+
+                if ($parts[0] == 'addon' && count($parts) == 3) {
+                    $namespace = 'MauticAddon';
+                    array_shift($parts);
+                    $isAddon = true;
+                }
+
                 if (count($parts) == 2) {
                     $bundle     = ucfirst($parts[0]);
                     $action     = $parts[1];
 
-                    if (class_exists('Mautic\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
-                        return $this->forward("Mautic{$bundle}Bundle:Ajax:executeAjax", array(
+                    if (class_exists($namespace . '\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
+                        if (!$isAddon) {
+                            $bundle = 'Mautic' . $bundle;
+                        }
+                        return $this->forward("{$bundle}Bundle:Ajax:executeAjax", array(
                             'action'  => $action,
                             //forward the request as well as Symfony creates a subrequest without GET/POST
                             'request' => $this->request
