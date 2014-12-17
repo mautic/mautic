@@ -28,6 +28,34 @@ class IntegrationController extends FormController
 
         $addonFilter = $this->request->get('addon');
 
+        if (!empty($addonFilter)) {
+            //check to see if the addon is enabled; if not redirect back to addons with a message to enable
+            $addonModel = $this->factory->getModel('addon');
+            $addonEntity = $addonModel->getEntity($addonFilter);
+            if ($addonEntity != null && !$addonEntity->isEnabled()) {
+                $viewParameters = array(
+                    'page' => $this->factory->getSession()->get('mautic.addon.page')
+                );
+
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $this->generateUrl('mautic_addon_index', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticAddonBundle:Addon:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_addon_index',
+                        'mauticContent' => 'addon'
+                    ),
+                    'flashes'         => array(
+                        array(
+                            'type'    => 'error',
+                            'msg'     => 'mautic.integration.error.addonnotenabled',
+                            'msgVars' => array('%name%' => $addonEntity->getName())
+                        )
+                    )
+                ));
+            }
+        }
+
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true, $addonFilter);

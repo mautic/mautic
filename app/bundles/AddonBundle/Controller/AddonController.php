@@ -71,7 +71,7 @@ class AddonController extends FormController
                 'contentTemplate' => 'MauticAddonBundle:Addon:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_addon_index',
-                    'mauticContent' => 'integration'
+                    'mauticContent' => 'addon'
                 )
             ));
         }
@@ -93,7 +93,7 @@ class AddonController extends FormController
             'contentTemplate' => 'MauticAddonBundle:Addon:list.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_addon_index',
-                'mauticContent'  => 'integration',
+                'mauticContent'  => 'addon',
                 'route'          => $this->generateUrl('mautic_addon_index', array('page' => $page))
             )
         ));
@@ -238,7 +238,7 @@ class AddonController extends FormController
             'contentTemplate' => 'MauticAddonBundle:Addon:index',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_addon_index',
-                'mauticContent' => 'integration'
+                'mauticContent' => 'addon'
             )
         ));
     }
