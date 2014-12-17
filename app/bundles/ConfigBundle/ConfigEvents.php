@@ -26,5 +26,5 @@ final class ConfigEvents
      *
      * @var string
      */
-    const GONFIG_ON_GENERATE   = 'mautic.config_on_generate';
+    const CONFIG_ON_GENERATE   = 'mautic.config_on_generate';
 }
