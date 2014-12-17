@@ -37,9 +37,20 @@ class AddonModel extends FormModel
 
     /**
      * {@inheritdoc}
+     *
+     * @param object $entity
+     *
+     * @return bool  Force browser refresh
      */
-    public function getNameGetter()
+    public function togglePublishStatus($entity)
     {
-        return 'getName';
+        parent::togglePublishStatus($entity);
+
+        //clear the cache
+        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+        $cacheHelper = $this->factory->getHelper('cache');
+        $cacheHelper->clearCache();
+
+        return true;
     }
 }
