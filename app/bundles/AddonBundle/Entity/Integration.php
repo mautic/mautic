@@ -11,6 +11,7 @@ namespace Mautic\AddonBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Integration
@@ -18,7 +19,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\AddonBundle\Entity\IntegrationRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Integration
+class Integration extends CommonEntity
 {
 
     /**
@@ -129,14 +130,6 @@ class Integration
     public function setName ($name)
     {
         $this->name = $name;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function isPublished()
-    {
-        return $this->getIsPublished();
     }
 
     /**

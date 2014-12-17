@@ -593,4 +593,14 @@ class MauticFactory
     {
         return $this->container->get('mautic.helper.' . $helper);
     }
+
+    /**
+     * Get's the Symfony kernel
+     *
+     * @return \Symfony\Component\HttpKernel\KernelInterface
+     */
+    public function getKernel()
+    {
+        return $this->container->get('kernel');
+    }
 }

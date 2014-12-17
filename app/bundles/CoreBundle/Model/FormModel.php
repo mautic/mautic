@@ -174,6 +174,8 @@ class FormModel extends CommonModel
      * Toggles entity publish status
      *
      * @param object $entity
+     *
+     * @return bool  Force browser refresh
      */
     public function togglePublishStatus($entity)
     {
@@ -203,6 +205,8 @@ class FormModel extends CommonModel
         $event = $this->dispatchEvent("pre_save", $entity, false);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, false, $event);
+
+        return false;
     }
 
 

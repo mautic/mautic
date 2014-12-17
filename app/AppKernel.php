@@ -57,12 +57,48 @@ class AppKernel extends Kernel
     {
         parent::boot();
 
+        $factory    = $this->getContainer()->get('mautic.factory');
+        $dispatcher = $factory->getDispatcher();
+
+        $listeners = $dispatcher->getListeners();
+
+        //listeners have to be removed as well so loop to find MauticAddon listeners
+        $addonListeners = array();
+        foreach ($listeners as $event => $subscribers) {
+            foreach ($subscribers as $subscriber) {
+                if (is_array($subscriber)) {
+                    $name = is_object($subscriber[0]) ? get_class($subscriber[0]) : $subscriber[0];
+                } else {
+                    $name = $subscriber;
+                }
+
+                if (strpos($name, 'MauticAddon') !== false) {
+                    //get the name of the bundle
+                    $parts      = explode('\\', $name);
+                    $bundlePath = $parts[0] . '\\' . $parts[1];
+                    $addonListeners[$bundlePath][] = array($event, $subscriber);
+                }
+            }
+        }
+
         // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
         foreach ($this->getBundles() as $name => $bundle) {
             if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
                 if (!$bundle->isEnabled()) {
                     unset($this->bundles[$name]);
                     unset($this->bundleMap[$name]);
+
+                    //remove listeners as well
+                    $bundleClass = get_class($bundle);
+
+                    $parts      = explode('\\', $bundleClass);
+                    $bundlePath = $parts[0] . '\\' . $parts[1];
+
+                    if (isset($addonListeners[$bundlePath])) {
+                        foreach ($addonListeners[$bundlePath] as $listener) {
+                            $dispatcher->removeListener($listener[0], $listener[1]);
+                        }
+                    }
                 }
             }
         }

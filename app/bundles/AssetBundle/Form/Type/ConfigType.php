@@ -25,6 +25,19 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ConfigType extends AbstractType
 {
     /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+    
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */

@@ -42,10 +42,14 @@ if ($tmpl == 'index') {
             <?php foreach ($params as $key => $paramArray) : ?>
             <div role="tabpanel" class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
-                <?php if (isset($paramArray['bundle'])) : ?>
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form[$paramArray['bundle']]); ?>
-                    </div>
+                <?php if (isset($paramArray['parameters']) && isset($paramArray['bundle'])) : ?>
+                    <?php foreach ($paramArray['parameters'] as $paramKey => $paramValue) : ?>
+                        <?php if (isset($form[$paramArray['bundle']][$paramKey])) : ?>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form[$paramArray['bundle']][$paramKey]); ?>
+                        </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 <?php else : ?>
                 <?php foreach ($paramArray as $paramKey => $paramValue) : ?>
                     <div class="col-md-6">

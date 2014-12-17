@@ -52,3 +52,12 @@ $container->setDefinition(
         'method' => 'onKernelException',
         'priority' => 255
     ));
+
+$container->setDefinition(
+    'mautic.core.configbundle.subscriber',
+    new Definition(
+        'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
