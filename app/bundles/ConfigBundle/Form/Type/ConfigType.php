@@ -44,7 +44,7 @@ class ConfigType extends AbstractType
         foreach ($options['data'] as $bundle => $config) {
 
             if (isset($config['formClass'])) {
-                $builder->add($bundle, new $config['formClass'], array('data' => $config['parameters']));
+                $builder->add($bundle, new $config['formClass']($this->factory), array('data' => $config['parameters']));
             } else {
 
                 foreach ($config as $key => $value) {
