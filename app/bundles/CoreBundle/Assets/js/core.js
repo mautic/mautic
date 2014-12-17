@@ -1375,7 +1375,9 @@ var Mautic = {
             success: function (response) {
                 Mautic.stopIconSpinPostEvent();
                 Mautic.stopPageLoadingBar();
-                if (response.statusHtml) {
+                if (response.reload) {
+                    location.reload();
+                } else if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
                 }
