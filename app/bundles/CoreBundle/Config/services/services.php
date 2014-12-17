@@ -82,3 +82,11 @@ $container->setDefinition('mautic.helper.update',
         array(
             new Reference('mautic.factory'))
     ));
+
+//Cache helper
+$container->setDefinition('mautic.helper.cache',
+    new Definition(
+        'Mautic\CoreBundle\Helper\CacheHelper',
+        array(
+            new Reference('mautic.factory'))
+    ));

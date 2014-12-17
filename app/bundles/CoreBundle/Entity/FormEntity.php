@@ -21,7 +21,7 @@ use Mautic\UserBundle\Entity\User;
  * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
  */
-class FormEntity
+class FormEntity extends CommonEntity
 {
 
     /**
@@ -107,25 +107,6 @@ class FormEntity
     protected $changes = array();
 
     /**
-     * Wrapper function for isProperty methods
-     *
-     * @param string $name
-     * @param        $arguments
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __call($name, $arguments)
-    {
-        if (strpos($name, 'is') === 0 && method_exists($this, 'get' . ucfirst($name))) {
-            return $this->{'get' . ucfirst($name)}();
-        } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
-            return $this->getTitle();
-        }
-
-        throw new \InvalidArgumentException('Method ' . $name . ' not exists');
-    }
-
-    /**
      * Check publish status with option to check against category, publish up and down dates
      *
      * @param bool $checkPublishStatus
@@ -186,14 +167,6 @@ class FormEntity
     public function resetChanges()
     {
         $this->changes = array();
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return get_called_class() . " with ID #" . $this->getId();
     }
 
     /**

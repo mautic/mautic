@@ -11,9 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -324,26 +322,9 @@ class CommonController extends Controller implements MauticController
      */
     public function clearCache()
     {
-        ini_set('memory_limit', '128M');
-
-        //attempt to squash command output
-        ob_start();
-
-        $env  = $this->factory->getEnvironment();
-        $args = array('console', 'cache:clear', '--env=' . $env);
-
-        if ($env == 'prod') {
-            $args[] = '--no-debug';
-        }
-
-        $input       = new ArgvInput($args);
-        $application = new Application($this->get('kernel'));
-        $application->setAutoExit(false);
-        $application->run($input);
-
-        if (ob_get_length() > 0) {
-            ob_end_clean();
-        }
+        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+        $cacheHelper = $this->factory->getHelper('cache');
+        $cacheHelper->clearCache();
     }
 
     /**
@@ -351,15 +332,9 @@ class CommonController extends Controller implements MauticController
      */
     public function clearCacheFile()
     {
-        $env      = $this->factory->getEnvironment();
-        $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
-        $cacheDir = $this->factory->getSystemPath('cache', true);
-
-        $cacheFile = "$cacheDir/app".ucfirst($env)."{$debug}ProjectContainer.php";
-
-        if (file_exists($cacheFile)) {
-            unlink($cacheFile);
-        }
+        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+        $cacheHelper = $this->factory->getHelper('cache');
+        $cacheHelper->clearCacheFile();
     }
 
     /**

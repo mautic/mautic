@@ -12,6 +12,7 @@ namespace Mautic\AddonBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Addon
@@ -19,7 +20,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\AddonBundle\Entity\AddonRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Addon
+class Addon extends CommonEntity
 {
 
     /**
