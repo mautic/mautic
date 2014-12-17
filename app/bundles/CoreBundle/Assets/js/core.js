@@ -85,21 +85,6 @@ var Mautic = {
         mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-rtl');
         });
-        //collapse animation
-        mQuery('[data-toggle="minimize"]').click(function(){
-            if (mQuery('html').hasClass('sidebar-minimized')) {
-                mQuery('.app-sidebar.sidebar-left').animate({
-                    width: "230px"
-                }, 'slow');
-            } else {
-                mQuery('.app-sidebar.sidebar-left').animate({
-                    width: "60px"
-                }, 'slow');
-                mQuery('.sidebar-left.sidebar-header').animate({
-                    width: "60px"
-                }, 'slow');
-            }
-        });
 
 
         //initialize forms
