@@ -675,7 +675,11 @@ body > #app-wrapper {
     margin-left: 60px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left {
-    width: 60px;
+    -webkit-transform: translate3d(-170px, 0px, 0px);
+    transform: translate3d(-170px, 0px, 0px);
+    -webkit-transition: transform 0.3s ease;
+    -o-transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar {
     margin-top: 10px;
@@ -726,9 +730,14 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left .sidebar-content > .scroll-wrapper > .scroll-bar {
     display: none !important;
   }
+  .sidebar-minimized .app-sidebar.sidebar-left .sidebar-content {
+    right: 0;
+    width: 60px;
+  }
   .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header {
     padding: 0;
-    width: 60px;
+    left: 85px;
+
   }
   .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header > .mautic-brand > .mautic-logo-text {
     display: none;
