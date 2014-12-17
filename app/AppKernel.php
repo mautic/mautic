@@ -162,7 +162,7 @@ class AppKernel extends Kernel
             $namespace = "MauticAddon\\" . implode('\\', $parts);
             $class     = $namespace . '\\' . $class;
             if (class_exists($class)) {
-                $addonInstance[] = new $class();
+                $bundles[] = new $class();
             }
         }
 
