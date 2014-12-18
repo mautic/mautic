@@ -63,19 +63,7 @@ class ConfigController extends FormController
                     $formValues[$bundle] = array();
 
                     foreach ($bundleConfig['parameters'] as $key => $value) {
-                        $postedValue = $post->get('config[' . $key . ']', null, true);
-
-                        // Check to ensure we don't save a blank password to the config which may remove the user's old password
-                        if (in_array($key, array('mailer_password', 'transifex_password')) && $postedValue == '') {
-                            continue;
-                        }
-
-                        $value = $post->get('config[' . $key . ']', null, true);
-
-                        if ($value === null) {
-                            $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
-                        }
-
+                        $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
                         $formValues[$bundle][$key] = $value;
                     }
                 }
