@@ -74,7 +74,8 @@ class TriggerType extends AbstractType
             'attr'       => array(
                 'class' => 'form-control',
                 'tooltip' => 'mautic.point.trigger.form.points_descr'
-            )
+            ),
+            'required'   => false
         ));
 
         $builder->add('color', 'text', array(
@@ -84,7 +85,8 @@ class TriggerType extends AbstractType
                 'class'       => 'form-control',
                 'data-toggle' => 'color',
                 'tooltip' => 'mautic.point.trigger.form.color_descr'
-            )
+            ),
+            'required'   => false
         ));
 
         $builder->add('triggerExistingLeads', 'button_group', array(

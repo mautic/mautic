@@ -97,7 +97,8 @@ class PageType extends AbstractType
             'attr'       => array(
                 'tooltip' => 'mautic.page.form.customhtml.help',
                 'class'   => 'form-control editor-fullpage'
-            )
+            ),
+            'required'   => false
         ));
 
         //build a list

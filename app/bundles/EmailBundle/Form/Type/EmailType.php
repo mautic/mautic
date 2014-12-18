@@ -111,7 +111,8 @@ class EmailType extends AbstractType
                 'tooltip' => 'mautic.email.form.plaintext.help',
                 'class'   => 'form-control',
                 'rows'    => '15'
-            )
+            ),
+            'required'   => false
         ));
 
         $contentMode = $options['data']->getContentMode();
@@ -140,7 +141,8 @@ class EmailType extends AbstractType
             'attr'       => array(
                 'tooltip' => 'mautic.email.form.customhtml.help',
                 'class'   => 'form-control editor-advanced-2rows'
-            )
+            ),
+            'required'   => false
         ));
 
         if ($isVariant) {
@@ -169,7 +171,8 @@ class EmailType extends AbstractType
                         'class' => 'form-control'
                     ),
                     'multiple' => true,
-                    'expanded' => false
+                    'expanded' => false,
+                    'required' => false
                 ))
                     ->addModelTransformer($transformer)
             );

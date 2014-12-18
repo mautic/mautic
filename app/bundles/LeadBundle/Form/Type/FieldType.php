@@ -90,7 +90,8 @@ class FieldType extends AbstractType
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'
             ),
-            'data'        => $default
+            'data'        => $default,
+            'required'    => false
         ));
 
         $builder->add('properties', 'collection', array(
@@ -118,7 +119,8 @@ class FieldType extends AbstractType
                 'query_builder' => function(EntityRepository $er) {
                     return $er->createQueryBuilder('f')
                         ->orderBy('f.order', 'ASC');
-                }
+                },
+                'required'   => false
             ))->addModelTransformer($transformer)
         );
 
