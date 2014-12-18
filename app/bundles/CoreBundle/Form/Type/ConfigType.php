@@ -118,10 +118,15 @@ class ConfigType extends ConfigParentType
             'attr'       => array('class' => 'form-control')
         ));
 
+        $mailerServiceConditions = '{"config_CoreBundle_mailer_transport":["mail"]}';
+
         $builder->add('mailer_user', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.user',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $mailerServiceConditions
+            )
         ));
 
         $builder->add('mailer_password', 'password', array(
@@ -130,7 +135,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.user.user.form.passwordplaceholder',
-                'preaddon'    => 'fa fa-lock'
+                'preaddon'    => 'fa fa-lock',
+                'data-hide-on' => $mailerServiceConditions
             )
         ));
 
@@ -159,6 +165,8 @@ class ConfigType extends ConfigParentType
             )
         ));
 
+        $spoolConditions = '{"config_CoreBundle_mailer_spool_type":[""]}';
+
         $builder->add('mailer_spool_type', 'choice', array(
             'choices'  => array(
                 'file'   => 'mautic.core.config.mailer_spool_type.file',
@@ -174,31 +182,46 @@ class ConfigType extends ConfigParentType
         $builder->add('mailer_spool_path', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.spool.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $spoolConditions
+            )
         ));
 
         $builder->add('mailer_spool_msg_limit', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.spool.msg.limit',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $spoolConditions
+            )
         ));
 
         $builder->add('mailer_spool_time_limit', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.spool.time.limit',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $spoolConditions
+            )
         ));
 
         $builder->add('mailer_spool_recover_timeout', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.spool.recover.timeout',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $spoolConditions
+            )
         ));
 
         $builder->add('mailer_spool_clear_timeout', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.spool.clear.timeout',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-hide-on' => $spoolConditions
+            )
         ));
 
         $builder->add('locale', 'choice', array(

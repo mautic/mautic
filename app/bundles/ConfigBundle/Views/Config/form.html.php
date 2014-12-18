@@ -9,6 +9,7 @@
 if ($tmpl == 'index') {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
+$view['slots']->set('mauticContent', 'config');
 ?>
 <?php if (!empty($params)) : ?>
 
