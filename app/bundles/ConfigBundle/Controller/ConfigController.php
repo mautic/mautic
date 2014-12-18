@@ -37,7 +37,7 @@ class ConfigController extends FormController
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $forms = $event->getForms();
 
-        $params = $this->getBundleParams($forms);
+        $params = $this->mergeParamsWithLocal($forms);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
         $model = $this->factory->getModel('config');
@@ -124,13 +124,13 @@ class ConfigController extends FormController
     }
 
     /**
-     * Retrieves the parameters defined in each bundle and merges with the local params
+     * Merges default parameters from each subscribed bundle with the local (real) params
      *
      * @param array $forms
      * 
      * @return array
      */
-    private function getBundleParams($forms)
+    private function mergeParamsWithLocal($forms)
     {
         $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
 
@@ -143,8 +143,6 @@ class ConfigController extends FormController
         $localParams = $parameters;
 
         $params = array();
-        $mauticBundles = $this->factory->getParameter('bundles');
-        $addonBundles  = $this->factory->getParameter('addon.bundles');
 
         foreach ($forms as &$form) {
             $parameters = $form['parameters'];
@@ -161,54 +159,6 @@ class ConfigController extends FormController
 
             $form['parameters'] = $parameters;
             $params[$form['bundle']] = $form;
-        }
-
-        // Remove code below after all bundles use events above
-
-        foreach ($mauticBundles as $bundle) {
-            if (!isset($params[$bundle['bundle']])) {
-                // Build the path to the bundle configuration
-                $paramsFile = $bundle['directory'] . '/Config/parameters.php';
-
-                if (file_exists($paramsFile)) {
-                    // Import the bundle configuration, $parameters is defined in this file
-                    include $paramsFile;
-
-                    // Merge the bundle params with the local params
-                    foreach ($parameters as $key => $value) {
-                        if (in_array($key, $doNotChange)) {
-                            unset($parameters[$key]);
-                        }
-                        elseif (array_key_exists($key, $localParams)) {
-                            $parameters[$key] = $localParams[$key];
-                        }
-                    }
-
-                    $params[$bundle['bundle']] = $parameters;
-                }
-            }
-        }
-
-        foreach ($addonBundles as $bundle) {
-            // Build the path to the bundle configuration
-            $paramsFile = $bundle['directory'] . '/Config/parameters.php';
-
-            if (file_exists($paramsFile)) {
-                // Import the bundle configuration, $parameters is defined in this file
-                include $paramsFile;
-
-                // Merge the bundle params with the local params
-                foreach ($parameters as $key => $value) {
-                    if (in_array($key, $doNotChange)) {
-                        unset($parameters[$key]);
-                    }
-                    elseif (array_key_exists($key, $localParams)) {
-                        $parameters[$key] = $localParams[$key];
-                    }
-                }
-
-                $params[$bundle['bundle']] = $parameters;
-            }
         }
 
         return $params;
