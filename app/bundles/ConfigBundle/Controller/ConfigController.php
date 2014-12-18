@@ -87,7 +87,9 @@ class ConfigController extends FormController
                     );
 
                     // We must clear the application cache for the updated values to take effect
-                    $this->clearCacheFile();
+                    /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                    $cacheHelper = $this->factory->getHelper('cache');
+                    $cacheHelper->clearCache();
                 } catch (RuntimeException $exception) {
                     $this->request->getSession()->getFlashBag()->add(
                         'error',
