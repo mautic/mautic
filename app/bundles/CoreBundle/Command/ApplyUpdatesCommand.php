@@ -97,7 +97,7 @@ EOT
             return 1;
         }
 
-        $zipFile = $this->getContainer()->getParameter('mautic.cache_path') . '/' . basename($update['package']);
+        $zipFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/' . basename($update['package']);
 
         $zipper = new \ZipArchive();
         $archive = $zipper->open($zipFile);
@@ -183,7 +183,7 @@ EOT
         }
 
         // Clear the cached update data and the download package now that we've updated
-        @unlink($this->getContainer()->getParameter('mautic.cache_path') . '/lastUpdateCheck.txt');
+        @unlink($this->getContainer()->getParameter('kernel.cache_dir') . '/lastUpdateCheck.txt');
         @unlink($zipFile);
 
         // Update successful
