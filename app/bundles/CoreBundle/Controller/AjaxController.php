@@ -370,7 +370,7 @@ class AjaxController extends CommonController
 
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $package['message']));
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($package['message'])));
         } else {
             $dataArray['success']        = 1;
             $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
@@ -398,14 +398,38 @@ class AjaxController extends CommonController
 
         // Fetch the package data
         $update  = $updateHelper->fetchData();
-        $zipFile = $this->factory->getParameter('cache_path') . '/' . basename($update['package']);
+        $zipFile = $this->factory->getSystemPath('cache') . '/' . basename($update['package']);
 
         $zipper = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
+            // Get the exact error
+            switch ($archive) {
+                case \ZipArchive::ER_EXISTS:
+                    $error = 'mautic.core.update.archive_file_exists';
+                    break;
+                case \ZipArchive::ER_INCONS:
+                case \ZipArchive::ER_INVAL:
+                case \ZipArchive::ER_MEMORY:
+                    $error = 'mautic.core.update.archive_zip_corrupt';
+                    break;
+                case \ZipArchive::ER_NOENT:
+                    $error = 'mautic.core.update.archive_no_such_file';
+                    break;
+                case \ZipArchive::ER_NOZIP:
+                    $error = 'mautic.core.update.archive_not_valid_zip';
+                    break;
+                case \ZipArchive::ER_READ:
+                case \ZipArchive::ER_SEEK:
+                case \ZipArchive::ER_OPEN:
+                default:
+                    $error = 'mautic.core.update.archive_could_not_open';
+                    break;
+            }
+
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.could_not_open_archive'));
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($error)));
         } else {
             // Extract the archive file now
             $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
@@ -477,7 +501,7 @@ class AjaxController extends CommonController
 
         if ($result !== 0) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => 'mautic.core.update.error_performing_migration'));
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
         } else {
             $dataArray['success'] = 1;
             $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));

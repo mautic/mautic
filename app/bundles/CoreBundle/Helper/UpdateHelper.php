@@ -35,7 +35,10 @@ class UpdateHelper
     {
         $this->factory = $factory;
 
-        $options = array('transport.curl' => array(CURLOPT_SSL_VERIFYPEER => false));
+        $options = array('transport.curl' => array(
+            CURLOPT_SSLVERSION      => 1,
+            CURLOPT_SSL_CIPHER_LIST => 'TLSv1',
+        ));
 
         $this->connector = HttpFactory::getHttp($options);
     }
@@ -67,7 +70,7 @@ class UpdateHelper
         }
 
         // Set the filesystem target
-        $target = $this->factory->getParameter('cache_path') . '/' . basename($package);
+        $target = $this->factory->getSystemPath('cache') . '/' . basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -87,7 +90,7 @@ class UpdateHelper
      */
     public function fetchData($overrideCache = false)
     {
-        $cacheFile = $this->factory->getParameter('cache_path') . '/lastUpdateCheck.txt';
+        $cacheFile = $this->factory->getSystemPath('cache') . '/lastUpdateCheck.txt';
 
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($cacheFile)) {

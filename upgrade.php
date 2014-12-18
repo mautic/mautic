@@ -16,6 +16,34 @@ define('MAUTIC_ROOT',              dirname(__DIR__));
 define('MAUTIC_UPGRADE_ROOT',      __DIR__);
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 
+// Get the local config file location
+/** @var $paths */
+$root = MAUTIC_ROOT . '/app';
+include "$root/config/paths.php";
+
+// Include local config to get cache_path
+$localConfig = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+
+/** @var $parameters */
+include $localConfig;
+
+$localParameters = $parameters;
+
+//check for parameter overrides
+if (file_exists("$root/config/parameters_local.php")) {
+    /** @var $parameters */
+    include "$root/config/parameters_local.php";
+    $localParameters = array_merge($localParameters, $parameters);
+}
+
+if (isset($localParameters['cache_path'])) {
+    $cacheDir = str_replace('%kernel.root_dir%', $root, $localParameters['cache_path'] . 'prod');
+} else {
+    $cacheDir = "$root/cache/prod";
+}
+
+define('MAUTIC_CACHE_DIR', $cacheDir);
+
 /**
  * Clears the application cache
  *
@@ -29,9 +57,11 @@ define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
  */
 function clear_mautic_cache(array $status)
 {
-    if (!recursive_remove_directory(MAUTIC_ROOT . '/app/cache/prod')) {
-        process_error_log(array('Could not remove the application cache.  You will need to manually delete app/cache/prod.'));
+    if (!recursive_remove_directory(MAUTIC_CACHE_DIR)) {
+        process_error_log(array('Could not remove the application cache.  You will need to manually delete ' . MAUTIC_CACHE_DIR . '.'));
     }
+
+    //Remove the cached update
 
     $status['complete']                      = true;
     $status['stepStatus']                    = 'Success';

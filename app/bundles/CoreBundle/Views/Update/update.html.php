@@ -20,16 +20,16 @@
         <div class="panel-body">
             <table class="table table-hover table-striped table-bordered addon-list" id="updateTable">
                 <thead>
-                    <tr>
-                        <th><?php echo $view['translator']->trans('mautic.core.update.heading.step'); ?></th>
-                        <th><?php echo $view['translator']->trans('mautic.core.update.heading.status'); ?></th>
-                    </tr>
+                <tr>
+                    <th><?php echo $view['translator']->trans('mautic.core.update.heading.step'); ?></th>
+                    <th><?php echo $view['translator']->trans('mautic.core.update.heading.status'); ?></th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><?php echo $view['translator']->trans('mautic.core.update.step.downloading.package'); ?></td>
-                        <td id="update-step-downloading-status"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?></td>
-                    </tr>
+                <tr>
+                    <td><?php echo $view['translator']->trans('mautic.core.update.step.downloading.package'); ?></td>
+                    <td id="update-step-downloading-status"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?> <i class="pull-right fa fa-spinner fa-spin"></i></td>
+                </tr>
                 </tbody>
             </table>
         </div>

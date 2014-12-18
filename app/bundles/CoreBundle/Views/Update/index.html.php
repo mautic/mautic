@@ -12,21 +12,21 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
 ?>
 
 <div class="panel panel-default mnb-5 bdr-t-wdh-0">
-	<div id="update-panel" class="panel-body">
+    <div id="update-panel" class="panel-body">
         <div class="col-sm-offset-3 col-sm-6">
             <?php if ($updateData['error'] || $updateData['message'] == 'mautic.core.updater.running.latest.version') : ?>
-            <div class="alert alert-mautic">
-                <?php echo $view['translator']->trans($updateData['message']); ?>
-            </div>
+                <div class="alert alert-mautic">
+                    <?php echo $view['translator']->trans($updateData['message']); ?>
+                </div>
             <?php else : ?>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h2 class="panel-title">
                         <?php echo $view['translator']->trans('mautic.core.update.available'); ?>
                     </h2>
-                <div class="panel-body">
-                    <table class="table table-hover table-striped table-bordered addon-list" id="updateTable">
-                        <tbody>
+                    <div class="panel-body">
+                        <table class="table table-hover table-striped table-bordered addon-list" id="updateTable">
+                            <tbody>
                             <tr>
                                 <td><?php echo $view['translator']->trans('mautic.core.update.current.version'); ?></td>
                                 <td><?php echo $currentVersion; ?></td>
@@ -39,12 +39,14 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                                 <td><?php echo $view['translator']->trans('mautic.core.update.announcement'); ?></td>
                                 <td><a href="<?php echo $updateData['announcement']; ?>" target="_blank"><?php echo $updateData['announcement']; ?></a></td>
                             </tr>
-                        </tbody>
-                    </table>
-                    <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '<?php echo base64_encode(json_encode(array())); ?>');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
+                            </tbody>
+                        </table>
+                        <div class="text-right">
+                            <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '<?php echo base64_encode(json_encode(array())); ?>');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
+                        </div>
+                    </div>
                 </div>
+                <?php endif; ?>
             </div>
-            <?php endif; ?>
         </div>
-	</div>
-</div>
+    </div>
