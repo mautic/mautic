@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\EventListener;
+namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
@@ -16,7 +16,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 /**
  * Class BuilderSubscriber
  *
- * @package Mautic\CoreBundle\EventListener
+ * @package Mautic\ApiBundle\EventListener
  */
 class ConfigSubscriber extends CommonSubscriber
 {
@@ -27,14 +27,14 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE   => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
             ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
         );
     }
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $paramsFile = $event->getContainer()->getParameter('kernel.root_dir') . '/bundles/CoreBundle/Config/parameters.php';
+        $paramsFile = $event->getContainer()->getParameter('kernel.root_dir') . '/bundles/ApiBundle/Config/parameters.php';
 
         if (file_exists($paramsFile)) {
             // Import the bundle configuration, $parameters is defined in this file
@@ -44,8 +44,8 @@ class ConfigSubscriber extends CommonSubscriber
         }
 
         $event->addForm(array(
-            'bundle' => 'CoreBundle',
-            'formClass' => '\Mautic\CoreBundle\Form\Type\ConfigType',
+            'bundle' => 'ApiBundle',
+            'formClass' => '\Mautic\ApiBundle\Form\Type\ConfigType',
             'parameters' => $parameters
         ));
     }
@@ -55,16 +55,8 @@ class ConfigSubscriber extends CommonSubscriber
         $values = $event->getConfig();
         $post   = $event->getPost();
 
-        $passwords = array(
-            'mailer_password' => $post->get('config[CoreBundle][mailer_password]', null, true),
-            'transifex_password' => $post->get('config[CoreBundle][transifex_password]', null, true)
-        );
-
-        foreach ($passwords as $key => $password) {
-            // Check to ensure we don't save a blank password to the config which may remove the user's old password
-            if ($password == '') {
-                unset($values['CoreBundle'][$key]);
-            }
+        if (isset($values['ApiBundle']['api_enabled'])) {
+            $values['ApiBundle']['api_enabled'] = (bool) $post->get('config[ApiBundle][api_enabled]', null, true);
         }
 
         $event->setConfig($values);

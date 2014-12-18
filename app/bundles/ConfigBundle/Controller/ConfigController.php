@@ -10,6 +10,7 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\ConfigEvents;
 
@@ -36,7 +37,7 @@ class ConfigController extends FormController
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $forms = $event->getForms();
 
-        $params = $this->getBundleParams($forms);
+        $params = $this->mergeParamsWithLocal($forms);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
         $model = $this->factory->getModel('config');
@@ -58,34 +59,19 @@ class ConfigController extends FormController
 
                 // Merge the values POSTed with the current data
                 foreach ($formData as $bundle => $bundleConfig) {
-                    // Bundles which uses event has values in parameters
-                    if (isset($bundleConfig['parameters'])) {
-                        $bundleConfig = $bundleConfig['parameters'];
-                    }
+
                     $formValues[$bundle] = array();
-                    foreach ($bundleConfig as $key => $value) {
 
-                        // Special handling for params stored as a boolean value
-                        if (in_array($key, array('api_enabled'))) {
-                            $formValues[$bundle][$key] = (bool) $post->get('config[' . $key . ']', null, true);
-                        } else {
-                            $postedValue = $post->get('config[' . $key . ']', null, true);
-
-                            // Check to ensure we don't save a blank password to the config which may remove the user's old password
-                            if (in_array($key, array('mailer_password', 'transifex_password')) && $postedValue == '') {
-                                continue;
-                            }
-
-                            $value = $post->get('config[' . $key . ']', null, true);
-
-                            if ($value === null) {
-                                $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
-                            }
-
-                            $formValues[$bundle][$key] = $value;
-                        }
+                    foreach ($bundleConfig['parameters'] as $key => $value) {
+                        $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
+                        $formValues[$bundle][$key] = $value;
                     }
                 }
+
+                // Dispatch pre-save event. Bundles may need to modify some field values like booleans and passwords before save
+                $configEvent = new ConfigEvent($formValues, $post);
+                $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
+                $formValues = $configEvent->getConfig();
 
                 // Merge each bundle's updated configuration into the local configuration
                 foreach ($formValues as $object) {
@@ -101,7 +87,9 @@ class ConfigController extends FormController
                     );
 
                     // We must clear the application cache for the updated values to take effect
-                    $this->clearCacheFile();
+                    /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                    $cacheHelper = $this->factory->getHelper('cache');
+                    $cacheHelper->clearCache();
                 } catch (RuntimeException $exception) {
                     $this->request->getSession()->getFlashBag()->add(
                         'error',
@@ -138,13 +126,13 @@ class ConfigController extends FormController
     }
 
     /**
-     * Retrieves the parameters defined in each bundle and merges with the local params
+     * Merges default parameters from each subscribed bundle with the local (real) params
      *
      * @param array $forms
      * 
      * @return array
      */
-    private function getBundleParams($forms)
+    private function mergeParamsWithLocal($forms)
     {
         $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
 
@@ -157,8 +145,6 @@ class ConfigController extends FormController
         $localParams = $parameters;
 
         $params = array();
-        $mauticBundles = $this->factory->getParameter('bundles');
-        $addonBundles  = $this->factory->getParameter('addon.bundles');
 
         foreach ($forms as &$form) {
             $parameters = $form['parameters'];
@@ -175,54 +161,6 @@ class ConfigController extends FormController
 
             $form['parameters'] = $parameters;
             $params[$form['bundle']] = $form;
-        }
-
-        // Remove code below after all bundles use events above
-
-        foreach ($mauticBundles as $bundle) {
-            if (!isset($params[$bundle['bundle']])) {
-                // Build the path to the bundle configuration
-                $paramsFile = $bundle['directory'] . '/Config/parameters.php';
-
-                if (file_exists($paramsFile)) {
-                    // Import the bundle configuration, $parameters is defined in this file
-                    include $paramsFile;
-
-                    // Merge the bundle params with the local params
-                    foreach ($parameters as $key => $value) {
-                        if (in_array($key, $doNotChange)) {
-                            unset($parameters[$key]);
-                        }
-                        elseif (array_key_exists($key, $localParams)) {
-                            $parameters[$key] = $localParams[$key];
-                        }
-                    }
-
-                    $params[$bundle['bundle']] = $parameters;
-                }
-            }
-        }
-
-        foreach ($addonBundles as $bundle) {
-            // Build the path to the bundle configuration
-            $paramsFile = $bundle['directory'] . '/Config/parameters.php';
-
-            if (file_exists($paramsFile)) {
-                // Import the bundle configuration, $parameters is defined in this file
-                include $paramsFile;
-
-                // Merge the bundle params with the local params
-                foreach ($parameters as $key => $value) {
-                    if (in_array($key, $doNotChange)) {
-                        unset($parameters[$key]);
-                    }
-                    elseif (array_key_exists($key, $localParams)) {
-                        $parameters[$key] = $localParams[$key];
-                    }
-                }
-
-                $params[$bundle['bundle']] = $parameters;
-            }
         }
 
         return $params;
