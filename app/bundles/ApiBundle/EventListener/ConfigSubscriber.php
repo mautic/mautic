@@ -11,6 +11,7 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 /**
  * Class BuilderSubscriber
@@ -26,7 +27,8 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE   => array('onConfigGenerate', 0)
+            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
         );
     }
 
@@ -46,5 +48,17 @@ class ConfigSubscriber extends CommonSubscriber
             'formClass' => '\Mautic\ApiBundle\Form\Type\ConfigType',
             'parameters' => $parameters
         ));
+    }
+
+    public function onConfigBeforeSave(ConfigEvent $event)
+    {
+        $values = $event->getConfig();
+        $post   = $event->getPost();
+
+        if (isset($values['ApiBundle']['api_enabled'])) {
+            $values['ApiBundle']['api_enabled'] = (bool) $post->get('config[ApiBundle][api_enabled]', null, true);
+        }
+
+        $event->setConfig($values);
     }
 }

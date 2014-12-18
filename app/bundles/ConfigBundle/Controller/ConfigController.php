@@ -10,6 +10,7 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\ConfigEvents;
 
@@ -58,34 +59,31 @@ class ConfigController extends FormController
 
                 // Merge the values POSTed with the current data
                 foreach ($formData as $bundle => $bundleConfig) {
-                    // Bundles which uses event has values in parameters
-                    if (isset($bundleConfig['parameters'])) {
-                        $bundleConfig = $bundleConfig['parameters'];
-                    }
+
                     $formValues[$bundle] = array();
-                    foreach ($bundleConfig as $key => $value) {
 
-                        // Special handling for params stored as a boolean value
-                        if (in_array($key, array('api_enabled'))) {
-                            $formValues[$bundle][$key] = (bool) $post->get('config[' . $key . ']', null, true);
-                        } else {
-                            $postedValue = $post->get('config[' . $key . ']', null, true);
+                    foreach ($bundleConfig['parameters'] as $key => $value) {
+                        $postedValue = $post->get('config[' . $key . ']', null, true);
 
-                            // Check to ensure we don't save a blank password to the config which may remove the user's old password
-                            if (in_array($key, array('mailer_password', 'transifex_password')) && $postedValue == '') {
-                                continue;
-                            }
-
-                            $value = $post->get('config[' . $key . ']', null, true);
-
-                            if ($value === null) {
-                                $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
-                            }
-
-                            $formValues[$bundle][$key] = $value;
+                        // Check to ensure we don't save a blank password to the config which may remove the user's old password
+                        if (in_array($key, array('mailer_password', 'transifex_password')) && $postedValue == '') {
+                            continue;
                         }
+
+                        $value = $post->get('config[' . $key . ']', null, true);
+
+                        if ($value === null) {
+                            $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
+                        }
+
+                        $formValues[$bundle][$key] = $value;
                     }
                 }
+
+                // Dispatch pre-save event. Bundles may need to modify some field values like booleans and passwords before save
+                $configEvent = new ConfigEvent($formValues, $post);
+                $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
+                $formValues = $configEvent->getConfig();
 
                 // Merge each bundle's updated configuration into the local configuration
                 foreach ($formValues as $object) {
