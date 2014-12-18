@@ -429,6 +429,10 @@ class PageModel extends FormModel
                 // if additional data were sent with the tracking pixel
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
+                    // URL attr 'd' is decoded. Encode it first.
+                    if (isset($query['d'])) {
+                        $query = unserialize(base64_decode(urldecode($query['d'])));
+                    }
                     if (isset($query['referrer'])) {
                         $hit->setReferer($query['referrer']);
                     }
