@@ -103,14 +103,17 @@ class DefaultController extends CommonController
 
         // Check for updates
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper  = $this->factory->getHelper('update');
-        $updateData    = $updateHelper->fetchData();
         $updateMessage = '';
+        if ($this->factory->getUser()->isAdmin()) {
+            $updateHelper = $this->factory->getHelper('update');
+            $updateData   = $updateHelper->fetchData();
 
-        // If the version key is set, we have an update
-        if (isset($updateData['version'])) {
-            $translator    = $this->factory->getTranslator();
-            $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+
+            // If the version key is set, we have an update
+            if (isset($updateData['version'])) {
+                $translator    = $this->factory->getTranslator();
+                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+            }
         }
 
         return $this->delegateView(array(
