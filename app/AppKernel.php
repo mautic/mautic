@@ -195,6 +195,9 @@ class AppKernel extends Kernel
             if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
                 //boot after it's been check to see if it's enabled
                 $addonBundles[$name] = $bundle;
+
+                //set the container for the addon helper
+                $bundle->setContainer($this->container);
             } else {
                 $bundle->setContainer($this->container);
                 $bundle->boot();
@@ -246,7 +249,6 @@ class AppKernel extends Kernel
                 }
             } else {
                 // boot the bundle
-                $bundle->setContainer($this->container);
                 $bundle->boot();
             }
         }
