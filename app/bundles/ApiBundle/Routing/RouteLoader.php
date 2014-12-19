@@ -45,7 +45,7 @@ class RouteLoader extends Loader
     public function __construct(MauticFactory $factory)
     {
         $this->bundles      = $factory->getParameter('bundles');
-        $this->addonBundles = $factory->getParameter('addon.bundles');
+        $this->addonBundles = $factory->getEnabledAddons();
         $this->apiEnabled   = $factory->getParameter('api_enabled');
     }
 

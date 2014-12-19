@@ -597,10 +597,30 @@ class MauticFactory
     /**
      * Get's the Symfony kernel
      *
-     * @return \Symfony\Component\HttpKernel\KernelInterface
+     * @return \AppKernel
      */
     public function getKernel()
     {
         return $this->container->get('kernel');
+    }
+
+    /**
+     * Get's an array of details for Mautic core bundles
+     *
+     * @return mixed
+     */
+    public function getMauticBundles()
+    {
+        return $this->container->getParameter('mautic.bundles');
+    }
+
+    /**
+     * Get's an array of details for enabled Mautic addons
+     *
+     * @return array
+     */
+    public function getEnabledAddons()
+    {
+        return $this->getKernel()->getAddonBundles();
     }
 }

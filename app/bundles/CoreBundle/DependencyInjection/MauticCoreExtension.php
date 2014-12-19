@@ -31,9 +31,7 @@ class MauticCoreExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $bundles = $container->getParameter('mautic.bundles');
-        $addons  = $container->getParameter('mautic.addon.bundles');
-
-        foreach ($bundles as $name => $bundle) {
+        foreach ($bundles as $bundle) {
             //load services
             $directory = $bundle['directory'] . '/Config/services';
             if (file_exists($directory)) {
@@ -70,7 +68,8 @@ class MauticCoreExtension extends Extension
             }
         }
 
-        foreach ($addons as $name => $bundle) {
+        $addons  = $container->getParameter('mautic.addon.bundles');
+        foreach ($addons as $bundle) {
             //load services
             $directory = $bundle['directory'] . '/Config/services';
             if (file_exists($directory)) {

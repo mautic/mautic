@@ -52,6 +52,7 @@ class AddonHelper
     public function isEnabled($bundle)
     {
         $dbName = $this->factory->getParameter('db_name');
+
         if (empty($dbName)) {
             //the database hasn't been installed yet
             return false;
