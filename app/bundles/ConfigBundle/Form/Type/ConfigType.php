@@ -26,7 +26,7 @@ class ConfigType extends AbstractType
     /**
      * @var MauticFactory
      */
-    private $factory;
+    protected $factory;
 
     /**
      * @param MauticFactory $factory

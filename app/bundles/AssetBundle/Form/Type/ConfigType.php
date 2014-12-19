@@ -24,20 +24,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @package Mautic\AssetBundle\Form\Type
  */
 class ConfigType extends AbstractType
-{
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-    
+{   
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
