@@ -25,7 +25,7 @@ $view['slots']->set('mauticContent', 'config');
             <?php foreach ($params as $key => $paramArray) : ?>
                 <li role="presentation" class="list-group-item <?php echo $i == 0 ? 'in active' : ''; ?>">
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps">
-                        <?php echo $key; ?>
+                        <?php echo $paramArray['bundle']; ?>
                     </a>
                 </li>
                 <?php $i++; ?>

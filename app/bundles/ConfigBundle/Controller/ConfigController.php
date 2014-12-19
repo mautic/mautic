@@ -58,13 +58,13 @@ class ConfigController extends FormController
                 $formValues = array();
 
                 // Merge the values POSTed with the current data
-                foreach ($formData as $bundle => $bundleConfig) {
+                foreach ($formData as $formAlias => $formConfig) {
 
-                    $formValues[$bundle] = array();
+                    $formValues[$formAlias] = array();
 
-                    foreach ($bundleConfig['parameters'] as $key => $value) {
-                        $value = $post->get('config[' . $bundle . '][' . $key . ']', null, true);
-                        $formValues[$bundle][$key] = $value;
+                    foreach ($formConfig['parameters'] as $key => $value) {
+                        $value = $post->get('config[' . $formAlias . '][' . $key . ']', null, true);
+                        $formValues[$formAlias][$key] = $value;
                     }
                 }
 
