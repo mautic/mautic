@@ -344,7 +344,11 @@
 
       // minimized state
       .sidebar-minimized & {
-        width: @sidebar-left-collapse-width;
+        -webkit-transform: translate3d(-170px, 0px, 0px);
+        transform: translate3d(-170px, 0px, 0px);
+        -webkit-transition: transform 0.3s ease;
+        -o-transition: transform 0.3s ease;
+        transition: transform 0.3s ease;
 
         // reset `nav-sidebar` style
         .nav-sidebar {
@@ -416,6 +420,11 @@
         .sidebar-header {
           padding: 0;
           width: @sidebar-left-collapse-width;
+          -webkit-transform: translate3d(-85px, 0px, 0px);
+          transform: translate3d(-85px, 0px, 0px);
+          -webkit-transition: transform 0.3s ease;
+          -o-transition: transform 0.3s ease;
+          transition: transform 0.3s ease;
 
           > .mautic-brand > .mautic-logo-text {
             display: none;
