@@ -85,6 +85,18 @@ class AuditLogSubscriber extends CommonSubscriber
             $eventLabel = $this->translator->trans('mautic.lead.event.'. $row->getAction());
 
             $details = $row->getDetails();
+
+            // Guess the IP address
+            if (is_string($details)) {
+                $ipAddress = $details;
+            }elseif (isset($details['ipAddresses'][1])) {
+                $ipAddress = $details['ipAddresses'][1];
+            } elseif (isset($details[1])) {
+                $ipAddress = $details[1];
+            } else {
+                continue;
+            }
+
             $event->addEvent(array(
                 'event'      => $eventTypeKey,
                 'eventLabel' => $eventLabel,
@@ -92,7 +104,7 @@ class AuditLogSubscriber extends CommonSubscriber
                 'extra'     => array(
                     'details'   => $details,
                     'editor'    => $row->getUserName(),
-                    'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$details[1]] : array()
+                    'ipDetails' => ($eventTypeKey == 'lead.ipadded') ? $IpAddresses[$ipAddress] : array()
                 ),
                 'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:' . $action . '.html.php'
             ));
