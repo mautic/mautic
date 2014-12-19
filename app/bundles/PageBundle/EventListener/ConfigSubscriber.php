@@ -43,7 +43,7 @@ class ConfigSubscriber extends CommonSubscriber
 
         $event->addForm(array(
             'bundle' => 'PageBundle',
-            'formClass' => '\Mautic\PageBundle\Form\Type\ConfigType',
+            'formAlias' => 'pageconfig',
             'parameters' => $parameters
         ));
     }

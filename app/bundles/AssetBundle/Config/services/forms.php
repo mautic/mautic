@@ -58,3 +58,11 @@ $container->setDefinition('mautic.form.type.assetlist', new Definition(
     ->addTag('form.type', array(
         'alias' => 'asset_list',
     ));
+
+$container->setDefinition('mautic.form.type.assetconfig', new Definition(
+    'Mautic\AssetBundle\Form\Type\ConfigType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'assetconfig',
+    ));

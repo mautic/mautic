@@ -45,7 +45,7 @@ class ConfigSubscriber extends CommonSubscriber
 
         $event->addForm(array(
             'bundle' => 'CoreBundle',
-            'formClass' => '\Mautic\CoreBundle\Form\Type\ConfigType',
+            'formAlias' => 'coreconfig',
             'parameters' => $parameters
         ));
     }

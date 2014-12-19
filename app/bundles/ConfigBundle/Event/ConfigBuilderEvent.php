@@ -29,7 +29,9 @@ class ConfigBuilderEvent extends CommonEvent
     private $forms = array();
 
     /**
+     * Consctructor
      * 
+     * @param appProdProjectContainer|appDevDebugProjectContainer
      */
     public function __construct($container)
     {
