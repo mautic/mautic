@@ -69,4 +69,26 @@ class ConfigBuilderEvent extends CommonEvent
     {
         return $this->container;
     }
+
+    /**
+     * Returns the container
+     *
+     * @param string $path (relative from the root dir)
+     * @return array
+     */
+    public function getParameters($path)
+    {
+        $paramsFile = $this->getContainer()->getParameter('kernel.root_dir') . $path;
+
+        if (file_exists($paramsFile)) {
+            // Import the bundle configuration, $parameters is defined in this file
+            include $paramsFile;
+        }
+
+        if (!isset($parameters)) {
+            $parameters = array();
+        }
+
+        return $parameters;
+    }
 }

@@ -32,19 +32,10 @@ class ConfigSubscriber extends CommonSubscriber
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $paramsFile = $event->getContainer()->getParameter('kernel.root_dir') . '/bundles/AssetBundle/Config/parameters.php';
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        } else {
-            $parameters = array();
-        }
-
         $event->addForm(array(
             'bundle' => 'AssetBundle',
             'formAlias' => 'assetconfig',
-            'parameters' => $parameters
+            'parameters' => $event->getParameters('/bundles/AssetBundle/Config/parameters.php')
         ));
     }
 }
