@@ -27,7 +27,7 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE   => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
             ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
         );
     }
@@ -35,9 +35,10 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm(array(
-            'bundle' => 'CoreBundle',
-            'formAlias' => 'coreconfig',
-            'parameters' => $event->getParameters('/bundles/CoreBundle/Config/parameters.php')
+            'bundle'        => 'CoreBundle',
+            'formAlias'     => 'coreconfig',
+            'formTheme'     => 'MauticCoreBundle:FormTheme\Config',
+            'parameters'    => $event->getParameters('/bundles/CoreBundle/Config/parameters.php')
         ));
     }
 
@@ -47,8 +48,8 @@ class ConfigSubscriber extends CommonSubscriber
         $post   = $event->getPost();
 
         $passwords = array(
-            'mailer_password' => $post->get('config[CoreBundle][mailer_password]', null, true),
-            'transifex_password' => $post->get('config[CoreBundle][transifex_password]', null, true)
+            'mailer_password'       => $post->get('config[CoreBundle][mailer_password]', null, true),
+            'transifex_password'    => $post->get('config[CoreBundle][transifex_password]', null, true)
         );
 
         foreach ($passwords as $key => $password) {

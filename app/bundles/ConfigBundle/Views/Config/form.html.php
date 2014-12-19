@@ -43,11 +43,11 @@ $view['slots']->set('mauticContent', 'config');
             <?php foreach ($params as $key => $paramArray) : ?>
             <div role="tabpanel" class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
-                <?php if (isset($paramArray['parameters']) && isset($paramArray['bundle'])) : ?>
+                <?php if (isset($paramArray['parameters']) && isset($paramArray['formAlias'])) : ?>
                     <?php foreach ($paramArray['parameters'] as $paramKey => $paramValue) : ?>
-                        <?php if (isset($form[$paramArray['bundle']][$paramKey])) : ?>
+                        <?php if (isset($form[$paramArray['formAlias']][$paramKey])) : ?>
                         <div class="col-md-6">
-                            <?php echo $view['form']->row($form[$paramArray['bundle']][$paramKey]); ?>
+                            <?php echo $view['form']->row($form[$paramArray['formAlias']][$paramKey]); ?>
                         </div>
                         <?php endif; ?>
                     <?php endforeach; ?>

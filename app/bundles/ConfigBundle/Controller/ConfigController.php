@@ -35,16 +35,16 @@ class ConfigController extends FormController
         $event = new ConfigBuilderEvent($this->container);
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
-        $forms = $event->getForms();
-
-        $params = $this->mergeParamsWithLocal($forms);
+        $formConfigs = $event->getForms();
+        $formThemes = $event->getFormThemes();
+        $this->mergeParamsWithLocal($formConfigs);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
         $model = $this->factory->getModel('config');
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
-        $form   = $model->createForm($params, $this->get('form.factory'), array('action' => $action));
+        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array('action' => $action));
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -111,9 +111,10 @@ class ConfigController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'params'      => $params,
+                'params'      => $formConfigs,
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
+                // 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes)
                 'form'        => $form->createView()
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
@@ -132,7 +133,7 @@ class ConfigController extends FormController
      * 
      * @return array
      */
-    private function mergeParamsWithLocal($forms)
+    private function mergeParamsWithLocal(&$forms)
     {
         $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
 
@@ -144,25 +145,17 @@ class ConfigController extends FormController
 
         $localParams = $parameters;
 
-        $params = array();
-
         foreach ($forms as &$form) {
-            $parameters = $form['parameters'];
 
             // Merge the bundle params with the local params
-            foreach ($parameters as $key => $value) {
+            foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
-                    unset($parameters[$key]);
+                    unset($form['parameters'][$key]);
                 }
                 elseif (array_key_exists($key, $localParams)) {
-                    $parameters[$key] = $localParams[$key];
+                    $form['parameters'][$key] = $localParams[$key];
                 }
             }
-
-            $form['parameters'] = $parameters;
-            $params[$form['bundle']] = $form;
         }
-
-        return $params;
     }
 }
