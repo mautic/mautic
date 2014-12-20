@@ -25,7 +25,6 @@ class AddonPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addManagePermission('addons');
-        $this->addManagePermission('integrations');
     }
 
     /**
@@ -41,6 +40,6 @@ class AddonPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addManageFormFields('integration', 'integrations', $builder, $data);
+        $this->addManageFormFields('addon', 'addons', $builder, $data);
     }
 }
