@@ -29,7 +29,14 @@ class ConfigBuilderEvent extends CommonEvent
     private $forms = array();
 
     /**
+     * @var array
+     */
+    private $formThemes = array();
+
+    /**
+     * Consctructor
      * 
+     * @param appProdProjectContainer|appDevDebugProjectContainer
      */
     public function __construct($container)
     {
@@ -45,7 +52,11 @@ class ConfigBuilderEvent extends CommonEvent
      */
     public function addForm($form)
     {
-        $this->forms[] = $form;
+        if (isset($form['formTheme'])) {
+            $this->formThemes[$form['formAlias']] = $form['formTheme'];
+        }
+
+        $this->forms[$form['formAlias']] = $form;
     }
 
     /**
@@ -59,6 +70,16 @@ class ConfigBuilderEvent extends CommonEvent
     }
 
     /**
+     * Returns the formThemes array
+     *
+     * @return array
+     */
+    public function getFormThemes()
+    {
+        return $this->formThemes;
+    }
+
+    /**
      * Returns the container
      *
      * @return Container
@@ -66,5 +87,27 @@ class ConfigBuilderEvent extends CommonEvent
     public function getContainer()
     {
         return $this->container;
+    }
+
+    /**
+     * Helper method can load $parameters array from a config file.
+     *
+     * @param string $path (relative from the root dir)
+     * @return array
+     */
+    public function getParameters($path)
+    {
+        $paramsFile = $this->getContainer()->getParameter('kernel.root_dir') . $path;
+
+        if (file_exists($paramsFile)) {
+            // Import the bundle configuration, $parameters is defined in this file
+            include $paramsFile;
+        }
+
+        if (!isset($parameters)) {
+            $parameters = array();
+        }
+
+        return $parameters;
     }
 }

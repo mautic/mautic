@@ -27,26 +27,18 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE   => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
             ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
         );
     }
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $paramsFile = $event->getContainer()->getParameter('kernel.root_dir') . '/bundles/CoreBundle/Config/parameters.php';
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        } else {
-            $parameters = array();
-        }
-
         $event->addForm(array(
-            'bundle' => 'CoreBundle',
-            'formClass' => '\Mautic\CoreBundle\Form\Type\ConfigType',
-            'parameters' => $parameters
+            'bundle'        => 'CoreBundle',
+            'formAlias'     => 'coreconfig',
+            'formTheme'     => 'MauticCoreBundle:FormTheme\Config',
+            'parameters'    => $event->getParameters('/bundles/CoreBundle/Config/parameters.php')
         ));
     }
 
@@ -56,8 +48,8 @@ class ConfigSubscriber extends CommonSubscriber
         $post   = $event->getPost();
 
         $passwords = array(
-            'mailer_password' => $post->get('config[CoreBundle][mailer_password]', null, true),
-            'transifex_password' => $post->get('config[CoreBundle][transifex_password]', null, true)
+            'mailer_password'       => $post->get('config[CoreBundle][mailer_password]', null, true),
+            'transifex_password'    => $post->get('config[CoreBundle][transifex_password]', null, true)
         );
 
         foreach ($passwords as $key => $password) {

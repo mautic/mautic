@@ -25,19 +25,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ConfigType extends ConfigParentType
 {
     /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
@@ -106,26 +93,61 @@ class ConfigType extends ConfigParentType
             )
         ));
 
+        $smtpServiceShowConditions = '{"config_CoreBundle_mailer_transport":["smtp"]}';
+
         $builder->add('mailer_host', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.host',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class'         => 'form-control',
+                'data-show-on'  => $smtpServiceShowConditions
+            )
         ));
 
         $builder->add('mailer_port', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.port',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class'         => 'form-control',
+                'data-show-on'  => $smtpServiceShowConditions
+            )
         ));
 
-        $mailerServiceConditions = '{"config_CoreBundle_mailer_transport":["mail"]}';
+        $mailerLoginShowConditions = '{
+            "config_CoreBundle_mailer_auth_mode":[
+                "plain",
+                "login",
+                "cram-md5"
+            ], "config_CoreBundle_mailer_transport":[
+                "mautic.transport.mandrill",
+                "mautic.transport.sendgrid",
+                "mautic.transport.amazon",
+                "mautic.transport.postmark",
+                "gmail",
+                "sendmail"
+            ]
+        }';
+
+        $builder->add('mailer_auth_mode', 'choice', array(
+            'choices'  => array(
+                'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
+                'login'    => 'mautic.core.config.mailer_auth_mode.login',
+                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5'
+            ),
+            'label'    => 'mautic.core.config.form.mailer.auth.mode',
+            'required' => false,
+            'attr'       => array(
+                'class'         => 'form-control',
+                'data-show-on'  => $smtpServiceShowConditions
+            )
+        ));
 
         $builder->add('mailer_user', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.user',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
-                'data-hide-on' => $mailerServiceConditions
+                'class'         => 'form-control',
+                'data-show-on'  => $mailerLoginShowConditions
             )
         ));
 
@@ -133,10 +155,10 @@ class ConfigType extends ConfigParentType
             'label'      => 'mautic.core.config.form.mailer.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'       => 'form-control',
-                'placeholder' => 'mautic.user.user.form.passwordplaceholder',
-                'preaddon'    => 'fa fa-lock',
-                'data-hide-on' => $mailerServiceConditions
+                'class'         => 'form-control',
+                'placeholder'   => 'mautic.user.user.form.passwordplaceholder',
+                'preaddon'      => 'fa fa-lock',
+                'data-show-on'  => $mailerLoginShowConditions
             )
         ));
 
@@ -147,21 +169,9 @@ class ConfigType extends ConfigParentType
             ),
             'label'    => 'mautic.core.config.form.mailer.encryption',
             'required' => false,
-            'attr'     => array(
-                'class' => 'form-control'
-            )
-        ));
-
-        $builder->add('mailer_auth_mode', 'choice', array(
-            'choices'  => array(
-                'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
-                'login'    => 'mautic.core.config.mailer_auth_mode.login',
-                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5'
-            ),
-            'label'    => 'mautic.core.config.form.mailer.auth.mode',
-            'required' => false,
-            'attr'     => array(
-                'class' => 'form-control'
+            'attr'       => array(
+                'class'         => 'form-control',
+                'data-show-on'  => $smtpServiceShowConditions
             )
         ));
 

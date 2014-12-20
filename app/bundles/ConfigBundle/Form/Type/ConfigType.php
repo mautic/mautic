@@ -26,7 +26,7 @@ class ConfigType extends AbstractType
     /**
      * @var MauticFactory
      */
-    private $factory;
+    protected $factory;
 
     /**
      * @param MauticFactory $factory
@@ -41,9 +41,9 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['data'] as $bundle => $config) {
-            if (isset($config['formClass']) && isset($config['parameters'])) {
-                $builder->add($bundle, new $config['formClass']($this->factory), array('data' => $config['parameters']));
+        foreach ($options['data'] as $config) {
+            if (isset($config['formAlias']) && isset($config['parameters'])) {
+                $builder->add($config['formAlias'], $config['formAlias'], array('data' => $config['parameters']));
             }
         }
 

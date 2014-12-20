@@ -102,3 +102,11 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'sortablelist',
     ));
+
+$container->setDefinition('mautic.form.type.coreconfig', new Definition(
+    'Mautic\CoreBundle\Form\Type\ConfigType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'coreconfig',
+    ));

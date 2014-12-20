@@ -34,19 +34,10 @@ class ConfigSubscriber extends CommonSubscriber
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $paramsFile = $event->getContainer()->getParameter('kernel.root_dir') . '/bundles/ApiBundle/Config/parameters.php';
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        } else {
-            $parameters = array();
-        }
-
         $event->addForm(array(
             'bundle' => 'ApiBundle',
-            'formClass' => '\Mautic\ApiBundle\Form\Type\ConfigType',
-            'parameters' => $parameters
+            'formAlias' => 'apiconfig',
+            'parameters' => $event->getParameters('/bundles/ApiBundle/Config/parameters.php')
         ));
     }
 
