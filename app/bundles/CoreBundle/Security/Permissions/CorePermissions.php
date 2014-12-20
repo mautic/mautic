@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -59,14 +60,14 @@ class CorePermissions
      * @param array               $addonBundles
      * @param array               $params
      */
-    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $addonBundles, array $params)
+    public function __construct(MauticFactory $factory)
     {
-        $this->translator   = $translator;
-        $this->em           = $em;
-        $this->bundles      = $bundles;
-        $this->addonBundles = $addonBundles;
-        $this->security     = $security;
-        $this->params       = $params;
+        $this->translator   = $factory->getTranslator();
+        $this->em           = $factory->getEntityManager();
+        $this->bundles      = $factory->getParameter('bundles');
+        $this->addonBundles = $factory->getEnabledAddons();
+        $this->security     = $factory->getSecurityContext();
+        $this->params       = $factory->getSystemParameters();
     }
 
     /**

@@ -111,7 +111,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $user     = $event->getUser();
 
         $bundles   = $this->factory->getParameter('bundles');
-        $addons    = $this->factory->getParameter('addon.bundles');
         $menuItems = array();
         foreach ($bundles as $bundle) {
             //check common place
@@ -126,6 +125,7 @@ class CommonSubscriber implements EventSubscriberInterface
             }
         }
 
+        $addons = $this->factory->getEnabledAddons();
         foreach ($addons as $bundle) {
             if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
                 continue;
@@ -171,7 +171,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $security = $event->getSecurity();
         $request  = $this->factory->getRequest();
         $bundles  = $this->factory->getParameter('bundles');
-        $addons   = $this->factory->getParameter('addon.bundles');
 
         $fetchIcons = function($bundle) use (&$event, $security, $request) {
             //check common place
@@ -200,6 +199,7 @@ class CommonSubscriber implements EventSubscriberInterface
             $fetchIcons($bundle);
         }
 
+        $addons = $this->factory->getEnabledAddons();
         foreach ($addons as $bundle) {
             if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
                 continue;
@@ -220,8 +220,6 @@ class CommonSubscriber implements EventSubscriberInterface
     protected function buildRoute(MauticEvents\RouteEvent $event, $name)
     {
         $bundles = $this->factory->getParameter('bundles');
-        $addons  = $this->factory->getParameter('addon.bundles');
-
         foreach ($bundles as $bundle) {
             $routing = $bundle['directory'] . "/Config/routing/$name.php";
             if (file_exists($routing)) {
@@ -229,6 +227,7 @@ class CommonSubscriber implements EventSubscriberInterface
             }
         }
 
+        $addons = $this->factory->getEnabledAddons();
         foreach ($addons as $bundle) {
             $routing = $bundle['directory'] . "/Config/routing/$name.php";
             if (file_exists($routing)) {

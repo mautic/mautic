@@ -72,7 +72,8 @@ class CategoryType extends AbstractType
             'attr'       => array(
                 'class'       => 'form-control',
                 'data-toggle' => 'color'
-            )
+            ),
+            'required'   => false
         ));
 
         $builder->add('isPublished', 'published_button_group');

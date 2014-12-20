@@ -26,7 +26,9 @@ abstract class AddonBundleBase extends Bundle
      */
     public function isEnabled()
     {
-        return $this->container->get('mautic.factory')->getHelper('addon')->isEnabled($this->getName());
+        /** @var \Mautic\AddonBundle\Helper\AddonHelper $helper */
+        $helper = $this->container->get('mautic.factory')->getHelper('addon');
+        return $helper->isEnabled($this->getName());
     }
 
     /**

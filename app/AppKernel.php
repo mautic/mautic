@@ -51,58 +51,9 @@ class AppKernel extends Kernel
     const EXTRA_VERSION = '-beta3-dev';
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public function boot()
-    {
-        parent::boot();
-
-        $factory    = $this->getContainer()->get('mautic.factory');
-        $dispatcher = $factory->getDispatcher();
-
-        $listeners = $dispatcher->getListeners();
-
-        //listeners have to be removed as well so loop to find MauticAddon listeners
-        $addonListeners = array();
-        foreach ($listeners as $event => $subscribers) {
-            foreach ($subscribers as $subscriber) {
-                if (is_array($subscriber)) {
-                    $name = is_object($subscriber[0]) ? get_class($subscriber[0]) : $subscriber[0];
-                } else {
-                    $name = $subscriber;
-                }
-
-                if (strpos($name, 'MauticAddon') !== false) {
-                    //get the name of the bundle
-                    $parts      = explode('\\', $name);
-                    $bundlePath = $parts[0] . '\\' . $parts[1];
-                    $addonListeners[$bundlePath][] = array($event, $subscriber);
-                }
-            }
-        }
-
-        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
-        foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
-                if (!$bundle->isEnabled()) {
-                    unset($this->bundles[$name]);
-                    unset($this->bundleMap[$name]);
-
-                    //remove listeners as well
-                    $bundleClass = get_class($bundle);
-
-                    $parts      = explode('\\', $bundleClass);
-                    $bundlePath = $parts[0] . '\\' . $parts[1];
-
-                    if (isset($addonListeners[$bundlePath])) {
-                        foreach ($addonListeners[$bundlePath] as $listener) {
-                            $dispatcher->removeListener($listener[0], $listener[1]);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    private $addonBundles  = array();
 
     /**
      * {@inheritdoc}
@@ -216,6 +167,105 @@ class AppKernel extends Kernel
         }
 
         return $bundles;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        if (true === $this->booted) {
+            return;
+        }
+
+        if ($this->loadClassCache) {
+            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
+        }
+
+        // init bundles
+        $this->initializeBundles();
+
+        // init container
+        $this->initializeContainer();
+
+        $registeredAddonBundles = $this->container->getParameter('mautic.addon.bundles');
+
+        $addonBundles = array();
+        foreach ($this->getBundles() as $name => $bundle) {
+            if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
+                //boot after it's been check to see if it's enabled
+                $addonBundles[$name] = $bundle;
+
+                //set the container for the addon helper
+                $bundle->setContainer($this->container);
+            } else {
+                $bundle->setContainer($this->container);
+                $bundle->boot();
+            }
+        }
+
+        $factory    = $this->container->get('mautic.factory');
+
+        $dispatcher = $factory->getDispatcher();
+        $listeners  = $dispatcher->getListeners();
+
+        // addon listeners have to be removed if disabled so loop to find MauticAddon listeners
+        $addonListeners = array();
+
+        foreach ($listeners as $event => $subscribers) {
+            foreach ($subscribers as $subscriber) {
+                if (is_array($subscriber)) {
+                    $name = is_object($subscriber[0]) ? get_class($subscriber[0]) : $subscriber[0];
+                } else {
+                    $name = $subscriber;
+                }
+
+                if (strpos($name, 'MauticAddon') !== false) {
+                    //get the name of the bundle
+                    $parts                         = explode('\\', $name);
+                    $bundlePath                    = $parts[0] . '\\' . $parts[1];
+                    $addonListeners[$bundlePath][] = array($event, $subscriber);
+                }
+            }
+        }
+
+        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled then deal with them accordingly
+        foreach ($addonBundles as $name => $bundle) {
+            if (!$bundle->isEnabled()) {
+                unset($this->bundles[$name]);
+                unset($this->bundleMap[$name]);
+                unset($registeredAddonBundles[$name]);
+
+                // remove listeners as well
+                $bundleClass = get_class($bundle);
+
+                $parts      = explode('\\', $bundleClass);
+                $bundlePath = $parts[0] . '\\' . $parts[1];
+
+                if (isset($addonListeners[$bundlePath])) {
+                    foreach ($addonListeners[$bundlePath] as $listener) {
+                        $dispatcher->removeListener($listener[0], $listener[1]);
+                    }
+                }
+            } else {
+                // boot the bundle
+                $bundle->boot();
+            }
+        }
+
+        $this->addonBundles = $registeredAddonBundles;
+
+        $this->booted = true;
+    }
+
+    /**
+     * Returns a list of addon bundles that are enabled
+     *
+     * @return array
+     */
+    public function getAddonBundles()
+    {
+        return $this->addonBundles;
     }
 
     /**

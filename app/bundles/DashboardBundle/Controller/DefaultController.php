@@ -102,12 +102,11 @@ class DefaultController extends CommonController
         }
 
         // Check for updates
-        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateMessage = '';
         if ($this->factory->getUser()->isAdmin()) {
+            /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
             $updateHelper = $this->factory->getHelper('update');
             $updateData   = $updateHelper->fetchData();
-
 
             // If the version key is set, we have an update
             if (isset($updateData['version'])) {

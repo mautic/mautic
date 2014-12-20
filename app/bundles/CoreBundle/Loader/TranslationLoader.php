@@ -40,7 +40,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         $bundles   = $this->factory->getParameter('bundles');
-        $addons    = $this->factory->getParameter('addon.bundles');
+        $addons    = $this->factory->getEnabledAddons();
         $catalogue = new MessageCatalogue($locale);
 
         foreach ($bundles as $name => $bundle) {

@@ -32,6 +32,8 @@ $container->setDefinition ('mautic.route_loader',
 $container->setDefinition ('mautic.security',
     new Definition(
         'Mautic\CoreBundle\Security\Permissions\CorePermissions',
+        array(new Reference('mautic.factory'))
+    /*
         array(
             new Reference('translator'),
             new Reference('doctrine.orm.entity_manager'),
@@ -40,6 +42,7 @@ $container->setDefinition ('mautic.security',
             '%mautic.addon.bundles%',
             '%mautic.parameters%'
         )
+    */
     )
 );
 

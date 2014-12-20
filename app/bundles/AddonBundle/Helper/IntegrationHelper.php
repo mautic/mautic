@@ -55,18 +55,12 @@ class IntegrationHelper
             $available = $integrations = array();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
-            $addons  = $this->factory->getParameter('addon.bundles');
+            $addons  = $this->factory->getEnabledAddons();
 
             // Quickly figure out which addons are enabled so we only process those
             /** @var \Mautic\AddonBundle\Entity\AddonRepository $addonRepo */
             $addonRepo     = $em->getRepository('MauticAddonBundle:Addon');
             $addonStatuses = $addonRepo->getBundleStatus(true);
-
-            foreach ($addons as $addon) {
-                if (empty($addonStatuses[$addon['bundle']]['enabled'])) {
-                    unset($addons[$addon['base']]);
-                }
-            }
 
             // Scan the addons for integration classes
             foreach ($addons as $addon) {
