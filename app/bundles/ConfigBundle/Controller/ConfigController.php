@@ -49,62 +49,53 @@ class ConfigController extends FormController
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
-                /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-                $configurator = $this->get('mautic.configurator');
+                if ($isValid = $this->isFormValid($form)) {
+                    /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+                    $configurator = $this->get('mautic.configurator');
 
-                // Bind request to the form
-                $post     = $this->request->request;
-                $formData = $form->getData();
-                $formValues = array();
+                    // Bind request to the form
+                    $post       = $this->request->request;
+                    $formData   = $form->getData();
 
-                // Merge the values POSTed with the current data
-                foreach ($formData as $formAlias => $formConfig) {
+                    // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
+                    $configEvent = new ConfigEvent($formData, $post);
+                    $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
+                    $formValues = $configEvent->getConfig();
 
-                    $formValues[$formAlias] = array();
-
-                    foreach ($formConfig['parameters'] as $key => $value) {
-                        $value = $post->get('config[' . $formAlias . '][' . $key . ']', null, true);
-                        $formValues[$formAlias][$key] = $value;
+                    // Merge each bundle's updated configuration into the local configuration
+                    foreach ($formValues as $object) {
+                        $configurator->mergeParameters($object);
                     }
-                }
 
-                // Dispatch pre-save event. Bundles may need to modify some field values like booleans and passwords before save
-                $configEvent = new ConfigEvent($formValues, $post);
-                $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
-                $formValues = $configEvent->getConfig();
+                    try {
+                        $configurator->write();
 
-                // Merge each bundle's updated configuration into the local configuration
-                foreach ($formValues as $object) {
-                    $configurator->mergeParameters($object);
-                }
+                        $this->request->getSession()->getFlashBag()->add(
+                            'notice',
+                            $this->get('translator')->trans('mautic.config.config.notice.updated', array(), 'flashes')
+                        );
 
-                try {
-                    $configurator->write();
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.config.config.notice.updated', array(), 'flashes')
-                    );
-
-                    // We must clear the application cache for the updated values to take effect
-                    /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-                    $cacheHelper = $this->factory->getHelper('cache');
-                    $cacheHelper->clearCache();
-                } catch (RuntimeException $exception) {
-                    $this->request->getSession()->getFlashBag()->add(
-                        'error',
-                        $this->get('translator')->trans('mautic.config.config.error.not.updated', array(), 'flashes')
-                    );
+                        // We must clear the application cache for the updated values to take effect
+                        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                        $cacheHelper = $this->factory->getHelper('cache');
+                        $cacheHelper->clearCache();
+                    } catch (RuntimeException $exception) {
+                        $this->request->getSession()->getFlashBag()->add(
+                            'error',
+                            $this->get('translator')->trans('mautic.config.config.error.not.updated', array(), 'flashes')
+                        );
+                    }
                 }
             }
 
             // If the form is saved or cancelled, redirect back to the dashboard
-            if ($cancelled || !$this->isFormApplied($form)) {
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            if ($cancelled || $isValid) {
+                if (!$cancelled && $this->isFormApplied($form)) {
+                    return $this->redirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
+                } else {
+                    return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                }
             }
-
-            // To get here, the form must have been applied; we must redirect to $this in order to force a proper refresh
-            return $this->redirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
         }
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
@@ -130,7 +121,7 @@ class ConfigController extends FormController
      * Merges default parameters from each subscribed bundle with the local (real) params
      *
      * @param array $forms
-     * 
+     *
      * @return array
      */
     private function mergeParamsWithLocal(&$forms)

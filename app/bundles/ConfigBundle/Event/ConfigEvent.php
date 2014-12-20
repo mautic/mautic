@@ -22,7 +22,7 @@ class ConfigEvent extends CommonEvent
     private $config;
 
     /**
-     * @param Symfony\Component\HttpFoundation\ParameterBag $post
+     * @param \Symfony\Component\HttpFoundation\ParameterBag $post
      */
     private $post;
 

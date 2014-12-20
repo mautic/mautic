@@ -45,17 +45,16 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigBeforeSave(ConfigEvent $event)
     {
         $values = $event->getConfig();
-        $post   = $event->getPost();
 
         $passwords = array(
-            'mailer_password'       => $post->get('config[CoreBundle][mailer_password]', null, true),
-            'transifex_password'    => $post->get('config[CoreBundle][transifex_password]', null, true)
+            'mailer_password'       => $values['coreconfig']['mailer_password'],
+            'transifex_password'    => $values['coreconfig']['transifex_password']
         );
 
         foreach ($passwords as $key => $password) {
             // Check to ensure we don't save a blank password to the config which may remove the user's old password
             if ($password == '') {
-                unset($values['CoreBundle'][$key]);
+                unset($values['coreconfig'][$key]);
             }
         }
 
