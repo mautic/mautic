@@ -9,20 +9,16 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ConfigBundle\Form\Type\ConfigType as ConfigParentType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class ConfigType
  *
  * @package Mautic\PageBundle\Form\Type
  */
-class ConfigType extends ConfigParentType
+class ConfigType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -36,15 +32,18 @@ class ConfigType extends ConfigParentType
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
             'label'       => 'mautic.page.config.form.cat.in.url',
+            'label_attr'  => array('class' => 'control-label'),
             'expanded'    => true,
             'empty_value' => false,
-            'data'        => (bool) $options['data']['cat_in_page_url']
+            'data'        => (bool) $options['data']['cat_in_page_url'],
+            'required' => false
         ));
 
         $builder->add('google_analytics', 'text', array(
             'label'      => 'mautic.page.config.form.google.analytics',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
     }
 

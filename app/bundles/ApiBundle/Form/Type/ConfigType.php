@@ -9,20 +9,16 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ConfigBundle\Form\Type\ConfigType as ConfigParentType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class ConfigType
  *
  * @package Mautic\ApiBundle\Form\Type
  */
-class ConfigType extends ConfigParentType
+class ConfigType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -38,7 +34,8 @@ class ConfigType extends ConfigParentType
             'label'       => 'mautic.api.config.form.api.enabled',
             'expanded'    => true,
             'empty_value' => false,
-            'data'        => (bool) $options['data']['api_enabled']
+            'data'        => (bool) $options['data']['api_enabled'],
+            'required'    => false
         ));
 
         $builder->add('api_mode', 'choice', array(
@@ -50,7 +47,8 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
     }
 

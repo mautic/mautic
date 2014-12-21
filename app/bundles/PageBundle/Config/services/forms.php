@@ -65,8 +65,7 @@ $container->setDefinition('mautic.form.type.page_publish_dates', new Definition(
     ));
 
 $container->setDefinition('mautic.form.type.pageconfig', new Definition(
-    'Mautic\PageBundle\Form\Type\ConfigType',
-    array(new Reference('mautic.factory'))
+    'Mautic\PageBundle\Form\Type\ConfigType'
 ))
     ->addTag('form.type', array(
         'alias' => 'pageconfig',

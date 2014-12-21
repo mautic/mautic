@@ -23,8 +23,7 @@ $container->setDefinition(
     ));
 
 $container->setDefinition('mautic.form.type.apiconfig', new Definition(
-    'Mautic\ApiBundle\Form\Type\ConfigType',
-    array(new Reference('mautic.factory'))
+    'Mautic\ApiBundle\Form\Type\ConfigType'
 ))
     ->addTag('form.type', array(
         'alias' => 'apiconfig',

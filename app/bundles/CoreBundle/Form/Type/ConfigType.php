@@ -10,20 +10,30 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ConfigBundle\Form\Type\ConfigType as ConfigParentType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class ConfigType
  *
  * @package Mautic\CoreBundle\Form\Type
  */
-class ConfigType extends ConfigParentType
+class ConfigType extends AbstractType
 {
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -33,25 +43,45 @@ class ConfigType extends ConfigParentType
         $builder->add('site_url', 'text', array(
             'label'      => 'mautic.core.config.form.site.url',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('cache_path', 'text', array(
             'label'      => 'mautic.core.config.form.cache.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('log_path', 'text', array(
             'label'      => 'mautic.core.config.form.log.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('image_path', 'text', array(
             'label'      => 'mautic.core.config.form.image.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('theme', 'choice', array(
@@ -67,13 +97,26 @@ class ConfigType extends ConfigParentType
         $builder->add('mailer_from_name', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.from.name',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('mailer_from_email', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.from.email',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.emailinvalid'
+                )),
+                new Email(array(
+                    'message' => 'mautic.config.emailinvalid'
+                ))
+            )
         ));
 
         $builder->add('mailer_transport', 'choice', array(
@@ -102,7 +145,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'         => 'form-control',
                 'data-show-on'  => $smtpServiceShowConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_port', 'text', array(
@@ -111,7 +155,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'         => 'form-control',
                 'data-show-on'  => $smtpServiceShowConditions
-            )
+            ),
+            'required' => false
         ));
 
         $mailerLoginShowConditions = '{
@@ -135,6 +180,7 @@ class ConfigType extends ConfigParentType
                 'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5'
             ),
             'label'    => 'mautic.core.config.form.mailer.auth.mode',
+            'label_attr' => array('class' => 'control-label'),
             'required' => false,
             'attr'       => array(
                 'class'         => 'form-control',
@@ -149,7 +195,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'         => 'form-control',
                 'data-show-on'  => $mailerLoginShowConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_password', 'password', array(
@@ -160,7 +207,8 @@ class ConfigType extends ConfigParentType
                 'placeholder'   => 'mautic.user.user.form.passwordplaceholder',
                 'preaddon'      => 'fa fa-lock',
                 'data-show-on'  => $mailerLoginShowConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_encryption', 'choice', array(
@@ -185,6 +233,7 @@ class ConfigType extends ConfigParentType
                 'file'   => 'mautic.core.config.mailer_spool_type.file'
             ),
             'label'    => 'mautic.core.config.form.mailer.spool.type',
+            'label_attr' => array('class' => 'control-label'),
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
@@ -198,7 +247,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class' => 'form-control',
                 'data-hide-on' => $spoolConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_spool_msg_limit', 'text', array(
@@ -207,7 +257,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class' => 'form-control',
                 'data-hide-on' => $spoolConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_spool_time_limit', 'text', array(
@@ -216,7 +267,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class' => 'form-control',
                 'data-hide-on' => $spoolConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_spool_recover_timeout', 'text', array(
@@ -225,7 +277,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class' => 'form-control',
                 'data-hide-on' => $spoolConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('mailer_spool_clear_timeout', 'text', array(
@@ -234,7 +287,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class' => 'form-control',
                 'data-hide-on' => $spoolConditions
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('locale', 'choice', array(
@@ -250,77 +304,131 @@ class ConfigType extends ConfigParentType
         $builder->add('trusted_hosts', 'text', array(
             'label'      => 'mautic.core.config.form.trusted.hosts',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
         $builder->add('trusted_proxies', 'text', array(
             'label'      => 'mautic.core.config.form.trusted.proxies',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
         $builder->add('rememberme_key', 'text', array(
             'label'      => 'mautic.core.config.form.rememberme.key',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('rememberme_lifetime', 'text', array(
             'label'      => 'mautic.core.config.form.rememberme.lifetime',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('rememberme_path', 'text', array(
             'label'      => 'mautic.core.config.form.rememberme.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('rememberme_domain', 'text', array(
             'label'      => 'mautic.core.config.form.rememberme.domain',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
-        $builder->add('default_pagelimit', 'text', array(
+        $builder->add('default_pagelimit', 'choice', array(
+            'choices' => array(
+                5   => 'mautic.core.pagination.5',
+                10  => 'mautic.core.pagination.10',
+                15  => 'mautic.core.pagination.15',
+                20  => 'mautic.core.pagination.20',
+                25  => 'mautic.core.pagination.25',
+                30  => 'mautic.core.pagination.30',
+                50  => 'mautic.core.pagination.50',
+                100 => 'mautic.core.pagination.100',
+                0   => 'mautic.core.pagination.all'
+            ),
+            'expanded'   => false,
+            'multiple'   => false,
             'label'      => 'mautic.core.config.form.default.pagelimit',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false,
+            'empty_value' => false
         ));
 
         $builder->add('default_timezone', 'timezone', array(
             'label'       => 'mautic.core.config.form.default.timezone',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
-                'class' => 'form-control'
+                'class' => 'form-control chosen'
             ),
             'multiple'    => false,
-            'empty_value' => 'mautic.user.user.form.defaulttimezone'
+            'empty_value' => 'mautic.user.user.form.defaulttimezone',
+            'required' => false
         ));
 
         $builder->add('date_format_full', 'text', array(
             'label'      => 'mautic.core.config.form.date.format.full',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('date_format_short', 'text', array(
             'label'      => 'mautic.core.config.form.date.format.short',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('date_format_dateonly', 'text', array(
             'label'      => 'mautic.core.config.form.date.format.dateonly',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('date_format_timeonly', 'text', array(
             'label'      => 'mautic.core.config.form.date.format.timeonly',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         // TODO - Write an API endpoint listing our supported services and build this list from that
@@ -337,23 +445,25 @@ class ConfigType extends ConfigParentType
                 'maxmind_omni'      => 'mautic.core.config.ip_lookup_service.maxmind_omni'
             ),
             'label'    => 'mautic.core.config.form.ip.lookup.service',
+            'label_attr' => array('class' => 'control-label'),
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            ),
-            'empty_value' => false
+            )
         ));
 
         $builder->add('ip_lookup_auth', 'text', array(
             'label'      => 'mautic.core.config.form.ip.lookup.auth',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
         $builder->add('transifex_username', 'text', array(
             'label'      => 'mautic.core.config.form.transifex.username',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
         $builder->add('transifex_password', 'password', array(
@@ -363,7 +473,8 @@ class ConfigType extends ConfigParentType
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.user.user.form.passwordplaceholder',
                 'preaddon'    => 'fa fa-lock'
-            )
+            ),
+            'required' => false
         ));
 
         $builder->add('update_stability', 'choice', array(
@@ -384,13 +495,19 @@ class ConfigType extends ConfigParentType
         $builder->add('cookie_path', 'text', array(
             'label'      => 'mautic.core.config.form.cookie.path',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.config.requiredvalue'
+                ))
+            )
         ));
 
         $builder->add('cookie_domain', 'text', array(
             'label'      => 'mautic.core.config.form.cookie.domain',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
         ));
 
         $builder->add('cookie_secure', 'button_group', array(
@@ -401,7 +518,8 @@ class ConfigType extends ConfigParentType
             'label'       => 'mautic.core.config.form.cookie.secure',
             'expanded'    => true,
             'empty_value' => 'mautic.core.form.default',
-            'data'        => ($options['data']['cookie_secure'] === '' || $options['data']['cookie_secure'] === null) ? '' : (bool) $$options['data']['cookie_secure']
+            'data'        => ($options['data']['cookie_secure'] === '' || $options['data']['cookie_secure'] === null) ? '' : (bool) $$options['data']['cookie_secure'],
+            'required' => false
         ));
 
         $builder->add('cookie_httponly', 'button_group', array(
@@ -412,7 +530,8 @@ class ConfigType extends ConfigParentType
             'label'       => 'mautic.core.config.form.cookie.httponly',
             'expanded'    => true,
             'empty_value' => false,
-            'data'        => (bool)$options['data']['cookie_httponly']
+            'data'        => (bool)$options['data']['cookie_httponly'],
+            'required' => false
         ));
     }
 
