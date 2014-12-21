@@ -10,30 +10,28 @@
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class ConfigType
  */
 class ConfigType extends AbstractType
 {
-
     /**
-     * @var MauticFactory
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
-    protected $factory;
+    private $translator;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory = $factory;
+        $this->translator = $factory->getTranslator();
     }
 
     /**
@@ -43,9 +41,37 @@ class ConfigType extends AbstractType
     {
         foreach ($options['data'] as $config) {
             if (isset($config['formAlias']) && isset($config['parameters'])) {
-                $builder->add($config['formAlias'], $config['formAlias'], array('data' => $config['parameters']));
+                $builder->add($config['formAlias'], $config['formAlias'], array(
+                    'data' => $config['parameters']
+                ));
             }
         }
+
+        $translator = $this->translator;
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $translator) {
+            $form = $event->getForm();
+
+            foreach ($form as $config => $configForm) {
+                foreach ($configForm as $key => $child) {
+                    if (in_array($key, $options['doNotChange'])) {
+                        $attributes = $child->getConfig()->getAttributes();
+                        $label      = $attributes['data_collector/passed_options']['label'];
+
+                        $configForm->add($key, 'text', array(
+                            'label' => $label,
+                            'required' => false,
+                            'mapped'   => false,
+                            'disabled' => true,
+                            'attr'     => array(
+                                'placeholder' => $translator->trans('mautic.config.restricted'),
+                                'class'       => 'form-control'
+                            ),
+                            'label_attr' => array('class' => 'control-label'),
+                        ));
+                    }
+                }
+            }
+        });
 
         $builder->add('buttons', 'form_buttons');
 
@@ -60,5 +86,15 @@ class ConfigType extends AbstractType
     public function getName()
     {
         return 'config';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setRequired(array('doNotChange'));
     }
 }

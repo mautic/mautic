@@ -37,14 +37,15 @@ class ConfigController extends FormController
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $formConfigs = $event->getForms();
         $formThemes  = $event->getFormThemes();
-        $this->mergeParamsWithLocal($formConfigs);
+        $doNotChange = $this->factory->getParameter('security.restrictedConfigFields');
+        $this->mergeParamsWithLocal($formConfigs, $doNotChange);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
         $model = $this->factory->getModel('config');
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
-        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array('action' => $action));
+        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array('action' => $action, 'doNotChange' => $doNotChange));
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -121,13 +122,12 @@ class ConfigController extends FormController
      * Merges default parameters from each subscribed bundle with the local (real) params
      *
      * @param array $forms
+     * @param array $doNotChange
      *
      * @return array
      */
-    private function mergeParamsWithLocal(&$forms)
+    private function mergeParamsWithLocal(&$forms, $doNotChange)
     {
-        $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
-
         // Import the current local configuration, $parameters is defined in this file
         $localConfigFile = $this->factory->getLocalConfigFile();
 
