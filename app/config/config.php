@@ -82,7 +82,7 @@ $container->loadFromExtension('framework', array(
         ),
         'form' => array(
             'resources' => array(
-                'MauticCoreBundle:Form',
+                'MauticCoreBundle:FormTheme\\Custom',
             ),
         ),
     ),
