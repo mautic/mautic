@@ -60,7 +60,8 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
         $builder->add('mailer_from_name', 'text', array(
@@ -90,11 +91,11 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
-        $smtpServiceShowConditions = '{"config_CoreBundle_mailer_transport":["smtp"]}';
-
+        $smtpServiceShowConditions = '{"config_coreconfig_mailer_transport":["smtp"]}';
         $builder->add('mailer_host', 'text', array(
             'label'      => 'mautic.core.config.form.mailer.host',
             'label_attr' => array('class' => 'control-label'),
@@ -114,17 +115,16 @@ class ConfigType extends ConfigParentType
         ));
 
         $mailerLoginShowConditions = '{
-            "config_CoreBundle_mailer_auth_mode":[
+            "config_coreconfig_mailer_auth_mode":[
                 "plain",
                 "login",
                 "cram-md5"
-            ], "config_CoreBundle_mailer_transport":[
+            ], "config_coreconfig_mailer_transport":[
                 "mautic.transport.mandrill",
                 "mautic.transport.sendgrid",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
-                "gmail",
-                "sendmail"
+                "gmail"
             ]
         }';
 
@@ -139,7 +139,8 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'         => 'form-control',
                 'data-show-on'  => $smtpServiceShowConditions
-            )
+            ),
+            'empty_value' => 'mautic.core.config.mailer_auth_mode.none'
         ));
 
         $builder->add('mailer_user', 'text', array(
@@ -172,21 +173,23 @@ class ConfigType extends ConfigParentType
             'attr'       => array(
                 'class'         => 'form-control',
                 'data-show-on'  => $smtpServiceShowConditions
-            )
+            ),
+            'empty_value' => false
         ));
 
-        $spoolConditions = '{"config_CoreBundle_mailer_spool_type":[""]}';
+        $spoolConditions = '{"config_coreconfig_mailer_spool_type":["memory"]}';
 
         $builder->add('mailer_spool_type', 'choice', array(
             'choices'  => array(
-                'file'   => 'mautic.core.config.mailer_spool_type.file',
-                'memory' => 'mautic.core.config.mailer_spool_type.memory'
+                'memory' => 'mautic.core.config.mailer_spool_type.memory',
+                'file'   => 'mautic.core.config.mailer_spool_type.file'
             ),
             'label'    => 'mautic.core.config.form.mailer.spool.type',
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
         $builder->add('mailer_spool_path', 'text', array(
@@ -240,7 +243,8 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
         $builder->add('trusted_hosts', 'text', array(
@@ -336,7 +340,8 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
         $builder->add('ip_lookup_auth', 'text', array(
@@ -372,7 +377,8 @@ class ConfigType extends ConfigParentType
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'
-            )
+            ),
+            'empty_value' => false
         ));
 
         $builder->add('cookie_path', 'text', array(

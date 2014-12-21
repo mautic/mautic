@@ -36,7 +36,7 @@ class ConfigController extends FormController
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $formConfigs = $event->getForms();
-        $formThemes = $event->getFormThemes();
+        $formThemes  = $event->getFormThemes();
         $this->mergeParamsWithLocal($formConfigs);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
@@ -102,11 +102,11 @@ class ConfigController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'params'      => $formConfigs,
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
-                // 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes)
-                'form'        => $form->createView()
+                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
+                'formConfigs' => $formConfigs
+
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(

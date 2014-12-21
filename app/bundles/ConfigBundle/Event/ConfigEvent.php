@@ -58,7 +58,7 @@ class ConfigEvent extends CommonEvent
     /**
      * Returns the POST
      *
-     * @return Symfony\Component\HttpFoundation\ParameterBag
+     * @return \Symfony\Component\HttpFoundation\ParameterBag
      */
     public function getPost()
     {

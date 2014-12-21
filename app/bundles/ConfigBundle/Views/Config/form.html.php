@@ -10,8 +10,10 @@ if ($tmpl == 'index') {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
 $view['slots']->set('mauticContent', 'config');
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.config.header.index'));
+
+$configKeys = array_keys($form->children);
 ?>
-<?php if (!empty($params)) : ?>
 
 <!-- start: box layout -->
 <div class="box-layout">
@@ -21,14 +23,13 @@ $view['slots']->set('mauticContent', 'config');
 
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
-            <?php $i = 0; ?>
-            <?php foreach ($params as $key => $paramArray) : ?>
-                <li role="presentation" class="list-group-item <?php echo $i == 0 ? 'in active' : ''; ?>">
+            <?php foreach ($configKeys as $i => $key) : ?>
+                <?php if (!isset($formConfigs[$key])) continue; ?>
+                <li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps">
-                        <?php echo $paramArray['bundle']; ?>
+                        <?php echo $view['translator']->trans('mautic.config.tab.' . $key); ?>
                     </a>
                 </li>
-                <?php $i++; ?>
             <?php endforeach; ?>
             </ul>
         </div>
@@ -36,37 +37,18 @@ $view['slots']->set('mauticContent', 'config');
 
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-l">
-        <!-- Tab panes -->
         <?php echo $view['form']->start($form); ?>
+        <!-- Tab panes -->
         <div class="tab-content">
-            <?php $i = 0; ?>
-            <?php foreach ($params as $key => $paramArray) : ?>
-            <div role="tabpanel" class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
+            <?php foreach ($configKeys as $i => $key) : ?>
+            <?php if (!isset($formConfigs[$key])) continue; ?>
+            <div role="tabpanel" class="tab-pane fade <?php echo $i === 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
-                <?php if (isset($paramArray['parameters']) && isset($paramArray['formAlias'])) : ?>
-                    <?php foreach ($paramArray['parameters'] as $paramKey => $paramValue) : ?>
-                        <?php if (isset($form[$paramArray['formAlias']][$paramKey])) : ?>
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form[$paramArray['formAlias']][$paramKey]); ?>
-                        </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php else : ?>
-                <?php foreach ($paramArray as $paramKey => $paramValue) : ?>
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form[$paramKey]); ?>
-                    </div>
-                <?php endforeach; ?>
-                <?php endif; ?>
+                    <?php echo $view['form']->widget($form[$key]); ?>
                 </div>
             </div>
-            <?php $i++; ?>
             <?php endforeach; ?>
         </div>
         <?php echo $view['form']->end($form); ?>
     </div>
 </div>
-
-<?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
-<?php endif; ?>

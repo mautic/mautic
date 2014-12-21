@@ -35,7 +35,7 @@ class ConfigType extends ConfigParentType
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
-            'label'       => 'mautic.page.config.form.api.enabled',
+            'label'       => 'mautic.api.config.form.api.enabled',
             'expanded'    => true,
             'empty_value' => false,
             'data'        => (bool) $options['data']['api_enabled']
@@ -46,7 +46,7 @@ class ConfigType extends ConfigParentType
                 'oauth1' => 'mautic.api.config.oauth1',
                 'oauth2' => 'mautic.api.config.oauth2'
             ),
-            'label'    => 'mautic.page.config.form.api.mode',
+            'label'    => 'mautic.api.config.form.api.mode',
             'required' => false,
             'attr'     => array(
                 'class' => 'form-control'

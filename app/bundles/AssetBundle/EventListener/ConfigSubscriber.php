@@ -35,6 +35,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm(array(
             'bundle' => 'AssetBundle',
             'formAlias' => 'assetconfig',
+            'formTheme'  => 'MauticAssetBundle:FormTheme\Config',
             'parameters' => $event->getParameters('/bundles/AssetBundle/Config/parameters.php')
         ));
     }
