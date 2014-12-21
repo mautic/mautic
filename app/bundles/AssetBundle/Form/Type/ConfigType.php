@@ -34,7 +34,10 @@ class ConfigType extends AbstractType
         $builder->add('upload_dir', 'text', array(
             'label'       => 'mautic.asset.config.form.upload.dir',
             'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array('class' => 'form-control'),
+            'attr'        => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.asset.config.form.upload.dir.tooltip'
+                ),
             'constraints' => array(
                 new NotBlank(array(
                     'message' => 'mautic.config.requiredvalue'

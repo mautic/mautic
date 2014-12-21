@@ -35,7 +35,10 @@ class ConfigType extends AbstractType
             'expanded'    => true,
             'empty_value' => false,
             'data'        => (bool) $options['data']['api_enabled'],
-            'required'    => false
+            'required'    => false,
+            'attr'        => array(
+                'tooltip' => 'mautic.api.config.form.api.enabled.tooltip'
+            )
         ));
 
         $builder->add('api_mode', 'choice', array(
@@ -46,7 +49,8 @@ class ConfigType extends AbstractType
             'label'    => 'mautic.api.config.form.api.mode',
             'required' => false,
             'attr'     => array(
-                'class' => 'form-control'
+                'class' => 'form-control',
+                'tooltip' => 'mautic.api.config.form.api.mode.tooltip'
             ),
             'empty_value' => false
         ));

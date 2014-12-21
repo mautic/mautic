@@ -21,7 +21,7 @@ $fields = $form->children;
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'locale'); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'update_stability'); ?>
             </div>
         </div>
 
@@ -44,12 +44,6 @@ $fields = $form->children;
                 <?php echo $view['form']->rowIfExists($fields, 'image_path'); ?>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'update_stability'); ?>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -67,6 +61,14 @@ $fields = $form->children;
                 <?php echo $view['form']->rowIfExists($fields, 'default_timezone'); ?>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'locale'); ?>
+            </div>
+        </div>
+
+        <hr class="text-muted" />
 
         <div class="row">
             <div class="col-md-6">

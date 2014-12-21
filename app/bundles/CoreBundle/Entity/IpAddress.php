@@ -240,7 +240,7 @@ class IpAddress
 
             if ($auth) {
                 curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-                curl_setopt($ch, CURLOPT_USERPWD, "{$auth[0]}:{$auth[1]}");
+                curl_setopt($ch, CURLOPT_USERPWD, $auth);
             }
 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -251,7 +251,7 @@ class IpAddress
             if ($auth) {
                 $context = stream_context_create(array(
                     'http' => array(
-                        'header'  => "Authorization: Basic " . base64_encode("{$auth[0]}:{$auth[1]}")
+                        'header'  => "Authorization: Basic " . base64_encode($auth)
                     )
                 ));
                 $data = @file_get_contents($url, false, $context);

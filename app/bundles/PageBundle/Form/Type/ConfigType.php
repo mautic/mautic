@@ -36,13 +36,19 @@ class ConfigType extends AbstractType
             'expanded'    => true,
             'empty_value' => false,
             'data'        => (bool) $options['data']['cat_in_page_url'],
-            'required' => false
+            'required'    => false,
+            'attr'        => array(
+                'tooltip' => 'mautic.page.config.form.cat.in.url.tooltip'
+            )
         ));
 
         $builder->add('google_analytics', 'text', array(
             'label'      => 'mautic.page.config.form.google.analytics',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.page.config.form.google.analytics.tooltip'
+            ),
             'required' => false
         ));
     }
