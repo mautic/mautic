@@ -15,7 +15,7 @@ if (!$user->isAdmin()) {
 
 return array(
     'items' => array(
-        'mautic.config.config.menu.index' => array(
+        'mautic.config.menu.index' => array(
             'route'           => 'mautic_config_action',
             'routeParameters' => array('objectAction' => 'edit'),
             'iconClass'       => 'fa-cogs',

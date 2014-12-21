@@ -10,12 +10,14 @@ Mautic.configOnLoad = function (container) {
 // show/hide field according to their data-hide-on and data-show-on attribute
 Mautic.hideSpecificConfigFields = function() {
 	var form = mQuery('form[name="config"]');
+
 	var fields = {};
 	// find all fields to hide
 	form.find('[data-hide-on]').each(function(index, el) {
 		var field = mQuery(el);
+		console.log(field.attr('data-hide-on'));
 		var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
-
+		console.log(hideOn);
 		mQuery.each(hideOn, function(fieldId, condition) {
 			var sourceFieldVal = mQuery('#' + fieldId).val();
 			if (mQuery.inArray(sourceFieldVal, condition) !== -1 && fields[field.attr('id')] !== true) {
@@ -29,6 +31,7 @@ Mautic.hideSpecificConfigFields = function() {
 	// find all fields to show
 	form.find('[data-show-on]').each(function(index, el) {
 		var field = mQuery(el);
+		console.log(field.attr('data-show-on'));
 		var showOn = jQuery.parseJSON(field.attr('data-show-on'));
 
 	    mQuery.each(showOn, function(fieldId, condition) {

@@ -6,5 +6,12 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-die('template loaded');
-echo $view['form']->row($form->children['cookie_secure']);
+?>
+
+<?php foreach ($form->children as $f): ?>
+<div class="row">
+    <div class="col-md-6">
+        <?php echo $view['form']->row($f); ?>
+    </div>
+</div>
+<?php endforeach; ?>

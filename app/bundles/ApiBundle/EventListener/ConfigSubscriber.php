@@ -27,8 +27,7 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
-            ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
+            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0)
         );
     }
 
@@ -37,19 +36,8 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm(array(
             'bundle' => 'ApiBundle',
             'formAlias' => 'apiconfig',
+            'formTheme'     => 'MauticApiBundle:FormTheme\Config',
             'parameters' => $event->getParameters('/bundles/ApiBundle/Config/parameters.php')
         ));
-    }
-
-    public function onConfigBeforeSave(ConfigEvent $event)
-    {
-        $values = $event->getConfig();
-        $post   = $event->getPost();
-
-        if (isset($values['ApiBundle']['api_enabled'])) {
-            $values['ApiBundle']['api_enabled'] = (bool) $post->get('config[ApiBundle][api_enabled]', null, true);
-        }
-
-        $event->setConfig($values);
     }
 }

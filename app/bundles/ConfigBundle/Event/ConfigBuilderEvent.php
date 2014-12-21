@@ -35,7 +35,7 @@ class ConfigBuilderEvent extends CommonEvent
 
     /**
      * Consctructor
-     * 
+     *
      * @param appProdProjectContainer|appDevDebugProjectContainer
      */
     public function __construct($container)
@@ -47,13 +47,13 @@ class ConfigBuilderEvent extends CommonEvent
      * Set new form to the forms array
      *
      * @param array $form
-     * 
+     *
      * @return void
      */
     public function addForm($form)
     {
         if (isset($form['formTheme'])) {
-            $this->formThemes[$form['formAlias']] = $form['formTheme'];
+            $this->formThemes[] = $form['formTheme'];
         }
 
         $this->forms[$form['formAlias']] = $form;
