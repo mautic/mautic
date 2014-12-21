@@ -6,7 +6,6 @@
 .csstransforms3d.sidebar-open-ltr {
   #app-content {
     .translate3d(@sidebar-left-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-ltr {
@@ -15,22 +14,22 @@
   }
 }
 .csstransforms3d.sidebar-open-rtl {
-  #app-content {
-    .translate3d(-@sidebar-right-width, 0, 0);
-    .transition(transform .3s ease);
-  }
+    #app-content {
+      .translate3d(-@sidebar-right-width, 0, 0);
+    }
 }
 .no-csstransforms3d.sidebar-open-rtl {
   #app-content {
     left: -@sidebar-right-width;
   }
 }
+
 #app-content {
   position: relative;
   //z-index: @content-zindex;
   //min-height: 100%;
   .clearfix();
-  .transition(transform .3s ease);
+  .transition(all .3s ease);
 
   // content body
   // -------------------------
@@ -67,7 +66,7 @@
 @media (min-width: @screen-sm-min) {
   #app-content {
     position: static;
-    
+
     // minimized state
     .sidebar-minimized & {
       margin-left: @sidebar-left-collapse-width !important;

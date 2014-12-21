@@ -6,7 +6,6 @@
 .csstransforms3d.sidebar-open-ltr {
   #app-header.navbar {
     .translate3d(@sidebar-left-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-ltr {
@@ -17,7 +16,6 @@
 .csstransforms3d.sidebar-open-rtl {
   #app-header.navbar {
     .translate3d(-@sidebar-right-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-rtl {
@@ -29,6 +27,8 @@
 
 // navbar as header
 #app-header.navbar {
+  .transition(all .3s ease);
+
   background-color: @header-bg;
   float: left;
   z-index: @header-zindex;
@@ -37,7 +37,6 @@
   border-radius: 0;
   margin-bottom: 0;
   .box-shadow(0 1px 0 rgba(0,0,0,0.05));
-  .transition(transform .3s ease);
 
   // fixed header
   .header-fixed & {

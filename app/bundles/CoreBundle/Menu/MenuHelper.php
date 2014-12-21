@@ -104,7 +104,7 @@ class MenuHelper extends Helper
      *
      * @param $items
      */
-    static public function createMenuStructure(&$items)
+    static public function createMenuStructure(&$items, $depth = 0)
     {
         foreach ($items as &$i) {
             if (!is_array($i) || empty($i)) {
@@ -124,6 +124,10 @@ class MenuHelper extends Helper
 
             $i['extras'] = array();
 
+
+            $i['extras']['depth'] = $depth;
+
+
             //Set the icon class for the menu item
             if (!empty($i['iconClass'])) {
                 $i['extras']['iconClass'] = $i['iconClass'];
@@ -136,7 +140,7 @@ class MenuHelper extends Helper
 
             //Repeat for sub items
             if (isset($i['children'])) {
-                self::createMenuStructure($i['children']);
+                self::createMenuStructure($i['children'], $depth + 1);
             }
         }
     }

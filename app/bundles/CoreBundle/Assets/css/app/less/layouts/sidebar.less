@@ -6,7 +6,6 @@
 .csstransforms3d.sidebar-open-ltr {
   .app-sidebar.sidebar-left {
     .translate3d(@sidebar-left-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-ltr {
@@ -17,11 +16,9 @@
 .csstransforms3d.sidebar-open-rtl {
   .app-sidebar.sidebar-right {
     .translate3d(-@sidebar-right-width, 0, 0);
-    .transition(transform .3s ease);
   }
   .app-sidebar.sidebar-left {
     .translate3d(-@sidebar-right-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-rtl {
@@ -39,7 +36,6 @@
   z-index: @sidebar-zindex;
   top: 0;
   bottom: 0;
-  .transition(transform .3s ease);
 
   // sidebar left
   // -------------------------
@@ -47,14 +43,28 @@
     width: @sidebar-left-width;
     left: -@sidebar-left-width;
     background-color: @sidebar-left-bg;
-    box-shadow:inset -1px 0 0 0 rgba(0,0,0,0.05);
+    box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
     color: fade(contrast(@sidebar-left-bg), 55%);
+    .transition(all .3s ease);
 
     // sidebar header & footer
     .sidebar-header,
     .sidebar-footer {
+      .transition(width .3s ease);
       width: @sidebar-left-width;
       background-color: @sidebar-left-header-bg;
+    }
+
+    .sidebar-header {
+      > .mautic-brand > .mautic-logo-text {
+        opacity: 1;
+        margin-left: 3px;
+        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+      }
+      > .mautic-brand {
+        .transition(padding-left .3s ease);
+      }
     }
 
     // sidebar content
@@ -82,6 +92,7 @@
     background-color: @sidebar-right-bg;
     box-shadow:inset 1px 0 0 0 rgba(0,0,0,0.05);
     color: fade(contrast(@sidebar-right-bg), 55%);
+    .transition(all .3s ease);
 
     // sidebar header & footer
     .sidebar-header,
@@ -133,7 +144,7 @@
     padding-left: 15px;
     padding-right: 15px;
     box-shadow: 0 -1px 0 0 rgba(0,0,0,0.07);
-    
+
     .form-control {
       color: darken(#fff, 40%);
     }
@@ -195,22 +206,32 @@
     > .nav {
       > li {
         > a {
+          overflow: hidden;
           padding: 12px 20px;
           .transition(all .15s ease);
           .text {
+            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            opacity: 1;
+            margin-left: 0;
             position: relative;
             top: -1px;
+            display: block;
             //font-weight: 600;
           }
           .icon {
             font-weight: normal;
             font-size: 14px;
             min-width: 26px;
+            display: block;
           }
           .arrow {
+            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            opacity: 1;
+            margin-left: 0;
             font-family: 'FontAwesome';
             position: relative;
             top: 1px;
+            display: block;
             &:after {
               content: "\f0da";
             }
@@ -355,16 +376,21 @@
               padding-bottom: 12px;
             }
             &.nav-heading,
-            > a .text,
             > a .arrow,
             > a .badge,
+            > a .text,
             > a .label {
-              display: none;
+              /* override default margin-left transition as any delay throws Chrome off */
+              .transition(none);
+              /* hide everything but the icon; using margin and opacity since display can't be transitioned */
+              margin-left: -500px;
+              opacity: 0;
             }
+
             > a .icon {
               min-width: 0;
               width: 100%;
-              text-align: center;
+              /* text-align: center; */
             }
             > .nav-submenu {
               display: none;
@@ -414,11 +440,16 @@
 
         // reset sidebar-header
         .sidebar-header {
-          padding: 0;
+          /* padding: 0; */
           width: @sidebar-left-collapse-width;
-
           > .mautic-brand > .mautic-logo-text {
-            display: none;
+            opacity: 0;
+            margin-left: -500px;
+            /* override default margin-left transition as any delay throws Chrome off */
+            .transition(none);
+          }
+          > .mautic-brand {
+            padding: 0;
           }
         }
       }

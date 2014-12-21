@@ -7,8 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()) {
+if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
 
     /** Top menu level start */
     if ($item->isRoot()) {
@@ -51,14 +50,15 @@ if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren
         }
 
         if (!empty($extras["iconClass"])) {
-            echo "<span class=\"icon fa {$extras["iconClass"]}\"></span>";
+            echo "<span class=\"icon pull-left fa {$extras["iconClass"]}\"></span>";
         }
 
         $labelAttributes = $child->getLabelAttributes();
         if (!isset($labelAttributes['class'])) {
             $labelAttributes['class'] = 'nav-item-name';
         }
-        $labelAttributes['class'] .= ' text';
+        $labelPull = $extras['depth'] === 0 ? ' pull-left' : '';
+        $labelAttributes['class'] .= ' text' . $labelPull;
 
         echo "<span{$view["menu_helper"]->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";
 

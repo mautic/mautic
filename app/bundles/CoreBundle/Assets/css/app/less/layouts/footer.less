@@ -6,7 +6,6 @@
 .csstransforms3d.sidebar-open-ltr {
   #app-footer {
     .translate3d(@sidebar-left-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-ltr {
@@ -17,7 +16,6 @@
 .csstransforms3d.sidebar-open-rtl {
   #app-footer {
     .translate3d(-@sidebar-right-width, 0, 0);
-    .transition(transform .3s ease);
   }
 }
 .no-csstransforms3d.sidebar-open-rtl {
@@ -36,7 +34,7 @@
   height: @footer-height;
   line-height: @footer-height;
   background-color: @footer-bg;
-  .transition(transform .3s ease);
+  .transition(all .3s ease);
 
   // Add bottom padding to app-content if footer is presented
   ~ #app-content {

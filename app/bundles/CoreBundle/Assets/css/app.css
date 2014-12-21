@@ -33,9 +33,6 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-ltr #app-header.navbar {
   -webkit-transform: translate3d(230px, 0, 0);
   transform: translate3d(230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-ltr #app-header.navbar {
   left: 230px;
@@ -43,15 +40,17 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-rtl #app-header.navbar {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-rtl #app-header.navbar {
   left: -230px;
   right: 230px;
 }
 #app-header.navbar {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
   background-color: #ffffff;
   float: left;
   z-index: 1005;
@@ -61,9 +60,6 @@ body > #app-wrapper {
   margin-bottom: 0;
   -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .header-fixed #app-header.navbar {
   position: fixed;
@@ -234,12 +230,16 @@ body > #app-wrapper {
   -webkit-box-shadow: none;
   box-shadow: none;
   -webkit-transition: top 0.3s ease;
+  -moz-transition: top 0.3s ease;
+  -ms-transition: top 0.3s ease;
   -o-transition: top 0.3s ease;
   transition: top 0.3s ease;
 }
 #app-header.navbar .navbar-nocollapse .navbar-form.open {
   top: 0;
   -webkit-transition: top 0.3s ease;
+  -moz-transition: top 0.3s ease;
+  -ms-transition: top 0.3s ease;
   -o-transition: top 0.3s ease;
   transition: top 0.3s ease;
 }
@@ -329,9 +329,6 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-ltr .app-sidebar.sidebar-left {
   -webkit-transform: translate3d(230px, 0, 0);
   transform: translate3d(230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-ltr .app-sidebar.sidebar-left {
   left: 0;
@@ -339,16 +336,10 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-right {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-left {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-right {
   right: 0;
@@ -361,9 +352,6 @@ body > #app-wrapper {
   z-index: 990;
   top: 0;
   bottom: 0;
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .app-sidebar.sidebar-left {
   width: 230px;
@@ -371,11 +359,37 @@ body > #app-wrapper {
   background-color: #1d232b;
   box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 .app-sidebar.sidebar-left .sidebar-header,
 .app-sidebar.sidebar-left .sidebar-footer {
+  -webkit-transition: width 0.3s ease;
+  -moz-transition: width 0.3s ease;
+  -ms-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
+  transition: width 0.3s ease;
   width: 230px;
   background-color: #4e5d9d;
+}
+.app-sidebar.sidebar-left .sidebar-header > .mautic-brand > .mautic-logo-text {
+  opacity: 1;
+  margin-left: 3px;
+  -webkit-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -moz-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -ms-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -o-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+}
+.app-sidebar.sidebar-left .sidebar-header > .mautic-brand {
+  -webkit-transition: padding-left 0.3s ease;
+  -moz-transition: padding-left 0.3s ease;
+  -ms-transition: padding-left 0.3s ease;
+  -o-transition: padding-left 0.3s ease;
+  transition: padding-left 0.3s ease;
 }
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
@@ -442,6 +456,11 @@ body > #app-wrapper {
   background-color: #1d232b;
   box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 .app-sidebar.sidebar-right .sidebar-header,
 .app-sidebar.sidebar-right .sidebar-footer {
@@ -574,24 +593,44 @@ body > #app-wrapper {
   height: 1px;
 }
 .app-sidebar .nav-sidebar > .nav > li > a {
+  overflow: hidden;
   padding: 12px 20px;
   -webkit-transition: all 0.15s ease;
+  -moz-transition: all 0.15s ease;
+  -ms-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .text {
+  -webkit-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -moz-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -ms-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -o-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  opacity: 1;
+  margin-left: 0;
   position: relative;
   top: -1px;
+  display: block;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .icon {
   font-weight: normal;
   font-size: 14px;
   min-width: 26px;
+  display: block;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow {
+  -webkit-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -moz-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -ms-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  -o-transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  transition: opacity 0.3s ease 0.1s, margin-left 0s ease 0.2s;
+  opacity: 1;
+  margin-left: 0;
   font-family: 'FontAwesome';
   position: relative;
   top: 1px;
+  display: block;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow:after {
   content: "\f0da";
@@ -638,6 +677,8 @@ body > #app-wrapper {
   display: block;
   padding: 5px 20px 5px 0px;
   -webkit-transition: all 0.15s ease;
+  -moz-transition: all 0.15s ease;
+  -ms-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
 }
@@ -675,12 +716,7 @@ body > #app-wrapper {
     margin-left: 60px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left {
-
-      -webkit-transform: translate3d(-170px, 0px, 0px);
-      transform: translate3d(-170px, 0px, 0px);
-      -webkit-transition: transform 0.3s ease;
-      -o-transition: transform 0.3s ease;
-      transition: transform 0.3s ease;
+    width: 60px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar {
     margin-top: 10px;
@@ -690,16 +726,24 @@ body > #app-wrapper {
     padding-bottom: 12px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-heading,
-  .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .text,
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .arrow,
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .badge,
+  .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .text,
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .label {
-    display: none;
+    /* override default margin-left transition as any delay throws Chrome off */
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+    /* hide everything but the icon; using margin and opacity since display can't be transitioned */
+    margin-left: -500px;
+    opacity: 0;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .icon {
     min-width: 0;
     width: 100%;
-    text-align: center;
+    /* text-align: center; */
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
     display: none;
@@ -731,29 +775,27 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left .sidebar-content > .scroll-wrapper > .scroll-bar {
     display: none !important;
   }
-  .sidebar-minimized .app-sidebar.sidebar-left .sidebar-content {
-    right: 0;
+  .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header {
+    /* padding: 0; */
     width: 60px;
   }
-  .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header {
-    padding: 0;
-    left: 170px;
-     -webkit-transform: translate3d(-85px, 0px, 0px);
-     transform: translate3d(-85px, 0px, 0px);
-     -webkit-transition: transform 0.3s ease;
-     -o-transition: transform 0.3s ease;
-     transition: transform 0.3s ease;
-  }
   .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header > .mautic-brand > .mautic-logo-text {
-    display: none;
+    opacity: 0;
+    margin-left: -500px;
+    /* override default margin-left transition as any delay throws Chrome off */
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+  }
+  .sidebar-minimized .app-sidebar.sidebar-left .sidebar-header > .mautic-brand {
+    padding: 0;
   }
 }
 .csstransforms3d.sidebar-open-ltr #app-content {
   -webkit-transform: translate3d(230px, 0, 0);
   transform: translate3d(230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-ltr #app-content {
   left: 230px;
@@ -761,18 +803,17 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-rtl #app-content {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-rtl #app-content {
   left: -230px;
 }
 #app-content {
   position: relative;
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 #app-content:before,
 #app-content:after {
@@ -813,9 +854,6 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-ltr #app-footer {
   -webkit-transform: translate3d(230px, 0, 0);
   transform: translate3d(230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-ltr #app-footer {
   left: 230px;
@@ -823,9 +861,6 @@ body > #app-wrapper {
 .csstransforms3d.sidebar-open-rtl #app-footer {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
 }
 .no-csstransforms3d.sidebar-open-rtl #app-footer {
   left: -230px;
@@ -840,9 +875,11 @@ body > #app-wrapper {
   height: 46px;
   line-height: 46px;
   background-color: #fbfbfb;
-  -webkit-transition: transform 0.3s ease;
-  -o-transition: transform 0.3s ease;
-  transition: transform 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 #app-footer ~ #app-content > .content-body {
   padding-bottom: 46px;
@@ -1742,8 +1779,10 @@ a.list-group-item:focus {
 .mautic-brand {
   display: block;
   height: 60px;
-  text-align: center;
+  padding-left: 35px;
+  padding-right: 32px;
   width: 100%;
+  overflow: hidden;
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
@@ -1778,6 +1817,8 @@ label {
   -webkit-box-shadow: none;
   box-shadow: none;
   -webkit-transition: border-color ease-in-out .15s;
+  -moz-transition: border-color ease-in-out .15s;
+  -ms-transition: border-color ease-in-out .15s;
   -o-transition: border-color ease-in-out .15s;
   transition: border-color ease-in-out .15s;
 }
@@ -1976,6 +2017,8 @@ label {
   -o-transform: scale(0);
   transform: scale(0);
   -webkit-transition: all 0.1s ease;
+  -moz-transition: all 0.1s ease;
+  -ms-transition: all 0.1s ease;
   -o-transition: all 0.1s ease;
   transition: all 0.1s ease;
 }
@@ -2022,6 +2065,8 @@ label {
   -o-transform: scale(1);
   transform: scale(1);
   -webkit-transition: all 0.1s ease;
+  -moz-transition: all 0.1s ease;
+  -ms-transition: all 0.1s ease;
   -o-transition: all 0.1s ease;
   transition: all 0.1s ease;
 }
@@ -3118,9 +3163,11 @@ lesshat-selector {
   left: 0px;
   width: 100%;
   height: 100%;
-  -webkit-transition: transform 0.2s ease;
-  -o-transition: transform 0.2s ease;
-  transition: transform 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 .offcanvas-container .offcanvas-main {
   position: absolute;
@@ -3147,12 +3194,16 @@ lesshat-selector {
 .offcanvas-container.offcanvas-open-rtl .offcanvas-wrapper {
   left: 100%;
   -webkit-transition: left 0.2s ease;
+  -moz-transition: left 0.2s ease;
+  -ms-transition: left 0.2s ease;
   -o-transition: left 0.2s ease;
   transition: left 0.2s ease;
 }
 .offcanvas-container.offcanvas-open-ltr .offcanvas-wrapper {
   left: -100%;
   -webkit-transition: left 0.2s ease;
+  -moz-transition: left 0.2s ease;
+  -ms-transition: left 0.2s ease;
   -o-transition: left 0.2s ease;
   transition: left 0.2s ease;
 }
@@ -3160,17 +3211,21 @@ lesshat-selector {
   left: auto;
   -webkit-transform: translate3d(100%, 0, 0);
   transform: translate3d(100%, 0, 0);
-  -webkit-transition: transform 0.2s ease;
-  -o-transition: transform 0.2s ease;
-  transition: transform 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 .csstransforms3d .offcanvas-container.offcanvas-open-rtl .offcanvas-wrapper {
   left: auto;
   -webkit-transform: translate3d(-100%, 0, 0);
   transform: translate3d(-100%, 0, 0);
-  -webkit-transition: transform 0.2s ease;
-  -o-transition: transform 0.2s ease;
-  transition: transform 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 .timeline {
   overflow: hidden;
@@ -4084,7 +4139,7 @@ lesshat-selector {
   width: 400px;
   font-size: 1.2em;
   font-weight: bold;
-  position: aboslute;
+  position: absolute;
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
@@ -4111,4 +4166,8 @@ lesshat-selector {
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
+}
+label.required:after {
+  content: " *";
+  color: #f86b4f;
 }

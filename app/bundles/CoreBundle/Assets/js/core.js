@@ -38,7 +38,7 @@ MauticVars.lastSearchStr        = "";
 MauticVars.globalLivecache      = new Array();
 MauticVars.lastGlobalSearchStr  = "";
 
-//used for spinning icons (to show something is in progress)
+//used for spinning icons to show something is in progress)
 MauticVars.iconClasses          = {};
 
 //prevent multiple ajax calls from multiple clicks
@@ -85,7 +85,6 @@ var Mautic = {
         mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-rtl');
         });
-
 
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
