@@ -17,37 +17,37 @@ $fields = $form->children;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['site_url']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'site_url'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['locale']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['cache_path']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['log_path']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'locale'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['theme']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'cache_path'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['image_path']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'log_path'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['update_stability']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'theme'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'image_path'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'update_stability'); ?>
             </div>
         </div>
     </div>
@@ -60,31 +60,31 @@ $fields = $form->children;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['default_pagelimit']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['default_timezone']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['date_format_full']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['date_format_short']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'default_timezone'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['date_format_dateonly']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'date_format_full'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['date_format_timeonly']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'date_format_short'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'date_format_dateonly'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'date_format_timeonly'); ?>
             </div>
         </div>
     </div>
@@ -97,49 +97,11 @@ $fields = $form->children;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_from_name']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_from_email']); ?>
-            </div>
-        </div>
-
-        <hr class="text-muted" />
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_transport']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_host']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_port']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_encryption']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_auth_mode']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_user']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_password']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email'); ?>
             </div>
         </div>
 
@@ -147,31 +109,69 @@ $fields = $form->children;
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_type']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_path']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_transport'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_msg_limit']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_host'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_time_limit']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_port'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_recover_timeout']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_encryption'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['mailer_spool_clear_timeout']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_auth_mode'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_user'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_password'); ?>
+            </div>
+        </div>
+
+        <hr class="text-muted" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout'); ?>
             </div>
         </div>
     </div>
@@ -184,41 +184,41 @@ $fields = $form->children;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['cookie_path']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'cookie_path'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['cookie_domain']); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['cookie_secure']); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->row($fields['cookie_httponly']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'cookie_domain'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['rememberme_key']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'cookie_secure'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['rememberme_lifetime']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'cookie_httponly'); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['rememberme_path']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'rememberme_key'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['rememberme_domain']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime'); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'rememberme_path'); ?>
+            </div>
+
+            <div class="col-md-6">
+                <?php echo $view['form']->rowIfExists($fields, 'rememberme_domain'); ?>
             </div>
         </div>
     </div>
@@ -231,11 +231,11 @@ $fields = $form->children;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['trusted_hosts']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'trusted_hosts'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['trusted_proxies']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'trusted_proxies'); ?>
             </div>
         </div>
 
@@ -243,24 +243,26 @@ $fields = $form->children;
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['ip_lookup_service']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['ip_lookup_auth']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth'); ?>
             </div>
         </div>
 
+        <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
 
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['transifex_username']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'transifex_username'); ?>
             </div>
 
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['transifex_password']); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'transifex_password'); ?>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>

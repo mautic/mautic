@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
 $container->setParameter('templating.helper.assets.class', 'Mautic\CoreBundle\Templating\Helper\AssetsHelper');
 $container->setParameter('templating.helper.slots.class', 'Mautic\CoreBundle\Templating\Helper\SlotsHelper');
 $container->setParameter('templating.name_parser.class', 'Mautic\CoreBundle\Templating\TemplateNameParser');
+$container->setParameter('templating.helper.form.class', 'Mautic\CoreBundle\Templating\Helper\FormHelper');
 
 //Template helpers
 $container->setDefinition('mautic.helper.template.date',
