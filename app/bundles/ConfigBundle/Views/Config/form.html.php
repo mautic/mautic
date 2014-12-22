@@ -24,7 +24,7 @@ $configKeys = array_keys($form->children);
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
             <?php foreach ($configKeys as $i => $key) : ?>
-                <?php if (!isset($formConfigs[$key])) continue; ?>
+                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) continue; ?>
                 <li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
                     <?php $containsErrors = ($view['form']->containsErrors($form[$key])) ? ' text-danger' : ''; ?>
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps<?php echo $containsErrors; ?>">
@@ -45,7 +45,13 @@ $configKeys = array_keys($form->children);
         <!-- Tab panes -->
         <div class="tab-content">
             <?php foreach ($configKeys as $i => $key) : ?>
-            <?php if (!isset($formConfigs[$key])) continue; ?>
+            <?php
+                if (!isset($formConfigs[$key])) continue;
+                if (!count($form[$key]->children)):
+                    $form[$key]->setRendered();
+                    continue;
+                endif;
+            ?>
             <div role="tabpanel" class="tab-pane fade <?php echo $i === 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php echo $view['form']->widget($form[$key]); ?>
