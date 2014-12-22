@@ -54,7 +54,7 @@ class UserPermissions extends AbstractPermissions
         $this->addStandardFormFields('user', 'users', $builder, $data, false);
         $this->addStandardFormFields('user', 'roles', $builder, $data, false);
 
-        $builder->add('user:profile', 'button_group', array(
+        $builder->add('user:profile', 'permissionlist', array(
             'choices'    => array(
                 'editname'     => 'mautic.user.account.permissions.editname',
                 'editusername' => 'mautic.user.account.permissions.editusername',
@@ -63,12 +63,9 @@ class UserPermissions extends AbstractPermissions
                 'full'         => 'mautic.user.account.permissions.editall',
             ),
             'label'      => 'mautic.user.permissions.profile',
-            'label_attr' => array('class' => 'control-label'),
-            'multiple'   => true,
-            'attr'       => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'user\')'
-            ),
-            'data'       => (!empty($data['profile']) ? $data['profile'] : array())
+            'data'       => (!empty($data['profile']) ? $data['profile'] : array()),
+            'bundle'     => 'user',
+            'level'      => 'profile'
         ));
     }
 }

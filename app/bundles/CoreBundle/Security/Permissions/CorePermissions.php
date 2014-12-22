@@ -75,7 +75,7 @@ class CorePermissions
      *
      * @return array
      */
-    public function getPermissionClasses()
+    public function getPermissionObjects()
     {
         static $classes = array();
         if (empty($classes)) {
@@ -85,7 +85,7 @@ class CorePermissions
                 } //do not include this file
 
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
-                $object = $this->getPermissionClass($bundle['base'], false);
+                $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
                 }
@@ -93,7 +93,7 @@ class CorePermissions
 
             foreach ($this->addonBundles as $bundle) {
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
-                $object = $this->getPermissionClass($bundle['base'], false, true);
+                $object = $this->getPermissionObject($bundle['base'], false, true);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
                 }
@@ -113,7 +113,7 @@ class CorePermissions
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function getPermissionClass($bundle, $throwException = true, $addonBundle = false)
+    public function getPermissionObject($bundle, $throwException = true, $addonBundle = false)
     {
         static $classes = array();
         if (!empty($bundle)) {
@@ -149,7 +149,7 @@ class CorePermissions
         $entities = array();
 
         //give bundles an opportunity to analyze and adjust permissions based on others
-        $classes = $this->getPermissionClasses();
+        $classes = $this->getPermissionObjects();
 
         //bust out permissions into their respective bundles
         $bundlePermissions = array();
@@ -190,7 +190,7 @@ class CorePermissions
                 $entity->setName(strtolower($name));
 
                 $bit   = 0;
-                $class = $this->getPermissionClass($bundle);
+                $class = $this->getPermissionObject($bundle);
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
@@ -256,7 +256,7 @@ class CorePermissions
             $activePermissions =  ($userEntity instanceof User) ? $userEntity->getActivePermissions() : array();
 
             //check against bundle permissions class
-            $permissionObject = $this->getPermissionClass($parts[0], true, $isAddon);
+            $permissionObject = $this->getPermissionObject($parts[0], true, $isAddon);
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
@@ -324,7 +324,7 @@ class CorePermissions
                 $result[$permission] = false;
             } else {
                 //check against bundle permissions class
-                $permissionObject    = $this->getPermissionClass($parts[0], false);
+                $permissionObject    = $this->getPermissionObject($parts[0], false);
                 $result[$permission] = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
             }
         }
@@ -396,7 +396,7 @@ class CorePermissions
      */
     public function getAllPermissions($forJs = false)
     {
-        $permissionObjects = $this->getPermissionClasses();
+        $permissionObjects = $this->getPermissionObjects();
         $permissions       = array();
         foreach ($permissionObjects as $object) {
             $perms = $object->getPermissions();

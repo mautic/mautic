@@ -56,9 +56,11 @@ Mautic.togglePermissionVisibility = function () {
     //is set to the parent div
     setTimeout(function () {
         if (mQuery('#role_isAdmin_0').prop('checked')) {
-            mQuery('#permissions-container').removeClass('hide');
+            mQuery('#rolePermissions').removeClass('hide');
+            mQuery('#isAdminMessage').addClass('hide');
         } else {
-            mQuery('#permissions-container').addClass('hide');
+            mQuery('#rolePermissions').addClass('hide');
+            mQuery('#isAdminMessage').removeClass('hide');
         }
     }, 10);
 };
@@ -75,7 +77,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
     if (mQuery(changedPermission).prop('checked')) {
         if (mQuery(changedPermission).val() == 'full') {
             //uncheck all of the others
-            mQuery(changedPermission).closest('.btn-group').find("label input:checkbox:checked").map(function () {
+            mQuery(changedPermission).closest('.choice-wrapper').find("label input:checkbox:checked").map(function () {
                 if (mQuery(this).val() != 'full') {
                     mQuery(this).prop('checked', false);
                     mQuery(this).parent().toggleClass('active');
@@ -83,7 +85,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
             })
         } else {
             //uncheck full
-            mQuery(changedPermission).closest('.btn-group').find("label input:checkbox:checked").map(function () {
+            mQuery(changedPermission).closest('.choice-wrapper').find("label input:checkbox:checked").map(function () {
                 if (mQuery(this).val() == 'full') {
                     granted = granted - 1;
                     mQuery(this).prop('checked', false);

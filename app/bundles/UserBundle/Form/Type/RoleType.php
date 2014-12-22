@@ -23,30 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class RoleType extends AbstractType
 {
-
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
@@ -61,7 +41,7 @@ class RoleType extends AbstractType
             'label'      => 'mautic.user.role.form.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
-            'required' => false
+            'required'   => false
         ));
 
         $builder->add('isAdmin', 'button_group', array(
@@ -69,42 +49,36 @@ class RoleType extends AbstractType
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.user.role.form.isadmin',
-            'attr'          => array(
-                'onchange' => 'Mautic.togglePermissionVisibility();'
+            'expanded'    => true,
+            'multiple'    => false,
+            'label'       => 'mautic.user.role.form.isadmin',
+            'attr'        => array(
+                'onchange' => 'Mautic.togglePermissionVisibility();',
+                'tooltip'  => 'mautic.user.role.form.isadmin.tooltip'
             ),
-            'empty_value'   => false,
-            'required'      => false
+            'empty_value' => false,
+            'required'    => false
         ));
 
         // add a normal text field, but add your transformer to it
         $hidden = ($options['data']->isAdmin()) ? ' hide' : '';
 
-        //get current permissions saved to the database for this role if applicable
-        $permissionsArray = array();
-        if ($options['data']->getId()) {
-           $repo             = $this->em->getRepository('MauticUserBundle:Permission');
-           $permissionsArray = $repo->getPermissionsByRole($options['data'], true);
-        }
-
         $builder->add(
             'permissions', 'permissions', array(
-                'label'    => 'mautic.user.role.form.permissions',
-                'mapped'   => false, //we'll have to manually build the permissions for persisting
-                'required' => false,
-                'attr'     => array(
+                'label'             => 'mautic.user.role.form.permissions',
+                'mapped'            => false, //we'll have to manually build the permissions for persisting
+                'required'          => false,
+                'attr'              => array(
                     'class' => $hidden
                 ),
-                'permissions' => $permissionsArray
+                'permissionsConfig' => $options['permissionsConfig']
             )
         );
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -112,18 +86,19 @@ class RoleType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'data_class'         => 'Mautic\UserBundle\Entity\Role',
-            'cascade_validation' => true
+            'cascade_validation' => true,
+            'permissionsConfig'  => array()
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return "role";
     }

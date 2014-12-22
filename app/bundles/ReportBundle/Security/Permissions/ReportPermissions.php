@@ -24,20 +24,7 @@ class ReportPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->permissions = array(
-            'reports' => array(
-                'viewown'      => 2,
-                'viewother'    => 4,
-                'editown'      => 8,
-                'editother'    => 16,
-                'create'       => 32,
-                'deleteown'    => 64,
-                'deleteother'  => 128,
-                'publishown'   => 256,
-                'publishother' => 512,
-                'full'         => 1024
-            )
-        );
+        $this->addExtendedPermissions('reports');
     }
 
     /**
@@ -53,26 +40,6 @@ class ReportPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('report:reports', 'button_group', array(
-            'choices'  => array(
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'editown'      => 'mautic.core.permissions.editown',
-                'editother'    => 'mautic.core.permissions.editother',
-                'create'       => 'mautic.core.permissions.create',
-                'deleteown'    => 'mautic.core.permissions.deleteown',
-                'deleteother'  => 'mautic.core.permissions.deleteother',
-                'publishown'   => 'mautic.core.permissions.publishown',
-                'publishother' => 'mautic.core.permissions.publishother',
-                'full'         => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.report.permissions.reports',
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'form\')'
-            ),
-            'data'     => (!empty($data['reports']) ? $data['reports'] : array())
-            )
-        );
+        $this->addExtendedFormFields('report', 'reports', $builder, $data);
     }
 }

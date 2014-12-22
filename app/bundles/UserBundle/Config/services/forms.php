@@ -26,8 +26,7 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.form.type.role',
     new Definition(
-        'Mautic\UserBundle\Form\Type\RoleType',
-        array(new Reference('mautic.factory'))
+        'Mautic\UserBundle\Form\Type\RoleType'
     )
 )
     ->addTag('form.type', array(
@@ -38,10 +37,19 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.form.type.permissions',
     new Definition(
-        'Mautic\UserBundle\Form\Type\PermissionsType',
-        array(new Reference('mautic.factory'))
+        'Mautic\UserBundle\Form\Type\PermissionsType'
     )
 )
     ->addTag('form.type', array(
         'alias' => 'permissions',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.permissionlist',
+    new Definition(
+        'Mautic\UserBundle\Form\Type\PermissionListType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'permissionlist',
     ));

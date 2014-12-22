@@ -47,16 +47,14 @@ class ApiPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('api:access', 'button_group', array(
+        $builder->add('api:access', 'permissionlist', array(
             'choices'  => array(
                 'full'     => 'mautic.api.permissions.granted',
             ),
             'label'    => 'mautic.api.permissions.apiaccess',
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'api\')'
-            ),
-            'data'     => (!empty($data['access']) ? $data['access'] : array())
+            'data'     => (!empty($data['access']) ? $data['access'] : array()),
+            'bundle'   => 'api',
+            'level'    => 'access'
         ));
 
         $this->addStandardFormFields('api', 'clients', $builder, $data, false);

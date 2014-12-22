@@ -116,11 +116,14 @@ class RoleModel extends FormModel
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof Role) {
-            throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
+            throw new MethodNotAllowedHttpException(array('Role'));
         }
 
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('role', $entity, $params);
+        if(!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('role', $entity, $options);
     }
 
     /**

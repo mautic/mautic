@@ -366,13 +366,11 @@ abstract class AbstractPermissions
         $choices['full'] = 'mautic.core.permissions.full';
 
         $label = ($level == "categories") ? "mautic.category.permissions.categories" : "mautic.$bundle.permissions.$level";
-        $builder->add("$bundle:$level", 'button_group', array(
+        $builder->add("$bundle:$level", 'permissionlist', array(
             'choices'  => $choices,
             'label'    => $label,
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
-            ),
+            'bundle'   => $bundle,
+            'level'    => $level,
             'data'     => (!empty($data[$level]) ? $data[$level] : array())
         ));
     }
@@ -414,14 +412,12 @@ abstract class AbstractPermissions
             'manage'   => 'mautic.core.permissions.manage'
         );
 
-        $builder->add("$bundle:$level", 'button_group', array(
+        $builder->add("$bundle:$level", 'permissionlist', array(
             'choices'  => $choices,
             'label'    => "mautic.$bundle.permissions.$level",
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
-            ),
-            'data'     => (!empty($data[$level]) ? $data[$level] : array())
+            'data'     => (!empty($data[$level]) ? $data[$level] : array()),
+            'bundle'   => $bundle,
+            'level'    => $level
         ));
     }
 
@@ -492,14 +488,12 @@ abstract class AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             );
 
-        $builder->add("$bundle:$level", 'button_group', array(
+        $builder->add("$bundle:$level", 'permissionlist', array(
                 'choices'  => $choices,
                 'label'    => "mautic.$bundle.permissions.$level",
-                'multiple' => true,
-                'attr'     => array(
-                    'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
-                ),
-                'data'     => (!empty($data[$level]) ? $data[$level] : array())
+                'data'     => (!empty($data[$level]) ? $data[$level] : array()),
+                'bundle'   => $bundle,
+                'level'    => $level
             )
         );
     }

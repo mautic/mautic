@@ -59,7 +59,7 @@ class LeadPermissions extends AbstractPermissions
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
-        $builder->add('lead:lists', 'button_group', array(
+        $builder->add('lead:lists', 'permissionlist', array(
             'choices'  => array(
                 'viewother'    => 'mautic.core.permissions.viewother',
                 'editother'    => 'mautic.core.permissions.editother',
@@ -67,23 +67,19 @@ class LeadPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.lead.permissions.lists',
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'lead\')'
-            ),
-            'data'     => (!empty($data['lists']) ? $data['lists'] : array())
+            'data'     => (!empty($data['lists']) ? $data['lists'] : array()),
+            'bundle'   => 'lead',
+            'level'    => 'lists'
         ));
 
-        $builder->add('lead:fields', 'button_group', array(
+        $builder->add('lead:fields', 'permissionlist', array(
             'choices'  => array(
                 'full' => 'mautic.lead.field.permissions.full'
             ),
             'label'    => 'mautic.lead.permissions.fields',
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'lead\')'
-            ),
-            'data'     => (!empty($data['fields']) ? $data['fields'] : array())
+            'data'     => (!empty($data['fields']) ? $data['fields'] : array()),
+            'bundle'   => 'lead',
+            'level'    => 'fields'
         ));
     }
 

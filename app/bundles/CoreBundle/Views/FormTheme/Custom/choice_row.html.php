@@ -2,6 +2,8 @@
 $hasErrors = count($form->vars['errors']);
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? ' has-error' : '';
 
+//apply attributes to radios
+$attr = $form->vars['attr'];
 ?>
 <div class="row">
     <div class="form-group col-xs-12 <?php echo $feedbackClass; ?>">
@@ -17,7 +19,7 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors
             <?php foreach ($form->children as $child): ?>
                 <div class="checkbox">
                     <label>
-                        <?php echo $view['form']->widget($child); ?>
+                        <?php echo $view['form']->widget($child, array('attr' => $attr)); ?>
                         <?php echo $view['translator']->trans($child->vars['label']); ?>
                     </label>
                 </div>

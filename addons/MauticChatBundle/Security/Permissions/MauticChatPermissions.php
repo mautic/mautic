@@ -53,7 +53,7 @@ class MauticChatPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('chat:channels', 'button_group', array(
+        $builder->add('chat:channels', 'permissionlist', array(
             'choices'  => array(
                 'editother'    => 'mautic.core.permissions.editother',
                 'create'       => 'mautic.core.permissions.create',
@@ -61,11 +61,9 @@ class MauticChatPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.chat.permissions.channels',
-            'multiple' => true,
-            'attr'     => array(
-                'onchange' => 'Mautic.onPermissionChange(this, \'chat\')'
-            ),
-            'data'     => (!empty($data['channels']) ? $data['channels'] : array())
+            'data'     => (!empty($data['channels']) ? $data['channels'] : array()),
+            'bundle'   => 'chat',
+            'level'    => 'channels'
         ));
     }
 }

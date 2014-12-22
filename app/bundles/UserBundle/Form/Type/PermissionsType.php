@@ -20,79 +20,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class PermissionsType extends AbstractType
 {
-
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory) {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
-    }
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $permissionClasses = $this->security->getPermissionClasses();
-
-        $builder->add("permissions-panel-wrapper-start", 'panel_wrapper_start', array(
-            'attr' => array(
-                'id' => "permissions-panel"
-            )
-        ));
-
-        //first pass to order headers
-        $panels = array();
-        foreach ($permissionClasses as $class) {
-            if ($class->isEnabled()) {
-                $bundle = $class->getName();
-                $label  = $this->translator->trans("mautic.{$bundle}.permissions.header");
-
-                $panels[$bundle] = $label;
-            }
-        }
-
-        //order panels
-        uasort($panels, "strnatcmp");
-
-        //build forms
-        foreach ($panels as $bundle => $label) {
-
-            $class =& $permissionClasses[$bundle];
-
-            //convert the permission bits from the db into readable names
-            $data    = $class->convertBitsToPermissionNames($options['permissions']);
-            //get the ratio of granted/total
-            list($granted, $total) = $class->getPermissionRatio($data);
-            $ratio = (!empty($total)) ?
-                      ' <span class="permission-ratio">('
-                        . '<span class="' . $bundle . '_granted">' . $granted . '</span>/'
-                        . '<span class="' . $bundle . '_total">' . $total . '</span>'
-                    . ')</span>'
-                : "";
-
-            $builder->add("{$bundle}-panel-start", 'panel_start', array(
-                'label'      => $label . $ratio,
-                'dataParent' => "#permissions-panel",
-                'bodyId'     => "{$bundle}-panel"
+        foreach ($options['permissionsConfig'] as $bundle => $config) {
+            $builder->add($bundle, 'hidden', array(
+                'data'   => 'newbundle',
+                'label'  => false,
+                'mapped' => false
             ));
-            $class->buildForm($builder, $options, $data);
-
-            $builder->add("{$bundle}-panel-end", 'panel_end');
+            $config['permissionObject']->buildForm($builder, $options, $config['data']);
         }
-
-        $builder->add("permissions-panel-wrapper-end", 'panel_wrapper_end');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -114,7 +54,7 @@ class PermissionsType extends AbstractType
     {
         $resolver->setDefaults(array(
             'cascade_validation' => true,
-            'permissions'        => array()
+            'permissionsConfig'  => array()
         ));
     }
 }
