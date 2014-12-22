@@ -10,4 +10,7 @@ $view->extend(":$template:base.html.php");
 ?>
 <div class="well text-center">
     <h2><?php echo $message; ?></h2>
+    <?php if (isset($content)): ?>
+        <p><?php echo $content; ?></p>
+    <?php endif; ?>
 </div>

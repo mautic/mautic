@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -195,6 +196,15 @@ class Email extends FormEntity
      * @Serializer\Groups({"emailDetails"})
      */
     private $variantReadCount = 0;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\FormBundle\Entity\Form", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="unsubscribeform_id", onDelete="SET NULL")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $unsubscribeForm;
 
     /**
      * Used to identify the page for the builder
@@ -713,5 +723,21 @@ class Email extends FormEntity
     public function setContentMode ($contentMode)
     {
         $this->contentMode = $contentMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnsubscribeForm ()
+    {
+        return $this->unsubscribeForm;
+    }
+
+    /**
+     * @param mixed $unsubscribeForm
+     */
+    public function setUnsubscribeForm (Form $unsubscribeForm)
+    {
+        $this->unsubscribeForm = $unsubscribeForm;
     }
 }

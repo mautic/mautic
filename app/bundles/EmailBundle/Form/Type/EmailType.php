@@ -150,6 +150,20 @@ class EmailType extends AbstractType
                 'label'       => false
             ));
         } else {
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
+            $builder->add(
+                $builder->create('unsubscribeForm', 'form_list', array(
+                    'label'      => 'mautic.email.form.unsubscribeform',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control chosen',
+                        'tootlip' => 'mautic.email.form.unsubscribeform.tooltip'
+                    ),
+                    'required'   => false,
+                    'multiple'   => false
+                ))
+                   ->addModelTransformer($transformer)
+            );
 
             //add category
             $builder->add('category', 'category', array(
@@ -157,12 +171,7 @@ class EmailType extends AbstractType
             ));
 
             //add lead lists
-            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-                $this->em,
-                'MauticLeadBundle:LeadList',
-                'id',
-                true
-            );
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
             $builder->add(
                 $builder->create('lists', 'leadlist_choices', array(
                     'label'      => 'mautic.email.form.list',

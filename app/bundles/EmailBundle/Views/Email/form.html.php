@@ -66,13 +66,15 @@ $contentMode = $form['contentMode']->vars['data'];
                     <?php echo $view['form']->row($form['isPublished']); ?>
                     <?php echo $view['form']->row($form['publishUp']); ?>
                     <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php endif; ?>
+                <?php else: ?>
                 <?php echo $view['form']->row($form['category']); ?>
                 <?php echo $view['form']->row($form['lists']); ?>
                 <?php echo $view['form']->row($form['language']); ?>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
+                <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+                <?php endif; ?>
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>

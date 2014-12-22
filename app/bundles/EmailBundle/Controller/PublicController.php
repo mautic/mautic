@@ -122,17 +122,30 @@ class PublicController extends CommonFormController
                 '%email%' => $stat->getEmailAddress(),
                 '%resubscribeUrl%' => $this->generateUrl('mautic_email_resubscribe', array('idHash' => $idHash))
             ));
+
+            /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
+            $unsubscribeForm = $email->getUnsubscribeForm();
+
+            if ($unsubscribeForm !=  null) {
+                $content = '<div class="mautic-unsubscribeform">' . $unsubscribeForm->getCachedHtml() . '</div>';
+            }
         } else {
             $email = $lead = false;
         }
 
-        return $this->render('MauticEmailBundle::message.html.php', array(
+        $viewParams = array(
             'message'  => $message,
             'type'     => 'notice',
             'email'    => $email,
             'lead'     => $lead,
             'template' => $template
-        ));
+        );
+
+        if (!empty($content)) {
+            $viewParams['content'] = $content;
+        }
+
+        return $this->render('MauticEmailBundle::message.html.php', $viewParams);
     }
 
     /**
