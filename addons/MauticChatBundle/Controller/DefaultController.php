@@ -48,6 +48,7 @@ class DefaultController extends FormController
         $channels = array_merge($withUnread, $withoutUnread);
 
         //get a list of  users
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $chatModel */
         $chatModel = $this->factory->getModel('addon.mauticChat.chat');
         $unsorted  = $chatModel->getUserList();
 
@@ -56,7 +57,7 @@ class DefaultController extends FormController
 
         //let's sort by unread count then alphabetical
         foreach ($unsorted as $u) {
-            if (!empty($u['stats']['unread'])) {
+            if (!empty($u['unread'])) {
                 $withUnread[] = $u;
             } else {
                 $withoutUnread[] = $u;

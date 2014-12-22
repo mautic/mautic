@@ -29,7 +29,8 @@
                 $status = 'default';
                 break;
         endswitch;
-        $hasUnread = (!empty($u['unread'])) ? ' text-warning' : '';
+        $hasUnread = (!empty($u['unread']));
+        $textClass =  $hasUnread ? ' text-warning' : ' text-white';
 
         $name      = $u['username'];
         $shortName = (strlen($name) > 15) ? substr($name, 0, 12) . '...' : $name;
@@ -40,7 +41,9 @@
                     <img src="<?php echo $view['gravatar']->getImage($u['email'], '40'); ?>" class="media-object img-circle" alt="" />
                 </span>
                 <span class="media-body">
-                    <span class="media-heading mb-0 text-nowrap text-white dark-sm<?php echo $hasUnread; ?>"><span class="bullet bullet-<?php echo $status; ?> chat-bullet mr-sm"></span><?php echo $shortName; ?></span>
+                    <span class="media-heading mb-0 text-nowrap <?php echo $textClass; ?>">
+                        <span class="bullet bullet-<?php echo $status; ?> chat-bullet mr-sm"></span><?php echo $shortName; ?><?php if ($hasUnread): ?> <span class="label label-primary label-as-badge pull-right"><?php echo $u['unread']; ?></span><?php endif; ?>
+                    </span>
                     <span class="meta text-white dark-lg small"><?php echo $view['translator']->trans('mautic.chat.chat.status.'.$u['onlineStatus']); ?></span>
                 </span>
             </a>

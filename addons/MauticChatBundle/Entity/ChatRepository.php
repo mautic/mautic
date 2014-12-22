@@ -288,14 +288,20 @@ class ChatRepository extends CommonRepository
             $q->setParameter('fromUsers', $fromUsers);
         }
 
-        $q->select('c.id, count(c.id) as unread, u.id as userId')
-            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+        $q->select('count(c.id) as unread, u.id as userId')
+            ->from('MauticChatBundle:Chat', 'c')
             ->leftJoin('c.fromUser', 'u')
             ->where($expr)
             ->setParameter('toUser', $toUser)
             ->groupBy('c.fromUser');
         $results = $q->getQuery()->getArrayResult();
-        return $results;
+
+        $return = array();
+        foreach ($results as $r) {
+            $return[$r['userId']] = $r['unread'];
+        }
+
+        return $return;
     }
 
 }

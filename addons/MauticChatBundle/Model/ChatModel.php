@@ -101,7 +101,7 @@ class ChatModel extends FormModel
         }
 
         //set the unread count
-        foreach ($users as &$u) {
+        foreach ($users as $u) {
             $users[$u['id']]['unread'] = (isset($unread[$u['id']])) ? $unread[$u['id']] : 0;
         }
 
