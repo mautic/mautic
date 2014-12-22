@@ -300,19 +300,18 @@ class MauticFactory
      * Retrieves a Mautic parameter
      *
      * @param $id
+     * @param mixed $default
      *
      * @return bool|mixed
      */
-    public function getParameter($id)
+    public function getParameter($id, $default = false)
     {
         if ($id == 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
             //use the constant in case in the installer
             return MAUTIC_TABLE_PREFIX;
         }
 
-        return ($this->container->hasParameter('mautic.' . $id)) ?
-            $this->container->getParameter('mautic.' . $id) :
-            false;
+        return ($this->container->hasParameter('mautic.' . $id)) ? $this->container->getParameter('mautic.' . $id) : $default;
     }
 
     /**

@@ -57,17 +57,21 @@ class ConfigType extends AbstractType
                         $attributes = $child->getConfig()->getAttributes();
                         $label      = $attributes['data_collector/passed_options']['label'];
 
-                        $configForm->add($key, 'text', array(
-                            'label' => $label,
-                            'required' => false,
-                            'mapped'   => false,
-                            'disabled' => true,
-                            'attr'     => array(
-                                'placeholder' => $translator->trans('mautic.config.restricted'),
-                                'class'       => 'form-control'
-                            ),
-                            'label_attr' => array('class' => 'control-label'),
-                        ));
+                        if ($options['doNotChangeDisplayMode'] == 'mask') {
+                            $configForm->add($key, 'text', array(
+                                'label'      => $label,
+                                'required'   => false,
+                                'mapped'     => false,
+                                'disabled'   => true,
+                                'attr'       => array(
+                                    'placeholder' => $translator->trans('mautic.config.restricted'),
+                                    'class'       => 'form-control'
+                                ),
+                                'label_attr' => array('class' => 'control-label'),
+                            ));
+                        } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
+                            $configForm->remove($key);
+                        }
                     }
                 }
             }
@@ -95,6 +99,10 @@ class ConfigType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('doNotChange'));
+        $resolver->setRequired(array(
+            'doNotChange',
+            'doNotChangeDisplayMode'
+        ));
+
     }
 }

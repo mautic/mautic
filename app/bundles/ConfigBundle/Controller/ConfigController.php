@@ -25,19 +25,21 @@ class ConfigController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction()
+    public function editAction ()
     {
         //admin only allowed
         if (!$this->factory->getUser()->isAdmin()) {
             return $this->accessDenied();
         }
 
-        $event = new ConfigBuilderEvent($this->container);
+        $event      = new ConfigBuilderEvent($this->container);
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
-        $formConfigs = $event->getForms();
-        $formThemes  = $event->getFormThemes();
-        $doNotChange = $this->factory->getParameter('security.restrictedConfigFields');
+        $formConfigs            = $event->getForms();
+        $formThemes             = $event->getFormThemes();
+        $doNotChange            = $this->factory->getParameter('security.restrictedConfigFields');
+        $doNotChangeDisplayMode = $this->factory->getParameter('security.restrictedConfigFields.displayMode', 'remove');
+
         $this->mergeParamsWithLocal($formConfigs, $doNotChange);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
@@ -45,7 +47,11 @@ class ConfigController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
-        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array('action' => $action, 'doNotChange' => $doNotChange));
+        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array(
+            'action'                 => $action,
+            'doNotChange'            => $doNotChange,
+            'doNotChangeDisplayMode' => $doNotChangeDisplayMode
+        ));
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -55,8 +61,8 @@ class ConfigController extends FormController
                     $configurator = $this->get('mautic.configurator');
 
                     // Bind request to the form
-                    $post       = $this->request->request;
-                    $formData   = $form->getData();
+                    $post     = $this->request->request;
+                    $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
                     $configEvent = new ConfigEvent($formData, $post);
@@ -102,7 +108,7 @@ class ConfigController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
+            'viewParameters'  => array(
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
                 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
@@ -111,9 +117,9 @@ class ConfigController extends FormController
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_config_index',
-                'mauticContent'  => 'config',
-                'route'          => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'))
+                'activeLink'    => '#mautic_config_index',
+                'mauticContent' => 'config',
+                'route'         => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'))
             )
         ));
     }
@@ -126,7 +132,7 @@ class ConfigController extends FormController
      *
      * @return array
      */
-    private function mergeParamsWithLocal(&$forms, $doNotChange)
+    private function mergeParamsWithLocal (&$forms, $doNotChange)
     {
         // Import the current local configuration, $parameters is defined in this file
         $localConfigFile = $this->factory->getLocalConfigFile();
@@ -142,8 +148,7 @@ class ConfigController extends FormController
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
-                }
-                elseif (array_key_exists($key, $localParams)) {
+                } elseif (array_key_exists($key, $localParams)) {
                     $form['parameters'][$key] = $localParams[$key];
                 }
             }
