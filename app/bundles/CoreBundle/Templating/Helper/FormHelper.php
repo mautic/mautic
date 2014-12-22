@@ -27,9 +27,15 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return string
      */
-    public function widgetIfExists ($form, $key)
+    public function widgetIfExists ($form, $key, $template = null)
     {
-        return (isset($form[$key])) ? $this->widget($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->widget($form[$key]) : '';
+
+        if (!empty($template)) {
+            $content = str_replace('{content}', $content, $template);
+        }
+
+        return $content;
     }
 
     /**
@@ -40,9 +46,15 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return string
      */
-    public function rowIfExists ($form, $key)
+    public function rowIfExists ($form, $key, $template = null)
     {
-        return (isset($form[$key])) ? $this->row($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->row($form[$key]) : '';
+
+        if (!empty($template)) {
+            $content = str_replace('{content}', $content, $template);
+        }
+
+        return $content;
     }
 
     /**
@@ -53,9 +65,15 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return string
      */
-    public function labelIfExists ($form, $key)
+    public function labelIfExists ($form, $key, $template = null)
     {
-        return (isset($form[$key])) ? $this->label($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->label($form[$key]) : '';
+
+        if (!empty($template)) {
+            $content = str_replace('{content}', $content, $template);
+        }
+
+        return $content;
     }
 
     /**

@@ -7,264 +7,164 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$fields = $form->children;
+$fields    = $form->children;
+$fieldKeys = array_keys($fields);
+$template = '<div class="col-md-6">{content}</div>';
 ?>
 
+<?php if (count(array_intersect($fieldKeys, array('site_url', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.general'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'site_url'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'update_stability'); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'cache_path'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'log_path'); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'theme'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'image_path'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'site_url', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'update_stability', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cache_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'theme', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'image_path', $template); ?>
         </div>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, array('default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short', 'date_format_dateonly', 'date_format_timeonly')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.defaults'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'default_timezone'); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'locale'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'default_timezone', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'locale', $template); ?>
         </div>
 
         <hr class="text-muted" />
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'date_format_full'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'date_format_short'); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'date_format_dateonly'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'date_format_timeonly'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'date_format_full', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'date_format_short', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'date_format_dateonly', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'date_format_timeonly', $template); ?>
         </div>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, array('mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.mail'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
         </div>
 
+        <?php if (isset($fields['mailer_from_name']) || isset($fields['mailer_from_email'])): ?>
         <hr class="text-muted" />
+        <?php endif; ?>
+
+        <?php echo $view['form']->rowIfExists($fields, 'mailer_transport', '<div class="row">'.$template.'</div>'); ?>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_transport'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_host'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_port'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_encryption', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_auth_mode', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_encryption'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_auth_mode'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
         </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_user'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_password'); ?>
-            </div>
-        </div>
-
+        <?php if (isset($fields['mailer_transport'])): ?>
         <hr class="text-muted" />
+        <?php endif; ?>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout', $template); ?>
         </div>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, array('cookie_path')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.cookie'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'cookie_path'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'cookie_domain'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'cookie_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cookie_domain', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'cookie_secure'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'cookie_httponly'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'cookie_secure', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cookie_httponly', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'rememberme_key'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'rememberme_key', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime', $template); ?>
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'rememberme_path'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'rememberme_domain'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'rememberme_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'rememberme_domain', $template); ?>
         </div>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, array('trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'trusted_hosts'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'trusted_proxies'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'trusted_hosts', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'trusted_proxies', $template); ?>
         </div>
 
+        <?php if (isset($fields['trusted_hosts'])): ?>
         <hr class="text-muted" />
+        <?php endif; ?>
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
         </div>
 
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
 
         <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'transifex_username'); ?>
-            </div>
-
-            <div class="col-md-6">
-                <?php echo $view['form']->rowIfExists($fields, 'transifex_password'); ?>
-            </div>
+            <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
