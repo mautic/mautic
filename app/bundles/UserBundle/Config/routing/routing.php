@@ -61,4 +61,11 @@ $collection->add('mautic_user_account', new Route('/account',
     )
 ));
 
+//forgotten password
+$collection->add('mautic_user_passwordreset', new Route('/p/passwordreset',
+    array(
+        '_controller' => 'MauticUserBundle:Public:passwordReset'
+    )
+));
+
 return $collection;

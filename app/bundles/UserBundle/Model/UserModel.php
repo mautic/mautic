@@ -188,4 +188,30 @@ class UserModel extends FormModel
     {
         return $this->getRepository()->getActiveUsers($this->factory->getUser()->getId(), $search, $limit, $start);
     }
+
+    /**
+     * Resets the user password and emails it
+     *
+     * @param User $user
+     */
+    public function resetPassword(User $user, PasswordEncoderInterface $encoder)
+    {
+        $newPassword     = hash('sha1', uniqid(mt_rand()));
+        $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
+
+        $user->setPassword($encodedPassword);
+        $this->saveEntity($user);
+
+        // Email the user
+        $mailer = $this->factory->getMailer();
+
+        $mailer->message->setTo(array($user->getEmail() => $user->getName()));
+        $mailer->message->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
+        $body = $this->translator->trans('mautic.user.user.passwordreset.body', array('%name%' => $user->getFirstName(), '%password%' => $newPassword));
+        $body = str_replace('\\n', "\n", $body);
+        $mailer->message->setBody($body);
+
+        //queue the message
+        $mailer->send();
+    }
 }

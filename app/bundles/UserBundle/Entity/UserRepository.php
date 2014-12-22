@@ -20,6 +20,24 @@ class UserRepository extends CommonRepository
 {
 
     /**
+     * Find user by username or email
+     *
+     * @param $identifier
+     *
+     * @return array|null
+     */
+    public function findByIdentifier($identifier)
+    {
+        $q = $this->createQueryBuilder('u')
+            ->where('u.username = :identifier OR u.email = :identifier')
+            ->setParameter('identifier', $identifier);
+
+        $result = $q->getQuery()->getResult();
+
+        return ($result != null) ? $result[0] : null;
+    }
+
+    /**
      * @param $user
      */
     public function setLastLogin($user)

@@ -25,8 +25,8 @@
         <div class="row">
             <div class="col-lg-4 col-lg-offset-4">
                 <div class="panel" name="form-login">
-                    <div class="panel-body text-center">
-                        <div class="mautic-logo img-circle mb-md">
+                    <div class="panel-body">
+                        <div class="mautic-logo img-circle mb-md text-center">
                             <svg version="1.1" class="mautic-logo-figure" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve">
                             <path class="circle" d="M64,119.843c-30.937,0-56.108-25.17-56.108-56.108C7.893,32.799,33.063,7.629,64,7.629
                             c7.474,0,14.734,1.446,21.578,4.301c1.936,0.807,2.85,3.03,2.041,4.964c-0.805,1.937-3.029,2.849-4.963,2.043

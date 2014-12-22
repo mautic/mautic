@@ -53,3 +53,14 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'permissionlist',
     ));
+
+//Password reset
+$container->setDefinition(
+    'mautic.form.type.passwordreset',
+    new Definition(
+        'Mautic\UserBundle\Form\Type\PasswordResetType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'passwordreset',
+    ));
