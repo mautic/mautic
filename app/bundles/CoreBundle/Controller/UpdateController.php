@@ -21,6 +21,10 @@ class UpdateController extends CommonController
      */
     public function indexAction()
     {
+        if (!$this->factory->getUser()->isAdmin()) {
+            return $this->accessDenied();
+        }
+
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->factory->getHelper('update');
         $updateData   = $updateHelper->fetchData();
