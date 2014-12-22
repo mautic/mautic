@@ -162,6 +162,9 @@ class PublicController extends CommonFormController
     public function generateAction()
     {
         $formId = InputHelper::int($this->request->get('id'));
+        $replaceText = InputHelper::string($this->request->get('replace'));
+        $style = InputHelper::string($this->request->get('style'));
+
         $model  = $this->factory->getModel('form.form');
         $form   = $model->getEntity($formId);
         $js     = '';
@@ -169,7 +172,7 @@ class PublicController extends CommonFormController
         if ($form !== null) {
             $status = $form->getPublishStatus();
             if ($status == 'published') {
-                $js = $model->getAutomaticJavascript($form);
+                $js = $model->getAutomaticJavascript($form, $replaceText, $style);
             }
         }
 
