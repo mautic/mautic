@@ -8,9 +8,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Symfony\Component\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
 /**
@@ -33,10 +32,16 @@ class CacheHelper
     /**
      * Clear the application cache and run the warmup routine for the current environment
      *
+     * @param bool $noWarmup Skips the warmup routine
+     *
      * @return void
      */
-    public function clearCache()
+    public function clearCache($noWarmup = false)
     {
+        // Force a refresh of enabled addon bundles so they are picked up by the events
+        $addonHelper = $this->factory->getHelper('addon');
+        $addonHelper->buildAddonCache();
+
         ini_set('memory_limit', '128M');
 
         //attempt to squash command output
@@ -49,6 +54,10 @@ class CacheHelper
             $args[] = '--no-debug';
         }
 
+        if ($noWarmup) {
+            $args[] = '--no-warmup';
+        }
+
         $input       = new ArgvInput($args);
         $application = new Application($this->factory->getKernel());
         $application->setAutoExit(false);
@@ -57,6 +66,17 @@ class CacheHelper
         if (ob_get_length() > 0) {
             ob_end_clean();
         }
+    }
+
+    /**
+     * Deletes the cache folder
+     */
+    public function nukeCache()
+    {
+        $cacheDir = $this->factory->getSystemPath('cache', true);
+
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->remove($cacheDir);
     }
 
     /**
