@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Joomla\Http\HttpFactory;
 
 /**
  * Class IpAddress
@@ -75,8 +76,6 @@ class IpAddress
                 switch ($params['ip_lookup_service']) {
                     case 'telize':
                         $data = $this->getRemoteIpData("http://www.telize.com/geoip/" . $this->getIpAddress());
-
-                        $data = json_decode($data);
                         if (is_object($data) && isset($data->city)) {
                             $ipData = array(
                                 'city'         => $data->city,
@@ -93,8 +92,6 @@ class IpAddress
                         break;
                     case 'freegeoip':
                         $data = $this->getRemoteIpData('http://freegeoip.net/json/' . $this->getIpAddress());
-
-                        $data = json_decode($data);
                         if (is_object($data)) {
                             $ipData = array(
                                 'city'         => $data->city,
@@ -133,7 +130,6 @@ class IpAddress
                         $data = $this->getRemoteIpData(
                             "http://api.ipinfodb.com/v3/ip-city/?key={$params['ip_lookup_auth']}&format=json&ip=" . $this->getIpAddress()
                         );
-                        $data = json_decode($data);
                         if (is_object($data) && $data->statusCode == 'OK') {
                             $ipData = array(
                                 'city'         => ucfirst($data->cityName),
@@ -152,8 +148,6 @@ class IpAddress
                         $data = $this->getRemoteIpData(
                             "http://api.geoips.com/ip/{$this->getIpAddress()}/key/{$params['ip_lookup_auth']}/output/json"
                         );
-
-                        $data = json_decode($data);
                         if (is_object($data)) {
                             $ipData = array(
                                 'city'         => $data->city_name,
@@ -170,17 +164,16 @@ class IpAddress
                     case 'maxmind_country':
                     case 'maxmind_precision':
                     case 'maxmind_omni':
+                        $baseUrl = 'https://'.$params['ip_lookup_auth'].'@geoip.maxmind.com/geoip/v2.0/';
                         if ($params['ip_lookup_service'] == 'maxmind_country') {
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/country/' . $this->getIpAddress();
+                            $url = $baseUrl . 'country/' . $this->getIpAddress();
                         } elseif ($params['ip_lookup_service'] == 'maxmind_precision') {
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/city_isp_org/' . $this->getIpAddress();
+                            $url = $baseUrl . 'city_isp_org/' . $this->getIpAddress();
                         } elseif ($params['ip_lookup_service'] == 'maxmind_omni') {
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/omni/' . $this->getIpAddress();
+                            $url = $baseUrl . 'omni/' . $this->getIpAddress();
                         }
 
-                        $data = $this->getRemoteIpData($url, $params['ip_lookup_auth']);
-
-                        $data = json_decode($data);
+                        $data = $this->getRemoteIpData($url);
                         if (is_object($data)) {
                             $ipData = array(
                                 'city'         => $data->city->names->en,
@@ -229,35 +222,23 @@ class IpAddress
 
     /**
      * @param string $url
-     * @param bool   $auth
+     * @param bool   $jsondecode
      *
      * @return mixed|string
      */
-    private function getRemoteIpData($url, $auth = false)
+    private function getRemoteIpData($url, $jsondecode = true)
     {
-        if (function_exists('curl_init')) {
-            $ch = curl_init();
+        static $connector;
 
-            if ($auth) {
-                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-                curl_setopt($ch, CURLOPT_USERPWD, $auth);
-            }
+        if (empty($connector)) {
+            $connector = HttpFactory::getHttp();
+        }
 
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            $data = @curl_exec($ch);
-            curl_close($ch);
-        } elseif (ini_get('allow_url_fopen')) {
-            if ($auth) {
-                $context = stream_context_create(array(
-                    'http' => array(
-                        'header'  => "Authorization: Basic " . base64_encode($auth)
-                    )
-                ));
-                $data = @file_get_contents($url, false, $context);
-            } else {
-                $data = @file_get_contents($url);
-            }
+        try {
+            $response = $connector->get($url);
+            $data     = ($jsondecode) ? json_decode($response->body) : $response->body;
+        } catch (\Exception $exception) {
+            $data = false;
         }
 
         return $data;
