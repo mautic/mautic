@@ -45,7 +45,7 @@ class LeadController extends FormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setTableOrder();
+            $this->setListFilters();
         }
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */

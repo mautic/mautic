@@ -49,7 +49,7 @@ class ReportController extends FormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setTableOrder();
+            $this->setListFilters();
         }
 
         //set limits
@@ -507,7 +507,7 @@ class ReportController extends FormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setTableOrder();
+            $this->setListFilters();
         }
 
         $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');

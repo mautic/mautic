@@ -54,7 +54,7 @@ class ResultController extends CommonFormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setTableOrder();
+            $this->setListFilters();
         }
 
         //set limits

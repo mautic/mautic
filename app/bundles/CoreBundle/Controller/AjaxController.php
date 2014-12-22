@@ -105,52 +105,6 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function setTableLimitAction(Request $request)
-    {
-        $dataArray = array('success' => 0);
-        $name  = InputHelper::clean($request->request->get("name"));
-        $limit = InputHelper::int($request->request->get("limit"));
-        if (!empty($name)) {
-            $this->get("session")->set("mautic.$name.limit", $limit);
-            $dataArray['success'] = 1;
-        }
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function setTableFilterAction(Request $request)
-    {
-        $dataArray = array('success' => 0);
-        $name   = InputHelper::clean($request->request->get("name"));
-        $filter = InputHelper::clean($request->request->get("filterby"));
-        $value  = InputHelper::clean($request->request->get("value"));
-        if (!empty($name) && !empty($filter)) {
-            $filters              = $this->get("session")->get("mautic.$name.filters", '');
-            if (empty($value) && isset($filters[$filter])) {
-                unset($filters[$filter]);
-            } else {
-                $filters[$filter] = array(
-                    'column' => $filter,
-                    'expr'   => 'like',
-                    'value'  => $value,
-                    'strict' => false
-                );
-            }
-            $this->get("session")->set("mautic.$name.filters", $filters);
-            $dataArray['success'] = 1;
-        }
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     protected function globalSearchAction(Request $request)
     {
         $dataArray = array('success' => 1);

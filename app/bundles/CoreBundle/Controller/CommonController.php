@@ -341,19 +341,45 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * Updates the table's ordering in the session
+     * Updates list filters, order, limit
      *
      * @return void
      */
-    protected function setTableOrder()
+    protected function setListFilters()
     {
+        $session = $this->factory->getSession();
         $name    = InputHelper::clean($this->request->query->get('name'));
-        $orderBy = InputHelper::clean($this->request->query->get('orderby'));
-        if (!empty($name) && !empty($orderBy)) {
-            $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
-            $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
-            $this->get('session')->set("mautic.$name.orderby", $orderBy);
-            $this->get('session')->set("mautic.$name.orderbydir", $dir);
+
+        if (!empty($name)) {
+            if ($this->request->query->has('orderby')) {
+                $orderBy = InputHelper::clean($this->request->query->get('orderby'));
+                $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
+                $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
+                $session->set("mautic.$name.orderby", $orderBy);
+                $session->set("mautic.$name.orderbydir", $dir);
+            }
+
+            if ($this->request->query->has('limit')) {
+                $limit = InputHelper::int($this->request->query->get('limit'));
+                $session->set("mautic.$name.limit", $limit);
+            }
+
+            if ($this->request->query->has('filterby')) {
+                $filter = InputHelper::clean($this->request->query->get("filterby"));
+                $value  = InputHelper::clean($this->request->query->get("value"));
+                $filters              = $this->get("session")->get("mautic.$name.filters", '');
+                if (empty($value) && isset($filters[$filter])) {
+                    unset($filters[$filter]);
+                } else {
+                    $filters[$filter] = array(
+                        'column' => $filter,
+                        'expr'   => 'like',
+                        'value'  => $value,
+                        'strict' => false
+                    );
+                }
+                $this->get("session")->set("mautic.$name.filters", $filters);
+            }
         }
     }
 

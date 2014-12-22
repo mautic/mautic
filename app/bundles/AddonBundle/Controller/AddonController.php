@@ -30,7 +30,7 @@ class AddonController extends FormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setTableOrder();
+            $this->setListFilters();
         }
 
         //set limits

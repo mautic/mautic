@@ -1027,7 +1027,6 @@ var Mautic = {
      */
     reorderTableData: function (name, orderby, tmpl, target) {
         var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
-
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1040,41 +1039,20 @@ var Mautic = {
      * @param target
      */
     filterTableData: function (name, filterby, filterValue, tmpl, target) {
-        var query = "action=setTableFilter&name=" + name + "&filterby=" + filterby + "&value=" + filterValue;
-        mQuery.ajax({
-            url: mauticAjaxUrl,
-            type: "POST",
-            data: query,
-            dataType: "json",
-            success: function (response) {
-                if (response.success) {
-                    var route = window.location.pathname + "?tmpl=" + tmpl;
-                    Mautic.loadContent(route, '', 'GET', target);
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + filterby + "&value=" + filterValue
+        Mautic.loadContent(route, '', 'POST', target);
     },
 
+    /**
+     *
+     * @param name
+     * @param limit
+     * @param tmpl
+     * @param target
+     */
     limitTableData: function (name, limit, tmpl, target) {
-        var query = "action=setTableLimit&name=" + name + "&limit=" + limit;
-        mQuery.ajax({
-            url: mauticAjaxUrl,
-            type: "POST",
-            data: query,
-            dataType: "json",
-            success: function (response) {
-                if (response.success) {
-                    var route = window.location.pathname + "?tmpl=" + tmpl;
-                    Mautic.loadContent(route, '', 'GET', target);
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
+        Mautic.loadContent(route, '', 'POST', target);
     },
 
     /**
