@@ -57,10 +57,23 @@ class SidebarCanvasHelper extends Helper
             }
         }
 
+        $hasContent = false;
         foreach ($this->canvases as $canvas) {
             if (!isset($this->content[$canvas])) {
                 $this->content[$canvas] = false;
             }
+
+            if ($this->content[$canvas]) {
+                $hasContent = true;
+            }
+        }
+
+        if (!$hasContent) {
+            $this->content['main'] = array(
+                'header'  => false,
+                'content' => '<img class="img-responsive mt-lg" style="margin-right: auto; margin-left: auto;" src="'.MautibotHelper::get('wave').'" />',
+                'footer'  => ''
+            );
         }
     }
 

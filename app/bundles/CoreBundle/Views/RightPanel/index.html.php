@@ -11,7 +11,6 @@ $view['canvas']->renderCanvasContent($view);
 $canvasContent = $view['canvas']->getContent();
 ?>
 
-
 <div class="offcanvas-container" data-toggle="offcanvas" data-options='{"openerClass":"offcanvas-opener", "closerClass":"offcanvas-closer"}'>
     <!-- START Wrapper -->
     <div class="offcanvas-wrapper">
