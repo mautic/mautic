@@ -125,7 +125,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
         )); ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('tip' => 'mautic.asset.noresults.tip')); ?>
 <?php endif; ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(

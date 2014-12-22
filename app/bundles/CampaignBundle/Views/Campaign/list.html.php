@@ -101,5 +101,5 @@ if ($tmpl == 'index')
     )); ?>
 </div>
  <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('tip' => 'mautic.campaign.noresults.tip')); ?>
 <?php endif; ?>
