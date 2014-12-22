@@ -14,7 +14,7 @@ foreach ($buttonGroupTypes as $groupType) {
         echo '<div class="btn-group hidden-xs hidden-sm">';
         $dropdownOpenHtml = '';
     } else {
-        echo '<div class="btn-group hidden-md hidden-lg">';
+        echo '<div class="btn-group btn-group-sm hidden-md hidden-lg">';
         $dropdownOpenHtml  = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
         $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">' . "\n";
     }

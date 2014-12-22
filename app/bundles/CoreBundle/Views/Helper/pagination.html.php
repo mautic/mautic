@@ -45,102 +45,119 @@ $limitOptions = array(
 );
 
 $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
+
+$responsiveViewports = array('desktop', 'mobile');
+
+foreach ($responsiveViewports as $viewport):
+
+if ($viewport == 'mobile'):
+    $paginationClass   = 'sm';
+    $pageClass         = 'pagination-sm';
+    $responsiveClass   = 'visible-xs hidden-sm hidden-md hidden-lg';
+    $paginationWrapper = "pagination-wrapper pull-left nm";
+else:
+    $responsiveClass = 'hidden-xs visible-sm visible-md visible-lg';
+endif;
+
 ?>
-<?php if (empty($fixedLimit)): ?>
-    <div class="pull-right">
-        <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
-        <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
-            '<?php echo $sessionVar; ?>',
-            this.value,
-            '<?php echo $tmpl; ?>',
-            '<?php echo $target; ?>'
-            );">
-            <?php foreach ($limitOptions as $value => $label): ?>
-            <?php $selected = ($limit === $value) ? ' selected="selected"': '';?>
-            <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
-            <?php endforeach; ?>
-        </select>
+<div class="<?php echo $responsiveClass; ?>">
+    <?php if (empty($fixedLimit)): ?>
+        <div class="pull-right">
+            <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
+            <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
+                '<?php echo $sessionVar; ?>',
+                this.value,
+                '<?php echo $tmpl; ?>',
+                '<?php echo $target; ?>'
+                );">
+                <?php foreach ($limitOptions as $value => $label): ?>
+                <?php $selected = ($limit === $value) ? ' selected="selected"': '';?>
+                <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    <?php endif; ?>
+
+    <div class="<?php echo $paginationWrapper; ?>">
+        <ul class="pagination nm <?php echo $pageClass; ?>">
+            <?php
+            $urlPage = $page - $range;
+            $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
+            $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+            ?>
+            <li<?php echo $class; ?>>
+                <?php  ?>
+                <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
+                    <i class="fa fa-angle-double-left"></i>
+                </a>
+            </li>
+
+            <?php
+            $urlPage = $page - 1;
+            $url     = ($urlPage >= 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
+            $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+            ?>
+            <li<?php echo $class; ?>>
+                <?php  ?>
+                <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            </li>
+
+            <?php
+            $startPage = $page - $range + 1;
+            if ($startPage <= 0) {
+                $startPage = 1;
+            }
+            $lastPage = $startPage + $range - 1;
+            if ($lastPage > $totalPages) {
+                $lastPage = $totalPages;
+            }
+            ?>
+            <?php for ($i=$startPage; $i<=$lastPage; $i++): ?>
+            <?php
+            $class = ($page === (int) $i) ? ' class="active"' : '';
+            $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl . $i . $queryString;
+            $data  = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
+            ?>
+            <li<?php echo $class; ?>>
+                <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
+                    <span><?php echo $i; ?></span>
+                </a>
+            </li>
+            <?php endfor; ?>
+
+            <?php
+            $urlPage = $page + 1;
+            $url     = ($urlPage <= $totalPages) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $data    = ($url == 'javascript: void(0);') ? '' : 'data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
+            $class   = ($urlPage > $totalPages) ? ' class="disabled"' : '';
+            ?>
+            <li<?php echo $class; ?>>
+                <?php  ?>
+                <a href="<?php echo $url; ?>" <?php echo $data.$formExit; ?>>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+
+            <?php
+            $urlPage = $page + $range;
+            if ($urlPage > $totalPages)
+                $urlPage = $totalPages;
+            $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
+            $class   = ($urlPage == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
+            ?>
+            <li<?php echo $class; ?>>
+                <?php  ?>
+                <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
+                    <i class="fa fa-angle-double-right"></i>
+                </a>
+            </li>
+        </ul>
+        <div class="clearfix"></div>
     </div>
-<?php endif; ?>
-
-<div class="<?php echo $paginationWrapper; ?>">
-    <ul class="pagination nm <?php echo $pageClass; ?>">
-        <?php
-        $urlPage = $page - $range;
-        $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
-        $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-        $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
-        ?>
-        <li<?php echo $class; ?>>
-            <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
-                <i class="fa fa-angle-double-left"></i>
-            </a>
-        </li>
-
-        <?php
-        $urlPage = $page - 1;
-        $url     = ($urlPage >= 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
-        $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-        $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
-        ?>
-        <li<?php echo $class; ?>>
-            <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
-                <i class="fa fa-angle-left"></i>
-            </a>
-        </li>
-
-        <?php
-        $startPage = $page - $range + 1;
-        if ($startPage <= 0) {
-            $startPage = 1;
-        }
-        $lastPage = $startPage + $range - 1;
-        if ($lastPage > $totalPages) {
-            $lastPage = $totalPages;
-        }
-        ?>
-        <?php for ($i=$startPage; $i<=$lastPage; $i++): ?>
-        <?php
-        $class = ($page === (int) $i) ? ' class="active"' : '';
-        $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl . $i . $queryString;
-        $data  = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-        ?>
-        <li<?php echo $class; ?>>
-            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
-                <span><?php echo $i; ?></span>
-            </a>
-        </li>
-        <?php endfor; ?>
-
-        <?php
-        $urlPage = $page + 1;
-        $url     = ($urlPage <= $totalPages) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
-        $data    = ($url == 'javascript: void(0);') ? '' : 'data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-        $class   = ($urlPage > $totalPages) ? ' class="disabled"' : '';
-        ?>
-        <li<?php echo $class; ?>>
-            <?php  ?>
-            <a href="<?php echo $url; ?>" <?php echo $data.$formExit; ?>>
-                <i class="fa fa-angle-right"></i>
-            </a>
-        </li>
-
-        <?php
-        $urlPage = $page + $range;
-        if ($urlPage > $totalPages)
-            $urlPage = $totalPages;
-        $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
-        $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-        $class   = ($urlPage == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
-        ?>
-        <li<?php echo $class; ?>>
-            <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
-                <i class="fa fa-angle-double-right"></i>
-            </a>
-        </li>
-    </ul>
-    <div class="clearfix"></div>
 </div>
+<?php endforeach; ?>
