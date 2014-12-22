@@ -349,7 +349,7 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            $builder->create('trusted_hosts', 'text', array(
+            $builder->create('trusted_proxies', 'text', array(
                 'label'      => 'mautic.core.config.form.trusted.proxies',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
