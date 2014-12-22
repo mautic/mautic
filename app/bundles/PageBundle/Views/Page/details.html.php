@@ -40,7 +40,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <p class="text-muted"><?php echo $activePage->getMetaDescription(); ?></p>
                     </div>
                     <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $activePage)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activePage)); ?>
                     </div>
                 </div>
             </div>
@@ -208,7 +208,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <div class="row">
                                     <div class="col-xs-1">
                                         <h3>
-                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                 'item'  => $variants['parent'],
                                                 'model' => 'page.page',
                                                 'size'  => '',
@@ -272,7 +272,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <div class="row">
                                     <div class="col-xs-1">
                                         <h3>
-                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                 'item'  => $variant,
                                                 'model' => 'page',
                                                 'size'  => '',
@@ -331,7 +331,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <div class="box-layout">
                                     <div class="col-md-1 va-m">
                                         <h3>
-                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                 'item'  => $translations['parent'],
                                                 'model' => 'page.page',
                                                 'size'  => ''
@@ -362,7 +362,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <div class="box-layout">
                                         <div class="col-md-1 va-m">
                                             <h3>
-                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                     'item'  => $translation,
                                                     'model' => 'page.page',
                                                     'size'  => ''

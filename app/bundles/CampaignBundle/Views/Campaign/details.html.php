@@ -34,7 +34,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <p class="text-white dark-sm mb-0"><?php echo $campaign->getDescription(); ?></p>
                     </div>
                     <div class="col-xs-6 va-m text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $campaign)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $campaign)); ?>
                     </div>
                 </div>
             </div>

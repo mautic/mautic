@@ -61,7 +61,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                           <p class="text-muted"><?php echo $activeForm->getDescription(); ?></p>
                       </div>
                       <div class="col-xs-2 text-right">
-                          <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $activeForm)); ?>
+                          <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeForm)); ?>
                       </div>
                   </div>
               </div>

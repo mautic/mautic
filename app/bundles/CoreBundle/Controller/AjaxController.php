@@ -288,7 +288,7 @@ class AjaxController extends CommonController
                     $dataArray['reload'] = 1;
                 } else {
                     //get updated icon HTML
-                    $html                    = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                    $html                    = $this->renderView('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                         'item'  => $entity,
                         'model' => $name,
                         'extra' => $extra

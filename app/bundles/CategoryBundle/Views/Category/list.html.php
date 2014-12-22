@@ -76,7 +76,7 @@ if ($tmpl == 'index')
                             <span class="label label-default pa-10" style="background: #<?php echo $item->getColor(); ?>;"> </span>
                         </td>
                         <td>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
                                 'item'  => $item,
                                 'model' => 'category',
                                 'query' => 'bundle=' . $bundle

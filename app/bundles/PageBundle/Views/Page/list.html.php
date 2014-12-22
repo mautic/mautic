@@ -77,7 +77,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                             ?>
                         </td>
                         <td>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
                                 'item'       => $item,
                                 'model'      => 'page.page'
                             )); ?>

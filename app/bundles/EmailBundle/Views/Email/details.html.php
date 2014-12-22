@@ -46,7 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $email)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $email)); ?>
                     </div>
                 </div>
             </div>
@@ -149,7 +149,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <div class="row">
                                         <div class="col-xs-1">
                                             <h3>
-                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                     'item'  => $variants['parent'],
                                                     'model' => 'page.page',
                                                     'size'  => '',
@@ -212,7 +212,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <div class="row">
                                             <div class="col-xs-1">
                                                 <h3>
-                                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                         'item'  => $variant,
                                                         'model' => 'page',
                                                         'size'  => '',
