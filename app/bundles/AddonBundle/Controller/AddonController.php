@@ -212,8 +212,8 @@ class AddonController extends FormController
             $model->saveEntities($persist);
         }
 
-        if ($added) {
-            //clear the cache if new addons were added
+        if ($updated) {
+            //clear the cache if addons were updated
             $this->clearCache();
         }
 

@@ -46,6 +46,7 @@ class AddonHelper
      * Check if a bundle is enabled
      *
      * @param string $bundle
+     * @param bool   $forceRefresh
      *
      * @return bool
      */
@@ -58,18 +59,8 @@ class AddonHelper
             return false;
         }
 
-        // Populate our addon cache if not present
         if (!static::$loaded) {
-            /** @var \Mautic\AddonBundle\Entity\IntegrationRepository $repo */
-            try {
-                $repo           = $this->factory->getModel('addon')->getRepository();
-                static::$addons = $repo->getBundleStatus();
-            } catch (\Exception $exception) {
-                //database is probably not installed or there was an issue connecting
-                return false;
-            }
-
-            static::$loaded = true;
+            $this->buildAddonCache();
         }
 
         // Check if the bundle is registered
@@ -79,5 +70,21 @@ class AddonHelper
 
         // If we don't know about the bundle, it isn't properly registered and we will always return false
         return false;
+    }
+
+    public function buildAddonCache()
+    {
+        // Populate our addon cache if not present
+
+        /** @var \Mautic\AddonBundle\Entity\IntegrationRepository $repo */
+        try {
+            $repo           = $this->factory->getModel('addon')->getRepository();
+            static::$addons = $repo->getBundleStatus();
+        } catch (\Exception $exception) {
+            //database is probably not installed or there was an issue connecting
+            return false;
+        }
+
+        static::$loaded = true;
     }
 }

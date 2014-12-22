@@ -125,7 +125,8 @@ class CommonSubscriber implements EventSubscriberInterface
             }
         }
 
-        $addons = $this->factory->getEnabledAddons();
+        // Cannot use the list from kernel here as enabled addons may have changed since
+        $addons = $this->factory->getParameter('addon.bundles');
         foreach ($addons as $bundle) {
             if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
                 continue;
@@ -199,7 +200,8 @@ class CommonSubscriber implements EventSubscriberInterface
             $fetchIcons($bundle);
         }
 
-        $addons = $this->factory->getEnabledAddons();
+        // Cannot use the list from kernel here as enabled addons may have changed since
+        $addons = $this->factory->getParameter('addon.bundles');
         foreach ($addons as $bundle) {
             if (!$this->addonHelper->isEnabled($bundle['bundle'])) {
                 continue;
@@ -227,11 +229,14 @@ class CommonSubscriber implements EventSubscriberInterface
             }
         }
 
-        $addons = $this->factory->getEnabledAddons();
+        // Cannot use the list from kernel here as enabled addons may have changed since
+        $addons = $this->factory->getParameter('addon.bundles');
         foreach ($addons as $bundle) {
-            $routing = $bundle['directory'] . "/Config/routing/$name.php";
-            if (file_exists($routing)) {
-                $event->addRoutes($routing);
+            if ($this->addonHelper->isEnabled($bundle['bundle'])) {
+                $routing = $bundle['directory'] . "/Config/routing/$name.php";
+                if (file_exists($routing)) {
+                    $event->addRoutes($routing);
+                }
             }
         }
     }
