@@ -47,6 +47,14 @@ $container->setDefinition('mautic.helper.template.gravatar',
     ->addTag('templating.helper', array('alias' => 'gravatar'))
     ->setScope('request');
 
+$container->setDefinition('mautic.helper.template.mautibot',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\MautibotHelper'
+    ))
+    ->addTag('templating.helper', array('alias' => 'mautibot'))
+    ->setScope('request');
+
+
 //Custom templating parser
 $container->setDefinition('mautic.templating.name_parser',
     new Definition(
