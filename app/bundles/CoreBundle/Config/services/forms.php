@@ -19,34 +19,6 @@ $container->setDefinition('mautic.form.type.spacer', new Definition(
         'alias' => 'spacer',
     ));
 
-$container->setDefinition('mautic.form.type.panel_start', new Definition(
-    'Mautic\CoreBundle\Form\Type\PanelStartType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'panel_start',
-    ));
-
-$container->setDefinition('mautic.form.type.panel_end', new Definition(
-    'Mautic\CoreBundle\Form\Type\PanelEndType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'panel_end',
-    ));
-
-$container->setDefinition('mautic.form.type.panel_wrapper_start', new Definition(
-    'Mautic\CoreBundle\Form\Type\PanelWrapperStartType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'panel_wrapper_start',
-    ));
-
-$container->setDefinition('mautic.form.type.panel_wrapper_end', new Definition(
-    'Mautic\CoreBundle\Form\Type\PanelWrapperEndType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'panel_wrapper_end',
-    ));
-
 $container->setDefinition('mautic.form.type.tel', new Definition(
     'Mautic\CoreBundle\Form\Type\TelType'
 ))
