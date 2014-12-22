@@ -201,6 +201,8 @@ class Configurator
                     $value = ($value) ? 'true' : 'false';
                 } elseif (is_null($value)) {
                     $value = 'null';
+                } elseif (is_array($value)) {
+                    $value = $this->renderArray($value);
                 }
 
                 $string .= "\t'$key' => $value,\n";
@@ -208,6 +210,39 @@ class Configurator
         }
 
         $string .= ");\n";
+
+        return $string;
+    }
+
+    /**
+     * @param $array
+     */
+    protected function renderArray($array, $addClosingComma = false)
+    {
+        $string = "array(";
+        $first = true;
+        foreach ($array as $key => $value)
+        {
+            if (!$first) {
+                $string .= ',';
+            }
+
+            if (is_string($key)) {
+                $string .= '"'.$key.'" => ';
+            }
+
+            if (is_array($value)) {
+                $string .= $this->renderArray($value, true);
+            } else {
+                $string .= $value;
+            }
+            $first = false;
+        }
+        $string .= ")";
+
+        if ($addClosingComma) {
+            $string .= ',';
+        }
 
         return $string;
     }
