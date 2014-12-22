@@ -35,20 +35,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <p class="text-white dark-sm mb-0"><?php echo $activeAsset->getDescription(); ?></p>
                     </div>
                     <div class="col-xs-2 text-right">
-                        <?php switch ($activeAsset->getPublishStatus()) {
-                            case 'published':
-                                $labelColor = "success";
-                                break;
-                            case 'unpublished':
-                            case 'expired'    :
-                                $labelColor = "danger";
-                                break;
-                            case 'pending':
-                                $labelColor = "warning";
-                                break;
-                        } ?>
-                        <?php $labelText = strtoupper($view['translator']->trans('mautic.core.form.' . $activeAsset->getPublishStatus())); ?>
-                        <h4 class="fw-sb"><span class="label label-<?php echo $labelColor; ?>"><?php echo $labelText; ?></span></h4>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $activeAsset)); ?>
                     </div>
                 </div>
             </div>

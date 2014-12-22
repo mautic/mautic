@@ -46,20 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-2 text-right">
-                        <?php switch ($email->getPublishStatus()) {
-                            case 'published':
-                                $labelColor = "success";
-                                break;
-                            case 'unpublished':
-                            case 'expired'    :
-                                $labelColor = "danger";
-                                break;
-                            case 'pending':
-                                $labelColor = "warning";
-                                break;
-                        } ?>
-                        <?php $labelText = strtoupper($view['translator']->trans('mautic.core.form.' . $email->getPublishStatus())); ?>
-                        <h4 class="fw-sb"><span class="label label-<?php echo $labelColor; ?>"><?php echo $labelText; ?></span></h4>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publish_status_badge.html.php', array('entity' => $email)); ?>
                     </div>
                 </div>
             </div>
