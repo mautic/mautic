@@ -71,7 +71,7 @@ class PointActionHelper
             }
         }
 
-        if ($limitToUrl && $url == $limitToUrl) {
+        if ($limitToUrl && fnmatch($limitToUrl, $url)) {
             //no points change
             return false;
         }
