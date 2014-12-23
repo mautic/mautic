@@ -7,7 +7,7 @@ Mautic.activateChatListUpdate = function() {
         } else {
             clearInterval(Mautic['chatListUpdaterInterval']);
         }
-    }, 30000);
+    }, 5000);
 };
 
 Mautic.updateChatList = function (killTimer) {
@@ -16,11 +16,9 @@ Mautic.updateChatList = function (killTimer) {
         url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
         dataType: "json",
         success: function (response) {
-            mQuery('#OffCanvasRightHeaderTitle').html('');
-            mQuery('#ChatSubHeader').html('');
+            mQuery('#OffCanvasMainContent').html(response.newContent);
 
-            mQuery('#ChatList').replaceWith(response.newContent);
-            response.target = '#ChatList';
+            response.target = '#OffCanvasMainContent';
             Mautic.processPageContent(response);
 
             if (killTimer) {
@@ -188,9 +186,6 @@ Mautic.sendChatMessage = function(toId, chatType) {
 Mautic.updateChatConversation = function(response, chatType) {
     var dividerAppended = false;
     var contentUpdated  = false;
-
-    //clear the chat list updater for now
-    clearInterval(Mautic['chatListUpdaterInterval']);
 
     if (response.conversationHtml) {
         mQuery('#OffCanvasRightContent').html(response.conversationHtml);
