@@ -11,11 +11,11 @@ $showDate = (!empty($showDate)) ? true : false;
 
 $dividerInserted = false;
 if (!empty($insertUnreadDivider) && !$firstMsg['isRead']) {
-    echo $view->render('MauticChatBundle:User:newdivider.html.php');
+    echo $view->render('MauticChatBundle:Default:newdivider.html.php');
     $dividerInserted = true;
 }
 ?>
-<li class="media<?php echo $direction; ?> chat-group" id="ChatGroup<?php echo $firstMsg['id']; ?>">
+<li class="media<?php echo $direction; ?> chat-group nm pb-0" id="ChatGroup<?php echo $firstMsg['id']; ?>">
     <a href="javascript:void(0);" class="media-object">
         <img src="<?php echo $view['gravatar']->getImage($user['email'], 40); ?>" class="img-circle" alt="">
     </a>
@@ -24,10 +24,10 @@ if (!empty($insertUnreadDivider) && !$firstMsg['isRead']) {
         <?php
         foreach ($messages as $message):
             if (!empty($insertUnreadDivider) && !$dividerInserted && !$message['isRead']):
-                echo $view->render('MauticChatBundle:User:newdivider.html.php', array('tag' => 'div'));
+                echo $view->render('MauticChatBundle:Default:newdivider.html.php', array('tag' => 'div'));
                 $dividerInserted = true;
             endif;
-            echo $view->render('MauticChatBundle:User:message.html.php', array('message' => $message));
+            echo $view->render('MauticChatBundle:Default:message.html.php', array('message' => $message));
         endforeach;
         ?>
         <?php if ($showDate): ?>

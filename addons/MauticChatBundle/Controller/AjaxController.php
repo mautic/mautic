@@ -104,7 +104,7 @@ class AjaxController extends CommonAjaxController
                 $lastMsg = end($messages);
                 $dataArray['latestId'] = $lastMsg['id'];
             }
-            $dataArray['divider'] = $this->renderView('MauticChatBundle:User:newdivider.html.php', array('tag' => 'div'));;
+            $dataArray['divider'] = $this->renderView('MauticChatBundle:Default:newdivider.html.php');
             $dataArray['success'] = 1;
             $dataArray['mauticContent'] = 'chatChannel';
         }
@@ -153,6 +153,11 @@ class AjaxController extends CommonAjaxController
 
             if ($recipient !== null) {
                 $repo->saveEntity($entity);
+
+                //if channel, update latest read
+                if ($chatType == 'channel') {
+                    $channelModel->markMessagesRead($recipient, $entity->getId());
+                }
                 return $this->getMessageContent($request, $currentUser, $recipient, $chatType, 'send');
             }
         }
@@ -212,10 +217,8 @@ class AjaxController extends CommonAjaxController
 
         if ($chatType == 'user') {
             if ($chatId !== $currentUser->getId()) {
-                $userModel = $this->factory->getModel('user.user');
-                $recipient = $userModel->getEntity($chatId);
                 $chatModel = $this->factory->getModel('addon.mauticChat.chat');
-                $chatModel->markMessagesRead($recipient, $lastId);
+                $chatModel->markMessagesRead($chatId, $lastId);
                 $dataArray['success'] = 1;
             }
         } elseif ($chatType == 'channel') {
@@ -290,7 +293,7 @@ class AjaxController extends CommonAjaxController
 
                 if ($owner && $msg['fromUser']['id'] === $owner) {
                     //this should be part of the same group
-                    $sameGroup[] = $this->renderView('MauticChatBundle:User:message.html.php', array('message' => $msg));
+                    $sameGroup[] = $this->renderView('MauticChatBundle:Default:message.html.php', array('message' => $msg));
                 } else {
                     //start or append to a new group
                     $owner                      = false;
@@ -304,17 +307,15 @@ class AjaxController extends CommonAjaxController
             }
         }
 
+        $dividerTag = 'li';
         if (!empty($sameGroup)) {
+            $dividerTag                 = 'div';
             $dataArray['appendToGroup'] = implode("\n", $sameGroup);
             $dataArray['groupId']       = $groupId;
         }
 
         if (!empty($newGroup)) {
             $groupHtml = "";
-
-            //add a new message divider
-            $divider = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:User:newdivider.html.php') : '';
-
             foreach ($newGroup as $g) {
                 if ($chatType == 'user') {
                     $groupHtml = $this->renderView('MauticChatBundle:User:messages.html.php', array(
@@ -334,9 +335,7 @@ class AjaxController extends CommonAjaxController
             $dataArray['messages'] = $groupHtml;
         }
         $dataArray['withId'] = $recipient->getId();
-        $divider             = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:User:newdivider.html.php',
-            array('tag' => 'div')
-        ) : '';
+        $divider             = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:Default:newdivider.html.php', array('tag' => $dividerTag)) : '';
         $dataArray['divider'] = $divider;
 
         $lastMessage           = end($messages);

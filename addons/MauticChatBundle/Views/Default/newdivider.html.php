@@ -8,6 +8,6 @@
  */
 $tag = (empty($tag)) ? 'li' : $tag;
 ?>
-<<?php echo $tag; ?> class="chat-new-divider">
+<<?php echo $tag; ?> class="chat-new-divider text-center text-danger pt-md pb-md">
   <span><?php echo $view['translator']->trans('mautic.chat.chat.new.messages'); ?></span>
 </<?php echo $tag; ?>>

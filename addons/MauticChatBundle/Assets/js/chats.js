@@ -116,7 +116,7 @@ Mautic.activateChatInput = function(itemId, chatType) {
 };
 
 Mautic.getLastChatGroup = function() {
-    var group = mQuery('#ChatConversation .chat-group').last().find('.chat-group-firstid');
+    var group = mQuery('#ChatMessages .chat-group').last().find('.chat-group-firstid');
     return group.length ? group.val() : '';
 };
 
@@ -194,6 +194,7 @@ Mautic.updateChatConversation = function(response, chatType) {
 
     if (response.conversationHtml) {
         mQuery('#OffCanvasRightContent').html(response.conversationHtml);
+        contentUpdated = true;
     }
 
     if (response.firstId && mQuery('#ChatMessage' + response.firstId).length) {
@@ -230,7 +231,7 @@ Mautic.updateChatConversation = function(response, chatType) {
 
     if (contentUpdated) {
         //Scroll to bottom of chat (latest messages)
-        mQuery('#ChatConversation').scrollTop(mQuery('#ChatConversation').scrollHeight);
+        Mautic.scrollToChatBottom();
     }
 
     if (response.latestId) {
@@ -260,4 +261,8 @@ Mautic.chatChannelOnLoad = function(container, response) {
     if (response.chatHtml) {
         mQuery('#OffCanvasMainContent').html(response.chatHtml);
     }
+};
+
+Mautic.scrollToChatBottom = function() {
+    mQuery("#OffCanvasRightContent").animate({ scrollTop: mQuery("#OffCanvasRightContent")[0].scrollHeight}, 1000);
 };

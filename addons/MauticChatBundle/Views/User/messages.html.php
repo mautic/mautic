@@ -35,7 +35,7 @@ foreach ($messages as $num => $dm) {
         //last message or new group
 
         //now render the messages
-        echo $view->render('MauticChatBundle:User:group.html.php', array(
+        echo $view->render('MauticChatBundle:Default:group.html.php', array(
             'direction'           => $direction,
             'messages'            => $grouped,
             'user'                => $dm['fromUser'],
