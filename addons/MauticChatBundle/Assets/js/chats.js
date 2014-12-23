@@ -76,8 +76,8 @@ Mautic.startChannelChat = function (channelId, fromDate) {
                 mQuery('#OffCanvasRightHeader h4').html(response.channelName);
 
                 Mautic.updateChatConversation(response);
-                Mautic.activateChatUpdater(response.channelId, 'channel');
-                Mautic.activateChatInput(response.channelId, 'channel');
+                Mautic.activateChatUpdater(response.withId, 'channel');
+                Mautic.activateChatInput(response.withId, 'channel');
 
                 //activate links, etc
                 response.target = "#OffCanvasRightContent";

@@ -40,7 +40,8 @@ foreach ($messages as $num => $dm) {
             'messages'            => $grouped,
             'user'                => $dm['fromUser'],
             'showDate'            => ($msgDate != $nextDate),
-            'insertUnreadDivider' => (!empty($insertUnreadDivider) && $groupId !== $myId) ? true : false
+            'insertUnreadDivider' => (!empty($insertUnreadDivider) && $groupId !== $myId) ? true : false,
+            'me'                  => $me
         ));
 
         //reset the group

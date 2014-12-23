@@ -10,7 +10,7 @@ $firstMsg = reset($messages);
 $showDate = (!empty($showDate)) ? true : false;
 
 $dividerInserted = false;
-if (!empty($insertUnreadDivider) && ((isset($lastReadId) && $firstMsg['id'] > $lastReadId) || (!isset($lastReadId) && !$firstMsg['isRead']))) {
+if (!empty($insertUnreadDivider) && ((isset($lastReadId) && $firstMsg['id'] > $lastReadId && $user['id'] != $me->getId()) || (!isset($lastReadId) && !$firstMsg['isRead']))) {
     echo $view->render('MauticChatBundle:Default:newdivider.html.php');
     $dividerInserted = true;
 }
@@ -23,7 +23,7 @@ if (!empty($insertUnreadDivider) && ((isset($lastReadId) && $firstMsg['id'] > $l
     <div class="media-body">
         <?php
         foreach ($messages as $message):
-            if (!empty($insertUnreadDivider) && !$dividerInserted && ((isset($lastReadId) && $message['id'] > $lastReadId) || (!isset($lastReadId) && !$message['isRead']))):
+            if (!empty($insertUnreadDivider) && !$dividerInserted && ((isset($lastReadId) && $user['id'] != $me->getId() && $message['id'] > $lastReadId) || (!isset($lastReadId) && !$message['isRead']))):
                 echo $view->render('MauticChatBundle:Default:newdivider.html.php', array('tag' => 'div'));
                 $dividerInserted = true;
             endif;
