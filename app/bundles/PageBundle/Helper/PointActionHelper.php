@@ -62,6 +62,15 @@ class PointActionHelper
 
         $limitToUrl = html_entity_decode(trim($action['properties']['page_url']));
 
+        if ($action['properties']['first_time'] === true) {
+            $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+            $lead = $eventDetails->getLead();
+            $hits = $hitRepository->getLeadHits($lead->getId(), array('url' => $url));
+            if (count($hits)) {
+                return false;
+            }
+        }
+
         if ($limitToUrl && $url == $limitToUrl) {
             //no points change
             return false;

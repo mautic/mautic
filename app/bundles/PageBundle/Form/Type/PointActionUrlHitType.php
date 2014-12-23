@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 
 /**
  * Class PointActionUrlHitType
@@ -31,6 +32,20 @@ class PointActionUrlHitType extends AbstractType
                 'class'         => 'form-control',
                 'tooltip'       => 'mautic.page.point.action.form.page.url.descr',
                 'placeholder'   => 'http://'
+            )
+        ));
+
+        $builder->add('first_time', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label'       => 'mautic.page.point.action.form.first.time.only',
+            'expanded'    => true,
+            'empty_value' => false,
+            'required'    => false,
+            'attr'        => array(
+                'tooltip' => 'mautic.page.point.action.form.first.time.only.descr'
             )
         ));
     }

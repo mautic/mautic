@@ -74,6 +74,10 @@ class HitRepository extends CommonRepository
                 ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
         }
 
+        if (isset($options['url']) && $options['url']) {
+            $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
+        }
+
         return $query->getQuery()->getArrayResult();
     }
 
