@@ -1,34 +1,35 @@
 /* ChatBundle */
 
 Mautic.activateChatListUpdate = function() {
-    Mautic['chatListUpdaterInterval'] = setInterval(function() {
-        if (mQuery('#ChatUsers').length) {
-            Mautic.updateChatList();
-        } else {
-            clearInterval(Mautic['chatListUpdaterInterval']);
-        }
-    }, 5000);
+    Mautic.setModeratedInterval('chatListUpdaterInterval', 'updateChatList', 5000);
 };
 
 Mautic.updateChatList = function (killTimer) {
-    mQuery.ajax({
-        type: "POST",
-        url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
-        dataType: "json",
-        success: function (response) {
-            mQuery('#OffCanvasMainContent').html(response.newContent);
+    if (!mQuery('#ChatUsers').length) {
+        Mautic.clearModeratedInterval('chatListUpdaterInterval');
+    } else {
+        mQuery.ajax({
+            type: "POST",
+            url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
+            dataType: "json",
+            success: function (response) {
+                mQuery('#OffCanvasMainContent').html(response.newContent);
 
-            response.target = '#OffCanvasMainContent';
-            Mautic.processPageContent(response);
+                response.target = '#OffCanvasMainContent';
+                Mautic.processPageContent(response);
 
-            if (killTimer) {
-                 clearInterval(Mautic['chatUpdaterInterval']);
+                if (killTimer) {
+                    Mautic.clearModeratedInterval('chatListUpdaterInterval');
+                } else {
+                    Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+                Mautic.clearModeratedInterval('chatListUpdaterInterval');
             }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
-    });
+        });
+    }
 };
 
 Mautic.startUserChat = function (userId, fromDate) {
@@ -129,30 +130,35 @@ Mautic.markMessagesRead = function(itemId, chatType) {
 };
 
 Mautic.activateChatUpdater = function(itemId, chatType) {
-    Mautic['chatUpdaterInterval'] = setInterval(function(){
-        var lastId  = mQuery('#ChatLastMessageId').val();
-        var groupId = Mautic.getLastChatGroup();
-
-        //only update if not in a form or single chat
-        if (mQuery('#ChatUsers').length) {
-            mQuery.ajax({
-                type: "POST",
-                url: mauticAjaxUrl + "?action=addon:mauticChat:getMessages",
-                data: 'chatId=' + itemId + '&chatType=' + chatType + '&lastId=' + lastId + '&groupId=' + groupId,
-                dataType: "json",
-                success: function (response) {
-                    Mautic.updateChatConversation(response, chatType);
-                },
-                error: function (request, textStatus, errorThrown) {
-                    Mautic.processAjaxError(request, textStatus, errorThrown);
-                }
-            });
-        } else {
-            //clear the interval
-            clearInterval(Mautic['chatUpdateInterval']);
-        }
-    }, 10000);
+    Mautic.setModeratedInterval('chatUpdaterInterval', 'chatUpdater', 5000, [itemId, chatType]);
 };
+
+Mautic.chatUpdater = function(itemId, chatType) {
+    var lastId  = mQuery('#ChatLastMessageId').val();
+    var groupId = Mautic.getLastChatGroup();
+
+    //only update if not in a form or single chat
+    if (mQuery('#ChatUsers').length) {
+        mQuery.ajax({
+            type: "POST",
+            url: mauticAjaxUrl + "?action=addon:mauticChat:getMessages",
+            data: 'chatId=' + itemId + '&chatType=' + chatType + '&lastId=' + lastId + '&groupId=' + groupId,
+            dataType: "json",
+            success: function (response) {
+                Mautic.updateChatConversation(response, chatType);
+                Mautic.moderatedIntervalCallbackIsComplete('chatUpdaterInterval');
+
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+                Mautic.moderatedIntervalCallbackIsComplete('chatUpdaterInterval');
+            }
+        });
+    } else {
+        //clear the interval
+        Mautic.clearModeratedInterval('chatUpdaterInterval');
+    }
+}
 
 Mautic.sendChatMessage = function(toId, chatType) {
     var msgText = mQuery('#ChatMessageInput').val();

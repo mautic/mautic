@@ -44,6 +44,10 @@ MauticVars.iconClasses          = {};
 //prevent multiple ajax calls from multiple clicks
 MauticVars.routeInProgress       = '';
 
+//prevent interval ajax requests from overlapping
+MauticVars.moderatedIntervals    = {};
+MauticVars.intervalsInProgress   = {};
+
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
@@ -755,6 +759,12 @@ var Mautic = {
         }));
     },
 
+    /**
+     * Retrieves content of href via ajax
+     * @param el
+     * @param event
+     * @returns {boolean}
+     */
     ajaxifyLink: function (el, event) {
         var route = mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0 || MauticVars.routeInProgress === route) {
@@ -824,6 +834,13 @@ var Mautic = {
         Mautic.loadAjaxModal(target, route, method, header);
     },
 
+    /**
+     * Retrieve ajax content for modal
+     * @param target
+     * @param route
+     * @param method
+     * @param header
+     */
     loadAjaxModal: function (target, route, method, header) {
 
         //show the modal
@@ -869,6 +886,11 @@ var Mautic = {
         });
     },
 
+    /**
+     * Clears content from a shared modal
+     * @param target
+     * @param firstLoad
+     */
     resetModal: function (target, firstLoad) {
         if (typeof MauticVars.modalsReset == 'undefined') {
             MauticVars.modalsReset = {};
@@ -890,10 +912,17 @@ var Mautic = {
         }
     },
 
+    /**
+     * Sets flashes
+     * @param flashes
+     */
     setFlashes: function (flashes) {
         mQuery('#flashes').replaceWith(flashes);
     },
 
+    /**
+     * Hides flashes
+     */
     hideFlashes: function () {
         window.setTimeout(function () {
             mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
@@ -902,6 +931,11 @@ var Mautic = {
         }, 7000);
     },
 
+    /**
+     * Handles modal content post ajax request
+     * @param response
+     * @param target
+     */
     processModalContent: function (response, target) {
         if (response.error) {
             Mautic.stopIconSpinPostEvent();
@@ -1143,6 +1177,13 @@ var Mautic = {
         }
     },
 
+    /**
+     * Activate live search feature
+     *
+     * @param el
+     * @param searchStrVar
+     * @param liveCacheVar
+     */
     activateLiveSearch: function (el, searchStrVar, liveCacheVar) {
         if (!mQuery(el).length) {
             return;
@@ -1757,5 +1798,50 @@ var Mautic = {
         }
 
         Mautic.stopPageLoadingBar();
+    },
+
+    /**
+     * Moderates intervals to prevent ajax overlaps
+     *
+     * @param key
+     * @param callback
+     * @param timeout
+     */
+    setModeratedInterval: function(key, callback, timeout, params) {
+        if (typeof MauticVars.intervalsInProgress[key] != 'undefined') {
+            //action is still pending so clear and reschedule
+            clearTimeout(MauticVars.moderatedIntervals[key]);
+        } else {
+            MauticVars.intervalsInProgress[key] = true;
+
+            //perform callback
+            if (typeof params == 'undefined') {
+                params = [];
+            }
+            window["Mautic"][callback].apply('window', params);
+        }
+
+        //schedule new timeout
+        MauticVars.moderatedIntervals[key] = setTimeout(function() { Mautic.setModeratedInterval(key, callback, timeout, params) }, timeout);
+    },
+
+    /**
+     * Call at the end of the moderated interval callback function to let setModeratedInterval know
+     * the action is done and it's safe to execute again
+     *
+     * @param key
+     */
+    moderatedIntervalCallbackIsComplete: function (key) {
+        delete MauticVars.intervalsInProgress[key];
+    },
+
+    /**
+     * Clears a moderated interval
+     *
+     * @param key
+     */
+    clearModeratedInterval: function (key) {
+        Mautic.moderatedIntervalCallbackIsComplete(key);
+        clearTimeout(MauticVars.moderatedIntervals[key]);
     }
 };

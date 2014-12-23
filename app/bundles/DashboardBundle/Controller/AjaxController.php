@@ -26,7 +26,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function viewingVisitorsAction(Request $request)
     {
-        $dataArray  = array('success' => 0);
+        $dataArray  = array('success' => 0, 'ignore_wdt' => 1);
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
         $pageRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');

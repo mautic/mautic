@@ -6,10 +6,7 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.updateActiveVisitorCount();
 
     // Refresh page visits every 5 sec
-    Mautic.ActiveVisitorsLoop = setInterval(function() {
-        Mautic.updateActiveVisitorCount();
-    }, 5000);
-
+    Mautic.setModeratedInterval('ActiveVisitorsLoop', 'updateActiveVisitorCount', 5000);
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -147,9 +144,13 @@ Mautic.updateActiveVisitorCount = function () {
                 }
                 Mautic.ActiveVisitorsCount = response.viewingVisitors;
             }
+
+            Mautic.moderatedIntervalCallbackIsComplete('ActiveVisitorsLoop');
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
+
+            Mautic.moderatedIntervalCallbackIsComplete('ActiveVisitorsLoop');
         }
     });
 }

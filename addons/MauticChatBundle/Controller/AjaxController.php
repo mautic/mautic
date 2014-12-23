@@ -193,7 +193,7 @@ class AjaxController extends CommonAjaxController
             $recipient    = $channelModel->getEntity($chatId);
         }
 
-        if ($recipient !== null) {
+        if (!empty($recipient)) {
             return $this->getMessageContent($request, $currentUser, $recipient, $chatType, 'update');
         }
 
