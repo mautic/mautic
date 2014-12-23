@@ -100,64 +100,30 @@ class ChannelRepository extends CommonRepository
         $ids = array_keys($channels);
         unset($results);
 
-        //get a list of total chats and unread chats
         $qb = $this->_em->createQueryBuilder();
-        $qb->select('c.id, u.id, s.lastRead, s.dateRead')
-            ->from('MauticChatBundle:ChannelStat', 's')
-            ->leftJoin('s.channel', 'c')
-            ->leftJoin('s.user', 'u')
-            ->where(
-                $q->expr()->eq('IDENTITY(s.user)', ':user')
-            )
-            ->setParameter('user', $userId)
-            ->andWhere(
-                $qb->expr()->in('s.channel', ':ids')
-            )
-            ->setParameter('ids', $ids);
-        $stats   = array();
-        $results = $qb->getQuery()->getArrayResult();
-
-        foreach ($results as $r) {
-            $stats[$r['id']] = $r;
-        }
-        unset($results);
-
-        unset($qb);
-
-        $expr = $q->expr()->andX(
-            $q->expr()->in('IDENTITY(c.channel)', ':ids'),
-            $q->expr()->notIn('c.fromUser', ':userId')
-        );
-
-        $qb = $this->_em->createQueryBuilder();
-        $qb->select('c.id, ch.id as channelId')
+        $qb->select('count(c.id) as unread, ch.id')
             ->from('MauticChatBundle:Chat', 'c')
-            ->leftJoin('c.channel', 'ch')
-            ->where($expr)
+            ->join('c.channel', 'ch')
+            ->leftJoin('MauticChatBundle:ChannelStat', 's', 'WITH', 's.channel = ch.id')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->in('IDENTITY(c.channel)', ':ids'),
+                    $qb->expr()->neq('IDENTITY(c.fromUser)', ':userId'),
+                    $qb->expr()->gt('c.id', 's.lastRead')
+                )
+            )
             ->setParameter('ids', $ids)
-            ->setParameter('userId', $userId)
-            ->orderBy('c.id', 'ASC');
-        $counts  = array();
+            ->setParameter('userId', $userId);
+
         $results = $qb->getQuery()->getArrayResult();
-        foreach($results as $r) {
-            $counts[$r['channelId']][] = $r['id'];
+        $unread  = array();
+        foreach ($results as $r) {
+            $unread[$r['id']] = $r['unread'];
         }
-        unset($results);
 
         foreach ($channels as &$c) {
-            //get the total
-            $c['stats'] = array(
-                'total' => (isset($counts[$c['id']])) ? count($counts[$c['id']]) : 0
-            );
-
             //get unread
-            if (isset($stats[$c['id']])) {
-                $lastRead = $stats[$c['id']]['lastRead'];
-                $key      = array_search($lastRead, $counts[$c['id']]);
-                $c['stats']['unread'] = $c['stats']['total'] - ($key + 1);
-            } else {
-                $c['stats']['unread'] = $c['stats']['total'];
-            }
+            $c['unread'] = (isset($unread[$c['id']])) ? $unread[$c['id']] : 0;
         }
 
         return $channels;

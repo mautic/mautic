@@ -33,7 +33,9 @@ foreach ($messages as $num => $dm) {
             'direction'           => $direction,
             'messages'            => $grouped,
             'user'                => $dm['fromUser'],
-            'showDate'            => ($msgDate != $nextDate)
+            'showDate'            => ($msgDate != $nextDate),
+            'insertUnreadDivider' => (!empty($insertUnreadDivider)) ? true : false,
+            'lastReadId'          => $lastReadId
         ));
 
         //reset the group

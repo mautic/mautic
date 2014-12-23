@@ -17,10 +17,10 @@
         </h5>
     </li>
     <?php foreach ($channels as $channel): ?>
-    <?php $hasUnread = (!empty($channel['stats']['unread'])) ? ' text-warning' : ''; ?>
-    <li class="media-heading ml-md">
+    <?php $hasUnread = (!empty($channel['unread'])) ? ' text-warning' : ''; ?>
+        <li class="media-heading ml-md">
         <a href="javascript:void(0);" onclick="Mautic.startChannelChat('<?php echo $channel['id']; ?>');" class="media offcanvas-opener offcanvas-open-rtl">
-            <span class="chat-channel media-heading<?php echo $hasUnread; ?>"># <?php echo $channel['name']; ?><?php if ($hasUnread): ?><span class="badge ml-sm"><?php echo $channel['stats']['unread']; ?></span><?php endif; ?></span>
+            <span class="chat-channel media-heading<?php echo $hasUnread; ?>"># <?php echo $channel['name']; ?><?php if ($hasUnread): ?><span class="label label-primary label-as-badge pull-right"><?php echo $channel['unread']; ?></span><?php endif; ?></span>
         </a>
     </li>
     <?php endforeach; ?>

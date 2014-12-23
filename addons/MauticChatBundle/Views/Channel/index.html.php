@@ -24,7 +24,8 @@ if (!empty($inPopup)):
             'messages'            => $messages,
             'me'                  => $me,
             'channel'             => $channel,
-            'insertUnreadDivider' => (!empty($insertUnreadDivider)) ? true : false
+            'insertUnreadDivider' => (!empty($insertUnreadDivider)) ? true : false,
+            'lastReadId'          => $lastReadId
         )); ?>
         <?php endif; ?>
     <?php endif; ?>

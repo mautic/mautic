@@ -23,6 +23,7 @@ class DefaultController extends FormController
     public function indexAction()
     {
         //get a list of channels
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $channelModel */
         $channelModel = $this->factory->getModel('addon.mauticChat.channel');
         $unsorted     = $channelModel->getMyChannels();
 
@@ -31,7 +32,7 @@ class DefaultController extends FormController
 
         //let's sort by unread count then alphabetical
         foreach ($unsorted as $c) {
-            if (!empty($c['stats']['unread'])) {
+            if (!empty($c['unread'])) {
                 $withUnread[] = $c;
             } else {
                 $withoutUnread[] = $c;

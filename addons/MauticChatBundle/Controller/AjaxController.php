@@ -91,9 +91,11 @@ class AjaxController extends CommonAjaxController
             $dataArray['conversationHtml'] = $this->renderView('MauticChatBundle:Channel:index.html.php', array(
                 'messages' => $messages,
                 'me'       => $currentUser,
-                'channel'  => $channel
+                'channel'  => $channel,
+                'insertUnreadDivider' => true,
+                'lastReadId' => $lastRead['lastRead']
             ));
-            $dataArray['channelId']   = $channel->getId();
+            $dataArray['withId']   = $channel->getId();
             $dataArray['channelName'] = $this->renderview('MauticChatBundle:Channel:header.html.php', array(
                 'channel' => $channel
             ));
@@ -104,7 +106,6 @@ class AjaxController extends CommonAjaxController
                 $lastMsg = end($messages);
                 $dataArray['latestId'] = $lastMsg['id'];
             }
-            $dataArray['divider'] = $this->renderView('MauticChatBundle:Default:newdivider.html.php');
             $dataArray['success'] = 1;
             $dataArray['mauticContent'] = 'chatChannel';
         }
