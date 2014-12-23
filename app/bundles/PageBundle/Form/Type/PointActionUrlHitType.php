@@ -48,6 +48,19 @@ class PointActionUrlHitType extends AbstractType
                 'tooltip' => 'mautic.page.point.action.form.first.time.only.descr'
             )
         ));
+
+        $builder->add('accumulative_time', 'time', array(
+            'label'         => 'mautic.page.point.action.form.accumulative.time',
+            'input'         => 'timestamp',
+            'widget'        => 'choice',
+            'required'      => false,
+            'with_seconds'  => true,
+            'label_attr'    => array('class' => 'control-label'),
+            'attr'          => array(
+                'class'         => 'form-control',
+                'tooltip'       => 'mautic.page.point.action.form.accumulative.time.descr'
+            )
+        ));
     }
 
     /**

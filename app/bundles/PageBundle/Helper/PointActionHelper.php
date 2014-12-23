@@ -58,24 +58,39 @@ class PointActionHelper
      */
     public static function validateUrlHit($factory, $eventDetails, $action)
     {
-        $url = $eventDetails->getUrl();
+        $changePoints   = array();
+        $url            = $eventDetails->getUrl();
+        $limitToUrl     = html_entity_decode(trim($action['properties']['page_url']));
 
-        $limitToUrl = html_entity_decode(trim($action['properties']['page_url']));
-
-        if ($action['properties']['first_time'] === true) {
-            $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-            $lead = $eventDetails->getLead();
-            $hits = $hitRepository->getLeadHits($lead->getId(), array('url' => $url));
-            if (count($hits)) {
-                return false;
-            }
-        }
-
-        if ($limitToUrl && fnmatch($limitToUrl, $url)) {
+        if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
             //no points change
             return false;
         }
 
-        return true;
+        $hitRepository  = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $lead           = $eventDetails->getLead();
+
+        if ($action['properties']['first_time'] === true) {
+            $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            if (isset($hitStats['count']) && $hitStats['count']) {
+                $changePoints[] = false;
+            } else {
+                $changePoints[] = true;
+            }
+        }
+
+        if ($action['properties']['accumulative_time']) {
+            if (!isset($hitStats)){
+                $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            }
+            if (isset($hitStats['sum']) && $hitStats['sum'] >=$action['properties']['accumulative_time'] ) {
+                $changePoints[] = true;
+            } else {
+                $changePoints[] = false;
+            }
+        }
+
+        // return true only if all configured options are true
+        return !in_array(false, $changePoints);
     }
 }
