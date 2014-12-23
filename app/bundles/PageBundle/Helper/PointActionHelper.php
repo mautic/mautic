@@ -48,4 +48,25 @@ class PointActionHelper
 
         return true;
     }
+
+    /**
+     * @param MauticFactory $factory
+     * @param               $eventDetails
+     * @param               $action
+     *
+     * @return bool
+     */
+    public static function validateUrlHit($factory, $eventDetails, $action)
+    {
+        $url = $eventDetails->getUrl();
+
+        $limitToUrl = html_entity_decode(trim($action['properties']['page_url']));
+
+        if ($limitToUrl && $url == $limitToUrl) {
+            //no points change
+            return false;
+        }
+
+        return true;
+    }
 }
