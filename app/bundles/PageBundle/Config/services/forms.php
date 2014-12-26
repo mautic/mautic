@@ -36,6 +36,12 @@ $container->setDefinition('mautic.form.type.pointaction_pointhit', new Definitio
         'alias' => 'pointaction_pagehit',
     ));
 
+$container->setDefinition('mautic.form.type.pointaction_urlhit', new Definition(
+    'Mautic\PageBundle\Form\Type\PointActionUrlHitType'))
+    ->addTag('form.type', array(
+        'alias' => 'pointaction_urlhit',
+    ));
+
 $container->setDefinition('mautic.form.type.pagehit.campaign_trigger', new Definition(
     'Mautic\PageBundle\Form\Type\CampaignEventPageHitType'))
     ->addTag('form.type', array(

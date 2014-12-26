@@ -514,7 +514,7 @@ class PageModel extends FormModel
      */
     public function getDwellTimeStats (Page $page)
     {
-        return $this->em->getRepository('MauticPageBundle:Hit')->getDwellTimes($page->getId());
+        return $this->em->getRepository('MauticPageBundle:Hit')->getDwellTimes(array('pageIds' => $page->getId()));
     }
 
     /**

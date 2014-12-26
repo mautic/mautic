@@ -48,4 +48,49 @@ class PointActionHelper
 
         return true;
     }
+
+    /**
+     * @param MauticFactory $factory
+     * @param               $eventDetails
+     * @param               $action
+     *
+     * @return bool
+     */
+    public static function validateUrlHit($factory, $eventDetails, $action)
+    {
+        $changePoints   = array();
+        $url            = $eventDetails->getUrl();
+        $limitToUrl     = html_entity_decode(trim($action['properties']['page_url']));
+
+        if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
+            //no points change
+            return false;
+        }
+
+        $hitRepository  = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $lead           = $eventDetails->getLead();
+
+        if ($action['properties']['first_time'] === true) {
+            $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            if (isset($hitStats['count']) && $hitStats['count']) {
+                $changePoints[] = false;
+            } else {
+                $changePoints[] = true;
+            }
+        }
+
+        if ($action['properties']['accumulative_time']) {
+            if (!isset($hitStats)){
+                $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            }
+            if (isset($hitStats['sum']) && $hitStats['sum'] >=$action['properties']['accumulative_time'] ) {
+                $changePoints[] = true;
+            } else {
+                $changePoints[] = false;
+            }
+        }
+
+        // return true only if all configured options are true
+        return !in_array(false, $changePoints);
+    }
 }

@@ -179,7 +179,7 @@ class ReportSubscriber extends CommonSubscriber
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.time.on.site') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);
-            $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
             $graphData = array();
             $graphData['data'] = $hitStats['timesOnSite'];
             $graphData['name'] = 'mautic.page.graph.pie.time.on.site';
@@ -191,7 +191,7 @@ class ReportSubscriber extends CommonSubscriber
             if (!isset($hitstats)) {
                 $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
                 $event->buildWhere($queryBuilder);
-                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
             }
             $graphData = array();
             $graphData['data'] = $hitStats['newVsReturning'];
@@ -204,7 +204,7 @@ class ReportSubscriber extends CommonSubscriber
             if (!isset($hitstats)) {
                 $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
                 $event->buildWhere($queryBuilder);
-                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
             }
             $graphData = array();
             $graphData['data'] = $hitStats['languages'];

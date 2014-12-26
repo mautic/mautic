@@ -46,6 +46,16 @@ class PointSubscriber extends CommonSubscriber
         );
 
         $event->addAction('page.hit', $action);
+
+        $action = array(
+            'group'       => 'mautic.page.point.action',
+            'label'       => 'mautic.page.point.action.urlhit',
+            'description' => 'mautic.page.point.action.urlhit_descr',
+            'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'validateUrlHit'),
+            'formType'    => 'pointaction_urlhit'
+        );
+
+        $event->addAction('url.hit', $action);
     }
 
     /**
@@ -55,6 +65,12 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onPageHit(Events\PageHitEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
+        if ($event->getPage()) {
+            // Mautic Landing Page was hit
+            $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
+        } else {
+            // Mautic Tracking Pixel was hit
+            $this->factory->getModel('point')->triggerAction('url.hit', $event->getHit());
+        }
     }
 }

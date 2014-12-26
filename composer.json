@@ -64,6 +64,7 @@
     "require-dev": {
         "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
+        "symfony/var-dumper": "3.0.*@dev",
         "liip/functional-test-bundle": "dev-master",
         "nelmio/api-doc-bundle": "2.7.*@dev",
         "sensio/generator-bundle": "~2.3",

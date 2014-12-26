@@ -74,6 +74,10 @@ class HitRepository extends CommonRepository
                 ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
         }
 
+        if (isset($options['url']) && $options['url']) {
+            $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
+        }
+
         return $query->getQuery()->getArrayResult();
     }
 
@@ -324,13 +328,12 @@ class HitRepository extends CommonRepository
     /**
      * Get the number of bounces
      *
-     * @param array|string|null                 $pageIds
-     * @param \DateTime                         $fromDate
+     * @param array                             $options
      * @param \Doctrine\DBAL\Query\QueryBuilder $q
      *
      * @return array
      */
-    public function getDwellTimes($pageIds = null, \DateTime $fromDate = null, $q = null)
+    public function getDwellTimes(array $options, $q = null)
     {
         if (!$q) {
             $q = $this->_em->getConnection()->createQueryBuilder();
@@ -340,20 +343,34 @@ class HitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id');
 
-        if ($pageIds) {
-            $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
-            $q->where(
+        if (isset($options['pageIds']) && $options['pageIds']) {
+            $inIds = (!is_array($options['pageIds'])) ? array($options['pageIds']) : $options['pageIds'];
+            $q->andWhere(
                 $q->expr()->andX(
                     $q->expr()->in('h.page_id', $inIds)
                 )
             );
         }
 
-        if ($fromDate !== null) {
+        if (isset($options['urls']) && $options['urls']) {
+            $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
+            foreach ($inUrls as $k => $u) {
+                $q->andWhere($q->expr()->like('h.url', ':url_'.$k))
+                    ->setParameter('url_'.$k, $u);
+            }
+        }
+
+        if (isset($options['fromDate']) && $options['fromDate'] !== null) {
             //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
+            $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
+            );
+        }
+
+        if (isset($options['leadId']) && $options['leadId']) {
+            $q->andWhere(
+                $q->expr()->eq('h.lead_id', (int) $options['leadId'])
             );
         }
 
@@ -367,11 +384,11 @@ class HitRepository extends CommonRepository
         $languages = array();
         foreach ($results as $r) {
 
-            $dateHit  = new \DateTime($r['date_hit']);
-            $dateLeft = new \DateTime($r['date_left']);
-            if ($pageIds) {
+            $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
+            $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
+            if (isset($options['pageIds']) && $options['pageIds']) {
                 $titles[$r['page_id']] = $r['title'];
-                $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+                $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
                 if (!isset($trackingIds[$r['page_id']])) {
                     $trackingIds[$r['page_id']] = array();
                 }
@@ -389,7 +406,7 @@ class HitRepository extends CommonRepository
                     $languages[$r['page_id']][$r['page_language']] = 1;
                 }
             } else {
-                $times[] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+                $times[] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
                 if (array_key_exists($r['tracking_id'], $trackingIds)) {
                     $trackingIds[$r['tracking_id']]++;
                 } else {
@@ -405,7 +422,7 @@ class HitRepository extends CommonRepository
 
         //now loop to create stats
         $stats = array();
-        if ($pageIds) {
+        if (isset($options['pageIds']) && $options['pageIds']) {
             foreach ($times as $pid => $time) {
                 $stats[$pid] = $this->countStats($time);
                 $stats[$pid]['returning'] = $this->countReturning($trackingIds[$pid]);
@@ -422,7 +439,7 @@ class HitRepository extends CommonRepository
             $stats['languages'] = $this->getLaguageGraphData($languages);
         }
 
-        return (!is_array($pageIds) && array_key_exists($pageIds, $stats)) ? $stats[$pageIds] : $stats;
+        return (isset($options['pageIds']) && !is_array($options['pageIds']) && array_key_exists($options['pageIds'], $stats)) ? $stats[$options['pageIds']] : $stats;
     }
 
     /**
