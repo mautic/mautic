@@ -85,7 +85,8 @@ class DefaultController extends FormController
                     'addon:mauticChat:channels:editother',
                     'addon:mauticChat:channels:archiveother'
                 ), 'RETURN_ARRAY'),
-                'ignoreModal' => $this->request->get('ignoreModal', false)
+                'ignoreModal' => $this->request->get('ignoreModal', false),
+                'inPopup'     => $this->request->get('inPopup', false)
             ),
             'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
             'passthroughVars' => array(

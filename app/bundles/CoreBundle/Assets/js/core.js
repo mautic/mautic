@@ -72,6 +72,20 @@ var Mautic = {
     },
 
     /**
+     * Starts the ajax loading indicator for the right canvas
+     */
+    startCanvasLoadingBar: function() {
+        mQuery('.canvas-loading-bar').addClass('active');
+    },
+
+    /**
+     * Stops the ajax loading indicator for the right canvas
+     */
+    stopCanvasLoadingBar: function() {
+        mQuery('.canvas-loading-bar').removeClass('active');
+    },
+
+    /**
      * Initiate various functions on page load, manual or ajax
      */
     onPageLoad: function (container, response, inModal) {
@@ -1538,7 +1552,10 @@ var Mautic = {
                 alert(error);
             }
         }
+
         Mautic.stopPageLoadingBar();
+        Mautic.stopCanvasLoadingBar();
+        Mautic.stopIconSpinPostEvent();
     },
 
     /**

@@ -18,47 +18,52 @@ if ($canvas == 'Main') {
     }
 }
 ?>
-<?php if (!empty($canvasContent['header'])): ?>
+
 <!-- start: sidebar header -->
-    <div class="sidebar-header box-layout"  id="OffCanvas<?php echo $canvas; ?>Header">
-        <?php if ($canvas == 'Left'): ?>
-        <div class="col-xs-11 pt-lg text-center">
-            <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
-        </div>
-        <div class="col-xs-1 pt-lg text-right">
-            <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-right fs-16"></span></a>
-        </div>
-
-        <?php elseif ($canvas == 'Right'): ?>
-        <div class="col-xs-1 pt-lg text-left">
-            <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
-        </div>
-        <div class="col-xs-11 pt-lg text-center">
-            <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
-        </div>
-
-        <?php elseif ($canvas == 'Main'): ?>
-            <?php if ($hasLeft): ?>
-                <?php $icon = ($canvasContent['header'] != 'mautic.core.menu.settings') ? 'fa-gears' : 'fa-arrow-left'; ?>
-                <div class="col-xs-1 pt-lg text-left">
-                    <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
-                </div>
-            <?php endif; ?>
-
-            <div class="<?php echo $class; ?> pt-lg text-center">
-                <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
-            </div>
-
-            <?php if ($hasRight): ?>
-                <div class="col-xs-1 pt-lg text-right">
-                    <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-rtl"><span class="fa fa-arrow-right fs-16"></span></a>
-                </div>
-            <?php endif; ?>
-
-        <?php endif; ?>
+<div class="sidebar-header box-layout"  id="OffCanvas<?php echo $canvas; ?>Header">
+    <?php if ($canvas == 'Left'): ?>
+    <div class="col-xs-11 pt-lg text-center">
+        <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
     </div>
+    <div class="col-xs-1 pt-lg text-right">
+        <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-right fs-16"></span></a>
+    </div>
+
+    <?php elseif ($canvas == 'Right'): ?>
+    <div class="col-xs-1 pt-lg text-left">
+        <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
+    </div>
+    <div class="col-xs-11 pt-lg text-center">
+        <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
+    </div>
+
+    <?php elseif ($canvas == 'Main'): ?>
+        <?php if ($hasLeft): ?>
+            <?php $icon = ($canvasContent['header'] != 'mautic.core.menu.settings') ? 'fa-gears' : 'fa-arrow-left'; ?>
+            <div class="col-xs-1 pt-lg text-left">
+                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
+            </div>
+        <?php endif; ?>
+
+        <div class="<?php echo $class; ?> pt-lg text-center">
+            <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
+        </div>
+
+        <?php if ($hasRight): ?>
+            <div class="col-xs-1 pt-lg text-right">
+                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-rtl"><span class="fa fa-arrow-right fs-16"></span></a>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+    <!-- start: loading bar -->
+    <div class="canvas-loading-bar">
+        <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+    </div>
+    <!--/ end: loading bar -->
+</div>
 <!--/ end: sidebar header -->
-<?php endif; ?>
 
 <?php if (!empty($canvasContent['footer'])): ?>
 <!-- start: sidebar footer -->

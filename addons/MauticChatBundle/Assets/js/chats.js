@@ -36,6 +36,9 @@ Mautic.startUserChat = function (userId, fromDate) {
     if (typeof fromDate == 'undefined') {
         fromDate = '';
     }
+
+    Mautic.startCanvasLoadingBar();
+
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:startUserChat",
@@ -54,6 +57,7 @@ Mautic.startUserChat = function (userId, fromDate) {
                 response.target = ".offcanvas-right";
                 Mautic.processPageContent(response);
             }
+            Mautic.stopCanvasLoadingBar();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -65,6 +69,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
     if (typeof fromDate == 'undefined') {
         fromDate = '';
     }
+    Mautic.startCanvasLoadingBar();
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:startChannelChat",
@@ -81,6 +86,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
                 //activate links, etc
                 response.target = "#OffCanvasRightContent";
                 Mautic.processPageContent(response);
+                Mautic.stopCanvasLoadingBar();
             }
         },
         error: function (request, textStatus, errorThrown) {
@@ -121,11 +127,15 @@ Mautic.getLastChatGroup = function() {
 
 Mautic.markMessagesRead = function(itemId, chatType) {
     var lastId  = mQuery('#ChatLastMessageId').val();
+    Mautic.startCanvasLoadingBar();
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:markRead",
         data: 'chatId=' + itemId + '&chatType=' + chatType + '&lastId=' + lastId,
-        dataType: "json"
+        dataType: "json",
+        done: function() {
+            Mautic.stopCanvasLoadingBar();
+        }
     });
 };
 
@@ -167,6 +177,8 @@ Mautic.sendChatMessage = function(toId, chatType) {
     var groupId = Mautic.getLastChatGroup();
 
     if (msgText) {
+        Mautic.startCanvasLoadingBar();
+
         var dataObj = {
             chatId: toId,
             msg: msgText,
@@ -181,6 +193,7 @@ Mautic.sendChatMessage = function(toId, chatType) {
             dataType: "json",
             success: function (response) {
                 Mautic.updateChatConversation(response, chatType);
+                Mautic.stopCanvasLoadingBar();
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -245,12 +258,13 @@ Mautic.updateChatConversation = function(response, chatType) {
 };
 
 Mautic.addChatChannel = function() {
+    Mautic.startCanvasLoadingBar();
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:addChannel",
         dataType: "json",
         success: function (response) {
-
+            Mautic.stopCanvasLoadingBar();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);

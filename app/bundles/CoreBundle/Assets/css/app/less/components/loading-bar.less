@@ -5,7 +5,7 @@
 
 .lh-keyframes(~'before-anim, 0% { width: 0%; left: 0%; } 0% { width: 60%; } 19.99% { width: 40%; left: 100%; } 20% { width: 0%; left: 0%; } 25% { width: 10%; left: 10%; } 30% { width: 40%; left: 30%; } 40% { width: 60%; left: 100%; } 40.01% { width: 0%; left: 0%; } 50% { width: 10%; left: 40%; } 60% { width: 30%; left: 100%; } 60.01% { width: 0%; left: 0%; } 70% { width: 10%; left: 40%; } 80% { width: 5%; left: 100%; } 80.01% { width: 0%; left: 0%; } 90% { width: 70%; left: 10%; } 100% { width: 10%; left: 100%; }');
 
-.loading-bar {
+.loading-bar, .canvas-loading-bar {
   //display: none;
   opacity: 0;
   position: absolute;
@@ -17,7 +17,7 @@
   background-color: lighten(@brand-primary, 30%);
   overflow: hidden;
   .lh-transition(opacity 0.3s ease);
-  
+
   // the bar itself
   &:after,
   &:before {
