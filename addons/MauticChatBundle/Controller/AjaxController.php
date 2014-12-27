@@ -244,7 +244,7 @@ class AjaxController extends CommonAjaxController
         $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true));
 
         $dataArray = array(
-            'newContent'    => $response->getContent(),
+            'canvasContent' => $response->getContent(),
             'ignore_wdt'    => 1
         );
 

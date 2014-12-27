@@ -13,15 +13,17 @@ Mautic.updateChatList = function (killTimer) {
             url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
             dataType: "json",
             success: function (response) {
-                mQuery('#OffCanvasMainContent').html(response.newContent);
+                if (response.canvasContent) {
+                    mQuery('#OffCanvasMainContent').html(response.canvasContent);
 
-                response.target = '#OffCanvasMainContent';
-                Mautic.processPageContent(response);
+                    response.target = '#OffCanvasMainContent';
+                    Mautic.processPageContent(response);
 
-                if (killTimer) {
-                    Mautic.clearModeratedInterval('chatListUpdaterInterval');
-                } else {
-                    Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+                    if (killTimer) {
+                        Mautic.clearModeratedInterval('chatListUpdaterInterval');
+                    } else {
+                        Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+                    }
                 }
             },
             error: function (request, textStatus, errorThrown) {
@@ -86,8 +88,8 @@ Mautic.startChannelChat = function (channelId, fromDate) {
                 //activate links, etc
                 response.target = "#OffCanvasRightContent";
                 Mautic.processPageContent(response);
-                Mautic.stopCanvasLoadingBar();
             }
+            Mautic.stopCanvasLoadingBar();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
