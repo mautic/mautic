@@ -11,68 +11,82 @@ $parentVariant = $page->getVariantParent();
 $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $page->getTitle();
 $view['slots']->set('pageTitle', $title);
 ?>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('top1'); ?></div>
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('top2'); ?></div>
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('top3'); ?></div>
-    </div>
+<!-- Page Content -->
+    <div class="container">
 
-    <div class="row">
-        <div class="col-xs-12 col-sm-2">
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('left1'); ?>
-                </div>
-            </div>
+        <!-- Jumbotron Header -->
+        <header class="jumbotron hero-spacer">
+            <h1><?php $view['slots']->output('page_title'); ?></h1>
+            <?php $view['slots']->output('header'); ?>
+        </header>
 
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('left2'); ?>
-                </div>
-            </div>
+        <hr>
 
-
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('left3'); ?>
-                </div>
+        <!-- Title -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h3><?php $view['slots']->output('section_title'); ?></h3>
             </div>
         </div>
+        <!-- /.row -->
 
-        <div class="col-xs-12 col-sm-8">
-            <?php $view['slots']->output('main'); ?>
+        <!-- Page Features -->
+        <div class="row text-center">
+
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <?php $view['slots']->output('graphic_1'); ?>
+                    <div class="caption">
+                        <h3><?php $view['slots']->output('graphic_1_title'); ?></h3>
+                        <?php $view['slots']->output('graphic_1_body'); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <?php $view['slots']->output('graphic_2'); ?>
+                    <div class="caption">
+                        <h3><?php $view['slots']->output('graphic_2_title'); ?></h3>
+                        <?php $view['slots']->output('graphic_2_body'); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <?php $view['slots']->output('graphic_3'); ?>
+                    <div class="caption">
+                        <h3><?php $view['slots']->output('graphic_3_title'); ?></h3>
+                        <?php $view['slots']->output('graphic_3_body'); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <?php $view['slots']->output('graphic_4'); ?>
+                    <div class="caption">
+                        <h3><?php $view['slots']->output('graphic_4_title'); ?></h3>
+                        <?php $view['slots']->output('graphic_4_body'); ?>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        <!-- /.row -->
 
-        <div class="col-xs-12 col-sm-2">
+        <hr>
+
+        <!-- Footer -->
+        <footer>
             <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('right1'); ?>
+                <div class="col-lg-12">
+                    <?php $view['slots']->output('footer'); ?>
                 </div>
             </div>
+        </footer>
 
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('right2'); ?>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php $view['slots']->output('right3'); ?>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <div class="row">
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom1'); ?></div>
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom2'); ?></div>
-        <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom3'); ?></div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-12"><?php $view['slots']->output('footer'); ?></div>
-    </div>
-</div>
+    <!-- /.container -->
 <?php $view['slots']->output('builder'); ?>
