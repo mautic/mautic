@@ -83,7 +83,18 @@ class PointActionHelper
             if (!isset($hitStats)){
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
-            if (isset($hitStats['sum']) && $hitStats['sum'] >=$action['properties']['accumulative_time'] ) {
+            if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
+                $changePoints[] = true;
+            } else {
+                $changePoints[] = false;
+            }
+        }
+
+        if ($action['properties']['page_hits']) {
+            if (!isset($hitStats)){
+                $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            }
+            if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints[] = true;
             } else {
                 $changePoints[] = false;

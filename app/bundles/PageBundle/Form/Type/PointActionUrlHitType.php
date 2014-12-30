@@ -61,6 +61,16 @@ class PointActionUrlHitType extends AbstractType
                 'tooltip'       => 'mautic.page.point.action.form.accumulative.time.descr'
             )
         ));
+
+        $builder->add('page_hits', 'integer', array(
+            'label'       => 'mautic.page.point.action.form.page.hits',
+            'label_attr'  => array('class' => 'control-label'),
+            'required'    => false,
+            'attr'        => array(
+                'class'         => 'form-control',
+                'tooltip'       => 'mautic.page.point.action.form.page.hits.descr'
+            )
+        ));
     }
 
     /**
