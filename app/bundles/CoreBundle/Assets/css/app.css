@@ -2226,6 +2226,9 @@ label {
 .radio-inline[class^="custom"] label {
   padding-left: 4px;
 }
+.time-input select {
+  margin: 0 3px 0 3px;
+}
 .input-group .input-group-btn + .form-control {
   margin-left: -1px;
 }

@@ -67,7 +67,7 @@ class PointActionUrlHitType extends AbstractType
             'with_seconds'  => true,
             'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
-                'class'         => 'form-control',
+                'class'         => 'time-input',
                 'tooltip'       => 'mautic.page.point.action.form.accumulative.time.descr'
             )
         ));
@@ -80,7 +80,7 @@ class PointActionUrlHitType extends AbstractType
             'with_seconds'  => true,
             'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
-                'class'         => 'form-control',
+                'class'         => 'time-input',
                 'tooltip'       => 'mautic.page.point.action.form.returns.within.descr'
             )
         ));
@@ -93,7 +93,7 @@ class PointActionUrlHitType extends AbstractType
             'with_seconds'  => true,
             'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
-                'class'         => 'form-control',
+                'class'         => 'time-input',
                 'tooltip'       => 'mautic.page.point.action.form.returns.after.descr'
             )
         ));
