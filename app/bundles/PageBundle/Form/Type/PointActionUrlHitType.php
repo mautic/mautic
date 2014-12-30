@@ -49,6 +49,16 @@ class PointActionUrlHitType extends AbstractType
             )
         ));
 
+        $builder->add('page_hits', 'integer', array(
+            'label'       => 'mautic.page.point.action.form.page.hits',
+            'label_attr'  => array('class' => 'control-label'),
+            'required'    => false,
+            'attr'        => array(
+                'class'         => 'form-control',
+                'tooltip'       => 'mautic.page.point.action.form.page.hits.descr'
+            )
+        ));
+
         $builder->add('accumulative_time', 'time', array(
             'label'         => 'mautic.page.point.action.form.accumulative.time',
             'input'         => 'timestamp',
@@ -62,13 +72,29 @@ class PointActionUrlHitType extends AbstractType
             )
         ));
 
-        $builder->add('page_hits', 'integer', array(
-            'label'       => 'mautic.page.point.action.form.page.hits',
-            'label_attr'  => array('class' => 'control-label'),
-            'required'    => false,
-            'attr'        => array(
+        $builder->add('returns_within', 'time', array(
+            'label'         => 'mautic.page.point.action.form.returns.within',
+            'input'         => 'timestamp',
+            'widget'        => 'choice',
+            'required'      => false,
+            'with_seconds'  => true,
+            'label_attr'    => array('class' => 'control-label'),
+            'attr'          => array(
                 'class'         => 'form-control',
-                'tooltip'       => 'mautic.page.point.action.form.page.hits.descr'
+                'tooltip'       => 'mautic.page.point.action.form.returns.within.descr'
+            )
+        ));
+
+        $builder->add('returns_after', 'time', array(
+            'label'         => 'mautic.page.point.action.form.returns.after',
+            'input'         => 'timestamp',
+            'widget'        => 'choice',
+            'required'      => false,
+            'with_seconds'  => true,
+            'label_attr'    => array('class' => 'control-label'),
+            'attr'          => array(
+                'class'         => 'form-control',
+                'tooltip'       => 'mautic.page.point.action.form.returns.after.descr'
             )
         ));
     }
