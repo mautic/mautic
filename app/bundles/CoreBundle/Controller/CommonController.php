@@ -352,7 +352,7 @@ class CommonController extends Controller implements MauticController
 
         if (!empty($name)) {
             if ($this->request->query->has('orderby')) {
-                $orderBy = InputHelper::clean($this->request->query->get('orderby'));
+                $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
                 $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
                 $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
                 $session->set("mautic.$name.orderby", $orderBy);
@@ -365,11 +365,13 @@ class CommonController extends Controller implements MauticController
             }
 
             if ($this->request->query->has('filterby')) {
-                $filter = InputHelper::clean($this->request->query->get("filterby"));
-                $value  = InputHelper::clean($this->request->query->get("value"));
-                $filters              = $this->get("session")->get("mautic.$name.filters", '');
-                if (empty($value) && isset($filters[$filter])) {
-                    unset($filters[$filter]);
+                $filter = InputHelper::clean($this->request->query->get("filterby"), true);
+                $value  = InputHelper::clean($this->request->query->get("value"), true);
+                $filters = $this->get("session")->get("mautic.$name.filters", '');
+                if (empty($value)) {
+                    if (isset($filters[$filter])) {
+                        unset($filters[$filter]);
+                    }
                 } else {
                     $filters[$filter] = array(
                         'column' => $filter,
@@ -378,7 +380,7 @@ class CommonController extends Controller implements MauticController
                         'strict' => false
                     );
                 }
-                $this->get("session")->set("mautic.$name.filters", $filters);
+                $session->set("mautic.$name.filters", $filters);
             }
         }
     }

@@ -21,25 +21,26 @@ class InputHelper
      *
      * @param mixed $value
      * @param mixed $mask
+     * @param bool  $urldecode
      *
      * @return mixed
      */
-    public static function _($value, $mask = 'clean')
+    public static function _($value, $mask = 'clean', $urldecode = false)
     {
         if (is_array($value) && is_array($mask)) {
             foreach ($value as $k => &$v) {
                 if (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
-                    $v = self::$mask[$k]($v);
+                    $v = self::$mask[$k]($v, $urldecode);
                 } else {
-                    $v = self::clean($v);
+                    $v = self::clean($v, $urldecode);
                 }
             }
 
             return $value;
         } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
-            return self::$mask($value);
+            return self::$mask($value, $urldecode);
         } else {
-            return self::clean($value);
+            return self::clean($value, $urldecode);
         }
     }
 
@@ -50,14 +51,16 @@ class InputHelper
      *
      * @return mixed
      */
-    public static function clean($value)
+    public static function clean($value, $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
-                $v = self::clean($v);
+                $v = self::clean($v, $urldecode);
             }
 
             return $value;
+        } elseif ($urldecode) {
+            $value = urldecode($value);
         }
 
         return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
@@ -70,8 +73,12 @@ class InputHelper
      *
      * @return mixed
      */
-    public static function string($value)
+    public static function string($value, $urldecode = false)
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
     }
 
@@ -79,12 +86,17 @@ class InputHelper
      * Strips non-alphanumeric characters
      *
      * @param string $value
+     * @param bool   $urldecode
      * @param bool   $convertSpacesToHyphen
      *
      * @return string
      */
-    public static function alphanum($value, $convertSpacesToHyphen = false)
+    public static function alphanum($value, $urldecode = false, $convertSpacesToHyphen = false)
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         if ($convertSpacesToHyphen) {
             $value = str_replace(' ', '-', $value);
 
@@ -101,8 +113,12 @@ class InputHelper
      *
      * @return mixed
      */
-    public static function raw($value)
+    public static function raw($value, $urldecode = false)
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         return $value;
     }
 
@@ -152,8 +168,12 @@ class InputHelper
      *
      * @return mixed
      */
-    public static function url($value, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
+    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         if (empty($allowedProtocols)) {
             $allowedProtocols = array('https', 'http', 'ftp');
         }
@@ -210,8 +230,12 @@ class InputHelper
      *
      * @return mixed
      */
-    public static function email($value)
+    public static function email($value, $urldecode = false)
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         $value = substr($value, 0, 254);
 
         return filter_var($value, FILTER_SANITIZE_EMAIL);
@@ -224,9 +248,9 @@ class InputHelper
      *
      * @return array|string
      */
-    public static function cleanArray($value)
+    public static function cleanArray($value, $urldecode = false)
     {
-        $value = self::clean($value);
+        $value = self::clean($value, $urldecode);
 
         if (!is_array($value)) {
             $value = array($value);
@@ -242,8 +266,12 @@ class InputHelper
      *
      * @return string
      */
-    public static function html($value)
+    public static function html($value, $urldecode = false)
     {
+        if ($urldecode) {
+            $value = urldecode($value);
+        }
+
         require_once __DIR__ . '/../Libraries/htmLawed/htmLawed.php';
         $config = array('tidy' => 4, 'safe' => 1);
 

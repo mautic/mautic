@@ -441,7 +441,7 @@ var Mautic = {
 
             mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
-                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(this).attr('id') != 'MauticCommonModal') {
+                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
                     mQuery(target).remove();
                 } else {
                     Mautic.resetModal(target, true);
@@ -1073,8 +1073,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    reorderTableData: function (name, orderby, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
+    reorderTableData: function (name, orderby, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + encodeURIComponent(orderby);
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1086,8 +1090,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    filterTableData: function (name, filterby, filterValue, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + filterby + "&value=" + filterValue
+    filterTableData: function (name, filterby, filterValue, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1098,8 +1106,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    limitTableData: function (name, limit, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
+    limitTableData: function (name, limit, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
         Mautic.loadContent(route, '', 'POST', target);
     },
 

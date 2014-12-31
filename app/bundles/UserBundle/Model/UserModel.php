@@ -25,7 +25,7 @@ class UserModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getRepository()
+    public function getRepository ()
     {
         return $this->em->getRepository('MauticUserBundle:User');
     }
@@ -33,7 +33,7 @@ class UserModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase ()
     {
         return 'user:users';
     }
@@ -43,7 +43,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity ($entity, $unlock = true)
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
@@ -61,7 +61,8 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword) {
+    public function checkNewPassword (User $entity, PasswordEncoderInterface $encoder, $submittedPassword)
+    {
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
             return $encoder->encodePassword($submittedPassword, $entity->getSalt());
@@ -76,7 +77,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm ($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
@@ -84,13 +85,14 @@ class UserModel extends FormModel
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
         return $formFactory->create('user', $entity, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEntity($id = null)
+    public function getEntity ($id = null)
     {
         if ($id === null) {
             return new User();
@@ -113,7 +115,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
@@ -142,6 +144,7 @@ class UserModel extends FormModel
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -157,7 +160,7 @@ class UserModel extends FormModel
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults ($type, $filter = '', $limit = 10)
     {
         $results = array();
         switch ($type) {
@@ -184,7 +187,7 @@ class UserModel extends FormModel
      *
      * @return mixed
      */
-    public function getActiveUsers($search = '', $limit = 10, $start = 0)
+    public function getActiveUsers ($search = '', $limit = 10, $start = 0)
     {
         return $this->getRepository()->getActiveUsers($this->factory->getUser()->getId(), $search, $limit, $start);
     }
@@ -194,7 +197,7 @@ class UserModel extends FormModel
      *
      * @param User $user
      */
-    public function resetPassword(User $user, PasswordEncoderInterface $encoder)
+    public function resetPassword (User $user, PasswordEncoderInterface $encoder)
     {
         $newPassword     = hash('sha1', uniqid(mt_rand()));
         $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
@@ -213,5 +216,43 @@ class UserModel extends FormModel
 
         //queue the message
         $mailer->send();
+    }
+
+    /**
+     * Set user preference
+     *
+     * @param      $key
+     * @param null $value
+     * @param User $user
+     */
+    public function setPreference ($key, $value = null, User $user = null)
+    {
+        if ($user == null) {
+            $user = $this->factory->getUser();
+        }
+
+        $preferences       = $user->getPreferences();
+        $preferences[$key] = $value;
+
+        $this->getRepository()->saveEntity($user);
+    }
+
+    /**
+     * Get user preference
+     *
+     * @param      $key
+     * @param null $default
+     * @param User $user
+     *
+     * @return null
+     */
+    public function getPreference ($key, $default = null, User $user = null)
+    {
+        if ($user == null) {
+            $user = $this->factory->getUser();
+        }
+        $preferences = $user->getPreferences();
+
+        return (isset($preferences[$key])) ? $preferences[$key] : $default;
     }
 }
