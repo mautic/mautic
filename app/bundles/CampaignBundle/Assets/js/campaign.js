@@ -365,14 +365,13 @@ Mautic.launchCampaignEditor = function() {
             },
             stop: function (event, ui) {
                 var endingPosition = ui.position;
-
-                if (this.startingPosition[1] !== endingPosition[1] || this.startingPosition[0] !== endingPosition[0]) {
+                if (this.startingPosition.left !== endingPosition.left || this.startingPosition.top !== endingPosition.top) {
 
                     //update coordinates
-                    mQuery('#droppedX').val(endingPosition[0]);
-                    mQuery('#droppedY').val(endingPosition[1]);
+                    mQuery('#droppedX').val(endingPosition.top);
+                    mQuery('#droppedY').val(endingPosition.left);
                     var campaignId = mQuery('#campaignId').val();
-                    var query = "action=campaign:updateCoordinates&campaignId=" + campaignId + "&droppedX=" + endingPosition[0] + "&droppedY=" + endingPosition[1] + "&eventId=" + mQuery(ui.draggable).attr('id');
+                    var query = "action=campaign:updateCoordinates&campaignId=" + campaignId + "&droppedX=" + endingPosition.top + "&droppedY=" + endingPosition.left + "&eventId=" + mQuery(ui.draggable).attr('id');
                     mQuery.ajax({
                         url: mauticAjaxUrl,
                         type: "POST",
