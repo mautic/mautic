@@ -79,10 +79,26 @@ var Mautic = {
     },
 
     /**
+     * Starts the ajax loading indicator for modals
+     *
+     * @param modalTarget
+     */
+    startModalLoadingBar: function(modalTarget) {
+        mQuery(modalTarget + ' .modal-loading-bar').addClass('active');
+    },
+
+    /**
      * Stops the ajax loading indicator for the right canvas
      */
     stopCanvasLoadingBar: function() {
         mQuery('.canvas-loading-bar').removeClass('active');
+    },
+
+    /**
+     * Stops the ajax loading indicator for modals
+     */
+    stopModalLoadingBar: function(modalTarget) {
+        mQuery(modalTarget + ' .modal-loading-bar').removeClass('active');
     },
 
     /**
@@ -342,7 +358,6 @@ var Mautic = {
         });
 
         //activate shuffles
-
         if (mQuery('.shuffle-grid').length) {
             var grid = mQuery(".shuffle-grid");
 
@@ -363,6 +378,13 @@ var Mautic = {
                     grid.shuffle("update");
                 });
 
+        }
+
+        //prevent auto closing dropdowns for dropdown forms
+        if (mQuery('.dropdown-menu-form').length) {
+            mQuery('.dropdown-menu-form').on('click', function (e) {
+                e.stopPropagation();
+            });
         }
 
         //run specific on loads
@@ -481,8 +503,9 @@ var Mautic = {
      * @param method
      * @param target
      * @param showPageLoading
+     * @param callback
      */
-    loadContent: function (route, link, method, target, showPageLoading) {
+    loadContent: function (route, link, method, target, showPageLoading, callback) {
         mQuery.ajax({
             showLoadingBar: (typeof showPageLoading == 'undefined' || showPageLoading) ? true : false,
             url: route,
@@ -526,6 +549,11 @@ var Mautic = {
 
                 //stop loading bar
                 Mautic.stopPageLoadingBar();
+            },
+            complete: function() {
+                if (typeof callback !== 'undefined') {
+                    window["Mautic"][callback].apply('window', []);
+                }
             }
         });
 
@@ -861,10 +889,10 @@ var Mautic = {
         if (mQuery(target + ' .loading-placeholder').length) {
             mQuery(target + ' .loading-placeholder').removeClass('hide');
             mQuery(target + ' .modal-body-content').addClass('hide');
-        }
 
-        if (header) {
-            mQuery(target + " .modal-title").html(header);
+            if (mQuery(target + ' .modal-loading-bar').length) {
+                mQuery(target + ' .modal-loading-bar').addClass('active');
+            }
         }
 
         //move the modal to the body tag to get around positioned div issues
@@ -872,6 +900,10 @@ var Mautic = {
             if (!mQuery(target).hasClass('modal-moved')) {
                 mQuery(target).appendTo('body');
                 mQuery(target).addClass('modal-moved');
+            }
+
+            if (header) {
+                mQuery(target + " .modal-title").html(header);
             }
         });
 
@@ -883,7 +915,6 @@ var Mautic = {
         mQuery(target).modal('show');
 
         mQuery.ajax({
-            showLoadingBar: true,
             url: route,
             type: method,
             dataType: "json",
@@ -896,6 +927,9 @@ var Mautic = {
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
                 Mautic.stopIconSpinPostEvent();
+            },
+            complete: function() {
+                Mautic.stopModalLoadingBar(target);
             }
         });
     },
@@ -906,6 +940,10 @@ var Mautic = {
      * @param firstLoad
      */
     resetModal: function (target, firstLoad) {
+        if (mQuery(target).hasClass('in')) {
+            return;
+        }
+
         if (typeof MauticVars.modalsReset == 'undefined') {
             MauticVars.modalsReset = {};
         }

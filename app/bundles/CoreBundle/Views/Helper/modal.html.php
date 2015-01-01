@@ -26,6 +26,13 @@ $padding         = (empty($padding)) ? "" : $padding;
                 <h4 class="modal-title" id="<?php echo $id; ?>-label">
                     <?php echo $header; ?>
                 </h4>
+
+                <!-- start: loading bar -->
+                <div class="modal-loading-bar">
+                    <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+                </div>
+                <!--/ end: loading bar -->
+
             </div>
             <?php endif; ?>
             <div class="modal-body <?php echo $padding; ?>">
