@@ -234,6 +234,8 @@ class UserModel extends FormModel
         $preferences       = $user->getPreferences();
         $preferences[$key] = $value;
 
+        $user->setPreferences($preferences);
+
         $this->getRepository()->saveEntity($user);
     }
 
