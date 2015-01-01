@@ -15,19 +15,12 @@ $config = array(
     ),
     "slots"       => array(
         "page" => array(
-            "left1",
-            "left2",
-            "left3",
-            "right1",
-            "right2",
-            "right3",
+            "header",
             "top1",
             "top2",
-            "top3",
-            "main",
-            "bottom1",
-            "bottom2",
-            "bottom3",
+            "mid1",
+            "mid2",
+            "mid3",
             "footer"
         ),
         "email" => array(

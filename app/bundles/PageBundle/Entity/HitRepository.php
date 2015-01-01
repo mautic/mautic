@@ -258,6 +258,38 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Get the latest hit
+     *
+     * @param array $options
+     *
+     * @return \DateTime
+     */
+    public function getLatestHit($options)
+    {
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('MAX(h.date_hit) latest_hit')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
+
+        if (isset($options['leadId'])) {
+            $sq->andWhere(
+                $sq->expr()->eq('h.lead_id', $options['leadId'])
+            );
+        }
+
+        if (isset($options['urls']) && $options['urls']) {
+            $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
+            foreach ($inUrls as $k => $u) {
+                $sq->andWhere($sq->expr()->like('h.url', ':url_'.$k))
+                    ->setParameter('url_'.$k, $u);
+            }
+        }
+
+        $result = $sq->execute()->fetch();
+
+        return new \DateTime($result['latest_hit']);
+    }
+
+    /**
      * Get the number of bounces
      *
      * @param array|string $pageIds
