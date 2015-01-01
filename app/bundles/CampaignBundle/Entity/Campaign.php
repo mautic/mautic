@@ -94,7 +94,7 @@ class Campaign extends FormEntity
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\LeadList", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="campaign_leadlist_xref")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      **/
     private $lists;
 

@@ -76,13 +76,13 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id")
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id", cascade={"remove"})
      * @ORM\JoinTable(name="lead_lists_included_leads")
      */
     private $includedLeads;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id")
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id", cascade={"remove"})
      * @ORM\JoinTable(name="lead_lists_excluded_leads")
      */
     private $excludedLeads;
