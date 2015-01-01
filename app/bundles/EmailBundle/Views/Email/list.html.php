@@ -42,9 +42,9 @@ if ($tmpl == 'index') {
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
-                'orderBy'    => 'e.sendCount',
+                'orderBy'    => 'e.sentCount',
                 'text'       => 'mautic.email.thead.sentcount',
-                'class'      => 'col-email-sendcount'
+                'class'      => 'col-email-sentcount'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
