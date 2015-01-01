@@ -80,6 +80,7 @@ class AjaxController extends CommonAjaxController
 
         $currentUser = $this->factory->getUser();
         $channelId   = InputHelper::int($request->request->get('chatId', $channelId));
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $model */
         $model       = $this->factory->getModel('addon.mauticChat.channel');
         $channel     = $model->getEntity($channelId);
 
@@ -93,12 +94,10 @@ class AjaxController extends CommonAjaxController
                 'me'       => $currentUser,
                 'channel'  => $channel,
                 'insertUnreadDivider' => true,
-                'lastReadId' => $lastRead['lastRead']
+                'lastReadId' => ($lastRead) ? $lastRead['lastRead'] : 0
             ));
             $dataArray['withId']      = $channel->getId();
-            $dataArray['channelName'] = $this->renderview('MauticChatBundle:Channel:header.html.php', array(
-                'channel' => $channel
-            ));
+            $dataArray['channelName'] = $channel->getName();
             if ($lastRead)  {
                 $dataArray['lastReadId'] = $lastRead['lastRead'];
             }
@@ -346,5 +345,108 @@ class AjaxController extends CommonAjaxController
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param $type
+     * @param $userId
+     */
+    public function toggleChatSettingAction(Request $request)
+    {
+        $chatType = $request->request->get('chatType');
+        $setting  = $request->request->get('setting');
+        $enabled  = InputHelper::boolean($request->request->get('enabled'));
+        $id       = InputHelper::int($request->request->get('id'));
+        $success  = 0;
+        $updateSettings = array();
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model    = $this->factory->getModel('addon.mauticChat.chat');
+        $settings = $model->getSettings($chatType);
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $channelModel */
+        $channelModel = $this->factory->getModel('addon.mauticChat.channel');
+
+        if ($chatType == 'channels' && $setting == 'archived') {
+            $channel = $channelModel->getEntity($id);
+
+            if ($channel != null) {
+                if ($this->factory->getSecurity()->hasEntityAccess(true, false, $channel->getCreatedBy())) {
+                    $success = 1;
+
+                    if ($enabled) {
+                        $channelModel->archiveChannel($id);
+                        $updateSettings['visible'] = false;
+                    } else {
+                        $channelModel->unarchiveChannel($id);
+                    }
+                }
+            }
+        } elseif ($chatType == 'channels' && $setting == 'subscribed') {
+            $channel = $channelModel->getEntity($id);
+
+            if ($channel != null) {
+                $success = 1;
+
+                if ($enabled) {
+                    $channelModel->subscribeToChannel($channel);
+                    $updateSettings['visible'] = true;
+                } else {
+                    $channelModel->unsubscribeFromChannel($channel);
+                    $updateSettings['visible'] = false;
+                }
+            }
+        } else {
+            $updateSettings[$setting] = $enabled;
+        }
+
+        foreach ($updateSettings as $setting => $enabled) {
+            if (isset($settings[$setting])) {
+                $success = 1;
+
+                if (!$enabled && in_array($id, $settings[$setting])) {
+                    $key = array_search($id, $settings[$setting]);
+                    if ($key !== false) {
+                        unset($settings[$setting][$key]);
+                    }
+                } elseif ($enabled && !in_array($id, $settings[$setting])) {
+                    $settings[$setting][] = $id;
+                }
+            }
+        }
+
+        if (!empty($updateSettings)) {
+            $model->setSettings($settings, $chatType);
+        }
+
+        return $this->sendJsonResponse(array(
+            'success'  => $success,
+            'settings' => $updateSettings
+        ));
+    }
+
+    /**
+     * Reorders visible users and/or channels
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function reorderVisibleChatListAction(Request $request)
+    {
+        $chatType = InputHelper::clean($request->request->get('chatType'));
+
+        $orderVar = ($chatType == 'users') ? 'chatUser' : 'chatChannel';
+        $order = InputHelper::clean($request->request->get($orderVar));
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model    = $this->factory->getModel('addon.mauticChat.chat');
+        $settings = $model->getSettings($chatType);
+
+        $settings['visible'] = $order;
+
+        $model->setSettings($settings, $chatType);
+
+        return $this->sendJsonResponse(array('success' => 1));
     }
 }

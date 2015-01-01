@@ -21,9 +21,6 @@ if (empty($contentOnly)) {
     'channels'    => $channels,
     'permissions' => $permissions
 )); ?>
-<?php echo $view->render('MauticChatBundle:Default:users.html.php', array('users' => $users)); ?>
-<?php
-if (empty($ignoreModal)):
-    echo $this->render('MauticCoreBundle:Helper:modal.html.php', array('id' => 'channelModal'));
-endif;
-?>
+<?php echo $view->render('MauticChatBundle:Default:users.html.php', array(
+    'users'  => $users
+)); ?>

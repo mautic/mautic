@@ -9,9 +9,12 @@
 
 namespace MauticAddon\MauticChatBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Entity\User;
 use MauticAddon\MauticChatBundle\Entity\Channel;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use MauticAddon\MauticChatBundle\Entity\ChannelStat;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -33,13 +36,97 @@ class ChannelModel extends FormModel
     }
 
     /**
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param bool   $usePreference
+     */
+    public function getMyChannels($search = '', $limit = 10, $start = 0, $usePreference = false)
+    {
+        $repo = $this->getRepository();
+        if ($usePreference) {
+            $settings = $this->getSettings();
+
+            //force user preferences
+            $search = $settings['visible'];
+
+            if (empty($search)) {
+                //prevent showing any channels until subscribed
+                $search[] = 0;
+            }
+
+            $limit  = $start = 0;
+        }
+
+        $results = $repo->getUserChannels($this->factory->getUser(), $search, $limit, $start);
+        $ids     = array_keys($results['channels']);
+
+        //compare user preference with returned Ids and update if applicable
+        if ($usePreference) {
+            $diff = array_diff($settings['visible'], $ids);
+
+            if (count($diff)) {
+                $settings['visible'] = $ids;
+                $this->setSettings($settings);
+            }
+        }
+
+        $unread = $this->getChannelsWithUnreadMessages();
+
+        //set the unread count
+        $listedUnread = 0;
+        $hasUnread    = array();
+        foreach ($results['channels'] as $r) {
+            if (!isset($unread[$r['id']])) {
+                $unread[$r['id']] = 0;
+            } else {
+                $unread[$r['id']] = (int)$unread[$r['id']];
+            }
+
+            if ($unread[$r['id']] > 0) {
+                $hasUnread[] = $r['id'];
+            }
+            $listedUnread += $unread[$r['id']];
+        }
+
+        //total unread count
+        $totalUnread       = array_sum($unread);
+        $results['unread'] = array(
+            'count'     => $totalUnread,
+            'hidden'    => $totalUnread - $listedUnread,
+            'channels'  => $unread,
+            'hasUnread' => $hasUnread
+        );
+
+        return $results;
+    }
+
+    /**
+     * Get channels with unread messages
+     *
+     * @param bool $includeIdList
+     *
      * @return array
      */
-    public function getMyChannels()
+    public function getChannelsWithUnreadMessages($includeIdList = false)
     {
-        return $this->getRepository()->getUserChannels(
-            $this->factory->getUser()
-        );
+        $repo = $this->getRepository();
+
+        $unreadCounts = $repo->getUnreadForUser($this->factory->getUser()->getId());
+
+        if ($includeIdList) {
+            $hasUnread = array();
+            foreach ($unreadCounts as $id => $count) {
+                if ($count > 0) {
+                    $hasUnread[] = $id;
+                }
+            }
+
+            return array($unreadCounts, $hasUnread);
+        } else {
+
+            return $unreadCounts;
+        }
     }
 
     /**
@@ -125,9 +212,19 @@ class ChannelModel extends FormModel
      *
      * @param  $entity
      */
-    public function archiveChannel($entity)
+    public function archiveChannel($id)
     {
-        $this->getRepository()->archiveChannel($entity->getId());
+        $this->getRepository()->archiveChannel($id);
+    }
+
+    /**
+     * Archive the channel
+     *
+     * @param  $entity
+     */
+    public function unarchiveChannel($id)
+    {
+        $this->getRepository()->unarchiveChannel($id);
     }
 
     /**
@@ -183,8 +280,80 @@ class ChannelModel extends FormModel
      *
      * @return array
      */
-    public function getUserChannelStats(Channel $channel)
+    public function getUserChannelStats(Channel $channel = null)
     {
-        return $this->getRepository()->getChannelStatForUser($this->factory->getUser(), $channel);
+        return $this->getRepository()->getChannelStatsForUser($this->factory->getUser(), $channel);
+    }
+
+    /**
+     * Get channel settings
+     *
+     * @param $type
+     *
+     * @return mixed
+     */
+    public function getSettings($type = 'channels')
+    {
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model = $this->factory->getModel('addon.mauticChat.chat');
+        return $model->getSettings($type);
+    }
+
+    /**
+     * Set channel settings
+     *
+     * @param $typeSettings
+     * @param $type
+     */
+    public function setSettings($typeSettings, $type = 'channels')
+    {
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model = $this->factory->getModel('addon.mauticChat.chat');
+        return $model->setSettings($typeSettings, $type);
+    }
+
+    /**
+     * Subscribe user to channel
+     *
+     * @param Channel $channel
+     * @param User    $user
+     */
+    public function subscribeToChannel(Channel $channel, User $user = null)
+    {
+        if ($user == null) {
+            $user = $this->factory->getUser();
+        }
+
+        $stat = $this->getUserChannelStats($channel);
+
+        if (empty($stat)) {
+            $now = new DateTimeHelper();
+
+            //get the last read id
+            $lastId = $this->getRepository()->getLastChatId($channel->getId());
+
+            $stat = new ChannelStat();
+            $stat->setChannel($channel);
+            $stat->setUser($user);
+            $stat->setLastRead($lastId);
+            $stat->setDateRead($now->getDateTime());
+            $stat->setDateJoined($now->getDateTime());
+            $this->getRepository()->saveEntity($stat);
+        }
+    }
+
+    /**
+     * Unsubscribe user from channel
+     *
+     * @param Channel $channel
+     * @param User    $user
+     */
+    public function unsubscribeFromChannel(Channel $channel, User $user = null)
+    {
+        if ($user == null) {
+            $user = $this->factory->getUser();
+        }
+
+        $this->getRepository()->deleteChannelStat($channel->getId(), $user->getId());
     }
 }

@@ -10,6 +10,7 @@
 namespace MauticAddon\MauticChatBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\Role;
@@ -20,7 +21,44 @@ use Mautic\UserBundle\Entity\User;
  */
 class ChannelRepository extends CommonRepository
 {
+    /**
+     * Get a list of entities
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this
+            ->createQueryBuilder('c')
+            ->select('c')
+            ->leftJoin('c.privateUsers', 'u')
+            ->leftJoin('c.stats', 's', 'WITH', 'IDENTITY(s.user) = :userId');
 
+        $this->buildClauses($q, $args);
+
+        $q->andWhere(
+            $q->expr()->andX(
+                $q->expr()->orX(
+                    $q->expr()->eq('c.isPrivate', 0),
+                    $q->expr()->andX(
+                        $q->expr()->eq('c.isPrivate', 1),
+                        $q->expr()->eq('u.id', ':userId')
+                    )
+                )
+            )
+        )->setParameter('userId', $args['userId']);
+
+        $query = $q->getQuery();
+
+        if (isset($args['hydration_mode'])) {
+            $mode = strtoupper($args['hydration_mode']);
+            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+        }
+
+        return new Paginator($query);
+    }
     /**
      * Gets group messages form a channel
      *
@@ -73,58 +111,74 @@ class ChannelRepository extends CommonRepository
      *
      * @return array
      */
-    public function getUserChannels($userId)
+    public function getUserChannels($userId, $search = '', $limit = 10, $start = 0)
     {
-        $q = $this->createQueryBuilder('c')
+        $q = $this->_em->createQueryBuilder();
+
+        $select = 'partial c.{id, name}';
+        if (is_array($search) && !empty($search)) {
+            $count = 1;
+            $order = '(CASE';
+            foreach ($search as $count => $id) {
+                $order .= ' WHEN c.id = ' . $id . ' THEN ' . $count;
+                $count++;
+            }
+            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+            $select .= ", $order";
+        }
+
+        $q->select($select)
+            ->from('MauticChatBundle:Channel', 'c', 'c.id')
             ->leftJoin('c.privateUsers', 'u');
-
-        $q->select('partial c.{id, name}')
-            ->where(
-                $q->expr()->orX(
-                    $q->expr()->eq('c.isPrivate', 0),
-                    $q->expr()->andX(
-                        $q->expr()->eq('c.isPrivate', 1),
-                        $q->expr()->eq('u.id', ':userId')
-                    )
+        $q->where(
+            $q->expr()->orX(
+                $q->expr()->eq('c.isPrivate', 0),
+                $q->expr()->andX(
+                    $q->expr()->eq('c.isPrivate', 1),
+                    $q->expr()->eq('u.id', ':userId')
                 )
             )
-            ->setParameter('userId', $userId)
-            ->orderBy('c.name', 'ASC');
+        )
+        ->setParameter('userId', $userId);
 
-        $results = $q->getQuery()->getArrayResult();
+        $q->andWhere('c.isPublished = true');
 
-        $channels = array();
-        foreach ($results as $r) {
-            $channels[$r['id']] = $r;
-        }
-        $ids = array_keys($channels);
-        unset($results);
-
-        $qb = $this->_em->createQueryBuilder();
-        $qb->select('count(c.id) as unread, ch.id')
-            ->from('MauticChatBundle:Chat', 'c')
-            ->join('c.channel', 'ch')
-            ->leftJoin('MauticChatBundle:ChannelStat', 's', 'WITH', 's.channel = ch.id')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->in('IDENTITY(c.channel)', ':ids'),
-                    $qb->expr()->neq('IDENTITY(c.fromUser)', ':userId'),
-                    $qb->expr()->gt('c.id', 's.lastRead')
-                )
-            )
-            ->setParameter('ids', $ids)
-            ->setParameter('userId', $userId);
-
-        $results = $qb->getQuery()->getArrayResult();
-        $unread  = array();
-        foreach ($results as $r) {
-            $unread[$r['id']] = $r['unread'];
+        if (!empty($search)) {
+            if (is_array($search)) {
+                $q->andWhere(
+                    $q->expr()->in('c.id', ':channels')
+                )->setParameter('channels', $search);
+            } else {
+                $q->andWhere(
+                    $q->expr()->like('c.name', ':search')
+                )->setParameter('search', "{$search}%");
+            }
         }
 
-        foreach ($channels as &$c) {
-            //get unread
-            $c['unread'] = (isset($unread[$c['id']])) ? $unread[$c['id']] : 0;
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
         }
+
+        if (!is_array($search)) {
+            $q->orderBy('c.name', 'ASC');
+        } elseif (!empty($search)) {
+            //force array order
+            $q->orderBy('ORD', 'ASC');
+        }
+
+        $query = $q->getQuery();
+        $query->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        $results = new Paginator($query);
+
+        $iterator = $results->getIterator();
+
+        $channels = array(
+            'channels' => $iterator->getArrayCopy(),
+            'count'    => count($iterator),
+            'total'    => count($results)
+        );
 
         return $channels;
     }
@@ -132,16 +186,16 @@ class ChannelRepository extends CommonRepository
     /**
      * Retrieves array of names used to ensure unique name
      *
-     * @param $exludingId
+     * @param $excludingId
      * @return array
      */
-    public function getNames($exludingId)
+    public function getNames($excludingId)
     {
         $q = $this->createQueryBuilder('c')
             ->select('c.name');
         if (!empty($exludingId)) {
             $q->where('c.id != :id')
-                ->setParameter('id', $exludingId);
+                ->setParameter('id', $excludingId);
         }
 
         $results = $q->getQuery()->getArrayResult();
@@ -159,7 +213,16 @@ class ChannelRepository extends CommonRepository
     public function archiveChannel($channelId)
     {
         $this->_em->getConnection()
-            ->update(MAUTIC_TABLE_PREFIX . 'channels', array('is_published' => 0), array('id' => $channelId));
+            ->update(MAUTIC_TABLE_PREFIX . 'chat_channels', array('is_published' => 0), array('id' => $channelId));
+    }
+
+    /**
+     * @param $channelId
+     */
+    public function unarchiveChannel($channelId)
+    {
+        $this->_em->getConnection()
+            ->update(MAUTIC_TABLE_PREFIX . 'chat_channels', array('is_published' => 1), array('id' => $channelId));
     }
 
     /**
@@ -198,6 +261,7 @@ class ChannelRepository extends CommonRepository
             $stat->setUser($user);
             $stat->setLastRead($lastId);
             $stat->setDateRead($now->getDateTime());
+            $stat->setDateJoined($now->getDateTime());
             $this->_em->persist($stat);
         }
         $this->_em->flush();
@@ -209,11 +273,12 @@ class ChannelRepository extends CommonRepository
      *
      * @return array
      */
-    public function getChannelStatForUser(User $user, Channel $channel = null)
+    public function getChannelStatsForUser(User $user, Channel $channel = null)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->select('s')
+        $qb->select('s, c')
             ->from('MauticChatBundle:ChannelStat', 's')
+            ->join('s.channel', 'c')
             ->where(
                 $qb->expr()->eq('s.user', ':user')
             )
@@ -228,6 +293,103 @@ class ChannelRepository extends CommonRepository
 
         $results = $qb->getQuery()->getArrayResult();
 
-        return (count($results)) ? $results[0] : array();
+        if ($channel == null) {
+            $stats = array();
+            foreach ($results as $r) {
+                $stats[$r['channel']['id']] = $r;
+            }
+            return $stats;
+        } else {
+            return (count($results)) ? $results[0] : array();
+        }
+    }
+
+    /**
+     * @param       $userId
+     * @param array $channels
+     *
+     * @return array
+     */
+    public function getUnreadForUser($userId)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('ch.id, count(c) as unread')
+            ->from('MauticChatBundle:Channel', 'ch')
+            ->leftJoin('ch.privateUsers', 'u')
+            ->leftJoin('ch.chats', 'c')
+            ->leftJoin('ch.stats', 's', 'WITH', 'IDENTITY(s.user) = :userId')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->isNull('c.fromUser'),
+                        $qb->expr()->neq('IDENTITY(c.fromUser)', ':userId')
+                    ),
+                    $qb->expr()->gt('c.id', 's.lastRead')
+                )
+            )
+            ->setParameter('userId', $userId);
+
+        $qb->andWhere('ch.isPublished = 1');
+
+        $qb->groupBy('ch.id');
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        $unread = array();
+        foreach ($results as $r) {
+            $unread[$r['id']] = (int) $r['unread'];
+        }
+
+        return $unread;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'c';
+    }
+
+    /**
+     * Get the last chat in the ID
+     *
+     * @param $channelId
+     */
+    public function getLastChatId($channelId)
+    {
+        $qb = $this->createQueryBuilder('ch');
+        $qb->select('MAX(c.id) as lastId')
+            ->join('MauticChatBundle:Chat', 'c', 'WITH', 'c.channel = ch')
+            ->where('ch.id = ' . (int) $channelId);
+
+        $result = $qb->getQuery()->getArrayResult();
+
+        return (count($result)) ? $result[0]['lastId'] : 0;
+    }
+
+    /**
+     * @param $channelId
+     * @param $userId
+     */
+    public function deleteChannelStat($channelId, $userId)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->delete('MauticChatBundle:ChannelStat', 's')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('IDENTITY(s.channel)', ':channelId'),
+                    $qb->expr()->eq('IDENTITY(s.user)', ':userId')
+                )
+            )
+            ->setParameters(array(
+                'channelId' => $channelId,
+                'userId'    => $userId
+            ));
+
+        $qb->getQuery()->execute();
     }
 }

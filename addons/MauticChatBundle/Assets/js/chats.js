@@ -1,36 +1,89 @@
 /* ChatBundle */
 
+Mautic.chatOnLoad = function() {
+    //make visible users/channels sortable
+
+    mQuery('#ChatUsers').sortable({
+        items: 'li.sortable',
+        start: function() {
+            Mautic.chatPauseUpdateChatList = true;
+        },
+        stop: function (i) {
+            Mautic.reorderVisibleChatList(mQuery('#ChatUsers').sortable('serialize'), 'users');
+        }
+    });
+
+    mQuery('#ChatChannels').sortable({
+        items: 'li.sortable',
+        start: function() {
+            Mautic.chatPauseUpdateChatList = true;
+        },
+        stop: function (i) {
+            Mautic.reorderVisibleChatList(mQuery('#ChatChannels').sortable('serialize'), 'channels');
+        }
+    });
+},
+
+Mautic.reorderVisibleChatList = function(order, chatType)
+{
+    if (typeof Mautic.chatReorderInProgress != 'undefined') {
+        setTimeout(function() {
+            Mautic.reorderVisibleChatList(order, chatType);
+        }, 1000);
+    } else {
+        Mautic.chatReorderInProgress = true;
+        mQuery.ajax({
+            type: "POST",
+            url: mauticAjaxUrl + "?action=addon:mauticChat:reorderVisibleChatList",
+            data: order + '&chatType=' + chatType,
+            complete: function () {
+                delete Mautic.chatPauseUpdateChatList;
+                delete Mautic.chatReorderInProgress;
+            }
+        });
+    }
+}
+
 Mautic.activateChatListUpdate = function() {
     Mautic.setModeratedInterval('chatListUpdaterInterval', 'updateChatList', 5000);
+
+    Mautic.chatOnLoad();
 };
 
 Mautic.updateChatList = function (killTimer) {
     if (!mQuery('#ChatUsers').length) {
         Mautic.clearModeratedInterval('chatListUpdaterInterval');
     } else {
-        mQuery.ajax({
-            type: "POST",
-            url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
-            dataType: "json",
-            success: function (response) {
-                if (response.canvasContent) {
-                    mQuery('#OffCanvasMainContent').html(response.canvasContent);
+        if (typeof Mautic.chatPauseUpdateChatList != 'undefined') {
+            console.log('paused');
+            //sorting pending so wait till next round to update
+            Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+        } else {
+            mQuery.ajax({
+                type: "POST",
+                url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
+                dataType: "json",
+                success: function (response) {
+                    if (response.canvasContent) {
+                        mQuery('#OffCanvasMainContent').html(response.canvasContent);
 
-                    response.target = '#OffCanvasMainContent';
-                    Mautic.processPageContent(response);
+                        response.target = '#OffCanvasMainContent';
+                        Mautic.processPageContent(response);
 
-                    if (killTimer) {
-                        Mautic.clearModeratedInterval('chatListUpdaterInterval');
-                    } else {
-                        Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+                        Mautic.chatOnLoad();
+
+                        if (killTimer) {
+                            Mautic.clearModeratedInterval('chatListUpdaterInterval');
+                        } else {
+                            Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
+                        }
                     }
+                },
+                error: function (request, textStatus, errorThrown) {
+                    Mautic.processAjaxError(request, textStatus, errorThrown);
                 }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-                Mautic.clearModeratedInterval('chatListUpdaterInterval');
-            }
-        });
+            });
+        }
     }
 };
 
@@ -54,10 +107,6 @@ Mautic.startUserChat = function (userId, fromDate) {
 
                 Mautic.activateChatUpdater(response.withId, 'user');
                 Mautic.activateChatInput(response.withId, 'user');
-
-                //activate links, etc
-                response.target = ".offcanvas-right";
-                Mautic.processPageContent(response);
             }
             Mautic.stopCanvasLoadingBar();
         },
@@ -71,6 +120,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
     if (typeof fromDate == 'undefined') {
         fromDate = '';
     }
+
     Mautic.startCanvasLoadingBar();
     mQuery.ajax({
         type: "POST",
@@ -84,10 +134,6 @@ Mautic.startChannelChat = function (channelId, fromDate) {
                 Mautic.updateChatConversation(response);
                 Mautic.activateChatUpdater(response.withId, 'channel');
                 Mautic.activateChatInput(response.withId, 'channel');
-
-                //activate links, etc
-                response.target = "#OffCanvasRightContent";
-                Mautic.processPageContent(response);
             }
             Mautic.stopCanvasLoadingBar();
         },
@@ -129,15 +175,11 @@ Mautic.getLastChatGroup = function() {
 
 Mautic.markMessagesRead = function(itemId, chatType) {
     var lastId  = mQuery('#ChatLastMessageId').val();
-    Mautic.startCanvasLoadingBar();
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:markRead",
         data: 'chatId=' + itemId + '&chatType=' + chatType + '&lastId=' + lastId,
-        dataType: "json",
-        done: function() {
-            Mautic.stopCanvasLoadingBar();
-        }
+        dataType: "json"
     });
 };
 
@@ -246,6 +288,10 @@ Mautic.updateChatConversation = function(response, chatType) {
     }
 
     if (contentUpdated) {
+        //activate links, etc
+        response.target = "#OffCanvasRight";
+        Mautic.processPageContent(response);
+
         //Scroll to bottom of chat (latest messages)
         Mautic.scrollToChatBottom();
     }
@@ -283,3 +329,65 @@ Mautic.chatChannelOnLoad = function(container, response) {
 Mautic.scrollToChatBottom = function() {
     mQuery("#OffCanvasRightContent").animate({ scrollTop: mQuery("#OffCanvasRightContent")[0].scrollHeight}, 1000);
 };
+
+Mautic.toggleChatSetting = function(chatType, setting, id, isChecked) {
+    if (typeof Mautic.chatSettingUpdateInProgress != 'undefined') {
+        //set a timeout
+        setTimeout(function() { Mautic.toggleChatSetting(chatType, setting, id, isChecked); }, 1000);
+        return;
+    }
+    Mautic.startModalLoadingBar('#MauticSharedModal');
+
+    Mautic.chatSettingUpdateInProgress = true;
+    mQuery.ajax({
+        type: "POST",
+        url: mauticAjaxUrl + "?action=addon:mauticChat:toggleChatSetting",
+        data: "chatType=" + chatType + "&id=" + id + "&setting=" + setting + "&enabled=" + isChecked,
+        dataType: "json",
+        success: function (response) {
+            Mautic.updateChatList();
+
+            mQuery.each(response.settings,  function( key, value ) {
+                if (key !== setting) {
+                    mQuery('#' + chatType + '_' + key + id).prop('checked', value);
+                }
+            });
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function() {
+            delete Mautic.chatSettingUpdateInProgress;
+            Mautic.stopModalLoadingBar('#MauticSharedModal');
+        }
+    });
+};
+
+Mautic.filterByChatAttribute = function(chatType, attr, isChecked, baseUrl)
+{
+    if (typeof Mautic.chatFilterUpdateInProgress != 'undefined') {
+        //set a timeout
+        setTimeout(function() { Mautic.filterByChatAttribute(chatType, attr, isChecked, baseUrl); }, 1000);
+        return;
+    }
+
+    Mautic.startModalLoadingBar('#MauticSharedModal');
+
+    Mautic.chatFilterUpdateInProgress = true;
+
+    if (typeof baseUrl == 'undefined') {
+        baseUrl = window.location.pathname;
+    }
+
+    var route = baseUrl + "?chatType=" + chatType + "&filter=" + attr + "&enabled=" + isChecked;
+    var target = (chatType == 'channels') ? '.chat-channel-list' : '.chat-user-list'
+
+    Mautic.loadContent(route, '', 'POST', target, false, 'clearChatFilterUpdateInProgress');
+};
+
+Mautic.clearChatFilterUpdateInProgress = function()
+{
+    delete Mautic.chatFilterUpdateInProgress;
+    Mautic.stopModalLoadingBar('#MauticSharedModal');
+
+}

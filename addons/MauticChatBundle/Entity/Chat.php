@@ -31,19 +31,19 @@ class Chat
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="from_user", referencedColumnName="id")
+     * @ORM\JoinColumn(name="from_user", referencedColumnName="id", onDelete="CASCADE")
      */
     private $fromUser;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="to_user", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="to_user", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     private $toUser;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Channel")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Channel", inversedBy="chats")
+     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     private $channel;
 

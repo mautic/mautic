@@ -24,3 +24,11 @@ li.chat-list:after {
 #ChatUsers li.chat-list img.media-object {
 	width: 40px;
 }
+
+.col-chat-settings {
+    width: 25px;
+}
+
+.col-chat-count {
+    width: 25px;
+}

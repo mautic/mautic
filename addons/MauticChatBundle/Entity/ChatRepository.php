@@ -10,6 +10,7 @@
 namespace MauticAddon\MauticChatBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\Role;
@@ -73,62 +74,66 @@ class ChatRepository extends CommonRepository
      * Returns a list of users that can be used in chat, etc
      *
      * @param int    $currentUserId
-     * @param string $search
+     * @param mixed  $search
      * @param int    $limit
      * @param int    $start
-     * @param array  $usersWithUnreadMsgs
      */
-    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0, $usersWithUnreadMsgs = array())
+    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0)
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('u.id, u.username, u.firstName, u.lastName, u.email, u.lastActive, u.onlineStatus')
+        $select = 'partial u.{id, username, firstName, lastName, email, lastActive, onlineStatus}';
+
+        if (is_array($search) && !empty($search)) {
+            $order = '(CASE';
+            $count = 1;
+            foreach ($search as $count => $id) {
+                $order .= ' WHEN u.id = ' . $id . ' THEN ' . $count;
+                $count++;
+            }
+            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+            $select .= ", $order";
+        }
+        $q->select($select)
             ->from('MauticUserBundle:User', 'u', 'u.id');
+
         if (!empty($currentUserId)) {
             $q->where('u.id != :currentUser')
                 ->setParameter('currentUser', $currentUserId);
         }
 
-        $q->orderBy('u.firstName, u.lastName');
+        $q->andWhere('u.isPublished = true');
 
         if (!empty($search)) {
-            $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->like('u.email', ':search'),
-                    $q->expr()->like('u.firstName', ':search'),
-                    $q->expr()->like('u.lastName', ':search'),
-                    $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
-                            $q->expr()->concat(
-                                $q->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
+            if (is_array($search)) {
+                $q->andWhere(
+                    $q->expr()->in('u.id', ':users')
+                )->setParameter('users', $search);
+            } else {
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->like('u.email', ':search'),
+                        $q->expr()->like('u.firstName', ':search'),
+                        $q->expr()->like('u.lastName', ':search'),
+                        $q->expr()->like(
+                            $q->expr()->concat('u.firstName',
+                                $q->expr()->concat(
+                                    $q->expr()->literal(' '),
+                                    'u.lastName'
+                                )
+                            ),
+                            ':search'
+                        )
                     )
-                )
-            )
-                ->setParameter('search', "{$search}%");
+                )->setParameter('search', "{$search}%");
+            }
         }
 
-        if (!empty($usersWithUnreadMsgs)) {
-            $q2 = clone $q;
-
-            $q2->andWhere(
-                $q2->expr()->in('u.id', ':users')
-            )->setParameter('users', $usersWithUnreadMsgs);
-
-            if (!empty($limit) && $limit > count($usersWithUnreadMsgs)) {
-                $q2->setFirstResult($start)
-                    ->setMaxResults($limit);
-            }
-
-            $results = $q2->getQuery()->getArrayResult();
-
-            if (count($results) > $limit) {
-                $this->generateOnlineStatuses($results);
-                return $results;
-            }
+        if (!is_array($search)) {
+            $q->orderBy('u.firstName, u.lastName');
+        } elseif (!empty($search)) {
+            //force array order
+            $q->orderBy('ORD', 'ASC');
         }
 
         if (!empty($limit)) {
@@ -136,10 +141,22 @@ class ChatRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        $this->generateOnlineStatuses($results);
+        $query = $q->getQuery();
+        $query->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
-        return $results;
+        $results = new Paginator($query);
+
+        $iterator = $results->getIterator();
+
+        $users = array(
+            'users' => $iterator->getArrayCopy(),
+            'count' => count($iterator),
+            'total' => count($results)
+        );
+
+        $this->generateOnlineStatuses($users['users']);
+
+        return $users;
     }
 
     /**
