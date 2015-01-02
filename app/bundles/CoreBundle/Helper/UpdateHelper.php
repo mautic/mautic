@@ -119,7 +119,7 @@ class UpdateHelper
                 'instanceId'  => $instanceId
             );
 
-            $this->connector->post('https://www.mautic.org/stats/send', $data);
+            $this->connector->post('https://updates.mautic.org/stats/send', $data);
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
         }
@@ -132,7 +132,7 @@ class UpdateHelper
                 'stability'  => $this->factory->getParameter('update_stability')
             );
 
-            $data    = $this->connector->post('https://www.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
+            $data    = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(
