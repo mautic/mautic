@@ -145,7 +145,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"userDetails"})
      */
-    private $onlineStatus;
+    private $onlineStatus = 'offline';
 
     /**
      * Stores active role permissions

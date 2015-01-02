@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Mautic\UserBundle\Entity\User;
@@ -21,6 +22,18 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
  */
 class UserModel extends FormModel
 {
+    /**
+     * Define statuses that are supported
+     *
+     * @var array
+     */
+    private $supportedOnlineStatuses = array(
+        'online',
+        'idle',
+        'away',
+        'dnd',
+        'offline'
+    );
 
     /**
      * {@inheritdoc}
@@ -179,20 +192,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * Get a list of active users
-     *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return mixed
-     */
-    public function getActiveUsers ($search = '', $limit = 10, $start = 0)
-    {
-        return $this->getRepository()->getActiveUsers($this->factory->getUser()->getId(), $search, $limit, $start);
-    }
-
-    /**
      * Resets the user password and emails it
      *
      * @param User $user
@@ -256,5 +255,25 @@ class UserModel extends FormModel
         $preferences = $user->getPreferences();
 
         return (isset($preferences[$key])) ? $preferences[$key] : $default;
+    }
+
+    /**
+     * @param $status
+     */
+    public function setOnlineStatus($status)
+    {
+        $status = strtolower($status);
+
+        if (in_array($status, $this->supportedOnlineStatuses)) {
+            $user = $this->factory->getUser();
+            $user->setOnlineStatus($status);
+            $this->getRepository()->saveEntity($user);
+
+            $dispatcher = $this->factory->getDispatcher();
+            if ($dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
+                $event = new StatusChangeEvent($this->factory);
+                $dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
+            }
+        }
     }
 }

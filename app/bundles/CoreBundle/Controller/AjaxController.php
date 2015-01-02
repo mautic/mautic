@@ -463,4 +463,28 @@ class AjaxController extends CommonController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateUserStatusAction(Request $request)
+    {
+        $status = InputHelper::clean($request->request->get('status'));
+
+        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        $model = $this->factory->getModel('user');
+
+        $currentStatus = $this->factory->getUser()->getOnlineStatus();
+        if (!in_array($currentStatus, array('manualaway', 'dnd'))) {
+            if ($status == 'back') {
+                $status = 'online';
+            }
+
+            $model->setOnlineStatus($status);
+        }
+
+        return $this->sendJsonResponse(array('success' => 1));
+    }
 }

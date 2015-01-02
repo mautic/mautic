@@ -1,14 +1,22 @@
-var MauticVars = {};
-var mQuery = jQuery.noConflict(true);
-window.jQuery = mQuery;
+var MauticVars  = {};
+var mQuery      = jQuery.noConflict(true);
+window.jQuery   = mQuery;
+
+//set default ajax options
+mQuery.ajaxSetup({
+    beforeSend: function (request, settings) {
+        if (settings.showLoadingBar) {
+            mQuery("body").addClass("loading-content");
+        }
+    },
+    cache: false
+});
 
 mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
-        (function ($) {
-            $("html").Core({
-                console: false
-            });
-        })(mQuery);
+        mQuery("html").Core({
+            console: false
+        });
     }
 
     if (typeof Mousetrap != 'undefined') {
@@ -20,17 +28,35 @@ mQuery( document ).ready(function() {
             mQuery('.navbar-right > button.navbar-toggle').click();
         });
     }
+
+    if (typeof IdleTimer != 'undefined') {
+        IdleTimer.init({
+            idleTimeout: 900000, //15 minutes = 900000
+            awayTimeout: 18000000, //30 minutes = 18000000
+            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
+        });
+    }
 });
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
-History.Adapter.bind(window, 'statechange', function () {
-    if (MauticVars.manualStateChange == true) {
-        //back/forward button pressed
-        window.location.reload();
-    }
-    MauticVars.manualStateChange = true;
-});
+
+if (typeof History != 'undefined') {
+    History.Adapter.bind(window, 'statechange', function () {
+        if (MauticVars.manualStateChange == true) {
+            //back/forward button pressed
+            window.location.reload();
+        }
+        MauticVars.manualStateChange = true;
+    });
+}
+
+//set global Chart defaults
+if (typeof Chart != 'undefined') {
+    // configure global Chart options
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
+}
 
 //live search vars
 MauticVars.liveCache            = new Array();
@@ -47,21 +73,6 @@ MauticVars.routeInProgress       = '';
 //prevent interval ajax requests from overlapping
 MauticVars.moderatedIntervals    = {};
 MauticVars.intervalsInProgress   = {};
-
-mQuery.ajaxSetup({
-    beforeSend: function (request, settings) {
-        if (settings.showLoadingBar) {
-            mQuery("body").addClass("loading-content");
-        }
-    },
-    cache: false
-});
-
-if (typeof Chart != 'undefined') {
-    // configure global Chart options
-    Chart.defaults.global.responsive = true;
-    Chart.defaults.global.maintainAspectRatio = false;
-}
 
 var Mautic = {
     /**
@@ -1470,6 +1481,10 @@ var Mautic = {
         });
     },
 
+    /**
+     * Toggles the class for published buttons
+      * @param changedId
+     */
     togglePublishedButtonClass: function (changedId) {
         changedId = '#' + changedId;
 

@@ -58,9 +58,35 @@ class UserRepository extends CommonRepository
     {
         $now = new DateTimeHelper();
         $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array(
-            'last_active' => $now->toUtcString()
-        ), array('id' => (int) $user->getId()));
+        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array('last_active' => $now->toUtcString()), array('id' => (int) $user->getId()));
+    }
+
+    /**
+     * @param $userId
+     * @param $status
+     */
+    public function setOnlineStatus($userId, $status)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array('online_status' => $status), array('id' => (int) $userId));
+    }
+
+    /**
+     * Default online statuses to offline if the last active is past 60 minutes
+     */
+    public function updateOnlineStatuses()
+    {
+        $dt    = new DateTimeHelper();
+        $delay = $dt->getUtcDateTime();
+        $delay->setTimestamp(strtotime('60 minutes ago'));
+
+        $q = $this->_em->createQueryBuilder()
+            ->update('MauticUserBundle:User', 'u')
+            ->set('u.onlineStatus', ':offline')
+            ->where('u.lastActive <= :delay')
+            ->setParameter('delay', $delay)
+            ->setParameter('offline', 'offline');
+        $q->getQuery()->execute();
     }
 
     /**
