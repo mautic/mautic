@@ -72,19 +72,15 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Default online statuses to offline if the last active is past 60 minutes
+     * Last active updates every 2 minutes. If it didn't get updated, it means the user closed their browser and are thus
+     * now offline
+     *
      */
     public function updateOnlineStatuses()
     {
         $dt    = new DateTimeHelper();
         $offlineDelay = $dt->getUtcDateTime();
-        $offlineDelay->setTimestamp(strtotime('60 minutes ago'));
-
-        $awayDelay = $dt->getUtcDateTime();
-        $awayDelay->setTimestamp(strtotime('30 minutes ago'));
-
-        $idleDelay = $dt->getUtcDateTime();
-        $idleDelay->setTimestamp(strtotime('15 minutes ago'));
+        $offlineDelay->setTimestamp(strtotime('15 minutes ago'));
 
         $q = $this->_em->createQueryBuilder()
             ->update('MauticUserBundle:User', 'u')
@@ -92,16 +88,6 @@ class UserRepository extends CommonRepository
             ->where('u.lastActive <= :delay')
             ->setParameter('delay', $offlineDelay)
             ->setParameter('status', 'offline');
-        $q->getQuery()->execute();
-
-        //Away
-        $q->setParameter('delay', $awayDelay);
-        $q->setParameter('status', 'away');
-        $q->getQuery()->execute();
-
-        //Idle
-        $q->setParameter('delay', $idleDelay);
-        $q->setParameter('status', 'away');
         $q->getQuery()->execute();
     }
 
