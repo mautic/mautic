@@ -238,9 +238,9 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateListAction(Request $request)
+    protected function updateListAction(Request $request)
     {
-        $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true));
+        $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true, 'tmpl' => $request->get('tmpl', 'index')));
 
         $dataArray = array(
             'canvasContent' => $response->getContent(),
@@ -351,7 +351,7 @@ class AjaxController extends CommonAjaxController
      * @param $type
      * @param $userId
      */
-    public function toggleChatSettingAction(Request $request)
+    protected function toggleChatSettingAction(Request $request)
     {
         $chatType = $request->request->get('chatType');
         $setting  = $request->request->get('setting');
@@ -432,7 +432,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function reorderVisibleChatListAction(Request $request)
+    protected function reorderVisibleChatListAction(Request $request)
     {
         $chatType = InputHelper::clean($request->request->get('chatType'));
 
@@ -446,6 +446,22 @@ class AjaxController extends CommonAjaxController
         $settings['visible'] = $order;
 
         $model->setSettings($settings, $chatType);
+
+        return $this->sendJsonResponse(array('success' => 1));
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function setChatOnlineStatusAction(Request $request)
+    {
+        $status = InputHelper::clean($request->request->get('status'));
+
+        if ($status) {
+            /** @var \Mautic\UserBundle\Model\UserModel $model */
+            $model = $this->factory->getModel('user');
+            $model->setOnlineStatus($status);
+        }
 
         return $this->sendJsonResponse(array('success' => 1));
     }

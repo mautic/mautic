@@ -13,7 +13,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\UserBundle\Entity\Role;
 /**
  * ChatRepository
  */
@@ -154,52 +153,7 @@ class ChatRepository extends CommonRepository
             'total' => count($results)
         );
 
-        $this->generateOnlineStatuses($users['users']);
-
         return $users;
-    }
-
-    /**
-     * @param      $results
-     * @param null $key
-     */
-    private function generateOnlineStatuses(&$results, $key = null)
-    {
-        //fix online statuses
-        $dt    = new DateTimeHelper(strtotime('15 minutes ago'), 'U', 'local');
-        $delay = $dt->getUtcDateTime();
-
-        foreach ($results as &$r) {
-            if (is_array($key)) {
-                foreach ($key as $k) {
-                    if ($k === null) {
-                        $use =& $r;
-                    } else {
-                        $use =& $r[$k];
-                    }
-
-                    if (empty($use['onlineStatus'])) {
-                        $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
-                    } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
-                        $use['onlineStatus'] = 'offline';
-                    }
-                    unset($use);
-                }
-            } else {
-                if ($key === null) {
-                    $use =& $r;
-                } else {
-                    $use =& $r[$key];
-                }
-
-                if (empty($use['onlineStatus'])) {
-                    $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
-                } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
-                    $use['onlineStatus'] = 'offline';
-                }
-                unset($use);
-            }
-        }
     }
 
     /**
@@ -228,59 +182,6 @@ class ChatRepository extends CommonRepository
             ->setParameter('to', $toUserId)
             ->setParameter('id', $upToId)
             ->execute();
-    }
-
-    /**
-     * Returns a list of active users
-     *
-     * @param int    $currentUserId
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     */
-    public function getActiveUsers($currentUserId, $search = '', $limit = 10, $start = 0)
-    {
-        $q = $this->_em->createQueryBuilder();
-
-        //consider a user active if their last activity is within 3 minute ago
-        $dt = new DateTimeHelper(strtotime('3 minutes ago'), 'U', 'local');
-        $delay = $dt->getUtcDateTime();
-
-        $q->select('partial u.{id, username, firstName, lastName, email, lastActive, onlineStatus}')
-            ->from('MauticUserBundle:User', 'u')
-            ->where('u.lastActive >= :delay')
-            ->setParameter('delay', $delay)
-            ->andWhere('u.id != :currentUser')
-            ->setParameter('currentUser', $currentUserId)
-            ->orderBy('u.firstName, u.lastName');
-
-        if (!empty($search)) {
-            $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->like('u.email', ':search'),
-                    $q->expr()->like('u.firstName', ':search'),
-                    $q->expr()->like('u.lastName', ':search'),
-                    $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
-                            $q->expr()->concat(
-                                $q->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
-                    )
-                )
-            )
-                ->setParameter('search', "{$search}%");
-        }
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
     }
 
     /**

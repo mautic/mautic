@@ -42,7 +42,9 @@ class DefaultController extends FormController
                     'addon:mauticChat:channels:create'
                 ), 'RETURN_ARRAY'),
                 'ignoreModal' => $this->request->get('ignoreModal', false),
-                'inPopup'     => $this->request->get('inPopup', false)
+                'inPopup'     => $this->request->get('inPopup', false),
+                'me'          => $this->factory->getUser(),
+                'tmpl'        => $this->request->get('tmpl', 'index')
             ),
             'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
             'passthroughVars' => array(

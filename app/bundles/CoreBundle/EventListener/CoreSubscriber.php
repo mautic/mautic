@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\AjaxController;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
@@ -167,7 +166,7 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //update the user's activity marker
-        if (!($controller[0] instanceof InstallController) && !($controller[0] instanceof AjaxController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
+        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
             //prevent multiple updates
             $user = $this->factory->getUser();
             //slight delay to prevent too many updates

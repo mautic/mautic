@@ -24,13 +24,16 @@
             case 'online':
                 $status = 'success';
                 break;
+            case 'idle':
             case 'away':
+            case 'manualaway':
                 $status = 'warning';
                 break;
             case 'dnd':
                 $status = 'danger';
                 break;
             default:
+                $u['onlineStatus'] = 'offline';
                 $status = 'default';
                 break;
         endswitch;

@@ -17,6 +17,20 @@ if (empty($contentOnly)) {
 }
 ?>
 
+<?php if ($tmpl == 'index'): ?>
+<div class="row ml-5 mr-5">
+    <div class="col-xs-12">
+        <?php $myStatus = $me->getOnlineStatus(); ?>
+        <select class="form-control input-sm" onchange="Mautic.setChatOnlineStatus(this.value);">
+            <option value="online"<?php echo ($myStatus != 'manualaway' && $myStatus != 'dnd') ? ' selected' : ''; ?>><?php echo $view['translator']->trans('mautic.chat.chat.status.online'); ?></option>
+            <option value="manualaway"<?php echo ($myStatus == 'manualaway') ? ' selected' : ''; ?>><?php echo $view['translator']->trans('mautic.chat.chat.status.manualaway'); ?></option>
+            <option value="dnd"<?php echo ($myStatus == 'dnd') ? ' selected' : ''; ?>><?php echo $view['translator']->trans('mautic.chat.chat.status.dnd'); ?></option>
+        </select>
+    </div>
+</div>
+<div id="ChatCanvasContent">
+<?php endif; ?>
+
 <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array(
     'channels'    => $channels,
     'permissions' => $permissions
@@ -24,3 +38,7 @@ if (empty($contentOnly)) {
 <?php echo $view->render('MauticChatBundle:Default:users.html.php', array(
     'users'  => $users
 )); ?>
+
+<?php if ($tmpl == 'index'): ?>
+</div>
+<?php endif; ?>

@@ -55,22 +55,24 @@ Mautic.updateChatList = function (killTimer) {
         Mautic.clearModeratedInterval('chatListUpdaterInterval');
     } else {
         if (typeof Mautic.chatPauseUpdateChatList != 'undefined') {
-            console.log('paused');
             //sorting pending so wait till next round to update
             Mautic.moderatedIntervalCallbackIsComplete('chatListUpdaterInterval');
         } else {
             mQuery.ajax({
                 type: "POST",
-                url: mauticAjaxUrl + "?action=addon:mauticChat:updateList",
+                url: mauticAjaxUrl + "?action=addon:mauticChat:updateList&tmpl=list",
                 dataType: "json",
                 success: function (response) {
                     if (response.canvasContent) {
-                        mQuery('#OffCanvasMainContent').html(response.canvasContent);
+                        if (typeof Mautic.chatPauseUpdateChatList == 'undefined') {
 
-                        response.target = '#OffCanvasMainContent';
-                        Mautic.processPageContent(response);
+                            mQuery('#ChatCanvasContent').html(response.canvasContent);
 
-                        Mautic.chatOnLoad();
+                            response.target = '#ChatCanvasContent';
+                            Mautic.processPageContent(response);
+
+                            Mautic.chatOnLoad();
+                        }
 
                         if (killTimer) {
                             Mautic.clearModeratedInterval('chatListUpdaterInterval');
@@ -175,11 +177,15 @@ Mautic.getLastChatGroup = function() {
 
 Mautic.markMessagesRead = function(itemId, chatType) {
     var lastId  = mQuery('#ChatLastMessageId').val();
+    Mautic.chatPauseUpdateChatList = true;
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=addon:mauticChat:markRead",
         data: 'chatId=' + itemId + '&chatType=' + chatType + '&lastId=' + lastId,
-        dataType: "json"
+        dataType: "json",
+        complete: function() {
+            delete Mautic.chatPauseUpdateChatList;
+        }
     });
 };
 
@@ -221,6 +227,8 @@ Mautic.sendChatMessage = function(toId, chatType) {
     var groupId = Mautic.getLastChatGroup();
 
     if (msgText) {
+        Mautic.chatPauseUpdateChatList = true;
+
         Mautic.startCanvasLoadingBar();
 
         var dataObj = {
@@ -241,6 +249,9 @@ Mautic.sendChatMessage = function(toId, chatType) {
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
+            },
+            complete: function() {
+                delete Mautic.chatPauseUpdateChatList;
             }
         });
     }
@@ -389,5 +400,13 @@ Mautic.clearChatFilterUpdateInProgress = function()
 {
     delete Mautic.chatFilterUpdateInProgress;
     Mautic.stopModalLoadingBar('#MauticSharedModal');
+};
 
-}
+Mautic.setChatOnlineStatus = function(onlineStatus)
+{
+    mQuery.ajax({
+        type: "POST",
+        url: mauticAjaxUrl + "?action=addon:mauticChat:setChatOnlineStatus",
+        data: 'status=' + onlineStatus
+    });
+};

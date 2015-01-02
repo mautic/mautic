@@ -31,6 +31,7 @@ class UserModel extends FormModel
         'online',
         'idle',
         'away',
+        'manualaway',
         'dnd',
         'offline'
     );

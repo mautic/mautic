@@ -77,15 +77,31 @@ class UserRepository extends CommonRepository
     public function updateOnlineStatuses()
     {
         $dt    = new DateTimeHelper();
-        $delay = $dt->getUtcDateTime();
-        $delay->setTimestamp(strtotime('60 minutes ago'));
+        $offlineDelay = $dt->getUtcDateTime();
+        $offlineDelay->setTimestamp(strtotime('60 minutes ago'));
+
+        $awayDelay = $dt->getUtcDateTime();
+        $awayDelay->setTimestamp(strtotime('30 minutes ago'));
+
+        $idleDelay = $dt->getUtcDateTime();
+        $idleDelay->setTimestamp(strtotime('15 minutes ago'));
 
         $q = $this->_em->createQueryBuilder()
             ->update('MauticUserBundle:User', 'u')
-            ->set('u.onlineStatus', ':offline')
+            ->set('u.onlineStatus', ':status')
             ->where('u.lastActive <= :delay')
-            ->setParameter('delay', $delay)
-            ->setParameter('offline', 'offline');
+            ->setParameter('delay', $offlineDelay)
+            ->setParameter('status', 'offline');
+        $q->getQuery()->execute();
+
+        //Away
+        $q->setParameter('delay', $awayDelay);
+        $q->setParameter('status', 'away');
+        $q->getQuery()->execute();
+
+        //Idle
+        $q->setParameter('delay', $idleDelay);
+        $q->setParameter('status', 'away');
         $q->getQuery()->execute();
     }
 
