@@ -71,6 +71,10 @@ $collection->add('mautic_form_postresults', new Route('/p/form/submit',
     array('_controller' => 'MauticFormBundle:Public:submit')
 ));
 
+$collection->add('mautic_form_preview', new Route('/p/form',
+    array('_controller' => 'MauticFormBundle:Public:preview')
+));
+
 $collection->add('mautic_form_generateform', new Route('/p/form/generate.js',
     array('_controller' => 'MauticFormBundle:Public:generate')
 ));
