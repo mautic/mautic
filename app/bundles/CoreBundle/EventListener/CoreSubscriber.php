@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Controller\AjaxController;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
@@ -17,6 +18,7 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -113,7 +115,18 @@ class CoreSubscriber extends CommonSubscriber
             //mark the user as last logged in
             $user = $this->factory->getUser();
             if ($user instanceof User) {
-                $this->factory->getModel('user.user')->getRepository()->setLastLogin($user);
+                /** @var \Mautic\UserBundle\Model\UserModel $userModel */
+                $userModel = $this->factory->getModel('user');
+                $userModel->setOnlineStatus('online');
+
+                $userModel->getRepository()->setLastLogin($user);
+            }
+
+            //dispatch on login events
+            $dispatcher = $this->factory->getDispatcher();
+            if ($dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
+                $event = new LoginEvent($this->factory);
+                $dispatcher->dispatch(UserEvents::USER_LOGIN, $event);
             }
         } else {
             $session->remove('mautic.user');
@@ -154,16 +167,32 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //update the user's activity marker
-        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
+        if (!($controller[0] instanceof InstallController) && !($controller[0] instanceof AjaxController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
             //prevent multiple updates
             $user = $this->factory->getUser();
             //slight delay to prevent too many updates
             //note that doctrine will return in current timezone so we do not have to worry about that
             $delay = new \DateTime();
             $delay->setTimestamp(strtotime('2 minutes ago'));
+
+            /** @var \Mautic\UserBundle\Model\UserModel $userModel */
+            $userModel = $this->factory->getModel('user');
             if ($user instanceof User && $user->getLastActive() < $delay) {
-                $this->factory->getModel('user.user')->getRepository()->setLastActive($user);
+                $userModel->getRepository()->setLastActive($user);
             }
+
+            $session = $this->factory->getSession();
+
+            $delay = new \DateTime();
+            $delay->setTimestamp(strtotime('15 minutes ago'));
+
+            $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
+
+            if ($lastOnlineStatusCleanup <= $delay) {
+                $userModel->getRepository()->updateOnlineStatuses();
+                $session->set('mautic.online.status.cleanup', new \DateTime());
+            }
+
             define('MAUTIC_ACTIVITY_CHECKED', 1);
         }
     }

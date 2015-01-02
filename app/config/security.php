@@ -91,7 +91,11 @@ $container->loadFromExtension('security', array(
                 'success_handler' => 'mautic.security.authentication_handler',
                 'failure_handler' => 'mautic.security.authentication_handler'
             ),
-            'logout'      => array(),
+            'logout'      => array(
+                'handlers' => array(
+                    'mautic.security.logout_handler'
+                )
+            ),
             'remember_me' => array(
                 'key'      => '%mautic.rememberme_key%',
                 'lifetime' => '%mautic.rememberme_lifetime%',
