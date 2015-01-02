@@ -382,8 +382,6 @@ var MauticSDK = {
     },
 
     getFormLink: function(options){
-        console.log('---debug---');
-        console.log(options.params);
         var link = this.config.mautic_base_url;
         link += (typeof(this.config.debug) != 'undefined') ? 'index_dev.php' : 'index.php';
         link += '/p/form/?' + options.params;
