@@ -10,7 +10,7 @@ Note: a minimum of PHP 5.3.7 is required.
 ```
 #!bash
 
-git clone https://github.com:mautic/mautic.git
+git clone https://github.com/mautic/mautic.git
 ```
 
 ### CD into the root folder
