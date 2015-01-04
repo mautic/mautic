@@ -9,13 +9,13 @@
 
 namespace Mautic\ApiBundle\Controller\OAuth1;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
 
-class SecurityController extends Controller
+class SecurityController extends CommonController
 {
 
     /**
@@ -41,10 +41,7 @@ class SecurityController extends Controller
                 $msg = $error->getMessage();
             }
 
-            $session->getFlashBag()->add(
-                'error',
-                $this->get("translator")->trans($msg, array(), 'flashes')
-            );
+            $this->addFlash($msg, array(), 'error', null, false);
         }
 
         return $this->render(
