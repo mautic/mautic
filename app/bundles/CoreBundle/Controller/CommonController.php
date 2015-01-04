@@ -128,14 +128,7 @@ class CommonController extends Controller implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->factory->getSession()->getFlashBag()->add(
-                    $flash['type'],
-                    $this->get('translator')->trans(
-                        $flash['msg'],
-                        (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
-                        'flashes'
-                    )
-                );
+                $this->addFlash($flash['msg'], (!empty($flash['msgVars']) ? $flash['msgVars'] : array()), $flash['type']);
             }
         }
 
@@ -187,7 +180,8 @@ class CommonController extends Controller implements MauticController
         }
 
         //render flashes
-        $passthrough['flashes'] = $this->getFlashContent();
+        $passthrough['flashes']       = $this->getFlashContent();
+        $passthrough['notifications'] = $this->getNotificationContent();
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
@@ -420,6 +414,69 @@ class CommonController extends Controller implements MauticController
      */
     protected function getFlashContent()
     {
-        return $this->renderView('MauticCoreBundle:Default:flashes.html.php');
+        return $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php');
+    }
+
+    /**
+     * Renders flashes' HTML
+     *
+     * @return string
+     */
+    protected function getNotificationContent()
+    {
+        return $this->forward('MauticCoreBundle:Default:notifications', array('ignoreAjax' => true))->getContent();
+    }
+
+    /**
+     * @param      $message
+     * @param null $type
+     * @param bool $isRead
+     * @param null $header
+     * @param null $iconClass
+     */
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null)
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
+        $notificationModel = $this->factory->getModel('core.notification');
+        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass );
+    }
+
+    /**
+     * @param        $message
+     * @param array  $messageVars
+     * @param string $type
+     * @param string $domain
+     * @param bool   $addNotification
+     */
+    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    {
+        if ($domain == null) {
+            $domain = 'flashes';
+        }
+
+        $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+
+        $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+
+        if ($addNotification) {
+            switch ($type) {
+                case 'warning':
+                    $iconClass = "text-warning fa-exclamation-triangle";
+                    break;
+                case 'error':
+                    $iconClass = "text-danger fa-exclamation-circle";
+                    break;
+                case 'notice':
+                    $iconClass = "fa-info-circle";
+                default:
+                    break;
+            }
+
+            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            $lastActive = $this->request->get('mauticUserLastActive', 0);
+            $isRead     = $lastActive > 30 ? 0 : 1;
+
+            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
+        }
     }
 }

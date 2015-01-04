@@ -703,6 +703,10 @@ var Mautic = {
                 Mautic.setFlashes(response.flashes);
             }
 
+            if (response.notifications) {
+                Mautic.setNotifications(response.notifications, true);
+            }
+
             if (response.route) {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
@@ -996,7 +1000,7 @@ var Mautic = {
      * @param flashes
      */
     setFlashes: function (flashes) {
-        mQuery('#flashes').replaceWith(flashes);
+        mQuery('#flashes').append(flashes);
     },
 
     /**
@@ -1008,6 +1012,29 @@ var Mautic = {
                 mQuery(this).remove();
             });
         }, 7000);
+    },
+
+    /**
+     *
+     * @param notifications
+     */
+    setNotifications: function (notifications, replace) {
+        if (replace) {
+            mQuery('#notificationsDropdown').replaceWith(notifications);
+
+            mQuery('#notificationsDropdown').on('click', function(e) {
+                if (mQuery(e.target).hasClass('do-not-close')) {
+                    e.stopPropagation();
+                }
+            });
+        } else {
+            if (mQuery('#notifications .mautic-update')) {
+                mQuery('#notifications .mautic-update').after(notifications);
+            } else {
+                mQuery('#notifications').prepend(notifications);
+            }
+        }
+
     },
 
     /**
