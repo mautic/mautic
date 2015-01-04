@@ -429,8 +429,6 @@ class LeadController extends FormController
             //set the default owner to the currently logged in user
             $currentUser = $this->get('security.context')->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
-            $userName = $currentUser->getName();
-            $form->get('owner_lookup')->setData($userName);
         }
 
         return $this->delegateView(array(
@@ -563,12 +561,6 @@ class LeadController extends FormController
         } else {
             //lock the entity
             $model->lockEntity($lead);
-
-            $owner = $lead->getOwner();
-            if (!empty($owner)) {
-                $userName = $owner->getName();
-                $form->get('owner_lookup')->setData($userName);
-            }
         }
 
         return $this->delegateView(array(

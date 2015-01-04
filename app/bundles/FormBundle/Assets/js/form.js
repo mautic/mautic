@@ -161,47 +161,6 @@ Mautic.formActionOnLoad = function (container, response) {
             mQuery('#form-action-placeholder').remove();
         }
     }
-
-    // Send predefined email to admin form user lookup
-    var userLookup = mQuery('#formaction_properties_user_lookup');
-    if (userLookup.length) {
-
-        var users = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            prefetch: {
-                url: mauticAjaxUrl + "?action=user:userList",
-            },
-            remote: {
-                url: mauticAjaxUrl + "?action=user:userList&filter=%QUERY"
-            },
-            dupDetector: function (remoteMatch, localMatch) {
-                return (remoteMatch.label == localMatch.label);
-            },
-            ttl: 1800000,
-            limit: 5
-        });
-        users.initialize();
-
-        userLookup.typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 2
-            },{
-                name: 'formaction_properties_user_lookup',
-                displayKey: 'label',
-                source: users.ttAdapter()
-            }).on('typeahead:selected', function (event, datum) {
-                mQuery("#formaction_properties_user_id").val(datum["value"]);
-            }).on('typeahead:autocompleted', function (event, datum) {
-                mQuery("#formaction_properties_user_id").val(datum["value"]);
-            }).on('keypress', function (event) {
-                if ((event.keyCode || event.which) == 13) {
-                    userLookup.typeahead('close');
-                }
-            });
-
-    }
 };
 
 Mautic.onPostSubmitActionChange = function(value) {

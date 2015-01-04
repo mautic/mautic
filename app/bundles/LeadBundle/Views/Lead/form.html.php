@@ -81,8 +81,8 @@ $groups = array_keys($fields);
                             <div class="form-group mb-0">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <?php echo $view['form']->label($form['owner_lookup']); ?>
-                                        <?php echo $view['form']->widget($form['owner_lookup']); ?>
+                                        <?php echo $view['form']->label($form['owner']); ?>
+                                        <?php echo $view['form']->widget($form['owner']); ?>
                                     </div>
                                     <div class="col-sm-4">
                                         <?php echo $view['form']->label($form['preferred_profile_image']); ?>

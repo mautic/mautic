@@ -84,7 +84,7 @@ class LeadControllerTest extends MauticWebTestCase
         //test to see if at least one form element is present
         $this->assertGreaterThan(
             0,
-            $crawler->filter('#lead_owner_lookup')->count()
+            $crawler->filter('#lead_owner')->count()
         );
 
         //let's try creating a lead
@@ -122,7 +122,7 @@ class LeadControllerTest extends MauticWebTestCase
         //test to see if at least one form element is present
         $this->assertGreaterThan(
             0,
-            $crawler->filter('#lead_owner_lookup')->count()
+            $crawler->filter('#lead_owner')->count()
         );
 
         //let's try creating a lead

@@ -64,3 +64,17 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'passwordreset',
     ));
+
+//User list
+$container->setDefinition(
+    'mautic.form.type.user_list',
+    new Definition(
+        'Mautic\UserBundle\Form\Type\UserListType',
+        array(
+            new Reference('mautic.factory')
+        )
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'user_list',
+    ));

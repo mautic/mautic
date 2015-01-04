@@ -427,28 +427,15 @@ var Mautic = {
                 }
             });
 
-            //activate global live search
-            var engine = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=globalCommandList"
-                }
-            });
-            engine.initialize();
-
-            mQuery('#global_search').typeahead({
-                    hint: true,
-                    highlight: true,
-                    minLength: 0,
+            if (mQuery('#global_search').length) {
+                var globalTypeahead = Mautic.activateTypeahead('#global_search', {
+                    prefetch: true,
+                    remote: false,
+                    limit: 0,
+                    action: 'globalCommandList',
                     multiple: true
-                },
-                {
-                    name: "global_search",
-                    displayKey: 'value',
-                    source: engine.ttAdapter()
-                }
-            ).on('typeahead:selected', function (event, datum) {
+                });
+                mQuery(globalTypeahead).on('typeahead:selected', function (event, datum) {
                     //force live search update
                     MauticVars.lastGlobalSearchStr = '';
                     mQuery('#global_search').keyup();
@@ -456,13 +443,10 @@ var Mautic = {
                     //force live search update
                     MauticVars.lastGlobalSearchStr = '';
                     mQuery('#global_search').keyup();
-                }).on('keypress', function (event) {
-                    if ((event.keyCode || event.which) == 13) {
-                        mQuery('#global_search').typeahead('close');
-                    }
                 });
 
-            Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
+                Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
+            }
         }
 
         //instantiate sparkline plugin
@@ -704,7 +688,7 @@ var Mautic = {
             }
 
             if (response.notifications) {
-                Mautic.setNotifications(response.notifications, true);
+               Mautic.setNotifications(response.notifications, true);
             }
 
             if (response.route) {
@@ -1267,43 +1251,26 @@ var Mautic = {
         if (mQuery('#' + elId).length) {
             var livesearch = (mQuery('#' + elId).attr("data-toggle=['livesearch']")) ? true : false;
 
-            var engine = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=commandList&model=" + modelName
+            var typeaheadObject = Mautic.activateTypeahead('#' + elId, {
+                prefetch: true,
+                remote: false,
+                limit: 0,
+                action: 'commandList&model=' + modelName,
+                multiple: true
+            });
+            mQuery(typeaheadObject).on('typeahead:selected', function (event, datum) {
+                if (livesearch) {
+                    //force live search update,
+                    MauticVars.lastSearchStr = '';
+                    mQuery('#' + elId).keyup();
+                }
+            }).on('typeahead:autocompleted', function (event, datum) {
+                if (livesearch) {
+                    //force live search update
+                    MauticVars.lastSearchStr = '';
+                    mQuery('#' + elId).keyup();
                 }
             });
-            engine.initialize();
-
-            mQuery('#' + elId).typeahead({
-                    hint: true,
-                    highlight: true,
-                    minLength: 0,
-                    multiple: true
-                },
-                {
-                    name: elId,
-                    displayKey: 'value',
-                    source: engine.ttAdapter()
-                }
-            ).on('typeahead:selected', function (event, datum) {
-                    if (livesearch) {
-                        //force live search update,
-                        MauticVars.lastSearchStr = '';
-                        mQuery('#' + elId).keyup();
-                    }
-                }).on('typeahead:autocompleted', function (event, datum) {
-                    if (livesearch) {
-                        //force live search update
-                        MauticVars.lastSearchStr = '';
-                        mQuery('#' + elId).keyup();
-                    }
-                }).on('keypress', function (event) {
-                    if ((event.keyCode || event.which) == 13) {
-                        mQuery('#' + elId).typeahead('close');
-                    }
-                });
         }
     },
 
@@ -2022,5 +1989,145 @@ var Mautic = {
             type: "GET",
             data: "action=clearNotification&id=" + id
         });
+    },
+
+    activateTypeahead: function(el, options) {
+        if (typeof options == 'undefined' || !mQuery(el).length) {
+            return;
+        }
+
+        if (typeof options.remote == 'undefined') {
+            options.remote = (options.action) ? true : false;
+        }
+
+        if (typeof options.prefetch == 'undefined') {
+            options.prefetch = false;
+        }
+
+        if (typeof options.limit == 'undefined') {
+            options.limit = 5;
+        }
+
+        if (!options.displayKey) {
+            options.displayKey = 'value';
+        }
+
+        if (typeof options.multiple == 'undefined') {
+            options.multiple = false;
+        }
+
+        if (typeof options.minLength == 'undefined') {
+            options.minLength = 2;
+        }
+
+        if (options.prefetch || options.remote) {
+            if (typeof options.action == 'undefined') {
+                return;
+            }
+
+            var sourceOptions = {
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace(options.displayKey),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                dupDetector: function (remoteMatch, localMatch) {
+                    return (remoteMatch[options.displayKey] == localMatch[options.displayKey]);
+                },
+                ttl: 15000,
+                limit: options.limit
+            };
+
+            var filterClosure = function (list) {
+                if (typeof list.ignore_wdt != 'undefined') {
+                    delete list.ignore_wdt;
+                }
+
+                if (typeof list == 'object' && typeof list[0] != 'undefined') {
+                    //meant to be an array and not an object
+                    list = mQuery.map(list, function (el) {
+                        return el;
+                    });
+                }
+                return list;
+            };
+
+            if (options.remote) {
+                sourceOptions.remote = {
+                    url: mauticAjaxUrl + "?action=" + options.action + "&filter=%QUERY",
+                    filter: filterClosure
+                };
+            }
+
+            if (options.prefetch) {
+                sourceOptions.prefetch = {
+                    url: mauticAjaxUrl + "?action=" + options.action,
+                    filter: filterClosure
+                };
+            }
+
+            var theBloodhound = new Bloodhound(sourceOptions);
+            theBloodhound.initialize();
+        } else {
+            var substringMatcher = function(strs, strKeys) {
+                return function findMatches(q, cb) {
+                    var matches, substrRegex;
+
+                    // an array that will be populated with substring matches
+                    matches = [];
+
+                    // regex used to determine if a string contains the substring `q`
+                    substrRegex = new RegExp(q, 'i');
+
+                    // iterate through the pool of strings and for any string that
+                    // contains the substring `q`, add it to the `matches` array
+                    mQuery.each(strs, function(i, str) {
+                        if (typeof str == 'object') {
+                            str = str[options.displayKey];
+                        }
+
+                        if (substrRegex.test(str)) {
+                            // the typeahead jQuery plugin expects suggestions to a
+                            // JavaScript object, refer to typeahead docs for more info
+                            var match = {};
+
+                            match[options.displayKey] = str;
+
+                            if (strKeys.length && typeof strKeys[i] != 'undefined') {
+                                match['id'] = strKeys[i];
+                            }
+                            matches.push(match);
+                        }
+                    });
+
+                    cb(matches);
+                };
+            };
+
+            var lookupOptions = (options.dataOptions) ? options.dataOptions : mQuery(el).data('options');
+            var lookupKeys    = (options.dataOptionKeys) ? options.dataOptionKeys : [];
+            if (!lookupOptions) {
+                return;
+            }
+        }
+
+        var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+
+        var theTypeahead = mQuery(el).typeahead(
+            {
+                hint: true,
+                highlight: true,
+                minLength: options.minLength,
+                multiple: options.multiple
+            },
+            {
+                name: theName,
+                displayKey: options.displayKey,
+                source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+            }
+        ).on('keypress', function (event) {
+            if ((event.keyCode || event.which) == 13) {
+                mQuery(el).typeahead('close');
+            }
+        });
+
+        return theTypeahead;
     }
 };

@@ -43,6 +43,11 @@ class UserType extends AbstractType
     private $em;
 
     /**
+     * @var \Mautic\UserBundle\Model\UserModel
+     */
+    private $model;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
@@ -50,6 +55,7 @@ class UserType extends AbstractType
         $this->translator         = $factory->getTranslator();
         $this->supportedLanguages = $factory->getParameter('supported_languages');
         $this->em                 = $factory->getEntityManager();
+        $this->model              = $factory->getModel('user');
     }
 
     /**
@@ -81,10 +87,15 @@ class UserType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
+
+        $positions = $this->model->getLookupResults('position', null, 0, true);
         $builder->add('position',  'text', array(
             'label'      => 'mautic.user.user.form.position',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array(
+                'class' => 'form-control',
+                'data-options' => json_encode($positions)
+            ),
             'required'   => false
         ));
 

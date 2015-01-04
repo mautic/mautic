@@ -2,34 +2,7 @@
 Mautic.userOnLoad = function (container) {
     if (mQuery(container + ' form[name="user"]').length) {
         if (mQuery('#user_position').length) {
-            var positions = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=user:positionList"
-                },
-                remote: {
-                    url: mauticAjaxUrl + "?action=user:positionList&filter=%QUERY"
-                },
-                dupDetector: function (remoteMatch, localMatch) {
-                    return (remoteMatch.label == localMatch.label);
-                },
-                ttl: 1800000,
-                limit: 5
-            });
-            positions.initialize();
-            mQuery("#user_position").typeahead(
-                {
-                    hint: true,
-                    highlight: true,
-                    minLength: 2
-                },
-                {
-                    name: 'user_position',
-                    displayKey: 'value',
-                    source: positions.ttAdapter()
-                }
-            );
+            Mautic.activateTypeahead('#user_position', {displayKey: 'position'});
         }
     } else {
         if (mQuery(container + ' #list-search').length) {
