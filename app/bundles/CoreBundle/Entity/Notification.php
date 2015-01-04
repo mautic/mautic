@@ -35,9 +35,9 @@ class Notification
     protected $user;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=25, nullable=true)
      */
-    protected $key;
+    protected $type;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -91,17 +91,17 @@ class Notification
     /**
      * @return mixed
      */
-    public function getKey ()
+    public function getType ()
     {
-        return $this->key;
+        return $this->type;
     }
 
     /**
-     * @param mixed $key
+     * @param mixed $type
      */
-    public function setKey ($key)
+    public function setType ($type)
     {
-        $this->key = $key;
+        $this->type = $type;
     }
 
     /**

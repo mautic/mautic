@@ -31,21 +31,21 @@ class NotificationModel extends FormModel
     /**
      * Write a notification
      *
-     * @param        $key       Key to ID the source of the notification
      * @param        $message   Message of the notification
+     * @param        $type       Optional $type to ID the source of the notification
      * @param        $isRead    Add unread indicator
-     * @param        $header    Header for message (optional)
+     * @param        $header    Header for message
      * @param string $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
      * @param null   $user      User object; defaults to current user
      */
-    public function insertNotification($key, $message, $isRead = false, $header = null, $iconClass = null, User $user = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, User $user = null)
     {
         if ($user == null) {
             $user = $this->factory->getUser();
         }
 
         $notification = new Notification();
-        $notification->setKey($key);
+        $notification->setType($type);
         $notification->setIsRead($isRead);
         $notification->setHeader($header);
         $notification->setMessage($message);
