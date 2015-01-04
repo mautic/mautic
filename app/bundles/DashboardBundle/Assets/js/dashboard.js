@@ -18,8 +18,8 @@ Mautic.dashboardOnUnload = function(id) {
         delete Mautic.dashboardClickRateDoughnutObject;
         delete Mautic.dashboardOpenRateDoughnutObject;
         delete Mautic.ActiveVisitorsCount;
-        clearInterval(Mautic.ActiveVisitorsLoop);
     }
+    Mautic.clearModeratedInterval('ActiveVisitorsLoop');
 };
 
 Mautic.renderDashboardMap = function () {
