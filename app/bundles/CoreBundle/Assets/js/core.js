@@ -8,6 +8,15 @@ mQuery.ajaxSetup({
         if (settings.showLoadingBar) {
             mQuery("body").addClass("loading-content");
         }
+
+        if (typeof IdleTimer != 'undefined') {
+            var userLastActive = IdleTimer.getLastActive();
+            var queryGlue = (settings.url.indexOf("?") == -1) ? '?' : '&';
+
+            settings.url = settings.url + queryGlue + 'mauticUserLastActive=' + userLastActive;
+        }
+
+        return true;
     },
     cache: false
 });

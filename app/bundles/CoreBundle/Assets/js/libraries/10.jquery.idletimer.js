@@ -17,6 +17,7 @@ var IdleTimer = (function($) {
         _onAwayCallback: null,
         _onBackCallback: null,
         _debug: false,
+        _lastActive: new Date().getTime(),
 
         _makeIdle: function () {
             var t = new Date().getTime();
@@ -52,6 +53,8 @@ var IdleTimer = (function($) {
 
         _active: function (timer) {
             var t = new Date().getTime();
+
+            this._lastActive    = t;
             this._idleTimestamp = t + this._idleTimeout;
             this._awayTimestamp = t + this._awayTimeout;
             if (this._debug) console.log('not idle.');
@@ -86,6 +89,19 @@ var IdleTimer = (function($) {
     };
 
     return {
+        getLastActive: function() {
+            var t = new Date().getTime();
+            return Math.ceil((t - activityHelper._lastActive) / 1000);
+        },
+
+        isIdle: function() {
+            return activityHelper._idleNow;
+        },
+
+        isAway: function() {
+            return activityHelper._awayNow;
+        },
+
         setIdleTimeout: function (ms) {
             activityHelper._idleTimeout = ms;
             activityHelper._idleTimestamp = new Date().getTime() + ms;
