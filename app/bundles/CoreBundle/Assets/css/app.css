@@ -1357,15 +1357,24 @@ blockquote > p:after {
 .alert-growl {
   background: rgba(0, 0, 0, 0.8);
   color: #FFFFFF;
+  border: 1px solid #000;
+}
+.alert-growl-container {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 100000;
-  border: 1px solid #000;
+}
+.alert-growl-container .alert-growl {
+  margin-bottom: 5px;
 }
 .alert-growl .close {
   font-size: 13px;
   color: #fff;
+  margin-left: 10px;
+}
+.alert .close {
+  font-size: 13px;
   margin-left: 10px;
 }
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,

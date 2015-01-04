@@ -10,7 +10,11 @@ if (!isset($dismissable)) {
     $dismissable = '';
 }
 
-$alertClasses  = (empty($noGrowl)) ?
+if (!isset($alertType)) {
+    $alertType = 'growl';
+}
+
+$alertClasses  = ($alertType == 'growl') ?
     array('notice' => 'alert-growl',   'warning' => 'alert-growl',   'error' => 'alert-growl') :
     array('notice' => 'alert-success', 'warning' => 'alert-warning', 'error' => 'alert-danger');
 

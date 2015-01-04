@@ -1007,11 +1007,12 @@ var Mautic = {
      * Hides flashes
      */
     hideFlashes: function () {
+        /*
         window.setTimeout(function () {
             mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
                 mQuery(this).remove();
             });
-        }, 7000);
+        }, 7000); */
     },
 
     /**
@@ -1026,6 +1027,17 @@ var Mautic = {
                 if (mQuery(e.target).hasClass('do-not-close')) {
                     e.stopPropagation();
                 }
+            });
+
+            mQuery("#notificationsDropdown .slimscroll").slimScroll({
+                size: "6px",
+                distance: "0px",
+                wrapperClass: "scroll-wrapper",
+                railClass: "scroll-rail",
+                barClass: "scroll-bar",
+                wheelStep: 10,
+                railVisible: true,
+                alwaysVisible: false
             });
         } else {
             if (mQuery('#notifications .mautic-update')) {
