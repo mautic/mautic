@@ -33,6 +33,10 @@ class AjaxController extends CommonController
     protected function sendJsonResponse($dataArray)
     {
         $response  = new JsonResponse();
+
+        if ($this->factory->getEnvironment() == 'dev') {
+            $dataArray['ignore_wdt'] = 1;
+        }
         $response->setData($dataArray);
 
         return $response;
@@ -47,7 +51,11 @@ class AjaxController extends CommonController
     {
         //process ajax actions
         $securityContext = $this->factory->getSecurityContext();
-        $action          = (empty($ajaxAction)) ? $this->request->get("action") : $ajaxAction;
+        $action          = $this->request->get('action');
+        if (empty($action)) {
+            //check POST
+            $action = $this->request->request->get('action');
+        }
 
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (strpos($action, ":") !== false) {
@@ -484,6 +492,66 @@ class AjaxController extends CommonController
 
             $model->setOnlineStatus($status);
         }
+
+        return $this->sendJsonResponse(array('success' => 1));
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function markNotificationsReadAction(Request $request)
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('core.notification');
+
+        $model->markAllRead();
+
+        return $this->sendJsonResponse(array('success' => 1));
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function getNotificationsAction(Request $request)
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model         = $this->factory->getModel('core.notification');
+        $notifications = $model->getNotifications();
+
+        $showNewIndicator = false;
+
+        //determine if the new message indicator should be shown
+        foreach ($notifications as $n) {
+            if (!$n['isRead']) {
+                $showNewIndicator = true;
+                break;
+            }
+        }
+
+        $notificationHtml = $this->render('MauticCoreBundle:Notification:notifications.html.php', array(
+            'showNewIndicator' => $showNewIndicator,
+            'notifications'    => $notifications
+        ));
+
+        return $this->sendJsonResponse(array('notificationHtml' => $notificationHtml));
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function clearNotificationAction(Request $request)
+    {
+        $id = InputHelper::int($request->get('id', 0));
+
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('core.notification');
+        $model->clearNotification($id);
 
         return $this->sendJsonResponse(array('success' => 1));
     }

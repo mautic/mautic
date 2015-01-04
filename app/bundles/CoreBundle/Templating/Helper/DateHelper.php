@@ -25,6 +25,11 @@ class DateHelper extends Helper
     protected $helper;
 
     /**
+     * @var
+     */
+    protected $translator;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
@@ -37,6 +42,8 @@ class DateHelper extends Helper
         );
 
         $this->helper  = $factory->getDate();
+
+        $this->translator = $factory->getTranslator();
     }
 
     /**
@@ -126,6 +133,29 @@ class DateHelper extends Helper
     public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('time', $datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * Returns date/time like Today, 10:00 AM
+     *
+     * @param        $datetime
+     * @param string $timezone
+     * @param string $fromFormat
+     */
+    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    {
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+
+        $textDate = $this->helper->getTextDate();
+        $dt = $this->helper->getLocalDateTime();
+
+        if ($textDate) {
+            return $this->translator->trans('mautic.core.date.' . $textDate, array('%time%' => $dt->format("g:i a")));
+        } else {
+            $interval = $this->helper->getDiff('now', null, true);
+
+            return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->format('%d')));
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class DefaultController
@@ -49,5 +50,57 @@ class DefaultController extends CommonController
         return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
             array('results' => $results)
         );
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function notificationsAction()
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model         = $this->factory->getModel('core.notification');
+        $notifications = $model->getNotifications();
+
+        $showNewIndicator = false;
+
+        //determine if the new message indicator should be shown
+        foreach ($notifications as $n) {
+            if (!$n['isRead']) {
+                $showNewIndicator = true;
+                break;
+            }
+        }
+
+        // Check for updates
+        $updateMessage = '';
+        if ($this->factory->getUser()->isAdmin()) {
+            $session = $this->factory->getSession();
+
+            //check to see when we last checked for an update
+            $lastChecked = $session->get('mautic.update.checked', 0);
+
+            if (time() - $lastChecked > 3600) {
+                $session->set('mautic.update.checked', time());
+
+                /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+                $updateHelper = $this->factory->getHelper('update');
+                $updateData   = $updateHelper->fetchData();
+
+                // If the version key is set, we have an update
+                if (isset($updateData['version'])) {
+                    $translator    = $this->factory->getTranslator();
+                    $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+                }
+            }
+        }
+
+        return $this->delegateView(array(
+            'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+            'viewParameters'  => array(
+                'showNewIndicator' => $showNewIndicator,
+                'notifications'    => $notifications,
+                'updateMessage'    => $updateMessage
+            )
+        ));
     }
 }

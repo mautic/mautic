@@ -114,11 +114,19 @@ class CommonRepository extends EntityRepository
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+            $hydrationMode = constant("\\Doctrine\\ORM\\Query::" . strtoupper($args['hydration_mode']));
+            $query->setHydrationMode($hydrationMode);
         }
 
-        return new Paginator($query);
+        if (empty($args['ignore_paginator'])) {
+            return new Paginator($query);
+        } else {
+            if (empty($hydrationMode)) {
+                $hydrationMode = Query::HYDRATE_OBJECT;
+            }
+
+            return $query->getResult($hydrationMode);
+        }
     }
 
     /**

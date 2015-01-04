@@ -411,6 +411,13 @@ var Mautic = {
         }
 
         if (!inModal && container == 'body') {
+            //prevent notification dropdown from closing if clicking an action
+            mQuery('#notificationsDropdown').on('click', function(e) {
+                if (mQuery(e.target).hasClass('do-not-close')) {
+                    e.stopPropagation();
+                }
+            });
+
             //activate global live search
             var engine = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
@@ -1925,5 +1932,47 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+    },
+
+    /**
+     * Marks notifications as read and clears unread indicators
+     */
+    markNotificationsRead: function() {
+        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function() {
+            if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
+                mQuery('#notifications .is-unread').remove();
+                mQuery('#newNotificationIndicator').addClass('hide');
+
+                mQuery.ajax({
+                    url: mauticAjaxUrl,
+                    type: "GET",
+                    data: "action=markNotificationsRead"
+                });
+            }
+        });
+    },
+
+    /**
+     * Clear notification(s)
+     * @param id
+     */
+    clearNotification: function(id) {
+        if (id) {
+            mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function() {
+                mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).remove();
+            });
+        } else {
+            mQuery("#notifications .notification").fadeOut(300, function () {
+                mQuery(this).remove();
+            });
+        }
+
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            type: "GET",
+            data: "action=clearNotification&id=" + id
+        });
     }
 };

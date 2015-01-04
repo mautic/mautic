@@ -33,7 +33,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function startUserChatAction(Request $request, $userId = 0)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $userId      = InputHelper::int($request->request->get('chatId', $userId));
@@ -76,7 +76,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function startChannelChatAction(Request $request, $channelId = 0)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $channelId   = InputHelper::int($request->request->get('chatId', $channelId));
@@ -121,7 +121,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function sendMessageAction(Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -174,7 +174,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getMessagesAction(Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -208,7 +208,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function markReadAction (Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -243,8 +243,7 @@ class AjaxController extends CommonAjaxController
         $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true, 'tmpl' => $request->get('tmpl', 'index')));
 
         $dataArray = array(
-            'canvasContent' => $response->getContent(),
-            'ignore_wdt'    => 1
+            'canvasContent' => $response->getContent()
         );
 
         return $this->sendJsonResponse($dataArray);
@@ -260,7 +259,7 @@ class AjaxController extends CommonAjaxController
      */
     private function getMessageContent(Request $request, $currentUser, $recipient, $chatType, $fromAction ='')
     {
-        $dataArray = array('ignore_wdt' => 1);
+        $dataArray = array();
         $lastId    = InputHelper::int($request->request->get('lastId'));
         $groupId   = InputHelper::int($request->request->get('groupId'));
 
