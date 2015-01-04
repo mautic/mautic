@@ -348,17 +348,14 @@ class PageController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_page_index',
-                            '%url%'       => $this->generateUrl('mautic_page_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_page_index',
+                        '%url%'       => $this->generateUrl('mautic_page_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = array(
@@ -483,17 +480,14 @@ class PageController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_page_index',
-                            '%url%'       => $this->generateUrl('mautic_page_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_page_index',
+                        '%url%'       => $this->generateUrl('mautic_page_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
                 }
             } else {
                 //clear any modified content

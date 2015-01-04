@@ -14,7 +14,7 @@
         <?php $view['assets']->outputScripts("bodyOpen"); ?>
         <section id="app-content" class="container">
             <div class="row">
-                <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php', array('noGrowl' => true)); ?>
+                <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php', array('noGrowl' => true)); ?>
                 <?php $view['slots']->output('_content'); ?>
             </div>
         </section>

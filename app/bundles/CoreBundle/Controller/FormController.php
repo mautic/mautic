@@ -170,13 +170,10 @@ class FormController extends CommonController
             if (empty($returnUrl)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
-            $this->factory->getSession()->getFlashBag()->add(
-                'notice',
-                $this->get('translator')->trans('mautic.core.action.entity.unlocked',
-                    array('%name%' => urldecode($this->request->get('name'))),
-                    'flashes'
-                )
-            );
+
+            $this->addFlash('mautic.core.action.entity.unlocked',
+                array('%name%' => urldecode($this->request->get('name'))
+            ));
             return $this->redirect($returnUrl);
         }
 

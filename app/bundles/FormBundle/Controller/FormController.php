@@ -269,17 +269,14 @@ class FormController extends CommonFormController
                         //form is valid so process the data
                         $model->saveEntity($entity);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.created', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_form_index',
-                                '%url%'       => $this->generateUrl('mautic_form_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_form_index',
+                            '%url%'       => $this->generateUrl('mautic_form_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
                             $viewParameters = array(
@@ -447,17 +444,14 @@ class FormController extends CommonFormController
                         $this->factory->getModel('form.field')->deleteEntities($deletedFields);
                         $this->factory->getModel('form.action')->deleteEntities($deletedActions);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.updated', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_form_index',
-                                '%url%'       => $this->generateUrl('mautic_form_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_form_index',
+                            '%url%'       => $this->generateUrl('mautic_form_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
                             $viewParameters = array(

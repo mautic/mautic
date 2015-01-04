@@ -218,14 +218,11 @@ class AddonController extends FormController
         }
 
         // Alert the user to the number of additions
-        $this->request->getSession()->getFlashBag()->add(
-            'notice',
-            $this->get('translator')->trans('mautic.addon.notice.reloaded', array(
-                '%added%'    => $added,
-                '%disabled%' => $disabled,
-                '%updated%'  => $updated
-            ), 'flashes')
-        );
+        $this->addFlash('mautic.addon.notice.reloaded', array(
+            '%added%'    => $added,
+            '%disabled%' => $disabled,
+            '%updated%'  => $updated
+        ));
 
         $viewParameters = array(
             'page' => $this->factory->getSession()->get('mautic.addon.page')

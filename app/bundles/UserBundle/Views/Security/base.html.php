@@ -39,7 +39,7 @@
                             </svg>
                         </div>
                         <div id="main-panel-flash-msgs">
-                            <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                            <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
                         </div>
                         <?php $view['slots']->output('_content'); ?>
                     </div>

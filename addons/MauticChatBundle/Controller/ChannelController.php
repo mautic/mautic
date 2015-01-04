@@ -36,14 +36,7 @@ class ChannelController extends FormController
             $privateMembers = $entity->getPrivateUsers();
             if (!$privateMembers->contains($currentUser)) {
                 //access denied
-                $this->factory->getSession()->getFlashBag()->add(
-                    'error',
-                    $this->get('translator')->trans(
-                        'mautic.core.error.accessdenied',
-                        array(),
-                        'flashes'
-                    )
-                );
+                $this->addFlash('mautic.core.error.accessdenied', array(), 'error');
 
                 return $this->forward('MauticChatBundle:Default:index');
             }

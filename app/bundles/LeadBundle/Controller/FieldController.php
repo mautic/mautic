@@ -145,17 +145,14 @@ class FieldController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($field);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.created',  array(
-                                '%name%'      => $field->getLabel(),
-                                '%menu_link%' => 'mautic_leadfield_index',
-                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $field->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.created',  array(
+                            '%name%'      => $field->getLabel(),
+                            '%menu_link%' => 'mautic_leadfield_index',
+                            '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $field->getId()
+                            ))
+                        ));
                     }
                 }
             }
@@ -254,17 +251,14 @@ class FieldController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.updated',  array(
-                                '%name%'      => $field->getLabel(),
-                                '%menu_link%' => 'mautic_leadfield_index',
-                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $field->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.updated',  array(
+                            '%name%'      => $field->getLabel(),
+                            '%menu_link%' => 'mautic_leadfield_index',
+                            '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $field->getId()
+                            ))
+                        ));
                     }
                 }
             } else {

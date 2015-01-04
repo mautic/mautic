@@ -220,17 +220,14 @@ class TriggerController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($entity);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.created', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_pointtrigger_index',
-                                '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_pointtrigger_index',
+                            '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
 
                         if (!$form->get('buttons')->get('save')->isClicked()) {
                             //return edit view so that all the session stuff is loaded
@@ -377,17 +374,14 @@ class TriggerController extends FormController
                         //delete entities
                         $this->factory->getModel('form.action')->deleteEntities($deletedEvents);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.updated', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_pointtrigger_index',
-                                '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_pointtrigger_index',
+                            '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
                             /*

@@ -145,17 +145,14 @@ class RoleController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_role_index',
-                            '%url%'       => $this->generateUrl('mautic_role_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $entity->getName(),
+                        '%menu_link%' => 'mautic_role_index',
+                        '%url%'       => $this->generateUrl('mautic_role_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
                 }
             }
 
@@ -257,17 +254,14 @@ class RoleController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_role_index',
-                            '%url%'       => $this->generateUrl('mautic_role_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getName(),
+                        '%menu_link%' => 'mautic_role_index',
+                        '%url%'       => $this->generateUrl('mautic_role_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
                 }
             } else {
                 //unlock the entity

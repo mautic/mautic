@@ -144,17 +144,14 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created',  array(
-                            '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
-                            '%menu_link%' => 'mautic_leadlist_index',
-                            '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $list->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created',  array(
+                        '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
+                        '%menu_link%' => 'mautic_leadlist_index',
+                        '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $list->getId()
+                        ))
+                    ));
                 }
             }
 
@@ -246,17 +243,14 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated',  array(
-                            '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
-                            '%menu_link%' => 'mautic_leadlist_index',
-                            '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $list->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated',  array(
+                        '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
+                        '%menu_link%' => 'mautic_leadlist_index',
+                        '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $list->getId()
+                        ))
+                    ));
                 }
             } else {
                 //unlock the entity

@@ -316,17 +316,14 @@ class ReportController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_report_index',
-                            '%url%'       => $this->generateUrl('mautic_report_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_report_index',
+                        '%url%'       => $this->generateUrl('mautic_report_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     $returnUrl = $this->generateUrl('mautic_report_action', array(
                         'objectAction' => 'view',
@@ -335,10 +332,7 @@ class ReportController extends FormController
                     $viewParams = array('reportId' => $entity->getId());
                     $template = 'MauticReportBundle:Report:view';
                 } else {
-                    $this->request->getSession()->getFlashBag()->add(
-                        'error',
-                        $this->get('translator')->trans('mautic.core.error.not.valid', array(), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.error.not.valid', array(), 'error');
                 }
             } else {
                 //unlock the entity
@@ -408,17 +402,14 @@ class ReportController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_report_index',
-                            '%url%'       => $this->generateUrl('mautic_report_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_report_index',
+                        '%url%'       => $this->generateUrl('mautic_report_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     if (!$form->get('buttons')->get('save')->isClicked()) {
                         //return edit view so that all the session stuff is loaded

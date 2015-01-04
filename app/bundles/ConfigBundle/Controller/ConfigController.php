@@ -77,20 +77,14 @@ class ConfigController extends FormController
                     try {
                         $configurator->write();
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.config.config.notice.updated', array(), 'flashes')
-                        );
+                        $this->addFlash('mautic.config.config.notice.updated');
 
                         // We must clear the application cache for the updated values to take effect
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                         $cacheHelper = $this->factory->getHelper('cache');
                         $cacheHelper->clearCache();
                     } catch (RuntimeException $exception) {
-                        $this->request->getSession()->getFlashBag()->add(
-                            'error',
-                            $this->get('translator')->trans('mautic.config.config.error.not.updated', array(), 'flashes')
-                        );
+                        $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
                     }
                 }
             }
