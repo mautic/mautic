@@ -118,8 +118,7 @@ class DefaultController extends CommonController
                 'logs'              => $logs,
                 'icons'             => $icons,
                 'upcomingEmails'    => $upcomingEmails,
-                'security'          => $this->factory->getSecurity(),
-                'updateMessage'     => $updateMessage
+                'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
             'passthroughVars' => array(
