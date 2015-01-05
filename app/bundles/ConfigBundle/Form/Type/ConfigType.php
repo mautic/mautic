@@ -54,12 +54,12 @@ class ConfigType extends AbstractType
             foreach ($form as $config => $configForm) {
                 foreach ($configForm as $key => $child) {
                     if (in_array($key, $options['doNotChange'])) {
-                        $attributes = $child->getConfig()->getAttributes();
-                        $label      = $attributes['data_collector/passed_options']['label'];
 
                         if ($options['doNotChangeDisplayMode'] == 'mask') {
+                            $fieldOptions = $child->getConfig()->getOptions();
+
                             $configForm->add($key, 'text', array(
-                                'label'      => $label,
+                                'label'      => $fieldOptions['label'],
                                 'required'   => false,
                                 'mapped'     => false,
                                 'disabled'   => true,
