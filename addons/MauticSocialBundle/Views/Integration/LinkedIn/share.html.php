@@ -13,7 +13,6 @@ $js = <<<js
     lang: $locale
 </script>
 js;
-$view['assets']->addCustomDeclaration($js, 'bodyClose');
 
 $counter     = (!empty($settings['counter'])) ? $settings['counter'] : 'none';
 $dataCounter = ($counter != 'none') ? ' data-counter="'.$settings['counter'].'"' : '';
@@ -21,3 +20,4 @@ $dataCounter = ($counter != 'none') ? ' data-counter="'.$settings['counter'].'"'
 <div class="share-button linkedin-share-button layout-<?php echo $counter; ?>">
 <script type="IN/Share"<?php echo $dataCounter; ?>></script>
 </div>
+<?php echo $js; ?>
