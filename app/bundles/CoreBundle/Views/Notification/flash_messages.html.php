@@ -22,7 +22,7 @@ $flashes = $view['session']->getFlashes();
 ?>
 <?php foreach ($flashes as $type => $messages): ?>
 <?php $message = (is_array($messages)) ? $messages[0] : $messages; ?>
-<div class="alert <?php echo $alertClasses[$type].$dismissable; ?>">
+<div class="alert <?php echo $alertClasses[$type].$dismissable; ?> alert-new">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times"></i></button>
     <span><?php echo $message; ?></span>
 </div>

@@ -10,10 +10,18 @@ mQuery.ajaxSetup({
         }
 
         if (typeof IdleTimer != 'undefined') {
+            //append last active time
             var userLastActive = IdleTimer.getLastActive();
             var queryGlue = (settings.url.indexOf("?") == -1) ? '?' : '&';
 
             settings.url = settings.url + queryGlue + 'mauticUserLastActive=' + userLastActive;
+        }
+
+        if (mQuery('#mauticLastNotificationId').length) {
+            //append last notifications
+            var queryGlue = (settings.url.indexOf("?") == -1) ? '?' : '&';
+
+            settings.url = settings.url + queryGlue + 'mauticLastNotificationId=' + mQuery('#mauticLastNotificationId').val();
         }
 
         return true;
@@ -25,16 +33,6 @@ mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
-        });
-    }
-
-    if (typeof Mousetrap != 'undefined') {
-        Mousetrap.bind('shift+d', function(e) {
-            mQuery('#mautic_dashboard_index').click();
-        });
-
-        Mousetrap.bind('shift+right', function(e) {
-            mQuery('.navbar-right > button.navbar-toggle').click();
         });
     }
 
@@ -84,6 +82,23 @@ MauticVars.moderatedIntervals    = {};
 MauticVars.intervalsInProgress   = {};
 
 var Mautic = {
+    /**
+     * Binds global keyboard shortcuts
+     */
+    bindGlobalKeyboardShortcuts: function() {
+        Mousetrap.bind('shift+d', function(e) {
+            mQuery('#mautic_dashboard_index').click();
+        });
+
+        Mousetrap.bind('shift+right', function(e) {
+            mQuery('.navbar-right > button.navbar-toggle').click();
+        });
+
+        Mousetrap.bind('shift+n', function(e) {
+            mQuery('.dropdown-notification').click();
+        });
+    },
+
     /**
      * Stops the ajax page loading indicator
      */
@@ -415,6 +430,11 @@ var Mautic = {
             contentSpecific = mauticContent;
         }
 
+        if (container == '#app-content' || container == 'body') {
+            //register global keyboard shortcuts
+            Mautic.bindGlobalKeyboardShortcuts();
+        }
+
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
             Mautic[contentSpecific + "OnLoad"](container, response);
         }
@@ -497,6 +517,8 @@ var Mautic = {
         var contentSpecific = false;
         if (container == '#app-content') {
             //full page gets precedence
+            Mousetrap.reset();
+
             contentSpecific = mauticContent;
         } else if (response && response.mauticContent) {
             contentSpecific = response.mauticContent;
@@ -688,7 +710,7 @@ var Mautic = {
             }
 
             if (response.notifications) {
-               Mautic.setNotifications(response.notifications, true);
+               Mautic.setNotifications(response.notifications);
             }
 
             if (response.route) {
@@ -702,8 +724,6 @@ var Mautic = {
                 if (response.mauticContent) {
                     mauticContent = response.mauticContent;
                 }
-
-                Mautic.hideFlashes();
 
                 if (response.activeLink) {
                     var link = response.activeLink;
@@ -977,60 +997,6 @@ var Mautic = {
         if (mQuery(target + " loading-placeholder").length) {
             mQuery(target + " loading-placeholder").removeClass('hide');
         }
-    },
-
-    /**
-     * Sets flashes
-     * @param flashes
-     */
-    setFlashes: function (flashes) {
-        mQuery('#flashes').append(flashes);
-    },
-
-    /**
-     * Hides flashes
-     */
-    hideFlashes: function () {
-        /*
-        window.setTimeout(function () {
-            mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
-                mQuery(this).remove();
-            });
-        }, 7000); */
-    },
-
-    /**
-     *
-     * @param notifications
-     */
-    setNotifications: function (notifications, replace) {
-        if (replace) {
-            mQuery('#notificationsDropdown').replaceWith(notifications);
-
-            mQuery('#notificationsDropdown').on('click', function(e) {
-                if (mQuery(e.target).hasClass('do-not-close')) {
-                    e.stopPropagation();
-                }
-            });
-
-            mQuery("#notificationsDropdown .slimscroll").slimScroll({
-                size: "6px",
-                distance: "0px",
-                wrapperClass: "scroll-wrapper",
-                railClass: "scroll-rail",
-                barClass: "scroll-bar",
-                wheelStep: 10,
-                railVisible: true,
-                alwaysVisible: false
-            });
-        } else {
-            if (mQuery('#notifications .mautic-update')) {
-                mQuery('#notifications .mautic-update').after(notifications);
-            } else {
-                mQuery('#notifications').prepend(notifications);
-            }
-        }
-
     },
 
     /**
@@ -1947,6 +1913,47 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+    },
+
+    /**
+     * Sets flashes
+     * @param flashes
+     */
+    setFlashes: function (flashes) {
+        mQuery('#flashes').append(flashes);
+
+        mQuery('#flashes .alert-new').each(function() {
+            var me = this;
+            window.setTimeout(function () {
+                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                    mQuery(this).remove();
+                });
+            }, 7000);
+
+            mQuery(this).removeClass('alert-new');
+        });
+    },
+
+    /**
+     *
+     * @param notifications
+     */
+    setNotifications: function (notifications) {
+        if (notifications.lastId) {
+            mQuery('#mauticLastNotificationId').val(notifications.lastId);
+        }
+
+        if (mQuery('#notifications .mautic-update')) {
+            mQuery('#notifications .mautic-update').remove();
+        }
+
+        if (notifications.hasNewNotifications) {
+            if (mQuery('#newNotificationIndicator').hasClass('hide')) {
+                mQuery('#newNotificationIndicator').removeClass('hide');
+            }
+        }
+
+        mQuery('#notifications').prepend(notifications.content);
     },
 
     /**

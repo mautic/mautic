@@ -58,41 +58,9 @@ class DefaultController extends CommonController
     public function notificationsAction()
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model         = $this->factory->getModel('core.notification');
-        $notifications = $model->getNotifications();
+        $model = $this->factory->getModel('core.notification');
 
-        $showNewIndicator = false;
-
-        //determine if the new message indicator should be shown
-        foreach ($notifications as $n) {
-            if (!$n['isRead']) {
-                $showNewIndicator = true;
-                break;
-            }
-        }
-
-        // Check for updates
-        $updateMessage = '';
-        if ($this->factory->getUser()->isAdmin()) {
-            $session = $this->factory->getSession();
-
-            //check to see when we last checked for an update
-            $lastChecked = $session->get('mautic.update.checked', 0);
-
-            if (time() - $lastChecked > 3600) {
-                $session->set('mautic.update.checked', time());
-
-                /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-                $updateHelper = $this->factory->getHelper('update');
-                $updateData   = $updateHelper->fetchData();
-
-                // If the version key is set, we have an update
-                if (isset($updateData['version'])) {
-                    $translator    = $this->factory->getTranslator();
-                    $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
-                }
-            }
-        }
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
 
         return $this->delegateView(array(
             'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',

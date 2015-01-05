@@ -422,9 +422,29 @@ class CommonController extends Controller implements MauticController
      *
      * @return string
      */
-    protected function getNotificationContent()
+    protected function getNotificationContent(Request $request = null)
     {
-        return $this->forward('MauticCoreBundle:Default:notifications', array('ignoreAjax' => true))->getContent();
+        if ($request == null) {
+            $request = $this->request;
+        }
+
+        $afterId = $request->get('mauticLastNotificationId', null);
+
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('core.notification');
+
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
+
+        $lastNotification = reset($notifications);
+        return array(
+            'content' => $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', array(
+                'notifications' => $notifications,
+                'updateMessage' => $updateMessage
+            )),
+            'lastId'              => (!empty($lastNotification)) ? $lastNotification['id'] : $afterId,
+            'hasNewNotifications' => $showNewIndicator,
+            'updateAvailable'     => (!empty($updateMessage))
+        );
     }
 
     /**
@@ -434,11 +454,11 @@ class CommonController extends Controller implements MauticController
      * @param null $header
      * @param null $iconClass
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->factory->getModel('core.notification');
-        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass );
+        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime );
     }
 
     /**
@@ -454,7 +474,12 @@ class CommonController extends Controller implements MauticController
             $domain = 'flashes';
         }
 
-        $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+        if ($domain === false) {
+            //message is already translated
+            $translatedMessage = $message;
+        } else {
+            $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+        }
 
         $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
 

@@ -1,7 +1,5 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    Mousetrap.reset();
-
     Mousetrap.bind('shift+l', function(e) {
         mQuery('#menu_lead_parent_child > li:first > a').click();
     });

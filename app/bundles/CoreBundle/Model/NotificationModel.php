@@ -31,14 +31,15 @@ class NotificationModel extends FormModel
     /**
      * Write a notification
      *
-     * @param        $message   Message of the notification
+     * @param        $message    Message of the notification
      * @param        $type       Optional $type to ID the source of the notification
-     * @param        $isRead    Add unread indicator
-     * @param        $header    Header for message
-     * @param string $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
-     * @param null   $user      User object; defaults to current user
+     * @param        $isRead     Add unread indicator
+     * @param        $header     Header for message
+     * @param string $iconClass  Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param DateTime $datetime Date the item was created
+     * @param null   $user       User object; defaults to current user
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, User $user = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime, User $user = null)
     {
         if ($user == null) {
             $user = $this->factory->getUser();
@@ -51,14 +52,17 @@ class NotificationModel extends FormModel
         $notification->setMessage($message);
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        $notification->setDateAdded(new \DateTime());
+        if ($datetime == null) {
+            $datetime = new \DateTime();
+        }
+        $notification->setDateAdded($datetime);
         $this->saveEntity($notification);
     }
 
     /**
      * @param null $key
      */
-    public function getNotifications($key = null)
+    public function getNotifications($afterId = null, $key = null)
     {
         $filter = array(
             'force' => array(
@@ -75,6 +79,14 @@ class NotificationModel extends FormModel
                 'column' => 'n.key',
                 'expr'   => 'eq',
                 'value'  => $key
+            );
+        }
+
+        if ($afterId != null) {
+            $filter['force'][] = array(
+                'column' => 'n.id',
+                'expr'   => 'gt',
+                'value'  => (int) $afterId
             );
         }
 
@@ -103,5 +115,50 @@ class NotificationModel extends FormModel
     public function clearNotification($id)
     {
         $this->getRepository()->clearNotificationsForUser($this->factory->getUser()->getId(), $id);
+    }
+
+    /**
+     * Get content for notifications
+     *
+     * @return array
+     */
+    public function getNotificationContent($afterId = null)
+    {
+        $notifications = $this->getNotifications($afterId);
+
+        $showNewIndicator = false;
+
+        //determine if the new message indicator should be shown
+        foreach ($notifications as $n) {
+            if (!$n['isRead']) {
+                $showNewIndicator = true;
+                break;
+            }
+        }
+
+        // Check for updates
+        $updateMessage = '';
+        if ($this->factory->getUser()->isAdmin()) {
+            $session = $this->factory->getSession();
+
+            //check to see when we last checked for an update
+            $lastChecked = $session->get('mautic.update.checked', 0);
+
+            if (time() - $lastChecked > 3600) {
+                $session->set('mautic.update.checked', time());
+
+                /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+                $updateHelper = $this->factory->getHelper('update');
+                $updateData   = $updateHelper->fetchData();
+
+                // If the version key is set, we have an update
+                if (isset($updateData['version'])) {
+                    $translator    = $this->factory->getTranslator();
+                    $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+                }
+            }
+        }
+
+        return array($notifications, $showNewIndicator, $updateMessage);
     }
 }
