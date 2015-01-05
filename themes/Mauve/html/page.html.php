@@ -195,7 +195,7 @@ $view['slots']->set('pageTitle', $title);
 
     <hr>
 
-    <?php if ($view['slots']->hasContent('cta')): ?>
+    <?php if ($view['slots']->hasContent('footer')): ?>
     <!-- Footer -->
     <footer>
         <div class="row">
