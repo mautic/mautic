@@ -268,9 +268,10 @@ class AjaxController extends CommonAjaxController
 
         $unread = $channelUnread + $userUnread;
 
+        $playSound = false;
+
         if (count($unread)) {
             $userSettings = $chatModel->getSettings(null);
-
 
             //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
             $onlineStatus = $this->factory->getUser()->getOnlineStatus();
@@ -297,6 +298,10 @@ class AjaxController extends CommonAjaxController
                     $header = $translator->trans('mautic.chat.chat.notification.header', array('%name%' => $name));
                 }
 
+                if (!$dnd && !$playSound && !in_array($id, $userSettings[$type]['mute'])) {
+                    $playSound = true;
+                }
+
                 if (!in_array($id, $userSettings[$type]['visible']) || in_array($id, $userSettings[$type]['silent'])) {
                     //don't display if set not to
                     continue;
@@ -306,8 +311,7 @@ class AjaxController extends CommonAjaxController
                 $this->addNotification($chat['message'], 'notice', $isRead, $header, 'img:' . $image, $chat['dateSent']);
 
                 if (!$dnd) {
-
-                    $flashMessage = '<div><span class="pull-left pr-xs pt-xs" style="width:36px"><span class="img-wrapper img-rounded"><img src="'.$image.'" /></span></span><strong>' . $header . '</strong><br />' . $chat['message'] . '</div>';
+                    $flashMessage = '<div><span class="pull-left pr-xs pt-xs" style="width:36px"><span class="img-wrapper img-rounded"><img src="' . $image . '" /></span></span><strong>' . $header . '</strong><br />' . $chat['message'] . '</div>';
                     $this->addFlash($flashMessage, array(), 'notice', false, false);
                 }
             }
@@ -316,8 +320,15 @@ class AjaxController extends CommonAjaxController
             $chatModel->markMessagesNotified($messageIds);
         }
 
-        $dataArray['flashes'] = $this->getFlashContent();
+        $dataArray['flashes']       = $this->getFlashContent();
         $dataArray['notifications'] = $this->getNotificationContent($request);
+
+        if ($playSound) {
+            $mediaDir                            = $this->factory->getSystemPath('assets');
+            $sound                               = $mediaDir . '/sounds/' . $this->factory->getParameter('chat_notification_sound', 'wet');
+            $assetHelper                         = $this->factory->getHelper('template.assets');
+            $dataArray['notifications']['sound'] = $assetHelper->getUrl($sound);
+        }
 
         return $this->sendJsonResponse($dataArray);
     }

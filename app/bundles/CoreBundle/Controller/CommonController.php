@@ -418,7 +418,7 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * Renders flashes' HTML
+     * Renders notification info for ajax
      *
      * @return string
      */
@@ -436,6 +436,7 @@ class CommonController extends Controller implements MauticController
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
 
         $lastNotification = reset($notifications);
+
         return array(
             'content' => $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', array(
                 'notifications' => $notifications,

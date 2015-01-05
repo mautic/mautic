@@ -39,7 +39,7 @@ class NotificationModel extends FormModel
      * @param DateTime $datetime Date the item was created
      * @param null   $user       User object; defaults to current user
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime, User $user = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null, User $user = null)
     {
         if ($user == null) {
             $user = $this->factory->getUser();

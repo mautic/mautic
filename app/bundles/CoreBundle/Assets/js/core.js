@@ -1954,6 +1954,12 @@ var Mautic = {
         }
 
         mQuery('#notifications').prepend(notifications.content);
+
+        if (notifications.sound) {
+            mQuery('.playSound').remove();
+
+            mQuery.playSound(notifications.sound);
+        }
     },
 
     /**
