@@ -51,9 +51,9 @@ class CategoryModel extends FormModel
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
+            $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, true));
         } else {
-            $alias = strtolower(InputHelper::alphanum($alias, true));
+            $alias = strtolower(InputHelper::alphanum($alias, false, true));
         }
 
         //make sure alias is not already taken

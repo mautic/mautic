@@ -469,6 +469,7 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
+  top: 60px;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
   content: '';
@@ -1356,11 +1357,25 @@ blockquote > p:after {
 .alert-growl {
   background: rgba(0, 0, 0, 0.8);
   color: #FFFFFF;
+  border: 1px solid #000;
+}
+.alert-growl-container {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 100000;
-  border: 1px solid #000;
+}
+.alert-growl-container .alert-growl {
+  margin-bottom: 5px;
+}
+.alert-growl .close {
+  font-size: 13px;
+  color: #fff;
+  margin-left: 10px;
+}
+.alert .close {
+  font-size: 13px;
+  margin-left: 10px;
 }
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
@@ -1568,6 +1583,11 @@ a.list-group-item:focus {
   height: auto;
   max-height: 200px;
   overflow-x: hidden;
+}
+ul.dropdown-menu-form {
+  padding: 0 5px 0 30px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 .nav > li > a {
   font-weight: normal;
@@ -3108,7 +3128,9 @@ lesshat-selector {
 @-o-keyframes before-anim{ 0% { width: 0%; left: 0%; } 0% { width: 60%; } 19.99% { width: 40%; left: 100%; } 20% { width: 0%; left: 0%; } 25% { width: 10%; left: 10%; } 30% { width: 40%; left: 30%; } 40% { width: 60%; left: 100%; } 40.01% { width: 0%; left: 0%; } 50% { width: 10%; left: 40%; } 60% { width: 30%; left: 100%; } 60.01% { width: 0%; left: 0%; } 70% { width: 10%; left: 40%; } 80% { width: 5%; left: 100%; } 80.01% { width: 0%; left: 0%; } 90% { width: 70%; left: 10%; } 100% { width: 10%; left: 100%; }}
 @keyframes before-anim{ 0% { width: 0%; left: 0%; } 0% { width: 60%; } 19.99% { width: 40%; left: 100%; } 20% { width: 0%; left: 0%; } 25% { width: 10%; left: 10%; } 30% { width: 40%; left: 30%; } 40% { width: 60%; left: 100%; } 40.01% { width: 0%; left: 0%; } 50% { width: 10%; left: 40%; } 60% { width: 30%; left: 100%; } 60.01% { width: 0%; left: 0%; } 70% { width: 10%; left: 40%; } 80% { width: 5%; left: 100%; } 80.01% { width: 0%; left: 0%; } 90% { width: 70%; left: 10%; } 100% { width: 10%; left: 100%; };
 }
-.loading-bar {
+.loading-bar,
+.canvas-loading-bar,
+.modal-loading-bar {
   opacity: 0;
   position: absolute;
   bottom: -1px;
@@ -3124,13 +3146,19 @@ lesshat-selector {
   transition: opacity 0.3s ease;
 }
 .loading-bar:after,
-.loading-bar:before {
+.canvas-loading-bar:after,
+.modal-loading-bar:after,
+.loading-bar:before,
+.canvas-loading-bar:before,
+.modal-loading-bar:before {
   content: '';
   position: absolute;
   height: 2px;
   background-color: #4e5d9d;
 }
-.loading-bar:after {
+.loading-bar:after,
+.canvas-loading-bar:after,
+.modal-loading-bar:after {
   left: 50%;
   width: 10%;
   -webkit-animation: after-anim 2.5s infinite linear;
@@ -3138,7 +3166,9 @@ lesshat-selector {
   -o-animation: after-anim 2.5s infinite linear;
   animation: after-anim 2.5s infinite linear;
 }
-.loading-bar:before {
+.loading-bar:before,
+.canvas-loading-bar:before,
+.modal-loading-bar:before {
   left: 0%;
   width: 0%;
   -webkit-animation: before-anim 2.5s infinite linear;
@@ -3147,12 +3177,20 @@ lesshat-selector {
   animation: before-anim 2.5s infinite linear;
 }
 .loading-bar.active,
-.loading-content .loading-bar {
+.canvas-loading-bar.active,
+.modal-loading-bar.active,
+.loading-content .loading-bar,
+.loading-content .canvas-loading-bar,
+.loading-content .modal-loading-bar {
   opacity: 1;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;
   -o-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
+}
+.modal-loading-bar {
+  bottom: auto;
+  top: 0;
 }
 .offcanvas-container {
   position: relative;

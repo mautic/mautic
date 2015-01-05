@@ -114,11 +114,19 @@ class CommonRepository extends EntityRepository
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+            $hydrationMode = constant("\\Doctrine\\ORM\\Query::" . strtoupper($args['hydration_mode']));
+            $query->setHydrationMode($hydrationMode);
         }
 
-        return new Paginator($query);
+        if (empty($args['ignore_paginator'])) {
+            return new Paginator($query);
+        } else {
+            if (empty($hydrationMode)) {
+                $hydrationMode = Query::HYDRATE_OBJECT;
+            }
+
+            return $query->getResult($hydrationMode);
+        }
     }
 
     /**
@@ -289,24 +297,47 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    protected function getFilterExpr(&$q, $filter)
+    protected function getFilterExpr(&$q, $filter, $parameterName = null)
     {
-        $unique    = $this->generateRandomParameterName();
-        $func      = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
+        $unique    = ($parameterName) ? $parameterName : $this->generateRandomParameterName();
         $parameter = false;
-        if (in_array($func, array('isNull', 'isNotNull'))) {
-            $expr = $q->expr()->{$func}($filter['column']);
-        } elseif (in_array($func, array('in', 'notIn'))) {
-            $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
-        } else {
-            if (isset($filter['strict']) && !$filter['strict']) {
-                $filter['value'] = "%{$filter['value']}%";
+
+        if (strpos($filter['column'], ',') !== false) {
+            $columns      = explode(',', $filter['column']);
+            $expr         = $q->expr()->orX();
+            $setParameter = false;
+            foreach ($columns as $c) {
+                $subFilter           = $filter;
+                $subFilter['column'] = trim($c);
+
+                list($subExpr, $parameterUsed) = $this->getFilterExpr($q, $subFilter, $unique);
+
+                if ($parameterUsed) {
+                    $setParameter = true;
+                }
+
+                $expr->add($subExpr);
             }
-            $expr      = $q->expr()->{$func}($filter['column'], ':' . $unique);
-            $parameter = array($unique => $filter['value']);
-        }
-        if (!empty($filter['not'])) {
-            $expr = $q->expr()->not($expr);
+            if ($setParameter) {
+                $parameter = array($unique => $filter['value']);
+            }
+        } else {
+            $func = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
+
+            if (in_array($func, array('isNull', 'isNotNull'))) {
+                $expr = $q->expr()->{$func}($filter['column']);
+            } elseif (in_array($func, array('in', 'notIn'))) {
+                $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
+            } else {
+                if (isset($filter['strict']) && !$filter['strict']) {
+                    $filter['value'] = "%{$filter['value']}%";
+                }
+                $expr      = $q->expr()->{$func}($filter['column'], ':' . $unique);
+                $parameter = array($unique => $filter['value']);
+            }
+            if (!empty($filter['not'])) {
+                $expr = $q->expr()->not($expr);
+            }
         }
 
         return array($expr, $parameter);

@@ -10,9 +10,9 @@
 namespace MauticAddon\MauticChatBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\UserBundle\Entity\Role;
 /**
  * ChatRepository
  */
@@ -64,8 +64,6 @@ class ChatRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        $this->generateOnlineStatuses($results, array('fromUser', 'toUser'));
-
         return $results;
     }
 
@@ -73,62 +71,66 @@ class ChatRepository extends CommonRepository
      * Returns a list of users that can be used in chat, etc
      *
      * @param int    $currentUserId
-     * @param string $search
+     * @param mixed  $search
      * @param int    $limit
      * @param int    $start
-     * @param array  $usersWithUnreadMsgs
      */
-    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0, $usersWithUnreadMsgs = array())
+    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0)
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('u.id, u.username, u.firstName, u.lastName, u.email, u.lastActive, u.onlineStatus')
+        $select = 'partial u.{id, username, firstName, lastName, email, lastActive, onlineStatus}';
+
+        if (is_array($search) && !empty($search)) {
+            $order = '(CASE';
+            $count = 1;
+            foreach ($search as $count => $id) {
+                $order .= ' WHEN u.id = ' . $id . ' THEN ' . $count;
+                $count++;
+            }
+            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+            $select .= ", $order";
+        }
+        $q->select($select)
             ->from('MauticUserBundle:User', 'u', 'u.id');
+
         if (!empty($currentUserId)) {
             $q->where('u.id != :currentUser')
                 ->setParameter('currentUser', $currentUserId);
         }
 
-        $q->orderBy('u.firstName, u.lastName');
+        $q->andWhere('u.isPublished = true');
 
         if (!empty($search)) {
-            $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->like('u.email', ':search'),
-                    $q->expr()->like('u.firstName', ':search'),
-                    $q->expr()->like('u.lastName', ':search'),
-                    $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
-                            $q->expr()->concat(
-                                $q->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
+            if (is_array($search)) {
+                $q->andWhere(
+                    $q->expr()->in('u.id', ':users')
+                )->setParameter('users', $search);
+            } else {
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->like('u.email', ':search'),
+                        $q->expr()->like('u.firstName', ':search'),
+                        $q->expr()->like('u.lastName', ':search'),
+                        $q->expr()->like(
+                            $q->expr()->concat('u.firstName',
+                                $q->expr()->concat(
+                                    $q->expr()->literal(' '),
+                                    'u.lastName'
+                                )
+                            ),
+                            ':search'
+                        )
                     )
-                )
-            )
-                ->setParameter('search', "{$search}%");
+                )->setParameter('search', "{$search}%");
+            }
         }
 
-        if (!empty($usersWithUnreadMsgs)) {
-            $q2 = clone $q;
-
-            $q2->andWhere(
-                $q2->expr()->in('u.id', ':users')
-            )->setParameter('users', $usersWithUnreadMsgs);
-
-            if (!empty($limit) && $limit > count($usersWithUnreadMsgs)) {
-                $q2->setFirstResult($start)
-                    ->setMaxResults($limit);
-            }
-
-            $results = $q2->getQuery()->getArrayResult();
-
-            if (count($results) > $limit) {
-                $this->generateOnlineStatuses($results);
-                return $results;
-            }
+        if (!is_array($search)) {
+            $q->orderBy('u.firstName, u.lastName');
+        } elseif (!empty($search)) {
+            //force array order
+            $q->orderBy('ORD', 'ASC');
         }
 
         if (!empty($limit)) {
@@ -136,53 +138,20 @@ class ChatRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        $this->generateOnlineStatuses($results);
+        $query = $q->getQuery();
+        $query->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
-        return $results;
-    }
+        $results = new Paginator($query);
 
-    /**
-     * @param      $results
-     * @param null $key
-     */
-    private function generateOnlineStatuses(&$results, $key = null)
-    {
-        //fix online statuses
-        $dt    = new DateTimeHelper(strtotime('15 minutes ago'), 'U', 'local');
-        $delay = $dt->getUtcDateTime();
+        $iterator = $results->getIterator();
 
-        foreach ($results as &$r) {
-            if (is_array($key)) {
-                foreach ($key as $k) {
-                    if ($k === null) {
-                        $use =& $r;
-                    } else {
-                        $use =& $r[$k];
-                    }
+        $users = array(
+            'users' => $iterator->getArrayCopy(),
+            'count' => count($iterator),
+            'total' => count($results)
+        );
 
-                    if (empty($use['onlineStatus'])) {
-                        $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
-                    } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
-                        $use['onlineStatus'] = 'offline';
-                    }
-                    unset($use);
-                }
-            } else {
-                if ($key === null) {
-                    $use =& $r;
-                } else {
-                    $use =& $r[$key];
-                }
-
-                if (empty($use['onlineStatus'])) {
-                    $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
-                } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
-                    $use['onlineStatus'] = 'offline';
-                }
-                unset($use);
-            }
-        }
+        return $users;
     }
 
     /**
@@ -214,56 +183,17 @@ class ChatRepository extends CommonRepository
     }
 
     /**
-     * Returns a list of active users
+     * Mark messages as having been displayed to the user
      *
-     * @param int    $currentUserId
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
+     * @param array $messageIds
      */
-    public function getActiveUsers($currentUserId, $search = '', $limit = 10, $start = 0)
+    public function markNotified(array $messageIds)
     {
-        $q = $this->_em->createQueryBuilder();
-
-        //consider a user active if their last activity is within 3 minute ago
-        $dt = new DateTimeHelper(strtotime('3 minutes ago'), 'U', 'local');
-        $delay = $dt->getUtcDateTime();
-
-        $q->select('partial u.{id, username, firstName, lastName, email, lastActive, onlineStatus}')
-            ->from('MauticUserBundle:User', 'u')
-            ->where('u.lastActive >= :delay')
-            ->setParameter('delay', $delay)
-            ->andWhere('u.id != :currentUser')
-            ->setParameter('currentUser', $currentUserId)
-            ->orderBy('u.firstName, u.lastName');
-
-        if (!empty($search)) {
-            $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->like('u.email', ':search'),
-                    $q->expr()->like('u.firstName', ':search'),
-                    $q->expr()->like('u.lastName', ':search'),
-                    $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
-                            $q->expr()->concat(
-                                $q->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
-                    )
-                )
-            )
-                ->setParameter('search', "{$search}%");
-        }
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'chats')
+            ->set('is_notified', 1)
+            ->where($q->expr()->in('id', $messageIds))
+            ->execute();
     }
 
     /**
@@ -304,4 +234,38 @@ class ChatRepository extends CommonRepository
         return $return;
     }
 
+    /**
+     * Get all unread messages for a user
+     *
+     * @param $userId
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getUnreadMessages($userId, $includeNotified = false)
+    {
+        $q = $this->_em->createQueryBuilder();
+        $q->select('partial c.{id, dateSent, message}, partial fu.{id, username, firstName, lastName, email, lastActive}')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+            ->join('c.fromUser', 'fu')
+            ->join('c.toUser', 'tu')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('c.isRead', 0),
+                    $q->expr()->eq('tu.id', ':userId')
+                )
+            )
+            ->setParameter(':userId', (int) $userId)
+            ->orderBy('c.dateSent', 'ASC');
+
+        if (!$includeNotified) {
+            $q->andwhere(
+                $q->expr()->eq('c.isNotified', 0)
+            );
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
 }

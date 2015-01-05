@@ -28,8 +28,7 @@ Mautic.campaignOnLoad = function (container) {
             helper: 'clone',
             appendTo: '#CampaignCanvas',
             zIndex: 8000,
-            scrollSensitivity: 100,
-            scrollSpeed: 15,
+            scroll: false,
             cursorAt: {top: 15, left: 15}
         });
 
@@ -360,35 +359,36 @@ Mautic.launchCampaignEditor = function() {
         };
 
         Mautic.campaignDragOptions = {
-            start: function (params) {
+            start: function (event, ui) {
                 //double clicking activates the stop function so add a catch to prevent unnecessary ajax calls
-                this.startingPosition = mQuery(params.el).position();
+                this.startingPosition = ui.position;
             },
-            stop: function (params) {
-                //use jQuery as well to ensure consistency with comparison
-                var endingPosition = mQuery(params.el).position();
-
+            stop: function (event, ui) {
+                var endingPosition = ui.position;
                 if (this.startingPosition.left !== endingPosition.left || this.startingPosition.top !== endingPosition.top) {
 
                     //update coordinates
-                    mQuery('#droppedX').val(params.pos[0]);
-                    mQuery('#droppedY').val(params.pos[1]);
+                    mQuery('#droppedX').val(endingPosition.top);
+                    mQuery('#droppedY').val(endingPosition.left);
                     var campaignId = mQuery('#campaignId').val();
-                    var query = "action=campaign:updateCoordinates&campaignId=" + campaignId + "&droppedX=" + params.pos[0] + "&droppedY=" + params.pos[1] + "&eventId=" + mQuery(params.el).attr('id');
+                    var query = "action=campaign:updateCoordinates&campaignId=" + campaignId + "&droppedX=" + endingPosition.top + "&droppedY=" + endingPosition.left + "&eventId=" + mQuery(ui.draggable).attr('id');
                     mQuery.ajax({
                         url: mauticAjaxUrl,
                         type: "POST",
                         data: query,
                         dataType: "json",
-                        success: function (response) {
-
-                        },
                         error: function (request, textStatus, errorThrown) {
                             Mautic.processAjaxError(request, textStatus, errorThrown);
                         }
                     });
                 }
-            }
+            },
+            scroll: true,
+            scrollSensitivity: 100,
+            scrollSpeed: 15,
+            appendTo: '#CampaignCanvas',
+            zIndex: 8000,
+            cursorAt: {top: 15, left: 15}
         };
 
         Mautic.campaignBuilderInstance.setSuspendDrawing(true);

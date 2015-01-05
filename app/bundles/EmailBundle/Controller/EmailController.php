@@ -357,17 +357,14 @@ class EmailController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getSubject(),
-                            '%menu_link%' => 'mautic_email_index',
-                            '%url%'       => $this->generateUrl('mautic_email_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $entity->getSubject(),
+                        '%menu_link%' => 'mautic_email_index',
+                        '%url%'       => $this->generateUrl('mautic_email_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = array(
@@ -490,17 +487,14 @@ class EmailController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getSubject(),
-                            '%menu_link%' => 'mautic_email_index',
-                            '%url%'       => $this->generateUrl('mautic_email_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getSubject(),
+                        '%menu_link%' => 'mautic_email_index',
+                        '%url%'       => $this->generateUrl('mautic_email_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ), 'warning');
                 }
             } else {
                 //clear any modified content

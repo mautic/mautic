@@ -18,3 +18,13 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'chatchannel'
     ));
+
+$container->setDefinition('mautic.form.type.chatconfig', new Definition(
+    'MauticAddon\MauticChatBundle\Form\Type\ConfigType',
+    array(
+        new \Symfony\Component\DependencyInjection\Reference('mautic.factory')
+    )
+))
+    ->addTag('form.type', array(
+        'alias' => 'chatconfig',
+    ));

@@ -37,7 +37,7 @@ class LeadNote extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="notes")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $lead;
 

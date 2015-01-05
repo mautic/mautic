@@ -39,19 +39,14 @@ class FormSubmitActionSendAdminEmailType extends AbstractType
             )
         ));
 
-        $builder->add('user_lookup', 'text', array(
+        $builder->add('user_id', 'user_list', array(
             'label'      => 'mautic.email.form.users',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'       => 'form-control',
                 'tooltip'     => 'mautic.core.help.autocomplete'
             ),
-            // 'mapped'     => false, // @todo load user name from the controller
             'required'   => false
-        ));
-
-        $builder->add('user_id', 'hidden', array(
-            'required'       => false
         ));
     }
 

@@ -48,16 +48,23 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
-            $builder->add('owner_lookup', 'text', array(
-                'label'      => 'mautic.lead.lead.field.owner',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.help.autocomplete',
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ));
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+                $this->factory->getEntityManager(),
+                'MauticUserBundle:User'
+            );
+            $builder->add(
+                $builder->create('owner', 'user_list', array(
+                    'label'      => 'mautic.lead.lead.field.owner',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control chosen',
+                        'tooltip' => 'mautic.core.help.autocomplete',
+                    ),
+                    'required'   => false,
+                    'multiple'   => false
+                ))
+                    ->addModelTransformer($transformer)
+            );
 
             $imageChoices = array('gravatar' => 'Gravatar');
 
@@ -77,11 +84,6 @@ class LeadType extends AbstractType
                 )
             );
         }
-
-        $builder->add('owner', 'hidden_entity', array(
-            'required'   => false,
-            'repository' => 'MauticUserBundle:User'
-        ));
 
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
         foreach ($options['fields'] as $field) {

@@ -23,15 +23,15 @@ class ChannelStat
 
     /**
      * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Channel")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Channel", inversedBy="stats")
+     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $channel;
 
     /**
      * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $user;
 
@@ -44,6 +44,11 @@ class ChannelStat
      * @ORM\Column(name="date_read", type="datetime")
      */
     protected $dateRead;
+
+    /**
+     * @ORM\Column(name="date_joined", type="datetime")
+     */
+    protected $dateJoined;
 
     /**
      * @return mixed
@@ -107,5 +112,21 @@ class ChannelStat
     public function setDateRead ($dateRead)
     {
         $this->dateRead = $dateRead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateJoined ()
+    {
+        return $this->dateJoined;
+    }
+
+    /**
+     * @param mixed $dateJoined
+     */
+    public function setDateJoined ($dateJoined)
+    {
+        $this->dateJoined = $dateJoined;
     }
 }

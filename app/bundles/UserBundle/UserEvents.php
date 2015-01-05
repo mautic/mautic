@@ -88,4 +88,32 @@ final class UserEvents
      * @var string
      */
     const ROLE_POST_DELETE = 'mautic.role_post_delete';
+
+    /**
+     * The mautic.user_logout event is thrown during the logout routine giving a chance to carry out tasks before
+     * the session is lost
+     *
+     * The event listener receives a Mautic\UserBundle\Event\LogoutEvent instance.
+     *
+     * @var string
+     */
+    const USER_LOGOUT = 'mautic.user_logout';
+
+    /**
+     * The mautic.user_login event is thrown right after a user logs in
+     *
+     * The event listener receives a Mautic\UserBundle\Event\LoginEvent instance.
+     *
+     * @var string
+     */
+    const USER_LOGIN = 'mautic.user_login';
+
+    /**
+     * The mautic.user_status_change event is thrown when a user's online status is changed
+     *
+     * The event listener receives a Mautic\UserBundle\Event\StatusChangeEvent instance.
+     *
+     * @var string
+     */
+    const STATUS_CHANGE = 'mautic.user_status_change';
 }

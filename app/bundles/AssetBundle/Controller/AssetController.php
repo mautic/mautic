@@ -285,17 +285,14 @@ class AssetController extends FormController
                     //remove the asset from request
                     $this->request->files->remove('asset');
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_asset_index',
-                            '%url%'       => $this->generateUrl('mautic_asset_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_asset_index',
+                        '%url%'       => $this->generateUrl('mautic_asset_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     if (!$form->get('buttons')->get('save')->isClicked()) {
                         //return edit view so that all the session stuff is loaded
@@ -417,17 +414,14 @@ class AssetController extends FormController
                     //remove the asset from request
                     $this->request->files->remove('asset');
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_asset_index',
-                            '%url%'       => $this->generateUrl('mautic_asset_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_asset_index',
+                        '%url%'       => $this->generateUrl('mautic_asset_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
 
                     $returnUrl  = $this->generateUrl('mautic_asset_action', array(
                         'objectAction' => 'view',

@@ -192,19 +192,15 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client);
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.api.client.notice.created', array(
-                            '%name%'         => $client->getName(),
-                            '%clientId%'     => $client->getPublicId(),
-                            '%clientSecret%' => $client->getSecret(),
-                            '%url%'          => $this->generateUrl('mautic_client_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $client->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.api.client.notice.created', array(
+                        '%name%'         => $client->getName(),
+                        '%clientId%'     => $client->getPublicId(),
+                        '%clientSecret%' => $client->getSecret(),
+                        '%url%'          => $this->generateUrl('mautic_client_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $client->getId()
+                        ))
+                    ));
                 }
             }
 
@@ -287,18 +283,14 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client, $form->get('buttons')->get('save')->isClicked());
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $client->getName(),
-                            '%menu_link%' => 'mautic_client_index',
-                            '%url%'       => $this->generateUrl('mautic_client_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $client->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $client->getName(),
+                        '%menu_link%' => 'mautic_client_index',
+                        '%url%'       => $this->generateUrl('mautic_client_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $client->getId()
+                        ))
+                    ));
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         return $this->postActionRedirect($postActionVars);

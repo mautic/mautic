@@ -43,7 +43,7 @@ if ($exceptionMessage) {
         </div>
     </div>
 
-    <div class="row mt-20">
+    <div class="row mt-20"">
         <h5 class="ml-lg text-danger"><?php echo $exception->getClass(); ?></h5>
         <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
             'traces' => $exception->getTrace()
@@ -51,7 +51,7 @@ if ($exceptionMessage) {
     </div>
 
     <?php if (count($previousExceptions)): ?>
-    <div class="row mt-20">
+    <div class="row mt-20 slimscroll">
         <h5><?php echo $view['translator']->trans('mautic.core.error.previousexceptions'); ?></h5>
         <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
         <?php foreach ($previousExceptions as $key => $e): ?>

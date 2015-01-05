@@ -64,10 +64,7 @@ class SecurityController extends CommonController
                 $msg = $error->getMessage();
             }
 
-            $this->factory->getSession()->getFlashBag()->add(
-                'error',
-                $this->get('translator')->trans($msg, array(), 'flashes')
-            );
+            $this->addFlash($msg, array(), 'error', null, false);
         }
         $this->request->query->set('tmpl', 'login');
         return $this->delegateView(array(

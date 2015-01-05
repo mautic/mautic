@@ -16,6 +16,19 @@ $collection->add('mautic_chat_index', new Route('/chat', array(
     '_controller' => 'MauticChatBundle:Default:index',
 )));
 
+$collection->add('mautic_chat_list', new Route('/chat/list/{page}',
+    array(
+        '_controller' => 'MauticChatBundle:User:list',
+        'page'        => 1
+    )
+));
+
+$collection->add('mautic_chatchannel_list', new Route('/chat/channel/list/{page}',
+    array(
+        '_controller' => 'MauticChatBundle:Channel:list',
+        'page'        => 1
+    )
+));
 
 $collection->add('mautic_chatchannel_action', new Route('/chat/channel/{objectAction}/{objectId}',
     array(

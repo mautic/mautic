@@ -374,18 +374,14 @@ class CampaignController extends FormController
                                 }
                             }
                         }
-
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.created', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_campaign_index',
-                                '%url%'       => $this->generateUrl('mautic_campaign_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_campaign_index',
+                            '%url%'       => $this->generateUrl('mautic_campaign_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
                             $viewParameters = array(
@@ -544,17 +540,14 @@ class CampaignController extends FormController
                             $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
                         }
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.core.notice.updated', array(
-                                '%name%'      => $entity->getName(),
-                                '%menu_link%' => 'mautic_campaign_index',
-                                '%url%'       => $this->generateUrl('mautic_campaign_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        $this->addFlash('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_campaign_index',
+                            '%url%'       => $this->generateUrl('mautic_campaign_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ));
                     }
                 }
             } else {

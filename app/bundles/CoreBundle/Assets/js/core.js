@@ -1,36 +1,69 @@
-var MauticVars = {};
-var mQuery = jQuery.noConflict(true);
-window.jQuery = mQuery;
+var MauticVars  = {};
+var mQuery      = jQuery.noConflict(true);
+window.jQuery   = mQuery;
+
+//set default ajax options
+mQuery.ajaxSetup({
+    beforeSend: function (request, settings) {
+        if (settings.showLoadingBar) {
+            mQuery("body").addClass("loading-content");
+        }
+
+        if (typeof IdleTimer != 'undefined') {
+            //append last active time
+            var userLastActive = IdleTimer.getLastActive();
+            var queryGlue = (settings.url.indexOf("?") == -1) ? '?' : '&';
+
+            settings.url = settings.url + queryGlue + 'mauticUserLastActive=' + userLastActive;
+        }
+
+        if (mQuery('#mauticLastNotificationId').length) {
+            //append last notifications
+            var queryGlue = (settings.url.indexOf("?") == -1) ? '?' : '&';
+
+            settings.url = settings.url + queryGlue + 'mauticLastNotificationId=' + mQuery('#mauticLastNotificationId').val();
+        }
+
+        return true;
+    },
+    cache: false
+});
 
 mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
-        (function ($) {
-            $("html").Core({
-                console: false
-            });
-        })(mQuery);
+        mQuery("html").Core({
+            console: false
+        });
     }
 
-    if (typeof Mousetrap != 'undefined') {
-        Mousetrap.bind('shift+d', function(e) {
-            mQuery('#mautic_dashboard_index').click();
-        });
-
-        Mousetrap.bind('shift+right', function(e) {
-            mQuery('.navbar-right > button.navbar-toggle').click();
+    if (typeof IdleTimer != 'undefined') {
+        IdleTimer.init({
+            idleTimeout: 900000, //15 minutes = 900000
+            awayTimeout: 18000000, //30 minutes = 18000000
+            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
 });
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
-History.Adapter.bind(window, 'statechange', function () {
-    if (MauticVars.manualStateChange == true) {
-        //back/forward button pressed
-        window.location.reload();
-    }
-    MauticVars.manualStateChange = true;
-});
+
+if (typeof History != 'undefined') {
+    History.Adapter.bind(window, 'statechange', function () {
+        if (MauticVars.manualStateChange == true) {
+            //back/forward button pressed
+            window.location.reload();
+        }
+        MauticVars.manualStateChange = true;
+    });
+}
+
+//set global Chart defaults
+if (typeof Chart != 'undefined') {
+    // configure global Chart options
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
+}
 
 //live search vars
 MauticVars.liveCache            = new Array();
@@ -48,27 +81,59 @@ MauticVars.routeInProgress       = '';
 MauticVars.moderatedIntervals    = {};
 MauticVars.intervalsInProgress   = {};
 
-mQuery.ajaxSetup({
-    beforeSend: function (request, settings) {
-        if (settings.showLoadingBar) {
-            mQuery("body").addClass("loading-content");
-        }
-    },
-    cache: false
-});
-
-if (typeof Chart != 'undefined') {
-    // configure global Chart options
-    Chart.defaults.global.responsive = true;
-    Chart.defaults.global.maintainAspectRatio = false;
-}
-
 var Mautic = {
+    /**
+     * Binds global keyboard shortcuts
+     */
+    bindGlobalKeyboardShortcuts: function() {
+        Mousetrap.bind('shift+d', function(e) {
+            mQuery('#mautic_dashboard_index').click();
+        });
+
+        Mousetrap.bind('shift+right', function(e) {
+            mQuery('.navbar-right > button.navbar-toggle').click();
+        });
+
+        Mousetrap.bind('shift+n', function(e) {
+            mQuery('.dropdown-notification').click();
+        });
+    },
+
     /**
      * Stops the ajax page loading indicator
      */
     stopPageLoadingBar: function() {
         mQuery("body").removeClass("loading-content");
+    },
+
+    /**
+     * Starts the ajax loading indicator for the right canvas
+     */
+    startCanvasLoadingBar: function() {
+        mQuery('.canvas-loading-bar').addClass('active');
+    },
+
+    /**
+     * Starts the ajax loading indicator for modals
+     *
+     * @param modalTarget
+     */
+    startModalLoadingBar: function(modalTarget) {
+        mQuery(modalTarget + ' .modal-loading-bar').addClass('active');
+    },
+
+    /**
+     * Stops the ajax loading indicator for the right canvas
+     */
+    stopCanvasLoadingBar: function() {
+        mQuery('.canvas-loading-bar').removeClass('active');
+    },
+
+    /**
+     * Stops the ajax loading indicator for modals
+     */
+    stopModalLoadingBar: function(modalTarget) {
+        mQuery(modalTarget + ' .modal-loading-bar').removeClass('active');
     },
 
     /**
@@ -328,7 +393,6 @@ var Mautic = {
         });
 
         //activate shuffles
-
         if (mQuery('.shuffle-grid').length) {
             var grid = mQuery(".shuffle-grid");
 
@@ -351,6 +415,13 @@ var Mautic = {
 
         }
 
+        //prevent auto closing dropdowns for dropdown forms
+        if (mQuery('.dropdown-menu-form').length) {
+            mQuery('.dropdown-menu-form').on('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+
         //run specific on loads
         var contentSpecific = false;
         if (response && response.mauticContent) {
@@ -359,33 +430,32 @@ var Mautic = {
             contentSpecific = mauticContent;
         }
 
+        if (container == '#app-content' || container == 'body') {
+            //register global keyboard shortcuts
+            Mautic.bindGlobalKeyboardShortcuts();
+        }
+
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
             Mautic[contentSpecific + "OnLoad"](container, response);
         }
 
         if (!inModal && container == 'body') {
-            //activate global live search
-            var engine = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=globalCommandList"
+            //prevent notification dropdown from closing if clicking an action
+            mQuery('#notificationsDropdown').on('click', function(e) {
+                if (mQuery(e.target).hasClass('do-not-close')) {
+                    e.stopPropagation();
                 }
             });
-            engine.initialize();
 
-            mQuery('#global_search').typeahead({
-                    hint: true,
-                    highlight: true,
-                    minLength: 0,
+            if (mQuery('#global_search').length) {
+                var globalTypeahead = Mautic.activateTypeahead('#global_search', {
+                    prefetch: true,
+                    remote: false,
+                    limit: 0,
+                    action: 'globalCommandList',
                     multiple: true
-                },
-                {
-                    name: "global_search",
-                    displayKey: 'value',
-                    source: engine.ttAdapter()
-                }
-            ).on('typeahead:selected', function (event, datum) {
+                });
+                mQuery(globalTypeahead).on('typeahead:selected', function (event, datum) {
                     //force live search update
                     MauticVars.lastGlobalSearchStr = '';
                     mQuery('#global_search').keyup();
@@ -393,13 +463,10 @@ var Mautic = {
                     //force live search update
                     MauticVars.lastGlobalSearchStr = '';
                     mQuery('#global_search').keyup();
-                }).on('keypress', function (event) {
-                    if ((event.keyCode || event.which) == 13) {
-                        mQuery('#global_search').typeahead('close');
-                    }
                 });
 
-            Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
+                Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
+            }
         }
 
         //instantiate sparkline plugin
@@ -427,7 +494,7 @@ var Mautic = {
 
             mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
-                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(this).attr('id') != 'MauticCommonModal') {
+                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
                     mQuery(target).remove();
                 } else {
                     Mautic.resetModal(target, true);
@@ -450,6 +517,8 @@ var Mautic = {
         var contentSpecific = false;
         if (container == '#app-content') {
             //full page gets precedence
+            Mousetrap.reset();
+
             contentSpecific = mauticContent;
         } else if (response && response.mauticContent) {
             contentSpecific = response.mauticContent;
@@ -467,8 +536,9 @@ var Mautic = {
      * @param method
      * @param target
      * @param showPageLoading
+     * @param callback
      */
-    loadContent: function (route, link, method, target, showPageLoading) {
+    loadContent: function (route, link, method, target, showPageLoading, callback) {
         mQuery.ajax({
             showLoadingBar: (typeof showPageLoading == 'undefined' || showPageLoading) ? true : false,
             url: route,
@@ -512,6 +582,11 @@ var Mautic = {
 
                 //stop loading bar
                 Mautic.stopPageLoadingBar();
+            },
+            complete: function() {
+                if (typeof callback !== 'undefined') {
+                    window["Mautic"][callback].apply('window', []);
+                }
             }
         });
 
@@ -634,6 +709,10 @@ var Mautic = {
                 Mautic.setFlashes(response.flashes);
             }
 
+            if (response.notifications) {
+               Mautic.setNotifications(response.notifications);
+            }
+
             if (response.route) {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
@@ -645,8 +724,6 @@ var Mautic = {
                 if (response.mauticContent) {
                     mauticContent = response.mauticContent;
                 }
-
-                Mautic.hideFlashes();
 
                 if (response.activeLink) {
                     var link = response.activeLink;
@@ -847,10 +924,10 @@ var Mautic = {
         if (mQuery(target + ' .loading-placeholder').length) {
             mQuery(target + ' .loading-placeholder').removeClass('hide');
             mQuery(target + ' .modal-body-content').addClass('hide');
-        }
 
-        if (header) {
-            mQuery(target + " .modal-title").html(header);
+            if (mQuery(target + ' .modal-loading-bar').length) {
+                mQuery(target + ' .modal-loading-bar').addClass('active');
+            }
         }
 
         //move the modal to the body tag to get around positioned div issues
@@ -858,6 +935,10 @@ var Mautic = {
             if (!mQuery(target).hasClass('modal-moved')) {
                 mQuery(target).appendTo('body');
                 mQuery(target).addClass('modal-moved');
+            }
+
+            if (header) {
+                mQuery(target + " .modal-title").html(header);
             }
         });
 
@@ -869,7 +950,6 @@ var Mautic = {
         mQuery(target).modal('show');
 
         mQuery.ajax({
-            showLoadingBar: true,
             url: route,
             type: method,
             dataType: "json",
@@ -882,6 +962,9 @@ var Mautic = {
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
                 Mautic.stopIconSpinPostEvent();
+            },
+            complete: function() {
+                Mautic.stopModalLoadingBar(target);
             }
         });
     },
@@ -892,6 +975,10 @@ var Mautic = {
      * @param firstLoad
      */
     resetModal: function (target, firstLoad) {
+        if (mQuery(target).hasClass('in')) {
+            return;
+        }
+
         if (typeof MauticVars.modalsReset == 'undefined') {
             MauticVars.modalsReset = {};
         }
@@ -910,25 +997,6 @@ var Mautic = {
         if (mQuery(target + " loading-placeholder").length) {
             mQuery(target + " loading-placeholder").removeClass('hide');
         }
-    },
-
-    /**
-     * Sets flashes
-     * @param flashes
-     */
-    setFlashes: function (flashes) {
-        mQuery('#flashes').replaceWith(flashes);
-    },
-
-    /**
-     * Hides flashes
-     */
-    hideFlashes: function () {
-        window.setTimeout(function () {
-            mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
-                mQuery(this).remove();
-            });
-        }, 7000);
     },
 
     /**
@@ -1059,8 +1127,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    reorderTableData: function (name, orderby, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
+    reorderTableData: function (name, orderby, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + encodeURIComponent(orderby);
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1072,8 +1144,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    filterTableData: function (name, filterby, filterValue, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + filterby + "&value=" + filterValue
+    filterTableData: function (name, filterby, filterValue, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1084,8 +1160,12 @@ var Mautic = {
      * @param tmpl
      * @param target
      */
-    limitTableData: function (name, limit, tmpl, target) {
-        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
+    limitTableData: function (name, limit, tmpl, target, baseUrl) {
+        if (typeof baseUrl == 'undefined') {
+            baseUrl = window.location.pathname;
+        }
+
+        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1137,43 +1217,26 @@ var Mautic = {
         if (mQuery('#' + elId).length) {
             var livesearch = (mQuery('#' + elId).attr("data-toggle=['livesearch']")) ? true : false;
 
-            var engine = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=commandList&model=" + modelName
+            var typeaheadObject = Mautic.activateTypeahead('#' + elId, {
+                prefetch: true,
+                remote: false,
+                limit: 0,
+                action: 'commandList&model=' + modelName,
+                multiple: true
+            });
+            mQuery(typeaheadObject).on('typeahead:selected', function (event, datum) {
+                if (livesearch) {
+                    //force live search update,
+                    MauticVars.lastSearchStr = '';
+                    mQuery('#' + elId).keyup();
+                }
+            }).on('typeahead:autocompleted', function (event, datum) {
+                if (livesearch) {
+                    //force live search update
+                    MauticVars.lastSearchStr = '';
+                    mQuery('#' + elId).keyup();
                 }
             });
-            engine.initialize();
-
-            mQuery('#' + elId).typeahead({
-                    hint: true,
-                    highlight: true,
-                    minLength: 0,
-                    multiple: true
-                },
-                {
-                    name: elId,
-                    displayKey: 'value',
-                    source: engine.ttAdapter()
-                }
-            ).on('typeahead:selected', function (event, datum) {
-                    if (livesearch) {
-                        //force live search update,
-                        MauticVars.lastSearchStr = '';
-                        mQuery('#' + elId).keyup();
-                    }
-                }).on('typeahead:autocompleted', function (event, datum) {
-                    if (livesearch) {
-                        //force live search update
-                        MauticVars.lastSearchStr = '';
-                        mQuery('#' + elId).keyup();
-                    }
-                }).on('keypress', function (event) {
-                    if ((event.keyCode || event.which) == 13) {
-                        mQuery('#' + elId).typeahead('close');
-                    }
-                });
         }
     },
 
@@ -1406,6 +1469,10 @@ var Mautic = {
         });
     },
 
+    /**
+     * Toggles the class for published buttons
+      * @param changedId
+     */
     togglePublishedButtonClass: function (changedId) {
         changedId = '#' + changedId;
 
@@ -1538,7 +1605,10 @@ var Mautic = {
                 alert(error);
             }
         }
+
         Mautic.stopPageLoadingBar();
+        Mautic.stopCanvasLoadingBar();
+        Mautic.stopIconSpinPostEvent();
     },
 
     /**
@@ -1843,5 +1913,234 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+    },
+
+    /**
+     * Sets flashes
+     * @param flashes
+     */
+    setFlashes: function (flashes) {
+        mQuery('#flashes').append(flashes);
+
+        mQuery('#flashes .alert-new').each(function() {
+            var me = this;
+            window.setTimeout(function () {
+                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                    mQuery(this).remove();
+                });
+            }, 7000);
+
+            mQuery(this).removeClass('alert-new');
+        });
+    },
+
+    /**
+     *
+     * @param notifications
+     */
+    setNotifications: function (notifications) {
+        if (notifications.lastId) {
+            mQuery('#mauticLastNotificationId').val(notifications.lastId);
+        }
+
+        if (mQuery('#notifications .mautic-update')) {
+            mQuery('#notifications .mautic-update').remove();
+        }
+
+        if (notifications.hasNewNotifications) {
+            if (mQuery('#newNotificationIndicator').hasClass('hide')) {
+                mQuery('#newNotificationIndicator').removeClass('hide');
+            }
+        }
+
+        mQuery('#notifications').prepend(notifications.content);
+
+        if (notifications.sound) {
+            mQuery('.playSound').remove();
+
+            mQuery.playSound(notifications.sound);
+        }
+    },
+
+    /**
+     * Marks notifications as read and clears unread indicators
+     */
+    markNotificationsRead: function() {
+        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function() {
+            if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
+                mQuery('#notifications .is-unread').remove();
+                mQuery('#newNotificationIndicator').addClass('hide');
+
+                mQuery.ajax({
+                    url: mauticAjaxUrl,
+                    type: "GET",
+                    data: "action=markNotificationsRead"
+                });
+            }
+        });
+    },
+
+    /**
+     * Clear notification(s)
+     * @param id
+     */
+    clearNotification: function(id) {
+        if (id) {
+            mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function() {
+                mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).remove();
+            });
+        } else {
+            mQuery("#notifications .notification").fadeOut(300, function () {
+                mQuery(this).remove();
+            });
+        }
+
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            type: "GET",
+            data: "action=clearNotification&id=" + id
+        });
+    },
+
+    activateTypeahead: function(el, options) {
+        if (typeof options == 'undefined' || !mQuery(el).length) {
+            return;
+        }
+
+        if (typeof options.remote == 'undefined') {
+            options.remote = (options.action) ? true : false;
+        }
+
+        if (typeof options.prefetch == 'undefined') {
+            options.prefetch = false;
+        }
+
+        if (typeof options.limit == 'undefined') {
+            options.limit = 5;
+        }
+
+        if (!options.displayKey) {
+            options.displayKey = 'value';
+        }
+
+        if (typeof options.multiple == 'undefined') {
+            options.multiple = false;
+        }
+
+        if (typeof options.minLength == 'undefined') {
+            options.minLength = 2;
+        }
+
+        if (options.prefetch || options.remote) {
+            if (typeof options.action == 'undefined') {
+                return;
+            }
+
+            var sourceOptions = {
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace(options.displayKey),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                dupDetector: function (remoteMatch, localMatch) {
+                    return (remoteMatch[options.displayKey] == localMatch[options.displayKey]);
+                },
+                ttl: 15000,
+                limit: options.limit
+            };
+
+            var filterClosure = function (list) {
+                if (typeof list.ignore_wdt != 'undefined') {
+                    delete list.ignore_wdt;
+                }
+
+                if (typeof list == 'object' && typeof list[0] != 'undefined') {
+                    //meant to be an array and not an object
+                    list = mQuery.map(list, function (el) {
+                        return el;
+                    });
+                }
+                return list;
+            };
+
+            if (options.remote) {
+                sourceOptions.remote = {
+                    url: mauticAjaxUrl + "?action=" + options.action + "&filter=%QUERY",
+                    filter: filterClosure
+                };
+            }
+
+            if (options.prefetch) {
+                sourceOptions.prefetch = {
+                    url: mauticAjaxUrl + "?action=" + options.action,
+                    filter: filterClosure
+                };
+            }
+
+            var theBloodhound = new Bloodhound(sourceOptions);
+            theBloodhound.initialize();
+        } else {
+            var substringMatcher = function(strs, strKeys) {
+                return function findMatches(q, cb) {
+                    var matches, substrRegex;
+
+                    // an array that will be populated with substring matches
+                    matches = [];
+
+                    // regex used to determine if a string contains the substring `q`
+                    substrRegex = new RegExp(q, 'i');
+
+                    // iterate through the pool of strings and for any string that
+                    // contains the substring `q`, add it to the `matches` array
+                    mQuery.each(strs, function(i, str) {
+                        if (typeof str == 'object') {
+                            str = str[options.displayKey];
+                        }
+
+                        if (substrRegex.test(str)) {
+                            // the typeahead jQuery plugin expects suggestions to a
+                            // JavaScript object, refer to typeahead docs for more info
+                            var match = {};
+
+                            match[options.displayKey] = str;
+
+                            if (strKeys.length && typeof strKeys[i] != 'undefined') {
+                                match['id'] = strKeys[i];
+                            }
+                            matches.push(match);
+                        }
+                    });
+
+                    cb(matches);
+                };
+            };
+
+            var lookupOptions = (options.dataOptions) ? options.dataOptions : mQuery(el).data('options');
+            var lookupKeys    = (options.dataOptionKeys) ? options.dataOptionKeys : [];
+            if (!lookupOptions) {
+                return;
+            }
+        }
+
+        var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+
+        var theTypeahead = mQuery(el).typeahead(
+            {
+                hint: true,
+                highlight: true,
+                minLength: options.minLength,
+                multiple: options.multiple
+            },
+            {
+                name: theName,
+                displayKey: options.displayKey,
+                source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+            }
+        ).on('keypress', function (event) {
+            if ((event.keyCode || event.which) == 13) {
+                mQuery(el).typeahead('close');
+            }
+        });
+
+        return theTypeahead;
     }
 };

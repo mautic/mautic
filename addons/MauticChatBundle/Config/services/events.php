@@ -19,3 +19,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.chat.configbundle.subscriber',
+    new Definition(
+        'MauticAddon\MauticChatBundle\EventListener\ConfigSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

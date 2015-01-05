@@ -63,43 +63,31 @@ class AjaxController extends CommonAjaxController
 
         //not found
         if ($entity === null) {
-            $this->request->getSession()->getFlashBag()->add(
-                'notice',
-                $this->get('translator')->trans('mautic.core.error.notfound', array(), 'flashes')
-            );
+            $this->addFlash('mautic.core.error.notfound', 'error');
         } elseif (!$event->hasAccess()) {
-            $this->request->getSession()->getFlashBag()->add(
-                'notice',
-                $this->get('translator')->trans('mautic.core.error.accessdenied', array(), 'flashes')
-            );
+            $this->addFlash('mautic.core.error.accessdenied', 'error');
         } elseif ($model->isLocked($entity)) {
-            $this->request->getSession()->getFlashBag()->add(
-                'notice',
-                $this->get('translator')->trans('mautic.core.error.locked', array(
-                    '%name%'      => $entity->getTitle(),
-                    '%menu_link%' => 'mautic_' . $source . '_index',
-                    '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
-                        'objectAction' => 'edit',
-                        'objectId'     => $entity->getId()
-                    ))
-                ), 'flashes')
-            );
-        }elseif ($this->request->getMethod() == 'POST') {
+            $this->addFlash('mautic.core.error.locked', array(
+                '%name%'      => $entity->getTitle(),
+                '%menu_link%' => 'mautic_' . $source . '_index',
+                '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            ));
+        } elseif ($this->request->getMethod() == 'POST') {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
 
-            $this->request->getSession()->getFlashBag()->add(
-                'notice',
-                $this->get('translator')->trans('mautic.core.notice.updated', array(
-                    '%name%'      => $entity->getTitle(),
-                    '%menu_link%' => 'mautic_' . $source . '_index',
-                    '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
-                        'objectAction' => 'edit',
-                        'objectId'     => $entity->getId()
-                    ))
-                ), 'flashes')
-            );
+            $this->addFlash('mautic.core.notice.updated', array(
+                '%name%'      => $entity->getTitle(),
+                '%menu_link%' => 'mautic_' . $source . '_index',
+                '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            ));
         }
 
         //render flashes

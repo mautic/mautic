@@ -28,10 +28,10 @@ class MauticChatPermissions extends AbstractPermissions
         parent::__construct($params);
         $this->permissions = array(
             'channels' => array(
-                'editother'    => 16,
+                //'editother'    => 16,
                 'create'       => 32,
-                'archiveother' => 512,
-                'full'         => 1024
+                //'archiveother' => 512,
+                //'full'         => 1024
             )
         );
     }
@@ -55,10 +55,10 @@ class MauticChatPermissions extends AbstractPermissions
     {
         $builder->add('chat:channels', 'permissionlist', array(
             'choices'  => array(
-                'editother'    => 'mautic.core.permissions.editother',
+                //'editother'    => 'mautic.core.permissions.editother',
                 'create'       => 'mautic.core.permissions.create',
-                'archiveother' => 'mautic.chat.permissions.archiveother',
-                'full'         => 'mautic.core.permissions.full'
+                //'archiveother' => 'mautic.chat.permissions.archiveother',
+                //'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.chat.permissions.channels',
             'data'     => (!empty($data['channels']) ? $data['channels'] : array()),

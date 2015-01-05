@@ -40,7 +40,7 @@ class AuthController extends FormController
 
         //check to see if the service exists
         if (!array_key_exists(strtolower($integration), $objects)) {
-            $this->request->getSession()->getFlashBag()->add('error', $integration . ' not found!');
+            $this->addFlash('mautic.integration.notfound', array('%name%' => $integration), 'error');
             if ($isAjax) {
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
@@ -53,7 +53,7 @@ class AuthController extends FormController
 
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
-            $this->request->getSession()->getFlashBag()->add('error', 'Invalid CSRF token!');
+            $this->addFlash('mautic.integration.auth.invalid.state', array(), 'error');
             if ($isAjax) {
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
@@ -74,10 +74,7 @@ class AuthController extends FormController
             $params  = array();
         }
 
-        $this->request->getSession()->getFlashBag()->add(
-            $type,
-            $this->get('translator')->trans($message, $params, 'flashes')
-        );
+        $this->addFlash($message, $params, $type);
 
         return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
     }

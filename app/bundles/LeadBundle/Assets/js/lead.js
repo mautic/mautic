@@ -1,7 +1,5 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    Mousetrap.reset();
-
     Mousetrap.bind('shift+l', function(e) {
         mQuery('#menu_lead_parent_child > li:first > a').click();
     });
@@ -50,8 +48,6 @@ Mautic.leadOnLoad = function (container) {
     };
 
     if (mQuery(container + ' form[name="lead"]').length) {
-        Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
-
         mQuery("*[data-toggle='field-lookup']").each(function (index) {
             var target = mQuery(this).attr('data-target');
             var field  = mQuery(this).attr('id');
@@ -113,85 +109,30 @@ Mautic.getLeadId = function() {
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
     if (options) {
-        //set to zero so the list shows from the start
-        var taMinLength = 0;
         var keys = values = [];
         //check to see if there is a key/value split
         options = options.split('||');
         if (options.length == 2) {
-            keys   = options[0].split('|');
+            keys = options[0].split('|');
             values = options[1].split('|');
         } else {
             values = options[0].split('|');
         }
 
-        var substringMatcher = function(strs, strKeys) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                mQuery.each(strs, function(i, str) {
-                    if (substrRegex.test(str)) {
-                        // the typeahead jQuery plugin expects suggestions to a
-                        // JavaScript object, refer to typeahead docs for more info
-                        if (strKeys.length && typeof strKeys[i] != 'undefined') {
-                            matches.push({
-                                value: str,
-                                id:    strKeys[i]
-                            });
-                        } else {
-                            matches.push({value: str});
-                        }
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
-        var source = substringMatcher(values, keys);
-    } else {
-        //set the length to 2 so it requires at least 2 characters to search
-        var taMinLength = 2;
-
-        this[field] = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            prefetch: {
-                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target
-            },
-            remote: {
-                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target + "&filter=%QUERY"
-            },
-            dupDetector: function (remoteMatch, localMatch) {
-                return (remoteMatch.value == localMatch.value);
-            },
-            ttl: 1800000,
-            limit: 5
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            dataOptions: values,
+            dataOptionKeys: keys,
+            minLength: 0
         });
-        this[field].initialize();
-        var source = this[field].ttAdapter();
+    } else {
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            prefetch: true,
+            remote: true,
+            action: "lead:fieldList&field=" + target
+        });
     }
 
-    mQuery('#' + field).typeahead(
-        {
-            hint: true,
-            highlight: true,
-            minLength: taMinLength
-        },
-        {
-            name: field,
-            displayKey: 'value',
-            source: source
-        }
-    ).on('typeahead:selected', function (event, datum) {
+    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
         if (mQuery("#" + field + "_id").length && datum["id"]) {
             mQuery("#" + field + "_id").val(datum["id"]);
         }
@@ -199,51 +140,6 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
         if (mQuery("#" + field + "_id").length && datum["id"]) {
             mQuery("#" + field + "_id").val(datum["id"]);
         }
-    }).on('keypress', function (event) {
-        if ((event.keyCode || event.which) == 13) {
-            mQuery('#' + field).typeahead('close');
-        }
-    });
-};
-
-Mautic.activateLeadOwnerTypeahead = function(el) {
-    var owners = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        prefetch: {
-            url: mauticAjaxUrl + "?action=lead:userList"
-        },
-        remote: {
-            url: mauticAjaxUrl + "?action=lead:userList&filter=%QUERY"
-        },
-        dupDetector: function (remoteMatch, localMatch) {
-            return (remoteMatch.label == localMatch.label);
-        },
-        ttl: 1800000,
-        limit: 5
-    });
-    owners.initialize();
-    mQuery("#"  + el).typeahead(
-        {
-            hint: true,
-            highlight: true,
-            minLength: 2
-        },
-        {
-            name: 'lead_owners',
-            displayKey: 'label',
-            source: owners.ttAdapter()
-        }).on('typeahead:selected', function (event, datum) {
-            if (mQuery("#lead_owner").length) {
-                mQuery("#lead_owner").val(datum["value"]);
-            }
-        }).on('typeahead:autocompleted', function (event, datum) {
-            if (mQuery("#lead_owner").length) {
-                mQuery("#lead_owner").val(datum["value"]);
-            }
-        }
-    ).on( 'focus', function() {
-        mQuery(this).typeahead( 'open');
     });
 };
 

@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class DefaultController
@@ -49,5 +50,25 @@ class DefaultController extends CommonController
         return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
             array('results' => $results)
         );
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function notificationsAction()
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('core.notification');
+
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
+
+        return $this->delegateView(array(
+            'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+            'viewParameters'  => array(
+                'showNewIndicator' => $showNewIndicator,
+                'notifications'    => $notifications,
+                'updateMessage'    => $updateMessage
+            )
+        ));
     }
 }

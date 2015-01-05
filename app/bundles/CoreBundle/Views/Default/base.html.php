@@ -33,7 +33,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <header id="app-header" class="navbar">
                <?php echo $view->render('MauticCoreBundle:Default:navbar.html.php'); ?>
 
-               <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+               <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
             </header>
             <!--/ end: app-header -->
 
@@ -78,8 +78,6 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <?php endif; ?>
         </script>
         <?php $view['assets']->outputScripts("bodyClose"); ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-        'id' => 'MauticCommonModal'
-    )); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array('id' => 'MauticSharedModal')); ?>
     </body>
 </html>

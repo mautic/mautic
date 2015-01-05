@@ -101,20 +101,6 @@ class DefaultController extends CommonController
             $email['lead'] = $leadModel->getEntity($email['lead_id']);
         }
 
-        // Check for updates
-        $updateMessage = '';
-        if ($this->factory->getUser()->isAdmin()) {
-            /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-            $updateHelper = $this->factory->getHelper('update');
-            $updateData   = $updateHelper->fetchData();
-
-            // If the version key is set, we have an update
-            if (isset($updateData['version'])) {
-                $translator    = $this->factory->getTranslator();
-                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
-            }
-        }
-
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -132,8 +118,7 @@ class DefaultController extends CommonController
                 'logs'              => $logs,
                 'icons'             => $icons,
                 'upcomingEmails'    => $upcomingEmails,
-                'security'          => $this->factory->getSecurity(),
-                'updateMessage'     => $updateMessage
+                'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
             'passthroughVars' => array(

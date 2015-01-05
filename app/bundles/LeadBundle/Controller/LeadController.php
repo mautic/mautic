@@ -381,17 +381,14 @@ class LeadController extends FormController
 
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created', array(
-                            '%name%'      => $identifier,
-                            '%menu_link%' => 'mautic_lead_index',
-                            '%url%'       => $this->generateUrl('mautic_lead_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $lead->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created', array(
+                        '%name%'      => $identifier,
+                        '%menu_link%' => 'mautic_lead_index',
+                        '%url%'       => $this->generateUrl('mautic_lead_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $lead->getId()
+                        ))
+                    ));
 
                     $inQuickForm = $this->request->get('qf', false);
 
@@ -432,8 +429,6 @@ class LeadController extends FormController
             //set the default owner to the currently logged in user
             $currentUser = $this->get('security.context')->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
-            $userName = $currentUser->getName();
-            $form->get('owner_lookup')->setData($userName);
         }
 
         return $this->delegateView(array(
@@ -534,17 +529,15 @@ class LeadController extends FormController
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
 
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $identifier,
-                            '%menu_link%' => 'mautic_lead_index',
-                            '%url%'       => $this->generateUrl('mautic_lead_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $lead->getId()
-                            ))
-                        ), 'flashes')
-                    );
+
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $identifier,
+                        '%menu_link%' => 'mautic_lead_index',
+                        '%url%'       => $this->generateUrl('mautic_lead_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $lead->getId()
+                        ))
+                    ));
                 }
             } else {
                 //unlock the entity
@@ -568,12 +561,6 @@ class LeadController extends FormController
         } else {
             //lock the entity
             $model->lockEntity($lead);
-
-            $owner = $lead->getOwner();
-            if (!empty($owner)) {
-                $userName = $owner->getName();
-                $form->get('owner_lookup')->setData($userName);
-            }
         }
 
         return $this->delegateView(array(

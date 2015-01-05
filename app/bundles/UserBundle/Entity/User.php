@@ -145,7 +145,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"userDetails"})
      */
-    private $onlineStatus;
+    private $onlineStatus = 'offline';
 
     /**
      * Stores active role permissions
@@ -153,6 +153,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @var
      */
     private $activePermissions;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $preferences;
 
     /**
      * {@inheritdoc}
@@ -740,5 +745,21 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function setOnlineStatus($status)
     {
         $this->onlineStatus = $status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreferences ()
+    {
+        return $this->preferences;
+    }
+
+    /**
+     * @param mixed $preferences
+     */
+    public function setPreferences (array $preferences)
+    {
+        $this->preferences = $preferences;
     }
 }

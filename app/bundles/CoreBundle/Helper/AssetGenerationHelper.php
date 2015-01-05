@@ -211,7 +211,13 @@ class AssetGenerationHelper
             foreach ($directories as $directory) {
                 $files         = new Finder();
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
-                $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory)->sortByName();
+                $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory);
+
+                $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
+                    return strnatcmp($a->getRealpath(), $b->getRealpath());
+                };
+                $files->sort($sort);
+
                 $group = $directory->getBasename();
 
                 foreach ($files as $file) {
@@ -242,7 +248,13 @@ class AssetGenerationHelper
 
         unset($directories);
         $files = new Finder();
-        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.' . $ext)->in($dir)->sortByName();
+        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.' . $ext)->in($dir);
+
+        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
+            return strnatcmp($a->getRealpath(), $b->getRealpath());
+        };
+        $files->sort($sort);
+
         foreach ($files as $file) {
             $fullPath = $file->getPathname();
             $relPath  = str_replace($rootPath, '', $fullPath);

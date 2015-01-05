@@ -153,17 +153,14 @@ class UserController extends FormController
                     $user->setPassword($password);
                     $model->saveEntity($user);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.created',  array(
-                            '%name%'      => $user->getName(),
-                            '%menu_link%' => 'mautic_user_index',
-                            '%url%'       => $this->generateUrl('mautic_user_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $user->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.created',  array(
+                        '%name%'      => $user->getName(),
+                        '%menu_link%' => 'mautic_user_index',
+                        '%url%'       => $this->generateUrl('mautic_user_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $user->getId()
+                        ))
+                    ));
                 }
             }
 
@@ -260,17 +257,14 @@ class UserController extends FormController
                     $user->setPassword($password);
                     $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated',  array(
-                            '%name%'      => $user->getName(),
-                            '%menu_link%' => 'mautic_user_index',
-                            '%url%'       => $this->generateUrl('mautic_user_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $user->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated',  array(
+                        '%name%'      => $user->getName(),
+                        '%menu_link%' => 'mautic_user_index',
+                        '%url%'       => $this->generateUrl('mautic_user_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $user->getId()
+                        ))
+                    ));
                 }
             } else {
                 //unlock the entity
@@ -442,13 +436,7 @@ class UserController extends FormController
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
-                    $this->request->getSession()->getFlashBag()->add('notice',
-                        $this->get('translator')->trans(
-                            'mautic.user.user.notice.messagesent',
-                            array('%name%' => $user->getName()),
-                            'flashes'
-                        )
-                    );
+                    $this->addFlash('mautic.user.user.notice.messagesent', array('%name%' => $user->getName()));
                 }
             }
             if ($cancelled || $valid) {

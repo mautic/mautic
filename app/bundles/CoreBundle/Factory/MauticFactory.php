@@ -472,16 +472,6 @@ class MauticFactory
     }
 
     /**
-     * Get AssetsHelper
-     *
-     * @return \Mautic\CoreBundle\Templating\Helper\AssetsHelper
-     */
-    public function getAssetsHelper()
-    {
-        return $this->container->get('templating.helper.assets');
-    }
-
-    /**
      * Returns MailHelper wrapper for Swift_Message via $helper->message
      *
      * @return MailHelper
@@ -590,7 +580,16 @@ class MauticFactory
      */
     public function getHelper($helper)
     {
-        return $this->container->get('mautic.helper.' . $helper);
+        switch ($helper) {
+            case 'template.assets':
+                return $this->container->get('templating.helper.assets');
+            case 'template.slots':
+                return $this->container->get('templating.helper.slots');
+            case 'template.form':
+                return $this->container->get('templating.helper.form');
+            default:
+                return $this->container->get('mautic.helper.' . $helper);
+        }
     }
 
     /**

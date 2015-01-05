@@ -202,4 +202,57 @@ class DateTimeHelper
 
         return false;
     }
+
+    /**
+     * Gets a difference
+     *
+     * @param string $from
+     * @param null   $format
+     *
+     * @return bool|\DateInterval|string
+     */
+    public function getDiff($compare = 'now', $format = null, $resetTime = false)
+    {
+        if ($compare == 'now') {
+            $compare = new \DateTime();
+        }
+
+        $with = clone $this->datetime;
+
+        if ($resetTime) {
+            $compare->setTime( 0, 0, 0 );
+            $with->setTime( 0, 0, 0 );
+        }
+
+        $interval = $compare->diff($with);
+
+        return ($format == null) ? $interval : $interval->format($format);
+    }
+
+    /**
+     * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow
+     *
+     * @param $interval
+     *
+     * @return bool|string
+     */
+    public function getTextDate($interval = null)
+    {
+        if ($interval == null) {
+            $interval = $this->getDiff('now', null, true);
+        }
+
+        $diffDays = (integer) $interval->format( "%R%a" );
+
+        switch( $diffDays ) {
+            case 0:
+                return 'today';
+            case -1:
+                return 'yesterday';
+            case +1:
+                return 'tomorrow';
+            default:
+                return false;
+        }
+    }
 }

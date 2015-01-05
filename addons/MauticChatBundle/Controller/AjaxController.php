@@ -33,7 +33,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function startUserChatAction(Request $request, $userId = 0)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $userId      = InputHelper::int($request->request->get('chatId', $userId));
@@ -76,10 +76,11 @@ class AjaxController extends CommonAjaxController
      */
     protected function startChannelChatAction(Request $request, $channelId = 0)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $channelId   = InputHelper::int($request->request->get('chatId', $channelId));
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $model */
         $model       = $this->factory->getModel('addon.mauticChat.channel');
         $channel     = $model->getEntity($channelId);
 
@@ -93,12 +94,10 @@ class AjaxController extends CommonAjaxController
                 'me'       => $currentUser,
                 'channel'  => $channel,
                 'insertUnreadDivider' => true,
-                'lastReadId' => $lastRead['lastRead']
+                'lastReadId' => ($lastRead) ? $lastRead['lastRead'] : 0
             ));
             $dataArray['withId']      = $channel->getId();
-            $dataArray['channelName'] = $this->renderview('MauticChatBundle:Channel:header.html.php', array(
-                'channel' => $channel
-            ));
+            $dataArray['channelName'] = $channel->getName();
             if ($lastRead)  {
                 $dataArray['lastReadId'] = $lastRead['lastRead'];
             }
@@ -122,7 +121,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function sendMessageAction(Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -175,7 +174,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getMessagesAction(Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -209,7 +208,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function markReadAction (Request $request)
     {
-        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+        $dataArray   = array('success' => 0);
 
         $currentUser = $this->factory->getUser();
         $chatId      = InputHelper::int($request->request->get('chatId'));
@@ -239,14 +238,97 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateListAction(Request $request)
+    protected function updateListAction(Request $request)
     {
-        $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true));
+        $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true, 'tmpl' => $request->get('tmpl', 'index')));
 
         $dataArray = array(
-            'newContent'    => $response->getContent(),
-            'ignore_wdt'    => 1
+            'canvasContent' => $response->getContent()
         );
+
+        //get new messages
+
+        //get a list of channels
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $channelModel */
+        $channelModel = $this->factory->getModel('addon.mauticChat.channel');
+        $channels     = $channelModel->getMyChannels(null, null, null, true);
+
+        //get a list of  users
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $chatModel */
+        $chatModel = $this->factory->getModel('addon.mauticChat.chat');
+        $users     = $chatModel->getUserList(null, null, null, true);
+
+        $userUnread = $channelUnread = array();
+        if ($channels['unread']['count']) {
+            $channelUnread = $channelModel->getNewUnreadMessages();
+        }
+        if ($users['unread']['count']) {
+            $userUnread = $chatModel->getNewUnreadMessages();
+        }
+
+        $unread = $channelUnread + $userUnread;
+
+        $playSound = false;
+
+        if (count($unread)) {
+            $userSettings = $chatModel->getSettings(null);
+
+            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            $onlineStatus = $this->factory->getUser()->getOnlineStatus();
+            $dnd          = ($onlineStatus == 'dnd');
+
+            $lastActive = $request->get('mauticUserLastActive', 0);
+            $isRead     = ($dnd || $lastActive > 30) ? 0 : 1;
+
+            $translator     = $this->factory->getTranslator();
+            $gravatarHelper = $this->factory->getHelper('template.gravatar');
+
+            foreach ($unread as $chat) {
+                $name = $chat['fromUser']['firstName'] . ' ' . substr($chat['fromUser']['lastName'], 0, 1) . '.';
+
+                if (isset($chat['channel'])) {
+                    $type = 'channels';
+                    $id   = $chat['channel']['id'];
+
+                    $header = $translator->trans('mautic.chat.channel.notification.header', array('%name%' => $chat['channel']['name'], '%from%' => $name));
+                } else {
+                    $type = 'users';
+                    $id   = $chat['fromUser']['id'];
+
+                    $header = $translator->trans('mautic.chat.chat.notification.header', array('%name%' => $name));
+                }
+
+                if (!$dnd && !$playSound && !in_array($id, $userSettings[$type]['mute'])) {
+                    $playSound = true;
+                }
+
+                if (!in_array($id, $userSettings[$type]['visible']) || in_array($id, $userSettings[$type]['silent'])) {
+                    //don't display if set not to
+                    continue;
+                }
+
+                $image = $gravatarHelper->getImage($chat['fromUser']['email'], 100);
+                $this->addNotification($chat['message'], 'notice', $isRead, $header, 'img:' . $image, $chat['dateSent']);
+
+                if (!$dnd) {
+                    $flashMessage = '<div><span class="pull-left pr-xs pt-xs" style="width:36px"><span class="img-wrapper img-rounded"><img src="' . $image . '" /></span></span><strong>' . $header . '</strong><br />' . $chat['message'] . '</div>';
+                    $this->addFlash($flashMessage, array(), 'notice', false, false);
+                }
+            }
+
+            $messageIds = array_keys($unread);
+            $chatModel->markMessagesNotified($messageIds);
+        }
+
+        $dataArray['flashes']       = $this->getFlashContent();
+        $dataArray['notifications'] = $this->getNotificationContent($request);
+
+        if ($playSound) {
+            $mediaDir                            = $this->factory->getSystemPath('assets');
+            $sound                               = $mediaDir . '/sounds/' . $this->factory->getParameter('chat_notification_sound', 'wet');
+            $assetHelper                         = $this->factory->getHelper('template.assets');
+            $dataArray['notifications']['sound'] = $assetHelper->getUrl($sound);
+        }
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -261,7 +343,7 @@ class AjaxController extends CommonAjaxController
      */
     private function getMessageContent(Request $request, $currentUser, $recipient, $chatType, $fromAction ='')
     {
-        $dataArray = array('ignore_wdt' => 1);
+        $dataArray = array();
         $lastId    = InputHelper::int($request->request->get('lastId'));
         $groupId   = InputHelper::int($request->request->get('groupId'));
 
@@ -346,5 +428,124 @@ class AjaxController extends CommonAjaxController
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param $type
+     * @param $userId
+     */
+    protected function toggleChatSettingAction(Request $request)
+    {
+        $chatType = $request->request->get('chatType');
+        $setting  = $request->request->get('setting');
+        $enabled  = InputHelper::boolean($request->request->get('enabled'));
+        $id       = InputHelper::int($request->request->get('id'));
+        $success  = 0;
+        $updateSettings = array();
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model    = $this->factory->getModel('addon.mauticChat.chat');
+        $settings = $model->getSettings($chatType);
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $channelModel */
+        $channelModel = $this->factory->getModel('addon.mauticChat.channel');
+
+        if ($chatType == 'channels' && $setting == 'archived') {
+            $channel = $channelModel->getEntity($id);
+
+            if ($channel != null) {
+                if ($this->factory->getSecurity()->hasEntityAccess(true, false, $channel->getCreatedBy())) {
+                    $success = 1;
+
+                    if ($enabled) {
+                        $channelModel->archiveChannel($id);
+                        $updateSettings['visible'] = false;
+                    } else {
+                        $channelModel->unarchiveChannel($id);
+                    }
+                }
+            }
+        } elseif ($chatType == 'channels' && $setting == 'subscribed') {
+            $channel = $channelModel->getEntity($id);
+
+            if ($channel != null) {
+                $success = 1;
+
+                if ($enabled) {
+                    $channelModel->subscribeToChannel($channel);
+                    $updateSettings['visible'] = true;
+                } else {
+                    $channelModel->unsubscribeFromChannel($channel);
+                    $updateSettings['visible'] = false;
+                }
+            }
+        } else {
+            $updateSettings[$setting] = $enabled;
+        }
+
+        foreach ($updateSettings as $setting => $enabled) {
+            if (isset($settings[$setting])) {
+                $success = 1;
+
+                if (!$enabled && in_array($id, $settings[$setting])) {
+                    $key = array_search($id, $settings[$setting]);
+                    if ($key !== false) {
+                        unset($settings[$setting][$key]);
+                    }
+                } elseif ($enabled && !in_array($id, $settings[$setting])) {
+                    $settings[$setting][] = $id;
+                }
+            }
+        }
+
+        if (!empty($updateSettings)) {
+            $model->setSettings($settings, $chatType);
+        }
+
+        return $this->sendJsonResponse(array(
+            'success'  => $success,
+            'settings' => $updateSettings
+        ));
+    }
+
+    /**
+     * Reorders visible users and/or channels
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function reorderVisibleChatListAction(Request $request)
+    {
+        $chatType = InputHelper::clean($request->request->get('chatType'));
+
+        $orderVar = ($chatType == 'users') ? 'chatUser' : 'chatChannel';
+        $order = InputHelper::clean($request->request->get($orderVar));
+
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $model */
+        $model    = $this->factory->getModel('addon.mauticChat.chat');
+        $settings = $model->getSettings($chatType);
+
+        $settings['visible'] = $order;
+
+        $model->setSettings($settings, $chatType);
+
+        return $this->sendJsonResponse(array('success' => 1));
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function setChatOnlineStatusAction(Request $request)
+    {
+        $status = InputHelper::clean($request->request->get('status'));
+
+        if ($status) {
+            /** @var \Mautic\UserBundle\Model\UserModel $model */
+            $model = $this->factory->getModel('user');
+            $model->setOnlineStatus($status);
+        }
+
+        return $this->sendJsonResponse(array('success' => 1));
     }
 }

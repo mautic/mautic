@@ -23,9 +23,9 @@ class ChatModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \MauticAddon\MauticChatBundle\Entity\ChatRepository
      */
-    public function getRepository()
+    public function getRepository ()
     {
         return $this->em->getRepository('MauticChatBundle:Chat');
     }
@@ -39,11 +39,12 @@ class ChatModel extends FormModel
      *
      * @return mixed
      */
-    public function getDirectMessages(User $withUser, $lastId = null, \DateTime $fromDate = null)
+    public function getDirectMessages (User $withUser, $lastId = null, \DateTime $fromDate = null)
     {
         if ($fromDate == null) {
-            $fromDate  = $this->getChatHistoryDate($withUser);
+            $fromDate = $this->getChatHistoryDate($withUser);
         }
+
         return $this->getRepository()->getUserConversation($this->factory->getUser(), $withUser, $lastId, $fromDate);
     }
 
@@ -52,7 +53,7 @@ class ChatModel extends FormModel
      *
      * @return \Mautic\CoreBundle\Helper\DateTimeHelper
      */
-    public function getChatHistoryDate(User $chattingWith)
+    public function getChatHistoryDate (User $chattingWith)
     {
         //save the from date from history so that the user doesn't have to wait to scroll back again
         $session = $this->factory->getSession();
@@ -73,7 +74,7 @@ class ChatModel extends FormModel
      * @param     $chattingWithId
      * @param int $lastId
      */
-    public function markMessagesRead($chattingWithId, $lastId = 0)
+    public function markMessagesRead ($chattingWithId, $lastId = 0)
     {
         $this->getRepository()->markRead($this->factory->getUser()->getId(), $chattingWithId, $lastId);
     }
@@ -84,27 +85,172 @@ class ChatModel extends FormModel
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     * @param bool   $unreadPriority
+     * @param bool   $usePreference
+     *
+     * @return array
+     */
+    public function getUserList ($search = '', $limit = 10, $start = 0, $usePreference = false)
+    {
+        static $userListResults = array();
+
+        $key = $search . $limit . $start . (int) $usePreference;
+
+        if (!isset($userListResults[$key])) {
+            $repo = $this->getRepository();
+
+            if ($usePreference) {
+                $settings = $this->getSettings();
+                $count    = count($settings['visible']);
+
+                if ($count) {
+                    //force user preferences
+                    $search = $settings['visible'];
+                    $limit  = $start = 0;
+                }
+            }
+
+            $results = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+
+            if ($usePreference && isset($settings['cleanSlate'])) {
+                $settings['visible'] = array_keys($results['users']);
+                $this->setSettings($settings);
+            }
+
+            list($unread, $hasUnread) = $this->getUnreadCounts(true);
+
+            //set the unread count
+            $listedUnread = 0;
+            foreach ($results['users'] as $r) {
+                if (!isset($unread[$r['id']])) {
+                    $unread[$r['id']] = 0;
+                } else {
+                    $unread[$r['id']] = (int)$unread[$r['id']];
+                }
+
+                $listedUnread += $unread[$r['id']];
+            }
+
+            //total unread count
+            $totalUnread       = array_sum($unread);
+            $results['unread'] = array(
+                'count'     => $totalUnread,
+                'hidden'    => $totalUnread - $listedUnread,
+                'users'     => $unread,
+                'hasUnread' => $hasUnread
+            );
+
+            $userListResults[$key] = $results;
+        }
+
+        return $userListResults[$key];
+    }
+
+    /**
+     * @return array
+     */
+    public function getUnreadCounts($includeIdList = false)
+    {
+        $unreadCounts = $this->getRepository()->getUnreadMessageCount($this->factory->getUser()->getId());
+
+        if ($includeIdList) {
+            $hasUnread = array();
+            foreach ($unreadCounts as $id => $count) {
+                if ($count > 0) {
+                    $hasUnread[] = $id;
+                }
+            }
+
+            return array($unreadCounts, $hasUnread);
+        } else {
+            return $unreadCounts;
+        }
+    }
+
+    /**
+     * Get chat settings
+     *
+     * @param $type
      *
      * @return mixed
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $unreadPriority = true)
+    public function getSettings ($type = 'users')
     {
-        $repo  = $this->getRepository();
+        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        $model    = $this->factory->getModel('user');
+        $settings = $model->getPreference('mauticChat.settings', array(
+            'users'    => array(
+                'cleanSlate' => true,
+                'visible' => array(),
+                'silent'  => array(),
+                'mute'    => array()
+            ),
+            'channels' => array(
+                'cleanSlate' => true,
+                'visible' => array(),
+                'silent'  => array(),
+                'mute'    => array()
+            )
+        ));
 
-        if ($unreadPriority) {
-            $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId());
-            $users  = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start, array_keys($unread));
-        } else {
-            $users  = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
-            $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId(), array_keys($users));
+        return ($type == null) ? $settings : $settings[$type];
+    }
+
+    /**
+     * Set chat settings
+     *
+     * @param $typeSettings
+     * @param $type
+     */
+    public function setSettings ($typeSettings, $type = 'users')
+    {
+        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        $model    = $this->factory->getModel('user');
+        $settings = $model->getPreference('mauticChat.settings', array(
+            'users'    => array(
+                'cleanSlate' => true,
+                'visible' => array(),
+                'silent'  => array(),
+                'mute'    => array()
+            ),
+            'channels' => array(
+                'cleanSlate' => true,
+                'visible' => array(),
+                'silent'  => array(),
+                'mute'    => array()
+            )
+        ));
+
+        if (isset($typeSettings['cleanSlate'])) {
+            unset($typeSettings['cleanSlate']);
         }
 
-        //set the unread count
-        foreach ($users as $u) {
-            $users[$u['id']]['unread'] = (isset($unread[$u['id']])) ? $unread[$u['id']] : 0;
-        }
+        $settings[$type] = $typeSettings;
+        $model->setPreference('mauticChat.settings', $settings);
+    }
 
-        return $users;
+    /**
+     * Get a list of unread messages
+     *
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getNewUnreadMessages($includeNotified = false)
+    {
+        $user = $this->factory->getUser();
+
+        return $this->getRepository()->getUnreadMessages($user->getId(), $includeNotified);
+    }
+
+    /**
+     * Marks an array of message ids as the user was notified
+     *
+     * @param array $messageIds
+     *
+     * @return mixed
+     */
+    public function markMessagesNotified(array $messageIds)
+    {
+        return $this->getRepository()->markNotified($messageIds);
     }
 }

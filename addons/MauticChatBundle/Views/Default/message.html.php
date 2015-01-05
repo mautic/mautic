@@ -10,5 +10,5 @@
 //use a placeholder to use for the prototype
 $text = (empty($message)) ? '[message]' : $message['message'];
 ?>
-<p class="media-text" id="ChatMessage<?php echo $message['id']; ?>"><?php echo $text; ?></p>
+<p class="media-text" id="ChatMessage<?php echo $message['id']; ?>" data-toggle="tooltip" title="<?php echo $view['date']->toFull($message['dateSent']); ?>"><?php echo $text; ?></p>
 <span class="clearfix"></span>

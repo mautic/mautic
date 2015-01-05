@@ -51,9 +51,19 @@ class Channel extends FormEntity
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="chat_channel_users")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     protected $privateUsers;
+
+    /**
+     * @ORM\OneToMany(targetEntity="ChannelStat", mappedBy="channel", fetch="EXTRA_LAZY")
+     */
+    protected $stats;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Chat", mappedBy="channel", fetch="EXTRA_LAZY")
+     */
+    protected $chats;
 
     public function __construct()
     {

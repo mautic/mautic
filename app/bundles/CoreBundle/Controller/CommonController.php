@@ -128,14 +128,7 @@ class CommonController extends Controller implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->factory->getSession()->getFlashBag()->add(
-                    $flash['type'],
-                    $this->get('translator')->trans(
-                        $flash['msg'],
-                        (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
-                        'flashes'
-                    )
-                );
+                $this->addFlash($flash['msg'], (!empty($flash['msgVars']) ? $flash['msgVars'] : array()), $flash['type']);
             }
         }
 
@@ -187,7 +180,8 @@ class CommonController extends Controller implements MauticController
         }
 
         //render flashes
-        $passthrough['flashes'] = $this->getFlashContent();
+        $passthrough['flashes']       = $this->getFlashContent();
+        $passthrough['notifications'] = $this->getNotificationContent();
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
@@ -352,7 +346,7 @@ class CommonController extends Controller implements MauticController
 
         if (!empty($name)) {
             if ($this->request->query->has('orderby')) {
-                $orderBy = InputHelper::clean($this->request->query->get('orderby'));
+                $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
                 $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
                 $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
                 $session->set("mautic.$name.orderby", $orderBy);
@@ -365,11 +359,13 @@ class CommonController extends Controller implements MauticController
             }
 
             if ($this->request->query->has('filterby')) {
-                $filter = InputHelper::clean($this->request->query->get("filterby"));
-                $value  = InputHelper::clean($this->request->query->get("value"));
-                $filters              = $this->get("session")->get("mautic.$name.filters", '');
-                if (empty($value) && isset($filters[$filter])) {
-                    unset($filters[$filter]);
+                $filter = InputHelper::clean($this->request->query->get("filterby"), true);
+                $value  = InputHelper::clean($this->request->query->get("value"), true);
+                $filters = $this->get("session")->get("mautic.$name.filters", '');
+                if (empty($value)) {
+                    if (isset($filters[$filter])) {
+                        unset($filters[$filter]);
+                    }
                 } else {
                     $filters[$filter] = array(
                         'column' => $filter,
@@ -378,7 +374,7 @@ class CommonController extends Controller implements MauticController
                         'strict' => false
                     );
                 }
-                $this->get("session")->set("mautic.$name.filters", $filters);
+                $session->set("mautic.$name.filters", $filters);
             }
         }
     }
@@ -418,6 +414,95 @@ class CommonController extends Controller implements MauticController
      */
     protected function getFlashContent()
     {
-        return $this->renderView('MauticCoreBundle:Default:flashes.html.php');
+        return $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php');
+    }
+
+    /**
+     * Renders notification info for ajax
+     *
+     * @return string
+     */
+    protected function getNotificationContent(Request $request = null)
+    {
+        if ($request == null) {
+            $request = $this->request;
+        }
+
+        $afterId = $request->get('mauticLastNotificationId', null);
+
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('core.notification');
+
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
+
+        $lastNotification = reset($notifications);
+
+        return array(
+            'content' => $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', array(
+                'notifications' => $notifications,
+                'updateMessage' => $updateMessage
+            )),
+            'lastId'              => (!empty($lastNotification)) ? $lastNotification['id'] : $afterId,
+            'hasNewNotifications' => $showNewIndicator,
+            'updateAvailable'     => (!empty($updateMessage))
+        );
+    }
+
+    /**
+     * @param      $message
+     * @param null $type
+     * @param bool $isRead
+     * @param null $header
+     * @param null $iconClass
+     */
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
+        $notificationModel = $this->factory->getModel('core.notification');
+        $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime );
+    }
+
+    /**
+     * @param        $message
+     * @param array  $messageVars
+     * @param string $type
+     * @param string $domain
+     * @param bool   $addNotification
+     */
+    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    {
+        if ($domain == null) {
+            $domain = 'flashes';
+        }
+
+        if ($domain === false) {
+            //message is already translated
+            $translatedMessage = $message;
+        } else {
+            $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+        }
+
+        $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+
+        if ($addNotification) {
+            switch ($type) {
+                case 'warning':
+                    $iconClass = "text-warning fa-exclamation-triangle";
+                    break;
+                case 'error':
+                    $iconClass = "text-danger fa-exclamation-circle";
+                    break;
+                case 'notice':
+                    $iconClass = "fa-info-circle";
+                default:
+                    break;
+            }
+
+            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            $lastActive = $this->request->get('mauticUserLastActive', 0);
+            $isRead     = $lastActive > 30 ? 0 : 1;
+
+            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
+        }
     }
 }

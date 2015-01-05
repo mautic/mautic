@@ -114,17 +114,14 @@ class DefaultController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.core.notice.updated', array(
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_' . $source . '_index',
-                            '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ), 'flashes')
-                    );
+                    $this->addFlash('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_' . $source . '_index',
+                        '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId()
+                        ))
+                    ));
                 }
             } else {
                 //clear any modified content

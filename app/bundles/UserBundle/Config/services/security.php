@@ -67,7 +67,6 @@ $container->setDefinition(
     )
 );
 
-
 $container->setDefinition(
     'mautic.security.authentication_handler',
     new Definition(
@@ -75,6 +74,16 @@ $container->setDefinition(
         array(
             new Reference('router'),
             new Reference('session')
+        )
+    )
+);
+
+$container->setDefinition(
+    'mautic.security.logout_handler',
+    new Definition(
+        'Mautic\UserBundle\Security\Authentication\LogoutHandler',
+        array(
+            new Reference('mautic.factory')
         )
     )
 );

@@ -18,6 +18,6 @@ Mautic.categoryOnLoad = function (container, response) {
 
 Mautic.onCategoryChange = function (catEl, route, header) {
     if (mQuery(catEl).val() == 'new') {
-        Mautic.loadAjaxModal('#MauticCommonModal', route, 'get', header);
+        Mautic.loadAjaxModal('#MauticSharedModal', route, 'get', header);
     }
 };

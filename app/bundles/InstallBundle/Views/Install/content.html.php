@@ -13,6 +13,6 @@ if (!$app->getRequest()->isXmlHttpRequest() && $view['slots']->get('contentOnly'
 endif;
 ?>
 
-<?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+<?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
 
 <?php $view['slots']->output('_content'); ?>

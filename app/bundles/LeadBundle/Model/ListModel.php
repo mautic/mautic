@@ -60,9 +60,9 @@ class ListModel extends FormModel
 
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName(), true));
+            $alias = strtolower(InputHelper::alphanum($entity->getName(), false, true));
         } else {
-            $alias = strtolower(InputHelper::alphanum($alias, true));
+            $alias = strtolower(InputHelper::alphanum($alias, false, true));
         }
 
         //make sure alias is not already taken
