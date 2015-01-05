@@ -172,14 +172,12 @@ class PublicController extends CommonFormController
             $customStyles .= sprintf('<link rel="stylesheet" type="text/css" href="%s">', $cssStyle);
         }
 
-        if ($form === null) {
+        if ($form === null || !$form->isPublished()) {
             $html =
                 '<h1>'.
                 $this->get('translator')->trans('mautic.form.error.notfound', array('%id%' => $objectId), 'flashes') .
                 '</h1>';
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'form:forms:editown', 'form:forms:editother', $form->getCreatedBy()
-        ))  {
+        } else {
             $html = $form->getCachedHtml();
         }
 
