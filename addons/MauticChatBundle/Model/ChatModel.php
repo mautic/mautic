@@ -91,50 +91,58 @@ class ChatModel extends FormModel
      */
     public function getUserList ($search = '', $limit = 10, $start = 0, $usePreference = false)
     {
-        $repo = $this->getRepository();
+        static $userListResults = array();
 
-        if ($usePreference) {
-            $settings = $this->getSettings();
-            $count    = count($settings['visible']);
+        $key = $search . $limit . $start . (int) $usePreference;
 
-            if ($count) {
-                //force user preferences
-                $search = $settings['visible'];
-                $limit  = $start = 0;
-            }
-        }
+        if (!isset($userListResults[$key])) {
+            $repo = $this->getRepository();
 
-        $results = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+            if ($usePreference) {
+                $settings = $this->getSettings();
+                $count    = count($settings['visible']);
 
-        if ($usePreference && isset($settings['cleanSlate'])) {
-            $settings['visible'] = array_keys($results['users']);
-            $this->setSettings($settings);
-        }
-
-        list($unread, $hasUnread) = $this->getUnreadCounts(true);
-
-        //set the unread count
-        $listedUnread = 0;
-        foreach ($results['users'] as $r) {
-            if (!isset($unread[$r['id']])) {
-                $unread[$r['id']] = 0;
-            } else {
-                $unread[$r['id']] = (int)$unread[$r['id']];
+                if ($count) {
+                    //force user preferences
+                    $search = $settings['visible'];
+                    $limit  = $start = 0;
+                }
             }
 
-            $listedUnread += $unread[$r['id']];
+            $results = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+
+            if ($usePreference && isset($settings['cleanSlate'])) {
+                $settings['visible'] = array_keys($results['users']);
+                $this->setSettings($settings);
+            }
+
+            list($unread, $hasUnread) = $this->getUnreadCounts(true);
+
+            //set the unread count
+            $listedUnread = 0;
+            foreach ($results['users'] as $r) {
+                if (!isset($unread[$r['id']])) {
+                    $unread[$r['id']] = 0;
+                } else {
+                    $unread[$r['id']] = (int)$unread[$r['id']];
+                }
+
+                $listedUnread += $unread[$r['id']];
+            }
+
+            //total unread count
+            $totalUnread       = array_sum($unread);
+            $results['unread'] = array(
+                'count'     => $totalUnread,
+                'hidden'    => $totalUnread - $listedUnread,
+                'users'     => $unread,
+                'hasUnread' => $hasUnread
+            );
+
+            $userListResults[$key] = $results;
         }
 
-        //total unread count
-        $totalUnread       = array_sum($unread);
-        $results['unread'] = array(
-            'count'     => $totalUnread,
-            'hidden'    => $totalUnread - $listedUnread,
-            'users'     => $unread,
-            'hasUnread' => $hasUnread
-        );
-
-        return $results;
+        return $userListResults[$key];
     }
 
     /**
@@ -184,7 +192,7 @@ class ChatModel extends FormModel
             )
         ));
 
-        return $settings[$type];
+        return ($type == null) ? $settings : $settings[$type];
     }
 
     /**
@@ -218,5 +226,31 @@ class ChatModel extends FormModel
 
         $settings[$type] = $typeSettings;
         $model->setPreference('mauticChat.settings', $settings);
+    }
+
+    /**
+     * Get a list of unread messages
+     *
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getNewUnreadMessages($includeNotified = false)
+    {
+        $user = $this->factory->getUser();
+
+        return $this->getRepository()->getUnreadMessages($user->getId(), $includeNotified);
+    }
+
+    /**
+     * Marks an array of message ids as the user was notified
+     *
+     * @param array $messageIds
+     *
+     * @return mixed
+     */
+    public function markMessagesNotified(array $messageIds)
+    {
+        return $this->getRepository()->markNotified($messageIds);
     }
 }

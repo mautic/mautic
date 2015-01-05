@@ -82,6 +82,10 @@ class Chat
      */
     private $dateEdited;
 
+    /**
+     * @ORM\Column(name="is_notified", type="boolean")
+     */
+    private $isNotified = false;
 
     /**
      * Construct
@@ -301,6 +305,22 @@ class Chat
     public function setMessage ($message)
     {
         $this->message = $message;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsNotified ()
+    {
+        return $this->isNotified;
+    }
+
+    /**
+     * @param mixed $isNotified
+     */
+    public function setIsNotified ($isNotified)
+    {
+        $this->isNotified = (bool) $isNotified;
     }
 }
 

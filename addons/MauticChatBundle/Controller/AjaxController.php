@@ -246,6 +246,79 @@ class AjaxController extends CommonAjaxController
             'canvasContent' => $response->getContent()
         );
 
+        //get new messages
+
+        //get a list of channels
+        /** @var \MauticAddon\MauticChatBundle\Model\ChannelModel $channelModel */
+        $channelModel = $this->factory->getModel('addon.mauticChat.channel');
+        $channels     = $channelModel->getMyChannels(null, null, null, true);
+
+        //get a list of  users
+        /** @var \MauticAddon\MauticChatBundle\Model\ChatModel $chatModel */
+        $chatModel = $this->factory->getModel('addon.mauticChat.chat');
+        $users     = $chatModel->getUserList(null, null, null, true);
+
+        $userUnread = $channelUnread = array();
+        if ($channels['unread']['count']) {
+            $channelUnread = $channelModel->getNewUnreadMessages();
+        }
+        if ($users['unread']['count']) {
+            $userUnread = $chatModel->getNewUnreadMessages();
+        }
+
+        $unread = $channelUnread + $userUnread;
+
+        if (count($unread)) {
+            $userSettings = $chatModel->getSettings(null);
+
+
+            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            $onlineStatus = $this->factory->getUser()->getOnlineStatus();
+            $dnd          = ($onlineStatus == 'dnd');
+
+            $lastActive = $request->get('mauticUserLastActive', 0);
+            $isRead     = ($dnd || $lastActive > 30) ? 0 : 1;
+
+            $translator     = $this->factory->getTranslator();
+            $gravatarHelper = $this->factory->getHelper('template.gravatar');
+
+            foreach ($unread as $chat) {
+                $name = $chat['fromUser']['firstName'] . ' ' . substr($chat['fromUser']['lastName'], 0, 1) . '.';
+
+                if (isset($chat['channel'])) {
+                    $type = 'channels';
+                    $id   = $chat['channel']['id'];
+
+                    $header = $translator->trans('mautic.chat.channel.notification.header', array('%name%' => $chat['channel']['name'], '%from%' => $name));
+                } else {
+                    $type = 'users';
+                    $id   = $chat['fromUser']['id'];
+
+                    $header = $translator->trans('mautic.chat.chat.notification.header', array('%name%' => $name));
+                }
+
+                if (!in_array($id, $userSettings[$type]['visible']) || in_array($id, $userSettings[$type]['silent'])) {
+                    //don't display if set not to
+                    continue;
+                }
+
+                $image = $gravatarHelper->getImage($chat['fromUser']['email'], 100);
+                $this->addNotification($chat['message'], 'notice', $isRead, $header, 'img:' . $image, $chat['dateSent']);
+
+                if (!$dnd) {
+
+                    $flashMessage = '<div><span class="pull-left pr-xs pt-xs" style="width:36px"><span class="img-wrapper img-rounded"><img src="'.$image.'" /></span></span><strong>' . $header . '</strong><br />' . $chat['message'] . '</div>';
+                    $this->addFlash($flashMessage, array(), 'notice', false, false);
+                }
+            }
+
+            $messageIds = array_keys($unread);
+            $chatModel->markMessagesNotified($messageIds);
+        }
+
+        $dataArray['flashes'] = $this->getFlashContent();
+        $dataArray['notifications'] = $this->getNotificationContent($request);
+
         return $this->sendJsonResponse($dataArray);
     }
 

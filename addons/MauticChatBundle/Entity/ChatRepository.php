@@ -64,8 +64,6 @@ class ChatRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        $this->generateOnlineStatuses($results, array('fromUser', 'toUser'));
-
         return $results;
     }
 
@@ -185,6 +183,20 @@ class ChatRepository extends CommonRepository
     }
 
     /**
+     * Mark messages as having been displayed to the user
+     *
+     * @param array $messageIds
+     */
+    public function markNotified(array $messageIds)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'chats')
+            ->set('is_notified', 1)
+            ->where($q->expr()->in('id', $messageIds))
+            ->execute();
+    }
+
+    /**
      * @param       $toUser
      * @param array $fromUsers
      *
@@ -222,4 +234,38 @@ class ChatRepository extends CommonRepository
         return $return;
     }
 
+    /**
+     * Get all unread messages for a user
+     *
+     * @param $userId
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getUnreadMessages($userId, $includeNotified = false)
+    {
+        $q = $this->_em->createQueryBuilder();
+        $q->select('partial c.{id, dateSent, message}, partial fu.{id, username, firstName, lastName, email, lastActive}')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+            ->join('c.fromUser', 'fu')
+            ->join('c.toUser', 'tu')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('c.isRead', 0),
+                    $q->expr()->eq('tu.id', ':userId')
+                )
+            )
+            ->setParameter(':userId', (int) $userId)
+            ->orderBy('c.dateSent', 'ASC');
+
+        if (!$includeNotified) {
+            $q->andwhere(
+                $q->expr()->eq('c.isNotified', 0)
+            );
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
 }

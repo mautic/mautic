@@ -392,4 +392,46 @@ class ChannelRepository extends CommonRepository
 
         $qb->getQuery()->execute();
     }
+
+    /**
+     * Gets a list of messages that are unread for the user
+     *
+     * @param $userId
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getUnreadMessages($userId, $includeNotified = false)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('partial c.{id, dateSent, message}, partial ch.{id, name, description}, partial fu.{id, username, firstName, lastName, email, lastActive}')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+            ->join('c.fromUser', 'fu')
+            ->leftJoin('c.channel', 'ch')
+            ->leftJoin('ch.privateUsers', 'u')
+            ->leftJoin('ch.stats', 's', 'WITH', 'IDENTITY(s.user) = :userId')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->isNull('c.fromUser'),
+                        $qb->expr()->neq('IDENTITY(c.fromUser)', ':userId')
+                    ),
+                    $qb->expr()->gt('c.id', 's.lastRead')
+                )
+            )
+            ->setParameter('userId', (int) $userId);
+
+        $qb->andWhere('ch.isPublished = 1');
+        $qb->orderBy('c.dateSent', 'ASC');
+
+        if (!$includeNotified) {
+            $qb->andwhere(
+                $qb->expr()->eq('c.isNotified', 0)
+            );
+        }
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        return $results;
+    }
 }

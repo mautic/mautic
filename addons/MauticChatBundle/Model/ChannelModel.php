@@ -43,62 +43,70 @@ class ChannelModel extends FormModel
      */
     public function getMyChannels($search = '', $limit = 10, $start = 0, $usePreference = false)
     {
-        $repo = $this->getRepository();
-        if ($usePreference) {
-            $settings = $this->getSettings();
+        static $channelListResults = array();
 
-            //force user preferences
-            $search = $settings['visible'];
+        $key = $search . $limit . $start . (int) $usePreference;
 
-            if (empty($search)) {
-                //prevent showing any channels until subscribed
-                $search[] = 0;
+        if (!isset($channelListResults[$key])) {
+            $repo = $this->getRepository();
+            if ($usePreference) {
+                $settings = $this->getSettings();
+
+                //force user preferences
+                $search = $settings['visible'];
+
+                if (empty($search)) {
+                    //prevent showing any channels until subscribed
+                    $search[] = 0;
+                }
+
+                $limit = $start = 0;
             }
 
-            $limit  = $start = 0;
+            $results = $repo->getUserChannels($this->factory->getUser(), $search, $limit, $start);
+            $ids     = array_keys($results['channels']);
+
+            //compare user preference with returned Ids and update if applicable
+            if ($usePreference) {
+                $diff = array_diff($settings['visible'], $ids);
+
+                if (count($diff)) {
+                    $settings['visible'] = $ids;
+                    $this->setSettings($settings);
+                }
+            }
+
+            $unread = $this->getChannelsWithUnreadMessages();
+
+            //set the unread count
+            $listedUnread = 0;
+            $hasUnread    = array();
+            foreach ($results['channels'] as $r) {
+                if (!isset($unread[$r['id']])) {
+                    $unread[$r['id']] = 0;
+                } else {
+                    $unread[$r['id']] = (int)$unread[$r['id']];
+                }
+
+                if ($unread[$r['id']] > 0) {
+                    $hasUnread[] = $r['id'];
+                }
+                $listedUnread += $unread[$r['id']];
+            }
+
+            //total unread count
+            $totalUnread       = array_sum($unread);
+            $results['unread'] = array(
+                'count'     => $totalUnread,
+                'hidden'    => $totalUnread - $listedUnread,
+                'channels'  => $unread,
+                'hasUnread' => $hasUnread
+            );
+
+            $channelListResults[$key] = $results;
         }
 
-        $results = $repo->getUserChannels($this->factory->getUser(), $search, $limit, $start);
-        $ids     = array_keys($results['channels']);
-
-        //compare user preference with returned Ids and update if applicable
-        if ($usePreference) {
-            $diff = array_diff($settings['visible'], $ids);
-
-            if (count($diff)) {
-                $settings['visible'] = $ids;
-                $this->setSettings($settings);
-            }
-        }
-
-        $unread = $this->getChannelsWithUnreadMessages();
-
-        //set the unread count
-        $listedUnread = 0;
-        $hasUnread    = array();
-        foreach ($results['channels'] as $r) {
-            if (!isset($unread[$r['id']])) {
-                $unread[$r['id']] = 0;
-            } else {
-                $unread[$r['id']] = (int)$unread[$r['id']];
-            }
-
-            if ($unread[$r['id']] > 0) {
-                $hasUnread[] = $r['id'];
-            }
-            $listedUnread += $unread[$r['id']];
-        }
-
-        //total unread count
-        $totalUnread       = array_sum($unread);
-        $results['unread'] = array(
-            'count'     => $totalUnread,
-            'hidden'    => $totalUnread - $listedUnread,
-            'channels'  => $unread,
-            'hasUnread' => $hasUnread
-        );
-
-        return $results;
+        return $channelListResults[$key];
     }
 
     /**
@@ -355,5 +363,19 @@ class ChannelModel extends FormModel
         }
 
         $this->getRepository()->deleteChannelStat($channel->getId(), $user->getId());
+    }
+
+    /**
+     * Get a list of unread messages
+     *
+     * @param $includeNotified
+     *
+     * @return array
+     */
+    public function getNewUnreadMessages($includeNotified = false)
+    {
+        $user = $this->factory->getUser();
+
+        return $this->getRepository()->getUnreadMessages($user->getId(), $includeNotified);
     }
 }

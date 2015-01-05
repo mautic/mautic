@@ -24,8 +24,7 @@ Mautic.chatOnLoad = function() {
     });
 },
 
-Mautic.reorderVisibleChatList = function(order, chatType)
-{
+Mautic.reorderVisibleChatList = function(order, chatType) {
     if (typeof Mautic.chatReorderInProgress != 'undefined') {
         setTimeout(function() {
             Mautic.reorderVisibleChatList(order, chatType);
@@ -42,7 +41,7 @@ Mautic.reorderVisibleChatList = function(order, chatType)
             }
         });
     }
-}
+};
 
 Mautic.activateChatListUpdate = function() {
     Mautic.setModeratedInterval('chatListUpdaterInterval', 'updateChatList', 5000);
