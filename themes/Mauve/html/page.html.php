@@ -173,9 +173,9 @@ $view['slots']->set('pageTitle', $title);
     <!-- /.row -->
     <?php endif; // end of Features check ?>
 
+    <?php if ($view['slots']->hasContent(array('cta', 'cta_button'))): ?>
     <hr>
 
-    <?php if ($view['slots']->hasContent(array('cta', 'cta_button'))): ?>
     <!-- Call to Action Section -->
     <div class="well">
         <div class="row">
@@ -191,9 +191,9 @@ $view['slots']->set('pageTitle', $title);
             <?php endif; // end of cta_button ?>
         </div>
     </div>
-    <?php endif; // end of Call to Action check ?>
 
     <hr>
+    <?php endif; // end of Call to Action check ?>
 
     <?php if ($view['slots']->hasContent('footer')): ?>
     <!-- Footer -->
