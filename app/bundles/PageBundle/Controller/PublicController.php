@@ -235,7 +235,8 @@ class PublicController extends CommonFormController
                     'content'         => $entity->getContent(),
                     'page'            => $entity,
                     'template'        => $template,
-                    'googleAnalytics' => $googleAnalytics
+                    'googleAnalytics' => $googleAnalytics,
+                    'public'          => true
                 ));
 
                 $content = $response->getContent();
