@@ -19,10 +19,10 @@ $dataLang     = ($locale != 'en_US')                 ? ' data-lang="'.$locale.'"
 $js = <<<JS
 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 JS;
-$view['assets']->addScriptDeclaration($js, 'bodyClose');
 ?>
 
 <div class="share-button twitter-share-button layout-<?php echo $settings['count']; ?>">
     <a href="https://twitter.com/share"
     class="twitter-share-button share-button"<?php echo $dataText.$dataVia.$dataRelated.$dataHashtags.$dataSize.$dataCount; ?>><?php echo $view['translator']->trans('mautic.integration.Twitter.share.tweet'); ?></a>
 </div>
+<script><?php echo $js; ?></script>
