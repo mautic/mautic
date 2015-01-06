@@ -253,4 +253,42 @@ class ChatModel extends FormModel
     {
         return $this->getRepository()->markNotified($messageIds);
     }
+
+    /**
+     * @param $filter
+     *
+     * @return array
+     */
+    public function searchMessages($filter, $limit = 30, $includeChannels = true)
+    {
+        $userId   = $this->factory->getUser()->getId();
+        $messages = $this->getRepository()->getFilteredMessages($filter, $userId, $limit);
+
+        $totalMessageCount   = count($messages);
+        $messages            = $messages->getIterator()->getArrayCopy();
+        $limitedMessageCount = count($messages);
+
+        if ($includeChannels) {
+            $channelMessages = $this->factory->getModel('addon.mauticChat.channel')->searchMessages($filter, $limit);
+
+            $messages = $messages + $channelMessages['messages'];
+
+            usort($messages, function($a, $b) {
+                return ($a['dateSent'] < $b['dateSent']);
+            });
+
+            $limitedCombinedCount = $limitedMessageCount + $channelMessages['count'];
+            if ($limitedCombinedCount > $limit) {
+                $messages = array_slice($messages, 0, $limit);
+            }
+
+            $totalMessageCount = $totalMessageCount + $channelMessages['total'];
+        }
+
+        return array(
+            'messages' => $messages,
+            'count'    => count($messages),
+            'total'    => $totalMessageCount
+        );
+    }
 }

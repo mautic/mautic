@@ -434,4 +434,45 @@ class ChannelRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Search messages
+     *
+     * @param $filter
+     * @param $userId
+     * @param $limit
+     *
+     * @return array
+     */
+    public function getFilteredMessages($filter, $userId, $limit = 30)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('partial c.{id, dateSent, message}, partial ch.{id, name, description}, partial fu.{id, username, firstName, lastName, email, lastActive}')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+            ->join('c.fromUser', 'fu')
+            ->leftJoin('c.channel', 'ch')
+            ->leftJoin('ch.privateUsers', 'u')
+            ->leftJoin('ch.stats', 's', 'WITH', 'IDENTITY(s.user) = :userId')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->isNull('c.fromUser'),
+                        $qb->expr()->neq('IDENTITY(c.fromUser)', ':userId')
+                    ),
+                    $qb->expr()->like('c.message', ':filter')
+                )
+            )
+            ->setParameter('userId', (int) $userId)
+            ->setParameter('filter', '%' . $filter . '%');
+
+        $qb->andWhere('ch.isPublished = 1');
+        $qb->orderBy('c.dateSent', 'ASC');
+
+        $qb->setMaxResults($limit);
+        $query = $qb->getQuery();
+        $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::HYDRATE_ARRAY"));
+
+        $results = new Paginator($query);
+        return $results;
+    }
 }

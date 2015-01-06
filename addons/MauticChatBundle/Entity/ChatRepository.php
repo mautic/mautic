@@ -268,4 +268,36 @@ class ChatRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Searches messages
+     *
+     * @param $filter
+     * @param $toUserId
+     * @param $limit
+     */
+    public function getFilteredMessages($filter, $toUserId, $limit = 30)
+    {
+        $q = $this->_em->createQueryBuilder();
+        $q->select('partial c.{id, dateSent, message}, partial fu.{id, username, firstName, lastName, email, lastActive}')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
+            ->join('c.fromUser', 'fu')
+            ->join('c.toUser', 'tu')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('tu.id', ':userId'),
+                    $q->expr()->like('c.message', ':filter')
+                )
+            )
+            ->setParameter(':userId', (int) $toUserId)
+            ->setParameter(':filter', '%' . $filter . '%')
+            ->orderBy('c.dateSent', 'ASC');
+
+        $q->setMaxResults($limit);
+        $query = $q->getQuery();
+        $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::HYDRATE_ARRAY"));
+
+        $results = new Paginator($query);
+        return $results;
+    }
 }

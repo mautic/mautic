@@ -378,4 +378,25 @@ class ChannelModel extends FormModel
 
         return $this->getRepository()->getUnreadMessages($user->getId(), $includeNotified);
     }
+
+    /**
+     * @param $filter
+     * @param $limit
+     *
+     * @return array
+     */
+    public function searchMessages($filter, $limit = 30)
+    {
+        $userId   = $this->factory->getUser()->getId();
+        $messages = $this->getRepository()->getFilteredMessages($filter, $userId, $limit);
+
+        $totalCount = count($messages);
+        $messages   = $messages->getIterator()->getArrayCopy();
+
+        return array(
+            'messages' => $messages,
+            'count'    => count($messages),
+            'total'    => $totalCount
+        );
+    }
 }
