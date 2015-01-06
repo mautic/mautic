@@ -12,37 +12,10 @@ $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $page->
 $view['slots']->set('public', (isset($public) && $public === true) ? true : false);
 $view['slots']->set('pageTitle', $title);
 ?>
-<!-- Header Carousel -->
-<div id="carousel-generic" class="carousel slide" data-ride="carousel">
-    <!-- Indicators -->
-    <ol class="carousel-indicators">
-        <li data-target="#carousel-generic" data-slide-to="0" class="active"></li>
-        <li data-target="#carousel-generic" data-slide-to="1"></li>
-        <li data-target="#carousel-generic" data-slide-to="2"></li>
-    </ol>
 
-    <!-- Wrapper for slides -->
-    <div class="carousel-inner" role="listbox">
-        <div class="item text-center active">
-            <img src="http://placehold.it/1900x800/4e5d9d&text=Slide+One" alt="Slide One" />
-            <div class="carousel-caption">
-                <h2>Caption 1</h2>
-            </div>
-        </div>
-        <div class="item text-center">
-            <img src="http://placehold.it/1900x800/4e5d9d&text=Slide+Two" alt="Slide Two" />
-            <div class="carousel-caption">
-                <h2>Caption 2</h2>
-            </div>
-        </div>
-        <div class="item text-center">
-            <img src="http://placehold.it/1900x800/4e5d9d&text=Slide+Three" alt="Slide Three" />
-            <div class="carousel-caption">
-                <h2>Caption 3</h2>
-            </div>
-        </div>
-    </div>
-</div>
+<?php if ($view['slots']->hasContent('slideshow')): ?>
+    <?php $view['slots']->output('slideshow'); ?>
+<?php endif; // end of slideshow ?>
 
 <!-- Page Content -->
 <div class="container">

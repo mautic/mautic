@@ -744,12 +744,13 @@ class PageController extends FormController
         $content    = $entity->getContent();
         $content    = array_merge($content, $newContent);
         return $this->render('MauticPageBundle::builder.html.php', array(
-            'isNew'    => $isNew,
-            'slots'    => $slots,
-            'content'  => $content,
-            'page'     => $entity,
-            'template' => $template,
-            'basePath' => $this->request->getBasePath()
+            'isNew'         => $isNew,
+            'slots'         => $slots,
+            'formFactory'   => $this->get('form.factory'),
+            'content'       => $content,
+            'page'          => $entity,
+            'template'      => $template,
+            'basePath'      => $this->request->getBasePath()
         ));
     }
 

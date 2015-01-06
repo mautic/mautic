@@ -76,3 +76,17 @@ $container->setDefinition('mautic.form.type.pageconfig', new Definition(
     ->addTag('form.type', array(
         'alias' => 'pageconfig',
     ));
+
+$container->setDefinition('mautic.form.type.slideshow_config', new Definition(
+    'Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'slideshow_config',
+    ));
+
+$container->setDefinition('mautic.form.type.slideshow_slide_config', new Definition(
+    'Mautic\PageBundle\Form\Type\SlideshowSlideConfigType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'slideshow_slide_config',
+    ));
