@@ -10,16 +10,10 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\ApiBundle\Event\RouteEvent;
-use Mautic\CalendarBundle\CalendarEvents;
-use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
-use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class FormSubscriber
@@ -33,79 +27,9 @@ class FormSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
             FormEvents::FORM_POST_SAVE       => array('onFormPostSave', 0),
             FormEvents::FORM_POST_DELETE     => array('onFormDelete', 0)
         );
-    }
-
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
-    {
-        $str = $event->getSearchString();
-        if (empty($str)) {
-            return;
-        }
-
-        $security   = $this->security;
-        $filter     = array("string" => $str, "force" => '');
-
-        $permissions = $security->isGranted(
-            array('form:forms:viewown', 'form:forms:viewother'),
-            'RETURN_ARRAY'
-        );
-        if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
-            //only show own forms if the user does not have permission to view others
-            if (!$permissions['form:forms:viewother']) {
-                $filter['force'] = array(
-                    array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser())
-                );
-            }
-
-            $forms = $this->factory->getModel('form.form')->getEntities(
-                array(
-                    'limit'  => 5,
-                    'filter' => $filter
-                ));
-
-            if (count($forms) > 0) {
-                $formResults = array();
-                foreach ($forms as $form) {
-                    $formResults[] = $this->templating->renderResponse(
-                        'MauticFormBundle:Search:form.html.php',
-                        array('form' => $form)
-                    )->getContent();
-                }
-                if (count($forms) > 5) {
-                    $formResults[] = $this->templating->renderResponse(
-                        'MauticFormBundle:Search:form.html.php',
-                        array(
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => (count($forms) - 5)
-                        )
-                    )->getContent();
-                }
-                $formResults['count'] = count($forms);
-                $event->addResults('mautic.form.form.header.index', $formResults);
-            }
-        }
-    }
-
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
-    {
-        if ($this->security->isGranted(array('form:forms:viewown', 'form:forms:viewother'), "MATCH_ONE")) {
-            $event->addCommands(
-                'mautic.form.form.header.index',
-                $this->factory->getModel('form.form')->getCommandList()
-            );
-        }
     }
 
     /**
