@@ -23,12 +23,10 @@ $js = <<<JS
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 JS;
-$view['assets']->addCustomDeclaration($js, 'bodyOpen');
-
-//add FB's required OG tag
-$view['assets']->addCustomDeclaration('<meta property="og:type" content="website" />');
 ?>
 
+<?php //add FB's required OG tag ?>
+<meta property="og:type" content="website" />
 <div class="fb-<?php echo ($action == 'share') ? 'share-button' : 'like'; ?> share-button facebook-share-button layout-<?php echo $settings['layout']; ?> action-<?php echo $action; ?>"
      data-<?php echo ($action == 'share') ? 'type' : 'layout'; ?>="<?php echo $layout; ?>"
      <?php if ($action != 'share'): ?>
@@ -36,4 +34,5 @@ $view['assets']->addCustomDeclaration('<meta property="og:type" content="website
      data-show-faces="<?php echo $showFaces; ?>"
      data-share="<?php echo $showShare; ?>"
      <?php endif; ?>>
- </div>
+</div>
+<?php echo $js; ?>

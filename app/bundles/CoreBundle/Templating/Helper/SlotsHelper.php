@@ -34,4 +34,31 @@ class SlotsHelper extends BaseSlotsHelper
             $this->slots[$name] = $content;
         }
     }
+
+    /**
+     * Checks if the slot has some content when a page is viewed in public.
+     *
+     * @param string|array $names
+     */
+    public function hasContent($names)
+    {
+        if (!$this->slots['public']) {
+            return true;
+        }
+
+        if (is_string($names)) {
+            $names = array($names);
+        }
+
+        if (is_array($names)) {
+            foreach ($names as $n) {
+                $hasContent = (boolean) strip_tags(trim($this->slots[$n]));
+                if ($hasContent) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
 }

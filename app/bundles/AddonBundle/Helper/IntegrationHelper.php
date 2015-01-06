@@ -403,7 +403,7 @@ class IntegrationHelper
 
                 //add the api keys for use within the share buttons
                 $shareSettings['keys'] = $apiKeys;
-                $shareBtns[$integration]   = $templating->render($addon->getBundle() . ":Integration/$integration:share.html.php", array(
+                $shareBtns[$integration] = $templating->render($addon->getBundle() . ":Integration/$integration:share.html.php", array(
                     'settings' => $shareSettings,
                 ));
             }
