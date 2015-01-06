@@ -125,7 +125,10 @@ class PointRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return $this->addStandardCatchAllWhereClause($q, $filter, array(
+            'p.name',
+            'p.description'
+        ));
     }
 
     /**
