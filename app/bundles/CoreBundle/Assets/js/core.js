@@ -97,6 +97,10 @@ var Mautic = {
         Mousetrap.bind('shift+n', function(e) {
             mQuery('.dropdown-notification').click();
         });
+
+        Mousetrap.bind('shift+s', function(e) {
+            mQuery('#globalSearchContainer .search-button').click();
+        });
     },
 
     /**
@@ -452,7 +456,9 @@ var Mautic = {
                     click: function() {
                         mQuery('#globalSearchContainer').addClass('active');
                         mQuery('#globalSearchDropdown').addClass('open');
-
+                        setTimeout(function() {
+                            mQuery('#globalSearchInput').focus();
+                        }, 100);
                         mQuery('body').on('click.globalsearch', function(event) {
                             var target = event.target;
                             if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
