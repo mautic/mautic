@@ -163,36 +163,36 @@ class CoreSubscriber extends CommonSubscriber
 
             //run any initialize functions
             $controller[0]->initialize($event);
-        }
 
-        //update the user's activity marker
-        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
-            //prevent multiple updates
-            $user = $this->factory->getUser();
-            //slight delay to prevent too many updates
-            //note that doctrine will return in current timezone so we do not have to worry about that
-            $delay = new \DateTime();
-            $delay->setTimestamp(strtotime('2 minutes ago'));
+            //update the user's activity marker
+            if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
+                //prevent multiple updates
+                $user = $this->factory->getUser();
+                //slight delay to prevent too many updates
+                //note that doctrine will return in current timezone so we do not have to worry about that
+                $delay = new \DateTime();
+                $delay->setTimestamp(strtotime('2 minutes ago'));
 
-            /** @var \Mautic\UserBundle\Model\UserModel $userModel */
-            $userModel = $this->factory->getModel('user');
-            if ($user instanceof User && $user->getLastActive() < $delay) {
-                $userModel->getRepository()->setLastActive($user);
+                /** @var \Mautic\UserBundle\Model\UserModel $userModel */
+                $userModel = $this->factory->getModel('user');
+                if ($user instanceof User && $user->getLastActive() < $delay) {
+                    $userModel->getRepository()->setLastActive($user);
+                }
+
+                $session = $this->factory->getSession();
+
+                $delay = new \DateTime();
+                $delay->setTimestamp(strtotime('15 minutes ago'));
+
+                $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
+
+                if ($lastOnlineStatusCleanup <= $delay) {
+                    $userModel->getRepository()->updateOnlineStatuses();
+                    $session->set('mautic.online.status.cleanup', new \DateTime());
+                }
+
+                define('MAUTIC_ACTIVITY_CHECKED', 1);
             }
-
-            $session = $this->factory->getSession();
-
-            $delay = new \DateTime();
-            $delay->setTimestamp(strtotime('15 minutes ago'));
-
-            $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
-
-            if ($lastOnlineStatusCleanup <= $delay) {
-                $userModel->getRepository()->updateOnlineStatuses();
-                $session->set('mautic.online.status.cleanup', new \DateTime());
-            }
-
-            define('MAUTIC_ACTIVITY_CHECKED', 1);
         }
     }
 
