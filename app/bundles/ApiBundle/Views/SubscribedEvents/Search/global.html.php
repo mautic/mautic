@@ -9,7 +9,7 @@
 ?>
 
 <?php if (!empty($showMore)): ?>
-    <a href="<?php echo $this->container->get('router')->generate('mautic_client_index', array('filter-client' => $searchString)); ?>" data-toggle="ajax">
+    <a href="<?php echo $this->container->get('router')->generate('mautic_client_index', array('search' => $searchString)); ?>" data-toggle="ajax">
         <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
     </a>
 </div>
