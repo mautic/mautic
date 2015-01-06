@@ -181,7 +181,11 @@ class CommonController extends Controller implements MauticController
 
         //render flashes
         $passthrough['flashes']       = $this->getFlashContent();
-        $passthrough['notifications'] = $this->getNotificationContent();
+
+        if (!defined('MAUTIC_INSTALLER')) {
+            // Prevent error in case installer is loaded via index_dev.php
+            $passthrough['notifications'] = $this->getNotificationContent();
+        }
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
