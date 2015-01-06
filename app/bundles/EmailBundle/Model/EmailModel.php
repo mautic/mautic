@@ -486,9 +486,8 @@ class EmailModel extends FormModel
 
             foreach ($lists as $l) {
                 $name           = $l->getName();
-                $filters        = $l->getFilters();
 
-                $recipientCount = $listRepo->getLeadCount($filters, $l);
+                $recipientCount = $listRepo->getLeadCount($l->getId());
                 $datasets[$combined][0] += $recipientCount;
 
                 $sentCount      = $statRepo->getSentCount($entity->getId(), $l->getId());

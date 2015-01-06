@@ -251,24 +251,15 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Get a count of leads that belong to the list
-     *
-     * @param array $filters
      */
-    public function getLeadCount($filters, $list = null)
+    public function getLeadCount($listId)
     {
-        $q          = $this->_em->getConnection()->createQueryBuilder();
-        $parameters = array();
-        $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $list);
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
         $q->select('count(*) as recipientCount')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'l')
+            ->where($q->expr()->eq('l.leadlist_id', (int) $listId));
 
-        if ($expr->count()) {
-            $q->where($expr);
-        }
-
-        foreach ($parameters as $k => $v) {
-            $q->setParameter($k, $v);
-        }
         $result = $q->execute()->fetchAll();
 
         return (!empty($result[0])) ? $result[0]['recipientCount'] : 0;
