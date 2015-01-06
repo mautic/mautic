@@ -72,6 +72,11 @@ class AppKernel extends Kernel
         if (false === $this->booted) {
             $this->boot();
         }
+        //the context is not populated at this point so have to do it manually
+        $router = $this->getContainer()->get('router');
+        $requestContext = new \Symfony\Component\Routing\RequestContext();
+        $requestContext->fromRequest($request);
+        $router->setContext($requestContext);
 
         if (strpos($request->getRequestUri(), 'installer') === false && !$this->isInstalled()) {
             //the context is not populated at this point so have to do it manually
@@ -80,8 +85,14 @@ class AppKernel extends Kernel
             $requestContext->fromRequest($request);
             $router->setContext($requestContext);
 
+            $base  = $requestContext->getBaseUrl();
+            //check to see if the .htaccess file exists or if not running under apache
+            if ((strpos(strtolower($_SERVER["SERVER_SOFTWARE"]), 'apache') === false || !file_exists(__DIR__ .'../.htaccess') && strpos($base, 'index') === false)) {
+                $base .= '/index.php';
+            }
+
             //return new RedirectResponse();
-            return new RedirectResponse($router->generate('mautic_installer_home'));
+            return new RedirectResponse($base . '/installer');
         }
 
         return parent::handle($request, $type, $catch);
