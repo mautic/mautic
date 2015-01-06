@@ -447,25 +447,21 @@ var Mautic = {
                 }
             });
 
-            if (mQuery('#global_search').length) {
-                var globalTypeahead = Mautic.activateTypeahead('#global_search', {
-                    prefetch: true,
-                    remote: false,
-                    limit: 0,
-                    action: 'globalCommandList',
-                    multiple: true
-                });
-                mQuery(globalTypeahead).on('typeahead:selected', function (event, datum) {
-                    //force live search update
-                    MauticVars.lastGlobalSearchStr = '';
-                    mQuery('#global_search').keyup();
-                }).on('typeahead:autocompleted', function (event, datum) {
-                    //force live search update
-                    MauticVars.lastGlobalSearchStr = '';
-                    mQuery('#global_search').keyup();
-                });
+            if (mQuery('#globalSearchContainer').length) {
+                mQuery('#globalSearchContainer .search-button').on({
+                    click: function() {
+                        mQuery('#globalSearchContainer').addClass('active');
+                        mQuery('#globalSearchDropdown').addClass('open');
 
-                Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
+                        mQuery('body').on('click.globalsearch', function(event) {
+                            var target = event.target;
+                            if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
+                                Mautic.closeGlobalSearchResults();
+                            }
+                        });
+                    }
+                });
+                Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
             }
         }
 
@@ -476,6 +472,15 @@ var Mautic = {
 
         //stop loading bar
         Mautic.stopPageLoadingBar();
+    },
+
+    /**
+     * Close global search results
+     */
+    closeGlobalSearchResults: function() {
+        mQuery('#globalSearchContainer').removeClass('active');
+        mQuery('#globalSearchDropdown').removeClass('open');
+        mQuery('body').off('click.globalsearch');
     },
 
     /**
@@ -882,6 +887,11 @@ var Mautic = {
 
         //give an ajaxified link the option of not displaying the global loading bar
         var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
+
+        //close the global search results if opened
+        if (mQuery('#globalSearchContainer').length && mQuery('#globalSearchContainer').hasClass('active')) {
+            Mautic.closeGlobalSearchResults();
+        }
 
         Mautic.loadContent(route, link, method, target, showLoadingBar);
     },

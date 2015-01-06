@@ -28,7 +28,3 @@
         </li>
     </ul>
 </li>
-
-<!--<li class="panel-toggle right-panel-toggle">
-    <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl"><i class="fa fa-bars fa-2x"></i></a>
-</li>-->

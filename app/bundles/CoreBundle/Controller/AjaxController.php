@@ -122,7 +122,7 @@ class AjaxController extends CommonController
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
-        $dataArray['newContent'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
+        $dataArray['newContent'] = $this->renderView('MauticCoreBundle:GlobalSearch:results.html.php',
             array('results' => $event->getResults())
         );
         return $this->sendJsonResponse($dataArray);

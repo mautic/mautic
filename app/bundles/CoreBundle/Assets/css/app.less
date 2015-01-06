@@ -1,25 +1,20 @@
 //
 // Application
 // --------------------------------------------------
-
-
 // load google font
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
-
 // Core variables and mixins
 @import "app/less/variables";
 @import "app/less/mixins";
 @import "app/less/lesshat";
 @import "libraries/bootstrap/less/variables";
 @import "libraries/bootstrap/less/mixins";
-
 // Layouts
 @import "app/less/layouts/base";
 @import "app/less/layouts/header";
 @import "app/less/layouts/sidebar";
 @import "app/less/layouts/content";
 @import "app/less/layouts/footer";
-
 // Components
 @import "app/less/components/scaffolding";
 @import "app/less/components/type";
@@ -53,9 +48,9 @@
 @import "app/less/components/offcanvas";
 @import "app/less/components/timeline";
 @import "app/less/components/utilities";
-
 @import "app/less/components/builder";
 
+//confirmation modal
 .confirmation-modal {
   position: fixed;
   font-family: Arial, Helvetica, sans-serif;
@@ -68,6 +63,7 @@
   height: 100%;
   width: 100%;
 }
+
 .confirmation-inner-wrapper {
   width: 400px;
   font-size: 1.2em;
@@ -80,20 +76,23 @@
   text-align: center;
   z-index: 10000;
 }
+
 .content-overlay {
-  position:absolute;
+  position: absolute;
   background: #fbfbfb;
   z-index: 1050;
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   padding-left: 15px;
   font-weight: bold;
 }
+
 .stat-boxes {
   .panel {
     height: 164px;
   }
 }
+
 .has-click-event {
   cursor: pointer;
 }
@@ -108,4 +107,44 @@
 label.required:after {
   content: " *";
   color: @brand-danger;
+}
+
+//Nav header
+#app-header .nav > li > a {
+  padding: 10px 12px;
+}
+
+//Search
+.search-container {
+  position: relative;
+  line-height: 60px;
+  .transition(all 0.3s ease);
+
+  .search {
+    border: 1px solid #fff;
+    position: absolute;
+    left: 0px;
+    width: 24px;
+    height: 34px;
+    padding: 0 0 0 24px;
+    margin: 12px 0 0 0;
+    z-index: 1;
+    .transition(all 0.5s ease);
+  }
+  a.search-button {
+    color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    left: 5px;
+    z-index: 5;
+  }
+
+  &.active {
+    .search {
+      width: 225px;
+      border: 1px solid @input-border;
+    }
+    i {
+      color: @brand-primary;
+    }
+  }
 }

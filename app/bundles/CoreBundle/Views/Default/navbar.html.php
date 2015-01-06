@@ -40,13 +40,14 @@
         <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
             <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="arrow fs-14"></span></a>
         </li>
+        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:notifications')); ?>
+        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:globalSearch')); ?>
     </ul>
     <!--/ end: left nav -->
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
         <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
-        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:notifications')); ?>
     </ul>
     <!--/ end: right nav -->
 </div>

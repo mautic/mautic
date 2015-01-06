@@ -36,7 +36,7 @@ class DefaultController extends CommonController
      */
     public function globalSearchAction()
     {
-        $searchStr = $this->request->request->get("searchstring", $this->factory->getSession()->get('mautic.global_search', ''));
+        $searchStr = $this->request->get("global_search", $this->factory->getSession()->get('mautic.global_search', ''));
         $this->factory->getSession()->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
@@ -47,8 +47,11 @@ class DefaultController extends CommonController
             $results = array();
         }
 
-        return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
-            array('results' => $results)
+        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+            array(
+                'results'      => $results,
+                'searchString' => $searchStr
+            )
         );
     }
 
