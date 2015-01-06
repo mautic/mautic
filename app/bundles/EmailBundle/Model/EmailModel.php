@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Email;
@@ -464,18 +465,12 @@ class EmailModel extends FormModel
      */
     public function getEmailListStats(Email $entity)
     {
-        $lists  = $entity->getLists();
-        $combinedLabel = $this->translator->trans('mautic.email.lists.combined');
-        $combinedColor = '#' . substr(md5($combinedLabel), 0, 6);
+        $lists     = $entity->getLists();
+        $listCount = count($lists);
+
+        $combined = $this->translator->trans('mautic.email.lists.combined');
         $datasets = array(
-            array(
-                'data' => array(0, 0, 0, 0),
-                'label' => $combinedLabel,
-                'fillColor' => $this->adjustColor($combinedColor, -30),
-                'highlightFill' => $combinedColor,
-                'highlightStroke' => $this->adjustColor($combinedColor, 10),
-                'strokeColor' => $combinedColor
-            )
+            $combined => array(0, 0, 0, 0)
         );
 
         $labels = array(
@@ -485,78 +480,43 @@ class EmailModel extends FormModel
             $this->translator->trans('mautic.email.failed')
         );
 
-        if (count($lists)) {
+        if ($listCount) {
             $listRepo = $this->em->getRepository('MauticLeadBundle:LeadList');
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+
             foreach ($lists as $l) {
+                $name           = $l->getName();
                 $filters        = $l->getFilters();
 
                 $recipientCount = $listRepo->getLeadCount($filters, $l);
-                $datasets[0]['data'][0] += $recipientCount;
+                $datasets[$combined][0] += $recipientCount;
 
                 $sentCount      = $statRepo->getSentCount($entity->getId(), $l->getId());
-                $datasets[0]['data'][1] += $sentCount;
+                $datasets[$combined][1] += $sentCount;
 
                 $readCount      = $statRepo->getReadCount($entity->getId(), $l->getId());
-                $datasets[0]['data'][2] += $readCount;
+                $datasets[$combined][2] += $readCount;
 
                 $failedCount    = $statRepo->getFailedCount($entity->getId(), $l->getId());
-                $datasets[0]['data'][3] += $failedCount;
+                $datasets[$combined][3] += $failedCount;
 
-                $datasets[$l->getId()] = array();
+                $datasets[$name] = array();
 
-                $datasets[$l->getId()]['data'] = array(
+                $datasets[$name] = array(
                     $recipientCount,
                     $sentCount,
                     $readCount,
                     $failedCount
                 );
-
-                $datasets[$l->getId()]['label'] = $l->getName();
-                $color = '#' . substr(md5($datasets[$l->getId()]['label']), 0, 6);
-                $datasets[$l->getId()]['fillColor'] = $this->adjustColor($color, -30);
-                $datasets[$l->getId()]['strokeColor'] = $color;
-                $datasets[$l->getId()]['highlightFill'] = $color;
-                $datasets[$l->getId()]['highlightStroke'] = $this->adjustColor($color, 10);
             }
         }
 
-        return array(
-            'datasets' => $datasets,
-            'labels' => $labels);
-    }
-
-    /**
-    * @param $color_code
-    * @param int $percentage_adjuster
-    * @return array|string
-    * @author Jaspreet Chahal
-    */
-    function adjustColor($color_code, $percentage_adjuster = 0) {
-        $percentage_adjuster = round($percentage_adjuster/100,2);
-        if(is_array($color_code)) {
-            $r = $color_code["r"] - (round($color_code["r"])*$percentage_adjuster);
-            $g = $color_code["g"] - (round($color_code["g"])*$percentage_adjuster);
-            $b = $color_code["b"] - (round($color_code["b"])*$percentage_adjuster);
-
-            return array("r"=> round(max(0,min(255,$r))),
-                "g"=> round(max(0,min(255,$g))),
-                "b"=> round(max(0,min(255,$b))));
+        if ($listCount === 1) {
+            unset($datasets[$combined]);
         }
-        else if(preg_match("/#/",$color_code)) {
-            $hex = str_replace("#","",$color_code);
-            $r = (strlen($hex) == 3)? hexdec(substr($hex,0,1).substr($hex,0,1)):hexdec(substr($hex,0,2));
-            $g = (strlen($hex) == 3)? hexdec(substr($hex,1,1).substr($hex,1,1)):hexdec(substr($hex,2,2));
-            $b = (strlen($hex) == 3)? hexdec(substr($hex,2,1).substr($hex,2,1)):hexdec(substr($hex,4,2));
-            $r = round($r - ($r*$percentage_adjuster));
-            $g = round($g - ($g*$percentage_adjuster));
-            $b = round($b - ($b*$percentage_adjuster));
 
-            return "#".str_pad(dechex( max(0,min(255,$r)) ),2,"0",STR_PAD_LEFT)
-                .str_pad(dechex( max(0,min(255,$g)) ),2,"0",STR_PAD_LEFT)
-                .str_pad(dechex( max(0,min(255,$b)) ),2,"0",STR_PAD_LEFT);
-
-        }
+        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
+        return $data;
     }
 
     /**

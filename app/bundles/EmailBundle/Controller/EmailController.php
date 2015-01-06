@@ -166,6 +166,7 @@ class EmailController extends FormController
      */
     public function viewAction ($objectId)
     {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
         $security = $this->factory->getSecurity();
         $email    = $model->getEntity($objectId);
@@ -235,7 +236,7 @@ class EmailController extends FormController
         }
 
         $abTestResults = array();
-        $criteria = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
+        $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
         if (!empty($lastCriteria) && empty($variantError)) {
             if (isset($criteria['criteria'][$lastCriteria])) {
                 $testSettings = $criteria['criteria'][$lastCriteria];
@@ -403,7 +404,7 @@ class EmailController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'   => $form->createView(),
+                'form'   => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                 'tokens' => $builderComponents['tokens'],
                 'email'  => $entity
             ),
@@ -508,6 +509,7 @@ class EmailController extends FormController
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId()
                 );
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
@@ -525,7 +527,7 @@ class EmailController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'   => $form->createView(),
+                'form'   => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                 'tokens' => $builderComponents['tokens'],
                 'email'  => $entity
             ),
@@ -950,8 +952,9 @@ class EmailController extends FormController
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                   'email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()
-                )) {
+                    'email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()
+                )
+                ) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'email', true);

@@ -95,13 +95,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <?php echo $view['translator']->trans('mautic.email.lead.list.comparison'); ?>
                                     </h5>
                                 </div>
-                                <div class="col-xs-8 va-m">
-                                    <?php foreach ($stats['datasets'] as $dataset) : ?>
-                                        <span class="label label-default" style="background-color:<?php echo $dataset['fillColor']; ?>">
-                                            <?php echo $dataset['label']; ?>
-                                        </span>
-                                    <?php endforeach; ?>
-                                </div>
+                                <div class="col-xs-8 va-m" id="legend"></div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>

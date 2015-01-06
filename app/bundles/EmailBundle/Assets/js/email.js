@@ -114,9 +114,15 @@ Mautic.renderListCompareChart = function () {
     if (!mQuery("#list-compare-chart").length) {
         return;
     }
-    var options = {};
+    var options = {
+        legendTemplate: "<% for (var i=0; i<datasets.length; i++){%><span class=\"label label-default mr-xs\" style=\"background-color:<%=datasets[i].fillColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></span><%}%>"
+    };
     var data = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
     Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(data, options);
+    var legendHolder = document.createElement('div');
+    legendHolder.innerHTML = Mautic.listCompareChart.generateLegend();
+    mQuery('#legend').html(legendHolder);
+    Mautic.listCompareChart.update();
 };
 
 Mautic.initializeEmailFilters = function(container) {
