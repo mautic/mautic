@@ -37,6 +37,9 @@ system('cp ../index.php packaging/');
 system('cp ../LICENSE.txt packaging/');
 system('cp ../robots.txt packaging/');
 
+// Generate the bootstrap.php.cache file
+system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
+
 // Common steps
 include_once __DIR__ . '/processfiles.php';
 
