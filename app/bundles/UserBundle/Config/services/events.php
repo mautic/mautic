@@ -20,3 +20,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.user.search.subscriber',
+    new Definition(
+        'Mautic\UserBundle\EventListener\SearchSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

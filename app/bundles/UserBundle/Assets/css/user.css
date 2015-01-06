@@ -4,15 +4,6 @@
     margin-bottom: 20px;
 }
 
-.gs-user-profile {
-    float: left;
-}
-
-.gs-user-avatar {
-    float: right;
-    margin: 0 8px;
-}
-
 .col-user-id, .col-role-id {
     width: 75px;
 }
