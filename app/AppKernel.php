@@ -60,7 +60,7 @@ class AppKernel extends Kernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (strpos($request->getRequestUri(), 'installer') !== false) {
+        if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
             define('MAUTIC_INSTALLER', 1);
         } else {
             //set the table prefix before boot
@@ -215,7 +215,7 @@ class AppKernel extends Kernel
             }
         }
 
-        $factory    = $this->container->get('mautic.factory');
+        $factory = $this->container->get('mautic.factory');
 
         $dispatcher = $factory->getDispatcher();
         $listeners  = $dispatcher->getListeners();
@@ -304,11 +304,8 @@ class AppKernel extends Kernel
      */
     private function isInstalled()
     {
-        if ($localConfig = $this->getLocalConfigFile()) {
-            /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-            $configurator = $this->getContainer()->get('mautic.configurator');
-            $params       = $configurator->getParameters();
-
+        $params = $this->getLocalParams();
+        if (!empty($params)) {
             // Check the DB Driver, Name, and User
             if ((isset($params['db_driver']) && $params['db_driver'])
                 && (isset($params['db_user']) && $params['db_user'])
