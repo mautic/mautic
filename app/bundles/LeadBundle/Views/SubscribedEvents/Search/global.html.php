@@ -13,10 +13,9 @@
     </a>
 <?php else: ?>
     <?php $fields = $lead->getFields(); ?>
-    <div class="pull-left mr-xs img-wrapper" style="width: 36px;">
-        <img class="img img-responsive" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '100'); ?>" />
-    </div>
-
+    <span class="pull-left pr-xs pt-xs" style="width:36px">
+        <span class="img-wrapper img-rounded"><img src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '100');; ?>" /></span>
+    </span>
     <a href="<?php echo $this->container->get('router')->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>" data-toggle="ajax">
         <span><?php echo $lead->getPrimaryIdentifier(true); ?></span>
         <?php
@@ -26,5 +25,4 @@
         <span class="label label-default pull-right"<?php echo $style; ?> data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.lead.pointscount'); ?>"><?php echo $lead->getPoints(); ?></span>
     </a>
 
-    <div class="clearfix"></div>
 <?php endif; ?>

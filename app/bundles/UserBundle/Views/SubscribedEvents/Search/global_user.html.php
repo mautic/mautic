@@ -14,10 +14,9 @@
 </a>
 <?php else: ?>
 <div>
-    <div class="pull-left mr-xs img-wrapper" style="width: 36px;">
-        <img class="img img-responsive" src="<?php echo $view['gravatar']->getImage($user->getEmail(), '100'); ?>" />
-    </div>
-
+    <span class="pull-left pr-xs pt-xs" style="width:36px">
+        <span class="img-wrapper img-rounded"><img src="<?php echo $view['gravatar']->getImage($user->getEmail(), '100');; ?>" /></span>
+    </span>
     <?php if ($canEdit): ?>
     <a href="<?php echo $this->container->get('router')->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $user->getId())); ?>" data-toggle="ajax">
         <?php echo $user->getName(true); ?>
@@ -27,7 +26,5 @@
     <?php endif; ?>
 
     <div><small><?php echo $user->getPosition(); ?></small></div>
-
-    <div class="clearfix"></div>
 </div>
 <?php endif; ?>
