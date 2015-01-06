@@ -23,51 +23,64 @@ class CorePermissions
 {
 
     /**
-     * @var TranslatorInterface
+     * @var MauticFactory
      */
-    private $translator;
+    protected $factory;
 
     /**
-     * @var array
-     */
-    private $bundles;
-
-    /**
-     * @var array
-     */
-    private $addonBundles;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var array
-     */
-    private $params;
-
-    /**
-     * @var \Symfony\Component\Security\Core\SecurityContext
-     */
-    private $security;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $em
-     * @param SecurityContext     $security
-     * @param array               $bundles
-     * @param array               $addonBundles
-     * @param array               $params
+     * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->translator   = $factory->getTranslator();
-        $this->em           = $factory->getEntityManager();
-        $this->bundles      = $factory->getParameter('bundles');
-        $this->addonBundles = $factory->getEnabledAddons();
-        $this->security     = $factory->getSecurityContext();
-        $this->params       = $factory->getSystemParameters();
+        $this->factory = $factory;
+    }
+
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
+    protected function getTranslator()
+    {
+        return $this->factory->getTranslator();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEm()
+    {
+        return $this->factory->getEntityManager();
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getBundles()
+    {
+        return $this->factory->getParameter('bundles');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAddonBundles()
+    {
+        return $this->factory->getEnabledAddons();
+    }
+
+    /**
+     * @return SecurityContext
+     */
+    protected function getSecurityContext()
+    {
+        return $this->factory->getSecurityContext();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getParams()
+    {
+        return $this->factory->getSystemParameters();
     }
 
     /**
@@ -79,7 +92,7 @@ class CorePermissions
     {
         static $classes = array();
         if (empty($classes)) {
-            foreach ($this->bundles as $bundle) {
+            foreach ($this->getBundles() as $bundle) {
                 if ($bundle['base'] == "Core") {
                     continue;
                 } //do not include this file
@@ -91,7 +104,7 @@ class CorePermissions
                 }
             }
 
-            foreach ($this->addonBundles as $bundle) {
+            foreach ($this->getAddonBundles() as $bundle) {
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
                 $object = $this->getPermissionObject($bundle['base'], false, true);
                 if (!empty($object)) {
@@ -122,7 +135,7 @@ class CorePermissions
                 $base      = $addonBundle ? 'MauticAddon' : 'Mautic';
                 $className = "{$base}\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
                 if (class_exists($className)) {
-                    $classes[$bundle] = new $className($this->params);
+                    $classes[$bundle] = new $className($this->getParams());
                 } elseif ($throwException) {
                     throw new \InvalidArgumentException("$className not found!");
                 } else {
@@ -248,7 +261,7 @@ class CorePermissions
             }
 
             if (count($parts) != 3) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.badformat',
+                throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.badformat',
                     array("%permission%" => $permission))
                 );
             }
@@ -260,7 +273,7 @@ class CorePermissions
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.notfound',
+                throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.notfound',
                         array("%permission%" => $permission))
                 );
             }
@@ -290,7 +303,7 @@ class CorePermissions
         } elseif ($mode == "RETURN_ARRAY") {
             return $permissions;
         } else {
-            throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.mode.notfound',
+            throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound',
                 array("%mode%" => $mode))
             );
         }
@@ -419,7 +432,7 @@ class CorePermissions
      */
     private function getUser()
     {
-        if ($token = $this->security->getToken()) {
+        if ($token = $this->getSecurityContext()->getToken()) {
             $this->user = $token->getUser();
         } else {
             $this->user = new User();
