@@ -488,7 +488,7 @@ class CommonController extends Controller implements MauticController
 
         $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
 
-        if ($addNotification) {
+        if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             switch ($type) {
                 case 'warning':
                     $iconClass = "text-warning fa-exclamation-triangle";
