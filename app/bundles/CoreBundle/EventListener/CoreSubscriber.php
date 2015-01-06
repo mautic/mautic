@@ -104,8 +104,9 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $session = $event->getRequest()->getSession();
-        if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        $securityContext = $this->factory->getSecurityContext();
+        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
+            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in

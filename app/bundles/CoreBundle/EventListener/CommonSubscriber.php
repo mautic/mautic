@@ -41,11 +41,6 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $security;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContext
-     */
-    protected $securityContext;
-
-    /**
      * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     protected $dispatcher;
@@ -79,7 +74,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->templating      = $factory->getTemplating();
         $this->request         = $factory->getRequest();
         $this->security        = $factory->getSecurity();
-        $this->securityContext = $factory->getSecurityContext();
         $this->serializer      = $factory->getSerializer();
         $this->params          = $factory->getSystemParameters();
         $this->dispatcher      = $factory->getDispatcher();
