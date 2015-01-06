@@ -1,0 +1,30 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+?>
+<?php if (!empty($showMore)): ?>
+    <a href="<?php echo $this->container->get('router')->generate('mautic_lead_index', array('search' => $searchString)); ?>" data-toggle="ajax">
+        <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
+    </a>
+<?php else: ?>
+    <?php $fields = $lead->getFields(); ?>
+    <div class="pull-left mr-xs img-wrapper" style="width: 36px;">
+        <img class="img img-responsive" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '100'); ?>" />
+    </div>
+
+    <a href="<?php echo $this->container->get('router')->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>" data-toggle="ajax">
+        <span><?php echo $lead->getPrimaryIdentifier(true); ?></span>
+        <?php
+        $color = $lead->getColor();
+        $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
+        ?>
+        <span class="label label-default pull-right"<?php echo $style; ?> data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.lead.pointscount'); ?>"><?php echo $lead->getPoints(); ?></span>
+    </a>
+
+    <div class="clearfix"></div>
+<?php endif; ?>

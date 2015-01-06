@@ -84,3 +84,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.serach.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\SearchSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
