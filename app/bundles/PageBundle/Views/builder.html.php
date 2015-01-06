@@ -16,6 +16,10 @@ $view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, tr
 
 $custom = <<<CUSTOM
 mQuery(document).ready( function() {
+
+    mQuery('.dropdown-toggle').dropdown();
+    mQuery('[data-toggle="tooltip"]').tooltip();
+
     CKEDITOR.disableAutoInline = true;
     mQuery("div[contenteditable='true']").each(function (index) {
         var content_id = mQuery(this).attr('id');
@@ -39,6 +43,50 @@ mQuery(document).ready( function() {
             }
         });
     });
+    
+    // add newProp (dot separated string) to obj with new value
+    function addValueToObj(obj, newProp, value) {
+        var path = newProp.split(":");
+        for (var i = 0, tmp = obj; i < path.length - 1; i++) {
+            if (typeof tmp[path[i]] === 'undefined') {
+                tmp = tmp[path[i]] = {};
+            } else {
+                tmp = tmp[path[i]]
+            }
+        }
+        tmp[path[i]] = value;
+    }
+
+    // Save slot config
+    var slotConfigs = {};
+    mQuery("[data-slot-config]").each(function (index) {
+        var input = mQuery(this);
+        input.blur(function() {
+            var slot = input.attr('data-slot-config');
+            var allSlotConfigs = mQuery('[data-slot-config=\"' + slot + '\"]');
+            allSlotConfigs.each(function(index, value) { 
+                element = mQuery(this);
+                var slotConfigPath = element.attr('name');
+                var value = element.val();
+
+                if (typeof slotConfigs[slot] === 'undefined') {
+                    slotConfigs[slot] = {};
+                }
+
+                addValueToObj(slotConfigs[slot], slotConfigPath, value);
+            });
+            mQuery.ajax({
+                url: mauticAjaxUrl + '?action=page:setBuilderContent',
+                type: "POST",
+                data: {
+                    content: JSON.stringify(slotConfigs[slot]),
+                    slot:    slot,
+                    page:    mQuery('#mauticPageId').val()
+                },
+                dataType: "json"
+            });
+        });
+    });
 });
 CUSTOM;
 $view['assets']->addScriptDeclaration($custom);
@@ -48,14 +96,90 @@ $css = <<<CSS
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
 .mautic-editable.over-droppable { border: dashed 1px #4e5e9e; }
 div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholder) }
+.dropdown.slideshow-options {position: absolute;top: 0;left: 0;}
+#slideshow-options {opacity: 0.7;}
 CSS;
 
 $view['assets']->addStyleDeclaration($css);
 
 //Set the slots
-foreach ($slots as $slot) {
-    $value = isset($content[$slot]) ? $content[$slot] : "";
-    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.builder.addcontent')}\">{$value}</div>");
+foreach ($slots as $slot => $slotConfig) {
+
+    // backward compatibility - if slotConfig array does not exist
+    if (is_numeric($slot)) {
+        $slot = $slotConfig;
+        $slotConfig = array();
+    }
+
+    // define default config if does not exist
+    if (!isset($slotConfig['type'])) {
+        $slotConfig['type'] = 'html';
+    }
+
+    if (!isset($slotConfig['placeholder'])) {
+        $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
+    }
+
+    if ($slotConfig['type'] == 'html' || $slotConfig['type'] == 'text') {
+        $value = isset($content[$slot]) ? $content[$slot] : "";
+        $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.builder.addcontent')}\">{$value}</div>");
+    }
+
+    if ($slotConfig['type'] == 'slideshow') {
+        if (isset($content[$slot])) {
+            $options = json_decode($content[$slot], true);
+        } else {
+            $options = array(
+                'width' => '100%',
+                'height' => '250px',
+                'background-color' => 'transparent',
+                'show-arrows' => false,
+                'show-dots' => true,
+                'interval' => 5000,
+                'pause' => 'hover',
+                'wrap' => true,
+                'keyboard' => true,
+                'slides' => array (
+                    array (
+                        'order' => 0,
+                        'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+One',
+                        'content' => '',
+                        'captionheader' => 'Caption 1'
+                    ),
+                    array (
+                        'order' => 1,
+                        'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+Two',
+                        'content' => '',
+                        'captionheader' => 'Caption 2'
+                    )
+                )
+            );
+        }
+        $options['slot'] = $slot;
+        $options['public'] = false;
+
+        // create config form
+        $options['configForm'] = $formFactory->createNamedBuilder(
+            null, 
+            'slideshow_config', 
+            array(), 
+            array('data' => $options)
+        )->getForm()->createView();
+
+        // create slide config forms
+        foreach ($options['slides'] as $key => &$slide) {
+            $slide['key'] = $key;
+            $slide['slot'] = $slot;
+            $slide['form'] = $formFactory->createNamedBuilder(
+                null, 
+                'slideshow_slide_config', 
+                array(), 
+                array('data' => $slide)
+            )->getForm()->createView();
+        }
+
+        $view['slots']->set($slot, $view->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+    }
 }
 
 //add builder toolbar
