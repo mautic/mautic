@@ -66,7 +66,7 @@ class SearchSubscriber extends CommonSubscriber
                 foreach ($forms as $form) {
                     $formResults[] = $this->templating->renderResponse(
                         'MauticFormBundle:SubscribedEvents\Search:global.html.php',
-                        array('form' => $form)
+                        array('form' => $form[0])
                     )->getContent();
                 }
                 if (count($forms) > 5) {
