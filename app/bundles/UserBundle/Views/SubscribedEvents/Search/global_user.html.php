@@ -26,5 +26,6 @@
     <?php endif; ?>
 
     <div><small><?php echo $user->getPosition(); ?></small></div>
+    <div class="clearfix"></div>
 </div>
 <?php endif; ?>

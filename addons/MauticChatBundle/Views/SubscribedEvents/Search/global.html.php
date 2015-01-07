@@ -21,6 +21,7 @@ else:
     </span>
     <strong><?php echo $header; ?></strong><br /><?php echo $chat['message']; ?><br />
     <small><?php echo $view['date']->toText($chat['dateSent']); ?></small>
+    <div class="clearfix"></div>
 </div>
 
 <?php endif; ?>

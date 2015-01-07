@@ -24,5 +24,5 @@
         ?>
         <span class="label label-default pull-right"<?php echo $style; ?> data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.lead.pointscount'); ?>"><?php echo $lead->getPoints(); ?></span>
     </a>
-
+    <div class="clearfix"></div>
 <?php endif; ?>
