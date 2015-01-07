@@ -125,14 +125,17 @@ $view['assets']->addStyleDeclaration($css);
 					<?php foreach($slides as $key => $slide) : ?>
 		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
 							<a href="#slide-tab-<?php echo $key; ?>" class="steps" data-toggle="tab">
-								Slide <small>(ID=<?php echo $key; ?>)</small>
+								Slide <small>(ID=<span class="slide-id"><?php echo $key; ?></span>)</small>
 							</a>
 						</li>
 					<?php endforeach; ?>
 		            </ul>
+		            <button type="button" onclick="SlideshowManager.newSlide();" class="btn button-default new-slide">
+						<i class="fa fa-plus-circle"></i> New Slide
+					</button>
 	            </div>
 	            <div class="tab-content col-md-9 bg-auto height-auto bdr-l config-fields">
-				<?php foreach($slides as $key => $slide) : ?>
+				<?php foreach ($slides as $key => $slide) : ?>
 					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo $key == 0 ? 'in active' : '' ?>" id="slide-tab-<?php echo $key; ?>">
 						<?php echo $view['form']->start($slide['form']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
@@ -156,8 +159,11 @@ $view['assets']->addStyleDeclaration($css);
 				<div id="fileManager"></div>
 			</div>
 			<div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot ?>');">
+	                <i class="fa fa-check"></i> Apply
+                </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
-	                <i class="fa fa-check"></i> OK
+	                <i class="fa fa-cross"></i> Close
                 </button>
             </div>
 		</div>

@@ -44,53 +44,73 @@ mQuery(document).ready( function() {
         });
     });
     
-    // add newProp (dot separated string) to obj with new value
-    function addValueToObj(obj, newProp, value) {
-        var path = newProp.split(":");
-        for (var i = 0, tmp = obj; i < path.length - 1; i++) {
-            if (typeof tmp[path[i]] === 'undefined') {
-                tmp = tmp[path[i]] = {};
-            } else {
-                tmp = tmp[path[i]]
-            }
-        }
-        tmp[path[i]] = value;
-    }
-
     // Save slot config
-    var slotConfigs = {};
-    mQuery("[data-slot-config]").each(function (index) {
-        var input = mQuery(this);
-        input.blur(function() {
-            var slot = input.attr('data-slot-config');
-            var allSlotConfigs = mQuery('[data-slot-config=\"' + slot + '\"]');
-            allSlotConfigs.each(function(index, value) { 
-                element = mQuery(this);
-                var slotConfigPath = element.attr('name');
-                var value = element.val();
-
-                if (typeof slotConfigs[slot] === 'undefined') {
-                    slotConfigs[slot] = {};
-                }
-
-                addValueToObj(slotConfigs[slot], slotConfigPath, value);
-            });
-            mQuery.ajax({
-                url: mauticAjaxUrl + '?action=page:setBuilderContent',
-                type: "POST",
-                data: {
-                    content: JSON.stringify(slotConfigs[slot]),
-                    slot:    slot,
-                    page:    mQuery('#mauticPageId').val()
-                },
-                dataType: "json"
-            });
-        });
-    });
+    // mQuery("[data-slot-config]").each(function (index) {
+    //     var input = mQuery(this);
+    //     input.blur(function() {
+    //         var slot = input.attr('data-slot-config');
+    //         SlideshowManager.buildConfigObject(slot);
+    //         mQuery.ajax({
+    //             url: mauticAjaxUrl + '?action=page:setBuilderContent',
+    //             type: "POST",
+    //             data: {
+    //                 content: JSON.stringify(SlideshowManager.slotConfigs[slot]),
+    //                 slot:    slot,
+    //                 page:    mQuery('#mauticPageId').val()
+    //             },
+    //             dataType: "json"
+    //         });
+    //     });
+    // });
 });
 
 var SlideshowManager = {};
+
 SlideshowManager.toggleFileOpened = false;
+SlideshowManager.slotConfigs = {};
+
+// add newProp (dot separated string) to obj with new value
+SlideshowManager.addValueToObj = function (obj, newProp, value) {
+    var path = newProp.split(":");
+    for (var i = 0, tmp = obj; i < path.length - 1; i++) {
+        if (typeof tmp[path[i]] === 'undefined') {
+            tmp = tmp[path[i]] = {};
+        } else {
+            tmp = tmp[path[i]]
+        }
+    }
+    tmp[path[i]] = value;
+}
+
+SlideshowManager.buildConfigObject = function(slot) {
+    var allSlotConfigs = mQuery('[data-slot-config=\"' + slot + '\"]');
+    allSlotConfigs.each(function(index, value) { 
+        element = mQuery(this);
+        var slotConfigPath = element.attr('name');
+        var value = element.val();
+
+        if (typeof SlideshowManager.slotConfigs[slot] === 'undefined') {
+            SlideshowManager.slotConfigs[slot] = {};
+        }
+
+        SlideshowManager.addValueToObj(SlideshowManager.slotConfigs[slot], slotConfigPath, value);
+    });
+}
+
+SlideshowManager.saveConfigObject = function(slot) {
+    SlideshowManager.buildConfigObject(slot);
+    mQuery.ajax({
+        url: mauticAjaxUrl + '?action=page:setBuilderContent',
+        type: "POST",
+        data: {
+            content: JSON.stringify(SlideshowManager.slotConfigs[slot]),
+            slot:    slot,
+            page:    mQuery('#mauticPageId').val()
+        },
+        dataType: "json"
+    });
+}
+
 SlideshowManager.toggleFileManager = function() {
     var listOfSlides = mQuery('.modal.slides-config .list-of-slides li:not(.active)');
     var activeSlide = mQuery('.modal.slides-config .list-of-slides li.active');
@@ -125,6 +145,42 @@ SlideshowManager.toggleFileManager = function() {
     }
 
     SlideshowManager.toggleFileOpened = !SlideshowManager.toggleFileOpened;
+}
+
+SlideshowManager.newSlide = function() {
+    var tabPaneExisting = mQuery('.config-fields .tab-pane').first();
+
+    // get slot name
+    var slotName = tabPaneExisting.find('[data-slot-config]').attr('data-slot-config');
+
+    // get valid slide ID
+    SlideshowManager.buildConfigObject(slotName);
+    var slideCount = 0;
+    for (i in SlideshowManager.slotConfigs[slotName].slides) {
+        if (SlideshowManager.slotConfigs[slotName].slides.hasOwnProperty(i)) {
+            slideCount++;
+        }
+    }
+    var newSlideId = slideCount;
+
+    // copy tab-pane
+    var tabPaneNew = tabPaneExisting.clone().attr('id', 'slide-tab-' + newSlideId).removeClass('in active');
+    tabPaneNew.find('input').each(function(index, value) {
+        var input = $(this);
+        input.val('');
+        var name = input.attr('name');
+        var newName = name.replace(/:\d+:/, ':' + newSlideId + ':');
+        input.attr('id', newName).attr('name', newName);
+
+    });
+    tabPaneExisting.parent().append(tabPaneNew);
+
+    // copy list-group-item
+    var listGroupItemExisting = mQuery('.list-of-slides .list-group .list-group-item').first();
+    var listGroupItemNew = listGroupItemExisting.clone().removeClass('active');
+    listGroupItemNew.find('a').attr('href', '#slide-tab-' + newSlideId);
+    listGroupItemNew.find('.slide-id').text(newSlideId);
+    listGroupItemExisting.parent().append(listGroupItemNew);
 }
 
 SlideshowManager.preloadFileManager = function() {
