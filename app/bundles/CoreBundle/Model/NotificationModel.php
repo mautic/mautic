@@ -41,8 +41,13 @@ class NotificationModel extends FormModel
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null, User $user = null)
     {
-        if ($user == null) {
+        if ($user === null) {
             $user = $this->factory->getUser();
+        }
+
+        if ($user === null || !$user->getId()) {
+            //ensure notifications aren't written for non users
+            return;
         }
 
         $notification = new Notification();
