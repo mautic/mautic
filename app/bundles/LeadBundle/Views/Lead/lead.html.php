@@ -109,10 +109,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <img src="<?php echo $img; ?>" alt="" />
                             </span>
                             <?php endif; ?>
-                            <div class="media-body">
-                                <h4 class="fw-sb text-primary"><?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?></h4>
-                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ? '' :  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
-                            </div>
                         </div>
                     </div>
                     <div class="col-xs-4 va-m text-right">
