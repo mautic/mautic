@@ -26,6 +26,15 @@ class SlideshowSlideConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('slides:' . $options['data']['key'] . ':remove', 'checkbox', array(
+            'label'      => 'mautic.page.slideshow.remove',
+            'attr'       => array(
+                'data-slot-config'  => $options['data']['slot'],
+                'data-remove-slide' => $options['data']['key']
+            ),
+            'required'   => false
+        ));
+
         $builder->add('slides:' . $options['data']['key'] . ':captionheader', 'text', array(
             'label'      => 'mautic.page.slideshow.caption.header',
             'label_attr' => array('class' => 'control-label'),

@@ -141,6 +141,9 @@ $view['assets']->addStyleDeclaration($css);
 				<?php foreach ($slides as $key => $slide) : ?>
 					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo $key == 0 ? 'in active' : '' ?>" id="slide-tab-<?php echo $key; ?>">
 						<?php echo $view['form']->start($slide['form']); ?>
+						<div class="row text-right">
+							<?php echo $view['form']->row($slide['form']['slides:' . $key . ':remove']); ?>
+						</div>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>

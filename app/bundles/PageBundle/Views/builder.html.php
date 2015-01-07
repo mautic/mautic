@@ -43,25 +43,10 @@ mQuery(document).ready( function() {
             }
         });
     });
-    
-    // Save slot config
-    // mQuery("[data-slot-config]").each(function (index) {
-    //     var input = mQuery(this);
-    //     input.blur(function() {
-    //         var slot = input.attr('data-slot-config');
-    //         SlideshowManager.buildConfigObject(slot);
-    //         mQuery.ajax({
-    //             url: mauticAjaxUrl + '?action=page:setBuilderContent',
-    //             type: "POST",
-    //             data: {
-    //                 content: JSON.stringify(SlideshowManager.slotConfigs[slot]),
-    //                 slot:    slot,
-    //                 page:    mQuery('#mauticPageId').val()
-    //             },
-    //             dataType: "json"
-    //         });
-    //     });
-    // });
+
+    mQuery("[data-remove-slide]").change(function () {
+        SlideshowManager.removeSlide(mQuery(this));
+    });
 });
 
 var SlideshowManager = {};
@@ -82,12 +67,29 @@ SlideshowManager.addValueToObj = function (obj, newProp, value) {
     tmp[path[i]] = value;
 }
 
+SlideshowManager.removeSlide = function (checkbox) {
+    var slideId = checkbox.attr('[data-remove-slide]');
+    var remove = checkbox.is(':checked');
+    mQuery('.list-of-slides li.active a').toggleClass('stroked');
+    mQuery('.tab-pane.active input[type="text"').prop('disabled', remove);
+    if (remove) {
+        checkbox.parent().addClass('text-danger');
+    } else {
+        checkbox.parent().removeClass('text-danger');
+    }
+    
+}
+
 SlideshowManager.buildConfigObject = function(slot) {
     var allSlotConfigs = mQuery('[data-slot-config=\"' + slot + '\"]');
     allSlotConfigs.each(function(index, value) { 
         element = mQuery(this);
         var slotConfigPath = element.attr('name');
         var value = element.val();
+
+        if (element.attr('type') === 'checkbox') {
+            value = element.is(':checked');
+        }
 
         if (typeof SlideshowManager.slotConfigs[slot] === 'undefined') {
             SlideshowManager.slotConfigs[slot] = {};
@@ -99,6 +101,14 @@ SlideshowManager.buildConfigObject = function(slot) {
 
 SlideshowManager.saveConfigObject = function(slot) {
     SlideshowManager.buildConfigObject(slot);
+
+    // remove slides which should be removed
+    mQuery.each(SlideshowManager.slotConfigs[slot].slides, function(index, slide) {
+        if (slide.remove) {
+            delete SlideshowManager.slotConfigs[slot].slides[index];
+        }
+    });
+
     mQuery.ajax({
         url: mauticAjaxUrl + '?action=page:setBuilderContent',
         type: "POST",
@@ -119,6 +129,7 @@ SlideshowManager.toggleFileManager = function() {
     var activeSlide = mQuery('.modal.slides-config .list-of-slides li.active');
     var configFields = mQuery('.modal.slides-config .config-fields .row:not(:last-child)');
     var fileManager = mQuery('#fileManager');
+    var newSlideBtn = mQuery('.btn.new-slide');
 
     listOfSlides.animate({
         opacity: "toggle",
@@ -131,6 +142,10 @@ SlideshowManager.toggleFileManager = function() {
         height: "toggle"
     }, 300);
     fileManager.animate({
+        height: "toggle",
+        opacity: "toggle"
+    }, 300);
+    newSlideBtn.animate({
         height: "toggle",
         opacity: "toggle"
     }, 300);
@@ -213,6 +228,7 @@ div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholde
 #slideshow-options {opacity: 0.7;}
 #filemanager_iframe {width: 100%; height: 500px;}
 .file-manager-toggle {margin-top: 24px;}
+.stroked, .stroked:hover, .stroked:focus {text-decoration: line-through;}
 CSS;
 
 $view['assets']->addStyleDeclaration($css);
