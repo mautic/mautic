@@ -103,11 +103,15 @@ SlideshowManager.saveConfigObject = function(slot) {
     SlideshowManager.buildConfigObject(slot);
 
     // remove slides which should be removed
+    var slides = [];
     mQuery.each(SlideshowManager.slotConfigs[slot].slides, function(index, slide) {
         if (slide.remove) {
             delete SlideshowManager.slotConfigs[slot].slides[index];
+        } else {
+            slides.push(slide);
         }
     });
+    SlideshowManager.slotConfigs[slot].slides = slides;
 
     mQuery.ajax({
         url: mauticAjaxUrl + '?action=page:setBuilderContent',
