@@ -452,19 +452,27 @@ var Mautic = {
             });
 
             if (mQuery('#globalSearchContainer').length) {
-                mQuery('#globalSearchContainer .search-button').on({
-                    click: function() {
-                        mQuery('#globalSearchContainer').addClass('active');
+                mQuery('#globalSearchContainer .search-button').click(function() {
+                    mQuery('#globalSearchContainer').addClass('active');
+                    if (mQuery('#globalSearchInput').val()) {
                         mQuery('#globalSearchDropdown').addClass('open');
-                        setTimeout(function() {
-                            mQuery('#globalSearchInput').focus();
-                        }, 100);
-                        mQuery('body').on('click.globalsearch', function(event) {
-                            var target = event.target;
-                            if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
-                                Mautic.closeGlobalSearchResults();
-                            }
-                        });
+                    }
+                    setTimeout(function () {
+                        mQuery('#globalSearchInput').focus();
+                    }, 100);
+                    mQuery('body').on('click.globalsearch', function (event) {
+                        var target = event.target;
+                        if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
+                            Mautic.closeGlobalSearchResults();
+                        }
+                    });
+                });
+
+                mQuery("#globalSearchInput").on('change keyup paste', function() {
+                    if (mQuery(this).val()) {
+                        mQuery('#globalSearchDropdown').addClass('open');
+                    } else {
+                        mQuery('#globalSearchDropdown').removeClass('open');
                     }
                 });
                 Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
@@ -1268,8 +1276,15 @@ var Mautic = {
             return;
         }
 
-        mQuery(el).on('keyup', {}, function (event) {
+        mQuery(el).on('focus', function() {
+           Mautic.currentSearchString = mQuery(this).val().trim();
+        });
+        mQuery(el).on('change keyup paste', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
+            if (Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
+                return;
+            }
+
             var target = mQuery(el).attr('data-target');
             var diff = searchStr.length - MauticVars[searchStrVar].length;
 
