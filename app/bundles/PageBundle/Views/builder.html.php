@@ -88,6 +88,61 @@ mQuery(document).ready( function() {
         });
     });
 });
+
+var SlideshowManager = {};
+SlideshowManager.toggleFileOpened = false;
+SlideshowManager.toggleFileManager = function() {
+    var listOfSlides = mQuery('.modal.slides-config .list-of-slides li:not(.active)');
+    var activeSlide = mQuery('.modal.slides-config .list-of-slides li.active');
+    var configFields = mQuery('.modal.slides-config .config-fields .row:not(:last-child)');
+    var fileManager = mQuery('#fileManager');
+
+    listOfSlides.animate({
+        opacity: "toggle",
+        padding: "toggle",
+        height: "toggle"
+    }, 300);
+    configFields.animate({
+        opacity: "toggle",
+        padding: "toggle",
+        height: "toggle"
+    }, 300);
+    fileManager.animate({
+        height: "toggle",
+        opacity: "toggle"
+    }, 300);
+    
+    if (SlideshowManager.toggleFileOpened) {
+        activeSlide.animate({
+            borderRadius: "0px"
+        }, 500, function() {
+            activeSlide.removeAttr( 'style' );
+        });
+    } else {
+        activeSlide.animate({
+            borderRadius: "21px"
+        }, 500);
+    }
+
+    SlideshowManager.toggleFileOpened = !SlideshowManager.toggleFileOpened;
+}
+
+SlideshowManager.preloadFileManager = function() {
+    filebrowserImageBrowseUrl = mauticBasePath + '/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
+    var iframe = $("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
+    $("#fileManager").hide().append(iframe);
+    iframe.load(function() {
+        var fileManager = mQuery('#filemanager_iframe').contents().find('body');
+        fileManager.click(function() {
+            console.log('fileManager clicked');
+            var copyBtn = fileManager.find('#copy-button');
+            if (copyBtn.length) {
+                mQuery('.tab-pane.active.in input.background-image').val(copyBtn.attr('data-clipboard-text'));
+            }
+        });
+    });
+}
+
 CUSTOM;
 $view['assets']->addScriptDeclaration($custom);
 
@@ -98,6 +153,8 @@ $css = <<<CSS
 div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholder) }
 .dropdown.slideshow-options {position: absolute;top: 0;left: 0;}
 #slideshow-options {opacity: 0.7;}
+#filemanager_iframe {width: 100%; height: 500px;}
+.file-manager-toggle {margin-top: 24px;}
 CSS;
 
 $view['assets']->addStyleDeclaration($css);

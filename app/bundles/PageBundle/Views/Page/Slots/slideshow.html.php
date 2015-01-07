@@ -79,7 +79,7 @@ $view['assets']->addStyleDeclaration($css);
 				</a>
 			</li>
 			<li role="presentation">
-				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot ?>">
+				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot ?>" onclick="SlideshowManager.preloadFileManager();">
 					<i class="fa fa-bars"></i> Edit Slides
 				</a>
 			</li>
@@ -91,7 +91,7 @@ $view['assets']->addStyleDeclaration($css);
 <?php if (!$public) : ?>
 <!-- Slideshow global config modal edit form -->
 <div class="modal fade slideshow-global-config<?php echo $slot ?>" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
+	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -112,7 +112,7 @@ $view['assets']->addStyleDeclaration($css);
 </div>
 
 <!-- Slideshow slide config modal edit form -->
-<div class="modal fade slideshow-slides-config<?php echo $slot ?>" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade slideshow-slides-config<?php echo $slot ?> slides-config" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -120,7 +120,7 @@ $view['assets']->addStyleDeclaration($css);
 		        <h4 class="modal-title" id="exampleModalLabel">Configure slides</h4>
 			</div>
 			<div class="modal-body">
-				<div class="col-md-3 bg-white height-auto">
+				<div class="col-md-3 bg-white height-auto list-of-slides">
 					<ul class="list-group list-group-tabs">
 					<?php foreach($slides as $key => $slide) : ?>
 		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
@@ -131,15 +131,29 @@ $view['assets']->addStyleDeclaration($css);
 					<?php endforeach; ?>
 		            </ul>
 	            </div>
-	            <div class="tab-content col-md-9 bg-auto height-auto bdr-l">
+	            <div class="tab-content col-md-9 bg-auto height-auto bdr-l config-fields">
 				<?php foreach($slides as $key => $slide) : ?>
 					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo $key == 0 ? 'in active' : '' ?>" id="slide-tab-<?php echo $key; ?>">
 						<?php echo $view['form']->start($slide['form']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
+						<div class="row">
+							<div class="col-md-9">
+								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>
+							</div>
+							<div class="col-md-3">
+								<button type="button" onclick="SlideshowManager.toggleFileManager();" class="btn button-default file-manager-toggle">
+									<i class="fa fa-folder-open-o"></i> File Manager
+								</button>
+							</div>
+						</div>
 						<?php echo $view['form']->end($slide['form']); ?>
 					</div>
 				<?php endforeach; ?>
 				</div>
 				<div class="clearfix"></div>
+				<div id="fileManager"></div>
 			</div>
 			<div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">

@@ -1,9 +1,9 @@
-a {
+a, a:hover, a:focus {
   color: #4e5d9d;
 }
-a:hover,
-a:focus {
-  color: #4e5d9d;
+
+.list-group-item.active a {
+  color: #fff;
 }
 
 hr {

@@ -66,7 +66,7 @@ class SlideshowSlideConfigType extends AbstractType
             'label'      => 'mautic.page.slideshow.background',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
+                'class'   => 'form-control background-image',
                 'tooltip' => 'mautic.page.slideshow.background.desc',
                 'data-slot-config' => $options['data']['slot']
             ),
