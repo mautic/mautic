@@ -12,17 +12,17 @@ if ($tmpl == 'index') {
 }
 ?>
 <div id="assetBuilderTokens">
-    <ul class="list-group">
+    <div class="list-group">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="list-group-item" data-token="{assetlink=<?php echo $i->getId(); ?>}">
+            <a href="#" class="list-group-item" data-token="{assetlink=<?php echo $i->getId(); ?>}">
                 <div>
                     <span><i class="fa fa-fw fa-file-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
                 </div>
-            </li>
+            </a>
         <?php endforeach; ?>
-    </ul>
+    </div>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"        => count($items),

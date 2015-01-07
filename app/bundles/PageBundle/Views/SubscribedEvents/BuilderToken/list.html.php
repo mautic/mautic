@@ -12,17 +12,15 @@ if ($tmpl == 'index') {
 }
 ?>
 <div id="pageBuilderTokens">
-    <ul class="list-group ma-5">
+    <div class="list-group ma-5">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="list-group-item" data-token="{pagelink=<?php echo $i->getId(); ?>}">
-                <div>
-                    <span><i class="fa fa-fw fa-file-text-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
-                </div>
-            </li>
+            <a href="#" class="list-group-item" data-token="{pagelink=<?php echo $i->getId(); ?>}">
+                <span><i class="fa fa-fw fa-file-text-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
+            </a>
         <?php endforeach; ?>
-    </ul>
+    </div>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"        => count($items),
