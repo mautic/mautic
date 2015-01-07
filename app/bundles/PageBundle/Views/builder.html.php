@@ -107,7 +107,10 @@ SlideshowManager.saveConfigObject = function(slot) {
             slot:    slot,
             page:    mQuery('#mauticPageId').val()
         },
-        dataType: "json"
+        dataType: "json",
+        success: function() {
+            document.location.href = document.location.href;
+        }
     });
 }
 
@@ -190,7 +193,6 @@ SlideshowManager.preloadFileManager = function() {
     iframe.load(function() {
         var fileManager = mQuery('#filemanager_iframe').contents().find('body');
         fileManager.click(function() {
-            console.log('fileManager clicked');
             var copyBtn = fileManager.find('#copy-button');
             if (copyBtn.length) {
                 mQuery('.tab-pane.active.in input.background-image').val(copyBtn.attr('data-clipboard-text'));

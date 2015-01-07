@@ -103,8 +103,11 @@ $view['assets']->addStyleDeclaration($css);
 				<?php echo $view['form']->end($configForm); ?>
 			</div>
 			<div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot ?>');">
+	                <i class="fa fa-check"></i> Apply
+                </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
-	                <i class="fa fa-check"></i> OK
+	                <i class="fa fa-cross"></i> Close
                 </button>
             </div>
 		</div>
