@@ -7,10 +7,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+// define default values
+if (!isset($height)) {
+	$height = '300px';
+}
+
+if (!isset($width)) {
+	$width = '100%';
+}
+
 // css declaration for whole slideshow
 $css = <<<CSS
 .slideshow-{$slot} .item {
 	height: {$height};
+	width: {$width};
 }
 CSS;
 
@@ -92,6 +102,11 @@ $view['assets']->addStyleDeclaration($css);
 
 				<?php echo $view['form']->end($configForm); ?>
 			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+	                <i class="fa fa-check"></i> OK
+                </button>
+            </div>
 		</div>
 	</div>
 </div>
