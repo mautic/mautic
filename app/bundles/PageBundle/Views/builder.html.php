@@ -60,14 +60,12 @@ foreach ($slots as $slot => $slotConfig) {
             $options['slides'] =  array (
                 array (
                     'order' => 0,
-                    'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+One',
-                    'content' => '',
+                    'background-image' => '../../../media/images/mautic_logo_lb200.png',
                     'captionheader' => 'Caption 1'
                 ),
                 array (
                     'order' => 1,
-                    'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+Two',
-                    'content' => '',
+                    'background-image' => '../../../media/images/mautic_logo_db200.png',
                     'captionheader' => 'Caption 2'
                 )
             );
