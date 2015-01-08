@@ -81,6 +81,8 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
+
+        return $this->sendJsonResponse($dataArray);
     }
 
     /**
