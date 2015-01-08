@@ -70,20 +70,11 @@ class ListType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isGlobal', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'label_attr'    => array('class' => 'control-label'),
-            'multiple'      => false,
-            'label'         => 'mautic.lead.list.form.isglobal',
-            'empty_value'   => false,
-            'required'      => false
+        $builder->add('isGlobal', 'yesno_button_group', array(
+            'label' => 'mautic.lead.list.form.isglobal'
         ));
 
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $filterTransformer      = new FieldTypeTransformer();
         $filterModalTransformer = new FieldDateTimeTransformer();

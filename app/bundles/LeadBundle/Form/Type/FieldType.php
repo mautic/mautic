@@ -57,26 +57,26 @@ class FieldType extends AbstractType
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
 
         $builder->add('group', 'choice', array(
-            'choices'       => array(
+            'choices'     => array(
                 'core'         => 'mautic.lead.field.group.core',
                 'social'       => 'mautic.lead.field.group.social',
                 'personal'     => 'mautic.lead.field.group.personal',
                 'professional' => 'mautic.lead.field.group.professional'
             ),
             'attr'        => array(
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.lead.field.form.group.help'
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.field.form.group.help'
             ),
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.lead.field.form.group',
-            'empty_value'   => false,
-            'required'      => false,
-            'disabled'      => $disabled
+            'expanded'    => false,
+            'multiple'    => false,
+            'label'       => 'mautic.lead.field.form.group',
+            'empty_value' => false,
+            'required'    => false,
+            'disabled'    => $disabled
         ));
 
-        $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
-        $default  = ($new) ? 'text' : $options['data']->getType();
+        $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
+        $default     = ($new) ? 'text' : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
         $builder->add('type', 'choice', array(
@@ -95,9 +95,9 @@ class FieldType extends AbstractType
         ));
 
         $builder->add('properties', 'collection', array(
-            'required'        => false,
-            'allow_add'       => true,
-            'error_bubbling'  => false
+            'required'       => false,
+            'allow_add'      => true,
+            'error_bubbling' => false
         ));
 
         $builder->add('defaultValue', 'text', array(
@@ -116,11 +116,11 @@ class FieldType extends AbstractType
                 'property'      => 'label',
                 'label_attr'    => array('class' => 'control-label'),
                 'attr'          => array('class' => 'form-control'),
-                'query_builder' => function(EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('f')
                         ->orderBy('f.order', 'ASC');
                 },
-                'required'   => false
+                'required'      => false
             ))->addModelTransformer($transformer)
         );
 
@@ -137,57 +137,25 @@ class FieldType extends AbstractType
         ));
 
         $data = ($disabled) ? true : $options['data']->getIsPublished();
-        $builder->add('isPublished', 'published_button_group', array(
-            'disabled'      => $disabled,
-            'data'          => $data
+        $builder->add('isPublished', 'yesno_button_group', array(
+            'disabled' => $disabled,
+            'data'     => $data
         ));
 
-        $builder->add('isRequired', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.lead.field.form.isrequired',
-            'empty_value'   => false,
-            'required'      => false
+        $builder->add('isRequired', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.isrequired'
         ));
 
-        $builder->add('isVisible', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.lead.field.form.isvisible',
-            'empty_value'   => false,
-            'required'      => false
+        $builder->add('isVisible', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.isvisible'
         ));
 
-        $builder->add('isShortVisible', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.lead.field.form.isshortvisible',
-            'empty_value'   => false,
-            'required'      => false
+        $builder->add('isShortVisible', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.isshortvisible'
         ));
 
-        $builder->add('isListable', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.lead.field.form.islistable',
-            'empty_value'   => false,
-            'required'      => false
+        $builder->add('isListable', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.islistable'
         ));
 
         $builder->add('buttons', 'form_buttons');

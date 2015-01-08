@@ -26,17 +26,9 @@ class ConfigType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('cat_in_page_url', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('cat_in_page_url', 'yesno_button_group', array(
             'label'       => 'mautic.page.config.form.cat.in.url',
-            'label_attr'  => array('class' => 'control-label'),
-            'expanded'    => true,
-            'empty_value' => false,
             'data'        => (bool) $options['data']['cat_in_page_url'],
-            'required'    => false,
             'attr'        => array(
                 'tooltip' => 'mautic.page.config.form.cat.in.url.tooltip'
             )

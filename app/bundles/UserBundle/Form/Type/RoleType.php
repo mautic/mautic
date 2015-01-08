@@ -44,20 +44,12 @@ class RoleType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isAdmin', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'    => true,
-            'multiple'    => false,
+        $builder->add('isAdmin', 'yesno_button_group', array(
             'label'       => 'mautic.user.role.form.isadmin',
             'attr'        => array(
                 'onchange' => 'Mautic.togglePermissionVisibility();',
                 'tooltip'  => 'mautic.user.role.form.isadmin.tooltip'
-            ),
-            'empty_value' => false,
-            'required'    => false
+            )
         ));
 
         // add a normal text field, but add your transformer to it
@@ -81,7 +73,6 @@ class RoleType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
 
     /**
      * {@inheritdoc}

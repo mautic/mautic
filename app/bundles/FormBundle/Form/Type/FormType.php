@@ -84,7 +84,7 @@ class FormType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'published_button_group', array(
+        $builder->add('isPublished', 'yesno_button_group', array(
             'read_only'     => $readonly,
             'data'          => $data
         ));

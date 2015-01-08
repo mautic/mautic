@@ -72,7 +72,7 @@ class TriggerType extends AbstractType
             'label'      => 'mautic.point.trigger.form.points',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'   => 'form-control',
                 'tooltip' => 'mautic.point.trigger.form.points_descr'
             ),
             'required'   => false
@@ -84,27 +84,18 @@ class TriggerType extends AbstractType
             'attr'       => array(
                 'class'       => 'form-control',
                 'data-toggle' => 'color',
-                'tooltip' => 'mautic.point.trigger.form.color_descr'
+                'tooltip'     => 'mautic.point.trigger.form.color_descr'
             ),
             'required'   => false
         ));
 
-        $builder->add('triggerExistingLeads', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'    => true,
-            'multiple'    => false,
-            'label'       => 'mautic.point.trigger.form.existingleads',
-            'label_attr'  => array('class' => 'control-label'),
-            'empty_value' => false,
-            'required'    => false
+        $builder->add('triggerExistingLeads', 'yesno_button_group', array(
+            'label' => 'mautic.point.trigger.form.existingleads'
         ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('point:triggers:publish');
-            $data = $options['data']->isPublished(false);
+            $data     = $options['data']->isPublished(false);
         } elseif (!$this->security->isGranted('point:triggers:publish')) {
             $readonly = true;
             $data     = false;
@@ -113,9 +104,9 @@ class TriggerType extends AbstractType
             $data     = false;
         }
 
-        $builder->add('isPublished', 'published_button_group', array(
-            'read_only'   => $readonly,
-            'data'        => $data
+        $builder->add('isPublished', 'yesno_button_group', array(
+            'read_only' => $readonly,
+            'data'      => $data
         ));
 
         $builder->add('publishUp', 'datetime', array(

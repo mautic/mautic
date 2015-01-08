@@ -30,7 +30,7 @@ class PagePublishDatesType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',

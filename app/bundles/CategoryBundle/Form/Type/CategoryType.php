@@ -76,7 +76,7 @@ class CategoryType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('bundle', 'hidden', array(
             'data' => $options['bundle']

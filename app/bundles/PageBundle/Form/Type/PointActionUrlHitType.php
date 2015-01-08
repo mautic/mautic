@@ -35,15 +35,8 @@ class PointActionUrlHitType extends AbstractType
             )
         ));
 
-        $builder->add('first_time', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('first_time', 'yesno_button_group', array(
             'label'       => 'mautic.page.point.action.form.first.time.only',
-            'expanded'    => true,
-            'empty_value' => false,
-            'required'    => false,
             'attr'        => array(
                 'tooltip' => 'mautic.page.point.action.form.first.time.only.descr'
             )

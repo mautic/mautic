@@ -14,9 +14,9 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PublishedButtonGroupType
+ * Class YesNoButtonGroupType
  */
-class PublishedButtonGroupType extends AbstractType
+class YesNoButtonGroupType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -31,7 +31,7 @@ class PublishedButtonGroupType extends AbstractType
      */
     public function getName()
     {
-        return 'published_button_group';
+        return 'yesno_button_group';
     }
 
     /**
@@ -47,10 +47,9 @@ class PublishedButtonGroupType extends AbstractType
             'expanded'    => true,
             'multiple'    => false,
             'label_attr'  => array('class' => 'control-label'),
-            'label'       => 'mautic.campaign.form.ispublished',
+            'label'       => 'mautic.core.form.ispublished',
             'empty_value' => false,
-            'required'    => false,
-            'attr'        => array('onchange' => 'Mautic.togglePublishedButtonClass(mQuery(this).attr(\'id\'));')
+            'required'    => false
         ));
     }
 }

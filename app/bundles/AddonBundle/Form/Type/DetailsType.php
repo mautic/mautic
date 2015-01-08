@@ -26,7 +26,7 @@ class DetailsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $keys = $options['integration_object']->getRequiredKeyFields();
         $builder->add('apiKeys', 'integration_keys', array(

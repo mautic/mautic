@@ -85,14 +85,8 @@ class DoctrineStepType extends AbstractType
             'required'   => true
         ));
 
-        $builder->add('backup_tables', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('backup_tables', 'yesno_button_group', array(
             'label'       => 'mautic.install.form.existing_tables',
-            'expanded'    => true,
-            'empty_value' => false,
             'attr'        => array(
                 'tooltip' => 'mautic.install.form.existing_tables_descr',
                 'onchange' => 'MauticInstaller.toggleBackupPrefix();'

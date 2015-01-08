@@ -184,7 +184,7 @@ class UserType extends AbstractType
                     )
                 ));
 
-            $builder->add('isPublished', 'published_button_group');
+            $builder->add('isPublished', 'yesno_button_group');
 
             $builder->add('buttons', 'form_buttons');
 

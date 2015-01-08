@@ -600,31 +600,18 @@ class ConfigType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('cookie_secure', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('cookie_secure', 'yesno_button_group', array(
             'label'       => 'mautic.core.config.form.cookie.secure',
-            'expanded'    => true,
             'empty_value' => 'mautic.core.form.default',
             'data'        => ($options['data']['cookie_secure'] === '' || $options['data']['cookie_secure'] === null) ? '' : (bool)$$options['data']['cookie_secure'],
-            'required'    => false,
             'attr'        => array(
                 'tooltip' => 'mautic.core.config.form.cookie.secure.tooltip'
             )
         ));
 
-        $builder->add('cookie_httponly', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('cookie_httponly', 'yesno_button_group', array(
             'label'       => 'mautic.core.config.form.cookie.httponly',
-            'expanded'    => true,
-            'empty_value' => false,
             'data'        => (bool)$options['data']['cookie_httponly'],
-            'required'    => false,
             'attr'        => array(
                 'tooltip' => 'mautic.core.config.form.cookie.httponly.tooltip'
             )

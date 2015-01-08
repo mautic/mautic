@@ -43,7 +43,7 @@ class ReportType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct (MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
@@ -52,7 +52,7 @@ class ReportType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
@@ -74,19 +74,10 @@ class ReportType extends AbstractType
                 'required'   => false
             ));
 
-            $builder->add('isPublished', 'published_button_group');
+            $builder->add('isPublished', 'yesno_button_group');
 
-            $builder->add('system', 'button_group', array(
-                'choice_list' => new ChoiceList(
-                    array(false, true),
-                    array('mautic.core.form.no', 'mautic.core.form.yes')
-                ),
-                'expanded'      => true,
-                'multiple'      => false,
-                'label'         => 'mautic.report.report.form.issystem',
-                'label_attr'    => array('class' => 'control-label'),
-                'empty_value'   => false,
-                'required'      => false
+            $builder->add('system', 'yesno_button_group', array(
+                'label' => 'mautic.report.report.form.issystem'
             ));
 
             // Quickly build the table source list for use in the selector
@@ -94,27 +85,27 @@ class ReportType extends AbstractType
 
             // Build a list of data sources
             $builder->add('source', 'choice', array(
-                'choices'       => $tables,
-                'expanded'      => false,
-                'multiple'      => false,
-                'label'         => 'mautic.report.report.form.source',
-                'label_attr'    => array('class' => 'control-label'),
-                'empty_value'   => false,
-                'required'      => false,
-                'attr'          => array(
+                'choices'     => $tables,
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.report.report.form.source',
+                'label_attr'  => array('class' => 'control-label'),
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.report.report.form.source.help',
                     'onchange' => 'Mautic.updateColumnList(this)'
                 )
             ));
 
-            $model = $this->factory->getModel('report');
+            $model        = $this->factory->getModel('report');
             $formModifier = function (FormInterface $form, $source = '') use ($model) {
-                $tableData  = $model->getTableData();
+                $tableData = $model->getTableData();
                 if (!$source) {
                     $source = key($tableData);
                 }
-                $columns    = $tableData[$source]['columns'];
+                $columns = $tableData[$source]['columns'];
 
                 // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
                 $columnList = array();
@@ -180,7 +171,7 @@ class ReportType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\ReportBundle\Entity\Report',
@@ -191,7 +182,7 @@ class ReportType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return "report";
     }
@@ -203,7 +194,7 @@ class ReportType extends AbstractType
      *
      * @return array
      */
-    private function buildTableSourceList($tables)
+    private function buildTableSourceList ($tables)
     {
         $temp = array_keys($tables);
 

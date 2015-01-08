@@ -33,11 +33,11 @@ $container->setDefinition('mautic.form.type.button_group', new Definition(
         'alias' => 'button_group',
     ));
 
-$container->setDefinition('mautic.form.type.published_button_group', new Definition(
-    'Mautic\CoreBundle\Form\Type\PublishedButtonGroupType'
+$container->setDefinition('mautic.form.type.yesno_button_group', new Definition(
+    'Mautic\CoreBundle\Form\Type\YesNoButtonGroupType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'published_button_group',
+        'alias' => 'yesno_button_group',
     ));
 
 $container->setDefinition('mautic.form.type.standalone_button', new Definition(

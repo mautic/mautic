@@ -1501,22 +1501,22 @@ var Mautic = {
     },
 
     /**
-     * Toggles the class for published buttons
+     * Toggles the class for yes/no button groups
      * @param changedId
      */
-    togglePublishedButtonClass: function (changedId) {
+    toggleYesNoButtonClass: function (changedId) {
         changedId = '#' + changedId;
 
-        var isPublishButton = mQuery(changedId).parent().hasClass('btn-publish');
+        var isYesButton = mQuery(changedId).parent().hasClass('btn-yes');
 
         //change the other
-        var otherButton = isPublishButton ? '.btn-unpublish' : '.btn-publish';
+        var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
         var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
 
         if (mQuery(changedId).prop('checked')) {
             var thisRemove = 'btn-default',
                 otherAdd = 'btn-default';
-            if (isPublishButton) {
+            if (isYesButton) {
                 var thisAdd = 'btn-success',
                     otherRemove = 'btn-danger';
             } else {
@@ -1525,7 +1525,7 @@ var Mautic = {
             }
         } else {
             var thisAdd = 'btn-default';
-            if (isPublishButton) {
+            if (isYesButton) {
                 var thisAdd = 'btn-success',
                     otherRemove = 'btn-danger';
             } else {

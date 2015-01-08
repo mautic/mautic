@@ -26,16 +26,9 @@ class ConfigType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('api_enabled', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
+        $builder->add('api_enabled', 'yesno_button_group', array(
             'label'       => 'mautic.api.config.form.api.enabled',
-            'expanded'    => true,
-            'empty_value' => false,
             'data'        => (bool) $options['data']['api_enabled'],
-            'required'    => false,
             'attr'        => array(
                 'tooltip' => 'mautic.api.config.form.api.enabled.tooltip'
             )

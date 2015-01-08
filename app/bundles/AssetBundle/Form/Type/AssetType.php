@@ -90,7 +90,7 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',

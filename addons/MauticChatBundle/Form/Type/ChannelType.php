@@ -49,7 +49,6 @@ class ChannelType extends AbstractType
             'required'   => false
         ));
 
-
         /*
         $builder->add('isPrivate', 'button_group', array(
             'choice_list' => new ChoiceList(

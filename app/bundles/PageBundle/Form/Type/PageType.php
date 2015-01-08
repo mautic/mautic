@@ -121,7 +121,7 @@ class PageType extends AbstractType
             'data'          => $template
         ));
 
-        $builder->add('isPublished', 'published_button_group');
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',
