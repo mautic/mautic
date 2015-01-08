@@ -143,7 +143,7 @@ class NotificationModel extends FormModel
 
         // Check for updates
         $updateMessage = '';
-        if ($this->factory->getUser()->isAdmin()) {
+        if (!$this->factory->getParameter('security.disableUpdates') && $this->factory->getUser()->isAdmin()) {
             $session = $this->factory->getSession();
 
             //check to see when we last checked for an update

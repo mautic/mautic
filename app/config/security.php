@@ -131,3 +131,9 @@ if ($container->getParameter('kernel.environment') == 'prod') {
 }
 
 $container->setParameter('mautic.security.restrictedConfigFields', $restrictedConfigFields);
+
+/**
+ * Optional security parameters
+ * mautic.security.disableUpdates = disables remote checks for updates
+ * mautic.security.restrictedConfigFields.displayMode = accepts either remove or mask; mask will disable the input with a "Set by system" message
+ */
