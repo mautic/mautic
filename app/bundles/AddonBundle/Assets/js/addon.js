@@ -19,3 +19,19 @@ Mautic.loadIntegrationAuthWindow = function(response) {
         }
     }
 };
+
+Mautic.refreshIntegrationForm = function() {
+    var opener = window.opener;
+    if(opener) {
+            var form = opener.mQuery('form[name="integration_details"]');
+            if (form.length) {
+                var action = form.attr('action');
+                if (action) {
+                    opener.Mautic.startModalLoadingBar('#IntegrationEditModal');
+                    opener.Mautic.loadAjaxModal('#IntegrationEditModal', action);
+                }
+            }
+    }
+
+    window.close()
+};

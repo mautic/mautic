@@ -38,26 +38,27 @@ class AuthController extends FormController
             $objects[strtolower($key)] = $value;
         }
 
+        $session = $this->factory->getSession();
+
         //check to see if the service exists
         if (!array_key_exists(strtolower($integration), $objects)) {
-            $this->addFlash('mautic.integration.notfound', array('%name%' => $integration), 'error');
+            $session->set('mautic.integration.postauth.message', array('mautic.integration.notfound', array('%name%' => $integration), 'error'));
             if ($isAjax) {
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
-                return $this->render('MauticAddonBundle:Auth:postauth.html.php');
+                return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
             }
         }
 
-        $session    = $this->factory->getSession();
-        $state      = $session->get($integration . '_csrf_token', false);
+        $state = $session->get($integration . '_csrf_token', false);
 
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
-            $this->addFlash('mautic.integration.auth.invalid.state', array(), 'error');
+            $session->set('mautic.integration.postauth.message', array('mautic.integration.auth.invalid.state', array(), 'error'));
             if ($isAjax) {
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
-                return $this->render('MauticAddonBundle:Auth:postauth.html.php');
+                return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
             }
         }
 
@@ -74,7 +75,7 @@ class AuthController extends FormController
             $params  = array();
         }
 
-        $this->addFlash($message, $params, $type);
+        $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
         return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
     }
@@ -84,6 +85,19 @@ class AuthController extends FormController
      */
     public function oAuthStatusAction ()
     {
-        return $this->render('MauticAddonBundle:Auth:postauth.html.php');
+        $session     = $this->factory->getSession();
+        $postMessage = $session->get('mautic.integration.postauth.message');
+        $message     = $type = '';
+        $alert       = 'success';
+        if (!empty($postMessage)) {
+            $message = $this->factory->getTranslator()->trans($postMessage[0], $postMessage[1], 'flashes');
+            $session->remove('mautic.integration.postauth.message');
+            $type = $postMessage[2];
+            if ($type == 'error') {
+                $alert = 'danger';
+            }
+        }
+
+        return $this->render('MauticAddonBundle:Auth:postauth.html.php', array('message' => $message, 'alert' => $alert));
     }
 }

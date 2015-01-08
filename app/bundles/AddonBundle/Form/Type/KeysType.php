@@ -33,7 +33,8 @@ class KeysType extends AbstractType
                 'label'        => $label,
                 'label_attr'   => array('class' => 'control-label'),
                 'attr'         => array(
-                    'class'       => 'form-control'
+                    'class'       => 'form-control',
+                    'placeholder' => ($type == 'password') ? '**************' : ''
                 )
             ));
         }
