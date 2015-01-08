@@ -23,23 +23,7 @@ mQuery(document).ready( function() {
     mQuery("div[contenteditable='true']").each(function (index) {
         var content_id = mQuery(this).attr('id');
         CKEDITOR.inline(content_id, {
-            toolbar: 'advanced',
-            on: {
-                blur: function (event) {
-                    var data = event.editor.getData();
-
-                    mQuery.ajax({
-                        url: mauticAjaxUrl + '?action=page:setBuilderContent',
-                        type: "POST",
-                        data: {
-                            content: data,
-                            slot:    content_id.replace("slot-", ""),
-                            page:    mQuery('#mauticPageId').val()
-                        },
-                        dataType: "html"
-                    });
-                }
-            }
+            toolbar: 'advanced'
         });
     });
 
@@ -80,7 +64,7 @@ mQuery(document).ready( function() {
                 data: {
                     content: JSON.stringify(slotConfigs[slot]),
                     slot:    slot,
-                    page:    mQuery('#mauticPageId').val()
+                    entity:  mQuery('#builder_entity_id').val()
                 },
                 dataType: "json"
             });
@@ -183,7 +167,7 @@ foreach ($slots as $slot => $slotConfig) {
 
 //add builder toolbar
 $view['slots']->start('builder');?>
-<input type="hidden" id="mauticPageId" value="<?php echo $page->getSessionId(); ?>" />
+<input type="hidden" id="builder_entity_id" value="<?php echo $page->getSessionId(); ?>" />
 <?php
 $view['slots']->stop();
 ?>

@@ -21,23 +21,7 @@ mQuery(document).ready( function() {
     mQuery("div[contenteditable='true']").each(function (index) {
         var content_id = mQuery(this).attr('id');
         CKEDITOR.inline(content_id, {
-            toolbar: 'advanced',
-            on: {
-                blur: function (event) {
-                    var data = event.editor.getData();
-
-                    var request = mQuery.ajax({
-                        url: mauticAjaxUrl + '?action=email:setBuilderContent',
-                        type: "POST",
-                        data: {
-                            content: data,
-                            slot:    content_id.replace("slot-", ""),
-                            email:    mQuery('#mauticEmailId').val()
-                        },
-                        dataType: "html"
-                    });
-                }
-            }
+            toolbar: 'advanced'
         });
     });
 });
@@ -60,7 +44,7 @@ foreach ($slots as $slot) {
 
 //add builder toolbar
 $view['slots']->start('builder');?>
-<input type="hidden" id="mauticEmailId" value="<?php echo $email->getSessionId(); ?>" />
+<input type="hidden" id="builder_entity_id" value="<?php echo $email->getSessionId(); ?>" />
 <?php
 $view['slots']->stop();
 ?>

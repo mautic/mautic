@@ -745,7 +745,10 @@ class PageController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', array());
         $content    = $entity->getContent();
-        $content    = array_merge($content, $newContent);
+        if (is_array($newContent)) {
+            $content = array_merge($content, $newContent);
+        }
+
         return $this->render('MauticPageBundle::builder.html.php', array(
             'isNew'         => $isNew,
             'slots'         => $slots,

@@ -2195,16 +2195,17 @@ var Mautic = {
             height: "100%"
         };
 
-        var overlay = mQuery("<div id='builder-overlay'></div>").css(builderCss).addClass("modal-backdrop fade in").appendTo('.builder-content');
+        var spinnerLeft = (mQuery(document).width() - 300) / 2;
+        var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
         var builder = mQuery("<iframe />", {
             css: builderCss,
             id: "builder-template-content"
         })
             .attr('src', src)
-            .appendTo('#builder-overlay')
+            .appendTo('.builder-content')
             .load(function () {
-                mQuery('#builder-overlay').removeClass('modal-backdrop fade in');
+                mQuery('#builder-overlay').addClass('hide');
                 var contents = mQuery(this).contents();
                 // here, catch the droppable div and create a droppable widget
                 contents.find('.mautic-editable').droppable({
@@ -2249,25 +2250,54 @@ var Mautic = {
         mQuery('.builder').removeClass('hide');
     },
 
-    closeBuilder: function() {
-        Mautic.stopIconSpinPostEvent();
+    closeBuilder: function(model) {
+        mQuery('#builder-overlay').removeClass('hide');
 
-        mQuery('.builder').addClass('hide');
+        // Save content
+        var editors = Mautic.getBuilderEditorInstance();
+        var content = {};
 
-        //make sure editors have lost focus so the content is updated
-        mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
+        var builderContents = mQuery('#builder-template-content').contents();
+
+        // Make sure editors have lost focus so the content is updated
+        builderContents.find('.mautic-editable').each(function (index) {
             mQuery(this).blur();
         });
 
-        setTimeout( function() {
-            //kill the draggables
-            mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-            mQuery("*[data-token]").draggable('destroy');
+        // Get the content of each editor
+        mQuery.each(editors, function(slot, editor) {
+            slot = slot.replace("slot-", "");
+            content[slot] = editor.getData();
+        });
 
-            //kill the iframe
-            mQuery('#builder-template-content').remove();
+        mQuery.ajax({
+            url: mauticAjaxUrl + '?action=' + model + ':setBuilderContent',
+            type: "POST",
+            data: {
+                slots: content,
+                entity: builderContents.find('#builder_entity_id').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Kill droppables
+                    builderContents.find('.mautic-editable').droppable('destroy');
 
-        }, 3000);
+                    // Kill draggables
+                    mQuery("*[data-token]").draggable('destroy');
+
+                    mQuery('.builder').addClass('hide');
+                    Mautic.stopIconSpinPostEvent();
+
+                    // Properly destory ckeditors
+                    mQuery.each(editors, function (slot, editor) {
+                        editor.destroy();
+                    });
+
+                }
+                //kill the iframe and overlay
+                mQuery('#builder-overlay').remove();
+            }
+        });
     },
 
     getBuilderEditorInstance: function (id) {
@@ -2275,7 +2305,7 @@ var Mautic = {
         if (id) {
             return editors[id];
         } else {
-            editors;
+            return editors;
         }
     },
 

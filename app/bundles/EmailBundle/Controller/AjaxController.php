@@ -28,17 +28,42 @@ class AjaxController extends CommonAjaxController
      */
     protected function setBuilderContentAction(Request $request)
     {
-        $newContent = InputHelper::html($request->request->get('content'));
-        $email      = InputHelper::clean($request->request->get('email'));
-        $slot       = InputHelper::clean($request->request->get('slot'));
         $dataArray  = array('success' => 0);
-        if (!empty($email) && !empty($slot)) {
-            $session = $this->factory->getSession();
-            $content = $session->get('mautic.emailbuilder.'.$email.'.content', array());
-            $content[$slot] = $newContent;
-            $session->set('mautic.emailbuilder.'.$email.'.content', $content);
-            $dataArray['success'] = 1;
+        $entityId   = InputHelper::clean($request->request->get('entity'));
+        $session    = $this->factory->getSession();
+
+        if (!empty($entityId)) {
+            $sessionVar = 'mautic.emailbuilder.' . $entityId . '.content';
+
+            // Check for an array of slots
+            $slots   = InputHelper::_($request->request->get('slots', array(), true), 'html');
+            $content = $session->get($sessionVar, array());
+
+            if (!is_array($content)) {
+                $content = array();
+            }
+
+            if (!empty($slots)) {
+                // Builder was closed so save each content
+                foreach ($slots as $slot => $newContent) {
+                    $content[$slot] = $newContent;
+                }
+
+                $session->set($sessionVar, $content);
+                $dataArray['success'] = 1;
+            } else {
+                // Check for a single slot
+                $newContent = InputHelper::html($request->request->get('content'));
+                $slot       = InputHelper::clean($request->request->get('slot'));
+
+                if (!empty($slot)) {
+                    $content[$slot] = $newContent;
+                    $session->set($sessionVar, $content);
+                    $dataArray['success'] = 1;
+                }
+            }
         }
+
         return $this->sendJsonResponse($dataArray);
     }
 

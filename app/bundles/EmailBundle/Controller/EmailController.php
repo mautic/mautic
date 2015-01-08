@@ -674,7 +674,10 @@ class EmailController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.emailbuilder.' . $objectId . '.content', array());
         $content    = $entity->getContent();
-        $content    = array_merge($content, $newContent);
+
+        if (is_array($newContent)) {
+            $content = array_merge($content, $newContent);
+        }
 
         return $this->render('MauticEmailBundle::builder.html.php', array(
             'isNew'    => $isNew,
