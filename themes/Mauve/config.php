@@ -38,6 +38,7 @@ $config = array(
             "footer"            => array('type' => 'html', 'placeholder' => 'mautic.page.builder.addcontent')
         ),
         "email" => array(
+            "header",
             "body",
             "footer"
         )
