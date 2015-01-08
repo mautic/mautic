@@ -211,7 +211,7 @@ abstract class AbstractIntegration
         $decrypted = array();
 
         foreach ($keys as $name => $key) {
-            $key = $helper->decrypt($key);
+            $key              = $helper->decrypt($key);
             $decrypted[$name] = $key;
         }
 
@@ -229,6 +229,7 @@ abstract class AbstractIntegration
 
         $keys = $this->getDecryptedApiKeys();
         $clientIdKey = $this->getClientIdKey();
+
         $clientId = $keys[$clientIdKey];
         $state = hash('sha1', uniqid(mt_rand()));
         $url = $this->getAuthenticationUrl()

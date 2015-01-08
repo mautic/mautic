@@ -147,11 +147,11 @@ class IntegrationController extends FormController
             'action'             => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
         ));
 
-        $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
-        $currentFeatureSettings = $entity->getFeatureSettings();
-
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
+                $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
+                $currentFeatureSettings = $entity->getFeatureSettings();
+
                 if ($this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
                     $integration = $entity->getName();

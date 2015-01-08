@@ -41,7 +41,7 @@ class DetailsType extends AbstractType
         $authType = $options['integration_object']->getAuthenticationType();
         if (in_array($authType, array('oauth2', 'callback'))) {
             $disabled = false;
-            $label    = (isset($decryptedKeys['access_token'])) ? 'reauthorize' : 'authorize';
+            $label    = (!empty($decryptedKeys['access_token'])) ? 'reauthorize' : 'authorize';
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
