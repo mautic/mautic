@@ -131,7 +131,7 @@ class TwitterIntegration extends AbstractIntegration
                 $keys['access_token'] = $values['access_token'];
                 $error                = false;
             } else {
-                $error = $this->parseResponse($values);
+                $error = $this->getErrorsFromResponse($values);
             }
 
             $this->encryptAndSetApiKeys($keys, $entity);
