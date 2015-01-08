@@ -59,17 +59,18 @@ class SlideshowSlideConfigType extends AbstractType
             'data'       => isset($options['data']['captionbody']) ? $options['data']['captionbody'] : '' 
         ));
 
-        $builder->add('slides:' . $options['data']['key'] . ':order', 'text', array(
-            'label'      => 'mautic.page.slideshow.order',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.page.slideshow.order.desc',
-                'data-slot-config' => $options['data']['slot']
-            ),
-            'required'   => false,
-            'data'      => isset($options['data']['order']) ? $options['data']['order'] : $options['data']['key'] 
-        ));
+        // TODO allow users to sort slides
+        // $builder->add('slides:' . $options['data']['key'] . ':order', 'text', array(
+        //     'label'      => 'mautic.page.slideshow.order',
+        //     'label_attr' => array('class' => 'control-label'),
+        //     'attr'       => array(
+        //         'class'   => 'form-control',
+        //         'tooltip' => 'mautic.page.slideshow.order.desc',
+        //         'data-slot-config' => $options['data']['slot']
+        //     ),
+        //     'required'   => false,
+        //     'data'      => isset($options['data']['order']) ? $options['data']['order'] : $options['data']['key'] 
+        // ));
 
         $builder->add('slides:' . $options['data']['key'] . ':background-image', 'text', array(
             'label'      => 'mautic.page.slideshow.background',
