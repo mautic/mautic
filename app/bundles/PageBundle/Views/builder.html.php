@@ -51,23 +51,28 @@ foreach ($slots as $slot => $slotConfig) {
                 'interval' => 5000,
                 'pause' => 'hover',
                 'wrap' => true,
-                'keyboard' => true,
-                'slides' => array (
-                    array (
-                        'order' => 0,
-                        'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+One',
-                        'content' => '',
-                        'captionheader' => 'Caption 1'
-                    ),
-                    array (
-                        'order' => 1,
-                        'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+Two',
-                        'content' => '',
-                        'captionheader' => 'Caption 2'
-                    )
+                'keyboard' => true
+            );
+        }
+
+        // Create sample slides for first time or if all slides were deleted
+        if (empty($options['slides'])) {
+            $options['slides'] =  array (
+                array (
+                    'order' => 0,
+                    'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+One',
+                    'content' => '',
+                    'captionheader' => 'Caption 1'
+                ),
+                array (
+                    'order' => 1,
+                    'background-image' => 'http://placehold.it/1900x250/4e5d9d&text=Slide+Two',
+                    'content' => '',
+                    'captionheader' => 'Caption 2'
                 )
             );
         }
+
         $options['slot'] = $slot;
         $options['public'] = false;
 
