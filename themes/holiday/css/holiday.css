@@ -4,6 +4,12 @@ body {
     color: #333333;
     background-color: #f7f7f7;
 }
+a {
+    color: #009af3;
+}
+a:hover, a:focus {
+    color: #009af3;
+}
 #header {
     background-color: #f6f6f6;
     border-color: #f6f6f6;

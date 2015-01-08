@@ -9,22 +9,33 @@
 ?>
 
 <html>
-<head>
-    <?php $view['assets']->outputHeadDeclarations(); ?>
-</head>
-<body style="background: #f2f2f2;">
-    <table style="background: #FFFFFF; width: 600px; height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; padding: 50px; border: 1px solid #d5d4d4; box-shadow: 1px 1px 1px #d5d4d4; margin: 50px auto;">
-        <tr>
-            <td style="vertical-align: top;">
-                <?php $view['slots']->output('body'); ?>
-            </td>
-        </tr>
-        <tr>
-            <td style="vertical-align: top;">
-                <?php $view['slots']->output('footer'); ?>
-            </td>
-        </tr>
-    </table>
-    <?php $view['slots']->output('builder'); ?>
-</body>
+    <head>
+        <?php $view['assets']->outputHeadDeclarations(); ?>
+    </head>
+    <body style="background: #f7f7f7; margin:0">
+        <div style="background-color: #F3F3F3; border-bottom: 2px solid #D3D2D2;">
+            <table style="border-collapse: collapse; width: 600px; min-height: 50px; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; margin: 0 auto;">
+                <tr>
+                    <td style="vertical-align: top; padding: 30px 50px; font-size: 28px; line-height: 1.5em; color: #999999;">
+                        <?php $view['slots']->output('header'); ?>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="border-top: 2px solid #E2E2E2;">
+            <table style="border-collapse: collapse; width: 600px; font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #333333; margin: 0 auto;">
+                <tr>
+                    <td style="vertical-align: top; padding: 30px 50px; font-size: 17px; line-height: 1.7em;">
+                        <?php $view['slots']->output('body'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; padding: 30px 50px; font-size: 12px; line-height: 1.5em;">
+                        <?php $view['slots']->output('footer'); ?>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <?php $view['slots']->output('builder'); ?>
+    </body>
 </html>
