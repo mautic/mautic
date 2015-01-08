@@ -52,7 +52,6 @@ CSS;
 $view['assets']->addStyleDeclaration($css);
 		?>
         <div class="item text-center <?php echo $key == 0 ? 'active' : '' ?> slide-<?php echo $slot ?>-<?php echo $key ?>">
-            <!-- <div id="slot-<?php echo $slot; ?>-<?php echo $key; ?>-content" class="mautic-editable" contenteditable="true" data-placeholder="<?php echo $view['translator']->trans('mautic.page.builder.addcontent'); ?>"></div> -->
             <?php if (!empty($slide['captionheader']) || !empty($slide['captionheader'])) : ?>
             <div class="carousel-caption">
 	            <?php if (!empty($slide['captionheader'])) : ?>
@@ -146,7 +145,9 @@ $view['assets']->addStyleDeclaration($css);
 						</div>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
-						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
+						<?php 
+                        // TODO allow users to sort slides
+                        // echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
 						<div class="row">
 							<div class="col-md-9">
 								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>

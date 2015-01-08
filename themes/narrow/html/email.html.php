@@ -12,15 +12,20 @@
 <head>
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
-<body style="background: #f2f2f2;">
-    <table style="background: #FFFFFF; width: 600px; height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; padding: 50px; border: 1px solid #d5d4d4; box-shadow: 1px 1px 1px #d5d4d4; margin: 50px auto;">
+<body style="background: #969696;">
+    <table style="border-collapse: collapse; background: #FFFFFF; width: 600px; min-height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; border: 1px solid #494949; box-shadow: 1px 1px 1px #5B5959; margin: 50px auto;">
         <tr>
-            <td style="vertical-align: top;">
+            <td style="vertical-align: top; padding: 30px 50px 10px 50px; font-size: 28px; line-height: 1.5em;">
+                <?php $view['slots']->output('header'); ?>
+            </td>
+        </tr>
+        <tr>
+            <td style="vertical-align: top; padding: 30px 50px; font-size: 17px; line-height: 1.7em;">
                 <?php $view['slots']->output('body'); ?>
             </td>
         </tr>
         <tr>
-            <td style="vertical-align: top;">
+            <td style="vertical-align: top; padding: 30px 50px; font-size: 12px; line-height: 1.5em;color: #ffffff; background-color: #888888;">
                 <?php $view['slots']->output('footer'); ?>
             </td>
         </tr>
