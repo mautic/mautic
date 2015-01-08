@@ -10,6 +10,9 @@ body {
     font-size: 15px;
     line-height: 1.6;
 }
+body > .container {
+    margin-top: 20px;
+}
 .container {
     width: 970px;
     background-color: rgba(255, 255, 255, 0.9);
@@ -20,4 +23,12 @@ body {
     margin: 20px auto;
     background-color: #494949;
 }
-
+.copyright small {
+    color: #fff;
+    background: rgba(73, 73, 73, 0.75);
+    padding: 2px;
+}
+.copyright small a {
+    color: #fff;
+    text-decoration: underline;
+}

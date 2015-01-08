@@ -74,5 +74,9 @@ $view['slots']->set('pageTitle', $title);
     <div class="row">
         <div class="col-xs-12"><?php $view['slots']->output('footer'); ?></div>
     </div>
+    
 </div>
+<div class="copyright text-center">
+        <small>Background <a href="https://flic.kr/p/ppk9JE" alt="Narrow river">photo</a> by Christopher Michel</small>
+    </div>
 <?php $view['slots']->output('builder'); ?>
