@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Factory;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
@@ -422,15 +423,48 @@ class MauticFactory
      * returns a ThemeHelper instance for the given theme
      *
      * @param string $theme
+     * @param bool $throwException
      *
      * @return \Mautic\CoreBundle\Templating\Helper\ThemeHelper
      */
-    public function getTheme($theme = 'current')
+    public function getTheme($theme = 'current', $throwException = false)
     {
         static $themeHelpers = array();
 
         if (empty($themeHelpers[$theme])) {
-            $themeHelpers[$theme] = new ThemeHelper($this, $theme);
+            try {
+                $themeHelpers[$theme] = new ThemeHelper($this, $theme);
+            } catch (\Exception $e) {
+                if (!$throwException) {
+                    if ($e instanceof FileNotFoundException) {
+                        //theme wasn't found so just use the first available
+                        $themes = $this->getInstalledThemes();
+                        foreach ($themes as $installedTheme => $name) {
+                            try {
+                                if (isset($themeHelpers[$installedTheme])) {
+                                    //theme found so return it
+                                    return $themeHelpers[$installedTheme];
+                                } else {
+                                    $themeHelpers[$installedTheme] = new ThemeHelper($this, $installedTheme);
+                                    //found so use this theme
+                                    $theme = $installedTheme;
+                                    $found = true;
+                                    break;
+                                }
+                            } catch (\Exception $e) {
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                if (empty($found)) {
+                    //if we get to this point then no template was found so throw an exception regardless
+                    if ($throwException) {
+                        throw ($e);
+                    }
+                }
+            }
         }
 
         return $themeHelpers[$theme];

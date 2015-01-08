@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
@@ -62,18 +63,18 @@ class ThemeHelper
 
         //check to make sure the theme exists
         if (!file_exists($this->themePath)) {
-            throw new FileNotFoundException($theme . ' not found!');
+            throw new FileNotFoundException($this->theme . ' not found!');
         }
 
         //get the config
         if (!file_exists($this->themePath . '/config.php')) {
-            throw new FileNotFoundException($this->theme . ' is missing a required config file');
+            throw new BadConfigurationException($this->theme . ' is missing a required config file');
         }
 
         $this->config = include $this->themePath . '/config.php';
 
         if (!isset($this->config['name'])) {
-            throw new FileNotFoundException($this->theme . ' does not have a valid config file');
+            throw new BadConfigurationException($this->theme . ' does not have a valid config file');
         }
     }
 
