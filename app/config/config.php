@@ -66,7 +66,7 @@ $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
 $container->loadFromExtension('framework', array(
-    'secret'               => '%mautic.secret%',
+    'secret'               => '%mautic.secret_key%',
     'router'               => array(
         'resource'            => '%kernel.root_dir%/config/routing.php',
         'strict_requirements' => null,

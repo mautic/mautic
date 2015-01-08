@@ -122,7 +122,7 @@ $restrictedConfigFields = array(
     'db_password',
     'db_path',
     'db_port',
-    'secret'
+    'secret_key'
 );
 
 // List config keys that are dev mode only
