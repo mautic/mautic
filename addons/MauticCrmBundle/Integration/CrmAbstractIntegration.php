@@ -67,6 +67,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function oAuthCallback($clientId = '', $clientSecret = '')
     {
         $entity = $this->getIntegrationSettings();
+
         if ($entity == null) {
             $entity = new Integration();
             $entity->setName($this->getName());

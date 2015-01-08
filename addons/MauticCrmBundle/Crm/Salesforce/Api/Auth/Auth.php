@@ -229,8 +229,7 @@ class Auth extends AbstractAuth
         );
 
         $ch = curl_init();
-
-        if (!empty($parameters) && $method !== 'GET') {
+        if (!empty($parameters) && !isset($parameters['grant_type']) && $method !== 'GET') {
             //encode the arguments as JSON
             $parameters = json_encode($parameters);
         }
@@ -241,10 +240,12 @@ class Auth extends AbstractAuth
             $options[CURLOPT_POSTFIELDS] = $parameters;
         }
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: OAuth {$this->_access_token}",
-            "Content-Type: application/json"
-        ));
+        if (!isset($parameters['grant_type'])) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Authorization: OAuth {$this->_access_token}",
+                "Content-Type: application/json"
+            ));
+        }
 
         //Make CURL request
         curl_setopt_array($ch, $options);
@@ -252,7 +253,6 @@ class Auth extends AbstractAuth
         curl_close($ch);
 
         $parsed = json_decode($response, true);
-
         if (!empty($parsed[0]['errorCode'])) {
             throw new ErrorException($parsed[0]['message']);
         }

@@ -38,7 +38,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getClientIdKey()
     {
-        return 'clientKey';
+        return 'client_key';
     }
 
     /**
@@ -48,7 +48,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getClientSecretKey()
     {
-        return 'clientSecret';
+        return 'client_secret';
     }
 
     /**
