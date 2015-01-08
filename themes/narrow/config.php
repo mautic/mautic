@@ -31,6 +31,7 @@ $config = array(
             "footer"
         ),
         "email" => array(
+            "header",
             "body",
             "footer"
         )
