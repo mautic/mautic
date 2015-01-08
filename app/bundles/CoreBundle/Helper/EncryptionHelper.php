@@ -29,7 +29,7 @@ class EncryptionHelper
      *
      * @return string
      */
-    public function generateKey()
+    static public function generateKey()
     {
         return hash('sha256', uniqid(mt_rand(), true));
     }

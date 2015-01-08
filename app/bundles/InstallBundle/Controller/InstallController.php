@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
@@ -213,8 +214,7 @@ class InstallController extends CommonController
                      */
 
                     // Need to generate a secret value and merge it into the config
-                    $secret = $this->factory->getHelper('encryption')->generateKey();
-                    $configurator->mergeParameters(array('secret' => $secret));
+                    $configurator->mergeParameters(array('secret_key' => EncryptionHelper::generateKey()));
 
                     // Write the updated config file
                     try {

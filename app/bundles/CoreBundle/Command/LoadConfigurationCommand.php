@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -29,7 +30,7 @@ class LoadConfigurationCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure ()
     {
         $this->setName('mautic:load:configuration')
             ->setDescription('Pre-configures Mautic for installation with a pre-generated data set')
@@ -38,13 +39,13 @@ The <info>%command.name%</info> command is used to pre-configure Mautic using a 
 
 <info>php %command.full_name%</info>
 EOT
-        );
+            );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute (InputInterface $input, OutputInterface $output)
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->getContainer()->get('mautic.configurator');
@@ -64,8 +65,8 @@ EOT
 
         // Merge in the rest of our configuration data
         $data = array_merge($data, array(
-           'secret' => hash('sha1', uniqid(mt_rand())),
-           'default_pagelimit' => 10
+            'secret_key'        => EncryptionHelper::generateKey(),
+            'default_pagelimit' => 10
         ));
 
         $configurator->mergeParameters($data);

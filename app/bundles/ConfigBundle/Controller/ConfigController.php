@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\ConfigEvents;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 
 /**
  * Class ConfigController
@@ -78,7 +79,7 @@ class ConfigController extends FormController
                         // Ensure the config has a secret key
                         $params = $configurator->getParameters();
                         if (empty($params['secret_key'])) {
-                            $configurator->mergeParameters(array('secret_key' => $this->factory->getHelper('encryption')->generateKey()));
+                            $configurator->mergeParameters(array('secret_key' => EncryptionHelper::generateKey()));
                         }
 
                         $configurator->write();
