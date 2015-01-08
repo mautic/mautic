@@ -9,9 +9,9 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ThemeHelper
@@ -48,8 +48,7 @@ class ThemeHelper
      * @param MauticFactory $factory
      * @param string        $theme
      *
-     * @throws \InvalidArgumentException
-     * @throws NotFoundHttpException
+     * @throws FileNotFoundException
      */
     public function __construct(MauticFactory $factory, $theme = 'current')
     {
@@ -63,18 +62,18 @@ class ThemeHelper
 
         //check to make sure the theme exists
         if (!file_exists($this->themePath)) {
-            throw new \InvalidArgumentException($theme . ' not found!');
+            throw new FileNotFoundException($theme . ' not found!');
         }
 
         //get the config
         if (!file_exists($this->themePath . '/config.php')) {
-            throw new NotFoundHttpException($this->theme . ' is missing a required config file');
+            throw new FileNotFoundException($this->theme . ' is missing a required config file');
         }
 
         $this->config = include $this->themePath . '/config.php';
 
         if (!isset($this->config['name'])) {
-            throw new NotFoundHttpException($this->theme . ' does not have a valid config file');
+            throw new FileNotFoundException($this->theme . ' does not have a valid config file');
         }
     }
 

@@ -213,7 +213,7 @@ class InstallController extends CommonController
                      */
 
                     // Need to generate a secret value and merge it into the config
-                    $secret = hash('sha1', uniqid(mt_rand()));
+                    $secret = $this->factory->getHelper('encryption')->generateKey();
                     $configurator->mergeParameters(array('secret' => $secret));
 
                     // Write the updated config file

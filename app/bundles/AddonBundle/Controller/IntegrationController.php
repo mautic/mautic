@@ -147,7 +147,7 @@ class IntegrationController extends FormController
             'action'             => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
         ));
 
-        $currentKeys = $entity->getApiKeys();
+        $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
         $currentFeatureSettings = $entity->getFeatureSettings();
 
         if ($this->request->getMethod() == 'POST') {
@@ -158,9 +158,11 @@ class IntegrationController extends FormController
 
                     //merge keys
                     $keys = $form['apiKeys']->getData();
+
                     //restore original keys then merge the new ones to keep the form from wiping out empty secrets
                     $mergedKeys = $integrationObject->mergeApiKeys($keys, $currentKeys, true);
-                    $entity->setApiKeys($mergedKeys);
+                    $integrationObject->encryptAndSetApiKeys($mergedKeys, $entity);
+
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {

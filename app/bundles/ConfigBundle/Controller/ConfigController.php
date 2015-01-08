@@ -75,6 +75,12 @@ class ConfigController extends FormController
                     }
 
                     try {
+                        // Ensure the config has a secret key
+                        $params = $configurator->getParameters();
+                        if (empty($params['secret_key'])) {
+                            $configurator->mergeParameters(array('secret_key' => $this->factory->getHelper('encryption')->generateKey()));
+                        }
+
                         $configurator->write();
 
                         $this->addFlash('mautic.config.config.notice.updated');

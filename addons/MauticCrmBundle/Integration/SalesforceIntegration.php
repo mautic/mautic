@@ -89,7 +89,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        $salesForceSettings                     = $this->settings->getApiKeys();
+        $salesForceSettings                     = $this->getDecryptedApiKeys();
         $salesForceSettings['callback']         = $this->getOauthCallbackUrl();
         $salesForceSettings['accessTokenUrl']   = 'https://login.salesforce.com/services/oauth2/token';
         $salesForceSettings['authorizationUrl'] = 'https://login.salesforce.com/services/oauth2/authorize';

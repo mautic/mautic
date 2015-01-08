@@ -108,7 +108,7 @@ class UpdateHelper
         // Before processing the update data, send up our metrics
         try {
             // Generate a unique instance ID for the site
-            $instanceId = hash('sha1', $this->factory->getParameter('secret') . 'Mautic' . $this->factory->getParameter('db_driver'));
+            $instanceId = hash('sha1', $this->factory->getParameter('secret_key') . 'Mautic' . $this->factory->getParameter('db_driver'));
 
             $data = array(
                 'application' => 'Mautic',

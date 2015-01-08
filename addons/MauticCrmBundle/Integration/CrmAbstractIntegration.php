@@ -29,7 +29,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $keys = $settings->getApiKeys();
         if (isset($keys['url']) && substr($keys['url'], -1) == '/') {
             $keys['url'] = substr($keys['url'], 0, -1);
-            $settings->setApiKeys($keys);
+            $this->encryptAndSetApiKeys($keys, $settings);
         }
 
         parent::setIntegrationSettings($settings);
@@ -73,12 +73,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         if (!empty($clientId)) {
-            $keys = $entity->getApiKeys();
+            $keys = $this->getDecryptedApiKeys($entity);
 
             $keys[$this->getClientIdKey()]     = $clientId;
             $keys[$this->getClientSecretKey()] = $clientSecret;
-            $entity->setApiKeys($keys);
 
+            $this->encryptAndSetApiKeys($keys, $entity);
             $this->setIntegrationSettings($entity);
         }
 
