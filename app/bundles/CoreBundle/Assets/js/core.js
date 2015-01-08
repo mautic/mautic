@@ -2242,9 +2242,7 @@ var Mautic = {
             });
 
         //make the panel full screen
-        mQuery('.builder').addClass('builder-active');
-        //show it
-        mQuery('.builder').removeClass('hide');
+        mQuery('.builder').addClass('builder-active').removeClass('hide');
     },
 
     closeBuilder: function(model) {
@@ -2267,32 +2265,39 @@ var Mautic = {
             content[slot] = editor.getData();
         });
 
+        Mautic.saveBuilderContent(model, builderContents.find('#builder_entity_id').val(), content, function (response) {
+            if (response.success) {
+                // Kill droppables
+                builderContents.find('.mautic-editable').droppable('destroy');
+
+                // Kill draggables
+                mQuery("*[data-token]").draggable('destroy');
+
+                // mQuery('.builder').addClass('hide');
+                Mautic.stopIconSpinPostEvent();
+            }
+            // Kill the iframe and overlay
+            mQuery('#builder-overlay').remove();
+
+            // Hide builder
+            mQuery('.builder').removeClass('builder-active').addClass('hide');
+        });
+
+        mQuery('#builder-template-content').remove();
+    },
+
+    saveBuilderContent: function (model, entityId, content, callback) {
         mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + model + ':setBuilderContent',
             type: "POST",
             data: {
                 slots: content,
-                entity: builderContents.find('#builder_entity_id').val()
+                entity: entityId
             },
             success: function(response) {
-                if (response.success) {
-                    // Kill droppables
-                    builderContents.find('.mautic-editable').droppable('destroy');
-
-                    // Kill draggables
-                    mQuery("*[data-token]").draggable('destroy');
-
-                    mQuery('.builder').addClass('hide');
-                    Mautic.stopIconSpinPostEvent();
-
-                    // Properly destory ckeditors
-                    mQuery.each(editors, function (slot, editor) {
-                        editor.destroy();
-                    });
-
+                if (typeof callback === "function") {
+                    callback(response);
                 }
-                //kill the iframe and overlay
-                mQuery('#builder-overlay').remove();
             }
         });
     },

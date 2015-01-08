@@ -79,18 +79,11 @@ SlideshowManager.saveConfigObject = function (slot) {
     });
     SlideshowManager.slotConfigs[slot].slides = slides;
 
-    mQuery.ajax({
-        url: mauticAjaxUrl + '?action=page:setBuilderContent',
-        type: "POST",
-        data: {
-            content: JSON.stringify(SlideshowManager.slotConfigs[slot]),
-            slot: slot,
-            page: mQuery('#mauticPageId').val()
-        },
-        dataType: "json",
-        success: function () {
-            document.location.href = document.location.href;
-        }
+    var jsonObject = {};
+    jsonObject[slot] = JSON.stringify(SlideshowManager.slotConfigs[slot]);
+    
+    Mautic.saveBuilderContent('page', mQuery('#builder_entity_id').val(), jsonObject, function() {
+        document.location.href = document.location.href;
     });
 }
 
