@@ -19,30 +19,12 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
 </div>
 <?php $view['slots']->output('_content'); ?>
 
-<ul class="list-group mt-sm">
-    <li class="list-group-item" data-token="{externallink=%url%}" data-predrop="showPageBuilderTokenExternalLinkModal">
+<div class="list-group mt-sm">
+    <a href="#" class="list-group-item" data-token='<a href="{externallink=%url%}">%text%</a>' data-drop="showBuilderLinkModal">
         <div>
             <span><i class="fa fa-external-link fa-fw"></i><?php echo $view['translator']->trans('mautic.page.builder.externallink'); ?></span>
         </div>
-    </li>
-</ul>
-
-<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'ExternalLinkModal',
-    'header' => false,
-    'body'   =>
-<<<BODY
-<div class="row">
-    <div class="col-lg-12">
-        <div class="input-group">
-            <input name="link" type="text" class="form-control" placeholder="{$view['translator']->trans('mautic.page.builder.externallink.placeholder')}" />
-            <span class="input-group-btn">
-                <button class="btn btn-default" onclick="Mautic.insertPageBuilderTokenExternalUrl();" type="button">{$view['translator']->trans('mautic.page.builder.externallink.insert')}</button>
-            </span>
-        </div>
-    </div>
-    <input type="hidden" name="editor" value="" />
-    <input type="hidden" name="token" value="" />
+    </a>
 </div>
-BODY
-)); ?>
+
+<?php echo $view->render('MauticCoreBundle:Helper:link_modal.html.php'); ?>

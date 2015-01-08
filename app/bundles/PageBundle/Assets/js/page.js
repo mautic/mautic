@@ -20,98 +20,6 @@ Mautic.pageOnUnload = function(id) {
     }
 };
 
-Mautic.launchPageEditor = function () {
-    var src = mQuery('#pageBuilderUrl').val();
-    src += '?template=' + mQuery('#page_template').val();
-
-    var builder = mQuery("<iframe />", {
-        css: {
-            margin: "0",
-            padding: "0",
-            border: "none",
-            width: "100%",
-            height: "100%"
-        },
-        id: "builder-template-content"
-    })
-        .attr('src', src)
-        .appendTo('.builder-content')
-        .load(function () {
-            var $this = mQuery(this);
-            var contents = $this.contents();
-            // here, catch the droppable div and create a droppable widget
-            contents.find('.mautic-editable').droppable({
-                iframeFix: true,
-                drop: function (event, ui) {
-                    var instance = mQuery(this).attr("id");
-                    var predrop  = mQuery(ui.draggable).data('predrop');
-                    if (predrop) {
-                        Mautic[predrop](event, ui, instance);
-                    } else {
-                        var token  = mQuery(ui.draggable).data('token');
-                        if (token) {
-                            Mautic.insertPageBuilderToken(instance, token);
-                        }
-                    }
-                    mQuery(this).removeClass('over-droppable');
-                },
-                over: function (e, ui) {
-                    mQuery(this).addClass('over-droppable');
-                },
-                out: function (e, ui) {
-                    mQuery(this).removeClass('over-droppable');
-                }
-            });
-        });
-
-    //make the panel full screen
-    mQuery('.builder').addClass('builder-active');
-    //show it
-    mQuery('.builder').removeClass('hide');
-
-    Mautic.pageEditorOnLoad('.builder-panel');
-};
-
-Mautic.getPageBuilderEditorInstances = function() {
-    return document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-};
-
-Mautic.closePageEditor = function() {
-    Mautic.stopIconSpinPostEvent();
-
-    mQuery('.builder').addClass('hide');
-
-    //make sure editors have lost focus so the content is updated
-    mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
-        mQuery(this).blur();
-    });
-
-    setTimeout( function() {
-        //kill the draggables
-        mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("*[data-token]").draggable('destroy');
-
-        //kill the iframe
-        mQuery('#builder-template-content').remove();
-
-    }, 3000);
-};
-
-Mautic.pageEditorOnLoad = function (container) {
-    //activate builder drag and drop
-    mQuery(container + " *[data-token]").draggable({
-        iframeFix: true,
-        iframeId: 'builder-template-content',
-        helper: 'clone',
-        appendTo: '.builder',
-        zIndex: 8000,
-        scroll: true,
-        scrollSensitivity: 100,
-        scrollSpeed: 100,
-        cursorAt: {top: 15, left: 15}
-    });
-};
-
 Mautic.renderPageViewsBarChart = function (container) {
     if (!mQuery('#page-views-chart').length) {
         return;
@@ -163,35 +71,6 @@ Mautic.renderPageTimePie = function () {
     timesOnSiteData = Mautic.emulateNoDataForPieChart(timesOnSiteData);
     var ctx = document.getElementById("time-rate").getContext("2d");
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
-};
-
-Mautic.showPageBuilderTokenExternalLinkModal = function (event, ui, editorId) {
-    var token  = mQuery(ui.draggable).data('token');
-    mQuery('#ExternalLinkModal input[name="editor"]').val(editorId);
-    mQuery('#ExternalLinkModal input[name="token"]').val(token);
-
-    //append the modal to the builder or else it won't display
-    mQuery('#ExternalLinkModal').appendTo('body');
-
-    mQuery('#ExternalLinkModal').modal('show');
-};
-
-Mautic.insertPageBuilderTokenExternalUrl = function () {
-    var editorId = mQuery('#ExternalLinkModal input[name="editor"]').val();
-    var token    = mQuery('#ExternalLinkModal input[name="token"]').val();
-    var url      = mQuery('#ExternalLinkModal input[name="link"]').val();
-
-    token = token.replace("%url%", url);
-
-    Mautic.insertPageBuilderToken(editorId, token);
-};
-
-Mautic.insertPageBuilderToken = function(editorId, token) {
-    var editor = Mautic.getPageBuilderEditorInstances();
-    editor[editorId].insertText(token);
-    mQuery('#ExternalLinkModal').modal('hide');
-
-    mQuery('#ExternalLinkModal input[name="link"]').val('');
 };
 
 Mautic.togglePageContentMode = function (el) {

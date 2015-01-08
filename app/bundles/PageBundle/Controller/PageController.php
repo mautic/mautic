@@ -513,6 +513,9 @@ class PageController extends FormController
             //lock the entity
             $model->lockEntity($entity);
 
+            //clear any modified content
+            $session->remove('mautic.pagebuilder.'.$objectId.'.content');
+
             //set the lookup values
             $parent = $entity->getTranslationParent();
             if ($parent && isset($form['translationParent_lookup']))

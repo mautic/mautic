@@ -49,7 +49,7 @@ $contentMode = $form['contentMode']->vars['data'];
                         </div>
                         <div class="col-md-6">
                             <div class="mt-20 pt-2">
-                                <button type="button" class="btn btn-primary" onclick="Mautic.launchEmailEditor();">
+                                <button type="button" class="btn btn-primary" onclick="Mautic.launchBuilder('emailform');">
                                     <i class="fa fa-cube text-mautic "></i><?php echo $view['translator']->trans('mautic.email.launch.builder'); ?>
                                 </button>
                             </div>
@@ -83,11 +83,11 @@ $contentMode = $form['contentMode']->vars['data'];
 
 <div class="hide builder email-builder">
     <div class="builder-content">
-        <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
         <p>
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
         </p>
         <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
         <div class="panel-group margin-sm-top" id="pageTokensPanel">

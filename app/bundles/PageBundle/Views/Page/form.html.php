@@ -61,9 +61,7 @@ $contentMode = $form['contentMode']->vars['data'];
                     <div id="builderHtmlContainer" class="row <?php echo ($contentMode == 'custom') ? 'hide"' : ''; ?>">
                         <div class="col-md-6">
                             <?php echo $view['form']->row($form['template']); ?>
-                            <button type="button" class="btn btn-primary" onclick="Mautic.launchPageEditor();">
-                                <i class="fa fa-cube text-mautic "></i><?php echo $view['translator']->trans('mautic.page.launch.builder'); ?>
-                            </button>
+                            <button type="button" class="btn btn-primary" onclick="Mautic.launchBuilder('page');"><i class="fa fa-cube text-mautic "></i> <?php echo $view['translator']->trans('mautic.page.launch.builder'); ?></button>
                         </div>
                         <div class="col-md-6"></div>
                     </div>
@@ -102,11 +100,11 @@ $contentMode = $form['contentMode']->vars['data'];
 
 <div class="hide builder page-builder">
     <div class="builder-content">
-        <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
         <p>
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.builder.close'); ?></button>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder();"><?php echo $view['translator']->trans('mautic.page.builder.close'); ?></button>
         </p>
         <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.token.help'); ?></div>
         <div class="panel-group margin-sm-top" id="pageTokensPanel">

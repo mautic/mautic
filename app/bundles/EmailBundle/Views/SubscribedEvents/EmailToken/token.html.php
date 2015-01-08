@@ -16,7 +16,7 @@
             </a>
         </div>
         <div class="col-sm-6">
-            <a href="#" data-toggle="tooltip" data-token="{unsubscribe_url}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url.descr'); ?>">
+            <a href="#" data-toggle="tooltip" data-token='<a href="%url={unsubscribe_url}%">%text%</a>' data-drop="showBuilderLinkModal" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url.descr'); ?>">
                 <i class="fa fa-link"></i><br />
                 <?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url'); ?>
             </a>
@@ -30,7 +30,7 @@
             </a>
         </div>
         <div class="col-sm-6">
-            <a href="#" data-toggle="tooltip" data-token="{webview_url}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.webview_url.descr'); ?>">
+            <a href="#" data-toggle="tooltip" data-token='<a href="%url={webview_url}%">%text%</a>' data-drop="showBuilderLinkModal" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.webview_url.descr'); ?>">
                 <i class="fa fa-link"></i><br />
                 <?php echo $view['translator']->trans('mautic.email.token.webview_url'); ?>
             </a>

@@ -16,7 +16,7 @@ if ($tmpl == 'index') {
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <a href="#" class="list-group-item" data-token="{pagelink=<?php echo $i->getId(); ?>}">
+            <a href="#" class="list-group-item" data-token='<a href="%url={pagelink=<?php echo $i->getId(); ?>}%">%text=<?php echo $i->getName(); ?>%</a>' data-drop="showBuilderLinkModal">
                 <span><i class="fa fa-fw fa-file-text-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
             </a>
         <?php endforeach; ?>

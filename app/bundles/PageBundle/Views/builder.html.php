@@ -16,7 +16,6 @@ $view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, tr
 
 $custom = <<<CUSTOM
 mQuery(document).ready( function() {
-
     mQuery('.dropdown-toggle').dropdown();
     mQuery('[data-toggle="tooltip"]').tooltip();
 
@@ -43,7 +42,7 @@ mQuery(document).ready( function() {
             }
         });
     });
-    
+
     // add newProp (dot separated string) to obj with new value
     function addValueToObj(obj, newProp, value) {
         var path = newProp.split(":");
@@ -64,7 +63,7 @@ mQuery(document).ready( function() {
         input.blur(function() {
             var slot = input.attr('data-slot-config');
             var allSlotConfigs = mQuery('[data-slot-config=\"' + slot + '\"]');
-            allSlotConfigs.each(function(index, value) { 
+            allSlotConfigs.each(function(index, value) {
                 element = mQuery(this);
                 var slotConfigPath = element.attr('name');
                 var value = element.val();
@@ -94,7 +93,7 @@ $view['assets']->addScriptDeclaration($custom);
 $css = <<<CSS
 .mautic-editable { min-height: 75px; width: 100%; border: dashed 1px #000; margin-top: 3px; margin-bottom: 3px; }
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
-.mautic-editable.over-droppable { border: dashed 1px #4e5e9e; }
+.mautic-editable.over-droppable { border: dashed 2px #4e5e9e; -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75); -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75); box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75);}
 div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholder) }
 .dropdown.slideshow-options {position: absolute;top: 0;left: 0;}
 #slideshow-options {opacity: 0.7;}
@@ -160,9 +159,9 @@ foreach ($slots as $slot => $slotConfig) {
 
         // create config form
         $options['configForm'] = $formFactory->createNamedBuilder(
-            null, 
-            'slideshow_config', 
-            array(), 
+            null,
+            'slideshow_config',
+            array(),
             array('data' => $options)
         )->getForm()->createView();
 
@@ -171,9 +170,9 @@ foreach ($slots as $slot => $slotConfig) {
             $slide['key'] = $key;
             $slide['slot'] = $slot;
             $slide['form'] = $formFactory->createNamedBuilder(
-                null, 
-                'slideshow_slide_config', 
-                array(), 
+                null,
+                'slideshow_slide_config',
+                array(),
                 array('data' => $slide)
             )->getForm()->createView();
         }
