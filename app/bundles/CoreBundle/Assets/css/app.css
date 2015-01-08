@@ -3178,10 +3178,7 @@ lesshat-selector {
 }
 .loading-bar.active,
 .canvas-loading-bar.active,
-.modal-loading-bar.active,
-.loading-content .loading-bar,
-.loading-content .canvas-loading-bar,
-.loading-content .modal-loading-bar {
+.modal-loading-bar.active {
   opacity: 1;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;

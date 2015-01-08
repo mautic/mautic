@@ -38,7 +38,7 @@ $extraHtml .=  $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'size'   => 'sm',
     'footer' =>
         '<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times text-danger "></i> ' . $view["translator"]->trans("mautic.core.form.cancel") . '</button>' .
-        '<button id="save-quick-add" type="button" class="btn btn-default" onclick="mQuery(\'form[name=lead]\').submit()"><i class="fa fa-save"></i> ' . $view["translator"]->trans("mautic.core.form.save") . '</button>'
+        '<button id="save-quick-add" type="button" class="btn btn-default" onclick="Mautic.startModalLoadingBar(\'#lead-quick-add\'); mQuery(\'form[name=lead]\').submit();"><i class="fa fa-save"></i> ' . $view["translator"]->trans("mautic.core.form.save") . '</button>'
 ));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(

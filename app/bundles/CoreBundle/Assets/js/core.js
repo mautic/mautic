@@ -6,7 +6,7 @@ window.jQuery   = mQuery;
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
-            mQuery("body").addClass("loading-content");
+            mQuery('.loading-bar').addClass('active');
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -107,7 +107,7 @@ var Mautic = {
      * Stops the ajax page loading indicator
      */
     stopPageLoadingBar: function () {
-        mQuery("body").removeClass("loading-content");
+        mQuery('.loading-bar').removeClass('active');
     },
 
     /**
@@ -680,7 +680,10 @@ var Mautic = {
             form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
         }
 
-        var showLoading = (form.attr('data-hide-loadingbar')) ? false : true;
+        if (!inMain) {
+            Mautic.startModalLoadingBar();
+        }
+        var showLoading = (!inMain || form.attr('data-hide-loadingbar')) ? false : true;
 
         form.ajaxSubmit({
             showLoadingBar: showLoading,
@@ -1032,15 +1035,8 @@ var Mautic = {
         if (response.error) {
             Mautic.stopIconSpinPostEvent();
 
-            //stop loading bar
-            Mautic.stopPageLoadingBar();
-
             alert(response.error);
             return;
-        }
-
-        if (response.flashes) {
-            Mautic.setFlashes(response.flashes);
         }
 
         if (response.closeModal && response.newContent) {
@@ -1049,6 +1045,10 @@ var Mautic = {
             //assume the content is to refresh main app
             Mautic.processPageContent(response);
         } else {
+            if (response.flashes) {
+                Mautic.setFlashes(response.flashes);
+            }
+
             if (response.closeModal) {
                 mQuery(target).modal('hide');
                 Mautic.onPageUnload(target, response);
@@ -1071,9 +1071,6 @@ var Mautic = {
                 //activate content specific stuff
                 Mautic.onPageLoad(target, response, true);
             }
-
-            //stop loading bar
-            Mautic.stopPageLoadingBar();
         }
     },
 
