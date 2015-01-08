@@ -12,7 +12,7 @@ Mautic.loadIntegrationAuthWindow = function(response) {
     mQuery('#integration_details_in_auth').val(0);
 
     if (response.authUrl) {
-        var generator = window.open(response.authUrl, 'integraitonauth','height=400,width=500');
+        var generator = window.open(response.authUrl, 'integrationauth','height=500,width=500');
 
         if(!generator || generator.closed || typeof generator.closed=='undefined') {
             alert(response.popupBlockerMessage);
