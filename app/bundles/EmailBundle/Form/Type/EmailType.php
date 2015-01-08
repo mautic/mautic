@@ -58,26 +58,19 @@ class EmailType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        //build a list
         $template = $options['data']->getTemplate();
         if (empty($template)) {
             $template = $this->defaultTheme;
         }
-        $builder->add('template', 'choice', array(
-            'choices'       => $this->themes,
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.email.form.template',
-            'empty_value'   => false,
-            'required'      => false,
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'          => array(
+        $builder->add('template', 'theme_list', array(
+            'feature' => 'email',
+            'data'    => $template,
+            'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.email.form.template.help'
-            ),
-            'data'          => $template
+            )
         ));
-
+        
         $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('publishUp', 'datetime', array(

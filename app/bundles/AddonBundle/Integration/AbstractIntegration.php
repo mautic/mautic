@@ -125,7 +125,7 @@ abstract class AbstractIntegration
     {
         $settings = $this->settings;
         if (empty($withKeys)) {
-            $withKeys = $settings->getApiKeys();
+            $withKeys = $this->getDecryptedApiKeys($settings);
         }
 
         foreach ($withKeys as $k => $v) {
@@ -141,10 +141,81 @@ abstract class AbstractIntegration
         if ($return) {
             return $withKeys;
         } else {
-            $settings->setApiKeys($withKeys);
+            $this->encryptAndSetApiKeys($withKeys, $settings);
+
             //reset for events that depend on rebuilding auth objects
             $this->setIntegrationSettings($settings);
         }
+    }
+
+    /**
+     * Encrypts and saves keys to the entity
+     *
+     * @param array       $keys
+     * @param Integration $entity
+     */
+    public function encryptAndSetApiKeys(array $keys, Integration $entity)
+    {
+        $encrypted  = $this->encryptApiKeys($keys);
+        $entity->setApiKeys($encrypted);
+    }
+
+    /**
+     * Returns decrypted API keys
+     *
+     * @param bool $entity
+     *
+     * @return array
+     */
+    public function getDecryptedApiKeys($entity = false)
+    {
+        if (!$entity) {
+            $entity = $this->settings;
+        }
+        $keys = $entity->getApiKeys();
+        return $this->decryptApiKeys($keys);
+    }
+
+    /**
+     * Encrypts API keys
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function encryptApiKeys(array $keys)
+    {
+        /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
+        $helper    = $this->factory->getHelper('encryption');
+        $encrypted = array();
+
+        foreach ($keys as $name => $key) {
+            $key = $helper->encrypt($key);
+            $encrypted[$name] = $key;
+        }
+
+        return $encrypted;
+    }
+
+    /**
+     * Decrypts API keys
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function decryptApiKeys(array $keys)
+    {
+        /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
+        $helper    = $this->factory->getHelper('encryption');
+        $decrypted = array();
+
+        foreach ($keys as $name => $key) {
+            $key = $helper->decrypt($key);
+            $decrypted[$name] = $key;
+        }
+
+        return $decrypted;
     }
 
     /**
@@ -156,7 +227,7 @@ abstract class AbstractIntegration
     {
         $callback = $this->getOauthCallbackUrl();
 
-        $keys = $this->settings->getApiKeys();
+        $keys = $this->getDecryptedApiKeys();
         $clientIdKey = $this->getClientIdKey();
         $clientId = $keys[$clientIdKey];
         $state = hash('sha1', uniqid(mt_rand()));
@@ -202,7 +273,7 @@ abstract class AbstractIntegration
     {
         $request  = $this->factory->getRequest();
         $url      = $this->getAccessTokenUrl();
-        $keys     = $this->settings->getApiKeys();
+        $keys     = $this->getDecryptedApiKeys();
         $callback = $this->getOauthCallbackUrl();
 
         if (!empty($clientId)) {
@@ -258,7 +329,8 @@ abstract class AbstractIntegration
                 }
             }
 
-            $entity->setApiKeys($keys);
+            $encrypted = $this->encryptApiKeys($keys);
+            $entity->setApiKeys($encrypted);
         } else {
             $error = $curlError;
         }
@@ -313,6 +385,7 @@ abstract class AbstractIntegration
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_REFERER, $referer);
         $data = @curl_exec($ch);
+
         curl_close($ch);
 
         return json_decode($data);

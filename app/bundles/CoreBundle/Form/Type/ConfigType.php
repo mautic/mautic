@@ -97,15 +97,12 @@ class ConfigType extends AbstractType
             )
         ));
 
-        $builder->add('theme', 'choice', array(
-            'choices'     => $this->factory->getInstalledThemes(),
-            'label'       => 'mautic.core.config.form.theme',
-            'required'    => false,
-            'attr'        => array(
+        $builder->add('theme', 'theme_list', array(
+            'label'   => 'mautic.core.config.form.theme',
+            'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.core.config.form.theme.tooltip'
-            ),
-            'empty_value' => false
+                'tooltip' => 'mautic.page.form.template.help'
+            )
         ));
 
         $builder->add('mailer_from_name', 'text', array(

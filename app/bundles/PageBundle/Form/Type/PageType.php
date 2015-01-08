@@ -49,8 +49,6 @@ class PageType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator   = $factory->getTranslator();
-        $this->themes       = $factory->getInstalledThemes('page');
-        $this->defaultTheme = $factory->getParameter('theme');
         $this->em           = $factory->getEntityManager();
     }
 
@@ -101,24 +99,17 @@ class PageType extends AbstractType
             'required'   => false
         ));
 
-        //build a list
         $template = $options['data']->getTemplate();
         if (empty($template)) {
             $template = $this->defaultTheme;
         }
-        $builder->add('template', 'choice', array(
-            'choices'       => $this->themes,
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.page.form.template',
-            'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => false,
+        $builder->add('template', 'theme_list', array(
+            'feature' => 'page',
+            'data'    => $template,
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.form.template.help'
-            ),
-            'data'          => $template
+            )
         ));
 
         $builder->add('isPublished', 'yesno_button_group');
@@ -163,7 +154,6 @@ class PageType extends AbstractType
                 'data'        => $options['data']->getVariantSettings()
             ));
         } else {
-
             $builder->add('alias', 'text', array(
                 'label'      => 'mautic.page.form.alias',
                 'label_attr' => array('class' => 'control-label'),
@@ -209,7 +199,6 @@ class PageType extends AbstractType
                     'ignore_ids' => array((int) $options['data']->getId())
                 ))->addModelTransformer($transformer)
             );
-
         }
 
         $builder->add('buttons', 'form_buttons');

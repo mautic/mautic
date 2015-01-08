@@ -47,7 +47,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        $zohoSettings = $this->settings->getApiKeys();
+        $zohoSettings = $this->getDecryptedApiKeys();
 
         parent::createApiAuth($zohoSettings);
     }

@@ -340,7 +340,7 @@ class GooglePlusIntegration extends AbstractIntegration
      */
     public function getApiUrl($endpoint)
     {
-        $keys = $this->settings->getApiKeys();
+        $keys = $this->getDecryptedApiKeys();
         $key  = (isset($keys['key'])) ? $keys['key'] : '';
         return "https://www.googleapis.com/plus/v1/$endpoint?key=" . $key;
     }

@@ -82,7 +82,7 @@ class TwitterIntegration extends AbstractIntegration
     public function oAuthCallback($clientId = '', $clientSecret = '')
     {
         $url      = $this->getAccessTokenUrl();
-        $keys     = $this->settings->getApiKeys();
+        $keys     = $this->getDecryptedApiKeys();
 
         if (!empty($clientId)) {
             //callback from JS
@@ -134,7 +134,7 @@ class TwitterIntegration extends AbstractIntegration
                 $error = $this->parseResponse($values);
             }
 
-            $entity->setApiKeys($keys);
+            $this->encryptAndSetApiKeys($keys, $entity);
         } else {
             $error = $curlError;
         }
@@ -308,7 +308,7 @@ class TwitterIntegration extends AbstractIntegration
     public function makeCall($url) {
         $referer = $this->getRefererUrl();
 
-        $keys = $this->settings->getApiKeys();
+        $keys = $this->getDecryptedApiKeys();
         if (empty($keys['access_token'])) {
             return null;
         }

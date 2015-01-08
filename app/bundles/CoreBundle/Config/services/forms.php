@@ -82,3 +82,11 @@ $container->setDefinition('mautic.form.type.coreconfig', new Definition(
     ->addTag('form.type', array(
         'alias' => 'coreconfig',
     ));
+
+$container->setDefinition('mautic.form.type.theme_list', new Definition(
+    'Mautic\CoreBundle\Form\Type\ThemeListType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'theme_list',
+    ));

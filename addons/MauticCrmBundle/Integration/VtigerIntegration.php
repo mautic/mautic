@@ -56,7 +56,7 @@ abstract class VtigerIntegration extends CrmAbstractIntegration
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        $vtigerSettings = $this->settings->getApiKeys();
+        $vtigerSettings = $this->getDecryptedApiKeys();
 
         parent::createApiAuth($vtigerSettings);
     }

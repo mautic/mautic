@@ -83,3 +83,20 @@ $container->setDefinition('mautic.helper.cache',
         array(
             new Reference('mautic.factory'))
     ));
+
+
+//Theme helper
+$container->setDefinition('mautic.helper.theme',
+    new Definition(
+        'Mautic\CoreBundle\Helper\ThemeHelper',
+        array(
+            new Reference('mautic.factory'))
+    ));
+
+//Encryption helper
+$container->setDefinition('mautic.helper.encryption',
+    new Definition(
+        'Mautic\CoreBundle\Helper\EncryptionHelper',
+        array(
+            new Reference('mautic.factory'))
+    ));
