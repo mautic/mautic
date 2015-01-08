@@ -11,7 +11,7 @@ $parentVariant = $page->getVariantParent();
 $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $page->getTitle();
 $view['slots']->set('pageTitle', $title);
 ?>
-<div class="container-fluid">
+<div class="container">
     <div class="row">
         <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('top1'); ?></div>
         <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('top2'); ?></div>
@@ -65,7 +65,7 @@ $view['slots']->set('pageTitle', $title);
         </div>
     </div>
 
-    <div class="row">
+    <div class="main-block bg-primary row">
         <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom1'); ?></div>
         <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom2'); ?></div>
         <div class="col-xs-12 col-sm-4"><?php $view['slots']->output('bottom3'); ?></div>
