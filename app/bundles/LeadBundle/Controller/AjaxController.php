@@ -99,8 +99,10 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $fields            = $lead->getFields();
-                $socialProfiles    = IntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
-                $socialProfileUrls = IntegrationHelper::getSocialProfileUrlRegex(false);
+                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+                $integrationHelper = $this->factory->getHelper('integration');
+                $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields, true, $network);
+                $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
                 $networks          = array();
                 $socialCount       = count($socialProfiles);
                 if (empty($network) || empty($socialCount)) {

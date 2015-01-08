@@ -393,11 +393,17 @@ class IntegrationHelper
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, array('share_button'), true);
             $templating     = $this->factory->getTemplating();
+
+            /**
+             * @var  string                                              $integration
+             * @var  \Mautic\AddonBundle\Integration\AbstractIntegration $details
+             */
             foreach ($socialIntegrations as $integration => $details) {
                 /** @var \Mautic\AddonBundle\Entity\Integration $settings */
                 $settings        = $details->getIntegrationSettings();
+
                 $featureSettings = $settings->getFeatureSettings();
-                $apiKeys         = $settings->getApiKeys();
+                $apiKeys         = $details->decryptApiKeys($settings->getApiKeys());
                 $addon           = $settings->getAddon();
                 $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : array();
 

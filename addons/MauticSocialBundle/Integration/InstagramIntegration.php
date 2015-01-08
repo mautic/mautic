@@ -84,7 +84,7 @@ class InstagramIntegration extends AbstractIntegration
      */
     public function getApiUrl($endpoint)
     {
-        $keys  = $this->settings->getApiKeys();
+        $keys  = $this->getDecryptedApiKeys();
         $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
         return "https://api.instagram.com/v1/$endpoint?access_token=$token";
     }

@@ -331,6 +331,7 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
     Mautic.startIconSpinOnEvent(event);
     var query = "action=lead:updateSocialProfile&network=" + network + "&lead=" + leadId;
     mQuery.ajax({
+        showLoadingBar: true,
         url: mauticAjaxUrl,
         type: "POST",
         data: query,
@@ -349,11 +350,11 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
                     });
                 }
             }
+            Mautic.stopPageLoadingBar();
             Mautic.stopIconSpinPostEvent();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            Mautic.stopIconSpinPostEvent();
         }
     });
 };

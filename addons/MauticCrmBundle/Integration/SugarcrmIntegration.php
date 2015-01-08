@@ -63,7 +63,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
     {
-        $sugarCRMSettings                    = $this->settings->getApiKeys();
+        $sugarCRMSettings                    = $this->getDecryptedApiKeys();
         $sugarCRMSettings['callback']        = $this->getOauthCallbackUrl();
         if (isset($sugarCRMSettings['url'])) {
             $sugarCRMSettings['requestTokenUrl'] = sprintf('%s/rest/v10/oauth2/token', $sugarCRMSettings['url']);
@@ -77,7 +77,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function checkApiAuth($silenceExceptions = true)
     {
-        $sugarCRMSettings = $this->settings->getApiKeys();
+        $sugarCRMSettings = $this->getDecryptedApiKeys();
         if (!isset($sugarCRMSettings['url'])) {
             return false;
         }

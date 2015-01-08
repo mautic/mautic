@@ -85,7 +85,7 @@ class FoursquareIntegration extends AbstractIntegration
      */
     public function getApiUrl($endpoint, $m = 'foursquare')
     {
-        $keys = $this->settings->getApiKeys();
+        $keys = $this->getDecryptedApiKeys();
         $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
         return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}&oauth_token={$token}";
     }
@@ -321,7 +321,7 @@ class FoursquareIntegration extends AbstractIntegration
             $cleaned = array($cleaned);
         }
 
-        $keys  = $this->settings->getApiKeys();
+        $keys  = $this->getDecryptedApiKeys();
 
         if (!empty($keys['access_token'])) {
             foreach ($cleaned as $type => $c) {

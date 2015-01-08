@@ -28,19 +28,20 @@ class DetailsType extends AbstractType
     {
         $builder->add('isPublished', 'yesno_button_group');
 
-        $keys = $options['integration_object']->getRequiredKeyFields();
+        $keys          = $options['integration_object']->getRequiredKeyFields();
+        $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+
         $builder->add('apiKeys', 'integration_keys', array(
-            'label'          => false,
-            'required'       => false,
-            'integration_keys' => $keys,
-            'data'           => $options['data']->getApiKeys()
+            'label'              => false,
+            'required'           => false,
+            'integration_keys'   => $keys,
+            'data'               => $decryptedKeys
         ));
 
         $authType = $options['integration_object']->getAuthenticationType();
         if (in_array($authType, array('oauth2', 'callback'))) {
-            $keys     = $options['data']->getApiKeys();
             $disabled = false;
-            $label    = (isset($keys['access_token'])) ? 'reauthorize' : 'authorize';
+            $label    = (isset($decryptedKeys['access_token'])) ? 'reauthorize' : 'authorize';
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
@@ -86,8 +87,8 @@ class DetailsType extends AbstractType
         $builder->add('in_auth', 'hidden', array('mapped' => false));
 
         $builder->add('buttons', 'form_buttons', array(
-            'apply_text'      => false,
-            'save_text'       => 'mautic.core.form.save'
+            'apply_text' => false,
+            'save_text'  => 'mautic.core.form.save'
         ));
 
         if (!empty($options['action'])) {
