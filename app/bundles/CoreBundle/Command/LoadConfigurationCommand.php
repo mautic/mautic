@@ -58,16 +58,18 @@ EOT
         // Load up the pre-loaded data
         $data = unserialize(file_get_contents($cacheDir . '/../install_data.txt'));
 
+        // Merge in the rest of our configuration data
+        $data = array_merge($data, array(
+            'secret_key'        => EncryptionHelper::generateKey(),
+            'default_pagelimit' => 10,
+            'mailer_from_name'  => $data['site_url'],
+            'mailer_from_email' => $data['email']
+        ));
+
         // Extract out the user data that won't be part of the configuration
         unset($data['username']);
         unset($data['password']);
         unset($data['email']);
-
-        // Merge in the rest of our configuration data
-        $data = array_merge($data, array(
-            'secret_key'        => EncryptionHelper::generateKey(),
-            'default_pagelimit' => 10
-        ));
 
         $configurator->mergeParameters($data);
 
