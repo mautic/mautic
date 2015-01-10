@@ -516,35 +516,6 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function getNotificationsAction(Request $request)
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model         = $this->factory->getModel('core.notification');
-        $notifications = $model->getNotifications();
-
-        $showNewIndicator = false;
-
-        //determine if the new message indicator should be shown
-        foreach ($notifications as $n) {
-            if (!$n['isRead']) {
-                $showNewIndicator = true;
-                break;
-            }
-        }
-
-        $notificationHtml = $this->render('MauticCoreBundle:Notification:notifications.html.php', array(
-            'showNewIndicator' => $showNewIndicator,
-            'notifications'    => $notifications
-        ));
-
-        return $this->sendJsonResponse(array('notificationHtml' => $notificationHtml));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     protected function clearNotificationAction(Request $request)
     {
         $id = InputHelper::int($request->get('id', 0));

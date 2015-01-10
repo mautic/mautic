@@ -1983,7 +1983,13 @@ var Mautic = {
             }
         }
 
-        mQuery('#notifications').prepend(notifications.content);
+        if (notifications.content) {
+            mQuery('#notifications').prepend(notifications.content);
+
+            if (!mQuery('#notificationMautibot').hasClass('hide')) {
+                mQuery('#notificationMautibot').addClass('hide');
+            }
+        }
 
         if (notifications.sound) {
             mQuery('.playSound').remove();
@@ -2020,10 +2026,20 @@ var Mautic = {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
                 mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
                 mQuery(this).remove();
+
+                if (!mQuery('#notifications .notification').length) {
+                    if (mQuery('#notificationMautibot').hasClass('hide')) {
+                        mQuery('#notificationMautibot').removeClass('hide');
+                    }
+                }
             });
         } else {
             mQuery("#notifications .notification").fadeOut(300, function () {
                 mQuery(this).remove();
+
+                if (mQuery('#notificationMautibot').hasClass('hide')) {
+                    mQuery('#notificationMautibot').removeClass('hide');
+                }
             });
         }
 

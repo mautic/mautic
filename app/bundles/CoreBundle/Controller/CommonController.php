@@ -442,10 +442,10 @@ class CommonController extends Controller implements MauticController
         $lastNotification = reset($notifications);
 
         return array(
-            'content' => $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', array(
+            'content' => ($notifications || $updateMessage) ? $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', array(
                 'notifications' => $notifications,
                 'updateMessage' => $updateMessage
-            )),
+            )) : '',
             'lastId'              => (!empty($lastNotification)) ? $lastNotification['id'] : $afterId,
             'hasNewNotifications' => $showNewIndicator,
             'updateAvailable'     => (!empty($updateMessage))
