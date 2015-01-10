@@ -148,6 +148,14 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $onlineStatus = 'offline';
 
     /**
+     * Notes if user is guest or not
+     *
+     * @var bool
+     */
+    public $isGuest = false;
+
+
+    /**
      * Stores active role permissions
      *
      * @var

@@ -120,20 +120,25 @@ class MauticFactory
     /**
      * Retrieves user currently logged in
      *
-     * @param bool $allowNull
+     * @param bool $nullIfGuest
      *
      * @return null|User
      */
-    public function getUser($allowNull = false)
+    public function getUser($nullIfGuest = false)
     {
         $token = $this->getSecurityContext()->getToken();
-        if (null !== $token) {
-            return $token->getUser();
-        } elseif ($allowNull) {
-            return null;
-        } else {
-            return new User();
+        $user  = ($token !== null) ? $token->getUser() : null;
+
+        if (!$user instanceof User) {
+            if ($nullIfGuest) {
+                return null;
+            } else {
+                $user          = new User();
+                $user->isGuest = true;
+            }
         }
+
+        return $user;
     }
 
     /**
