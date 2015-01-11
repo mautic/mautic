@@ -41,7 +41,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <footer id="app-footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xs-6 text-muted"><?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => '2014')); ?></div>
+                        <div class="col-xs-6 text-muted"><?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => date('Y'))); ?></div>
                     </div>
                 </div>
             </footer>
