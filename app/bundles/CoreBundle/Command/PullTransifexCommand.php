@@ -72,17 +72,16 @@ EOT
                     $languageStats = $transifex->statistics->getStatistics('mautic', $alias);
 
                     foreach ($languageStats as $language => $stats) {
-                        // TODO - After Transifex is fixed, change the default to en_US
                         if ($language == 'en') {
                             continue;
                         }
 
                         $output->writeln($translator->trans('mautic.core.command.transifex_processing_language', array('%language%' => $language)));
 
-                        $reviewed = str_replace('%', '', $stats->reviewed_percentage);
+                        $completed = str_replace('%', '', $stats->completed);
 
-                        // We only want resources which are 90% reviewed
-                        if ($reviewed >= 90) {
+                        // We only want resources which are 80% completed
+                        if ($completed >= 80) {
                             $translation = $transifex->translations->getTranslation('mautic', $alias, $language);
 
                             $path = str_replace('en_US', $language, $file);
