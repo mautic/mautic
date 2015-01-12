@@ -110,6 +110,7 @@ SlideshowManager.toggleFileManager = function () {
     var configFields = mQuery('.modal.slides-config .config-fields .row:not(:last-child)');
     var fileManager = mQuery('#fileManager');
     var newSlideBtn = mQuery('.btn.new-slide');
+    var handle = mQuery('.list-of-slides .ui-sortable-handle');
 
     listOfSlides.animate({
         opacity: "toggle",
@@ -127,6 +128,9 @@ SlideshowManager.toggleFileManager = function () {
     }, 300);
     newSlideBtn.animate({
         height: "toggle",
+        opacity: "toggle"
+    }, 300);
+    handle.animate({
         opacity: "toggle"
     }, 300);
 
@@ -183,8 +187,8 @@ SlideshowManager.newSlide = function () {
 
 SlideshowManager.preloadFileManager = function () {
     filebrowserImageBrowseUrl = mauticBasePath + '/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
-    var iframe = $("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
-    $("#fileManager").hide().append(iframe);
+    var iframe = mQuery("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
+    mQuery("#fileManager").hide().append(iframe);
     iframe.load(function () {
         var fileManager = mQuery('#filemanager_iframe').contents().find('body');
         fileManager.click(function () {
