@@ -53,7 +53,7 @@ SlideshowManager.buildConfigObject = function (slot) {
         var slotConfigPath = element.attr('name');
         var value = element.val();
 
-        if (element.attr('type') === 'checkbox') {
+        if (element.attr('type') === 'checkbox' || element.attr('type') === 'radio') {
             value = element.is(':checked');
         }
 

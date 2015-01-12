@@ -26,6 +26,15 @@ class SlideshowGlobalConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('slideshow_enabled', 'yesno_button_group', array(
+            'label'       => 'mautic.page.slideshow.enabled',
+            'data'        => (bool) isset($options['data']['slideshow_enabled']) ? $options['data']['slideshow_enabled'] : true,
+            'attr'        => array(
+                'tooltip' => 'mautic.page.slideshow.enabled.desc',
+                'data-slot-config' => $options['data']['slot']
+            )
+        ));
+
         $builder->add('height', 'text', array(
             'label'      => 'mautic.page.slideshow.height',
             'label_attr' => array('class' => 'control-label'),
