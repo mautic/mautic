@@ -168,10 +168,10 @@ class TwitterIntegration extends AbstractIntegration
      */
     public function getErrorsFromResponse($response)
     {
-        if (is_array($response) && isset($response['errors'])) {
+        if (is_object($response) && !empty($response->errors)) {
             $errors = array();
             foreach ($response->errors as $e) {
-                $errors[] = $e['message'] . ' ('.$e['code'].')';
+                $errors[] = $e->message . ' ('.$e->code.')';
             }
 
             return implode('; ', $errors);
