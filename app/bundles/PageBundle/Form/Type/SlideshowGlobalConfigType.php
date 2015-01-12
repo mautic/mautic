@@ -44,6 +44,15 @@ class SlideshowGlobalConfigType extends AbstractType
             )
         ));
 
+        $builder->add('arrow_navigation', 'yesno_button_group', array(
+            'label'       => 'mautic.page.slideshow.arrow.navigation',
+            'data'        => (bool) isset($options['data']['arrow_navigation']) ? $options['data']['arrow_navigation'] : true,
+            'attr'        => array(
+                'tooltip' => 'mautic.page.slideshow.arrow.navigation.desc',
+                'data-slot-config' => $options['data']['slot']
+            )
+        ));
+
         $builder->add('height', 'text', array(
             'label'      => 'mautic.page.slideshow.height',
             'label_attr' => array('class' => 'control-label'),

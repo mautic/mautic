@@ -47,13 +47,13 @@ $view['assets']->addStyleDeclaration($css);
 ?>
 
 <!-- Header Carousel -->
-<div id="carousel-generic" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
+<div id="carousel-generic-<?php echo $slot ?>" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
 
 <?php if (isset($dot_navigation) && $dot_navigation) : ?>
     <!-- Indicators -->
     <ol class="carousel-indicators">
     <?php foreach($slides as $key => $slide) : ?>
-        <li data-target="#carousel-generic" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
+        <li data-target="#carousel-generic-<?php echo $slot ?>" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
 	<?php endforeach; ?>
     </ol>
 <?php endif; ?>
@@ -86,6 +86,19 @@ $view['assets']->addStyleDeclaration($css);
         </div>
     <?php endforeach; ?>
     </div>
+
+<?php if (isset($arrow_navigation) && $arrow_navigation) : ?>
+    <!-- Controls -->
+    <a class="left carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+<?php endif; ?>
+
     <?php if (!$public) : ?>
     <div class="dropdown slideshow-options">
 		<button class="btn btn-default dropdown-toggle" type="button" id="slideshow-options" data-toggle="dropdown" aria-expanded="true">
