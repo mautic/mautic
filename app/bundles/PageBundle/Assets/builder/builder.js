@@ -1,6 +1,10 @@
 mQuery(document).ready(function () {
     mQuery('.dropdown-toggle').dropdown();
     mQuery('[data-toggle="tooltip"]').tooltip();
+    mQuery('input[data-toggle="color"]').pickAColor({
+        fadeMenuToggle: false,
+        inlineDropdown: true
+    });
 
     CKEDITOR.disableAutoInline = true;
     mQuery("div[contenteditable='true']").each(function (index) {

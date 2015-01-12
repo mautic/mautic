@@ -14,6 +14,7 @@ $view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
 $view['assets']->addScriptDeclaration("var mauticAjaxUrl = '" . $view['router']->generate("mautic_core_ajax") . "';");
 $view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, true));
 $view['assets']->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
+$view['assets']->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
 $view['assets']->addStylesheet('app/bundles/PageBundle/Assets/builder/builder.css');
 //Set the slots
 foreach ($slots as $slot => $slotConfig) {

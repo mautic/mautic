@@ -58,6 +58,19 @@ class SlideshowGlobalConfigType extends AbstractType
             'required'   => false,
             'data'      => isset($options['data']['width']) ? $options['data']['width'] : ''
         ));
+
+        $builder->add('background_color', 'text', array(
+            'label'      => 'mautic.page.slideshow.background.color',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'tooltip'     => 'mautic.page.slideshow.background.color.desc',
+                'data-toggle' => 'color',
+                'data-slot-config' => $options['data']['slot']
+            ),
+            'required'   => false,
+            'data'       => isset($options['data']['background_color']) ? $options['data']['background_color'] : ''
+        ));
     }
 
     /**

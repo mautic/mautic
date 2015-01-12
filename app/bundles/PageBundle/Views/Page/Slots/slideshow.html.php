@@ -7,18 +7,26 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+// Enable / Disable the slideshow
 if (isset($slideshow_enabled) && !$slideshow_enabled && $public) {
     return;
 }
 
-
 // define default values
-if (!isset($height)) {
+if (!isset($height) || !$height) {
 	$height = '300px';
 }
 
-if (!isset($width)) {
+if (!isset($width) || !$width) {
 	$width = '100%';
+}
+
+if (!isset($background_color) || !$background_color) {
+    $background_color = 'transparent';
+}
+
+if ($background_color != 'transparent') {
+    $background_color = '#' . $background_color;
 }
 
 // css declaration for whole slideshow
@@ -26,6 +34,12 @@ $css = <<<CSS
 .slideshow-{$slot} .item {
 	height: {$height};
 	width: {$width};
+    background-color: {$background_color};
+}
+.slideshow-{$slot} {
+    height: {$height};
+    width: {$width};
+    background-color: {$background_color};
 }
 CSS;
 
