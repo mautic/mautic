@@ -89,7 +89,7 @@ $container->loadFromExtension('framework', array(
     'default_locale'       => '%mautic.locale%',
     'translator'           => array(
         'enabled'  => true,
-        'fallback' => 'en'
+        'fallback' => 'en_US'
     ),
     'trusted_hosts'        => '%mautic.trusted_hosts%',
     'trusted_proxies'      => '%mautic.trusted_proxies%',
