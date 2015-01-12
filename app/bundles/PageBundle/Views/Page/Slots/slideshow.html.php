@@ -49,12 +49,14 @@ $view['assets']->addStyleDeclaration($css);
 <!-- Header Carousel -->
 <div id="carousel-generic" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
 
+<?php if (isset($dot_navigation) && $dot_navigation) : ?>
     <!-- Indicators -->
     <ol class="carousel-indicators">
     <?php foreach($slides as $key => $slide) : ?>
         <li data-target="#carousel-generic" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
 	<?php endforeach; ?>
     </ol>
+<?php endif; ?>
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
