@@ -46,3 +46,12 @@ div[contentEditable=true]:empty:not(:focus):before {
 .stroked, .stroked:hover, .stroked:focus {
     text-decoration: line-through;
 }
+
+.ui-placeholder-highlight {
+    border: 2px dashed #999;
+    background: #ccc;
+}
+.ui-placeholder-highlight .fa-arrow-right {
+    position: relative;
+    left: -30px;
+}

@@ -76,6 +76,12 @@ foreach ($slots as $slot => $slotConfig) {
             );
         }
 
+        // Order slides
+        usort($options['slides'], function($a, $b)
+        {
+            return strcmp($a['order'], $b['order']);
+        });
+
 		$options['slot'] = $slot;
 		$options['public'] = true;
 

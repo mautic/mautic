@@ -157,12 +157,15 @@ $view['assets']->addStyleDeclaration($css);
 			</div>
 			<div class="modal-body">
 				<div class="col-md-3 bg-white height-auto list-of-slides">
-					<ul class="list-group list-group-tabs">
+					<ul class="list-group list-group-tabs" data-toggle="sortablelist">
 					<?php foreach($slides as $key => $slide) : ?>
 		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
 							<a href="#slide-tab-<?php echo $key; ?>" class="steps" data-toggle="tab">
-								Slide <small>(ID=<span class="slide-id"><?php echo $key; ?></span>)</small>
+								Slide <span class="slide-id"><?php echo $key; ?></span>
 							</a>
+                            <span class="btn btn-default btn-xs pull-right ui-sort-handle" data-toggle="tooltip" data-placement="right" data-original-title="Drag&drop this item by the button to change order of the slides.">
+                                <i class="fa fa-arrows-v"></i>
+                            </span>
 						</li>
 					<?php endforeach; ?>
 		            </ul>
@@ -179,9 +182,7 @@ $view['assets']->addStyleDeclaration($css);
 						</div>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
-						<?php 
-                        // TODO allow users to sort slides
-                        // echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
 						<div class="row">
 							<div class="col-md-9">
 								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>

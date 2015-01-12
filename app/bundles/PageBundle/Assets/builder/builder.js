@@ -5,6 +5,13 @@ mQuery(document).ready(function () {
         fadeMenuToggle: false,
         inlineDropdown: true
     });
+    mQuery('*[data-toggle="sortablelist"]').sortable({
+        placeholder: 'list-group-item ui-placeholder-highlight',
+        handle: '.ui-sort-handle',
+        start: function(event, ui) {
+            mQuery('.ui-placeholder-highlight').append('<i class="fa fa-arrow-right"></i>');
+        }
+    });
 
     CKEDITOR.disableAutoInline = true;
     mQuery("div[contenteditable='true']").each(function (index) {
@@ -37,6 +44,12 @@ SlideshowManager.addValueToObj = function (obj, newProp, value) {
     tmp[path[i]] = value;
 }
 
+SlideshowManager.updateOrder = function () {
+    mQuery('.list-of-slides ul.list-group').find('a.steps').each(function (index, link) {
+        mQuery(mQuery(link).attr('href')).find('input.slide-order').val(index);
+    });
+}
+
 SlideshowManager.removeSlide = function (checkbox) {
     var slideId = checkbox.attr('[data-remove-slide]');
     var remove = checkbox.is(':checked');
@@ -47,7 +60,6 @@ SlideshowManager.removeSlide = function (checkbox) {
     } else {
         checkbox.parent().removeClass('text-danger');
     }
-
 }
 
 SlideshowManager.buildConfigObject = function (slot) {
@@ -70,6 +82,7 @@ SlideshowManager.buildConfigObject = function (slot) {
 }
 
 SlideshowManager.saveConfigObject = function (slot) {
+    SlideshowManager.updateOrder();
     SlideshowManager.buildConfigObject(slot);
 
     // remove slides which should be removed
