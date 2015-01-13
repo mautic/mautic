@@ -53,10 +53,11 @@ class PageBuilderEvent extends Event
      * @param $key
      * @param $header
      * @param $content
+     * @param $priority
      *
      * @return void
      */
-    public function addTokenSection($key, $header, $content)
+    public function addTokenSection($key, $header, $content, $priority = 0)
     {
         if (array_key_exists($key, $this->tokens)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another subscriber. Please use a different key.");
@@ -64,8 +65,9 @@ class PageBuilderEvent extends Event
 
         $header = $this->translator->trans($header);
         $this->tokens[$key] = array(
-            "header"  => $header,
-            "content" => $content
+            'header'   => $header,
+            'content'  => $content,
+            'priority' => $priority
         );
     }
 
@@ -76,10 +78,13 @@ class PageBuilderEvent extends Event
      */
     public function getTokenSections()
     {
-        uasort($this->tokens, function ($a, $b) {
-            return strnatcasecmp(
-                $a['header'], $b['header']);
-        });
+        $sort = array();
+        foreach($this->tokens as $k => $v) {
+            $sort['priority'][$k] = $v['priority'];
+            $sort['header'][$k]   = $v['header'];
+        }
+
+        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->tokens);
         return $this->tokens;
     }
 

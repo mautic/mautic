@@ -31,7 +31,13 @@ class EmailBuilderEvent extends Event
         $this->email      = $email;
     }
 
-    public function addTokenSection($key, $header, $content)
+    /**
+     * @param $key
+     * @param $header
+     * @param $content
+     * @param $priority
+     */
+    public function addTokenSection($key, $header, $content, $priority = 0)
     {
         if (array_key_exists($key, $this->tokens)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another subscriber. Please use a different key.");
@@ -40,8 +46,9 @@ class EmailBuilderEvent extends Event
         if (!empty($content)) {
             $header             = $this->translator->trans($header);
             $this->tokens[$key] = array(
-                "header"  => $header,
-                "content" => $content
+                'header'   => $header,
+                'content'  => $content,
+                'priority' => $priority
             );
         }
     }
@@ -53,10 +60,13 @@ class EmailBuilderEvent extends Event
      */
     public function getTokenSections()
     {
-        uasort($this->tokens, function ($a, $b) {
-            return strnatcasecmp(
-                $a['header'], $b['header']);
-        });
+        $sort = array();
+        foreach($this->tokens as $k => $v) {
+            $sort['priority'][$k] = $v['priority'];
+            $sort['header'][$k]   = $v['header'];
+        }
+
+        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->tokens);
         return $this->tokens;
     }
 

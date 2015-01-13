@@ -39,7 +39,7 @@ class EmailSubscriber extends CommonSubscriber
     {
         //add email tokens
         $tokenHelper = new EmailTokenHelper($this->factory);
-        $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent());
+        $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent(), 255);
     }
 
     public function onEmailDisplay(EmailSendEvent $event)
