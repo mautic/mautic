@@ -104,7 +104,7 @@ class PointRepository extends CommonRepository
         $q->where(
             $q->expr()->andX(
                 $q->expr()->eq('p.type', ':type'),
-                $q->expr()->eq('x.lead_id', $leadId)
+                $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         )
             ->setParameter('type', $type);
