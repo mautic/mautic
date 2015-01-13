@@ -707,8 +707,13 @@ class EmailModel extends FormModel
 
         //how many of this batch should go to which email
         $batchCount = 0;
+
         foreach ($emailSettings as $eid => &$details) {
-            $details['limit'] = round($count * $details['weight']);
+            if (isset($details['weight'])) {
+                $details['limit'] = round($count * $details['weight']);
+            } else {
+                $details['limit'] = $count;
+            }
         }
 
         //randomize the leads for statistic purposes
