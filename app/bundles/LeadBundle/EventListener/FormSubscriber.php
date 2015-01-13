@@ -44,6 +44,7 @@ class FormSubscriber extends CommonSubscriber
             'label'        => 'mautic.lead.lead.submitaction.createlead',
             'description'  => 'mautic.lead.lead.submitaction.createlead_descr',
             'formType'     => 'lead_submitaction_createlead',
+            'formTheme'    => 'MauticLeadBundle:FormTheme\\FormAction',
             'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::createLead'
         );
         $event->addSubmitAction('lead.create', $action);

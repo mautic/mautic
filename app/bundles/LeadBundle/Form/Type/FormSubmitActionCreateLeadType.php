@@ -40,18 +40,6 @@ class FormSubmitActionCreateLeadType extends AbstractType
             'required'   => false
         ));
 
-
-        $builder->add('instructions', 'spacer', array(
-            'text' => 'mautic.lead.lead.submitaction.createlead.help',
-            'tag'  => 'h4'
-        ));
-
-        $builder->add('instructions2', 'spacer', array(
-            'text' => 'mautic.lead.lead.submitaction.createlead.help2',
-            'tag'  => 'span',
-            'class' => 'text-warning'
-        ));
-
         $builder->add('mappedFields', 'lead_submitaction_mappedfields', array(
             'label'  => false,
             'formId' => $options['attr']['data-formid']

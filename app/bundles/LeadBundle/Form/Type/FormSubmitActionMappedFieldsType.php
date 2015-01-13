@@ -46,7 +46,7 @@ class FormSubmitActionMappedFieldsType extends AbstractType
             foreach ($fields as $k => $f) {
                 //only show fields with ids
                 if (strpos($k, 'new') !== false)
-                    continue;
+                    //continue;
                 //ignore some types of fields
                 if (in_array($f['type'], array('button', 'freetext', 'captcha')))
                     continue;
@@ -60,6 +60,9 @@ class FormSubmitActionMappedFieldsType extends AbstractType
             array('filter' => array('isPublished' => true))
         );
 
+        $translator = $this->factory->getTranslator();
+        $chooseLead = $translator->trans('mautic.lead.field.form.choose');
+
         foreach ($fields as $field) {
             $id    = $field->getId();
             $label = $field->getLabel();
@@ -67,7 +70,10 @@ class FormSubmitActionMappedFieldsType extends AbstractType
             $builder->add($id, 'choice', array(
                 'label'      => $label,
                 'choices'    => $choices,
-                'attr'       => array('class' => 'form-control'),
+                'attr'       => array(
+                    'class'            => 'form-control chosen',
+                    'data-placeholder' => $chooseLead
+                ),
                 'label_attr' => array('class' => 'control-label'),
                 'multiple'   => false,
                 'expanded'   => false,
@@ -75,6 +81,7 @@ class FormSubmitActionMappedFieldsType extends AbstractType
                 'empty_value' => ''
             ));
         }
+
 
     }
 
