@@ -127,7 +127,7 @@ class FormModel extends CommonFormModel
         $aliases = array();
         $existingFields = $entity->getFields();
 
-        foreach ($sessionFields as $properties) {
+        foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
 
@@ -167,8 +167,9 @@ class FormModel extends CommonFormModel
                 if (method_exists($field, $func)) {
                     $field->$func($v);
                 }
-                $field->setForm($entity);
             }
+            $field->setForm($entity);
+            $field->setSessionId($key);
             $field->setOrder($order);
             $order++;
             $entity->addField($properties['id'], $field);
@@ -179,10 +180,17 @@ class FormModel extends CommonFormModel
      * @param Form $entity
      * @param      $sessionActions
      */
-    public function setActions(Form &$entity, $sessionActions)
+    public function setActions(Form &$entity, $sessionActions, $sessionFields)
     {
         $order   = 1;
         $existingActions = $entity->getActions();
+        $savedFields     = $entity->getFields();
+
+        //match sessionId with field Id to update mapped fields
+        $fieldIds = array();
+        foreach ($savedFields as $id => $field) {
+            $fieldIds[$field->getSessionId()] = $field->getId();
+        }
 
         foreach ($sessionActions as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
@@ -193,11 +201,22 @@ class FormModel extends CommonFormModel
                     continue;
 
                 $func = "set" .  ucfirst($f);
+
+                if ($f == 'properties') {
+                    if (isset($v['mappedFields'])) {
+                        foreach ($v['mappedFields'] as $pk => $pv) {
+                            if (strpos($pv, 'new') !== false) {
+                                $v['mappedFields'][$pk] = $fieldIds[$pv];
+                            }
+                        }
+                    }
+                }
+
                 if (method_exists($action, $func)) {
                     $action->$func($v);
                 }
-                $action->setForm($entity);
             }
+            $action->setForm($entity);
             $action->setOrder($order);
             $order++;
             $entity->addAction($properties['id'], $action);

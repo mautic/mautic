@@ -213,6 +213,7 @@ class FormController extends CommonFormController
      */
     public function newAction()
     {
+        /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model   = $this->factory->getModel('form');
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
@@ -264,10 +265,12 @@ class FormController extends CommonFormController
                         $valid = false;
                     } else {
                         $model->setFields($entity, $fields);
-                        $model->setActions($entity, $actions);
 
-                        //form is valid so process the data
+                        //save the form first so that new fields are available to actions
                         $model->saveEntity($entity);
+
+                        //now set the actions
+                        $model->setActions($entity, $actions, $fields);
 
                         $this->addFlash('mautic.core.notice.created', array(
                             '%name%'      => $entity->getName(),
@@ -435,10 +438,12 @@ class FormController extends CommonFormController
                         $valid = false;
                     } else {
                         $model->setFields($entity, $fields);
-                        $model->setActions($entity, $actions);
 
-                        //form is valid so process the data
+                        //save the form first so that new fields are available to actions
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        //now set the actions
+                        $model->setActions($entity, $actions, $fields);
 
                         //delete entities
                         $this->factory->getModel('form.field')->deleteEntities($deletedFields);

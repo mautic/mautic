@@ -149,6 +149,11 @@ class Field
     private $changes;
 
     /**
+     * @var
+     */
+    private $sessionId;
+
+    /**
      * @param $prop
      * @param $val
      *
@@ -587,5 +592,21 @@ class Field
     public function getCustomParameters()
     {
         return $this->customParameters;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSessionId ()
+    {
+        return $this->sessionId;
+    }
+
+    /**
+     * @param mixed $sessionId
+     */
+    public function setSessionId ($sessionId)
+    {
+        $this->sessionId = $sessionId;
     }
 }
