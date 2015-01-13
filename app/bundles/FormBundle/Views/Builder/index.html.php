@@ -161,6 +161,6 @@ $formId = $form['sessionId']->vars['data'];
 <?php
 $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'formComponentModal',
-    'header' => $view['translator']->trans('mautic.form.form.modalheader'),
+    'header' => false
 )));
 ?>
