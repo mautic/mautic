@@ -51,6 +51,7 @@ class FormBuilderEvent extends Event
      *  'template'    => (optional) template to use for the action's HTML in the form builder
      *      i.e AcmeMyBundle:FormAction:theaction.html.php
      *  'formType'    => (required) name of the form type SERVICE for the action
+     *  'formTheme'   => (optional  theme for custom form views
      *  'callback'    => (required) callback function that will be passed the results upon a form submit.
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          array $fields - form fields with keys id, type and alias
@@ -118,9 +119,10 @@ class FormBuilderEvent extends Event
      *
      * @param string $key   - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
      * @param array  $field - must contain the following keys
-     *  'label'    => (required) what to display in the list
-     *  'formType' => (required) name of the form type SERVICE for the field's property column
-     *  'template' => (required) template to use for the field's HTML i.e AcmeMyBundle:FormField:thefield.html.php
+     *  'label'     => (required) what to display in the list
+     *  'formType'  => (required) name of the form type SERVICE for the field's property column
+     *  'formTheme' => (optional) theme for custom form view
+     *  'template'  => (required) template to use for the field's HTML i.e AcmeMyBundle:FormField:thefield.html.php
      *  'valueFilter' = (optional)the filter to use to clean the input as supported by InputHelper or a callback function that accepts
      *      the variables FormField $field and $value
      *  'valueConstraints' = (optional) callback function to use to validate the value; FormField $field and $filteredValue are passed in
