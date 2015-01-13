@@ -1,6 +1,17 @@
 mQuery(document).ready(function () {
     mQuery('.dropdown-toggle').dropdown();
     mQuery('[data-toggle="tooltip"]').tooltip();
+    mQuery('input[data-toggle="color"]').pickAColor({
+        fadeMenuToggle: false,
+        inlineDropdown: true
+    });
+    mQuery('*[data-toggle="sortablelist"]').sortable({
+        placeholder: 'list-group-item ui-placeholder-highlight',
+        handle: '.ui-sort-handle',
+        start: function(event, ui) {
+            mQuery('.ui-placeholder-highlight').append('<i class="fa fa-arrow-right"></i>');
+        }
+    });
 
     CKEDITOR.disableAutoInline = true;
     mQuery("div[contenteditable='true']").each(function (index) {
@@ -33,6 +44,12 @@ SlideshowManager.addValueToObj = function (obj, newProp, value) {
     tmp[path[i]] = value;
 }
 
+SlideshowManager.updateOrder = function () {
+    mQuery('.list-of-slides ul.list-group').find('a.steps').each(function (index, link) {
+        mQuery(mQuery(link).attr('href')).find('input.slide-order').val(index);
+    });
+}
+
 SlideshowManager.removeSlide = function (checkbox) {
     var slideId = checkbox.attr('[data-remove-slide]');
     var remove = checkbox.is(':checked');
@@ -43,7 +60,6 @@ SlideshowManager.removeSlide = function (checkbox) {
     } else {
         checkbox.parent().removeClass('text-danger');
     }
-
 }
 
 SlideshowManager.buildConfigObject = function (slot) {
@@ -53,7 +69,7 @@ SlideshowManager.buildConfigObject = function (slot) {
         var slotConfigPath = element.attr('name');
         var value = element.val();
 
-        if (element.attr('type') === 'checkbox') {
+        if (element.attr('type') === 'checkbox' || element.attr('type') === 'radio') {
             value = element.is(':checked');
         }
 
@@ -66,6 +82,7 @@ SlideshowManager.buildConfigObject = function (slot) {
 }
 
 SlideshowManager.saveConfigObject = function (slot) {
+    SlideshowManager.updateOrder();
     SlideshowManager.buildConfigObject(slot);
 
     // remove slides which should be removed
@@ -93,6 +110,7 @@ SlideshowManager.toggleFileManager = function () {
     var configFields = mQuery('.modal.slides-config .config-fields .row:not(:last-child)');
     var fileManager = mQuery('#fileManager');
     var newSlideBtn = mQuery('.btn.new-slide');
+    var handle = mQuery('.list-of-slides .ui-sortable-handle');
 
     listOfSlides.animate({
         opacity: "toggle",
@@ -110,6 +128,9 @@ SlideshowManager.toggleFileManager = function () {
     }, 300);
     newSlideBtn.animate({
         height: "toggle",
+        opacity: "toggle"
+    }, 300);
+    handle.animate({
         opacity: "toggle"
     }, 300);
 
@@ -166,8 +187,8 @@ SlideshowManager.newSlide = function () {
 
 SlideshowManager.preloadFileManager = function () {
     filebrowserImageBrowseUrl = mauticBasePath + '/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
-    var iframe = $("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
-    $("#fileManager").hide().append(iframe);
+    var iframe = mQuery("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
+    mQuery("#fileManager").hide().append(iframe);
     iframe.load(function () {
         var fileManager = mQuery('#filemanager_iframe').contents().find('body');
         fileManager.click(function () {

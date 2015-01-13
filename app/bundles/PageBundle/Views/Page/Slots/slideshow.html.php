@@ -7,13 +7,26 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+// Enable / Disable the slideshow
+if (isset($slideshow_enabled) && !$slideshow_enabled && $public) {
+    return;
+}
+
 // define default values
-if (!isset($height)) {
+if (!isset($height) || !$height) {
 	$height = '300px';
 }
 
-if (!isset($width)) {
+if (!isset($width) || !$width) {
 	$width = '100%';
+}
+
+if (!isset($background_color) || !$background_color) {
+    $background_color = 'transparent';
+}
+
+if ($background_color != 'transparent') {
+    $background_color = '#' . $background_color;
 }
 
 // css declaration for whole slideshow
@@ -21,6 +34,12 @@ $css = <<<CSS
 .slideshow-{$slot} .item {
 	height: {$height};
 	width: {$width};
+    background-color: {$background_color};
+}
+.slideshow-{$slot} {
+    height: {$height};
+    width: {$width};
+    background-color: {$background_color};
 }
 CSS;
 
@@ -28,14 +47,16 @@ $view['assets']->addStyleDeclaration($css);
 ?>
 
 <!-- Header Carousel -->
-<div id="carousel-generic" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
+<div id="carousel-generic-<?php echo $slot ?>" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
 
+<?php if (isset($dot_navigation) && $dot_navigation) : ?>
     <!-- Indicators -->
     <ol class="carousel-indicators">
     <?php foreach($slides as $key => $slide) : ?>
-        <li data-target="#carousel-generic" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
+        <li data-target="#carousel-generic-<?php echo $slot ?>" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
 	<?php endforeach; ?>
     </ol>
+<?php endif; ?>
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
@@ -65,6 +86,19 @@ $view['assets']->addStyleDeclaration($css);
         </div>
     <?php endforeach; ?>
     </div>
+
+<?php if (isset($arrow_navigation) && $arrow_navigation) : ?>
+    <!-- Controls -->
+    <a class="left carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+<?php endif; ?>
+
     <?php if (!$public) : ?>
     <div class="dropdown slideshow-options">
 		<button class="btn btn-default dropdown-toggle" type="button" id="slideshow-options" data-toggle="dropdown" aria-expanded="true">
@@ -123,12 +157,15 @@ $view['assets']->addStyleDeclaration($css);
 			</div>
 			<div class="modal-body">
 				<div class="col-md-3 bg-white height-auto list-of-slides">
-					<ul class="list-group list-group-tabs">
+					<ul class="list-group list-group-tabs" data-toggle="sortablelist">
 					<?php foreach($slides as $key => $slide) : ?>
 		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
 							<a href="#slide-tab-<?php echo $key; ?>" class="steps" data-toggle="tab">
-								Slide <small>(ID=<span class="slide-id"><?php echo $key; ?></span>)</small>
+								Slide <span class="slide-id"><?php echo $key; ?></span>
 							</a>
+                            <span class="btn btn-default btn-xs pull-right ui-sort-handle" data-toggle="tooltip" data-placement="right" data-original-title="Drag&drop this item by the button to change order of the slides.">
+                                <i class="fa fa-arrows-v"></i>
+                            </span>
 						</li>
 					<?php endforeach; ?>
 		            </ul>
@@ -145,9 +182,7 @@ $view['assets']->addStyleDeclaration($css);
 						</div>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
 						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
-						<?php 
-                        // TODO allow users to sort slides
-                        // echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
 						<div class="row">
 							<div class="col-md-9">
 								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>

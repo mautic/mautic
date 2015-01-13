@@ -14,6 +14,7 @@ $view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
 $view['assets']->addScriptDeclaration("var mauticAjaxUrl = '" . $view['router']->generate("mautic_core_ajax") . "';");
 $view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, true));
 $view['assets']->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
+$view['assets']->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
 $view['assets']->addStylesheet('app/bundles/PageBundle/Assets/builder/builder.css');
 //Set the slots
 foreach ($slots as $slot => $slotConfig) {
@@ -45,9 +46,9 @@ foreach ($slots as $slot => $slotConfig) {
             $options = array(
                 'width' => '100%',
                 'height' => '250px',
-                'background-color' => 'transparent',
-                'show-arrows' => false,
-                'show-dots' => true,
+                'background_color' => 'transparent',
+                'arrow_navigation' => false,
+                'dot_navigation' => true,
                 'interval' => 5000,
                 'pause' => 'hover',
                 'wrap' => true,
@@ -70,6 +71,12 @@ foreach ($slots as $slot => $slotConfig) {
                 )
             );
         }
+
+        // Order slides
+        usort($options['slides'], function($a, $b)
+        {
+            return strcmp($a['order'], $b['order']);
+        });
 
         $options['slot'] = $slot;
         $options['public'] = false;

@@ -48,16 +48,16 @@ foreach ($slots as $slot => $slotConfig) {
 			$options = json_decode($content[$slot], true);
 		} else {
 			$options = array(
-	            'width' => '100%',
-	            'height' => '250px',
-	            'background-color' => 'transparent',
-	            'show-arrows' => false,
-	            'show-dots' => true,
-	            'interval' => 5000,
-	            'pause' => 'hover',
-	            'wrap' => true,
-	            'keyboard' => true,
-	        );
+                'width' => '100%',
+                'height' => '250px',
+                'background_color' => 'transparent',
+                'arrow_navigation' => false,
+                'dot_navigation' => true,
+                'interval' => 5000,
+                'pause' => 'hover',
+                'wrap' => true,
+                'keyboard' => true
+            );
 		}
 
 		// Create sample slides for first time or if all slides were deleted
@@ -75,6 +75,12 @@ foreach ($slots as $slot => $slotConfig) {
                 )
             );
         }
+
+        // Order slides
+        usort($options['slides'], function($a, $b)
+        {
+            return strcmp($a['order'], $b['order']);
+        });
 
 		$options['slot'] = $slot;
 		$options['public'] = true;
