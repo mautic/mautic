@@ -62,7 +62,7 @@ class BuilderSubscriber extends CommonSubscriber
         $lead   = $event->getLead();
         $leadId = ($lead !== null) ? $lead['id'] : null;
         $email  = $event->getEmail();
-        $this->replaceTokens($event, $leadId, $event->getSource(), $email->getId());
+        $this->replaceTokens($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
     }
 
     public function onPageDisplay (PageDisplayEvent $event)

@@ -60,6 +60,10 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $content  = $event->getContent();
         $idHash   = $event->getIdHash();
+        if ($idHash == null) {
+            // Generate a bogus idHash to prevent errors for routes that may include it
+            $idHash = uniqid();
+        }
         $model    = $this->factory->getModel('email');
         if (strpos($content, '{unsubscribe_text}') !== false) {
             $content = str_ireplace('{unsubscribe_text}',
