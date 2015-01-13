@@ -120,7 +120,7 @@ class FieldType extends AbstractType
 
         if ($addShowLabel) {
             $default = (!isset($options['data']['showLabel'])) ? true : (boolean) $options['data']['showLabel'];
-            $builder->add('showLabel', 'button_group', array(
+            $builder->add('showLabel', 'yesno_button_group', array(
                 'label'       => 'mautic.form.field.form.showlabel',
                 'data'        => $default
             ));
