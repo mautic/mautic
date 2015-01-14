@@ -372,7 +372,7 @@ class TriggerController extends FormController
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                         //delete entities
-                        $this->factory->getModel('form.action')->deleteEntities($deletedEvents);
+                        $this->factory->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
 
                         $this->addFlash('mautic.core.notice.updated', array(
                             '%name%'      => $entity->getName(),
