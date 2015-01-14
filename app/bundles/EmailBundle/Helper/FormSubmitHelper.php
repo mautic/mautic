@@ -25,16 +25,16 @@ class FormSubmitHelper
         $emailId    = (int) $properties['email'];
         $form       = $action->getForm();
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model  = $factory->getModel('email');
-        $email  = $model->getEntity($emailId);
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel  = $factory->getModel('email');
+        $email  = $emailModel->getEntity($emailId);
 
         //make sure the email still exists and is published
         if ($email != null && $email->isPublished()) {
 
         	// Deal with Admin email
 	        if (isset($properties['user_id']) && $properties['user_id']) {
-		        $model->sendEmailToUser($email, $properties['user_id']);
+		        $emailModel->sendEmailToUser($email, $properties['user_id']);
 		    }
 
 		    // Deal with Lead email
@@ -42,8 +42,8 @@ class FormSubmitHelper
 		    	//the lead was just created via the lead.create action
 		    	$currentLead = $feedback['lead.create']['lead'];
 		    } else {
-		        $model = $factory->getModel('lead');
-		        $currentLead = $model->getCurrentLead();
+		        $leadModel = $factory->getModel('lead');
+		        $currentLead = $leadModel->getCurrentLead();
 		    }
 
 		    if (isset($currentLead)) {
@@ -55,7 +55,7 @@ class FormSubmitHelper
 		    			'firstname' => $leadFields['core']['firstname']['value'],
 		    			'lastname' 	=> $leadFields['core']['lastname']['value']
 		    		);
-		    		$model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('form', $form->getId()));
+		    		$emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('form', $form->getId()));
 		    	}
 		    }
         }
