@@ -312,7 +312,7 @@ class TriggerEventController extends CommonFormController
                     'event'     => $triggerEvent,
                     'id'        => $objectId,
                     'deleted'   => true,
-                    'triggerId' => $triggerId
+                    'sessionId' => $triggerId
                 ))
             );
         } else {
