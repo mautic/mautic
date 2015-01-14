@@ -624,4 +624,25 @@ class HitRepository extends CommonRepository
 
         return $query->execute()->fetchAll();
     }
+
+    /**
+     * @param $leadId
+     * @param $newTrackingId
+     * @param $oldTrackingId
+     */
+    public function updateLead($leadId, $newTrackingId, $oldTrackingId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'page_hits')
+            ->set('lead_id', (int) $leadId)
+            ->set('tracking_id', ':newTrackingId')
+            ->where(
+                $q->expr()->eq('tracking_id', ':oldTrackingId')
+            )
+            ->setParameters(array(
+                'newTrackingId' => $newTrackingId,
+                'oldTrackingId' => $oldTrackingId
+            ))
+            ->execute();
+    }
 }

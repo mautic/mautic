@@ -88,6 +88,18 @@ final class LeadEvents
     const LEAD_IDENTIFIED   = 'mautic.lead_identified';
 
     /**
+     * The mautic.current_lead_changed event is thrown when the current lead is changed to another such as when
+     * a new lead is created from a form submit.  This gives opportunity to update session data if applicable
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadChangeEvent instance.
+     *
+     * @var string
+     */
+    const CURRENT_LEAD_CHANGED   = 'mautic.current_lead_changed';
+
+
+    /**
      * The mautic.lead_list_pre_save event is thrown right before a lead_list is persisted.
      *
      * The event listener receives a

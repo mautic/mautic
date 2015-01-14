@@ -121,8 +121,7 @@ class AssetModel extends FormModel
             $asset->setDownloadCount($downloadCount);
 
             //check for a download count from tracking id
-            $countById = $this->em
-                ->getRepository('MauticAssetBundle:Download')->getDownloadCountForTrackingId($asset->getId(), $trackingId);
+            $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
             if (empty($countById)) {
                 $uniqueDownloadCount = $asset->getUniqueDownloadCount();
                 $uniqueDownloadCount++;
@@ -150,16 +149,33 @@ class AssetModel extends FormModel
         $this->em->flush();
     }
 
+    /**
+     * @return \Mautic\AssetBundle\Entity\AssetRepository
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticAssetBundle:Asset');
     }
 
+    /**
+     * @return \Mautic\AssetBundle\Entity\DownloadRepository
+     */
+    public function getDownloadRepository()
+    {
+        return $this->em->getRepository('MauticAssetBundle:Download');
+    }
+
+    /**
+     * @return string
+     */
     public function getPermissionBase()
     {
         return 'asset:assets';
     }
 
+    /**
+     * @return string
+     */
     public function getNameGetter()
     {
         return "getTitle";

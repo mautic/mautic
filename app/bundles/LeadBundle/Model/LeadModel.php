@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -452,10 +453,21 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
+        $oldLead = $this->currentLead;
         $this->currentLead = $lead;
 
-        //set the tracking cookies
-        $this->setLeadCookie($lead->getId());
+        if ($oldLead->getId() != $lead->getId()) {
+
+            list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
+
+            //set the tracking cookies
+            $this->setLeadCookie($lead->getId());
+
+            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+                $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
+                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+            }
+        }
     }
 
     /**
@@ -491,14 +503,26 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getTrackingCookie()
+    public function getTrackingCookie($forceRegeneration = false)
     {
         static $trackingId = false, $generated = false;
 
-        if (empty($trackingId)) {
-            $request = $this->factory->getRequest();
-            $cookies = $request->cookies;
+        $request = $this->factory->getRequest();
+        $cookies = $request->cookies;
 
+        if ($forceRegeneration) {
+            $generated = true;
+
+            $oldTrackingId = $cookies->get('mautic_session_id');
+            $trackingId    = hash('sha1', uniqid(mt_rand()));
+
+            //create a tracking cookie
+            $this->factory->getHelper('cookie')->setCookie('mautic_session_id', $trackingId);
+
+            return array($trackingId, $oldTrackingId);
+        }
+
+        if (empty($trackingId)) {
             //check for the tracking cookie
             $trackingId = $cookies->get('mautic_session_id');
             $generated  = false;

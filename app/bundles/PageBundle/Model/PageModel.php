@@ -36,6 +36,14 @@ class PageModel extends FormModel
     }
 
     /**
+     * @return \Mautic\PageBundle\Entity\HitRepository
+     */
+    public function getHitRepository()
+    {
+        return $this->em->getRepository('MauticPageBundle:Hit');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPermissionBase ()
@@ -309,6 +317,7 @@ class PageModel extends FormModel
             return;
         }
 
+        $hitRepo = $this->getHitRepository();
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
@@ -350,8 +359,7 @@ class PageModel extends FormModel
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
                 //this is not a new session so update the last hit if applicable with the date/time the user left
-                $repo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-                $repo->updateHitDateLeft($lastHit);
+                $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
         }
 
@@ -361,7 +369,7 @@ class PageModel extends FormModel
             $page->setHits($hitCount);
 
             //check for a hit from tracking id
-            $countById = $this->em->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page, $trackingId);
+            $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
             if (empty($countById)) {
                 $uniqueHitCount = $page->getUniqueHits();
                 $uniqueHitCount++;
@@ -501,7 +509,7 @@ class PageModel extends FormModel
      */
     public function getBounces (Page $page)
     {
-        return $this->em->getRepository('MauticPageBundle:Hit')->getBounces($page->getId());
+        return $this->getHitRepository()->getBounces($page->getId());
     }
 
 
@@ -514,7 +522,7 @@ class PageModel extends FormModel
      */
     public function getDwellTimeStats (Page $page)
     {
-        return $this->em->getRepository('MauticPageBundle:Hit')->getDwellTimes(array('pageIds' => $page->getId()));
+        return $this->getHitRepository()->getDwellTimes(array('pageIds' => $page->getId()));
     }
 
     /**

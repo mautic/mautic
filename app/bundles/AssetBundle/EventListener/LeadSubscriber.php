@@ -9,6 +9,7 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
@@ -26,7 +27,8 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
+            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0)
         );
     }
 
@@ -79,5 +81,13 @@ class LeadSubscriber extends CommonSubscriber
                 'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
+    }
+
+    /**
+     * @param LeadChangeEvent $event
+     */
+    public function onLeadChange(LeadChangeEvent $event)
+    {
+        $this->factory->getModel('asset')->getDownloadRepository()->updateLead($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
     }
 }
