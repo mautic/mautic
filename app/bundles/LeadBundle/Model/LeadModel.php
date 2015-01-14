@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class LeadModel extends FormModel
 {
+    private $currentLead = null;
 
     /**
      * {@inheritdoc}
@@ -403,14 +404,12 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        static $lead;
-
         $request = $this->factory->getRequest();
         $cookies = $request->cookies;
 
         list($trackingId, $generated) = $this->getTrackingCookie();
 
-        if (empty($lead)) {
+        if (empty($this->currentLead)) {
             $leadId = $cookies->get($trackingId);
             $ip     = $this->factory->getIpAddress();
             if (empty($leadId)) {
@@ -440,9 +439,23 @@ class LeadModel extends FormModel
                     $leadId = $lead->getId();
                 }
             }
+            $this->currentLead = $lead;
             $this->setLeadCookie($leadId);
         }
-        return ($returnTracking) ? array($lead, $trackingId, $generated) : $lead;
+        return ($returnTracking) ? array($this->currentLead, $trackingId, $generated) : $this->currentLead;
+    }
+
+    /**
+     * Sets current lead
+     *
+     * @param Lead $lead
+     */
+    public function setCurrentLead(Lead $lead)
+    {
+        $this->currentLead = $lead;
+
+        //set the tracking cookies
+        $this->setLeadCookie($lead->getId());
     }
 
     /**
@@ -673,10 +686,10 @@ class LeadModel extends FormModel
         //merge fields
         $newLeadFields = $newLead->getFields();
         foreach ($newLeadFields as $group => $groupFields) {
-            foreach ($groupFields as $alias => $value) {
+            foreach ($groupFields as $alias => $details) {
                 //overwrite old lead's data with new lead's if new lead's is not empty
-                if (!empty($value)) {
-                    $oldLead->addUpdatedField($alias, $value);
+                if (!empty($details['value'])) {
+                    $oldLead->addUpdatedField($alias, $details['value']);
                 }
             }
         }
