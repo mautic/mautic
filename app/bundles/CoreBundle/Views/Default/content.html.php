@@ -7,9 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!$app->getRequest()->isXmlHttpRequest() && $view['slots']->get('contentOnly', false) === false):
+$request = $app->getRequest();
+if (!$request->isXmlHttpRequest() && $view['slots']->get('contentOnly', false) === false):
     //load base template
-    $view->extend('MauticCoreBundle:Default:base.html.php');
+    $template = ($request->get('contentOnly')) ? 'slim' : 'base';
+    $view->extend("MauticCoreBundle:Default:$template.html.php");
 endif;
 ?>
 
