@@ -121,10 +121,9 @@ class AddonController extends FormController
         $installedAddons = $repo->getInstalled();
 
         $persist = array();
-
         foreach ($installedAddons as $bundle => $addon) {
-            $baseName = str_replace('Bundle', '', $bundle);
-            if (!isset($addons[$baseName])) {
+            $persistUpdate = false;
+            if (!isset($addons[$bundle])) {
                 //files are no longer found
                 $addon->setIsEnabled(false);
                 $addon->setIsMissing(true);
@@ -133,9 +132,10 @@ class AddonController extends FormController
                 if ($addon->getIsMissing()) {
                     //was lost but now is found
                     $addon->setIsMissing(false);
+                    $persistUpdate = true;
                 }
 
-                $file = $addons[$baseName]['directory'].'/Config/details.php';
+                $file = $addons[$bundle]['directory'].'/Config/details.php';
 
                 //update details of the bundle
                 if (file_exists($file)) {
@@ -147,14 +147,15 @@ class AddonController extends FormController
                         $updated++;
 
                         //call the update callback
-                        $callback = $addons[$baseName]['bundleClass'];
+                        $callback = $addons[$bundle]['bundleClass'];
                         $callback::onUpdate($addon, $this->factory);
+                        $persistUpdate = true;
                     }
 
                     $addon->setVersion($version);
 
                     $addon->setName(
-                        isset($details['name']) ? $details['name'] : $addons[$baseName]['base']
+                        isset($details['name']) ? $details['name'] : $addons[$bundle]['base']
                     );
 
                     if (isset($details['description'])) {
@@ -166,9 +167,11 @@ class AddonController extends FormController
                     }
                 }
 
-                unset($addons[$baseName]);
+                unset($addons[$bundle]);
             }
-            $persist[] = $addon;
+            if ($persistUpdate) {
+                $persist[] = $addon;
+            }
         }
 
         //rest are new
