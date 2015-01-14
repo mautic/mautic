@@ -263,6 +263,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get the array key for the auth token
+     *
+     * @return string
+     */
+    public function getAuthTokenKey()
+    {
+        return 'access_token';
+    }
+
+    /**
      * Retrieves and stores tokens returned from oAuthLogin
      *
      * @param string $clientId
