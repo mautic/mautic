@@ -1014,13 +1014,18 @@ var Mautic = {
 
         mQuery(target + " .modal-title").html('');
         mQuery(target + " .modal-body-content").html('');
-        if (mQuery(target + " .modal-form-buttons").length) {
-            mQuery(target + " .modal-form-buttons").html('');
-        }
+
         if (mQuery(target + " loading-placeholder").length) {
             mQuery(target + " loading-placeholder").removeClass('hide');
         }
-        mQuery(target + " .modal-footer").html('');
+        if (mQuery(target + " .modal-footer").length) {
+            var hasFooterButtons = mQuery(target + " .modal-footer .modal-form-buttons").length;
+            mQuery(target + " .modal-footer").html('');
+            if (hasFooterButtons) {
+                //add footer buttons
+                mQuery('<div class="modal-form-buttons" />').appendTo(target + " .modal-footer");
+            }
+        }
     },
 
     /**

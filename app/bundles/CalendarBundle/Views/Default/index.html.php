@@ -18,6 +18,6 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.calendar.m
 </div>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'CalendarEditModal',
-    'footer' => '<div class="modal-form-buttons"></div>'
+    'id'            => 'CalendarEditModal',
+	'footerButtons' => true
 ));

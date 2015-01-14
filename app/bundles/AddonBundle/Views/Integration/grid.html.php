@@ -35,6 +35,6 @@ if ($tmpl == 'index')
     </div>
 </div>
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'IntegrationEditModal',
-    'footer' => '<div class="modal-form-buttons"></div>'
+    'id'            => 'IntegrationEditModal',
+    'footerButtons' => true
 ));

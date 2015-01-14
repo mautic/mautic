@@ -119,7 +119,8 @@ $view['slots']->set("headerTitle", $header);
 
  <?php
     $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
-        'id'     => 'triggerEventModal',
-        'header' => $view['translator']->trans('mautic.point.trigger.form.modalheader'),
+        'id'            => 'triggerEventModal',
+        'header'        => $view['translator']->trans('mautic.point.trigger.form.modalheader'),
+        'footerButtons' => true
     )));
 ?>

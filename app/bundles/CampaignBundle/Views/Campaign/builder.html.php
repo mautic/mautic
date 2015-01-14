@@ -89,8 +89,9 @@
 <input type="hidden" value="<?php echo $campaignId; ?>" id="campaignId" />
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'CampaignEventModal',
-    'header' => false
+    'id'            => 'CampaignEventModal',
+    'header'        => false,
+    'footerButtons' => true
 ));
 ?>
 <script>

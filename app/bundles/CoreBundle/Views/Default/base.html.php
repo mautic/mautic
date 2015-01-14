@@ -77,6 +77,9 @@
             <?php endif; ?>
         </script>
         <?php $view['assets']->outputScripts("bodyClose"); ?>
-        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array('id' => 'MauticSharedModal')); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+            'id'            => 'MauticSharedModal',
+            'footerButtons' => true
+        )); ?>
     </body>
 </html>

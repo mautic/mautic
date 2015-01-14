@@ -129,7 +129,7 @@ class EventType extends AbstractType
             'save_icon' => $btnIcon,
             'save_onclick' => 'Mautic.submitCampaignEvent(event)',
             'apply_text' => false,
-            'container_class' => 'bottom-campaignevent-buttons'
+            'container_class' => 'bottom-form-buttons'
         ));
 
         $builder->add('campaignId', 'hidden', array(
