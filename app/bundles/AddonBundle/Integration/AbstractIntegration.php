@@ -659,4 +659,16 @@ abstract class AbstractIntegration
         $logger = $this->factory->getLogger();
         $logger->addError('INTEGRATION ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
     }
+
+    /**
+     * Returns notes specific to sections of the integration form (if applicable)
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        return array('', 'info');
+    }
 }

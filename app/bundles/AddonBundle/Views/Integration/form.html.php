@@ -28,9 +28,15 @@ $hasFeatures = (isset($form['supportedFeatures']));
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php if (isset($form['authButton'])): ?>
+        <?php list($specialInstructions, $alertType) = $integration->getFormNotes('authorization'); ?>
+        <?php if (!empty($specialInstructions)): ?>
+            <div class="alert alert-<?php echo $alertType; ?>">
+                <?php echo $view['translator']->trans($specialInstructions); ?>
+            </div>
+        <?php endif; ?>
         <?php if (isset($form['apiKeys']->children['client_key']) || isset($form['apiKeys']->children['clientKey'])): ?>
         <div class="well well-sm">
-            <?php echo $view['translator']->trans('mautic.integration.callbackuri', array('%url%' => $callbackUri)); ?><br />
+            <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
             <input type="text" readonly value="<?php echo $integration->getOauthCallbackUrl(); ?>" class="form-control" />
         </div>
         <?php endif; ?>
@@ -40,6 +46,13 @@ $hasFeatures = (isset($form['supportedFeatures']));
 
     <?php if ($hasFeatures): ?>
     <div class="tab-pane fade bdr-w-0" id="features-container">
+        <?php list($specialInstructions, $alertType) = $integration->getFormNotes('features'); ?>
+        <?php if (!empty($specialInstructions)): ?>
+            <div class="alert alert-<?php echo $alertType; ?>">
+                <?php echo $view['translator']->trans($specialInstructions); ?>
+            </div>
+        <?php endif; ?>
+
         <?php echo $view['form']->row($form['supportedFeatures']); ?>
         <?php echo $view['form']->row($form['featureSettings']); ?>
         <?php endif; ?>
@@ -47,6 +60,12 @@ $hasFeatures = (isset($form['supportedFeatures']));
 
     <?php if ($leadField): ?>
     <div class="tab-pane fade bdr-w-0" id="fields-container">
+        <?php list($specialInstructions, $alertType) = $integration->getFormNotes('field_match'); ?>
+        <?php if (!empty($specialInstructions)): ?>
+        <div class="alert alert-<?php echo $alertType; ?>">
+            <?php echo $view['translator']->trans($specialInstructions); ?>
+        </div>
+        <?php endif; ?>
         <?php echo $leadField; ?>
     </div>
     <?php endif; ?>

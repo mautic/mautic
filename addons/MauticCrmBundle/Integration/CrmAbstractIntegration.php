@@ -196,9 +196,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function pushLead($lead)
     {
         $mappedData = $this->populateLeadData($lead);
+        if (empty($mappedData)) {
+            return false;
+        }
+
         try {
             if ($this->checkApiAuth(false)) {
-                return CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
+                CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
+                return true;
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);

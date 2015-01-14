@@ -95,10 +95,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
                 $leadObject  = CrmApi::getContext($this->getName(), "lead", $this->auth)->getInfo();
-                $sugarFields = array();
-                foreach ($leadObject['fields'] as $fieldInfo) {
-                    if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
-                        $sugarFields[$fieldInfo['name']] = array('type' => 'string', 'label' => $fieldInfo['comment']);
+                if ($leadObject != null && isset($leadObject['fields'])) {
+                    foreach ($leadObject['fields'] as $fieldInfo) {
+                        if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
+                            $sugarFields[$fieldInfo['name']] = array('type' => 'string', 'label' => $fieldInfo['comment']);
+                        }
                     }
                 }
             }

@@ -169,7 +169,7 @@ class IntegrationController extends FormController
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
                             if (isset($featureSettings['leadFields'])) {
-                                $fields                        = $integrationHelper->getAvailableFields($integration);
+                                $fields  = $integrationHelper->getAvailableFields($integration);
                                 if (!empty($fields)) {
                                     $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
                                     foreach ($featureSettings['leadFields'] as $f => $v) {
@@ -223,8 +223,8 @@ class IntegrationController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form' => $this->setFormTheme($form, $template, $themes),
-                'callbackUri' => $integrationObject->getOauthCallbackUrl()
+                'form'        => $this->setFormTheme($form, $template, $themes),
+                'integration' => $integrationObject
             ),
             'contentTemplate' => $template,
             'passthroughVars' => array(
