@@ -506,6 +506,10 @@ var Mautic = {
             mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
             //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+            if (typeof MauticVars.modalsReset == 'undefined') {
+                MauticVars.modalsReset = {};
+            }
+
             mQuery(container + " *[data-toggle='modal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
                 mQuery(target).remove();
@@ -513,10 +517,13 @@ var Mautic = {
 
             mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
-                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
-                    mQuery(target).remove();
-                } else {
-                    Mautic.resetModal(target, true);
+                if (typeof MauticVars.modalsReset[target] == 'undefined') {
+                    if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
+                        mQuery(target).remove();
+                    } else {
+                        Mautic.resetModal(target, true);
+                    }
+                    MauticVars.modalsReset[target] = target;
                 }
             });
 
@@ -970,7 +977,7 @@ var Mautic = {
         });
 
         //clean slate upon close
-        mQuery(target).on('hide.bs.modal', function () {
+        mQuery(target).on('hidden.bs.modal', function () {
             Mautic.resetModal(target);
         });
 
@@ -999,22 +1006,11 @@ var Mautic = {
     /**
      * Clears content from a shared modal
      * @param target
-     * @param firstLoad
      */
-    resetModal: function (target, firstLoad) {
+    resetModal: function (target) {
         if (mQuery(target).hasClass('in')) {
             return;
         }
-
-        if (typeof MauticVars.modalsReset == 'undefined') {
-            MauticVars.modalsReset = {};
-        }
-
-        if (firstLoad && typeof MauticVars.modalsReset[target] != 'undefined') {
-            return;
-        }
-
-        MauticVars.modalsReset[target] = target;
 
         mQuery(target + " .modal-title").html('');
         mQuery(target + " .modal-body-content").html('');
@@ -1024,6 +1020,7 @@ var Mautic = {
         if (mQuery(target + " loading-placeholder").length) {
             mQuery(target + " loading-placeholder").removeClass('hide');
         }
+        mQuery(target + " .modal-footer").html('');
     },
 
     /**
