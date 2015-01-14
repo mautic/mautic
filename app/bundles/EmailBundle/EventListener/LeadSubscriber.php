@@ -89,7 +89,7 @@ class LeadSubscriber extends CommonSubscriber
                     'extra'     => array(
                         'stats' => $stat
                     ),
-                    'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
+                    'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
                 ));
             }
         }
