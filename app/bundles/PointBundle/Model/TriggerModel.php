@@ -322,9 +322,8 @@ class TriggerModel extends CommonFormModel
                     $pass[] = null;
                 }
             }
-            $reflection->invokeArgs($this, $pass);
 
-            return true;
+            return $reflection->invokeArgs($this, $pass);
         }
 
         return false;
