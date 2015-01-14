@@ -28,6 +28,9 @@ Mautic.pointTriggerOnLoad = function (container) {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.triggerevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        }).on('dblclick.triggerevents', function(event) {
+            event.preventDefault();
+            mQuery(this).find('.btn-edit').first().click();
         });
     }
 };
