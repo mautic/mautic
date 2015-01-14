@@ -844,6 +844,18 @@ body > #app-wrapper {
   padding-left: 20px;
   padding-right: 20px;
 }
+#app-content.content-only {
+  width: 100%;
+}
+#app-content.content-only .page-header {
+  padding-top: 30px;
+  padding-left: 30px;
+  margin: -15px -15px 0 -15px;
+}
+#app-content.content-only.container {
+  padding-left: 0;
+  padding-right: 0;
+}
 @media (min-width: 768px) {
   #app-content {
     position: static;

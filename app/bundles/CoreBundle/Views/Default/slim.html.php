@@ -12,11 +12,9 @@
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body>
         <?php $view['assets']->outputScripts("bodyOpen"); ?>
-        <section id="app-content" class="container">
-            <div class="row">
-                <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php', array('alertType' => 'standard')); ?>
-                <?php $view['slots']->output('_content'); ?>
-            </div>
+        <section id="app-content" class="container content-only">
+            <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php', array('alertType' => 'standard')); ?>
+            <?php $view['slots']->output('_content'); ?>
         </section>
         <?php $view['assets']->outputScripts("bodyClose"); ?>
     </body>
