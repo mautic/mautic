@@ -74,9 +74,11 @@ class LeadRepository extends CommonRepository
      *
      * @param $field
      * @param $value
+     * @param $ignoreId
+     *
      * @return array
      */
-    public function getLeadsByFieldValue($field, $value)
+    public function getLeadsByFieldValue($field, $value, $ignoreId = null)
     {
         $col = 'l.'.$field;
         $q = $this->_em->getConnection()->createQueryBuilder()
@@ -84,6 +86,12 @@ class LeadRepository extends CommonRepository
         ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
         ->where("$col = :search")
         ->setParameter("search", $value);
+
+        if ($ignoreId) {
+            $q->andWhere('l.id != :ignoreId')
+                ->setParameter('ignoreId', $ignoreId);
+        }
+
         $results = $q->execute()->fetchAll();
 
         if (count($results)) {

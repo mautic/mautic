@@ -219,9 +219,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
         $submission->setLead($lead);
+
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId);
 

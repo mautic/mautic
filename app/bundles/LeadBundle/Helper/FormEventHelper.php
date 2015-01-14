@@ -25,13 +25,12 @@ class FormEventHelper
      * @param       $action
      * @param       $form
      * @param array $post
-     * @param array $server
      * @param       $factory
      * @param array $fields
      *
      * @return array
      */
-    public static function createLead($action, $form, array $post, array $server, MauticFactory $factory, array $fields)
+    public static function createLead($action, $form, array $post, MauticFactory $factory, array $fields)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model      = $factory->getModel('lead');
@@ -44,6 +43,7 @@ class FormEventHelper
         );
         $data = array();
         $lead = $model->getCurrentLead();
+        $currentFields = $lead->getFields();
 
         foreach ($leadFields as $f) {
             $id    = $f->getId();
@@ -62,15 +62,17 @@ class FormEventHelper
 
                         //update the lead rather than creating a new one if there is for sure identifier match
                         if ($type == 'email') {
-                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue(
-                                $alias,
-                                $value
-                            );
+                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue($alias, $value, $lead->getId());
                             if (count($leads)) {
-                                //there is a match so use the latest lead
-                                if ($leads[0]->getId() != $lead->getId()) {
-                                    //merge with current lead
-                                    $lead = $model->mergeLeads($lead, $leads[0]);
+                                //merge with current lead
+                                $lead = $model->mergeLeads($lead, $leads[0]);
+                            } else {
+                                //create a new lead if details differ
+                                $currentEmail = $currentFields['core']['email']['value'];
+                                if (!empty($currentEmail) && $currentEmail != $value) {
+                                    //for sure a different lead so create a new one
+                                    $lead = new Lead();
+                                    $lead->setNewlyCreated(true);
                                 }
                             }
                         }
@@ -107,8 +109,7 @@ class FormEventHelper
         //create a new lead
         $model->saveEntity($lead, false);
 
-        //set the tracking cookies
-        $model->setLeadCookie($lead->getId());
+        $model->setCurrentLead($lead);
 
         //return the lead so it can be used elsewhere
         return array('lead' => $lead);
