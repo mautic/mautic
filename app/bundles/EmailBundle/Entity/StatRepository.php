@@ -204,8 +204,9 @@ class StatRepository extends CommonRepository
     public function getLeadStats($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('s')
-            ->select('IDENTITY(s.email) AS email_id, s.dateRead, s.dateSent, e.subject, e.plainText')
+            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as listName')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
+            ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
             ->where('s.lead = ' . $leadId);
 
         if (!empty($options['ipIds'])) {
@@ -219,7 +220,18 @@ class StatRepository extends CommonRepository
             ));
         }
 
-        return $query->getQuery()->getArrayResult();
+        $stats = $query->getQuery()->getArrayResult();
+
+        foreach ($stats as &$stat) {
+            $dateSent = new DateTimeHelper($stat['dateSent']);
+            if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
+                $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
+            } else {
+                $stat['timeToRead'] = false;
+            }
+        }
+
+        return $stats;
     }
 
     /**

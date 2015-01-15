@@ -26,7 +26,25 @@ $item = $event['extra']['stats'];
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
-	            <p><?php echo $view['translator']->trans('mautic.email.timeline.event.body', array('%body%' => $item['plainText'])); ?></p>
+	            <p>
+	            <?php if (empty($item['dateRead'])) : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
+	            <?php else : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.read', array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']))); ?>
+	            <?php endif; ?>
+	            <?php if (!empty($item['viewedInBrowser'])) : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.viewed.in.browser'); ?>
+	            <?php endif; ?>
+	            <?php if (!empty($item['retryCount'])) : ?>
+	            	<?php echo $view['translator']->transChoice('mautic.email.timeline.event.retried', $item['retryCount'], array('%count%' => $item['retryCount'])); ?>
+	            <?php endif; ?>
+	            <?php if (!empty($item['listName'])) : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['listName'])); ?>
+	            <?php endif; ?>
+	            <?php if (!empty($item['isFailed'])) : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
+	            <?php endif; ?>
+	            </p>
 	        </div>
 	    <?php endif; ?>
 	</div>
