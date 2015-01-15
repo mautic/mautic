@@ -211,15 +211,19 @@ class LeadRepository extends CommonRepository
 
         $leads = $q->getQuery()->getArrayResult();
 
-        // Count total until date
-        $q2 = $this->createQueryBuilder('cl');
-        $q2->select('count(cl.lead) as total');
+        $total = false;
 
-        $q2->andwhere($q->expr()->lt('cl.dateAdded', ':date'))
-            ->setParameter('date', $graphData['fromDate']);
+        if (isset($options['total']) && $options['total']) {
+            // Count total until date
+            $q2 = $this->createQueryBuilder('cl');
+            $q2->select('count(cl.lead) as total');
 
-        $total = $q2->getQuery()->getSingleResult();
-        $total = (int) $total['total'];
+            $q2->andwhere($q->expr()->lt('cl.dateAdded', ':date'))
+                ->setParameter('date', $graphData['fromDate']);
+
+            $total = $q2->getQuery()->getSingleResult();
+            $total = (int) $total['total'];
+        }
 
         return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'dateAdded', null, false, $total);
     }
