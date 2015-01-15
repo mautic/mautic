@@ -225,3 +225,7 @@ body
     border-top: 5px solid white;
     box-shadow: none;
 }
+
+.mauticForm-content {
+    height: 100%;
+}

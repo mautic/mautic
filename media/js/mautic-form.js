@@ -1,56 +1,3 @@
-function base64_encode(data) {
-  //  discuss at: http://phpjs.org/functions/base64_encode/
-  // original by: Tyler Akins (http://rumkin.com)
-  // improved by: Bayron Guevara
-  // improved by: Thunder.m
-  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // improved by: Rafał Kukawski (http://kukawski.pl)
-  // bugfixed by: Pellentesque Malesuada
-  //   example 1: base64_encode('Kevin van Zonneveld');
-  //   returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
-  //   example 2: base64_encode('a');
-  //   returns 2: 'YQ=='
-  //   example 3: base64_encode('✓ à la mode');
-  //   returns 3: '4pyTIMOgIGxhIG1vZGU='
-
-  var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-    ac = 0,
-    enc = '',
-    tmp_arr = [];
-
-  if (!data) {
-    return data;
-  }
-
-  data = unescape(encodeURIComponent(data));
-
-  do {
-    // pack three octets into four hexets
-    o1 = data.charCodeAt(i++);
-    o2 = data.charCodeAt(i++);
-    o3 = data.charCodeAt(i++);
-
-    bits = o1 << 16 | o2 << 8 | o3;
-
-    h1 = bits >> 18 & 0x3f;
-    h2 = bits >> 12 & 0x3f;
-    h3 = bits >> 6 & 0x3f;
-    h4 = bits & 0x3f;
-
-    // use hexets to index into b64, and append result to encoded string
-    tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
-  } while (i < data.length);
-
-  enc = tmp_arr.join('');
-
-  var r = data.length % 3;
-
-  return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
-}
-
-
 function trim(str, charlist) {
     var whitespace, l = 0,
         i = 0;
@@ -182,8 +129,8 @@ var MauticModal = {
         className: 'fade-and-drop',
         closeButton: true,
         content: "",
-        maxWidth: '600px',
-        minWidth: '280px',
+        width: '600px',
+        height: '480px',
         overlay: true
     },
 
@@ -227,8 +174,9 @@ var MauticModal = {
         // Create modal element
         this.modal = document.createElement("div");
         this.modal.className = "mauticForm-modal " + this.options.className;
-        this.modal.style.minWidth = this.options.minWidth;
-        this.modal.style.maxWidth = this.options.maxWidth;
+        this.modal.style.width = this.options.width;
+        this.modal.style.height = this.options.height;
+
 
         // If closeButton option is true, add a close button
         if (this.options.closeButton === true) {
@@ -353,13 +301,14 @@ var MauticSDK = {
             console.log('binding modal click events');
         }
         for(var index in MauticSDK.clickEvents) {
-            var current = MauticSDK.clickEvents[index];
+            current = MauticSDK.clickEvents[index];
+            document.querySelector(current.data.element).setAttribute("_mautic_form_index", index);
             document.querySelector(current.data.element).addEventListener("click", function(){
                 if (MauticSDK.config.debug) {
                     console.log('add event to '+current.data.element);
                 }
 
-                MauticSDK.openModal(current);
+                MauticSDK.openModal(MauticSDK.clickEvents[this.getAttribute('_mautic_form_index')]);
             });
         }
 
@@ -372,12 +321,12 @@ var MauticSDK = {
      * Display Modal
      */
     openModal: function(current){
-        iframe = this.createIframe(current);
+        var iframe = this.createIframe(current, true);
 
         MauticModal.open({
             content: iframe.outerHTML,
-            maxWidth: typeof(current['width']) != 'undefined' ? current['width'] : '800px',
-            maxHeight: typeof(current['height']) != 'undefined' ? current['height'] : '600px'
+            width: typeof(current.data['width']) != 'undefined' ? current.data['width'] : '600px',
+            height: typeof(current.data['height']) != 'undefined' ? current.data['height'] : '480px'
         });
     },
 
@@ -389,13 +338,22 @@ var MauticSDK = {
         return link;
     },
 
-    createIframe: function(options)
+    createIframe: function(options, modal)
     {
+        if (typeof(modal) == 'undefined') {
+            modal = false;
+        }
+
         var iframe = document.createElement('iframe');
         //iframe config properties
         iframe.frameBorder = typeof(options.data['border']) != 'undefined' ? parseInt(options.data['border']) : '0' ;
-        iframe.width = typeof(options.data['width']) != 'undefined' ? options.data['width'] : '600px' ;
-        iframe.height = typeof(options.data['height']) != 'undefined' ? options.data['height'] : '400px' ;
+        if (modal) {
+            iframe.width = '100%' ;
+            iframe.height = '100%' ;
+        } else {
+            iframe.width = typeof(options.data['width']) != 'undefined' ? options.data['width'] : '600px' ;
+            iframe.height = typeof(options.data['height']) != 'undefined' ? options.data['height'] : '400px' ;
+        }
         if (typeof(options.data['class']) == 'string') {
             iframe.className = options.data['class'];
         }
