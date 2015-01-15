@@ -10,7 +10,6 @@
 
 <div class="row">
     <div class="form-group col-xs-12">
-        <label class="control-label"><?php echo $view['form']->label($form); ?></label>
         <?php echo $view['form']->errors($form); ?>
         <?php $rowCount = 1; ?>
         <?php foreach ($form->children as $child): ?>

@@ -61,9 +61,13 @@ if ($tmpl == 'index') {
                             'item'       => $item,
                             'model'      => 'addon'
                         )); ?>
+                        <?php if ($integrationHelper->getIntegrationCount($item->getBundle())): ?>
                         <a href="<?php echo $view['router']->generate('mautic_addon_integration_index', array("addon" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                         </a>
+                        <?php else: ?>
+                        <?php echo $item->getName(); ?>
+                        <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

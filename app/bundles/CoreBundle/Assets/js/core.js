@@ -406,17 +406,17 @@ var Mautic = {
                     itemSelector: ".shuffle",
                     sizer: false
                 });
+
+                // Update shuffle on sidebar minimize/maximize
+                mQuery("html")
+                    .on("fa.sidebar.minimize", function () {
+                        grid.shuffle("update");
+                    })
+                    .on("fa.sidebar.maximize", function () {
+                        grid.shuffle("update");
+                    });
+
             }, 1000);
-
-            // Update shuffle on sidebar minimize/maximize
-            mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
-                })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
-                });
-
         }
 
         //prevent auto closing dropdowns for dropdown forms
@@ -537,6 +537,11 @@ var Mautic = {
                     }
                 });
             });
+
+            //turn off shuffle events
+            mQuery('html')
+                .off('fa.sidebar.minimize')
+                .off('fa.sidebar.maximize');
         }
 
         //run specific unloads

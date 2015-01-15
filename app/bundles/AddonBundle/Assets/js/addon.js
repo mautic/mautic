@@ -35,3 +35,44 @@ Mautic.refreshIntegrationForm = function() {
 
     window.close()
 };
+
+Mautic.integrationOnLoad = function(container, response) {
+   Mautic.filterIntegrations();
+};
+
+Mautic.filterIntegrations = function(update) {
+    var filter = mQuery('#integrationFilter').val();
+
+    if (update) {
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            type: "POST",
+            data: "action=addon:setIntegrationFilter&addon=" + filter
+        });
+    }
+
+    //activate shuffles
+    if (mQuery('.shuffle-integrations').length) {
+        var grid = mQuery(".shuffle-integrations");
+
+        //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
+        setTimeout(function () {
+            grid.shuffle('shuffle', function($el, shuffle) {
+                if (filter) {
+                    return $el.hasClass('integration' + filter);
+                } else {
+                    return true;
+                }
+            });
+
+            // Update shuffle on sidebar minimize/maximize
+            mQuery("html")
+                .on("fa.sidebar.minimize", function () {
+                    grid.shuffle("update");
+                })
+                .on("fa.sidebar.maximize", function () {
+                    grid.shuffle("update");
+                });
+        }, 500);
+    }
+};
