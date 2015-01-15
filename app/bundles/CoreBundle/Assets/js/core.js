@@ -681,11 +681,16 @@ var Mautic = {
     /**
      * Posts a form and returns the output.
      * Uses jQuery form plugin so it handles files as well.
+     *
      * @param form
      * @param callback
      */
-    postForm: function (form, callback, inMain) {
+    postForm: function (form, callback) {
         var form = mQuery(form);
+
+        var modalParent = form.closest('.modal');
+        var inMain = modalParent.length > 0 ? false : true;
+
         var action = form.attr('action');
 
         if (action.indexOf("ajax=1") == -1) {
@@ -701,7 +706,23 @@ var Mautic = {
             showLoadingBar: showLoading,
             success: function (data) {
                 MauticVars.formSubmitInProgress = false;
-                if (callback) {
+                if (!inMain) {
+                    var modalId = mQuery(modalParent).attr('id');
+                }
+
+                if (data.sessionExpired) {
+                    if (!inMain) {
+                        mQuery('#' + modalId).modal('hide');
+                        mQuery('.modal-backdrop').remove();
+                    }
+                    Mautic.processPageContent(data);
+                } else if (callback) {
+                    data.inMain = inMain;
+
+                    if (!inMain) {
+                        data.modalId = modalId;
+                    }
+
                     if (typeof callback == 'function') {
                         callback(data);
                     } else if (typeof Mautic[callback] == 'function') {
@@ -853,18 +874,13 @@ var Mautic = {
                 MauticVars.formSubmitInProgress = true;
             }
 
-            var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
-            var isInModal = modalParent.length > 0 ? true : false;
-
             Mautic.postForm(mQuery(this), function (response) {
-
-                if (!isInModal) {
+                if (response.inMain) {
                     Mautic.processPageContent(response);
                 } else {
-                    var target = '#' + modalParent.attr('id');
-                    Mautic.processModalContent(response, target);
+                    Mautic.processModalContent(response, response.modalId);
                 }
-            }, !isInModal);
+            });
 
             return false;
         }));
@@ -1045,8 +1061,7 @@ var Mautic = {
             alert(response.error);
             return;
         }
-
-        if (response.closeModal && response.newContent) {
+        if (response.sessionExpired || (response.closeModal && response.newContent)) {
             mQuery(target).modal('hide');
             mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app
