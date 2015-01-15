@@ -33,14 +33,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     */
-    public function getOAuthLoginUrl()
-    {
-        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @return array
      */

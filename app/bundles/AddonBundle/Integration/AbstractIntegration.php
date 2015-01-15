@@ -11,6 +11,7 @@ namespace Mautic\AddonBundle\Integration;
 
 use Mautic\AddonBundle\Entity\Integration;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class AbstractIntegration
@@ -31,7 +32,7 @@ abstract class AbstractIntegration
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct (MauticFactory $factory)
     {
         $this->factory = $factory;
 
@@ -41,7 +42,7 @@ abstract class AbstractIntegration
     /**
      * Called on construct
      */
-    public function init()
+    public function init ()
     {
 
     }
@@ -51,7 +52,7 @@ abstract class AbstractIntegration
      *
      * @return int
      */
-    public function getPriority()
+    public function getPriority ()
     {
         return 9999;
     }
@@ -61,14 +62,14 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    abstract public function getName();
+    abstract public function getName ();
 
     /**
      * Returns the field the integration needs in order to find the user
      *
      * @return mixed
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields ()
     {
         return array();
     }
@@ -78,7 +79,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getFormTemplate()
+    public function getFormTemplate ()
     {
         return 'MauticAddonBundle:Integration:form.html.php';
     }
@@ -88,7 +89,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getFormTheme()
+    public function getFormTheme ()
     {
         return 'MauticAddonBundle:FormTheme\Integration';
     }
@@ -98,7 +99,7 @@ abstract class AbstractIntegration
      *
      * @param Integration $settings
      */
-    public function setIntegrationSettings(Integration $settings)
+    public function setIntegrationSettings (Integration $settings)
     {
         $this->settings = $settings;
     }
@@ -108,7 +109,7 @@ abstract class AbstractIntegration
      *
      * @return Integration
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings ()
     {
         return $this->settings;
     }
@@ -121,7 +122,7 @@ abstract class AbstractIntegration
      * @param $return   Returns the key array rather than setting them
      *
      */
-    public function mergeApiKeys($mergeKeys, $withKeys = array(), $return = false)
+    public function mergeApiKeys ($mergeKeys, $withKeys = array(), $return = false)
     {
         $settings = $this->settings;
         if (empty($withKeys)) {
@@ -154,9 +155,9 @@ abstract class AbstractIntegration
      * @param array       $keys
      * @param Integration $entity
      */
-    public function encryptAndSetApiKeys(array $keys, Integration $entity)
+    public function encryptAndSetApiKeys (array $keys, Integration $entity)
     {
-        $encrypted  = $this->encryptApiKeys($keys);
+        $encrypted = $this->encryptApiKeys($keys);
         $entity->setApiKeys($encrypted);
     }
 
@@ -167,12 +168,13 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getDecryptedApiKeys($entity = false)
+    public function getDecryptedApiKeys ($entity = false)
     {
         if (!$entity) {
             $entity = $this->settings;
         }
         $keys = $entity->getApiKeys();
+
         return $this->decryptApiKeys($keys);
     }
 
@@ -183,14 +185,14 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function encryptApiKeys(array $keys)
+    public function encryptApiKeys (array $keys)
     {
         /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
         $helper    = $this->factory->getHelper('encryption');
         $encrypted = array();
 
         foreach ($keys as $name => $key) {
-            $key = $helper->encrypt($key);
+            $key              = $helper->encrypt($key);
             $encrypted[$name] = $key;
         }
 
@@ -204,7 +206,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function decryptApiKeys(array $keys)
+    public function decryptApiKeys (array $keys)
     {
         /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
         $helper    = $this->factory->getHelper('encryption');
@@ -223,17 +225,17 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getOAuthLoginUrl()
+    public function getOAuthLoginUrl ()
     {
         $callback = $this->getOauthCallbackUrl();
 
-        $keys = $this->getDecryptedApiKeys();
+        $keys        = $this->getDecryptedApiKeys();
         $clientIdKey = $this->getClientIdKey();
 
         $clientId = $keys[$clientIdKey];
-        $state = hash('sha1', uniqid(mt_rand()));
-        $url = $this->getAuthenticationUrl()
-            . '?client_id='.$clientId //placeholder to be replaced by whatever is the field
+        $state    = hash('sha1', uniqid(mt_rand()));
+        $url      = $this->getAuthenticationUrl()
+            . '?client_id=' . $clientId //placeholder to be replaced by whatever is the field
             . '&response_type=code'
             . '&redirect_uri=' . urlencode($callback)
             . '&state=' . $state; //set a state to protect against CSRF attacks
@@ -247,7 +249,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey ()
     {
         return 'clientId';
     }
@@ -257,7 +259,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey ()
     {
         return 'clientSecret';
     }
@@ -267,7 +269,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey ()
     {
         return 'access_token';
     }
@@ -280,7 +282,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function oAuthCallback($clientId = '', $clientSecret = '')
+    public function oAuthCallback ($clientId = '', $clientSecret = '')
     {
         $request  = $this->factory->getRequest();
         $url      = $this->getAccessTokenUrl();
@@ -297,11 +299,11 @@ abstract class AbstractIntegration
             return array(false, $this->factory->getTranslator()->trans('mautic.integration.missingkeys'));
         }
 
-        $query = 'client_id='.$keys['clientId']
-                . '&client_secret='.$keys['clientSecret']
-                . '&grant_type=authorization_code'
-                . '&redirect_uri=' . urlencode($callback)
-                . '&code='.$request->get('code');
+        $query = 'client_id=' . $keys['clientId']
+            . '&client_secret=' . $keys['clientSecret']
+            . '&grant_type=authorization_code'
+            . '&redirect_uri=' . urlencode($callback)
+            . '&code=' . $request->get('code');
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -311,7 +313,7 @@ abstract class AbstractIntegration
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
 
-        $data = curl_exec($ch);
+        $data      = curl_exec($ch);
         $curlError = curl_error($ch);
         curl_close($ch);
 
@@ -359,7 +361,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getOauthCallbackUrl()
+    public function getOauthCallbackUrl ()
     {
         return $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
             array('integration' => $this->getName()),
@@ -375,7 +377,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    protected function parseCallbackResponse($data)
+    protected function parseCallbackResponse ($data)
     {
         return json_decode($data, true);
     }
@@ -387,9 +389,9 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function makeCall($url)
+    public function makeCall ($url)
     {
-        $referer  = $this->getRefererUrl();
+        $referer = $this->getRefererUrl();
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -407,7 +409,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableFields ($silenceExceptions = true)
     {
         return array();
     }
@@ -415,7 +417,7 @@ abstract class AbstractIntegration
     /**
      * Sets whether fields should be sorted alphabetically or by the order the integration feeds
      */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically ()
     {
         return true;
     }
@@ -425,7 +427,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields ()
     {
         return array();
     }
@@ -435,7 +437,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures ()
     {
         return array();
     }
@@ -446,7 +448,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType ()
     {
         return 'none';
     }
@@ -456,7 +458,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl ()
     {
         return '';
     }
@@ -466,7 +468,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    protected function getAuthenticationUrl()
+    protected function getAuthenticationUrl ()
     {
         return '';
     }
@@ -478,7 +480,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getErrorsFromResponse($response)
+    public function getErrorsFromResponse ($response)
     {
         if (is_array($response)) {
             return implode(' ', $response);
@@ -494,7 +496,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    protected function cleanIdentifier($identifier)
+    protected function cleanIdentifier ($identifier)
     {
         if (is_array($identifier)) {
             foreach ($identifier as &$i) {
@@ -515,7 +517,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function getUserId($identifier, &$socialCache)
+    public function getUserId ($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
@@ -532,7 +534,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity ($identifier, &$socialCache)
     {
         return array();
     }
@@ -545,7 +547,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData ($identifier, &$socialCache)
     {
         return array();
     }
@@ -555,7 +557,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    protected function getRefererUrl()
+    protected function getRefererUrl ()
     {
         return 'http' . (($_SERVER['SERVER_PORT'] == 443) ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
@@ -568,7 +570,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function matchFieldName($field, $subfield = '')
+    public function matchFieldName ($field, $subfield = '')
     {
         if (!empty($field) && !empty($subfield)) {
             return $subfield . ucfirst($field);
@@ -584,10 +586,10 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    protected function matchUpData($data)
+    protected function matchUpData ($data)
     {
-        $info       = array();
-        $available  = $this->getAvailableFields();
+        $info      = array();
+        $available = $this->getAvailableFields();
 
         foreach ($available as $field => $fieldDetails) {
             if (is_array($data)) {
@@ -614,7 +616,7 @@ abstract class AbstractIntegration
                 case 'object':
                     foreach ($fieldDetails['fields'] as $f) {
                         if (isset($values->$f)) {
-                            $fn = $this->matchFieldName($field, $f);
+                            $fn        = $this->matchFieldName($field, $f);
                             $info[$fn] = $values->$f;
                         }
                     }
@@ -639,7 +641,7 @@ abstract class AbstractIntegration
      *
      * @return bool
      */
-    public function checkImageExists($url)
+    public function checkImageExists ($url)
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
@@ -654,7 +656,7 @@ abstract class AbstractIntegration
     /**
      * @param \Exception $e
      */
-    public function logIntegrationError(\Exception $e)
+    public function logIntegrationError (\Exception $e)
     {
         $logger = $this->factory->getLogger();
         $logger->addError('INTEGRATION ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
@@ -667,8 +669,30 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getFormNotes($section)
+    public function getFormNotes ($section)
     {
         return array('', 'info');
+    }
+
+    /**
+     * Allows appending extra data to the featureSettings array
+     *
+     * @param FormBuilder $builder
+     */
+    public function appendToFeatureForm (FormBuilder &$builder)
+    {
+
+    }
+
+    /**
+     * Get available fields for choices in the config UI
+     *
+     * @param bool $silenceExceptions
+     *
+     * @return mixed
+     */
+    public function getFormLeadFields ($silenceExceptions = true)
+    {
+        return $this->getAvailableFields($silenceExceptions);
     }
 }

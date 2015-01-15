@@ -52,7 +52,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return string
      */
-    public function getClientSecreteKey ()
+    public function getClientSecretKey ()
     {
         return 'password';
     }
@@ -66,14 +66,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getOAuthLoginUrl ()
-    {
-        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
-    }
-
-    /**
      * @param array  $parameters
      * @param string $authMethod
      *
@@ -84,28 +76,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         $zohoSettings = $this->getDecryptedApiKeys();
 
         parent::createApiAuth($zohoSettings);
-    }
-
-    /**
-     * Check API Authentication
-     */
-    public function checkApiAuth ($silenceExceptions = true)
-    {
-        try {
-            if (!$this->auth->isAuthorized()) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (ErrorException $exception) {
-            $this->logIntegrationError($exception);
-
-            if (!$silenceExceptions) {
-                throw $exception;
-            }
-
-            return false;
-        }
     }
 
     /**
@@ -134,9 +104,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                         }
                         $key              = InputHelper::alphanum($field['dv']);
                         $zohoFields[$key] = array(
-                            'type'  => 'string',
-                            'label' => $field['label'],
-                            'dv'    => $field['dv']
+                            'type'     => 'string',
+                            'label'    => $field['label'],
+                            'dv'       => $field['dv'],
+                            'required' => ($field['req'] == 'true')
                         );
                     }
                 }
@@ -157,58 +128,35 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $lead
+     * @param $key
+     * @param $field
      *
-     * @return array
+     * @return mixed
      */
-    public function populateLeadData($lead)
+    public function convertLeadFieldKey($key, $field)
     {
-        $mappedData      = parent::populateLeadData($lead);
-        $availableFields = $this->getAvailableFields();
-
-        $useToMatch = array();
-        foreach ($availableFields as $key => $field) {
-            $useToMatch[$key] = $field['dv'];
-        }
-
-        $unknown = $this->factory->getTranslator()->trans('mautic.zoho.form.lead.unknown');
-
-        if (empty($mappedData['LastName'])) {
-            $mappedData['LastName'] = $unknown;
-        }
-        if (empty($mappedData['Company'])) {
-            $mappedData['Company'] = $unknown;
-        }
-
-        $xmlData = '<Leads>';
-        $xmlData .= '<row no="1">';
-        foreach ($mappedData as $name => $value) {
-            if (!isset($useToMatch[$name])) {
-                //doesn't seem to exist now
-                continue;
-            }
-            $zohoFieldName = $useToMatch[$name];
-            $xmlData      .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $zohoFieldName, $value);
-        }
-        $xmlData .= '</row>';
-        $xmlData .= '</Leads>';
-
-        return $xmlData;
+        return $field['dv'];
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param $section
+     * @param $lead
      *
-     * @return string
+     * @return array
      */
-    public function getFormNotes($section)
+    public function populateLeadData ($lead)
     {
-        if ($section == 'field_match') {
-            return array('mautic.zoho.form.field_match_notes', 'info');
-        }
+        $mappedData = parent::populateLeadData($lead);
 
-        return parent::getFormNotes($section);
+        $xmlData = '<Leads>';
+        $xmlData .= '<row no="1">';
+        foreach ($mappedData as $name => $value) {
+            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $mappedData, $value);
+        }
+        $xmlData .= '</row>';
+        $xmlData .= '</Leads>';
+
+        return $xmlData;
     }
 }

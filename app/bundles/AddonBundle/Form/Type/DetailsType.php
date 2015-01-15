@@ -35,7 +35,8 @@ class DetailsType extends AbstractType
             'label'              => false,
             'required'           => false,
             'integration_keys'   => $keys,
-            'data'               => $decryptedKeys
+            'data'               => $decryptedKeys,
+            'secret_key'         => $options['integration_object']->getClientSecretKey()
         ));
 
         $authType = $options['integration_object']->getAuthenticationType();
@@ -74,7 +75,7 @@ class DetailsType extends AbstractType
 
             $builder->add('featureSettings', 'integration_featuresettings', array(
                 'label'              => 'mautic.integration.form.feature.settings',
-                'required'           => false,
+                'required'           => true,
                 'data'               => $options['data']->getFeatureSettings(),
                 'label_attr'         => array('class' => 'control-label'),
                 'integration'        => $options['integration'],

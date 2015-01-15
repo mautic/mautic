@@ -660,4 +660,14 @@ class MauticFactory
     {
         return $this->getKernel()->getAddonBundles();
     }
+
+    /**
+     * @param $service
+     *
+     * @return bool
+     */
+    public function serviceExists($service)
+    {
+        return $this->container->has($service);
+    }
 }

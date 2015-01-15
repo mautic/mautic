@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class AjaxController
  *
- * @package Mautic\EmailBundle\Controller
+ * @package Mautic\CategoryBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {

@@ -8,12 +8,11 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class FoursquareIntegration
  */
-class FoursquareIntegration extends AbstractIntegration
+class FoursquareIntegration extends SocialIntegration
 {
     /**
      * {@inheritdoc}

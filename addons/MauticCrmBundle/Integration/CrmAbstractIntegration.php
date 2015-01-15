@@ -23,6 +23,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     protected $auth;
 
+    /**
+     * @param Integration $settings
+     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
@@ -54,6 +57,28 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getSupportedFeatures()
     {
         return array('push_lead');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOAuthLoginUrl ()
+    {
+        return $this->getCrmLoginUrl();
+    }
+
+    /**
+     * @param bool $oauth
+     *
+     * @return string
+     */
+    public function getCrmLoginUrl($oauth = false)
+    {
+        if ($oauth) {
+            return parent::getOAuthLoginUrl();
+        } else {
+            return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
+        }
     }
 
     /**
@@ -141,6 +166,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * Return key recognized by CRM
+     *
+     * @param $key
+     * @param $field
+     *
+     * @return mixed
+     */
+    public function convertLeadFieldKey($key, $field)
+    {
+        return $key;
+    }
+
+    /**
      * Match lead data with CRM fields
      *
      * @param $lead
@@ -155,14 +193,24 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             return false;
         }
 
-        $fields = $lead->getFields(true);
+        $fields          = $lead->getFields(true);
+        $leadFields      = $featureSettings['leadFields'];
+        $availableFields = $this->getAvailableFields();
 
-        $leadFields = $featureSettings['leadFields'];
+        $unknown = $this->factory->getTranslator()->trans('mautic.crm.form.lead.unknown');
 
-        $matched = array();
-        foreach ($leadFields as $crm => $mautic) {
-            if (isset($fields[$mautic]) && !empty($fields[$mautic]['value'])) {
-                $matched[$crm] = $fields[$mautic]['value'];
+        foreach ($availableFields as $key => $field) {
+            $crmKey = $this->convertLeadFieldKey($key, $field);
+
+            if (isset($leadFields[$key])) {
+                $mauticKey = $leadFields[$key];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
+                    $matched[$crmKey] = $fields[$mauticKey]['value'];
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$crmKey])) {
+                $matched[$crmKey] = $unknown;
             }
         }
 
@@ -181,10 +229,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 return true;
             }
         } catch (ErrorException $exception) {
+            $this->logIntegrationError($exception);
             if (!$silenceExceptions) {
                 throw $exception;
-            } else {
-                $this->logIntegrationError($exception);
             }
             return false;
         }
@@ -222,7 +269,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @return string
      */
-    public function getClientSecreteKey()
+    public function getClientSecretKey()
     {
         return 'client_secret';
     }
@@ -236,4 +283,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes ($section)
+    {
+        if ($section == 'field_match') {
+            return array('mautic.crm.form.field_match_notes', 'info');
+        }
+
+        return parent::getFormNotes($section);
+    }
 }

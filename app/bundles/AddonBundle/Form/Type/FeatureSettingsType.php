@@ -38,24 +38,13 @@ class FeatureSettingsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $integration = $options['integration'];
-
         $integration_object = $options['integration_object'];
 
-        $class  = explode('\\', get_class($integration_object));
-        $exists = class_exists('\\MauticAddon\\' . $class[1] . '\\Form\\Type\\' . $integration . 'Type');
+        //add custom feature settings
+        $integration_object->appendToFeatureForm($builder);
 
-        if ($exists) {
-            $builder->add('shareButton', 'socialmedia_' . strtolower($integration), array(
-                'label'    => false,
-                'required' => false
-            ));
-        }
-
-        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
         try {
-            $fields = $integrationHelper->getAvailableFields($options['integration'], false);
+            $fields = $integration_object->getFormLeadFields($options['integration'], false);
             $error = '';
         } catch (\Exception $e) {
             $fields = array();
@@ -65,7 +54,7 @@ class FeatureSettingsType extends AbstractType
         if (!empty($fields) || $error) {
             $builder->add('leadFields', 'integration_fields', array(
                 'label'            => 'mautic.integration.leadfield_matches',
-                'required'         => false,
+                'required'         => true,
                 'lead_fields'      => $options['lead_fields'],
                 'data'             => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : array(),
                 'integration_fields' => $fields

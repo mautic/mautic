@@ -28,10 +28,6 @@ class LinkedInType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.integration.form.sharebutton'
-        ));
-
         $builder->add('counter', 'choice', array(
             'choices'     => array(
                 'right' => 'mautic.integration.LinkedIn.share.counter.right',

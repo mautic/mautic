@@ -28,10 +28,6 @@ class FacebookType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.integration.form.sharebutton'
-        ));
-
         $builder->add('layout', 'choice', array(
             'choices'     => array(
                 'standard'     => 'mautic.integration.Facebook.share.layout.standard',
@@ -44,41 +40,46 @@ class FacebookType extends AbstractType
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array('class'   => 'form-control')
+            'attr'        => array('class' => 'form-control')
         ));
 
         $builder->add('action', 'choice', array(
             'choices'     => array(
-                'like'       => 'mautic.integration.Facebook.share.action.like',
-                'recommend'  => 'mautic.integration.Facebook.share.action.recommend',
-                'share'      => 'mautic.integration.Facebook.share.action.share'
+                'like'      => 'mautic.integration.Facebook.share.action.like',
+                'recommend' => 'mautic.integration.Facebook.share.action.recommend',
+                'share'     => 'mautic.integration.Facebook.share.action.share'
             ),
             'label'       => 'mautic.integration.Facebook.share.action',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array('class'   => 'form-control')
+            'attr'        => array('class' => 'form-control')
         ));
 
-        $builder->add('showFaces', 'checkbox', array(
-            'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.integration.Facebook.share.showfaces',
-            'value'         =>  1,
-            'required'      => false
+        $builder->add('showFaces', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array(0, 1),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label' => 'mautic.integration.Facebook.share.showfaces',
+            'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces']
         ));
 
-        $builder->add('showShare', 'checkbox', array(
-            'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.integration.Facebook.share.showshare',
-            'value'         => 1,
-            'required'      => false
+        $builder->add('showShare', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array(0, 1),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label' => 'mautic.integration.Facebook.share.showshare',
+            'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare']
         ));
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName ()
+    {
         return "socialmedia_facebook";
     }
 }

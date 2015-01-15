@@ -30,7 +30,7 @@ class IntegrationHelper
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct (MauticFactory $factory)
     {
         $this->factory = $factory;
     }
@@ -45,7 +45,7 @@ class IntegrationHelper
      *
      * @return mixed
      */
-    public function getIntegrationObjects($services = null, $withFeatures = null, $alphabetical = false, $addonFilter = null)
+    public function getIntegrationObjects ($services = null, $withFeatures = null, $alphabetical = false, $addonFilter = null)
     {
         static $integrations, $available;
 
@@ -55,7 +55,7 @@ class IntegrationHelper
             $available = $integrations = array();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
-            $addons  = $this->factory->getEnabledAddons();
+            $addons = $this->factory->getEnabledAddons();
 
             // Quickly figure out which addons are enabled so we only process those
             /** @var \Mautic\AddonBundle\Entity\AddonRepository $addonRepo */
@@ -66,7 +66,7 @@ class IntegrationHelper
             foreach ($addons as $addon) {
                 if (is_dir($addon['directory'] . '/Integration')) {
                     $finder = new Finder();
-                    $finder->files()->name('*Integration.php')->in($addon['directory'] . '/Integration');
+                    $finder->files()->name('*Integration.php')->in($addon['directory'] . '/Integration')->ignoreDotFiles(true);
 
                     if ($alphabetical) {
                         $finder->sortByName();
@@ -75,8 +75,8 @@ class IntegrationHelper
                     $id = $addonStatuses[$addon['bundle']]['id'];
                     foreach ($finder as $file) {
                         $available[] = array(
-                            'addon' => $em->getReference('MauticAddonBundle:Addon', $id),
-                            'integration'   => substr($file->getBaseName(), 0, -15),
+                            'addon'       => $em->getReference('MauticAddonBundle:Addon', $id),
+                            'integration' => substr($file->getBaseName(), 0, -15),
                             'namespace'   => str_replace('MauticAddon', '', $addon['bundle'])
                         );
                     }
@@ -91,7 +91,7 @@ class IntegrationHelper
                     continue;
                 }
                 if (!isset($integrations[$a['integration']])) {
-                    $class = "\\MauticAddon\\{$a['namespace']}\\Integration\\{$a['integration']}Integration";
+                    $class           = "\\MauticAddon\\{$a['namespace']}\\Integration\\{$a['integration']}Integration";
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInstantiable()) {
                         $integrations[$a['integration']] = new $class($this->factory);
@@ -115,6 +115,7 @@ class IntegrationHelper
                     if ($aP === $bP) {
                         return 0;
                     }
+
                     return ($aP < $bP) ? -1 : 1;
                 });
             }
@@ -130,6 +131,7 @@ class IntegrationHelper
                         $specific[$s] = $integrations[$s];
                     }
                 }
+
                 return $specific;
             } else {
                 throw new MethodNotAllowedHttpException($available);
@@ -151,6 +153,7 @@ class IntegrationHelper
                     }
                 }
             }
+
             return $specific;
         }
 
@@ -158,72 +161,27 @@ class IntegrationHelper
     }
 
     /**
-     * Get available fields for choices in the config UI
+     * Gets a count of integrations
      *
-     * @param string|null $service
+     * @param $addon
      *
-     * @return mixed
+     * @return int
      */
-    public function getAvailableFields($service = null, $silenceExceptions = true)
+    public function getIntegrationCount ($addon)
     {
-        static $fields = array();
-
-        if (empty($fields)) {
-            $integrations = $this->getIntegrationObjects($service);
-            $translator   = $this->factory->getTranslator();
-            foreach ($integrations as $s => $object) {
-                /** @var $object \Mautic\AddonBundle\Integration\AbstractIntegration */
-                $fields[$s] = array();
-                $available  = $object->getAvailableFields($silenceExceptions);
-                if (empty($available) || !is_array($available)) {
-                    continue;
-                }
-                foreach ($available as $field => $details) {
-                    $label = (!empty($details['label'])) ? $details['label'] : false;
-                    $fn = $object->matchFieldName($field);
-                    switch ($details['type']) {
-                        case 'string':
-                        case 'boolean':
-                            $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
-                            break;
-                        case 'object':
-                            if (isset($details['fields'])) {
-                                foreach ($details['fields'] as $f) {
-                                    $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}"): $label;
-                                }
-                            } else {
-                                $fields[$s][$field] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
-                            }
-                            break;
-                        case 'array_object':
-                            if ($field == "urls" || $field == "url") {
-                                //create social profile fields
-                                $socialProfileUrls = $this->getSocialProfileUrlRegex();
-                                foreach ($socialProfileUrls as $p => $d) {
-                                    $fields[$s]["{$p}ProfileHandle"] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$p}ProfileHandle") : $label;
-                                }
-                                foreach ($details['fields'] as $f) {
-                                    $fields[$s]["{$f}Urls"] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$f}Urls") : $label;
-                                }
-                            } elseif (isset($details['fields'])) {
-                                foreach ($details['fields'] as $f) {
-                                    $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
-                                }
-                            } else {
-                                $fields[$s][$fn] = (!$label) ? $translator->trans("mautic.integration.{$s}.{$fn}") : $label;
-                            }
-                            break;
-                    }
-                }
-                if ($object->sortFieldsAlphabetically()) {
-                    uasort($fields[$s], "strnatcmp");
-                }
-            }
+        if (!is_array($addon)) {
+            $addons = $this->factory->getParameter('addon.bundles');
+            $addon  = $addons[$addon];
         }
 
-        return (!empty($service)) ? $fields[$service] : $fields;
+        if (is_dir($addon['directory'] . '/Integration')) {
+            $finder = new Finder();
+            $finder->files()->name('*Integration.php')->in($addon['directory'] . '/Integration')->ignoreDotFiles(true);
+
+            return iterator_count($finder);
+        }
+
+        return 0;
     }
 
     /**
@@ -235,7 +193,7 @@ class IntegrationHelper
      * @return array
      * @todo Extend this method to allow addons to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex($find = true)
+    public function getSocialProfileUrlRegex ($find = true)
     {
         if ($find) {
             //regex to find a match
@@ -279,7 +237,7 @@ class IntegrationHelper
      *
      * @return mixed
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings ()
     {
         return $this->factory->getEntityManager()->getRepository('MauticAddonBundle:Integration')->getIntegrations();
     }
@@ -296,10 +254,10 @@ class IntegrationHelper
      *
      * @return array
      */
-    public function getUserProfiles($lead, $fields = array(), $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles ($lead, $fields = array(), $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
     {
-        $socialCache      = $lead->getSocialCache();
-        $featureSettings  = array();
+        $socialCache     = $lead->getSocialCache();
+        $featureSettings = array();
         if ($refresh) {
             //regenerate from integrations
             $now = new DateTimeHelper();
@@ -334,7 +292,7 @@ class IntegrationHelper
                             $socialCache[$integration] = array();
                         }
 
-                        $socialCache[$integration]['profile']     = (!empty($profile['profile']))  ? $profile['profile'] : array();
+                        $socialCache[$integration]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : array();
                         $socialCache[$integration]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
                         $socialCache[$integration]['lastRefresh'] = $now->toUtcString();
                     } else {
@@ -353,7 +311,7 @@ class IntegrationHelper
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, array('public_profile', 'public_activity'));
             foreach ($socialIntegrations as $integration => $sn) {
-                $settings                  = $sn->getIntegrationSettings();
+                $settings                      = $sn->getIntegrationSettings();
                 $featureSettings[$integration] = $settings->getFeatureSettings();
             }
         }
@@ -370,7 +328,7 @@ class IntegrationHelper
      * @param      $lead
      * @param bool $integration
      */
-    public function clearIntegrationCache($lead, $integration = false)
+    public function clearIntegrationCache ($lead, $integration = false)
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {
@@ -380,19 +338,20 @@ class IntegrationHelper
         }
         $lead->setSocialCache($socialCache);
         $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+
         return $socialCache;
     }
 
     /**
      * Gets an array of the HTML for share buttons
      */
-    public function getShareButtons()
+    public function getShareButtons ()
     {
         static $shareBtns = array();
 
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, array('share_button'), true);
-            $templating     = $this->factory->getTemplating();
+            $templating         = $this->factory->getTemplating();
 
             /**
              * @var  string                                              $integration
@@ -400,7 +359,7 @@ class IntegrationHelper
              */
             foreach ($socialIntegrations as $integration => $details) {
                 /** @var \Mautic\AddonBundle\Entity\Integration $settings */
-                $settings        = $details->getIntegrationSettings();
+                $settings = $details->getIntegrationSettings();
 
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $details->decryptApiKeys($settings->getApiKeys());
@@ -408,12 +367,13 @@ class IntegrationHelper
                 $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : array();
 
                 //add the api keys for use within the share buttons
-                $shareSettings['keys'] = $apiKeys;
+                $shareSettings['keys']   = $apiKeys;
                 $shareBtns[$integration] = $templating->render($addon->getBundle() . ":Integration/$integration:share.html.php", array(
                     'settings' => $shareSettings,
                 ));
             }
         }
+
         return $shareBtns;
     }
 
@@ -422,15 +382,16 @@ class IntegrationHelper
      *
      * @param $integrationObject
      * @param $fields
+     *
      * @return bool
      */
-    public function getUserIdentifierField($integrationObject, $fields)
+    public function getUserIdentifierField ($integrationObject, $fields)
     {
         $identifierField = $integrationObject->getIdentifierFields();
         $identifier      = (is_array($identifierField)) ? array() : false;
         $matchFound      = false;
 
-        $findMatch = function ($f, $fields) use(&$identifierField, &$identifier, &$matchFound) {
+        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound) {
             if (is_array($identifier)) {
                 //there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {
@@ -484,7 +445,7 @@ class IntegrationHelper
      *
      * @return string
      */
-    public function getIconPath($integration)
+    public function getIconPath ($integration)
     {
         $systemPath  = $this->factory->getSystemPath('root');
         $genericIcon = 'app/bundles/AddonBundle/Assets/img/generic.png';

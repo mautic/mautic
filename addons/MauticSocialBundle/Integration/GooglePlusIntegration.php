@@ -8,17 +8,16 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class GooglePlusIntegration
  */
-class GooglePlusIntegration extends AbstractIntegration
+class GooglePlusIntegration extends SocialIntegration
 {
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return 'GooglePlus';
     }
@@ -26,7 +25,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority ()
     {
         return 1;
     }
@@ -35,7 +34,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields ()
     {
         return array(
             'googleplus',
@@ -46,7 +45,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures ()
     {
         return array(
             'public_activity',
@@ -58,7 +57,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData ($identifier, &$socialCache)
     {
         if ($userid = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userid}");
@@ -72,8 +71,8 @@ class GooglePlusIntegration extends AbstractIntegration
 
             if (isset($data->image->url)) {
                 //remove the size from the end
-                $image = $data->image->url;
-                $image                   = preg_replace('/\?.*/', '', $image);
+                $image                = $data->image->url;
+                $image                = preg_replace('/\?.*/', '', $image);
                 $info["profileImage"] = $image;
             }
             $socialCache['profile'] = $info;
@@ -83,7 +82,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity ($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/$id/activities/public") . "&maxResults=10";
@@ -96,7 +95,7 @@ class GooglePlusIntegration extends AbstractIntegration
                     'tags'   => array()
                 );
                 foreach ($data->items as $page) {
-                    $post = array(
+                    $post                               = array(
                         'title'     => $page->title,
                         'url'       => $page->url,
                         'published' => $page->published,
@@ -134,8 +133,8 @@ class GooglePlusIntegration extends AbstractIntegration
                                     $url = substr($url, 0, $pos);
                                 }
 
-                                $photo = array(
-                                    'url'  => $url
+                                $photo                               = array(
+                                    'url' => $url
                                 );
                                 $socialCache['activity']['photos'][] = $photo;
                             }
@@ -153,11 +152,12 @@ class GooglePlusIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function matchUpData($data)
+    protected function matchUpData ($data)
     {
-        $info       = array();
-        $available  = $this->getAvailableFields();
-        $translator = $this->factory->getTranslator();
+        $info              = array();
+        $available         = $this->getAvailableFields();
+        $translator        = $this->factory->getTranslator();
+        $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
 
         foreach ($available as $field => $fieldDetails) {
             if (!isset($data->$field)) {
@@ -180,7 +180,6 @@ class GooglePlusIntegration extends AbstractIntegration
                         break;
                     case 'array_object':
                         if ($field == "urls") {
-                            $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
                             foreach ($values as $k => $v) {
                                 $socialMatch = false;
                                 foreach ($socialProfileUrls as $service => $regex) {
@@ -254,13 +253,14 @@ class GooglePlusIntegration extends AbstractIntegration
                 }
             }
         }
+
         return $info;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableFields ($silenceExceptions = true)
     {
         return array(
             "profileHandle"      => array("type" => "string"),
@@ -318,7 +318,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields ()
     {
         return array(
             'key' => 'mautic.integration.keyfield.api'
@@ -328,7 +328,7 @@ class GooglePlusIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType ()
     {
         return 'key';
     }
@@ -338,17 +338,18 @@ class GooglePlusIntegration extends AbstractIntegration
      *
      * @return string
      */
-    public function getApiUrl($endpoint)
+    public function getApiUrl ($endpoint)
     {
         $keys = $this->getDecryptedApiKeys();
         $key  = (isset($keys['key'])) ? $keys['key'] : '';
+
         return "https://www.googleapis.com/plus/v1/$endpoint?key=" . $key;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUserId($identifier, &$socialCache)
+    public function getUserId ($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];

@@ -28,10 +28,6 @@ class TwitterType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.integration.form.sharebutton'
-        ));
-
         $builder->add('count', 'choice', array(
             'choices'     => array(
                 'horizontal' => 'mautic.integration.Twitter.share.layout.horizontal',
@@ -88,11 +84,13 @@ class TwitterType extends AbstractType
             )
         ));
 
-        $builder->add('size', 'checkbox', array(
-            'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.integration.Twitter.share.largesize',
-            'value'         => 'large',
-            'required'      => false
+        $builder->add('size', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array('medium', 'large'),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label' => 'mautic.integration.Twitter.share.largesize',
+            'data'  => (!empty($options['data']['size'])) ? $options['data']['size'] : 'medium'
         ));
     }
 

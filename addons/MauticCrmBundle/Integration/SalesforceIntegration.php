@@ -85,6 +85,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getOAuthLoginUrl()
+    {
+        return $this->getCrmLoginUrl(true);
+    }
+
+    /**
      * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
