@@ -8,7 +8,7 @@
  */
 
 $config = array(
-    "name"        => "Narrow",
+    "name"        => "Nature",
     "features"    => array(
         "page",
         "email"
