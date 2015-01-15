@@ -129,6 +129,10 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null)
     {
+        if ($this->factory->getUser()->isGuest) {
+            return array(array(), false, '');
+        }
+
         $notifications = $this->getNotifications($afterId);
 
         $showNewIndicator = false;
