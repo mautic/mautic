@@ -160,7 +160,8 @@ $formId = $form['sessionId']->vars['data'];
 
 <?php
 $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'formComponentModal',
-    'header' => false
+    'id'           => 'formComponentModal',
+    'header'       => false,
+    'footerButtons'=> true
 )));
 ?>

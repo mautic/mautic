@@ -2,27 +2,31 @@
 namespace MauticAddon\MauticCrmBundle\Crm\Vtiger\Api\Object;
 
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
+use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 class Lead extends CrmApi
 {
-    protected $object = "Leads";
+    protected $element = "Leads";
 
-    /**
-     * List types
-     *
-     * @return mixed
-     */
-    public function listTypes()
+    public function request($operation, $element, $elementData = array(), $method = 'GET')
     {
         $tokenData = $this->auth->getAccessTokenData();
 
-        $request_url = sprintf('%s/webservice.php',$tokenData['vtiger_url']);
-        $parameters = array(
-            'operation' => 'listtypes',
-            'sessionName' => $tokenData['session_id']
+        $request_url = sprintf('%s/webservice.php', $tokenData['url']);
+        $parameters  = array(
+            'operation'   => $operation,
+            'sessionName' => $tokenData['sessionName'],
+            'elementType' => $element
         );
 
-        $response = $this->auth->makeRequest($request_url, $parameters);
+        if (!empty($elementData)) {
+            $parameters['element'] = json_encode($elementData);
+        }
+        $response = $this->auth->makeRequest($request_url, $parameters, $method);
+
+        if (!empty($response['error'])) {
+            throw new ErrorException($response['error']['message']);
+        }
 
         return $response['result'];
     }
@@ -32,40 +36,28 @@ class Lead extends CrmApi
      *
      * @return mixed
      */
-    public function describe($type)
+    public function listTypes ()
     {
-        $tokenData = $this->auth->getAccessTokenData();
+        return $this->request('listtypes', $this->element);
+    }
 
-        $request_url = sprintf('%s/webservice.php',$tokenData['vtiger_url']);
-        $parameters = array(
-            'operation' => 'describe',
-            'sessionName' => $tokenData['session_id'],
-            'elementType' => $type
-        );
-
-        $response = $this->auth->makeRequest($request_url, $parameters);
-
-        return $response['result'];
+    /**
+     * List leads
+     *
+     * @return mixed
+     */
+    public function describe ()
+    {
+        return $this->request('describe', $this->element);
     }
 
     /**
      * @param array $data
+     *
      * @return mixed
      */
-    public function create(array $data)
+    public function create (array $data)
     {
-        $tokenData = $this->auth->getAccessTokenData();
-
-        $request_url = sprintf('%s/webservice.php',$tokenData['vtiger_url']);
-        $parameters = array(
-            'operation' => 'create',
-            'sessionName' => $tokenData['session_id'],
-            'elementType' => $this->object,
-            'element' => json_encode($data)
-        );
-
-        $response = $this->auth->makeRequest($request_url, $parameters);
-
-        return $response['result'];
+        return $this->request('create', $this->element, $data, 'POST');
     }
 }

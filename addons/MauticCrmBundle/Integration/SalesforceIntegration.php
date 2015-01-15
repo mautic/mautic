@@ -85,6 +85,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getOAuthLoginUrl()
+    {
+        return $this->getCrmLoginUrl(true);
+    }
+
+    /**
      * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')
@@ -97,7 +105,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         parent::createApiAuth($salesForceSettings);
     }
 
-
     /**
      * @return array|mixed
      */
@@ -109,7 +116,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($this->checkApiAuth($silenceExceptions)) {
                 $leadObject = CrmApi::getContext($this->getName(), 'lead', $this->auth)->getInfo();
 
-                if (isset($leadObject['fields'])) {
+                if ($leadObject != null && isset($leadObject['fields'])) {
                     foreach ($leadObject['fields'] as $fieldInfo) {
                         if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], array('reference', 'boolean'))) {
                             continue;
@@ -132,5 +139,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $salesFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        if ($section == 'authorization') {
+            return array('mautic.salesforce.form.oauth_requirements', 'warning');
+        }
+
+        return parent::getFormNotes($section);
     }
 }

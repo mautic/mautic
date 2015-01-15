@@ -24,16 +24,17 @@ class SecurityController extends CommonController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize (FilterControllerEvent $event)
     {
         $securityContext = $this->get('security.context');
 
         //redirect user if they are already authenticated
         if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        ) {
 
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
-            $event->setController(function() use ($redirectUrl) {
+            $event->setController(function () use ($redirectUrl) {
                 return new RedirectResponse($redirectUrl);
             });
         }
@@ -44,7 +45,8 @@ class SecurityController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction() {
+    public function loginAction ()
+    {
 
         $session = $this->request->getSession();
 
@@ -67,12 +69,14 @@ class SecurityController extends CommonController
             $this->addFlash($msg, array(), 'error', null, false);
         }
         $this->request->query->set('tmpl', 'login');
+
         return $this->delegateView(array(
             'viewParameters'  => array('last_username' => $session->get(SecurityContext::LAST_USERNAME)),
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
             'passthroughVars' => array(
-                'route'         => $this->generateUrl('login'),
-                'mauticContent' => 'user'
+                'route'          => $this->generateUrl('login'),
+                'mauticContent'  => 'user',
+                'sessionExpired' => true
             )
         ));
     }

@@ -56,18 +56,21 @@ class Auth extends AbstractAuth
     protected $_expires;
 
     /**
-     * @param null $vtiger_url
+     * @param null $url
      * @param null $username
      * @param null $accessKey
+     * @param null $sessionName
+     * @param null $userId
+     * @param null $version
      */
-    public function setup ($url = null, $username = null, $access_key = null, $session_id = null, $user_id = null, $api_version = null)
+    public function setup ($url = null, $username = null, $accessKey = null, $sessionName = null, $userId = null, $version = null)
     {
         $this->_vtiger_url  = $url;
         $this->_username    = $username;
-        $this->_accessKey   = $access_key;
-        $this->_session_id  = $session_id;
-        $this->_api_version = $api_version;
-        $this->_user_id     = $user_id;
+        $this->_accessKey   = $accessKey;
+        $this->_session_id  = $sessionName;
+        $this->_api_version = $version;
+        $this->_user_id     = $userId;
     }
 
     /**
@@ -120,10 +123,10 @@ class Auth extends AbstractAuth
     public function getAccessTokenData ()
     {
         return array(
-            "session_id"  => $this->_session_id,
-            "user_id"     => $this->_user_id,
-            "vtiger_url"  => $this->_vtiger_url,
-            "api_version" => $this->_api_version
+            'sessionName' => $this->_session_id,
+            'userId'      => $this->_user_id,
+            'version'     => $this->_api_version,
+            'url'         => $this->_vtiger_url
         );
     }
 
@@ -137,8 +140,7 @@ class Auth extends AbstractAuth
      */
     public function makeRequest ($url, array $parameters = array(), $method = 'GET', array $settings = array())
     {
-        $method     = strtoupper($method);
-        $encodeData = isset($settings['encoded_data']) ? true : false;
+        $method = strtoupper($method);
 
         if ($method == 'GET') {
             $url .= "?" . http_build_query($parameters);
@@ -148,18 +150,10 @@ class Auth extends AbstractAuth
 
         if ($method == 'POST') {
             curl_setopt($curl_request, CURLOPT_POST, 1);
-        } elseif ($method == 'PUT') {
-            curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "PUT");
-        } elseif ($method == 'DELETE') {
-            curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "DELETE");
         }
 
         curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
         if (!empty($parameters) && $method !== 'GET') {
-            if ($encodeData) {
-                //encode the arguments as JSON
-                $parameters = json_encode($parameters);
-            }
             curl_setopt($curl_request, CURLOPT_POSTFIELDS, $parameters);
         }
 
@@ -182,13 +176,6 @@ class Auth extends AbstractAuth
         //Check for existing access token
         if (!empty($this->_session_id)) {
             if (strlen($this->_session_id) > 0) {
-                return true;
-            }
-        } else {
-            //Check to see if token in session has expired
-            if (!empty($this->_expires) && $this->_expires < time()) {
-                return false;
-            } elseif (strlen($this->_access_token) > 0) {
                 return true;
             }
         }

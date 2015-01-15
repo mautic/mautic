@@ -83,7 +83,9 @@ class AddonRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->createQueryBuilder($this->getTableAlias());
+        $q = $this->_em->createQueryBuilder();
+        $q->select($this->getTableAlias())
+            ->from('MauticAddonBundle:Addon', $this->getTableAlias(), $this->getTableAlias() . '.id');
 
         $this->buildClauses($q, $args);
 

@@ -44,6 +44,7 @@ class PointEventHelper
                 }
             }
         }
+
         return $success;
     }
 }

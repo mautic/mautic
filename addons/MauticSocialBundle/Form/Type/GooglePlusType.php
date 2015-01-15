@@ -28,10 +28,6 @@ class GooglePlusType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.integration.form.sharebutton'
-        ));
-
         $builder->add('annotation', 'choice', array(
             'choices'     => array(
                 'inline'            => 'mautic.integration.GooglePlus.share.annotation.inline',

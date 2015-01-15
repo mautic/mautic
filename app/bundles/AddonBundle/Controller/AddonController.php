@@ -20,9 +20,9 @@ class AddonController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction($page = 1)
+    public function indexAction ($page = 1)
     {
-	    /* @type \Mautic\AddonBundle\Model\AddonModel $model */
+        /* @type \Mautic\AddonBundle\Model\AddonModel $model */
         $model = $this->factory->getModel('addon');
 
         if (!$this->factory->getSecurity()->isGranted('addon:addons:manage')) {
@@ -63,7 +63,7 @@ class AddonController extends FormController
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.addon.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_addon_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_addon_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -82,19 +82,20 @@ class AddonController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'searchValue' => $search,
-                'items'       => $addons,
-                'page'        => $page,
-                'limit'       => $limit,
-                'model'       => $model,
-                'tmpl'        => $tmpl
+            'viewParameters'  => array(
+                'searchValue'       => $search,
+                'items'             => $addons,
+                'page'              => $page,
+                'limit'             => $limit,
+                'model'             => $model,
+                'tmpl'              => $tmpl,
+                'integrationHelper' => $this->factory->getHelper('integration')
             ),
             'contentTemplate' => 'MauticAddonBundle:Addon:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_addon_index',
-                'mauticContent'  => 'addon',
-                'route'          => $this->generateUrl('mautic_addon_index', array('page' => $page))
+                'activeLink'    => '#mautic_addon_index',
+                'mauticContent' => 'addon',
+                'route'         => $this->generateUrl('mautic_addon_index', array('page' => $page))
             )
         ));
     }
@@ -106,7 +107,7 @@ class AddonController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reloadAction($objectId)
+    protected function reloadAction ($objectId)
     {
         if (!$this->factory->getSecurity()->isGranted('addon:addons:manage')) {
             return $this->accessDenied();
@@ -121,10 +122,9 @@ class AddonController extends FormController
         $installedAddons = $repo->getInstalled();
 
         $persist = array();
-
         foreach ($installedAddons as $bundle => $addon) {
-            $baseName = str_replace('Bundle', '', $bundle);
-            if (!isset($addons[$baseName])) {
+            $persistUpdate = false;
+            if (!isset($addons[$bundle])) {
                 //files are no longer found
                 $addon->setIsEnabled(false);
                 $addon->setIsMissing(true);
@@ -133,9 +133,10 @@ class AddonController extends FormController
                 if ($addon->getIsMissing()) {
                     //was lost but now is found
                     $addon->setIsMissing(false);
+                    $persistUpdate = true;
                 }
 
-                $file = $addons[$baseName]['directory'].'/Config/details.php';
+                $file = $addons[$bundle]['directory'] . '/Config/details.php';
 
                 //update details of the bundle
                 if (file_exists($file)) {
@@ -143,18 +144,19 @@ class AddonController extends FormController
 
                     //compare versions to see if an update is necessary
                     $version = isset($details['version']) ? $details['version'] : '';
-                    if (!empty($version) && version_compare($addon->getVersion(), $version) == -1 ) {
+                    if (!empty($version) && version_compare($addon->getVersion(), $version) == -1) {
                         $updated++;
 
                         //call the update callback
-                        $callback = $addons[$baseName]['bundleClass'];
+                        $callback = $addons[$bundle]['bundleClass'];
                         $callback::onUpdate($addon, $this->factory);
+                        $persistUpdate = true;
                     }
 
                     $addon->setVersion($version);
 
                     $addon->setName(
-                        isset($details['name']) ? $details['name'] : $addons[$baseName]['base']
+                        isset($details['name']) ? $details['name'] : $addons[$bundle]['base']
                     );
 
                     if (isset($details['description'])) {
@@ -166,9 +168,11 @@ class AddonController extends FormController
                     }
                 }
 
-                unset($addons[$baseName]);
+                unset($addons[$bundle]);
             }
-            $persist[] = $addon;
+            if ($persistUpdate) {
+                $persist[] = $addon;
+            }
         }
 
         //rest are new
@@ -178,7 +182,7 @@ class AddonController extends FormController
             $entity->setBundle($addon['bundle']);
             $entity->setIsEnabled(false);
 
-            $file = $addon['directory'].'/Config/details.php';
+            $file = $addon['directory'] . '/Config/details.php';
 
             //update details of the bundle
             if (file_exists($file)) {

@@ -8,13 +8,13 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
+
 use Mautic\AddonBundle\Entity\Integration;
 
 /**
  * Class TwitterIntegration
  */
-class TwitterIntegration extends AbstractIntegration
+class TwitterIntegration extends SocialIntegration
 {
 
     /**

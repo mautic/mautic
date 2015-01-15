@@ -406,17 +406,17 @@ var Mautic = {
                     itemSelector: ".shuffle",
                     sizer: false
                 });
+
+                // Update shuffle on sidebar minimize/maximize
+                mQuery("html")
+                    .on("fa.sidebar.minimize", function () {
+                        grid.shuffle("update");
+                    })
+                    .on("fa.sidebar.maximize", function () {
+                        grid.shuffle("update");
+                    });
+
             }, 1000);
-
-            // Update shuffle on sidebar minimize/maximize
-            mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
-                })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
-                });
-
         }
 
         //prevent auto closing dropdowns for dropdown forms
@@ -506,6 +506,10 @@ var Mautic = {
             mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
             //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+            if (typeof MauticVars.modalsReset == 'undefined') {
+                MauticVars.modalsReset = {};
+            }
+
             mQuery(container + " *[data-toggle='modal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
                 mQuery(target).remove();
@@ -513,10 +517,13 @@ var Mautic = {
 
             mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
-                if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
-                    mQuery(target).remove();
-                } else {
-                    Mautic.resetModal(target, true);
+                if (typeof MauticVars.modalsReset[target] == 'undefined') {
+                    if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
+                        mQuery(target).remove();
+                    } else {
+                        Mautic.resetModal(target, true);
+                    }
+                    MauticVars.modalsReset[target] = target;
                 }
             });
 
@@ -530,6 +537,11 @@ var Mautic = {
                     }
                 });
             });
+
+            //turn off shuffle events
+            mQuery('html')
+                .off('fa.sidebar.minimize')
+                .off('fa.sidebar.maximize');
         }
 
         //run specific unloads
@@ -669,11 +681,16 @@ var Mautic = {
     /**
      * Posts a form and returns the output.
      * Uses jQuery form plugin so it handles files as well.
+     *
      * @param form
      * @param callback
      */
-    postForm: function (form, callback, inMain) {
+    postForm: function (form, callback) {
         var form = mQuery(form);
+
+        var modalParent = form.closest('.modal');
+        var inMain = modalParent.length > 0 ? false : true;
+
         var action = form.attr('action');
 
         if (action.indexOf("ajax=1") == -1) {
@@ -689,7 +706,23 @@ var Mautic = {
             showLoadingBar: showLoading,
             success: function (data) {
                 MauticVars.formSubmitInProgress = false;
-                if (callback) {
+                if (!inMain) {
+                    var modalId = mQuery(modalParent).attr('id');
+                }
+
+                if (data.sessionExpired) {
+                    if (!inMain) {
+                        mQuery('#' + modalId).modal('hide');
+                        mQuery('.modal-backdrop').remove();
+                    }
+                    Mautic.processPageContent(data);
+                } else if (callback) {
+                    data.inMain = inMain;
+
+                    if (!inMain) {
+                        data.modalId = modalId;
+                    }
+
                     if (typeof callback == 'function') {
                         callback(data);
                     } else if (typeof Mautic[callback] == 'function') {
@@ -841,18 +874,13 @@ var Mautic = {
                 MauticVars.formSubmitInProgress = true;
             }
 
-            var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
-            var isInModal = modalParent.length > 0 ? true : false;
-
             Mautic.postForm(mQuery(this), function (response) {
-
-                if (!isInModal) {
+                if (response.inMain) {
                     Mautic.processPageContent(response);
                 } else {
-                    var target = '#' + modalParent.attr('id');
-                    Mautic.processModalContent(response, target);
+                    Mautic.processModalContent(response, response.modalId);
                 }
-            }, !isInModal);
+            });
 
             return false;
         }));
@@ -970,7 +998,7 @@ var Mautic = {
         });
 
         //clean slate upon close
-        mQuery(target).on('hide.bs.modal', function () {
+        mQuery(target).on('hidden.bs.modal', function () {
             Mautic.resetModal(target);
         });
 
@@ -999,30 +1027,25 @@ var Mautic = {
     /**
      * Clears content from a shared modal
      * @param target
-     * @param firstLoad
      */
-    resetModal: function (target, firstLoad) {
+    resetModal: function (target) {
         if (mQuery(target).hasClass('in')) {
             return;
         }
 
-        if (typeof MauticVars.modalsReset == 'undefined') {
-            MauticVars.modalsReset = {};
-        }
-
-        if (firstLoad && typeof MauticVars.modalsReset[target] != 'undefined') {
-            return;
-        }
-
-        MauticVars.modalsReset[target] = target;
-
         mQuery(target + " .modal-title").html('');
         mQuery(target + " .modal-body-content").html('');
-        if (mQuery(target + " .modal-form-buttons").length) {
-            mQuery(target + " .modal-form-buttons").html('');
-        }
+
         if (mQuery(target + " loading-placeholder").length) {
             mQuery(target + " loading-placeholder").removeClass('hide');
+        }
+        if (mQuery(target + " .modal-footer").length) {
+            var hasFooterButtons = mQuery(target + " .modal-footer .modal-form-buttons").length;
+            mQuery(target + " .modal-footer").html('');
+            if (hasFooterButtons) {
+                //add footer buttons
+                mQuery('<div class="modal-form-buttons" />').appendTo(target + " .modal-footer");
+            }
         }
     },
 
@@ -1038,8 +1061,7 @@ var Mautic = {
             alert(response.error);
             return;
         }
-
-        if (response.closeModal && response.newContent) {
+        if (response.sessionExpired || (response.closeModal && response.newContent)) {
             mQuery(target).modal('hide');
             mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app

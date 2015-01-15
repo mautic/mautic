@@ -13,7 +13,7 @@ use Mautic\AddonBundle\Integration\AbstractIntegration;
 /**
  * Class InstagramIntegration
  */
-class InstagramIntegration extends AbstractIntegration
+class InstagramIntegration extends SocialIntegration
 {
     /**
      * {@inheritdoc}

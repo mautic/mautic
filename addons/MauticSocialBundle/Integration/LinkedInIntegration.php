@@ -8,12 +8,11 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class LinkedInIntegration
  */
-class LinkedInIntegration extends AbstractIntegration
+class LinkedInIntegration extends SocialIntegration
 {
     /**
      * {@inheritdoc}

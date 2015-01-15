@@ -178,6 +178,7 @@ class PointModel extends CommonFormModel
 
         $persist     = array();
         $persistLead = false;
+
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {

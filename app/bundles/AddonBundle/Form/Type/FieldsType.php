@@ -9,6 +9,7 @@
 
 namespace Mautic\AddonBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -29,12 +30,14 @@ class FieldsType extends AbstractType
     {
         foreach ($options['integration_fields'] as $field => $details) {
             $label = (is_array($details)) ? $details['label'] : $details;
+            $field = InputHelper::alphanum($field);
+
             $builder->add($field, 'choice', array(
                 'choices'    => $options['lead_fields'],
                 'label'      => $label,
-                'required'   => false,
+                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class'   => 'form-control chosen', 'data-placeholder' => ' ')
+                'attr'       => array('class' => 'form-control chosen', 'data-placeholder' => ' ')
             ));
         }
     }

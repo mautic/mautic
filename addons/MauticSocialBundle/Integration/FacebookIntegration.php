@@ -8,12 +8,11 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class FacebookIntegration
  */
-class FacebookIntegration extends AbstractIntegration
+class FacebookIntegration extends SocialIntegration
 {
 
     /**

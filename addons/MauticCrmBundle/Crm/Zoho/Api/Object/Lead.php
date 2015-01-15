@@ -2,22 +2,25 @@
 namespace MauticAddon\MauticCrmBundle\Crm\Zoho\Api\Object;
 
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
+use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 class Lead extends CrmApi
 {
+    private $module = 'Leads';
+
     /**
      * List types
      *
      * @return mixed
      */
-    public function getFields($module)
+    public function getFields ()
     {
         $tokenData = $this->auth->getAccessTokenData();
 
-        $request_url = sprintf('%s%s/getFields',$tokenData['endpoint_url'],$module);
-        $parameters = array(
+        $request_url = sprintf('%s%s/getFields', $tokenData['endpoint_url'], $this->module);
+        $parameters  = array(
             'authtoken' => $tokenData['authtoken'],
-            'scope' => 'crmapi'
+            'scope'     => 'crmapi'
         );
 
         $response = $this->auth->makeRequest($request_url, $parameters);
@@ -26,24 +29,33 @@ class Lead extends CrmApi
     }
 
     /**
-     * @param $module
      * @param $data
+     *
      * @return array
      */
-    public function create($module, $data)
+    public function create ($data)
     {
         //https://crm.zoho.com/crm/private/xml/Leads/insertRecords
         $tokenData = $this->auth->getAccessTokenData();
 
-        $request_url = sprintf('%s%s/InsertRecords',$tokenData['endpoint_url'],$module);
-        $parameters = array(
-            'authtoken' => $tokenData['authtoken'],
-            'scope' => 'crmapi',
-            'xmlData' => $data,
+        $request_url = sprintf('%s%s/insertRecords', $tokenData['endpoint_url'], $this->module);
+        $parameters  = array(
+            'authtoken'      => $tokenData['authtoken'],
+            'scope'          => 'crmapi',
+            'xmlData'        => $data,
             'duplicateCheck' => 2 //update if exists
         );
 
-        $response = $this->auth->makeRequest($request_url, $parameters);
+        $response = $this->auth->makeRequest($request_url, $parameters, 'POST');
+
+        if (!empty($response['response']['error'])) {
+            $response = $response['response'];
+            $errorMsg = $response['error']['message'] . ' (' . $response['error']['code'] . ')';
+            if (isset($response['uri'])) {
+                $errorMsg .= '; ' . $response['uri'];
+            }
+            throw new ErrorException($errorMsg);
+        }
 
         return $response;
     }

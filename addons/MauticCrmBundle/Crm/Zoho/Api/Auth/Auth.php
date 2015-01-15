@@ -44,10 +44,10 @@ class Auth extends AbstractAuth
      * @param null $password
      * @param null $authtoken
      */
-    public function setup($email_id= null, $password = null, $authtoken = null)
+    public function setup ($email_id = null, $password = null, $authtoken = null)
     {
-        $this->_email_id = $email_id;
-        $this->_password = $password;
+        $this->_email_id  = $email_id;
+        $this->_password  = $password;
         $this->_authtoken = $authtoken;
     }
 
@@ -59,8 +59,8 @@ class Auth extends AbstractAuth
     public function validateAccessToken ()
     {
         $request_url = 'https://accounts.zoho.com/apiauthtoken/nb/create';
-        $parameters = array(
-            'SCOPE' => 'ZohoCRM/crmapi',
+        $parameters  = array(
+            'SCOPE'    => 'ZohoCRM/crmapi',
             'EMAIL_ID' => $this->_email_id,
             'PASSWORD' => $this->_password
         );
@@ -68,12 +68,12 @@ class Auth extends AbstractAuth
         $raw = $this->makeRequest($request_url, $parameters, 'GET', array('raw' => true));
 
         $attributes = array();
-        preg_match_all('(\w*=\w*)',$raw,$matches);
+        preg_match_all('(\w*=\w*)', $raw, $matches);
         if (empty($matches[0])) {
             return false;
         }
         foreach ($matches[0] as $string_attribute) {
-            $parts = explode('=',$string_attribute);
+            $parts                 = explode('=', $string_attribute);
             $attributes[$parts[0]] = $parts[1];
         }
 
@@ -81,7 +81,7 @@ class Auth extends AbstractAuth
             return false;
         }
 
-        $this->_authtoken = $attributes['AUTHTOKEN'];
+        $this->_authtoken            = $attributes['AUTHTOKEN'];
         $this->_access_token_updated = true;
 
         return true;
@@ -92,56 +92,40 @@ class Auth extends AbstractAuth
      *
      * @return array
      */
-    public function getAccessTokenData()
+    public function getAccessTokenData ()
     {
         return array(
-            "authtoken"        => $this->_authtoken,
-            "endpoint_url"     => $this->_endpoint_url,
+            "authtoken"    => $this->_authtoken,
+            "endpoint_url" => $this->_endpoint_url,
         );
     }
 
     /**
-     * @param $url
-     * @param array $parameters
+     * @param        $url
+     * @param array  $parameters
      * @param string $method
-     * @param array $settings
+     * @param array  $settings
+     *
      * @return array|mixed|string
      */
-    public function makeRequest($url, array $parameters = array(), $method = 'GET', array $settings = array())
+    public function makeRequest ($url, array $parameters = array(), $method = 'GET', array $settings = array())
     {
         $method = strtoupper($method);
-        $encodeData = isset($settings['encoded_data']) ? true : false ;
 
-        if ($method == 'GET')
-        {
+        if ($method == 'GET') {
             $url .= "?" . http_build_query($parameters);
         }
 
         $curl_request = curl_init($url);
 
-        if ($method == 'POST')
-        {
+        if ($method == 'POST') {
             curl_setopt($curl_request, CURLOPT_POST, 1);
-        }
-        elseif ($method == 'PUT')
-        {
-            curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "PUT");
-        }
-        elseif ($method == 'DELETE')
-        {
-            curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "DELETE");
         }
 
         curl_setopt($curl_request, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl_request, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
-        if (!empty($parameters) && $method !== 'GET')
-        {
-            if ($encodeData)
-            {
-                //encode the arguments as JSON
-                $parameters = json_encode($parameters);
-            }
+        if (!empty($parameters) && $method !== 'GET') {
             curl_setopt($curl_request, CURLOPT_POSTFIELDS, $parameters);
         }
 
@@ -181,6 +165,4 @@ class Auth extends AbstractAuth
 
         return false;
     }
-
-
 }

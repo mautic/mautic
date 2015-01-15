@@ -50,10 +50,10 @@ class AuthController extends FormController
             }
         }
 
-        $state = $session->get($integration . '_csrf_token', false);
-
+        $state      = $session->get($integration . '_csrf_token', false);
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
+            $session->remove($integration . '_csrf_token');
             $session->set('mautic.integration.postauth.message', array('mautic.integration.auth.invalid.state', array(), 'error'));
             if ($isAjax) {
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));

@@ -1,6 +1,7 @@
 <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
     <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
-    <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+    <?php $message = (empty($message)) ? 'mautic.core.noresults' : $message; ?>
+    <p><?php echo $view['translator']->trans($message); ?></p>
 </div>
 
 

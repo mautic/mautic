@@ -26,11 +26,14 @@ class IntegrationController extends FormController
             return $this->accessDenied();
         }
 
-        $addonFilter = $this->request->get('addon');
+        $session     = $this->factory->getSession();
+        $addonFilter = $this->request->get('addon', $session->get('mautic.integrations.filter', ''));
+        $session->set('mautic.integrations.filter', $addonFilter);
+
+        $addonModel  = $this->factory->getModel('addon');
 
         if (!empty($addonFilter)) {
             //check to see if the addon is enabled; if not redirect back to addons with a message to enable
-            $addonModel = $this->factory->getModel('addon');
             $addonEntity = $addonModel->getEntity($addonFilter);
             if ($addonEntity != null && !$addonEntity->isEnabled()) {
                 $viewParameters = array(
@@ -58,15 +61,16 @@ class IntegrationController extends FormController
 
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true, $addonFilter);
+        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = array();
 
         foreach ($integrationObjects as $name => $object) {
-            $settings = $object->getIntegrationSettings();
+            $settings            = $object->getIntegrationSettings();
             $integrations[$name] = array(
-                'name' => $name,
-                'icon' => $integrationHelper->getIconPath($object),
-                'enabled' => $settings->isPublished()
+                'name'    => $name,
+                'icon'    => $integrationHelper->getIconPath($object),
+                'enabled' => $settings->isPublished(),
+                'addon'   => $settings->getAddon()->getId()
             );
         }
 
@@ -75,16 +79,33 @@ class IntegrationController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
+        //get a list of addons for filter
+        $addons = $addonModel->getEntities(array(
+            'hydration_mode' => 'hydrate_array',
+            'orderBy' => 'i.name',
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => 'i.isEnabled',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    )
+                )
+            )
+        ))->getIterator()->getArrayCopy();
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items' => $integrations,
-                'tmpl'  => $tmpl
+                'items'       => $integrations,
+                'tmpl'        => $tmpl,
+                'addonFilter' => ($addonFilter) ? array('id' => $addonEntity->getId(), 'name' => $addonEntity->getName()) : false,
+                'addons'      => $addons
             ),
             'contentTemplate' => 'MauticAddonBundle:Integration:grid.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_addon_integration_index',
                 'mauticContent' => 'integration',
-                'route'         => $this->generateUrl('mautic_addon_integration_index')
+                'route'         => $this->generateUrl('mautic_addon_integration_index'),
             )
         ));
     }
@@ -169,7 +190,7 @@ class IntegrationController extends FormController
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
                             if (isset($featureSettings['leadFields'])) {
-                                $fields                        = $integrationHelper->getAvailableFields($integration);
+                                $fields  = $integrationObject->getAvailableFields();
                                 if (!empty($fields)) {
                                     $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
                                     foreach ($featureSettings['leadFields'] as $f => $v) {
@@ -197,7 +218,7 @@ class IntegrationController extends FormController
                             'integration' => $integration,
                             'authUrl' => $oauthUrl,
                             'authorize' => 1,
-                            'popupBlockerMessage' => $this->factory->getTranslator('mautic.integration.oauth.popupblocked')
+                            'popupBlockerMessage' => $this->factory->getTranslator()->trans('mautic.integration.oauth.popupblocked')
                         ));
                     }
                 }
@@ -223,8 +244,8 @@ class IntegrationController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form' => $this->setFormTheme($form, $template, $themes),
-                'callbackUri' => $integrationObject->getOauthCallbackUrl()
+                'form'        => $this->setFormTheme($form, $template, $themes),
+                'integration' => $integrationObject
             ),
             'contentTemplate' => $template,
             'passthroughVars' => array(

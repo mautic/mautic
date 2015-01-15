@@ -64,7 +64,7 @@ class TriggerEventType extends AbstractType
             'save_text' => $btnValue,
             'save_icon' => $btnIcon,
             'apply_text' => false,
-            'container_class' => 'bottom-triggerevent-buttons'
+            'container_class' => 'bottom-form-buttons'
         ));
 
         $builder->add('triggerId', 'hidden', array(

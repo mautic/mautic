@@ -45,7 +45,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 </div>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'CategoryFormModal',
-    'footer' => '<div class="modal-form-buttons"></div>'
+    'id'            => 'CategoryFormModal',
+    'footerButtons' => true
 ));
 ?>

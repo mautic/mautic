@@ -43,9 +43,13 @@ $padding         = (empty($padding)) ? "" : $padding;
                     <?php echo $body; ?>
                 </div>
             </div>
-            <?php if (!empty($footer)) : ?>
+            <?php if (!empty($footer) || !empty($footerButtons)) : ?>
             <div class="modal-footer">
+                <?php if (!empty($footerButtons)): ?>
+                <div class="modal-form-buttons"></div>
+                <?php else: ?>
                 <?php echo $footer; ?>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         </div>

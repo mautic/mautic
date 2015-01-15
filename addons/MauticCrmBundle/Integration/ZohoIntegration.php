@@ -8,12 +8,14 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+use Mautic\CoreBundle\Helper\InputHelper;
+use MauticAddon\MauticCrmBundle\Api\CrmApi;
 use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 /**
  * Class ZohoIntegration
  */
-abstract class ZohoIntegration extends CrmAbstractIntegration
+class ZohoIntegration extends CrmAbstractIntegration
 {
 
     /**
@@ -21,7 +23,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return 'Zoho';
     }
@@ -31,7 +33,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields ()
     {
         return array(
             'email_id' => 'mautic.zoho.form.email',
@@ -40,12 +42,36 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getClientIdKey ()
+    {
+        return 'email_id';
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientSecretKey ()
+    {
+        return 'password';
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthTokenKey ()
+    {
+        return 'authtoken';
+    }
+
+    /**
      * @param array  $parameters
      * @param string $authMethod
      *
      * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
-    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
+    public function createApiAuth ($parameters = array(), $authMethod = 'Auth')
     {
         $zohoSettings = $this->getDecryptedApiKeys();
 
@@ -53,30 +79,9 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Check API Authentication
-     */
-    public function checkApiAuth($silenceExceptions = true)
-    {
-        try {
-            if (!$this->auth->isAuthorized()) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (ErrorException $exception) {
-            $this->logIntegrationError($exception);
-
-            if (!$silenceExceptions) {
-                throw $exception;
-            }
-            return false;
-        }
-    }
-
-    /**
      * @return array
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableFields ($silenceExceptions = true)
     {
         $zohoFields = array();
 
@@ -84,18 +89,26 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
             if ($this->checkApiAuth($silenceExceptions)) {
                 $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getFields('Leads');
 
-                if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
+                if ($leadObject == null || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                     return array();
                 }
 
-                //@todo need to set array("type" => "string");
                 $zohoFields = array();
                 foreach ($leadObject['Leads']['section'] as $optgroup) {
-                    $zohoFields[$optgroup['dv']] = array();
+                    //$zohoFields[$optgroup['dv']] = array();
                     if (!array_key_exists(0, $optgroup['FL']))
                         $optgroup['FL'] = array($optgroup['FL']);
                     foreach ($optgroup['FL'] as $field) {
-                        $zohoFields[$optgroup['dv']][$field['dv']] = $field['dv'];
+                        if (!(bool)$field['isreadonly'] || in_array($field['type'], array('Lookup', 'OwnerLookup', 'Boolean'))) {
+                            continue;
+                        }
+                        $key              = InputHelper::alphanum($field['dv']);
+                        $zohoFields[$key] = array(
+                            'type'     => 'string',
+                            'label'    => $field['label'],
+                            'dv'       => $field['dv'],
+                            'required' => ($field['req'] == 'true')
+                        );
                     }
                 }
             }
@@ -105,6 +118,7 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
             if (!$silenceExceptions) {
                 throw $exception;
             }
+
             return false;
         }
 
@@ -112,70 +126,37 @@ abstract class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @return mixed|void
+     * {@inheritdoc}
+     *
+     * @param $key
+     * @param $field
+     *
+     * @return mixed
      */
-    public function create(MauticFactory $factory, $data)
+    public function convertLeadFieldKey($key, $field)
     {
-        try {
-            $this->factory = $factory;
-            $router = $this->factory->getRouter();
-            $request = $this->factory->getRequest();
-            $modelClient = $this->factory->getModel('mapper.ApplicationClient');
-            $application = 'zoho';
-            $request->set('application', $application);
-            $entityClient = $modelClient->loadByApplication($application);
-            $client = $entityClient->getAlias();
-            $request->set('client', $client);
+        return $field['dv'];
+    }
 
-            $this->checkApiAuth();
+    /**
+     * {@inheritdoc}
+     *
+     * @param $lead
+     *
+     * @return array
+     */
+    public function populateLeadData ($lead)
+    {
+        $mappedData = parent::populateLeadData($lead);
 
-            $modelMapper = $this->factory->getModel('mapper.ApplicationObjectMapper');
-            $mapperEntity = $modelMapper->getByClientAndObject($entityClient->getId(),$this->getBaseName());
-
-            $mappedFields = array();
-
-            $xmlData = '<Leads>';
-            $xmlData .= '<row no="1">';
-            foreach ($mappedFields as $field) {
-                $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $field['name'], $field['value']);
-            }
-            $xmlData .= '</row>';
-            $xmlData .= '</Leads>';
-
-            $zohoSettings = $entityClient->getApiKeys();
-
-            $zohoAuth = ApiAuth::initiate($zohoSettings);
-            $leadObject = CrmApi::getContext('Zoho', "object", $zohoAuth)->insert('Leads', $xmlData);
-
-            if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
-                throw new ErrorException($leadObject['response']['error']['message'],$leadObject['response']['error']['code']);
-            }
-
-
-        } catch (ErrorException $exception) {
-            //remove keys and try again
-            if ($exception->getCode() == 1) {
-                $zohoSettings = $entityClient->getApiKeys();
-                unset($zohoSettings['accessToken']);
-                unset($zohoSettings['accessTokenExpires']);
-                $entityClient->setApiKeys($zohoSettings);
-                $modelClient->saveEntity($entityClient);
-            }
-            $this->factory->getSession()->getFlashBag()->add('error',
-                $this->factory->getTranslator()->trans(
-                    $exception->getMessage(),
-                    (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
-                    'flashes'
-                ));
-
-            $url = $router->generate('mautic_crm_client_objects_index', array(
-                'client'      => $client,
-                'application' => $application
-            ));
-
-            $redirect = new RedirectResponse($url);
-            $redirect->send();
+        $xmlData = '<Leads>';
+        $xmlData .= '<row no="1">';
+        foreach ($mappedData as $name => $value) {
+            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $mappedData, $value);
         }
+        $xmlData .= '</row>';
+        $xmlData .= '</Leads>';
+
+        return $xmlData;
     }
 }
