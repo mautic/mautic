@@ -243,6 +243,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function pushLead($lead)
     {
         $mappedData = $this->populateLeadData($lead);
+
+        $this->amendLeadDataBeforePush($mappedData);
+
         if (empty($mappedData)) {
             return false;
         }
@@ -256,6 +259,16 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $this->logIntegrationError($e);
         }
         return false;
+    }
+
+    /**
+     * Amend mapped lead data before pushing to CRM
+     *
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforePush(&$mappedData)
+    {
+
     }
 
     /**
