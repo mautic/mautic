@@ -8,7 +8,7 @@
  */
 
 $config = array(
-    "name"        => "Holiday",
+    "name"        => "Coffee",
     "features"    => array(
         "page",
         "email"

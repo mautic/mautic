@@ -159,6 +159,38 @@ class DateHelper extends Helper
     }
 
     /**
+     * Format DateInterval into humanly readable format.
+     * Example: 55 minutes 49 seconds.
+     * It doesn't return zero values like 0 years.
+     *
+     * @param   DateInterval    $range
+     * @param   string          $format
+     * 
+     * @return  string          $formatedRange
+     */
+    public function formatRange($range, $format = null)
+    {
+        if ($range instanceof \DateInterval) {
+
+            $formated = array();
+            $timeUnits = array('y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second');
+
+            foreach ($timeUnits as $key => $unit) {
+                if ($range->{$key}) {
+                    $formated[] = $this->translator->transChoice(
+                        'mautic.core.date.' . $unit,
+                        $range->{$key},
+                        array('%count%' => $range->{$key}));
+                }
+            }
+
+            return implode(' ', $formated);
+        }
+
+        return '';
+    }
+
+    /**
      * @return string
      */
     public function getFullFormat()

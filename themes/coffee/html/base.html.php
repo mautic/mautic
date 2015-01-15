@@ -14,8 +14,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" type="text/css" />
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="../../../themes/narrow/css/narrow.css" type="text/css" />
+        <link rel="stylesheet" href="../../../themes/coffee/css/coffee.css" type="text/css" />
         <?php $view['assets']->outputHeadDeclarations(); ?>
     </head>
     <body>
