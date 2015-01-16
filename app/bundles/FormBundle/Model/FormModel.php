@@ -408,11 +408,9 @@ class FormModel extends CommonFormModel
      * Get the document write javascript for the form
      *
      * @param Form $form
-     * @param null $replaceText
-     * @param null $style
      * @return string
      */
-    public function getAutomaticJavascript(Form $form, $replaceText = null, $style = null)
+    public function getAutomaticJavascript(Form $form)
     {
         $html = $form->getCachedHtml();
 
@@ -420,10 +418,6 @@ class FormModel extends CommonFormModel
         $search  = array("\n", '"');
         $replace = array('\n', '\"');
         $html = str_replace($search, $replace, $html);
-        if (!empty($replaceText)) {
-            return !empty($style) && $style == 'modal' ? $html : "document.body.innerHTML = document.body.innerHTML.replace(\"".$replaceText."\",\"".$html."\");";
-        } else {
-            return "document.write(\"".$html."\");";
-        }
+        return "document.write(\"".$html."\");";
     }
 }

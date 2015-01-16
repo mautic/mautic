@@ -155,6 +155,40 @@ class PublicController extends CommonFormController
     }
 
     /**
+     * Gives a preview of the form
+     *
+     * @return Response
+     */
+    public function previewAction()
+    {
+        $objectId = InputHelper::int($this->request->get('id'));
+        $css = InputHelper::raw($this->request->get('css'));
+        $cssFiles = explode(',',$css);
+        $model = $this->factory->getModel('form.form');
+        $form  = $model->getEntity($objectId);
+        $customStyles = '';
+
+        foreach (explode(',',$css) as $cssStyle) {
+            $customStyles .= sprintf('<link rel="stylesheet" type="text/css" href="%s">', $cssStyle);
+        }
+
+        if ($form === null || !$form->isPublished()) {
+            $html =
+                '<h1>'.
+                $this->get('translator')->trans('mautic.form.error.notfound', array('%id%' => $objectId), 'flashes') .
+                '</h1>';
+        } else {
+            $html = $form->getCachedHtml();
+        }
+
+        $response = new Response();
+        $response->setContent('<html><head><title>' . $form->getName() . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
+        $response->setStatusCode(Response::HTTP_OK);
+        $response->headers->set('Content-Type', 'text/html');
+        return $response;
+    }
+
+    /**
      * Generates JS file for automatic form generation
      *
      * @return Response
@@ -162,8 +196,6 @@ class PublicController extends CommonFormController
     public function generateAction()
     {
         $formId = InputHelper::int($this->request->get('id'));
-        $replaceText = InputHelper::string($this->request->get('replace'));
-        $style = InputHelper::string($this->request->get('style'));
 
         $model  = $this->factory->getModel('form.form');
         $form   = $model->getEntity($formId);
@@ -172,7 +204,7 @@ class PublicController extends CommonFormController
         if ($form !== null) {
             $status = $form->getPublishStatus();
             if ($status == 'published') {
-                $js = $model->getAutomaticJavascript($form, $replaceText, $style);
+                $js = $model->getAutomaticJavascript($form);
             }
         }
 
