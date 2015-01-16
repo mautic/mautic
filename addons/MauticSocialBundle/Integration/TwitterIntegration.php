@@ -148,6 +148,14 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAuthenticationType()
+    {
+        return 'oauth1a';
+    }
+
+    /**
      * Generate a Twitter bearer token
      *
      * @param $keys

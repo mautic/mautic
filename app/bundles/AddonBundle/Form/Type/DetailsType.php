@@ -40,7 +40,7 @@ class DetailsType extends AbstractType
         ));
 
         $authType = $options['integration_object']->getAuthenticationType();
-        if (in_array($authType, array('oauth2', 'callback'))) {
+        if (in_array($authType, array('oauth1a', 'oauth2', 'callback'))) {
             $disabled     = false;
             $authTokenKey = $options['integration_object']->getAuthTokenKey();
             $label        = (!empty($decryptedKeys[$authTokenKey])) ? 'reauthorize' : 'authorize';
