@@ -387,6 +387,8 @@ class EmailController extends FormController
                 $session->remove('mautic.emailbuilder.' . $entity->getSessionId() . '.content');
             }
 
+            $viewParameters['updateSelect'] = InputHelper::clean($this->request->query->get('updateSelect'));
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -394,7 +396,8 @@ class EmailController extends FormController
                     'contentTemplate' => $template,
                     'passthroughVars' => array(
                         'activeLink'    => 'mautic_email_index',
-                        'mauticContent' => 'email'
+                        'mauticContent' => 'email',
+                        'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     )
                 ));
             }
@@ -406,12 +409,14 @@ class EmailController extends FormController
             'viewParameters'  => array(
                 'form'   => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                 'tokens' => $builderComponents['tokens'],
-                'email'  => $entity
+                'email'  => $entity,
+                'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect'))
             ),
             'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_email_index',
                 'mauticContent' => 'email',
+                'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                 'route'         => $this->generateUrl('mautic_email_action', array(
                     'objectAction' => 'new'
                 ))

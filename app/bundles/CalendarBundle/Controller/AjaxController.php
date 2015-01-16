@@ -11,6 +11,7 @@ namespace Mautic\CalendarBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AjaxController
@@ -36,7 +37,12 @@ class AjaxController extends CommonAjaxController
         $model  = $this->factory->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
 
-        return $this->sendJsonResponse($events);
+        // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then. 
+        $response = new Response;
+        $response->setContent(json_encode($events));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**

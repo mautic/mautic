@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -21,6 +22,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class EmailSendType extends AbstractType
 {
+    protected $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory) {
+        $this->factory = $factory;
+    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -41,6 +50,23 @@ class EmailSendType extends AbstractType
                     array('message' => 'mautic.email.chooseemail.notblank')
                 )
             )
+        ));
+
+        $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
+            'objectAction' => 'new',
+            'contentOnly' => 1,
+            'updateSelect' => 'email'
+        ));
+
+        $builder->add('newEmailButton', 'standalone_button', array(
+            'attr'     => array(
+                'class'   => 'btn btn-primary',
+                'onclick' => 'Mautic.loadNewEmailWindow({
+                    "windowUrl": "' . $windowUrl . '"
+                })',
+                'icon'    => 'fa fa-plus'
+            ),
+            'label'    => 'mautic.email.send.new.email'
         ));
     }
 
