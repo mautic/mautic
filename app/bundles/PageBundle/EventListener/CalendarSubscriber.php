@@ -46,7 +46,7 @@ class CalendarSubscriber extends CommonSubscriber
         $dates  = $event->getDates();
         $router = $this->factory->getRouter();
 
-        $commonSelect = 'p.title, p.id as page_id';
+        $commonSelect = 'p.title, p.id as page_id, c.color';
         $eventTypes = array(
             'publish.up'   => array('dateName' => 'publish_up', 'setter' => 'PublishUp'),
             'publish.down' => array('dateName' => 'publish_down', 'setter' => 'PublishDown')
@@ -54,6 +54,7 @@ class CalendarSubscriber extends CommonSubscriber
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
+            ->leftJoin('p', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = p.category_id AND c.bundle="page"')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)
