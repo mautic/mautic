@@ -40,4 +40,12 @@ class LinkedInIntegration extends SocialIntegration
     {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthenticationType()
+    {
+        return 'none';
+    }
 }

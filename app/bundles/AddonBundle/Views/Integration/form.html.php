@@ -34,7 +34,7 @@ $hasFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatu
                 <?php echo $view['translator']->trans($specialInstructions); ?>
             </div>
         <?php endif; ?>
-        <?php if (isset($form['apiKeys']->children['client_key']) || isset($form['apiKeys']->children['clientKey'])): ?>
+        <?php if (strpos($integration->getAuthenticationType(), 'oauth') !== false): ?>
         <div class="well well-sm">
             <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
             <input type="text" readonly value="<?php echo $integration->getOauthCallbackUrl(); ?>" class="form-control" />

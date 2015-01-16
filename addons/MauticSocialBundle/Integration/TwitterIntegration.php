@@ -192,14 +192,6 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
-    {
-        return 'oauth2';
-    }
-
-    /**
      * @param $endpoint
      *
      * @return string

@@ -94,4 +94,12 @@ abstract class SocialIntegration extends AbstractIntegration
 
         return $fields;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthenticationType()
+    {
+        return 'oauth2';
+    }
 }

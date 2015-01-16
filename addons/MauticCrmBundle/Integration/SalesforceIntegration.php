@@ -93,6 +93,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getAuthenticationType()
+    {
+        return 'oauth2';
+    }
+
+    /**
      * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
      */
     public function createApiAuth($parameters = array(), $authMethod = 'Auth')

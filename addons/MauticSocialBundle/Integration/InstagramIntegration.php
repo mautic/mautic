@@ -37,14 +37,6 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
-    {
-        return 'oauth2';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifierFields()
     {
         return 'instagram';

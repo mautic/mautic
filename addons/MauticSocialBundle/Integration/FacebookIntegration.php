@@ -79,14 +79,6 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
-    {
-        return 'oauth2';
-    }
-
-    /**
      * Extract the tokens returned by the oauth2 callback
      *
      * @param $data

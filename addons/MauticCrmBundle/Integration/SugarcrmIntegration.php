@@ -105,4 +105,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $sugarFields;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getAuthenticationType()
+    {
+        return 'oauth2';
+    }
 }
