@@ -878,7 +878,7 @@ var Mautic = {
                 if (response.inMain) {
                     Mautic.processPageContent(response);
                 } else {
-                    Mautic.processModalContent(response, response.modalId);
+                    Mautic.processModalContent(response, '#' + response.modalId);
                 }
             });
 
@@ -1065,7 +1065,7 @@ var Mautic = {
             mQuery(target).modal('hide');
             mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app
-            Mautic.processPageContent(response);
+             Mautic.processPageContent(response);
         } else {
             if (response.flashes) {
                 Mautic.setFlashes(response.flashes);

@@ -69,7 +69,7 @@ if ($tmpl == 'index') {
                         <?php echo $item->getName(); ?>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                    <td><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
