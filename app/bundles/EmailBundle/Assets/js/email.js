@@ -106,3 +106,16 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
         }
     });
 };
+
+Mautic.loadNewEmailWindow = function(options) {
+    Mautic.stopPageLoadingBar();
+    Mautic.stopIconSpinPostEvent();
+
+    if (options.windowUrl) {
+        var generator = window.open(options.windowUrl, 'newemailwindow','height=600,width=1000');
+
+        if (!generator || generator.closed || typeof generator.closed=='undefined') {
+            alert(response.popupBlockerMessage);
+        }
+    }
+};

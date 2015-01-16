@@ -46,7 +46,10 @@ $container->setDefinition('mautic.form.type.emailopen_list', new Definition(
     ));
 
 $container->setDefinition('mautic.form.type.emailsend_list', new Definition(
-    'Mautic\EmailBundle\Form\Type\EmailSendType'
+    'Mautic\EmailBundle\Form\Type\EmailSendType',
+    array(
+        new Reference('mautic.factory')
+    )
 ))
     ->addTag('form.type', array(
         'alias' => 'emailsend_list',
