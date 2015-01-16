@@ -44,9 +44,10 @@ class CalendarSubscriber extends CommonSubscriber
         $router = $this->factory->getRouter();
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('es.email_id, e.subject AS title, COUNT(es.id) AS quantity, es.date_sent AS start, e.plain_text AS description')
+        $query->select('es.email_id, e.subject AS title, COUNT(es.id) AS quantity, es.date_sent AS start, e.plain_text AS description, cat.color')
             ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
             ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'es.email_id = e.id')
+            ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'categories', 'cat', 'cat.id = e.category_id AND cat.bundle="email"')
             ->where($query->expr()->andX(
                 $query->expr()->gte('es.date_sent', ':start'),
                 $query->expr()->lte('es.date_sent', ':end')
