@@ -56,85 +56,27 @@ if (!isset($langVar) && isset($routeBase)) {
 if (!isset($groupType)) {
     $groupType = 'group';
 }
+$view['buttons']->setGroupType($groupType);
 
 //Extra HTML to be inserted after the buttons
 if (!isset($extraHtml)) {
     $extraHtml = '';
 }
 
+//Wrapper such as li
 if (!isset($wrapOpeningTag)) {
     $wrapOpeningTag = $wrapClosingTag = '';
 }
+$view['buttons']->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
 
 //Builder for custom buttons
 $menuLink  = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
-$buildCustom = function($c, $buttonCount) use ($menuLink, $view, $wrapOpeningTag, $wrapClosingTag, $groupType) {
-    //Add tooltip stuff
-    $tooltipAttr = '';
-    if (isset($tooltip)) {
-        if (!isset($tooltipPosition)) {
-            $tooltipPosition = 'left';
-        }
-        $tooltipAttr = ' data-toggle="tooltip" title="'.$tooltip.'" data-placement="'.$tooltipPosition.'"';
-    }
-
-    $buttons = '';
-
-    //Wrap links in a tag
-    if ($groupType == 'dropdown' || ($groupType == 'button-dropdown' && $buttonCount > 0)) {
-        $wrapOpeningTag = "<li>\n";
-        $wrapClosingTag = "</li>\n";
-    }
-
-    if (isset($c['confirm'])) {
-        if (in_array($groupType, array('button-dropdown', 'dropdown')) && !isset($c['confirm']['btnClass'])) {
-            $c['confirm']['btnClass'] = "";
-        }
-        $buttons .= $wrapOpeningTag.$view->render('MauticCoreBundle:Helper:confirm.html.php', $c['confirm'])."$wrapClosingTag\n";
-    } else {
-        $attr = $menuLink;
-
-        if (!isset($c['attr'])) {
-            $c['attr'] = array();
-        }
-
-        if(($groupType == 'group' || ($groupType == 'button-dropdown' && $buttonCount === 0)) && !isset($c['attr']['class'])) {
-            $c['attr']['class'] = 'btn btn-default';
-        }
-
-        if (!isset($c['attr']['data-toggle'])) {
-            $c['attr']['data-toggle'] = 'ajax';
-        }
-
-        foreach ($c['attr'] as $k => $v):
-            $attr .= " $k=" . '"' . $v . '"';
-        endforeach;
-
-        $buttonContent  = (isset($c['iconClass'])) ? '<i class="' . $c['iconClass'] . '"></i> ' : '';
-        $buttonContent .= $view['translator']->trans($c['btnText']);
-        $buttons       .= "$wrapOpeningTag<a{$attr}><span{$tooltipAttr}>{$buttonContent}</span></a>$wrapClosingTag\n";
-    }
-
-    return $buttons;
-};
+$view['buttons']->setMenuLink($menuLink);
 
 //Build pre template custom buttons
 if (!isset($preCustomButtons)) {
     $preCustomButtons = array();
 }
-$renderPreCustomButtons = function(&$buttonCount, $dropdownHtml = '') use ($preCustomButtons, $groupType, $buildCustom) {
-    $preCustomButtonContent = '';
-
-    foreach ($preCustomButtons as $c) {
-        if ($groupType == 'button-dropdown' && $buttonCount === 1) {
-            $preCustomButtonContent .= $dropdownHtml;
-        }
-        $preCustomButtonContent .= $buildCustom($c, $buttonCount);
-        $buttonCount++;
-    }
-
-    return $preCustomButtonContent;
-};
 
 //Build post template custom buttons
 if (isset($customButtons)) {
@@ -142,18 +84,5 @@ if (isset($customButtons)) {
 } elseif (!isset($postCustomButtons)) {
     $postCustomButtons = array();
 }
-$renderPostCustomButtons = function(&$buttonCount, $dropdownHtml = '') use ($postCustomButtons, $groupType, $buildCustom) {
-    $postCustomButtonContent = '';
 
-    if (!empty($postCustomButtons)) {
-        foreach ($postCustomButtons as $c) {
-            if ($groupType == 'button-dropdown' && $buttonCount === 1) {
-                $postCustomButtonContent .= $dropdownHtml;
-            }
-            $postCustomButtonContent .= $buildCustom($c, $buttonCount);
-            $buttonCount++;
-        }
-    }
-
-    return $postCustomButtonContent;
-};
+$view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);

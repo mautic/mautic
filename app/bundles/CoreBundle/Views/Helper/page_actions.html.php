@@ -21,7 +21,7 @@ foreach ($buttonGroupTypes as $groupType) {
 
     include 'action_button_helper.php';
 
-    echo $renderPreCustomButtons($buttonCount, $dropdownOpenHtml);
+    echo $view['buttons']->renderPreCustomButtons($buttonCount, $dropdownOpenHtml);
 
     foreach ($templateButtons as $action => $enabled) {
         if (empty($enabled)) {
@@ -76,7 +76,7 @@ foreach ($buttonGroupTypes as $groupType) {
         echo $wrapClosingTag;
     }
 
-    echo $renderPostCustomButtons($buttonCount, $dropdownOpenHtml);
+    echo $view['buttons']->renderPostCustomButtons($buttonCount, $dropdownOpenHtml);
 
     echo ($groupType == 'group') ? '</div>' : '</ul></div>';
 }

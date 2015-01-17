@@ -73,6 +73,7 @@ $container->setDefinition('mautic.helper.assetgeneration',
     )
 );
 
+//Right canvas helper
 $container->setDefinition('mautic.helper.template.canvas',
     new Definition(
         'Mautic\CoreBundle\Templating\Helper\SidebarCanvasHelper',
@@ -81,4 +82,15 @@ $container->setDefinition('mautic.helper.template.canvas',
         )
     ))
     ->addTag('templating.helper', array('alias' => 'canvas'))
+    ->setScope('request');
+
+//Button helper
+$container->setDefinition('mautic.helper.template.button',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
+        array(
+            new Reference('mautic.factory')
+        )
+    ))
+    ->addTag('templating.helper', array('alias' => 'buttons'))
     ->setScope('request');

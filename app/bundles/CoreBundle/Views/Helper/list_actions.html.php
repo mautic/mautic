@@ -20,7 +20,7 @@ include 'action_button_helper.php';
             <i class="fa fa-angle-down "></i>
         </button>
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
-            <?php echo $renderPreCustomButtons($buttonCount); ?>
+            <?php echo $view['buttons']->renderPreCustomButtons($buttonCount); ?>
 
             <?php if (!empty($templateButtons['edit'])): ?>
             <li>
@@ -49,7 +49,7 @@ include 'action_button_helper.php';
             </li>
             <?php endif; ?>
 
-            <?php echo $renderPostCustomButtons($buttonCount); ?>
+            <?php echo $view['buttons']->renderPostCustomButtons($buttonCount); ?>
         </ul>
     </div>
 </div>
