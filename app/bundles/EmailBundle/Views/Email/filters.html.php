@@ -9,7 +9,7 @@
 $filtersEmpty = true;
 ?>
 
-<div class="col-md-3 bg-white height-auto visible-md visible-lg">
+<div class="col-md-3 bg-white height-auto hidden-xs">
         <div class="pr-lg pl-lg pt-md pb-md">
             <form action="" id="email-filters">
                 <!-- <a href="#" class="btn btn-primary btn-block">
