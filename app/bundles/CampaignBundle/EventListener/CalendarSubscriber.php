@@ -37,7 +37,6 @@ class CalendarSubscriber extends CommonSubscriber
      * @param CalendarGeneratorEvent $event
      *
      * @return void
-     * @todo   This method is only a model and should be removed when actual data is being populated
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
@@ -45,7 +44,7 @@ class CalendarSubscriber extends CommonSubscriber
         $router = $this->factory->getRouter();
         $now    = new DateTimeHelper;
 
-        $commonSelect = 'cl.campaign_id, c.name AS campaign_name, l.firstname, l.lastname, ce.type AS event_type, ce.name as event_name';
+        $commonSelect = 'cl.campaign_id, c.name AS campaign_name, l.firstname, l.lastname, ce.type AS event_type, ce.name as event_name, cat.color';
         $eventTypes = array();
         $eventTypes['triggered'] = array('dateName' => 'cl.date_triggered');
         $eventTypes['upcoming']  = array('dateName' => 'cl.trigger_date');
@@ -55,6 +54,7 @@ class CalendarSubscriber extends CommonSubscriber
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'campaigns', 'c', 'cl.campaign_id = c.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'cl.lead_id = l.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'campaign_events', 'ce', 'cl.event_id = ce.id')
+            ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'categories', 'cat', 'cat.id = c.category_id AND cat.bundle="campaign"')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)
@@ -71,6 +71,7 @@ class CalendarSubscriber extends CommonSubscriber
                     ->setParameter('now', $now->toUtcString());
             }
             $results = $query->execute()->fetchAll();
+            // echo "<pre>";var_dump($results);die("</pre>");
 
             // We need to convert the date to a ISO8601 compliant string
             foreach ($results as &$object) {
