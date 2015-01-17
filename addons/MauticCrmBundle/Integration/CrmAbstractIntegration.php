@@ -252,7 +252,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->checkApiAuth(false)) {
-                CrmApi::getContext($this->getName(), "lead", $this->auth)->create($mappedData);
+                CrmApi::getContext($this, "lead", $this->auth)->create($mappedData);
                 return true;
             }
         } catch (\Exception $e) {

@@ -115,6 +115,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Persist settings to the database
+     */
+    public function persistIntegrationSettings ()
+    {
+        $em = $this->factory->getEntityManager();
+        $em->persist($this->settings);
+        $em->flush();
+    }
+
+    /**
      * Merge api keys
      *
      * @param $mergeKeys

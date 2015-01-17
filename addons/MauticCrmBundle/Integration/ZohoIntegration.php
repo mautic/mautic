@@ -87,7 +87,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->getFields('Leads');
+                $leadObject = CrmApi::getContext($this, "lead", $this->auth)->getFields('Leads');
 
                 if ($leadObject == null || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                     return array();

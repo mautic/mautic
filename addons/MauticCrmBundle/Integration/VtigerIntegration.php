@@ -86,7 +86,7 @@ class VtigerIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this->getName(), "lead", $this->auth)->describe();
+                $leadObject = CrmApi::getContext($this, "lead", $this->auth)->describe();
 
                 if ($leadObject == null || !isset($leadObject['fields'])) {
                     return array();
