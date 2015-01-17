@@ -29,6 +29,7 @@ class EmailType extends AbstractType
     private $themes;
     private $defaultTheme;
     private $em;
+    private $request;
 
     /**
      * @param MauticFactory $factory
@@ -195,7 +196,18 @@ class EmailType extends AbstractType
 
         $builder->add('sessionId', 'hidden');
 
-        $builder->add('buttons', 'form_buttons');
+        if (!empty($options['update_select'])) {
+            $builder->add('buttons', 'form_buttons', array(
+                'apply_text' => false
+            ));
+            $builder->add('updateSelect', 'hidden', array(
+               'data'   => $options['update_select'],
+               'mapped' => false
+            ));
+        } else {
+            $builder->add('buttons', 'form_buttons');
+        }
+
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -210,6 +222,8 @@ class EmailType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\EmailBundle\Entity\Email'
         ));
+
+        $resolver->setOptional(array('update_select'));
     }
 
     /**

@@ -9,7 +9,6 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
-isset($updateSelect) ? $view['assets']->addScriptDeclaration('var mauticUpdateSelect = "' . $updateSelect . '"', 'head') : "";
 
 $variantParent = $email->getVariantParent();
 $subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', array(

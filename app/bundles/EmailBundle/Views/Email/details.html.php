@@ -10,7 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getSubject());
-isset($updateSelect) ? $view['assets']->addScriptDeclaration('var mauticUpdateSelect = "' . $updateSelect . '"', 'head') : "";
 
 $isVariant = $email->isVariant(true);
 

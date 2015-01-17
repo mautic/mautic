@@ -1,14 +1,41 @@
 /** EmailBundle **/
-Mautic.emailOnLoad = function (container) {
-    if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'email');
-    }
+Mautic.emailOnLoad = function (container, response) {
+    if (response && response.updateSelect) {
+        //added email through a popup
+        var newOption = mQuery('<option />').val(response.emailId);
+        newOption.html(response.emailId + ':' + response.emailSubject);
 
-    if (typeof Mautic.listCompareChart === 'undefined') {
-        Mautic.renderListCompareChart();
-    }
+        var opener = window.opener;
+        if(opener) {
+            var el = '#' + response.updateSelect;
+            var optgroup = el + " optgroup[label=" + response.emailLang + "]";
+            if (opener.mQuery(optgroup).length) {
+                //the optgroup exist so append to it
+                opener.mQuery(optgroup + " option:last").prev().before(newOption);
+            } else {
+                //create the optgroup
+                var newOptgroup = mQuery('<optgroup label="' + response.emailLang + '" />');
+                newOption.appendTo(newOptgroup);
+                opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
+            }
+            opener.mQuery(el + " option:last").prev().before(newOption);
+            newOption.prop('selected', true);
 
-    Mautic.initializeEmailFilters(container);
+            opener.mQuery(el).trigger("chosen:updated");
+        }
+
+        window.close();
+    } else {
+        if (mQuery(container + ' #list-search').length) {
+            Mautic.activateSearchAutocomplete('list-search', 'email');
+        }
+
+        if (typeof Mautic.listCompareChart === 'undefined') {
+            Mautic.renderListCompareChart();
+        }
+
+        Mautic.initializeEmailFilters(container);
+    }
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -108,14 +135,20 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
 };
 
 Mautic.loadNewEmailWindow = function(options) {
-    Mautic.stopPageLoadingBar();
-    Mautic.stopIconSpinPostEvent();
-
     if (options.windowUrl) {
-        var generator = window.open(options.windowUrl, 'newemailwindow','height=600,width=1000');
+        Mautic.startModalLoadingBar();
 
-        if (!generator || generator.closed || typeof generator.closed=='undefined') {
-            alert(response.popupBlockerMessage);
-        }
+        setTimeout(function() {
+            var generator = window.open(options.windowUrl, 'newemailwindow', 'height=600,width=1100');
+
+            if (!generator || generator.closed || typeof generator.closed == 'undefined') {
+                alert(response.popupBlockerMessage);
+            } else {
+                generator.onload = function () {
+                    Mautic.stopModalLoadingBar();
+                    Mautic.stopIconSpinPostEvent();
+                };
+            }
+        }, 100);
     }
 };

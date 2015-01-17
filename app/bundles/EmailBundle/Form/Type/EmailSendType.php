@@ -54,8 +54,8 @@ class EmailSendType extends AbstractType
 
         $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
             'objectAction' => 'new',
-            'contentOnly' => 1,
-            'updateSelect' => 'email'
+            'contentOnly'  => 1,
+            'updateSelect' => 'campaignevent_properties_email'
         ));
 
         $builder->add('newEmailButton', 'standalone_button', array(

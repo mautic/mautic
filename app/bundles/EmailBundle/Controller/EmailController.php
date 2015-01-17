@@ -339,8 +339,10 @@ class EmailController extends FormController
         $page   = $session->get('mautic.email.page', 1);
         $action = $this->generateUrl('mautic_email_action', array('objectAction' => 'new'));
 
+        $updateSelect = ($method == 'POST') ? $this->request->request->get('emailform[updateSelect]', false, true) : $this->request->get('updateSelect', false);
+
         //create the form
-        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
         if ($method == 'POST') {
@@ -387,18 +389,27 @@ class EmailController extends FormController
                 $session->remove('mautic.emailbuilder.' . $entity->getSessionId() . '.content');
             }
 
-            $viewParameters['updateSelect'] = InputHelper::clean($this->request->query->get('updateSelect'));
+            $passthrough = array(
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email'
+            );
+
+            // Check to see if this is a popup
+            if(isset($form['updateSelect'])) {
+                $passthrough = array_merge($passthrough, array(
+                    'updateSelect'  => $form['updateSelect']->getData(),
+                    'emailId'       => $entity->getId(),
+                    'emailSubject'  => $entity->getSubject(),
+                    'emailLang'     => $entity->getLanguage()
+                ));
+            }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $template,
-                    'passthroughVars' => array(
-                        'activeLink'    => 'mautic_email_index',
-                        'mauticContent' => 'email',
-                        'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
-                    )
+                    'passthroughVars' => $passthrough
                 ));
             }
         }
@@ -409,8 +420,7 @@ class EmailController extends FormController
             'viewParameters'  => array(
                 'form'   => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                 'tokens' => $builderComponents['tokens'],
-                'email'  => $entity,
-                'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect'))
+                'email'  => $entity
             ),
             'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
             'passthroughVars' => array(
@@ -694,6 +704,13 @@ class EmailController extends FormController
         ));
     }
 
+    /**
+     * Create an AB test
+     *
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function abtestAction ($objectId)
     {
         $model  = $this->factory->getModel('email');

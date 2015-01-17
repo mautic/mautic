@@ -181,9 +181,11 @@ class EmailModel extends FormModel
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(array('Email'));
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create('emailform', $entity, $params);
+        return $formFactory->create('emailform', $entity, $options);
     }
 
     /**

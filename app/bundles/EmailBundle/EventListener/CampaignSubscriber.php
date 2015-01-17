@@ -53,7 +53,8 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.email.campaign.event.send',
             'description' => 'mautic.email.campaign.event.send_descr',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
-            'formType'    => 'emailsend_list'
+            'formType'    => 'emailsend_list',
+            'formTheme'   => 'MauticEmailBundle:FormTheme\CampaignEvent'
         );
         $event->addAction('email.send', $action);
     }
