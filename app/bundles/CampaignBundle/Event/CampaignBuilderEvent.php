@@ -56,6 +56,7 @@ class CampaignBuilderEvent extends Event
      *                        'label'       => (required) what to display in the list
      *                        'description' => (optional) short description of event
      *                        'formType'    => (optional) name of the form type SERVICE for the action
+     *                        'formTheme'   => (optional) form theme
      *                        'callback'    => (optional) callback function that will be passed when the event is triggered
      *                            The callback function should return a bool to determine if the trigger's actions
      *                            should be executed.  For example, only trigger actions for specific entities.
@@ -113,6 +114,7 @@ class CampaignBuilderEvent extends Event
      *                        'label'       => (required) what to display in the list
      *                        'description' => (optional) short description of event
      *                        'formType'    => (optional) name of the form type SERVICE for the action
+     *                        'formTheme'   => (optional) form theme
      *                        'callback'    => (optional) callback function that will be passed when the event is triggered
      *                            The callback function should return a bool to determine if the trigger's actions
      *                            should be executed.  For example, only trigger actions for specific entities.
@@ -169,6 +171,7 @@ class CampaignBuilderEvent extends Event
      *                       'label'       => (required) what to display in the list
      *                       'description' => (optional) short description of event
      *                       'formType'    => (optional) name of the form type SERVICE for the action
+     *                       'formTheme'   => (optional) form theme
      *                       'callback'    => (required) callback function that will be passed when the action is triggered
      *                            The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *                              Mautic\CoreBundle\Factory\MauticFactory $factory
