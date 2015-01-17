@@ -35,7 +35,7 @@ class DoNotEmail
 
     /**
      * @ORM\ManyToOne(targetEntity="Email")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -52,6 +52,7 @@ class DoNotEmail
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
