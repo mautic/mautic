@@ -71,14 +71,14 @@ class InstallController extends CommonController
                 } catch (RuntimeException $exception) {
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
-                            'form'    => $form->createView(),
-                            'index'   => $index,
-                            'count'   => $configurator->getStepCount(),
-                            'version' => $this->factory->getVersion(),
-                            'tmpl'    => $tmpl,
-                            'majors'  => $majors,
-                            'minors'  => $minors,
-                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                            'form'       => $form->createView(),
+                            'index'      => $index,
+                            'count'      => $configurator->getStepCount(),
+                            'version'    => $this->factory->getVersion(),
+                            'tmpl'       => $tmpl,
+                            'majors'     => $majors,
+                            'minors'     => $minors,
+                            'appRoot'    => $this->container->getParameter('kernel.root_dir'),
                             'configFile' => $this->factory->getLocalConfigFile()
                         ),
                         'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
@@ -129,32 +129,25 @@ class InstallController extends CommonController
                         $entityManager = $this->getEntityManager();
 
                         //ensure the username and email are unique
-                        $existing = $entityManager->getRepository('MauticUserBundle:User')->checkUniqueUsernameEmail(array(
-                            'username' => $originalData->username,
-                            'email'    => $originalData->email
-                        ));
+                        try {
+                            $existing = $entityManager->getRepository('MauticUserBundle:User')->find(1);
+                        } catch (\Exception $e) {
+                            $existing = null;
+                        }
 
                         if (!empty($existing)) {
-                            $translator = $this->factory->getTranslator();
-                            if ($existing[0]->getEmail() == $originalData->email) {
-                                $form['email']->addError(new FormError(
-                                    $translator->trans('mautic.user.user.email.unique', array(), 'validators')
-                                ));
-                            }
-
-                            if ($existing[0]->getUsername() == $originalData->username) {
-                                $form['username']->addError(new FormError(
-                                    $translator->trans('mautic.user.user.username.unique', array(), 'validators')
-                                ));
-                            }
-
-                            $success = false;
+                            $result = $this->performUserAddition($form, $existing);
                         } else {
                             $result = $this->performUserAddition($form);
-                            if (is_array($result)) {
-                                $flashes[] = $result;
-                            }
                         }
+
+                        if (is_array($result)) {
+                            $flashes[] = $result;
+                        }
+
+                        //store the data
+                        unset($originalData->password);
+                        $session->set('mautic.installer.user', $originalData);
 
                         break;
                 }
@@ -164,14 +157,14 @@ class InstallController extends CommonController
                     if (!empty($flashes)) {
                         return $this->postActionRedirect(array(
                             'viewParameters'    => array(
-                                'form'    => $form->createView(),
-                                'index'   => $index,
-                                'count'   => $configurator->getStepCount(),
-                                'version' => $this->factory->getVersion(),
-                                'tmpl'    => $tmpl,
-                                'majors'  => $majors,
-                                'minors'  => $minors,
-                                'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                'form'       => $form->createView(),
+                                'index'      => $index,
+                                'count'      => $configurator->getStepCount(),
+                                'version'    => $this->factory->getVersion(),
+                                'tmpl'       => $tmpl,
+                                'majors'     => $majors,
+                                'minors'     => $minors,
+                                'appRoot'    => $this->container->getParameter('kernel.root_dir'),
                                 'configFile' => $this->factory->getLocalConfigFile()
                             ),
                             'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
@@ -193,14 +186,14 @@ class InstallController extends CommonController
 
                         return $this->postActionRedirect(array(
                             'viewParameters'    => array(
-                                'form'    => $form->createView(),
-                                'index'   => $index,
-                                'count'   => $configurator->getStepCount(),
-                                'version' => $this->factory->getVersion(),
-                                'tmpl'    => $tmpl,
-                                'majors'  => $majors,
-                                'minors'  => $minors,
-                                'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                'form'       => $form->createView(),
+                                'index'      => $index,
+                                'count'      => $configurator->getStepCount(),
+                                'version'    => $this->factory->getVersion(),
+                                'tmpl'       => $tmpl,
+                                'majors'     => $majors,
+                                'minors'     => $minors,
+                                'appRoot'    => $this->container->getParameter('kernel.root_dir'),
                                 'configFile' => $this->factory->getLocalConfigFile()
                             ),
                             'returnUrl'         => $action,
@@ -230,6 +223,7 @@ class InstallController extends CommonController
                     $this->clearCacheFile();
 
                     $session->remove('mautic.install.completedsteps');
+                    $session->remove('mautic.install.user');
 
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
@@ -249,24 +243,23 @@ class InstallController extends CommonController
             }
         } else {
             //redirect back to last step if the user advanced ahead via the URL
-            $last = (int) end($completedSteps) + 1;
+            $last = (int)end($completedSteps) + 1;
             if ($index > $last) {
-                return $this->redirect($this->generateUrl('mautic_installer_step', array('index' => (int) $last)));
+                return $this->redirect($this->generateUrl('mautic_installer_step', array('index' => (int)$last)));
             }
-
         }
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'    => $form->createView(),
-                'index'   => $index,
-                'count'   => $configurator->getStepCount(),
-                'version' => $this->factory->getVersion(),
-                'tmpl'    => $tmpl,
-                'majors'  => $majors,
-                'minors'  => $minors,
-                'appRoot' => $this->container->getParameter('kernel.root_dir'),
-                'configFile' => $this->factory->getLocalConfigFile(),
+                'form'           => $form->createView(),
+                'index'          => $index,
+                'count'          => $configurator->getStepCount(),
+                'version'        => $this->factory->getVersion(),
+                'tmpl'           => $tmpl,
+                'majors'         => $majors,
+                'minors'         => $minors,
+                'appRoot'        => $this->container->getParameter('kernel.root_dir'),
+                'configFile'     => $this->factory->getLocalConfigFile(),
                 'completedSteps' => $completedSteps
             ),
             'contentTemplate' => $step->getTemplate(),
@@ -366,8 +359,8 @@ class InstallController extends CommonController
             $db->close();
 
             return array(
-                'type' => 'error',
-                'msg'  => 'mautic.installer.error.connecting.database',
+                'type'    => 'error',
+                'msg'     => 'mautic.installer.error.connecting.database',
                 'msgVars' => array(
                     '%exception%' => $exception->getMessage()
                 )
@@ -580,17 +573,23 @@ class InstallController extends CommonController
      * Creates the admin user
      *
      * @param \Symfony\Component\Form\Form $form
+     * @param User                         $existingUser
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
-    private function performUserAddition ($form)
+    private function performUserAddition ($form, User $existingUser = null)
     {
         try {
             $entityManager = $this->getEntityManager();
 
             // Now we create the user
             $data = $form->getData();
-            $user = new User();
+
+            if ($existingUser != null) {
+                $user = $existingUser;
+            } else {
+                $user = new User();
+            }
 
             /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
             $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
@@ -646,7 +645,7 @@ class InstallController extends CommonController
             foreach ($bundles as $b) {
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
-                    $paths[] = $entityPath;
+                    $paths[]                             = $entityPath;
                     $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
                 }
             }
@@ -655,11 +654,11 @@ class InstallController extends CommonController
             foreach ($addons as $b) {
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
-                    $paths[] = $entityPath;
+                    $paths[]                  = $entityPath;
                     $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
                 }
             }
-            $config  = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
+            $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
             foreach ($namespaces as $alias => $namespace) {
                 $config->addEntityNamespace($alias, $namespace);
             }

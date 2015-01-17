@@ -31,12 +31,13 @@ class MauticInstallBundle extends Bundle
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
-        $request = $this->container->get('mautic.factory')->getRequest();
+        $factory =  $this->container->get('mautic.factory');
+        $request = $factory->getRequest();
 
         // Steps should be added here in the order they'll be displayed
         $configurator->addStep(new CheckStep($configurator->isFileWritable(), $this->container->getParameter('kernel.root_dir'), $request->getSchemeAndHttpHost().$request->getBasePath()));
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
-        $configurator->addStep(new UserStep());
+        $configurator->addStep(new UserStep($factory->getSession()));
         $configurator->addStep(new EmailStep());
 
         /*

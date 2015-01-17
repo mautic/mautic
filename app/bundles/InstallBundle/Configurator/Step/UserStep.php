@@ -10,6 +10,7 @@
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -55,11 +56,21 @@ class UserStep implements StepInterface
     public $password;
 
     /**
+     * @var Session
+     */
+    private $session;
+
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return new UserStepType();
+        return new UserStepType($this->session);
     }
 
     /**

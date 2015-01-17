@@ -9,8 +9,10 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use MyProject\Proxies\__CG__\OtherProject\Proxies\__CG__\stdClass;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -18,23 +20,41 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class UserStepType extends AbstractType
 {
+
+    /**
+     * @var
+     */
+    private $session;
+
+    /**
+     * @param Session $session
+     */
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $storedData = $this->session->get('mautic.installer.user', new \stdClass());
+
         $builder->add('firstname', 'text', array(
             'label'      => 'mautic.install.form.user.firstname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
-            'required'   => true
+            'required'   => true,
+            'data'       => (!empty($storedData->firstname)) ? $storedData->firstname : ''
         ));
 
         $builder->add('lastname', 'text', array(
             'label'      => 'mautic.install.form.user.lastname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
-            'required'   => true
+            'required'   => true,
+            'data'       => (!empty($storedData->lastname)) ? $storedData->lastname : ''
         ));
 
         $builder->add('email', 'email', array(
@@ -44,7 +64,8 @@ class UserStepType extends AbstractType
                 'class'    => 'form-control',
                 'preaddon' => 'fa fa-envelope'
             ),
-            'required'   => true
+            'required'   => true,
+            'data'       => (!empty($storedData->email)) ? $storedData->email : ''
         ));
 
         $builder->add('username', 'text', array(
@@ -53,7 +74,8 @@ class UserStepType extends AbstractType
             'attr'       => array(
                 'class' => 'form-control'
             ),
-            'required'   => true
+            'required'   => true,
+            'data'       => (!empty($storedData->username)) ? $storedData->username : ''
         ));
 
         $builder->add('password', 'password', array(
