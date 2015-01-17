@@ -29,7 +29,7 @@ class BuilderTokenController extends FormController
 
         $dataArray = array(
             'newContent'     => $tokenHelper->getTokenContent($page),
-            'mauticContent'  => 'emailEditor'
+            'mauticContent'  => 'builder'
         );
 
         $response  = new JsonResponse($dataArray);

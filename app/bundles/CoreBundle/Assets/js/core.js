@@ -2265,22 +2265,34 @@ var Mautic = {
                     }
                 });
 
-                //activate builder drag and drop
-                mQuery(".builder-panel *[data-token]").draggable({
-                    iframeFix: true,
-                    iframeId: 'builder-template-content',
-                    helper: 'clone',
-                    appendTo: '.builder',
-                    zIndex: 8000,
-                    scroll: true,
-                    scrollSensitivity: 100,
-                    scrollSpeed: 100,
-                    cursorAt: {top: 15, left: 15}
-                });
+                Mautic.activateBuilderDragTokens();
             });
 
         //make the panel full screen
         mQuery('.builder').addClass('builder-active').removeClass('hide');
+    },
+
+    builderOnLoad: function (target) {
+        Mautic.activateBuilderDragTokens();
+    },
+
+    activateBuilderDragTokens: function (target) {
+        if (typeof target == 'undefined') {
+            target = '.builder-panel';
+        }
+
+        //activate builder drag and drop
+        mQuery(target + " *[data-token]").draggable({
+            iframeFix: true,
+            iframeId: 'builder-template-content',
+            helper: 'clone',
+            appendTo: '.builder',
+            zIndex: 8000,
+            scroll: true,
+            scrollSensitivity: 100,
+            scrollSpeed: 100,
+            cursorAt: {top: 15, left: 15}
+        });
     },
 
     closeBuilder: function(model) {

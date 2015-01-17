@@ -30,7 +30,7 @@ class PageTokenController extends FormController
 
         $dataArray = array(
             'newContent'     => $tokenHelper->getTokenContent($page),
-            'mauticContent'  => 'pageEditor'
+            'mauticContent'  => 'builder'
         );
 
         $response  = new JsonResponse($dataArray);
