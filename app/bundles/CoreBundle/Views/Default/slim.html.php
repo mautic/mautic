@@ -16,6 +16,13 @@
             <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php', array('alertType' => 'standard')); ?>
             <?php $view['slots']->output('_content'); ?>
         </section>
+        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+            'id'            => 'MauticSharedModal',
+            'footerButtons' => true
+        )); ?>
         <?php $view['assets']->outputScripts("bodyClose"); ?>
+        <script>
+            Mautic.onPageLoad('body');
+        </script>
     </body>
 </html>
