@@ -119,12 +119,16 @@ if ($tmpl == 'index')
                     <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="mr-sm" />
                     <?php
                     endif;
-                    if (!empty($fields['core']['city']) && !empty($fields['core']['state']))
-                        echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
-                    elseif (!empty($fields['core']['city']))
-                        echo $fields['core']['city']['value'];
-                    elseif (!empty($fields['core']['state']))
-                        echo $fields['core']['state']['value'];
+                    $location = array();
+                    if (!empty($fields['core']['city']['value'])):
+                        $location[] = $fields['core']['city']['value'];
+                    endif;
+                    if (!empty($fields['core']['state']['value'])):
+                        $location[] = $fields['core']['state']['value'];
+                    elseif (!empty($fields['core']['country']['value'])):
+                        $location[] = $fields['core']['country']['value'];
+                    endif;
+                    echo implode(', ', $location);
                     ?>
                     <div class="clearfix"></div>
                 </td>

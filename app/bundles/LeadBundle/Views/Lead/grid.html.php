@@ -59,20 +59,24 @@ if ($tmpl == 'index')
                                             <span><?php echo $item->getPrimaryIdentifier(); ?></span>
                                         </a>
                                     </h4>
-                                    <div class="text-muted mb-1">
+                                    <div class="text-muted mb-1 ellipsis">
                                         <i class="fa fa-fw fa-building mr-xs"></i><?php echo $fields['core']['company']['value']; ?>
                                     </div>
-                                    <div class="text-muted mb-1">
+                                    <div class="text-muted mb-1 ellipsis">
                                         <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
-                                        if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
-                                            echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
-                                        elseif (!empty($fields['core']['city']['value']))
-                                            echo $fields['core']['city']['value'];
-                                        elseif (!empty($fields['core']['state']['value']))
-                                            echo $fields['core']['state']['value'];
+                                        $location = array();
+                                        if (!empty($fields['core']['city']['value'])):
+                                            $location[] = $fields['core']['city']['value'];
+                                        endif;
+                                        if (!empty($fields['core']['state']['value'])):
+                                            $location[] = $fields['core']['state']['value'];
+                                        elseif (!empty($fields['core']['country']['value'])):
+                                            $location[] = $fields['core']['country']['value'];
+                                        endif;
+                                        echo implode(', ', $location);
                                         ?>
                                     </div>
-                                    <div class="text-muted mb-1">
+                                    <div class="text-muted mb-1 ellipsis">
                                         <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
                                     </div>
                                     <?php $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : ''; ?>
