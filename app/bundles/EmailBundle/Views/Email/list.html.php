@@ -44,21 +44,21 @@ if ($tmpl == 'index') {
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.sentCount',
                 'text'       => 'mautic.email.thead.sentcount',
-                'class'      => 'col-email-sentcount'
+                'class'      => 'visible-md visible-lg col-email-sentcount'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.readCount',
                 'text'       => 'mautic.email.thead.readcount',
-                'class'      => 'col-email-readcount'
+                'class'      => 'visible-md visible-lg col-email-readcount'
             )); ?>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.id',
                 'text'       => 'mautic.email.thead.id',
-                'class'      => 'col-email-id'
+                'class'      => 'visible-md visible-lg col-email-id'
             ));
             ?>
         </tr>
