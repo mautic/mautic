@@ -302,7 +302,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
-    <input id="itemId" value="<?php echo $email->getId(); ?>" />
+    <input id="itemId" type="hidden" value="<?php echo $email->getId(); ?>" />
 </div>
 <!--/ end: box layout -->
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(

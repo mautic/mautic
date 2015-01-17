@@ -172,6 +172,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
-    <input id="itemId" value="<?php echo $activeAsset->getId(); ?>" />
+    <input id="itemId" type="hidden" value="<?php echo $activeAsset->getId(); ?>" />
 </div>
 <!--/ end: box layout -->
