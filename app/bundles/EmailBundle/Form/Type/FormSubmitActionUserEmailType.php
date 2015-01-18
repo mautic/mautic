@@ -14,11 +14,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FormSubmitActionSendAdminEmailType
+ * Class FormSubmitActionUserEmailType
  *
  * @package Mautic\EmailBundle\Form\Type
  */
-class FormSubmitActionSendAdminEmailType extends AbstractType
+class FormSubmitActionUserEmailType extends AbstractType
 {
 
     /**
@@ -27,16 +27,13 @@ class FormSubmitActionSendAdminEmailType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('email', 'email_list', array(
-            'expanded'      => false,
-            'multiple'      => false,
+        $builder->add('email', 'emailsend_list', array(
             'label'         => 'mautic.email.form.submit.emails',
-            'label_attr'    => array('class' => 'control-label'),
-            'required'      => false,
             'attr'       => array(
-                'class'   => 'form-control',
+                'class'   => 'form-control chosen',
                 'tooltip' => 'mautic.email.form.submit.emails_descr'
-            )
+            ),
+            'update_select' => 'formaction_properties_email_email'
         ));
 
         $builder->add('user_id', 'user_list', array(
@@ -50,10 +47,17 @@ class FormSubmitActionSendAdminEmailType extends AbstractType
         ));
     }
 
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'label' => false
+        ));
+    }
+
     /**
      * @return string
      */
     public function getName() {
-        return "email_submitaction_sendemail_admin";
+        return "email_submitaction_useremail";
     }
 }

@@ -24,7 +24,7 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
             FormEvents::FORM_ON_BUILD => array('onFormBuilder', 0),
@@ -36,27 +36,30 @@ class FormSubscriber extends CommonSubscriber
      *
      * @param FormBuilderEvent $event
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder (FormBuilderEvent $event)
     {
         // Add form submit actions
-        // Send email to admin user
+        // Send email to user
         $action = array(
-            'group'        => 'mautic.email.form.action',
-            'label'        => 'mautic.email.form.action.sendemail.admin',
-            'description'  => 'mautic.email.form.action.sendemail.admin.descr',
-            'formType'     => 'email_submitaction_sendemail_admin',
-            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
+            'group'       => 'mautic.email.form.action',
+            'label'       => 'mautic.email.form.action.sendemail.admin',
+            'description' => 'mautic.email.form.action.sendemail.admin.descr',
+            'formType'    => 'email_submitaction_useremail',
+            'formTheme'   => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'callback'    => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
         );
 
-        $event->addSubmitAction('email.send.admin', $action);
+        $event->addSubmitAction('email.send.user', $action);
 
         // Send email to lead
         $action = array(
-            'group'        => 'mautic.email.form.action',
-            'label'        => 'mautic.email.form.action.sendemail.lead',
-            'description'  => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'     => 'emailsend_list',
-            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
+            'group'           => 'mautic.email.form.action',
+            'label'           => 'mautic.email.form.action.sendemail.lead',
+            'description'     => 'mautic.email.form.action.sendemail.lead.descr',
+            'formType'        => 'emailsend_list',
+            'formTypeOptions' => array('update_select' => 'formaction_properties_email'),
+            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
         );
 
         $event->addSubmitAction('email.send.lead', $action);

@@ -50,11 +50,12 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addLeadDecision('email.open', $trigger);
 
         $action = array(
-            'label'       => 'mautic.email.campaign.event.send',
-            'description' => 'mautic.email.campaign.event.send_descr',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
-            'formType'    => 'emailsend_list',
-            'formTheme'   => 'MauticEmailBundle:FormTheme\CampaignEvent'
+            'label'           => 'mautic.email.campaign.event.send',
+            'description'     => 'mautic.email.campaign.event.send_descr',
+            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
+            'formType'        => 'emailsend_list',
+            'formTypeOptions' => array('update_select' => 'campaignevent_properties_email'),
+            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
         );
         $event->addAction('email.send', $action);
     }

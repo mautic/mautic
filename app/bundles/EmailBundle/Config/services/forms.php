@@ -62,10 +62,10 @@ $container->setDefinition('mautic.validator.leadlistaccess', new Definition(
     ->addTag('validator.constraint_validator', array('alias' => 'leadlist_access'));
 
 $container->setDefinition('mautic.form.type.formsubmit_sendemail_admin', new Definition(
-    'Mautic\EmailBundle\Form\Type\FormSubmitActionSendAdminEmailType'
+    'Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'email_submitaction_sendemail_admin',
+        'alias' => 'email_submitaction_useremail',
     ));
 
 $container->setDefinition('mautic.email.type.email_abtest_settings', new Definition(

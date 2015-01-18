@@ -38,13 +38,13 @@ class EmailSendType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('email', 'email_list', array(
-            'label'      => 'mautic.email.send.selectemails',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class' => 'form-control chosen',
+            'label'       => 'mautic.email.send.selectemails',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control chosen',
                 'tooltip' => 'mautic.email.send.selectemails_descr'
             ),
-            'multiple'   => false,
+            'multiple'    => false,
             'constraints' => array(
                 new NotBlank(
                     array('message' => 'mautic.email.chooseemail.notblank')
@@ -52,22 +52,29 @@ class EmailSendType extends AbstractType
             )
         ));
 
-        $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
-            'objectAction' => 'new',
-            'contentOnly'  => 1,
-            'updateSelect' => 'campaignevent_properties_email'
-        ));
+        if (!empty($options['update_select'])) {
+            $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
+                'objectAction' => 'new',
+                'contentOnly'  => 1,
+                'updateSelect' => $options['update_select']
+            ));
 
-        $builder->add('newEmailButton', 'standalone_button', array(
-            'attr'     => array(
-                'class'   => 'btn btn-primary',
-                'onclick' => 'Mautic.loadNewEmailWindow({
-                    "windowUrl": "' . $windowUrl . '"
-                })',
-                'icon'    => 'fa fa-plus'
-            ),
-            'label'    => 'mautic.email.send.new.email'
-        ));
+            $builder->add('newEmailButton', 'standalone_button', array(
+                'attr'  => array(
+                    'class'   => 'btn btn-primary',
+                    'onclick' => 'Mautic.loadNewEmailWindow({
+                        "windowUrl": "' . $windowUrl . '"
+                    })',
+                    'icon'    => 'fa fa-plus'
+                ),
+                'label' => 'mautic.email.send.new.email'
+            ));
+        }
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(array('update_select'));
     }
 
     /**
