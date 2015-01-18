@@ -100,11 +100,11 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
         }
     }
 
-    var labelSpinner = mQuery("label[for='email_variantSettings_winnerCriteria']");
+    var labelSpinner = mQuery("label[for='emailform_variantSettings_winnerCriteria']");
     var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
     labelSpinner.append(spinner);
 
-    var emailId = mQuery('#email_sessionId').val();
+    var emailId = mQuery('#emailform_sessionId').val();
 
     var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
 
@@ -115,14 +115,14 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
         dataType: "json",
         success: function (response) {
             if (typeof response.html != 'undefined') {
-                if (mQuery('#email_variantSettings_properties').length) {
-                    mQuery('#email_variantSettings_properties').replaceWith(response.html);
+                if (mQuery('#emailform_variantSettings_properties').length) {
+                    mQuery('#emailform_variantSettings_properties').replaceWith(response.html);
                 } else {
-                    mQuery('#email_variantSettings').append(response.html);
+                    mQuery('#emailform_variantSettings').append(response.html);
                 }
 
                 if (response.html != '') {
-                    Mautic.onPageLoad('#email_variantSettings_properties', response);
+                    Mautic.onPageLoad('#emailform_variantSettings_properties', response);
                 }
             }
             spinner.remove();
