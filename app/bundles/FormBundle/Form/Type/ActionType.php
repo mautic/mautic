@@ -41,16 +41,22 @@ class ActionType extends AbstractType
             'required'   => false
         ));
 
-        $formType = $options['settings']['formType'];
-
-        $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
-        $builder->add('properties', $formType, array(
+        $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
+        $formType        = $options['settings']['formType'];
+        $formTypeOptions = array(
             'label'  => false,
             'data'   => $properties,
             'attr'   => array(
                 'data-formid' => $options['formId'] //sneaky way of feeding the formId without requiring the option
-            )
-        ));
+            ));
+        if (!empty($options['settings']['formTypeOptions'])) {
+            // Ensure that attr is not overwritten
+            if (isset($options['settings']['formTypeOptions']['attr'])) {
+                $options['settings']['formTypeOptions']['attr']['data-formid'] = $options['formId'];
+            }
+            $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
+        }
+        $builder->add('properties', $formType, $formTypeOptions);
 
         $builder->add('type', 'hidden');
 

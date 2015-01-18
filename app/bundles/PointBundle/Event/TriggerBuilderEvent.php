@@ -44,12 +44,13 @@ class TriggerBuilderEvent extends Event
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array $event - can contain the following keys:
-     *  'label'       => (required) what to display in the list
-     *  'description' => (optional) short description of event
-     *  'template'    => (optional) template to use for the action's HTML in the point builder
+     *  'label'           => (required) what to display in the list
+     *  'description'     => (optional) short description of event
+     *  'template'        => (optional) template to use for the action's HTML in the point builder
      *      i.e AcmeMyBundle:PointAction:theaction.html.php
-     *  'formType'    => (optional) name of the form type SERVICE for the action
-     *  'callback'    => (required) callback function that will be passed when the action is triggered
+     *  'formType'        => (optional) name of the form type SERVICE for the action
+     *  'formTypeOptions' => (optional) array of options to pass to formType
+     *  'callback'        => (required) callback function that will be passed when the action is triggered
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\PointBundle\Entity\TriggerEvent  $event

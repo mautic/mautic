@@ -49,10 +49,14 @@ class FieldType extends AbstractType
 
         if (!empty($options['customParameters'])) {
             $customParams =& $options['customParameters'];
-            $builder->add('properties', $customParams['formType'], array(
+            $formTypeOptions = array(
                 'required'   => false,
                 'label'      => false
-            ));
+            );
+            if (!empty($customParams['formTypeOptions'])) {
+                $formTypeOptions = array_merge($formTypeOptions, $customParams['formTypeOptions']);
+            }
+            $builder->add('properties', $customParams['formType'], $formTypeOptions);
             $addFields = array(
                 'addHelpMessage',
                 'addShowLabel',

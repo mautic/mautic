@@ -249,7 +249,6 @@ class PointController extends FormController
             return $this->isLocked($postActionVars, $entity, 'point');
         }
 
-
         $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
 
         $action  = $this->generateUrl('mautic_point_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -258,7 +257,6 @@ class PointController extends FormController
             'pointActions' => $actions,
             'actionType'   => $actionType
         ));
-
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {

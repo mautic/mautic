@@ -25,9 +25,13 @@ class PointActionType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('properties', $options['formType'], array(
-           'label' => false
-        ));
+        $formTypeOptions = array(
+            'label' => false
+        );
+        if (!empty($options['formTypeOptions'])) {
+            $formTypeOptions = array_merge($formTypeOptions, $options['formTypeOptions']);
+        }
+        $builder->add('properties', $options['formType'], $formTypeOptions);
     }
 
     /**
@@ -36,7 +40,8 @@ class PointActionType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'formType' => 'genericpoint_settings',
+            'formType'        => 'genericpoint_settings',
+            'formTypeOptions' => array()
         ));
     }
 

@@ -43,10 +43,15 @@ class TriggerEventType extends AbstractType
 
         if (!empty($options['settings']['formType'])) {
             $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
-            $builder->add('properties', $options['settings']['formType'], array(
+
+            $formTypeOptions =  array(
                 'label' => false,
                 'data'  => $properties
-            ));
+            );
+            if (!empty($options['settings']['formTypeOptions'])) {
+                $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
+            }
+            $builder->add('properties', $options['settings']['formType'], $formTypeOptions);
         }
 
         $builder->add('type', 'hidden');
