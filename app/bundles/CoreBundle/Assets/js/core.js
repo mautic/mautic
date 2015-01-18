@@ -999,6 +999,9 @@ var Mautic = {
 
         //clean slate upon close
         mQuery(target).on('hidden.bs.modal', function () {
+            //unload
+            Mautic.onPageUnload(target);
+
             Mautic.resetModal(target);
         });
 
