@@ -122,6 +122,58 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * @param $emailId
+     */
+    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('dne.lead_id')->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne');
+
+        $sq2 = $this->_em->getConnection()->createQueryBuilder();
+        $sq2->select('stat.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
+            ->where('stat.email_id = el.email_id');
+
+        if ($countOnly) {
+            $q->select('count(l.id) as count');
+        } else {
+            $q->select('l.*');
+        }
+        $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id')
+            ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
+
+        $q->where('el.email_id = ' . (int) $emailId);
+        $q->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()));
+        $q->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq2->getSQL()));
+
+        if ($listIds != null) {
+            if (!is_array($listIds)) {
+                $listIds = array($listIds);
+            }
+            $q->andWhere(
+                $q->expr()->notIn('ll.leadlist_id', $listIds)
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        if ($countOnly) {
+
+            return (isset($results[0])) ? $results[0]['count'] : 0;
+        } else {
+            $leads = array();
+            foreach ($results as $r) {
+                $leads[$r['id']] = $r;
+            }
+
+            return $leads;
+        }
+    }
+
+    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start
@@ -274,6 +326,9 @@ class EmailRepository extends CommonRepository
         );
     }
 
+    /**
+     * @return string
+     */
     public function getTableAlias()
     {
         return 'e';

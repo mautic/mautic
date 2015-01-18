@@ -528,6 +528,22 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Get the number of leads this email will be sent to
+     *
+     * @param Email $email
+     * @param mixed $listId     Leads for a specific lead list
+     * @param bool  $countOnly  If true, return count otherwise array of leads
+     *
+     * @return int
+     */
+    public function getPendingLeads(Email $email, $listId = null, $countOnly = false)
+    {
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $listId, $countOnly);
+
+        return $total;
+    }
+
+    /**
      * Send an email to lead lists
      *
      * @param Email $email
@@ -540,15 +556,13 @@ class EmailModel extends FormModel
             $lists = $email->getLists();
         }
 
-        $listModel = $this->factory->getModel('lead.list');
-        $listLeads = $listModel->getLeadsByList($lists);
-
         //get email settings such as templates, weights, etc
         $emailSettings = $this->getEmailSettings($email);
         $saveEntities  = array();
 
-        foreach ($listLeads as $listId => $leads) {
-            $listSaveEntities = $this->sendEmail($email, $leads, array('email', $email->getId()), $emailSettings, $listId, true);
+        foreach ($lists as $list) {
+            $leads = $this->getPendingLeads($email, $list->getId());
+            $listSaveEntities = $this->sendEmail($email, $leads, array('email', $email->getId()), $emailSettings, $list->getId(), true, false);
             if (!empty($listSaveEntities)) {
                 $saveEntities = array_merge($saveEntities, $listSaveEntities);
             }
@@ -657,11 +671,12 @@ class EmailModel extends FormModel
      * @param array $emailSettings
      * @param null  $listId
      * @param bool  $returnEntities
+     * @param bool  $ignoreLeadChecks  If true, do not contact and already sent checks will be ignored
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmail ($email, $leads, $source = null, $emailSettings = array(), $listId = null, $returnEntities = false)
+    public function sendEmail ($email, $leads, $source = null, $emailSettings = array(), $listId = null, $returnEntities = false, $ignoreLeadChecks = false)
     {
         if (!$email->getId()) {
             return ($returnEntities) ? array() : false;
@@ -681,22 +696,26 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        //get the list of do not contacts
-        static $dnc = array();
-        if (empty($dnc)) {
-            $dnc = $emailRepo->getDoNotEmailList();
-        }
+        if (!$ignoreLeadChecks) {
+            $sent   = $statRepo->getSentStats($email->getId(), $listId);
+            $sendTo = array_diff_key($leads, $sent);
 
-        $sent   = $statRepo->getSentStats($email->getId(), $listId);
-        $sendTo = array_diff_key($leads, $sent);
+            //get the list of do not contacts
+            static $dnc = array();
+            if (empty($dnc)) {
+                $dnc = $emailRepo->getDoNotEmailList();
+            }
 
-        //weed out do not contacts
-        if (!empty($dnc)) {
-            foreach ($sendTo as $k => $lead) {
-                if (in_array($lead['email'], $dnc)) {
-                    unset($sendTo[$k]);
+            //weed out do not contacts
+            if (!empty($dnc)) {
+                foreach ($sendTo as $k => $lead) {
+                    if (in_array($lead['email'], $dnc)) {
+                        unset($sendTo[$k]);
+                    }
                 }
             }
+        } else {
+            $sendTo = $leads;
         }
 
         //get a count of leads

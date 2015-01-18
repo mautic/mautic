@@ -53,6 +53,9 @@ if ($tmpl == 'index') {
                 'text'       => 'mautic.email.thead.readcount',
                 'class'      => 'visible-md visible-lg col-email-readcount'
             )); ?>
+
+            <th><?php echo $view['translator']->trans('mautic.email.thead.leadcount'); ?></th>
+
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
@@ -122,6 +125,7 @@ if ($tmpl == 'index') {
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getSentCount(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getReadCount(); ?></td>
+                <td class="visible-md visible-lg">~<?php echo $model->getPendingLeads($item, null, true); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
