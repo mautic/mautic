@@ -420,4 +420,29 @@ class FormModel extends CommonFormModel
         $html = str_replace($search, $replace, $html);
         return "document.write(\"".$html."\");";
     }
+
+    /**
+     * Writes in form values from get parameters
+     *
+     * @param $form
+     * @param $formHtml
+     */
+    public function populateValuesWithGetParameters($form, &$formHtml)
+    {
+        $request = $this->factory->getRequest();
+
+        $fields = $form->getFields();
+        foreach ($fields as $f) {
+            $alias = $f->getAlias();
+            if ($request->query->has($alias)) {
+                preg_match('/<input id="mauticform_input_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match);
+                if (!empty($match)) {
+
+                    //replace value with GET
+                    $replace = '<input id="mauticform_input_' . $alias . '"' . $match[1] . 'value="' . urldecode($request->query->get($alias)) . '"' . $match[3] . '/>';
+                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                }
+            }
+        }
+    }
 }

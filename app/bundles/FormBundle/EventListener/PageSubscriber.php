@@ -63,6 +63,7 @@ class PageSubscriber extends CommonSubscriber
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
+            /** @var \Mautic\FormBundle\Model\FormModel $model */
             $model = $this->factory->getModel('form');
             foreach ($matches[1] as $k => $id) {
                 $form = $model->getEntity($id);
@@ -82,6 +83,9 @@ class PageSubscriber extends CommonSubscriber
                     //add the hidden page input
                     $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
                     $formHtml  = preg_replace("#</form>#", $pageInput . "</form>", $formHtml);
+
+                    //pouplate get parameters
+                    $model->populateValuesWithGetParameters($form, $formHtml);
 
                     $content = preg_replace('#{form=' . $id . '}#', $formHtml, $content);
                 } else {

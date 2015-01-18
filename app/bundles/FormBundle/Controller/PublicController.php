@@ -161,30 +161,32 @@ class PublicController extends CommonFormController
      */
     public function previewAction()
     {
-        $objectId = InputHelper::int($this->request->get('id'));
-        $css = InputHelper::raw($this->request->get('css'));
-        $cssFiles = explode(',',$css);
-        $model = $this->factory->getModel('form.form');
-        $form  = $model->getEntity($objectId);
+        $objectId     = InputHelper::int($this->request->get('id'));
+        $css          = InputHelper::raw($this->request->get('css'));
+        $model        = $this->factory->getModel('form.form');
+        $form         = $model->getEntity($objectId);
         $customStyles = '';
 
-        foreach (explode(',',$css) as $cssStyle) {
+        foreach (explode(',', $css) as $cssStyle) {
             $customStyles .= sprintf('<link rel="stylesheet" type="text/css" href="%s">', $cssStyle);
         }
 
         if ($form === null || !$form->isPublished()) {
             $html =
-                '<h1>'.
+                '<h1>' .
                 $this->get('translator')->trans('mautic.form.error.notfound', array('%id%' => $objectId), 'flashes') .
                 '</h1>';
         } else {
             $html = $form->getCachedHtml();
         }
 
+        $model->populateValuesWithGetParameters($form, $html);
+
         $response = new Response();
         $response->setContent('<html><head><title>' . $form->getName() . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
         $response->setStatusCode(Response::HTTP_OK);
         $response->headers->set('Content-Type', 'text/html');
+
         return $response;
     }
 

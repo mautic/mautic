@@ -619,6 +619,7 @@ class FormController extends CommonFormController
         } else {
             $html = $form->getCachedHtml();
         }
+        $model->populateValuesWithGetParameters($form, $html);
 
         $response = new Response();
         $response->setContent('<html><head><title>' . $form->getName() . '</title></head><body>' . $html . '</body></html>');
