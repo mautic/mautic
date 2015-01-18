@@ -95,8 +95,9 @@ class AjaxController extends CommonAjaxController
                 $html     = '';
                 $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
                 if (!empty($formType)) {
-                    $form     = $this->get('form.factory')->create('email_abtest_settings', array(), array('formType' => $formType));
-                    $html     = $this->renderView('MauticEmailBundle:AbTest:form.html.php', array(
+                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : array();
+                    $form        = $this->get('form.factory')->create('email_abtest_settings', array(), array('formType' => $formType, 'formTypeOptions' => $formOptions));
+                    $html        = $this->renderView('MauticEmailBundle:AbTest:form.html.php', array(
                         'form' => $this->setFormTheme($form, 'MauticEmailBundle:AbTest:form.html.php', 'MauticEmailBundle:FormTheme\Email')
                     ));
                 }

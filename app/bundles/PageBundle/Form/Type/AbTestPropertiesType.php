@@ -24,9 +24,11 @@ class AbTestPropertiesType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('properties', $options['formType'], array(
-           'label' => false
-        ));
+        $options = array('label' => false);
+        if (isset($options['formTypeOptions'])) {
+            $options = array_merge($options, $options['formTypeOptions']);
+        }
+        $builder->add('properties', $options['formType'], $options);
     }
 
     /**
@@ -34,7 +36,10 @@ class AbTestPropertiesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('formType'));
+        $resolver->setOptional(array(
+            'formType',
+            'formTypeOptions'
+        ));
     }
 
     /**

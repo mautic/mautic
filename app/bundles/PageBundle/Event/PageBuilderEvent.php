@@ -116,10 +116,11 @@ class PageBuilderEvent extends Event
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.points
      * @param array $criteria - can contain the following keys:
-     *  'group'    => (required) translation string to group criteria by in the dropdown select list
-     *  'label'    => (required) what to display in the list
-     *  'formType' => (optional) name of the form type SERVICE for the criteria
-     *  'callback' => (required) callback function that will be passed the parent page for winner determination
+     *  'group'           => (required) translation string to group criteria by in the dropdown select list
+     *  'label'           => (required) what to display in the list
+     *  'formType'        => (optional) name of the form type SERVICE for the criteria
+     *  'formTypeOptions' => (optional) array of options to pass to the formType service
+     *  'callback'        => (required) callback function that will be passed the parent page for winner determination
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          array $properties - values saved from the formType as defined here; keyed by page id in the case of
      *              multiple variants

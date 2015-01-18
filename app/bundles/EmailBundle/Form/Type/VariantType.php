@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -75,14 +77,23 @@ class VariantType extends AbstractType
                 )
             ));
 
-            foreach ($criteria as $k => $c) {
-                if (isset($c['formType'])) {
-                    $builder->add($k, $c['formType'], array(
-                        'required' => false,
-                        'label'    => false
-                    ));
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $criteria) {
+                $form = $event->getForm();
+                $data = $event->getData();
+
+                if (isset($data['winnerCriteria'])) {
+                    if (!empty($criteria[$data['winnerCriteria']]['formType'])) {
+                        $formTypeOptions = array(
+                            'required' => false,
+                            'label'    => false
+                        );
+                        if (!empty($criteria[$data]['formTypeOptions'])) {
+                            $formTypeOptions = array_merge($formTypeOptions, $criteria[$data]['formTypeOptions']);
+                        }
+                        $form->add('properties', $criteria[$data]['formType'], $formTypeOptions);
+                    }
                 }
-            }
+            });
         }
     }
 
