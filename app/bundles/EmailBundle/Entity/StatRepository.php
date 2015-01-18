@@ -41,7 +41,7 @@ class StatRepository extends CommonRepository
             ->setParameter('hash', $trackingHash);
         $result = $q->getQuery()->getResult();
 
-        return ($result != null) ? $result[0] : $result;
+        return (!empty($result)) ? $result[0] : null;
     }
 
     /**
