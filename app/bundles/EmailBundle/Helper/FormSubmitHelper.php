@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\LeadBundle\Entity\Lead;
 
 class FormSubmitHelper
 {
@@ -22,42 +23,48 @@ class FormSubmitHelper
     public static function sendEmail(Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
-        $emailId    = (int) $properties['email'];
+        $emailId    = (isset($properties['useremail'])) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
         $form       = $action->getForm();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel  = $factory->getModel('email');
-        $email  = $emailModel->getEntity($emailId);
+        $email  	 = $emailModel->getEntity($emailId);
+
+		/** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+		$leadModel = $factory->getModel('lead');
 
         //make sure the email still exists and is published
         if ($email != null && $email->isPublished()) {
-
-        	// Deal with Admin email
-	        if (isset($properties['user_id']) && $properties['user_id']) {
-		        $emailModel->sendEmailToUser($email, $properties['user_id']);
-		    }
-
 		    // Deal with Lead email
 		    if (!empty($feedback['lead.create']['lead'])) {
 		    	//the lead was just created via the lead.create action
 		    	$currentLead = $feedback['lead.create']['lead'];
 		    } else {
-		        $leadModel = $factory->getModel('lead');
 		        $currentLead = $leadModel->getCurrentLead();
 		    }
 
-		    if (isset($currentLead)) {
+			if ($currentLead instanceof Lead) {
+				//flatten the lead
+				$lead = $currentLead;
+				$currentLead = array(
+					'id' => $lead->getId()
+				);
+				$leadFields = $leadModel->flattenFields($lead->getFields());
+
+				$currentLead = array_merge($currentLead, $leadFields);
+			}
+
+			if (isset($properties['user_id']) && $properties['user_id']) {
+				// User email
+				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead);
+			} elseif (isset($currentLead)) {
+				// Lead email
 		    	$leadFields = $currentLead->getFields();
 		    	if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-		    		$leadCredentials = array(
-		    			'email' 	=> $leadFields['core']['email']['value'],
-		    			'id' 		=> $currentLead->getId(),
-		    			'firstname' => $leadFields['core']['firstname']['value'],
-		    			'lastname' 	=> $leadFields['core']['lastname']['value']
-		    		);
-		    		$emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('form', $form->getId()));
+
+		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), array('form', $form->getId()));
 		    	}
 		    }
-        }
+		}
     }
 }

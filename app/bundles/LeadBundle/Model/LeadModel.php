@@ -388,6 +388,24 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Takes leads organized by group and flattens them into just alias => value
+     *
+     * @param $fields
+     */
+    public function flattenFields($fields)
+    {
+        $flat = array();
+        foreach ($fields as $group => $fields) {
+            foreach ($fields as $field) {
+                $flat[$field['alias']] = $field['value'];
+            }
+        }
+
+        return $flat;
+    }
+
+
+    /**
      * Returns flat array for single lead
      *
      * @param $leadId

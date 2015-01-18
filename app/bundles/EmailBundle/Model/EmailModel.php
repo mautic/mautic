@@ -826,11 +826,12 @@ class EmailModel extends FormModel
      *
      * @param       $email
      * @param       $users
+     * @param mixed $lead
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser ($email, $users)
+    public function sendEmailToUser ($email, $users, $lead = null)
     {
         if (!$emailId = $email->getId()) {
             return false;
@@ -869,6 +870,7 @@ class EmailModel extends FormModel
             }
 
             $mailer = $this->factory->getMailer();
+            $mailer->setLead($lead);
 
             if ($email->getContentMode() == 'builder') {
                 $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
