@@ -10,10 +10,10 @@
 
 <div class="page-header">
     <div class="box-layout">
-        <div class="col-xs-5 col-sm-6 col-md-4 va-m">
+        <div class="col-xs-5 col-sm-6 col-md-5 va-m">
             <h3><?php $view['slots']->output('headerTitle'); ?></h3>
         </div>
-        <div class="col-xs-7 col-sm-6 col-md-8 va-m">
+        <div class="col-xs-7 col-sm-6 col-md-7 va-m">
             <div class="toolbar text-right" id="toolbar">
                 <?php $view['slots']->output('actions'); ?>
 
