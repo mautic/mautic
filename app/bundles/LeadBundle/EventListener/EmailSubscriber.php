@@ -59,8 +59,12 @@ class EmailSubscriber extends CommonSubscriber
         preg_match_all($regex, $content, $matches);
         if (!empty($matches[1])) {
             foreach ($matches[1] as $match) {
-                if (isset($lead[$match])) {
-                    $content = str_ireplace('{leadfield=' . $match . '}', $lead[$match], $content);
+                $urlencode = (strpos($match, '|true') !== false);
+                $alias = ($urlencode) ? str_replace('|true', '', $match) : $match;
+
+                if (isset($lead[$alias])) {
+                    $value   = ($urlencode) ? urlencode($lead[$alias]) : $lead[$alias];
+                    $content = str_ireplace('{leadfield=' . $match . '}', $value, $content);
                 }
             }
         }

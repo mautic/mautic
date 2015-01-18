@@ -27,7 +27,7 @@ class ListModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\LeadBundle\Entity\LeadListRepository
      */
     public function getRepository()
     {
