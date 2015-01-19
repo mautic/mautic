@@ -25,15 +25,15 @@ if ($tmpl == 'index')
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
-                        'orderBy'    => 'p.title',
-                        'text'       => 'mautic.report.report.thead.title',
-                        'class'      => 'col-report-title',
+                        'orderBy'    => 'r.name',
+                        'text'       => 'mautic.report.report.thead.name',
+                        'class'      => 'col-report-name',
                         'default'    => true
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
-                        'orderBy'    => 'p.id',
+                        'orderBy'    => 'r.id',
                         'text'       => 'mautic.report.report.thead.id',
                         'class'      => 'col-report-id'
                     ));
@@ -53,8 +53,7 @@ if ($tmpl == 'index')
                                 'delete'    => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $item->getCreatedBy()),
                             ),
                             'routeBase'  => 'report',
-                            'langVar'    => 'report.report',
-                            'nameGetter' => 'getTitle'
+                            'langVar'    => 'report.report'
                         ));
                         ?>
                     </td>
@@ -67,7 +66,7 @@ if ($tmpl == 'index')
                             <a href="<?php echo $view['router']->generate('mautic_report_action',
                                 array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                data-toggle="ajax">
-                                <?php echo $item->getTitle(); ?>
+                                <?php echo $item->getName(); ?>
                             </a>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
@@ -81,7 +80,7 @@ if ($tmpl == 'index')
         </table>
         <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => count($items),
+            "totalItems"      => $totalItems,
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_report_index',

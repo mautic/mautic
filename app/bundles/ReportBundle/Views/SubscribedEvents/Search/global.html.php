@@ -13,6 +13,6 @@
 </a>
 <?php else: ?>
 <a href="<?php echo $this->container->get('router')->generate('mautic_report_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
-    <?php echo $item->getTitle(); ?>
+    <?php echo $item->getName(); ?>
 </a>
 <?php endif; ?>

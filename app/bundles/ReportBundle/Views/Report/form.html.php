@@ -12,7 +12,7 @@ $view['slots']->set('mauticContent', 'report');
 
 $header = ($report->getId()) ?
     $view['translator']->trans('mautic.report.report.header.edit',
-        array('%name%' => $view['translator']->trans($report->getTitle()))) :
+        array('%name%' => $view['translator']->trans($report->getName()))) :
     $view['translator']->trans('mautic.report.report.header.new');
 
 $view['slots']->set("headerTitle", $header);
@@ -39,7 +39,7 @@ $view['slots']->set("headerTitle", $header);
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">
-                                    <?php echo $view['form']->row($form['title']); ?>
+                                    <?php echo $view['form']->row($form['name']); ?>
                                 </div>
                             </div>
                             <div class="col-md-6">

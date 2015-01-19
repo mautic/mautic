@@ -44,39 +44,6 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     *
-     * @return array
-     */
-    public function getReportList($search = '', $limit = 10, $start = 0, $viewOther = false)
-    {
-        $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title}');
-
-        if (!empty($search)) {
-            $q->andWhere($q->expr()->like('p.title', ':search'))
-                ->setParameter('search', "{$search}%");
-        }
-
-        if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
-                ->setParameter('id', $this->currentUser->getId());
-        }
-
-        $q->orderBy('p.title');
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        return $q->getQuery()->getArrayResult();
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
@@ -85,7 +52,7 @@ class ReportRepository extends CommonRepository
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
-            $q->expr()->like('p.title',  ":$unique")
+            $q->expr()->like('r.name',  ":$unique")
         );
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
@@ -110,13 +77,13 @@ class ReportRepository extends CommonRepository
             case $this->translator->trans('mautic.core.searchcommand.is'):
                 switch ($string) {
                     case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 1);
+                        $expr = $q->expr()->eq("r.isPublished", 1);
                         break;
                     case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 0);
+                        $expr = $q->expr()->eq("r.isPublished", 0);
                         break;
                     case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("IDENTITY(p.createdBy)", $this->currentUser->getId());
+                        $expr = $q->expr()->eq("IDENTITY(r.createdBy)", $this->currentUser->getId());
                         break;
                 }
                 $returnParameter = false;
@@ -159,7 +126,7 @@ class ReportRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('p.title', 'ASC')
+            array('r.name', 'ASC')
         );
     }
 
@@ -168,6 +135,6 @@ class ReportRepository extends CommonRepository
      */
     public function getTableAlias()
     {
-        return 'p';
+        return 'r';
     }
 }

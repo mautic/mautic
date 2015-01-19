@@ -44,14 +44,6 @@ class ReportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     */
-    public function getNameGetter()
-    {
-        return "getTitle";
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -125,29 +117,6 @@ class ReportModel extends FormModel
         } else {
             return false;
         }
-    }
-
-    /**
-     * Get list of entities for autopopulate fields
-     *
-     * @param $type
-     * @param $filter
-     * @param $limit
-     * @return array
-     */
-    public function getLookupResults($type, $filter = '', $limit = 10)
-    {
-        $results = array();
-        switch ($type) {
-            case 'report':
-                $viewOther = $this->security->isGranted('report:reports:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->factory->getUser());
-                $results = $repo->getReportList($filter, $limit, 0, $viewOther);
-                break;
-        }
-
-        return $results;
     }
 
     /**

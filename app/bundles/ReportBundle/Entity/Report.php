@@ -40,7 +40,7 @@ class Report extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportList", "reportDetails"})
      */
-    private $title;
+    private $name;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -87,8 +87,8 @@ class Report extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.report.title.notblank'
+        $metadata->addPropertyConstraint('name', new NotBlank(array(
+            'message' => 'mautic.report.name.notblank'
         )));
     }
 
@@ -103,28 +103,28 @@ class Report extends FormEntity
     }
 
     /**
-     * Set title
+     * Set name
      *
-     * @param string $title
+     * @param string $name
      *
      * @return Report
      */
-    public function setTitle($title)
+    public function setName($name)
     {
-        $this->isChanged('title', $title);
-        $this->title = $title;
+        $this->isChanged('name', $name);
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get title
+     * Get name
      *
      * @return string
      */
-    public function getTitle()
+    public function getName()
     {
-        return $this->title;
+        return $this->name;
     }
 
     /**

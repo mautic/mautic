@@ -20,12 +20,13 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class AjaxController extends CommonAjaxController
 {
+
     /**
      * Returns form HTML. Used for AJAX calls which modifies form field elements.
      *
      * @param Request $request
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function getFormAction(Request $request)
     {

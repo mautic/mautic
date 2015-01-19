@@ -65,10 +65,10 @@ class ReportController extends FormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['report:reports:viewother']) {
-            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'][] = array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $orderBy    = $this->factory->getSession()->get('mautic.report.orderby', 'p.title');
+        $orderBy    = $this->factory->getSession()->get('mautic.report.orderby', 'r.name');
         $orderByDir = $this->factory->getSession()->get('mautic.report.orderbydir', 'DESC');
 
         $reports = $model->getEntities(
@@ -108,6 +108,7 @@ class ReportController extends FormController
             'viewParameters'  =>  array(
                 'searchValue' => $search,
                 'items'       => $reports,
+                'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -183,11 +184,14 @@ class ReportController extends FormController
             $model  = $this->factory->getModel('report');
             $entity = $model->getEntity($objectId);
 
-            $this->checkEntityAccess($entity, $objectId, array('report:reports:deleteown', 'report:reports:deleteother'), $model, 'report');
+            $check = $this->checkEntityAccess($postActionVars, $entity, $objectId, array('report:reports:deleteown', 'report:reports:deleteother'), $model, 'report');
+            if ($check !== true) {
+                return $check;
+            }
 
             $model->deleteEntity($entity);
 
-            $identifier = $this->get('translator')->trans($entity->getTitle());
+            $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[] = array(
                 'type' => 'notice',
                 'msg'  => 'mautic.core.notice.deleted',
@@ -302,7 +306,10 @@ class ReportController extends FormController
         );
 
         //not found
-        $this->checkEntityAccess($entity, $objectId, array('report:reports:viewown', 'report:reports:viewother'), $model, 'report');
+        $check = $this->checkEntityAccess($postActionVars, $entity, $objectId, array('report:reports:viewown', 'report:reports:viewother'), $model, 'report');
+        if ($check !== true) {
+            return $check;
+        }
 
         //Create the form
         $action = $this->generateUrl('mautic_report_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -317,7 +324,7 @@ class ReportController extends FormController
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', array(
-                        '%name%'      => $entity->getTitle(),
+                        '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_report_index',
                         '%url%'       => $this->generateUrl('mautic_report_action', array(
                             'objectAction' => 'edit',
@@ -403,7 +410,7 @@ class ReportController extends FormController
                     $model->saveEntity($entity);
 
                     $this->addFlash('mautic.core.notice.created', array(
-                        '%name%'      => $entity->getTitle(),
+                        '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_report_index',
                         '%url%'       => $this->generateUrl('mautic_report_action', array(
                             'objectAction' => 'edit',
@@ -575,7 +582,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|void
      */
-    private function checkEntityAccess($entity, $objectId, array $permissions, $model, $modelName)
+    private function checkEntityAccess($postActionVars, $entity, $objectId, array $permissions, $model, $modelName)
     {
         if ($entity === null) {
             return $this->postActionRedirect(
@@ -595,5 +602,7 @@ class ReportController extends FormController
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $modelName);
         }
+
+        return true;
     }
 }
