@@ -447,6 +447,9 @@ class PageModel extends FormModel
                     if (isset($query['language'])) {
                         $hit->setPageLanguage($query['language']);
                     }
+                    if (isset($query['title'])) {
+                        $hit->setUrlTitle($query['title']);
+                    }
                 }
             } else {
                 $pageURL = 'http';
