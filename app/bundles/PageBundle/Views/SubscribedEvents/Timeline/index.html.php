@@ -35,7 +35,7 @@ if ($event['extra']['hit']['dateLeft']) {
 					    <?php echo $item->getTitle(); ?>
 					</a>
 				<?php elseif (!empty($event['extra']['hit']['urlTitle'])) : ?>
-					<a href="<?php echo $event['extra']['hit']['url']; ?>">
+					<a href="<?php echo $event['extra']['hit']['url']; ?>" target="_blank">
 					    <?php echo $event['extra']['hit']['urlTitle']; ?>
 					</a>
 				<?php else : ?>
