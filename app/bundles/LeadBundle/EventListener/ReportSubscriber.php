@@ -115,6 +115,36 @@ class ReportSubscriber extends CommonSubscriber
         $options = $event->getOptions();
         $pointLogRepo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
 
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.graph.line.leads') {
+            // Generate data for leads line graph
+            $unit = 'D';
+            $amount = 30;
+
+            if (isset($options['amount'])) {
+                $amount = $options['amount'];
+            }
+
+            if (isset($options['unit'])) {
+                $unit = $options['unit'];
+            }
+
+            $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('leads', 'emails'));
+
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+            $queryBuilder->select('l.id as lead, l.date_added as dateAdded, LENGTH(l.email) > 0 as email');
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->andwhere($queryBuilder->expr()->gte('l.date_added', ':date'))
+                ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
+            $leads = $queryBuilder->execute()->fetchAll();
+
+            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 0, 'dateAdded');
+            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 1, 'dateAdded', 'email');
+            $timeStats['name'] = 'mautic.lead.graph.line.leads';
+
+            $event->setGraph('line', $timeStats);
+        }
+
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.graph.line.points') {
             // Generate data for points line graph
             $unit = 'D';
