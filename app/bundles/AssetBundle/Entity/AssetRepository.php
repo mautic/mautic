@@ -222,6 +222,7 @@ class AssetRepository extends CommonRepository
         $q = $this->createQueryBuilder('a');
 
         $q->select('a.id, a.title, a.downloadCount')
+            ->where('a.downloadCount > 0')
             ->orderBy('a.downloadCount', 'DESC')
             ->groupBy('a.id')
             ->setMaxResults($limit);
