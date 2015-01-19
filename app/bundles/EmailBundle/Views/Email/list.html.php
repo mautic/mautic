@@ -54,7 +54,7 @@ if ($tmpl == 'index') {
                 'class'      => 'visible-md visible-lg col-email-readcount'
             )); ?>
 
-            <th><?php echo $view['translator']->trans('mautic.email.thead.leadcount'); ?></th>
+            <th class="visible-md visible-lg col-email-pending"><?php echo $view['translator']->trans('mautic.email.thead.leadcount'); ?></th>
 
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
