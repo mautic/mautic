@@ -279,16 +279,16 @@ var Mautic = {
             inlineDropdown: true
         });
 
-        //convert multiple selects into chosen
-        mQuery("select[multiple]").chosen({
+        mQuery("select").not('.multiselect, .not-chosen').chosen({
             placeholder_text_multiple: ' ',
-            width: "100%"
-        });
-
-        //convert single selects that have opted in into chosen
-        mQuery(".chosen").chosen({
             width: "100%",
             allow_single_deselect: true
+        });
+
+        mQuery("select.multiselect").each(function() {
+            mQuery(this).multiSelect({
+
+            });
         });
 
         //spin icons on button click

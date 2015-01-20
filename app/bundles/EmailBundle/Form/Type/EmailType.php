@@ -151,7 +151,7 @@ class EmailType extends AbstractType
                     'label'       => 'mautic.email.form.unsubscribeform',
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => array(
-                        'class'            => 'form-control chosen',
+                        'class'            => 'form-control',
                         'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
                         'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone')
                     ),
@@ -188,7 +188,7 @@ class EmailType extends AbstractType
                 'label'      => 'mautic.email.form.language',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
-                    'class' => 'form-control chosen'
+                    'class' => 'form-control'
                 ),
                 'required'   => false,
             ));

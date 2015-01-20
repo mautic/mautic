@@ -71,7 +71,7 @@ class FormSubmitActionMappedFieldsType extends AbstractType
                 'label'      => $label,
                 'choices'    => $choices,
                 'attr'       => array(
-                    'class'            => 'form-control chosen',
+                    'class'            => 'form-control',
                     'data-placeholder' => $chooseLead
                 ),
                 'label_attr' => array('class' => 'control-label'),

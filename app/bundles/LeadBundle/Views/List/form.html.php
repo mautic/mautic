@@ -147,7 +147,7 @@ $form['filters']->setRendered();
 
                                                             <?php
                                                             case 'country': ?>
-                                                                <select class="form-control chosen" name="leadlist[filters][filter][]" data-placeholder="<?php echo $choices[$filter['field']]['label']; ?>">
+                                                                <select class="form-control" name="leadlist[filters][filter][]" data-placeholder="<?php echo $choices[$filter['field']]['label']; ?>">
                                                                     <option value=""></option>
                                                                     <?php foreach ($countries as $v => $l): ?>
                                                                         <?php $selected = ($filter['filter'] == $v) ? ' selected="selected"' : ''; ?>
@@ -159,7 +159,7 @@ $form['filters']->setRendered();
 
                                                             <?php
                                                             case 'region': ?>
-                                                                <select class="form-control chosen" name="leadlist[filters][filter][]" data-placeholder="<?php echo $choices[$filter['field']]['label']; ?>">
+                                                                <select class="form-control" name="leadlist[filters][filter][]" data-placeholder="<?php echo $choices[$filter['field']]['label']; ?>">
                                                                     <?php foreach ($regions as $country => $countryRegions): ?>
                                                                         <optgroup><?php echo $country; ?></optgroup>
                                                                         <?php $selected = ($filter['filter'] == $v) ? ' selected="selected"' : ''; ?>

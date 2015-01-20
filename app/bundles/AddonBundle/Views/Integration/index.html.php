@@ -25,7 +25,7 @@ $view['slots']->set('headerTitle', $header);
         <div class="box-layout">
             <div class="row">
                 <div class="col-xs-3 va-m">
-                    <select id="integrationFilter" onchange="Mautic.filterIntegrations(true);" class="form-control chosen" data-placeholder="<?php echo $view['translator']->trans('mautic.integration.filter.all'); ?>">
+                    <select id="integrationFilter" onchange="Mautic.filterIntegrations(true);" class="form-control" data-placeholder="<?php echo $view['translator']->trans('mautic.integration.filter.all'); ?>">
                         <option value=""></option>
                         <?php foreach ($addons as $a): ?>
                         <option<?php echo ($filterValue === $a['id']) ? ' selected' : ''; ?> value="<?php echo $a['id']; ?>"><?php echo $a['name']; ?></option>

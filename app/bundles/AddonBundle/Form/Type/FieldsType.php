@@ -37,7 +37,7 @@ class FieldsType extends AbstractType
                 'label'      => $label,
                 'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control chosen', 'data-placeholder' => ' ')
+                'attr'       => array('class' => 'form-control', 'data-placeholder' => ' ')
             ));
         }
     }

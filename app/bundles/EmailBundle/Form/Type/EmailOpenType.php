@@ -30,7 +30,7 @@ class EmailOpenType extends AbstractType
             'label'      => 'mautic.email.open.limittoemails',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control chosen',
+                'class' => 'form-control',
                 'tooltip' => 'mautic.email.open.limittoemails_descr'
             ),
             'required'   => false

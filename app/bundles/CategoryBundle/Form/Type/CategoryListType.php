@@ -78,7 +78,7 @@ class CategoryListType extends AbstractType
                     'inForm'       => 1
                 ));
                 return array(
-                    'class'     => 'form-control chosen category-select',
+                    'class'     => 'form-control category-select',
                     'onchange'  => "Mautic.onCategoryChange(this, '{$newUrl}', '{$modalHeader}');"
                 );
             },

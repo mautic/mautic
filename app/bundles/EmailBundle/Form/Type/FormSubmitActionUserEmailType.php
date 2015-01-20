@@ -30,7 +30,7 @@ class FormSubmitActionUserEmailType extends AbstractType
         $builder->add('useremail', 'emailsend_list', array(
             'label'         => 'mautic.email.form.submit.emails',
             'attr'       => array(
-                'class'   => 'form-control chosen',
+                'class'   => 'form-control',
                 'tooltip' => 'mautic.email.form.submit.emails_descr'
             ),
             'update_select' => 'formaction_properties_useremail_email'

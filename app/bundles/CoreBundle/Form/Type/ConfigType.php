@@ -437,7 +437,7 @@ class ConfigType extends AbstractType
             'label'       => 'mautic.core.config.form.default.timezone',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
-                'class'   => 'form-control chosen',
+                'class'   => 'form-control',
                 'tooltip' => 'mautic.core.config.form.default.timezone.tooltip'
             ),
             'multiple'    => false,

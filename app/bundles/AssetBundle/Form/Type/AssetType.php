@@ -84,7 +84,7 @@ class AssetType extends AbstractType
             'label'      => 'mautic.asset.asset.form.language',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control chosen',
+                'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.form.language.help',
             ),
             'required'   => false
