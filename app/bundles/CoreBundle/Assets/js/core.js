@@ -388,6 +388,7 @@ var Mautic = {
 
                     if (editorClass == 'editor-fullpage') {
                         settings.fullPage = true;
+                        settings.allowedContent = true;
                         settings.extraPlugins = "docprops";
                     }
 
