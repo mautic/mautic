@@ -13,7 +13,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $activePage->getTitle());
 
-$showVariants     = (count($variants['children']) || (!empty($variants['parent']) && isset($variant['parent']) && $variant['parent']->getId() != $activePage->getId()));
+$showVariants     = (count($variants['children']) || (!empty($variants['parent']) && $variants['parent']->getId() != $activePage->getId()));
 $showTranslations = (count($translations['children']) || (!empty($translations['parent']) && $translations['parent']->getId() != $activePage->getId()));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
@@ -402,7 +402,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <?php $trans = (!empty($variants['parent'])) ? 'mautic.page.urlvariant' : 'mautic.page.url'; ?>
+                <?php $trans = (!empty($variants['parent']) && $variants['parent']->getId() != $activePage->getId()) ? 'mautic.page.urlvariant' : 'mautic.page.url'; ?>
                 <div class="panel-title"><?php echo $view['translator']->trans($trans); ?></div>
             </div>
             <div class="panel-body pt-xs">
