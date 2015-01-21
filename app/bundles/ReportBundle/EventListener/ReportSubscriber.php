@@ -35,7 +35,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @param ReportEvent $event
      */
-    public function onPagePostSave(ReportEvent $event)
+    public function onReportPostSave(ReportEvent $event)
     {
         $report = $event->getReport();
         if ($details = $event->getChanges()) {
@@ -56,7 +56,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @param ReportEvent $event
      */
-    public function onPageDelete(ReportEvent $event)
+    public function onReportDelete(ReportEvent $event)
     {
         $report = $event->getReport();
         $log = array(
