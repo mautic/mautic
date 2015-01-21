@@ -95,13 +95,10 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
         }
     }
 
-    var labelSpinner = mQuery("label[for='page_variantSettings_winnerCriteria']");
-    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
-    labelSpinner.append(spinner);
+    Mautic.activateLabelLoadingIndicator('page_variantSettings_winnerCriteria');
 
     var pageId = mQuery('#page_sessionId').val();
-
-    var query = "action=page:getAbTestForm&abKey=" + mQuery(abKey).val() + "&pageId=" + pageId;
+    var query  = "action=page:getAbTestForm&abKey=" + mQuery(abKey).val() + "&pageId=" + pageId;
 
     mQuery.ajax({
         url: mauticAjaxUrl,
@@ -125,6 +122,9 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
             spinner.remove();
+        },
+        complete: function () {
+            Mautic.removeLabelLoadingIndicator();
         }
     });
 };

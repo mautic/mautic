@@ -100,10 +100,7 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
         }
     }
 
-    var labelSpinner = mQuery("label[for='emailform_variantSettings_winnerCriteria']");
-    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
-    labelSpinner.append(spinner);
-
+    Mautic.activateLabelLoadingIndicator('emailform_variantSettings_winnerCriteria');
     var emailId = mQuery('#emailform_sessionId').val();
 
     var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
@@ -125,11 +122,12 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
                     Mautic.onPageLoad('#emailform_variantSettings_properties', response);
                 }
             }
-            spinner.remove();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            spinner.remove();
+        },
+        complete: function() {
+            Mautic.removeLabelLoadingIndicator();
         }
     });
 };
