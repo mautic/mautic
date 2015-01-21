@@ -45,32 +45,102 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadataEmail = $this->factory->getEntityManager()->getClassMetadata('Mautic\\EmailBundle\\Entity\\Email');
-        $metadataStat = $this->factory->getEntityManager()->getClassMetadata('Mautic\\EmailBundle\\Entity\\Stat');
-        $emailFields = $metadataEmail->getFieldNames();
-        $statFields = $metadataStat->getFieldNames();
-
-        // Unset stat id
-        unset($statFields[0]);
-
-        $columns  = array();
-
-        foreach ($emailFields as $field) {
-            $fieldData = $metadataEmail->getFieldMapping($field);
-            $columns['e.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        foreach ($statFields as $field) {
-            $fieldData = $metadataStat->getFieldMapping($field);
-            $columns['es.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
+        $prefix = 'e.';
+        $variantParent = 'vp.';
+        $columns = array(
+            $prefix . 'subject' => array(
+                'label' => 'mautic.email.report.subject',
+                'type'  => 'string'
+            ),
+            $prefix . 'lang' => array(
+                'label' => 'mautic.report.field.lang',
+                'type'  => 'string'
+            ),
+            $prefix . 'read_count' => array(
+                'label' => 'mautic.email.report.read_count',
+                'type'  => 'int'
+            ),
+            $prefix . 'read_in_browser' => array(
+                'label' => 'mautic.email.report.read_in_browser',
+                'type'  => 'int'
+            ),
+            $prefix . 'revision' => array(
+                'label' => 'mautic.email.report.revision',
+                'type'  => 'int'
+            ),
+            $variantParent . 'id' => array(
+                'label' => 'mautic.email.report.variant_parent_id',
+                'type'  => 'int'
+            ),
+            $variantParent . 'subject' => array(
+                'label' => 'mautic.email.report.variant_parent_subject',
+                'type'  => 'string'
+            ),
+            $prefix . 'variant_start_date' => array(
+                'label' => 'mautic.email.report.variant_start_date',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'variant_sent_count' => array(
+                'label' => 'mautic.email.report.variant_sent_count',
+                'type'  => 'int'
+            ),
+            $prefix . 'variant_read_count' => array(
+                'label' => 'mautic.email.report.variant_read_count',
+                'type'  => 'int'
+            )
+        );
+        $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
         $data = array(
             'display_name' => 'mautic.email.email.report.table',
             'columns'      => $columns
         );
-
         $event->addTable('emails', $data);
+
+        $statPrefix = 'es.';
+        $statColumns = array(
+            $statPrefix . 'email_address' => array(
+                'label' => 'mautic.email.report.stat.email_address',
+                'type'  => 'email'
+            ),
+            $statPrefix . 'date_sent' => array(
+                'label' => 'mautic.email.report.stat.date_sent',
+                'type'  => 'datetime'
+            ),
+            $statPrefix . 'is_read' => array(
+                'label' => 'mautic.email.report.stat.is_read',
+                'type'  => 'bool'
+            ),
+            $statPrefix . 'is_failed' => array(
+                'label' => 'mautic.email.report.stat.is_failed',
+                'type'  => 'bool'
+            ),
+            $statPrefix . 'viewed_in_browser' => array(
+                'label' => 'mautic.email.report.stat.viewed_in_browser',
+                'type'  => 'bool'
+            ),
+            $statPrefix . 'date_read' => array(
+                'label' => 'mautic.email.report.stat.date_read',
+                'type'  => 'datetime'
+            ),
+            $statPrefix . 'retry_count' => array(
+                'label' => 'mautic.email.report.stat.retry_count',
+                'type'  => 'int'
+            ),
+            $statPrefix . 'source' => array(
+                'label' => 'mautic.report.field.source',
+                'type'  => 'string'
+            ),
+            $statPrefix . 'source_id' => array(
+                'label' => 'mautic.report.field.source_id',
+                'type'  => 'int'
+            )
+        );
+
+        $data = array(
+            'display_name' => 'mautic.email.stats.report.table',
+            'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn())
+        );
+        $event->addTable('email.stats', $data);
     }
 
     /**
@@ -82,18 +152,27 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Email reports
-        if ($event->getContext() != 'emails')
-        {
-            return;
+        $context = $event->getContext();
+        if ($context == 'emails') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'emails', 'e')
+                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
+            $event->addCategoryLeftJoin($qb, 'e');
+
+            $event->setQueryBuilder($qb);
+        } elseif ($context == 'email.stats') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
+                ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id')
+                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
+            $event->addCategoryLeftJoin($qb, 'e');
+            $event->addLeadLeftJoin($qb, 'es');
+            $event->addIpAddressLeftJoin($qb, 'es');
+
+            $event->setQueryBuilder($qb);
         }
-
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'emails', 'e');
-        $queryBuilder->leftJoin('e', MAUTIC_TABLE_PREFIX . 'email_stats', 'es', 'e.id = es.email_id');
-
-        $event->setQueryBuilder($queryBuilder);
     }
 
     /**

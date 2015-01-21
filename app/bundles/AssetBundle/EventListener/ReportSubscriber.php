@@ -45,32 +45,66 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadataAsset = $this->factory->getEntityManager()->getClassMetadata('Mautic\\AssetBundle\\Entity\\Asset');
-        $metadataDownload = $this->factory->getEntityManager()->getClassMetadata('Mautic\\AssetBundle\\Entity\\Download');
-        $assetFields = $metadataAsset->getFieldNames();
-        $downloadFields = $metadataDownload->getFieldNames();
-
-        // Unset download id
-        unset($downloadFields[0]);
-
-        $columns  = array();
-
-        foreach ($assetFields as $field) {
-            $fieldData = $metadataAsset->getFieldMapping($field);
-            $columns['a.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        foreach ($downloadFields as $field) {
-            $fieldData = $metadataDownload->getFieldMapping($field);
-            $columns['ad.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        $data = array(
-            'display_name' => 'mautic.asset.asset.report.table',
-            'columns'      => $columns
+        // Assets
+        $prefix          = 'a.';
+        $columns         = array(
+            $prefix . 'download_count' => array(
+                'label' => 'mautic.asset.report.download_count',
+                'type'  => 'int'
+            ),
+            $prefix . 'unique_download_count' => array(
+                'label' => 'mautic.asset.report.unique_download_count',
+                'type'  => 'int'
+            ),
+            $prefix . 'alias' => array(
+                'label' => 'mautic.report.field.alias',
+                'type'  => 'string'
+            ),
+            $prefix . 'lang' => array(
+                'label' => 'mautic.report.field.lang',
+                'type'  => 'string'
+            ),
+            $prefix . 'title' => array(
+                'label' => 'mautic.asset.report.title',
+                'type'  => 'string'
+            )
         );
 
-        $event->addTable('assets', $data);
+        $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
+        $event->addTable('assets',  array(
+            'display_name' => 'mautic.asset.report.table',
+            'columns'      => $columns
+        ));
+
+        // Downloads
+        $downloadPrefix = 'ad.';
+        $downloadColumns        = array(
+            $downloadPrefix . 'date_download' => array(
+                'label' => 'mautic.asset.report.download.date_download',
+                'type'  => 'datetime'
+            ),
+            $downloadPrefix . 'code' => array(
+                'label' => 'mautic.asset.report.download.code',
+                'type'  => 'string'
+            ),
+            $downloadPrefix . 'referer' => array(
+                'label' => 'mautic.asset.report.download.referer',
+                'type'  => 'string'
+            ),
+            $downloadPrefix . 'source' => array(
+                'label' => 'mautic.report.field.source',
+                'type'  => 'string'
+            ),
+            $downloadPrefix . 'source_id' => array(
+                'label' => 'mautic.report.field.source_id',
+                'type'  => 'int'
+            )
+        );
+
+        $event->addTable('asset.downloads',  array(
+            'display_name' => 'mautic.asset.report.downloads.table',
+            'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
+        ));
     }
 
     /**
@@ -82,18 +116,25 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Asset reports
-        if ($event->getContext() != 'assets')
-        {
-            return;
+        $context = $event->getContext();
+        if ($context == 'assets') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
+            $event->addCategoryLeftJoin($qb, 'a');
+
+            $event->setQueryBuilder($qb);
+        } elseif ($context == 'asset.downloads') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad')
+                ->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
+            $event->addCategoryLeftJoin($qb, 'a');
+            $event->addLeadLeftJoin($qb, 'ad');
+            $event->addIpAddressLeftJoin($qb, 'ad');
+
+            $event->setQueryBuilder($qb);
         }
-
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
-        $queryBuilder->leftJoin('a', MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad', 'a.id = ad.asset_id');
-
-        $event->setQueryBuilder($queryBuilder);
     }
 
     /**
@@ -130,14 +171,14 @@ class ReportSubscriber extends CommonSubscriber
 
             $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
 
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
-            $queryBuilder->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
-            $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $qb->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
+            $qb->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
+            $qb->select('ad.asset_id as asset, ad.date_download as dateDownload');
+            $event->buildWhere($qb);
+            $qb->andwhere($qb->expr()->gte('ad.date_download', ':date'))
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-            $downloads = $queryBuilder->execute()->fetchAll();
+            $downloads = $qb->execute()->fetchAll();
 
             $timeStats = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
             $timeStats['name'] = 'mautic.asset.graph.line.downloads';
@@ -146,11 +187,11 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.most.downloaded') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($qb);
             $limit = 10;
             $offset = 0;
-            $items = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
+            $items = $downloadRepo->getMostDownloaded($qb, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.asset.table.most.downloaded';
@@ -160,11 +201,11 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.top.referrers') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($qb);
             $limit = 10;
             $offset = 0;
-            $items = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
+            $items = $downloadRepo->getTopReferrers($qb, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.asset.table.top.referrers';
@@ -174,9 +215,9 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.pie.statuses') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $items = $downloadRepo->getHttpStatuses($queryBuilder);
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($qb);
+            $items = $downloadRepo->getHttpStatuses($qb);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.asset.graph.pie.statuses';

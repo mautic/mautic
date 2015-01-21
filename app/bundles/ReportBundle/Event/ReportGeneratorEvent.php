@@ -113,4 +113,39 @@ class ReportGeneratorEvent extends Event
     {
         $this->contentTemplate = $contentTemplate;
     }
+
+    /**
+     * Add category left join
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     */
+    public function addCategoryLeftJoin(QueryBuilder &$queryBuilder, $prefix, $categoryPrefix = 'c')
+    {
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'categories', $categoryPrefix, 'c.id = ' . $prefix . '.category_id');
+    }
+
+    /**
+     * Add lead left join
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     * @param string       $leadPrefix
+     */
+    public function addLeadLeftJoin(QueryBuilder &$queryBuilder, $prefix, $leadPrefix = 'l')
+    {
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'leads', $leadPrefix, 'l.id = ' . $prefix . '.lead_id');
+    }
+
+    /**
+     * Add IP left join
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     * @param string       $ipPrefix
+     */
+    public function addIpAddressLeftJoin(QueryBuilder &$queryBuilder, $prefix, $ipPrefix = 'i')
+    {
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'ip_addresses', $ipPrefix, 'i.id = ' . $prefix . '.ip_id');
+    }
 }

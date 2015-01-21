@@ -130,11 +130,46 @@ class ReportModel extends FormModel
 
         if (empty($tableData)) {
             //build them
-            $event = new ReportBuilderEvent();
+            $event = new ReportBuilderEvent($this->factory->getTranslator());
             $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
             $tableData = $event->getTables();
         }
 
         return $tableData;
+    }
+
+    /**
+     * @param string $source
+     *
+     * @return array
+     */
+    public function getColumnList($source = '', $asOptionHtml = false)
+    {
+        $tableData = $this->getTableData();
+        if (!$source) {
+            $source = key($tableData);
+        }
+        $columns = $tableData[$source]['columns'];
+
+        if ($asOptionHtml) {
+            $columnList = '';
+            $typeList   = array();
+            foreach ($columns as $column => $data) {
+                if (isset($data['label'])) {
+                    $columnList       .= '<option value="'.$column.'">'.$data['label']."</option>\n";
+                    $typeList[$column] = $data['type'];
+                }
+            }
+        } else {
+            $columnList = $typeList = array();
+            foreach ($columns as $column => $data) {
+                if (isset($data['label'])) {
+                    $columnList[$column] = $data['label'];
+                    $typeList[$column]   = $data['type'];
+                }
+            }
+        }
+
+        return array($columnList, htmlspecialchars(json_encode($typeList), ENT_QUOTES, 'UTF-8'));
     }
 }

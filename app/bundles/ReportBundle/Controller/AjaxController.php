@@ -22,36 +22,21 @@ class AjaxController extends CommonAjaxController
 {
 
     /**
-     * Returns form HTML. Used for AJAX calls which modifies form field elements.
+     * Get updated column list
      *
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function getFormAction(Request $request)
+    public function getColumnListAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model   = $this->factory->getModel('report');
-        $entity  = $model->getEntity();
-        $action  = $this->generateUrl('mautic_report_action', array('objectAction' => 'new'));
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action);
-        $form->handleRequest($request);
+        $source  = $request->get('source');
+        list($list, $types) = $model->getColumnList($source, true);
 
-        return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'report'      => $entity,
-                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
-            ),
-            'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_report_index',
-                'mauticContent' => 'report',
-                'route'         => $this->generateUrl('mautic_report_action', array(
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId()
-                ))
-            )
-        ));
+        return $this->sendJsonResponse(array('columns' => $list, 'types' => $types));
+
     }
 
     /**

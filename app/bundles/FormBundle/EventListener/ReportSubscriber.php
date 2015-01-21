@@ -45,32 +45,47 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadataForm = $this->factory->getEntityManager()->getClassMetadata('Mautic\\FormBundle\\Entity\\Form');
-        $metadataSubmission = $this->factory->getEntityManager()->getClassMetadata('Mautic\\FormBundle\\Entity\\Submission');
-        $formFields = $metadataForm->getFieldNames();
-        $submissionFields = $metadataSubmission->getFieldNames();
-
-        // Unset submission id
-        unset($submissionFields[0]);
-
-        $columns  = array();
-
-        foreach ($formFields as $field) {
-            $fieldData = $metadataForm->getFieldMapping($field);
-            $columns['f.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        foreach ($submissionFields as $field) {
-            $fieldData = $metadataSubmission->getFieldMapping($field);
-            $columns['fs.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
+        // Forms
+        $prefix          = 'f.';
+        $columns         = array(
+            $prefix . 'alias' => array(
+                'label' => 'mautic.report.field.alias',
+                'type'  => 'int'
+            )
+        );
         $data = array(
             'display_name' => 'mautic.form.form.report.table',
-            'columns'      => $columns
+            'columns'      => array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns())
         );
-
         $event->addTable('forms', $data);
+
+        // Form submissions
+        $submissionPrefix = 'fs.';
+        $pagePrefix       = 'p.';
+
+        $submissionColumns = array(
+            $submissionPrefix . 'date_submitted' => array(
+                'label' => 'mautic.form.report.submit.date_submitted',
+                'type'  => 'datetime'
+            ),
+            $submissionPrefix . 'referer' => array(
+                'label' => 'mautic.form.report.submit.referer',
+                'type'  => 'string'
+            ),
+            $pagePrefix . 'id' => array(
+                'label' => 'mautic.form.report.page_id',
+                'type'  => 'int'
+            ),
+            $pagePrefix . 'name' => array(
+                'label' => 'mautic.form.report.page_name',
+                'type'  => 'string'
+            )
+        );
+        $data = array(
+            'display_name' => 'mautic.form.report.submission.table',
+            'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
+        );
+        $event->addTable('form.submissions', $data);
     }
 
     /**
@@ -82,18 +97,26 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Form reports
-        if ($event->getContext() != 'forms')
-        {
-            return;
+        $context = $event->getContext();
+        if ($context == 'forms') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'forms', 'f');
+            $event->addCategoryLeftJoin($qb, 'f');
+
+            $event->setQueryBuilder($qb);
+        } elseif ($context == 'form.submissions') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+                ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
+                ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'p.id = fs.page_id');
+            $event->addCategoryLeftJoin($qb, 'f');
+            $event->addLeadLeftJoin($qb, 'fs');
+            $event->addIpAddressLeftJoin($qb, 'fs');
+
+            $event->setQueryBuilder($qb);
         }
-
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'forms', 'f');
-        $queryBuilder->leftJoin('f', MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs', 'f.id = fs.form_id');
-
-        $event->setQueryBuilder($queryBuilder);
     }
 
     /**

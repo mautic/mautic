@@ -45,32 +45,95 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadataLead = $this->factory->getEntityManager()->getClassMetadata('Mautic\\LeadBundle\\Entity\\Lead');
-        $metadataPoint = $this->factory->getEntityManager()->getClassMetadata('Mautic\\LeadBundle\\Entity\\PointsChangeLog');
-        $leadFields = $metadataLead->getFieldNames();
-        $pointFields = $metadataPoint->getFieldNames();
-
-        // Unset point change log id
-        unset($pointFields[0]);
-
-        $columns  = array();
-
-        foreach ($leadFields as $field) {
-            $fieldData = $metadataLead->getFieldMapping($field);
-            $columns['l.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        foreach ($pointFields as $field) {
-            $fieldData = $metadataPoint->getFieldMapping($field);
-            $columns['lp.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
-        $data = array(
-            'display_name' => 'mautic.lead.lead.report.table',
-            'columns'      => $columns
+        $prefix     = 'l.';
+        $userPrefix = 'u.';
+        $columns    = array(
+            $prefix . 'date_identified' => array(
+                'label' => 'mautic.lead.report.date_identified',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'points'          => array(
+                'label' => 'mautic.lead.report.points',
+                'type'  => 'int'
+            ),
+            $userPrefix . 'id'          => array(
+                'label' => 'mautic.lead.report.owner_id',
+                'type'  => 'int'
+            ),
+            $userPrefix . 'firstname'   => array(
+                'label' => 'mautic.lead.report.owner_firstname',
+                'type'  => 'string'
+            ),
+            $userPrefix . 'lastname'    => array(
+                'label' => 'mautic.lead.report.owner_lastname',
+                'type'  => 'string'
+            )
         );
 
+        /** @var \Mautic\LeadBundle\Model\FieldModel $model */
+        $model        = $this->factory->getModel('lead.field');
+        $leadFields   = $model->getEntities();
+        $fieldColumns = array();
+        foreach ($leadFields as $f) {
+            switch ($f->getType()) {
+                case 'boolean':
+                    $type = 'bool';
+                    break;
+                case 'date':
+                case 'datetime':
+                case 'time':
+                    $type = 'datetime';
+                    break;
+                case 'url':
+                    $type = 'url';
+                    break;
+                case 'email':
+                    $type = 'email';
+                    break;
+                default:
+                    $type = 'string';
+                    break;
+            }
+            $fieldColumns[$prefix . $f->getAlias()] = array(
+                'label' => $f->getLabel(),
+                'type'  => $type
+            );
+        }
+        $data = array(
+            'display_name' => 'mautic.lead.lead.report.table',
+            'columns'      => array_merge($columns, $fieldColumns)
+        );
         $event->addTable('leads', $data);
+
+        $pointPrefix = 'p.';
+        $pointColumns    = array(
+            $pointPrefix . 'type' => array(
+                'label' => 'mautic.lead.report.points.type',
+                'type'  => 'string'
+            ),
+            $pointPrefix . 'event_name' => array(
+                'label' => 'mautic.lead.report.points.event_name',
+                'type'  => 'string'
+            ),
+            $pointPrefix . 'action_name' => array(
+                'label' => 'mautic.lead.report.points.action_name',
+                'type'  => 'string'
+            ),
+            $pointPrefix . 'delta' => array(
+                'label' => 'mautic.lead.report.points.delta',
+                'type'  => 'int'
+            ),
+            $pointPrefix . 'date_added' => array(
+                'label' => 'mautic.lead.report.points.date_added',
+                'type'  => 'datetime'
+            )
+        );
+        $data = array(
+            'display_name' => 'mautic.lead.report.points.table',
+            'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn())
+        );
+        $event->addTable('lead.pointlog', $data);
+
     }
 
     /**
@@ -82,18 +145,23 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Lead reports
-        if ($event->getContext() != 'leads')
-        {
-            return;
+        $context = $event->getContext();
+        if ($context == 'leads') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+            $qb->leftJoin('l', MAUTIC_TABLE_PREFIX . 'users', 'u', 'u.id = l.owner_id');
+
+            $event->setQueryBuilder($qb);
+        } elseif ($context == 'lead.pointlog') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'lead_points_change_log', 'p')
+                ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = p.lead_id');
+            $event->addIpAddressLeftJoin($qb, 'p');
+
+            $event->setQueryBuilder($qb);
         }
-
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
-        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_points_change_log', 'lp', 'l.id = lp.lead_id');
-
-        $event->setQueryBuilder($queryBuilder);
     }
 
     /**

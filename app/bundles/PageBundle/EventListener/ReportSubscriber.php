@@ -43,21 +43,70 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadata = $this->factory->getEntityManager()->getClassMetadata('Mautic\\PageBundle\\Entity\\Page');
-        $fields   = $metadata->getFieldNames();
-        $columns  = array();
+        $prefix = 'p.';
+        $translationPrefix = 'tp.';
+        $variantPrefix = 'vp.';
 
-        foreach ($fields as $field) {
-            $fieldData = $metadata->getFieldMapping($field);
-            $columns['p.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
-        }
-
+        $columns = array(
+            $prefix . 'title' => array(
+                'label' => 'mautic.page.report.title',
+                'type'  => 'string'
+            ),
+            $prefix . 'alias' => array(
+                'label' => 'mautic.report.field.alias',
+                'type'  => 'string'
+            ),
+            $prefix . 'revision' => array(
+                'label' => 'mautic.page.report.revision',
+                'type'  => 'string'
+            ),
+            $prefix . 'hits' => array(
+                'label' => 'mautic.page.field.hits',
+                'type'  => 'int'
+            ),
+            $prefix . 'unique_hits' => array(
+                'label' => 'mautic.page.field.unique_hits',
+                'type'  => 'int'
+            ),
+            $translationPrefix . 'id' => array(
+                'label' => 'mautic.page.report.translation_parent_id',
+                'type'  => 'int'
+            ),
+            $translationPrefix . 'title' => array(
+                'label' => 'mautic.page.report.translation_parent_title',
+                'type'  => 'string'
+            ),
+            $variantPrefix . 'id' => array(
+                'label' => 'mautic.page.report.variant_parent_id',
+                'type'  => 'string'
+            ),
+            $variantPrefix . 'title' => array(
+                'label' => 'mautic.page.report.variant_parent_title',
+                'type'  => 'string'
+            ),
+            $prefix . 'lang' => array(
+                'label' => 'mautic.report.field.lang',
+                'type'  => 'string'
+            ),
+            $prefix . 'variant_start_date' => array(
+                'label' => 'mautic.page.report.variant_start_date',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'variant_hits' => array(
+                'label' => 'mautic.page.report.variant_hits',
+                'type'  => 'int'
+            )
+        );
         $data = array(
             'display_name' => 'mautic.page.report.table',
             'columns'      => $columns
         );
-
         $event->addTable('pages', $data);
+
+        $hitPrefix = 'h.';
+        $hitColumns = array(
+
+        );
     }
 
     /**

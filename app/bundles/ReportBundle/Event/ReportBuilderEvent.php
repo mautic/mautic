@@ -11,12 +11,23 @@ namespace Mautic\ReportBundle\Event;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class ReportBuilderEvent
  */
 class ReportBuilderEvent extends Event
 {
+
+    /**
+     * @var Translator
+     */
+    private $translator;
+
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * Container with all registered tables and columns
@@ -39,6 +50,14 @@ class ReportBuilderEvent extends Event
      */
     public function addTable($tableName, array $data)
     {
+        foreach ($data['columns'] as &$d) {
+            $d['label'] = $this->translator->trans($d['label']);
+        }
+
+        uasort($data['columns'], function($a, $b) {
+           return strnatcmp($a['label'], $b['label']);
+        });
+
         $this->tableArray[$tableName] = $data;
     }
 
@@ -53,49 +72,172 @@ class ReportBuilderEvent extends Event
     }
 
     /**
-     * Remove a table from the lookup array
+     * Returns standard form fields such as id, name, publish_up, etc
      *
-     * @param string $tableName Table to remove
+     * @param        $prefix
      *
-     * @return void
+     * @return array
      */
-    public function removeTable($tableName)
+    public function getStandardColumns($prefix, $removeColumns = array())
     {
-        if (isset($this->tableArray[$tableName])) {
-            unset($this->tableArray[$tableName]);
+        $columns = array(
+            $prefix . 'id' => array(
+                'label' => 'mautic.report.field.id',
+                'type'  => 'int'
+            ),
+            $prefix . 'name' => array(
+                'label' => 'mautic.report.field.name',
+                'type'  => 'string'
+            ),
+            $prefix . 'created_by_user' => array(
+                'label' => 'mautic.report.field.created_by_user',
+                'type'  => 'string'
+            ),
+            $prefix . 'date_added' => array(
+                'label' => 'mautic.report.field.date_added',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'modified_by_user' => array(
+                'label' => 'mautic.report.field.modified_by_user',
+                'type'  => 'string'
+            ),
+            $prefix . 'date_modified' => array(
+                'label' => 'mautic.report.field.date_modified',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'description' => array(
+                'label' => 'mautic.report.field.description',
+                'type'  => 'string'
+            ),
+            $prefix . 'publish_up' => array(
+                'label' => 'mautic.report.field.publish_up',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'publish_down' => array(
+                'label' => 'mautic.report.field.publish_down',
+                'type'  => 'datetime'
+            ),
+            $prefix . 'is_published' => array(
+                'label' => 'mautic.report.field.is_published',
+                'type'  => 'bool'
+            )
+        );
+
+        if (!empty($removeColumns)) {
+            foreach ($removeColumns as $c) {
+                if(isset($columns[$prefix.$c])) {
+                    unset($columns[$prefix.$c]);
+                }
+            }
         }
+
+        return $columns;
     }
 
     /**
-     * Add a column to the specified table
+     * Returns lead columns
      *
-     * @param string $tableName Table to add the column to
-     * @param string $column    Column to add
+     * @param        $prefix
      *
-     * @return void
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException If table is not registered
+     * @return array
      */
-    public function addColumn($tableName, $column)
+    public function getLeadColumns($prefix = 'l.')
     {
-        if (!array_key_exists($tableName, $this->tableArray)) {
-            throw new InvalidArgumentException(sprintf('The %s table is not set.', $tableName));
-        }
-
-        $this->tableArray[$table]['columns'][] = $column;
+        return array(
+            $prefix . 'id' => array(
+                'label' => 'mautic.report.field.lead.id',
+                'type'  => 'int'
+            ),
+            $prefix . 'title' => array(
+                'label' => 'mautic.report.field.lead.title',
+                'type'  => 'string'
+            ),
+            $prefix . 'firstname' => array(
+                'label' => 'mautic.report.field.lead.firstname',
+                'type'  => 'string'
+            ),
+            $prefix . 'lastname' => array(
+                'label' => 'mautic.report.field.lead.lastname',
+                'type'  => 'string'
+            ),
+            $prefix . 'email' => array(
+                'label' => 'mautic.report.field.lead.email',
+                'type'  => 'string'
+            ),
+            $prefix . 'company' => array(
+                'label' => 'mautic.report.field.lead.company',
+                'type'  => 'string'
+            ),
+            $prefix . 'position' => array(
+                'label' => 'mautic.report.field.lead.position',
+                'type'  => 'string'
+            ),
+            $prefix . 'phone' => array(
+                'label' => 'mautic.report.field.lead.phone',
+                'type'  => 'string'
+            ),
+            $prefix . 'mobile' => array(
+                'label' => 'mautic.report.field.lead.mobile',
+                'type'  => 'string'
+            ),
+            $prefix . 'address1' => array(
+                'label' => 'mautic.report.field.lead.address1',
+                'type'  => 'string'
+            ),
+            $prefix . 'address2' => array(
+                'label' => 'mautic.report.field.lead.address2',
+                'type'  => 'string'
+            ),
+            $prefix . 'country' => array(
+                'label' => 'mautic.report.field.lead.country',
+                'type'  => 'string'
+            ),
+            $prefix . 'city' => array(
+                'label' => 'mautic.report.field.lead.city',
+                'type'  => 'string'
+            ),
+            $prefix . 'state' => array(
+                'label' => 'mautic.report.field.lead.zipcode',
+                'type'  => 'string'
+            )
+        );
     }
 
     /**
-     * Remove a column from the specified table
+     * Get IP Address column
      *
-     * @param string $tableName Table to remove the column from
-     * @param string $column    Column to remove
+     * @param string $prefix
      *
-     * @return void
+     * @return array
      */
-    public function removeColumn($tableName, $column)
+    public function getIpColumn($prefix = 'i.')
     {
-        if (($key = array_search($column, $this->tableArray[$tableName]['columns'])) !== false) {
-            unset($this->tableArray[$tableName]['columns'][$key]);
-        }
+        return array(
+            $prefix . 'ip_address' => array(
+                'label' => 'mautic.report.field.ip_address',
+                'type'  => 'string'
+            )
+        );
+    }
+
+    /**
+     * Add category columns
+     *
+     * @param string $prefix
+     *
+     * @return array
+     */
+    public function getCategoryColumns($prefix = 'c.')
+    {
+        return array(
+            $prefix . 'id' => array(
+                'label' => 'mautic.report.field.category_id',
+                'type'  => 'int'
+            ),
+            $prefix . 'title' => array(
+                'label' => 'mautic.report.field.category_name',
+                'type'  => 'string'
+            ),
+        );
     }
 }

@@ -100,7 +100,7 @@ class ReportType extends AbstractType
                 'attr'        => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.report.report.form.source.help',
-                    'onchange' => 'Mautic.updateColumnList(this)'
+                    'onchange' => 'Mautic.updateColumnList(this.value)'
                 )
             ));
 
@@ -108,24 +108,11 @@ class ReportType extends AbstractType
             $model   = $this->factory->getModel('report');
             $report  = $options['data'];
             $formModifier = function (FormInterface $form, $source = '') use ($model, $report) {
-                $tableData = $model->getTableData();
-                if (!$source) {
-                    $source = key($tableData);
-                }
-                $columns = $tableData[$source]['columns'];
-
-                // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
-                $columnList = array();
-                foreach ($columns as $column => $data) {
-                    if (isset($data['label'])) {
-                        $columnList[$column] = $data['label'];
-                    }
-                }
-
+                list($columnList, $types) = $model->getColumnList($source);
                 $currentColumns = $report->getColumns();
                 if (is_array($currentColumns)) {
                     $orderColumns = array_values($currentColumns);
-                    $order = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+                    $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
                 } else {
                     $order = '[]';
                 }
@@ -139,7 +126,7 @@ class ReportType extends AbstractType
                     'multiple'   => true,
                     'expanded'   => false,
                     'attr'       => array(
-                        'class' => 'form-control multiselect',
+                        'class'         => 'form-control multiselect',
                         'data-order'    => $order,
                         'data-sortable' => 'true'
                     )
@@ -157,7 +144,10 @@ class ReportType extends AbstractType
                     'allow_add'    => true,
                     'allow_delete' => true,
                     'prototype'    => true,
-                    'required'     => false
+                    'required'     => false,
+                    'attr'         => array(
+                        'data-column-types' => $types
+                    )
                 ));
             };
 
