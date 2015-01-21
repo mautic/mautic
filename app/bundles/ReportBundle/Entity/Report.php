@@ -67,7 +67,7 @@ class Report extends FormEntity
     private $source;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -75,12 +75,28 @@ class Report extends FormEntity
     private $columns = array();
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
      */
     private $filters = array();
+
+    /**
+     * @ORM\Column(type="array", name="table_order", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
+     */
+    private $tableOrder = array();
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
+     */
+    private $graphs = array();
 
     /**
      * @param ClassMetadata $metadata
@@ -241,5 +257,37 @@ class Report extends FormEntity
     public function setDescription ($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTableOrder ()
+    {
+        return $this->tableOrder;
+    }
+
+    /**
+     * @param array $tableOrder
+     */
+    public function setTableOrder (array $tableOrder)
+    {
+        $this->tableOrder = $tableOrder;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGraphs ()
+    {
+        return $this->graphs;
+    }
+
+    /**
+     * @param array $graphs
+     */
+    public function setGraphs (array $graphs)
+    {
+        $this->graphs = $graphs;
     }
 }

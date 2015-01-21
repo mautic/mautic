@@ -28,3 +28,11 @@ $container->setDefinition('mautic.form.type.filter_selector', new Definition(
     ->addTag('form.type', array(
         'alias' => 'filter_selector',
     ));
+
+$container->setDefinition('mautic.form.type.table_order', new Definition(
+    'Mautic\ReportBundle\Form\Type\TableOrderType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'table_order',
+    ));

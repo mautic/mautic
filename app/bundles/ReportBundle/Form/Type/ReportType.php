@@ -100,7 +100,7 @@ class ReportType extends AbstractType
                 'attr'        => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.report.report.form.source.help',
-                    'onchange' => 'Mautic.updateColumnList(this.value)'
+                    'onchange' => 'Mautic.updateReportColumnList(this.value)'
                 )
             ));
 
@@ -120,7 +120,7 @@ class ReportType extends AbstractType
                 // Build the columns selector
                 $form->add('columns', 'choice', array(
                     'choices'    => $columnList,
-                    'label'      => 'mautic.report.report.form.columnselector',
+                    'label'      => false,
                     'label_attr' => array('class' => 'control-label'),
                     'required'   => false,
                     'multiple'   => true,
@@ -135,8 +135,7 @@ class ReportType extends AbstractType
                 // Build the filter selector
                 $form->add('filters', 'collection', array(
                     'type'         => 'filter_selector',
-                    'label'        => 'mautic.report.report.form.filterselector',
-                    'label_attr'   => array('class' => 'control-label'),
+                    'label'        => false,
                     'options'      => array(
                         'columnList' => $columnList,
                         'required'   => false
@@ -148,6 +147,19 @@ class ReportType extends AbstractType
                     'attr'         => array(
                         'data-column-types' => $types
                     )
+                ));
+
+                $form->add('tableOrder', 'collection', array(
+                    'type'         => 'table_order',
+                    'label'        => false,
+                    'options'      => array(
+                        'columnList' => $columnList,
+                        'required'   => false
+                    ),
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'prototype'    => true,
+                    'required'     => false
                 ));
             };
 

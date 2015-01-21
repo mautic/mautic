@@ -8,9 +8,11 @@ Mautic.reportOnLoad = function (container) {
 	// Append an index of the number of filters on the edit form
 	if (mQuery('div[id=report_filters]').length) {
 		mQuery('div[id=report_filters]').data('index', mQuery('#report_filters > div').length);
+
+		mQuery('div[id=report_tableOrder]').data('index', mQuery('#report_tableOrder > div').length);
 	}
 
-	Mautic.initGraphs();
+	Mautic.initReportGraphs();
 };
 
 Mautic.reportOnUnload = function(id) {
@@ -22,9 +24,9 @@ Mautic.reportOnUnload = function(id) {
 /**
  * Written with inspiration from http://symfony.com/doc/current/cookbook/form/form_collections.html#allowing-new-tags-with-the-prototype
  */
-Mautic.addFilterRow = function() {
+Mautic.addReportRow = function(elId) {
 	// Container with the prototype markup
-	var prototypeHolder = mQuery('div[id=report_filters]');
+	var prototypeHolder = mQuery('div[id="'+elId+'"]');
 
 	// Fetch the index
 	var index = prototypeHolder.data('index');
@@ -41,14 +43,16 @@ Mautic.addFilterRow = function() {
 	// Render the new row
 	prototypeHolder.append(output);
 
-	Mautic.activateChosenSelect(mQuery('#report_filters_'+index+'_column'));
+	Mautic.activateChosenSelect(mQuery('#'+elId+'_'+index+'_column'));
+	mQuery("#"+elId+" *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 };
 
-Mautic.removeFilterRow = function(container) {
+Mautic.removeReportRow = function(container) {
+	mQuery("#"+container+" *[data-toggle='tooltip']").tooltip('destroy');
 	mQuery('#' + container).remove();
 };
 
-Mautic.updateColumnList = function (source) {
+Mautic.updateReportColumnList = function (source) {
 	Mautic.activateLabelLoadingIndicator('report_source');
 	mQuery.ajax({
 	    url : mauticAjaxUrl,
@@ -88,7 +92,7 @@ Mautic.checkReportCondition = function(selector) {
 	}
 };
 
-Mautic.initGraphs = function () {
+Mautic.initReportGraphs = function () {
 	Mautic.reportGraphs = {};
 	var graphs = mQuery('canvas.graph');
 	mQuery.each(graphs, function(i, graph){
@@ -97,14 +101,14 @@ Mautic.initGraphs = function () {
 			var id = mGraph.attr('id');
 			if (typeof Mautic.reportGraphs[id] === 'undefined') {
 				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
-				Mautic.reportGraphs[id] = Mautic.renderLineGraph(graph.getContext("2d"), graphData);
+				Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(graph.getContext("2d"), graphData);
 			}
 		}
 		if (mGraph.hasClass('graph-pie')) {
 			var id = mGraph.attr('id');
 			if (typeof Mautic.reportGraphs[id] === 'undefined') {
 				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
-				Mautic.reportGraphs[id] = Mautic.renderPieGraph(graph.getContext("2d"), graphData);
+				Mautic.reportGraphs[id] = Mautic.renderReportPieGraph(graph.getContext("2d"), graphData);
 			}
 		}
 	});
@@ -131,7 +135,7 @@ Mautic.updateReportGraph = function(element, options) {
             	delete Mautic.reportGraphs[id];
             	var mGraph = mQuery('#' + id);
             	if (typeof response.graph.line != 'undefined') {
-            		Mautic.reportGraphs[id] = Mautic.renderLineGraph(mGraph.get(0).getContext("2d"), response.graph.line[0]);
+            		Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph.line[0]);
             	}
             }
         },
@@ -141,12 +145,12 @@ Mautic.updateReportGraph = function(element, options) {
     });
 }
 
-Mautic.renderLineGraph = function (canvas, chartData) {
+Mautic.renderReportLineGraph = function (canvas, chartData) {
     var options = {};
     return new Chart(canvas).Line(chartData, options);
 };
 
-Mautic.renderPieGraph = function (canvas, chartData) {
+Mautic.renderReportPieGraph = function (canvas, chartData) {
     var options = {
         responsive: false,
         tooltipFontSize: 10,

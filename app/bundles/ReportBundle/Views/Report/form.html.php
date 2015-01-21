@@ -61,13 +61,21 @@ $view['slots']->set("headerTitle", $header);
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.columnselector'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['columns']); ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.tableorder'); ?></strong></h4>
+                                    <?php echo $view['form']->row($form['tableOrder']); ?>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.filterselector'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['filters']); ?>
                                 </div>
                             </div>

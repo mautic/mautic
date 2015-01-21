@@ -140,12 +140,20 @@ var Mautic = {
         mQuery(modalTarget + ' .modal-loading-bar').removeClass('active');
     },
 
+    /**
+     * Activate label loading spinner
+     *
+     * @param el
+     */
     activateLabelLoadingIndicator: function(el) {
         var labelSpinner    = mQuery("label[for='"+el+"']");
         Mautic.labelSpinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
+    /**
+     * Remove the spinner from label
+     */
     removeLabelLoadingIndicator: function() {
         mQuery(Mautic.labelSpinner).remove();;
     },
@@ -500,8 +508,7 @@ var Mautic = {
      *
      * @param el
      */
-    activateChosenSelect: function(el)
-    {
+    activateChosenSelect: function(el) {
         mQuery(el).chosen({
             placeholder_text_multiple: ' ',
             width: "100%",
@@ -514,8 +521,7 @@ var Mautic = {
      *
      * @param el
      */
-    activateMultiSelect: function(el)
-    {
+    activateMultiSelect: function(el) {
         var moveOption = function(v, prev) {
             var theOption = mQuery(el).find('option[value="' + v + '"]').first();
             var lastSelected = mQuery(el).find('option[selected]').last();
@@ -2348,6 +2354,11 @@ var Mautic = {
         return theTypeahead;
     },
 
+    /**
+     * Launch builder
+     *
+     * @param formName
+     */
     launchBuilder: function (formName) {
         var src = mQuery('#builder_url').val();
         src += '?template=' + mQuery('#'+formName+'_template').val();
@@ -2402,10 +2413,20 @@ var Mautic = {
         mQuery('.builder').addClass('builder-active').removeClass('hide');
     },
 
+    /**
+     * Prepare builder
+     *
+     * @param target
+     */
     builderOnLoad: function (target) {
         Mautic.activateBuilderDragTokens();
     },
 
+    /**
+     * Set builder token draggables
+     *
+     * @param target
+     */
     activateBuilderDragTokens: function (target) {
         if (typeof target == 'undefined') {
             target = '.builder-panel';
@@ -2425,6 +2446,11 @@ var Mautic = {
         });
     },
 
+    /**
+     * Close the builder
+     *
+     * @param model
+     */
     closeBuilder: function(model) {
         mQuery('#builder-overlay').removeClass('hide');
 
@@ -2466,6 +2492,14 @@ var Mautic = {
         mQuery('#builder-template-content').remove();
     },
 
+    /**
+     * Save the builder content
+     *
+     * @param model
+     * @param entityId
+     * @param content
+     * @param callback
+     */
     saveBuilderContent: function (model, entityId, content, callback) {
         mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + model + ':setBuilderContent',
@@ -2482,6 +2516,12 @@ var Mautic = {
         });
     },
 
+    /**
+     * Get ckeditor instance
+     *
+     * @param id
+     * @returns {*}
+     */
     getBuilderEditorInstance: function (id) {
         var editors = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
         if (id) {
@@ -2491,6 +2531,13 @@ var Mautic = {
         }
     },
 
+    /**
+     * Insert token into ckeditor
+     *
+     * @param editorId
+     * @param token
+     * @param isHtml
+     */
     insertBuilderEditorToken: function(editorId, token, isHtml) {
         var editor = Mautic.getBuilderEditorInstance(editorId);
 
@@ -2508,6 +2555,12 @@ var Mautic = {
         }
     },
 
+    /**
+     * Show modal to insert a link into ckeditor
+     * @param event
+     * @param ui
+     * @param editorId
+     */
     showBuilderLinkModal: function (event, ui, editorId) {
         // Reset in case the modal wasn't closed via cancel
         mQuery('#BuilderLinkModal input[name="link"]').val('');
@@ -2537,6 +2590,9 @@ var Mautic = {
         mQuery('#BuilderLinkModal').modal('show');
     },
 
+    /**
+     * Insert link into ckeditor
+     */
     insertBuilderLink: function () {
         var editorId = mQuery('#BuilderLinkModal input[name="editor"]').val();
         var token    = mQuery('#BuilderLinkModal input[name="token"]').val();
