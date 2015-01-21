@@ -43,9 +43,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $prefix = 'p.';
+        $prefix            = 'p.';
         $translationPrefix = 'tp.';
-        $variantPrefix = 'vp.';
+        $variantPrefix     = 'vp.';
 
         $columns = array(
             $prefix . 'title' => array(
@@ -99,14 +99,101 @@ class ReportSubscriber extends CommonSubscriber
         );
         $data = array(
             'display_name' => 'mautic.page.report.table',
-            'columns'      => $columns
+            'columns'      => array_merge($columns, $event->getCategoryColumns())
         );
         $event->addTable('pages', $data);
 
-        $hitPrefix = 'h.';
-        $hitColumns = array(
-
+        $hitPrefix   = 'h.';
+        $redirectHit = 'r.';
+        $emailPrefix = 'e.';
+        $hitColumns  = array(
+            $hitPrefix . 'date_hit' => array(
+                'label' => 'mautic.page.report.hits.date_hit',
+                'type'  => 'datetime'
+            ),
+            $hitPrefix . 'date_left' => array(
+                'label' => 'mautic.page.report.hits.date_left',
+                'type'  => 'datetime'
+            ),
+            $hitPrefix . 'country' => array(
+                'label' => 'mautic.page.report.hits.country',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'region' => array(
+                'label' => 'mautic.page.report.hits.region',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'city' => array(
+                'label' => 'mautic.page.report.hits.city',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'isp' => array(
+                'label' => 'mautic.page.report.hits.isp',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'organization' => array(
+                'label' => 'mautic.page.report.hits.organization',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'code' => array(
+                'label' => 'mautic.page.report.hits.code',
+                'type'  => 'int'
+            ),
+            $hitPrefix . 'referer' => array(
+                'label' => 'mautic.page.report.hits.referer',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'url' => array(
+                'label' => 'mautic.page.report.hits.url',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'user_agent' => array(
+                'label' => 'mautic.page.report.hits.user_agent',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'remote_host' => array(
+                'label' => 'mautic.page.report.hits.remote_host',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'browser_languages' => array(
+                'label' => 'mautic.page.report.hits.browser_languages',
+                'type'  => 'array'
+            ),
+            $hitPrefix . 'source' => array(
+                'label' => 'mautic.report.field.source',
+                'type'  => 'string'
+            ),
+            $hitPrefix . 'source_id' => array(
+                'label' => 'mautic.report.field.source_id',
+                'type'  => 'int'
+            ),
+            $redirectHit . 'url' => array(
+                'label' => 'mautic.page.report.hits.redirect_url',
+                'type'  => 'string'
+            ),
+            $redirectHit . 'hits' => array(
+                'label' => 'mautic.page.report.hits.redirect_hit_count',
+                'type'  => 'int'
+            ),
+            $redirectHit . 'unique_hits' => array(
+                'label' => 'mautic.page.report.hits.redirect_unique_hits',
+                'type'  => 'string'
+            ),
+            $emailPrefix . 'id' => array(
+                'label' => 'mautic.page.report.hits.email_id',
+                'type'  => 'int'
+            ),
+            $emailPrefix . 'subject' => array(
+                'label' => 'mautic.page.report.hits.email_subject',
+                'type'  => 'string'
+            )
         );
+        $data = array(
+            'display_name' => 'mautic.page.report.hits.table',
+            'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
+        );
+        $event->addTable('page.hits', $data);
+
     }
 
     /**
@@ -118,17 +205,32 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Page reports
-        if ($event->getContext() != 'pages')
-        {
-            return;
+        $context = $event->getContext();
+        if ($context == 'pages') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
+                ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'tp', 'p.id = tp.id')
+                ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'vp', 'p.id = vp.id');
+            $event->addCategoryLeftJoin($qb, 'p');
+
+            $event->setQueryBuilder($qb);
+        } elseif ($context == 'page.hits') {
+            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $qb->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
+                ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id.id = p.id')
+                ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'tp', 'p.id = tp.id')
+                ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'vp', 'p.id = vp.id')
+                ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = h.email_id')
+                ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'page_redirects', 'r', 'r.id = h.redirect_id');
+
+            $event->addIpAddressLeftJoin($qb, 'h');
+            $event->addCategoryLeftJoin($qb, 'p');
+            $event->addLeadLeftJoin($qb, 'l');
+
+            $event->setQueryBuilder($qb);
         }
-
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'p');
-
-        $event->setQueryBuilder($queryBuilder);
     }
 
     /**
@@ -143,7 +245,7 @@ class ReportSubscriber extends CommonSubscriber
         $report = $event->getReport();
 
         // Context check, we only want to fire for Page reports
-        if ($report->getSource() != 'pages')
+        if ($report->getSource() != 'page.hits')
         {
             return;
         }

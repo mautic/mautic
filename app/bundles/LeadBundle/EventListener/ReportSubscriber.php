@@ -175,7 +175,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $report = $event->getReport();
         // Context check, we only want to fire for Lead reports
-        if ($report->getSource() != 'leads')
+        if ($report->getSource() != 'lead.pointlog')
         {
             return;
         }

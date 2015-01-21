@@ -148,7 +148,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $report = $event->getReport();
         // Context check, we only want to fire for Asset reports
-        if ($report->getSource() != 'assets')
+        if ($report->getSource() != 'asset.downloads')
         {
             return;
         }

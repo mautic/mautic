@@ -130,7 +130,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $report = $event->getReport();
         // Context check, we only want to fire for Forms reports
-        if ($report->getSource() != 'forms')
+        if ($report->getSource() != 'form.submissions')
         {
             return;
         }

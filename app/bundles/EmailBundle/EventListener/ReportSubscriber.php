@@ -186,7 +186,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $report = $event->getReport();
         // Context check, we only want to fire for Email reports
-        if ($report->getSource() != 'emails')
+        if ($report->getSource() != 'email.stats')
         {
             return;
         }
