@@ -1,6 +1,8 @@
+@import "../../app/less/variables";
+
 .ms-container{
   background: transparent url('multiselect/switch.png') no-repeat 50% 50%;
-  width: 370px;
+  /*width: 370px;*/
 }
 
 .ms-container:after{
@@ -41,13 +43,14 @@
   height: 200px;
   padding: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ms-container .ms-list.ms-focus{
-  border-color: rgba(82, 168, 236, 0.8);
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+  border-color: @mautic-primary;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), fade(@mautic-primary, 60%);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px fade(@mautic-primary, 60%);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px fade(@mautic-primary, 60%);
   outline: 0;
   outline: thin dotted \9;
 }
@@ -82,7 +85,7 @@
   cursor: pointer;
   color: #fff;
   text-decoration: none;
-  background-color: #08c;
+  background-color: @mautic-primary;
 }
 
 .ms-container .ms-selectable li.disabled,
@@ -90,4 +93,10 @@
   background-color: #eee;
   color: #aaa;
   cursor: text;
+}
+
+.ms-search {
+  width: 100%;
+  margin-bottom: 5px;
+  height: auto;
 }

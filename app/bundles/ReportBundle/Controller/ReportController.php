@@ -319,6 +319,9 @@ class ReportController extends FormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
+                // Columns have to be reset in order for Symfony to honor the new submitted order
+                $oldColumns = $entity->getColumns();
+                $entity->setColumns(array());
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -332,22 +335,25 @@ class ReportController extends FormController
                         ))
                     ));
 
-                    $returnUrl = $this->generateUrl('mautic_report_action', array(
+                    $returnUrl  = $this->generateUrl('mautic_report_action', array(
                         'objectAction' => 'view',
                         'reportId'     => $entity->getId()
                     ));
                     $viewParams = array('reportId' => $entity->getId());
-                    $template = 'MauticReportBundle:Report:view';
+                    $template   = 'MauticReportBundle:Report:view';
                 } else {
+                    //reset old columns
+                    $entity->setColumns($oldColumns);
+
                     $this->addFlash('mautic.core.error.not.valid', array(), 'error');
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);
 
-                $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $page));
+                $returnUrl  = $this->generateUrl('mautic_report_index', array('page' => $page));
                 $viewParams = array('report' => $page);
-                $template  = 'MauticReportBundle:Report:index';
+                $template   = 'MauticReportBundle:Report:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -358,6 +364,9 @@ class ReportController extends FormController
                         'contentTemplate' => $template
                     ))
                 );
+            } else {
+                // Rebuild the form for updated columns
+                $form = $model->createForm($entity, $this->get('form.factory'), $action);
             }
         } else {
             //lock the entity
@@ -365,9 +374,9 @@ class ReportController extends FormController
         }
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'report'      => $entity,
-                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+            'viewParameters'  => array(
+                'report' => $entity,
+                'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
             ),
             'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
             'passthroughVars' => array(

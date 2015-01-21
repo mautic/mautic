@@ -55,7 +55,7 @@ class ReportType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
-        $builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
+        $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode
         if (!$options['read_only']) {
@@ -76,8 +76,13 @@ class ReportType extends AbstractType
 
             $builder->add('isPublished', 'yesno_button_group');
 
+            $data = $options['data']->getSystem();
             $builder->add('system', 'yesno_button_group', array(
-                'label' => 'mautic.report.report.form.issystem'
+                'label' => 'mautic.report.report.form.issystem',
+                'data'  => $data,
+                'attr'  => array(
+                    'tooltip' => 'mautic.report.report.form.issystem.tooltip'
+                )
             ));
 
             // Quickly build the table source list for use in the selector
@@ -99,8 +104,10 @@ class ReportType extends AbstractType
                 )
             ));
 
-            $model        = $this->factory->getModel('report');
-            $formModifier = function (FormInterface $form, $source = '') use ($model) {
+            /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+            $model   = $this->factory->getModel('report');
+            $report  = $options['data'];
+            $formModifier = function (FormInterface $form, $source = '') use ($model, $report) {
                 $tableData = $model->getTableData();
                 if (!$source) {
                     $source = key($tableData);
@@ -115,6 +122,14 @@ class ReportType extends AbstractType
                     }
                 }
 
+                $currentColumns = $report->getColumns();
+                if (is_array($currentColumns)) {
+                    $orderColumns = array_values($currentColumns);
+                    $order = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+                } else {
+                    $order = '[]';
+                }
+
                 // Build the columns selector
                 $form->add('columns', 'choice', array(
                     'choices'    => $columnList,
@@ -124,7 +139,9 @@ class ReportType extends AbstractType
                     'multiple'   => true,
                     'expanded'   => false,
                     'attr'       => array(
-                        'class' => 'form-control'
+                        'class' => 'form-control multiselect',
+                        'data-order'    => $order,
+                        'data-sortable' => 'true'
                     )
                 ));
 

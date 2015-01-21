@@ -279,15 +279,111 @@ var Mautic = {
             inlineDropdown: true
         });
 
-        mQuery("select").not('.multiselect, .not-chosen').chosen({
+        mQuery(container + " select").not('.multiselect, .not-chosen').chosen({
             placeholder_text_multiple: ' ',
             width: "100%",
             allow_single_deselect: true
         });
 
-        mQuery("select.multiselect").each(function() {
-            mQuery(this).multiSelect({
+        mQuery(container + " select.multiselect").each(function() {
+            var that = this;
 
+            var moveOption = function(v, prev) {
+                var theOption = mQuery(that).find('option[value="' + v + '"]').first();
+                var lastSelected = mQuery(that).find('option[selected]').last();
+
+                if (typeof prev !== 'undefined') {
+                    if (prev) {
+                        var prevOption = mQuery(that).find('option[value="' + prev + '"]').first();
+                        theOption.insertAfter(prevOption);
+                        return;
+                    }
+                } else if (lastSelected.length) {
+                    theOption.insertAfter(lastSelected);
+                    return;
+                }
+
+                theOption.prependTo(that);
+            };
+            mQuery(this).multiSelect({
+                afterInit: function(container) {
+                    var funcName = mQuery(that).data('afterInit');
+                    if (funcName) {
+                        Mautic[funcName]('init', container);
+                    }
+
+                    var selectThat = this,
+                        $selectableSearch = selectThat.$selectableUl.prev(),
+                        $selectionSearch = selectThat.$selectionUl.prev(),
+                        selectableSearchString = '#' + selectThat.$container.attr('id') + ' .ms-elem-selectable:not(.ms-selected)',
+                        selectionSearchString = '#' + selectThat.$container.attr('id') + ' .ms-elem-selection.ms-selected';
+
+                    selectThat.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                        .on('keydown', function (e) {
+                            if (e.which === 40) {
+                                that.$selectableUl.focus();
+                                return false;
+                            }
+                        });
+
+                    selectThat.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+                        .on('keydown', function (e) {
+                            if (e.which == 40) {
+                                that.$selectionUl.focus();
+                                return false;
+                            }
+                        });
+
+
+                    var selectOrder = mQuery(that).data('order');
+                    if (selectOrder && selectOrder.length > 1) {
+                        this.deselect_all();
+                        mQuery.each(selectOrder, function(k, v) {
+                            selectThat.select(v);
+                        });
+                    }
+
+                    var isSortable = mQuery(that).data('sortable');
+                    if (isSortable) {
+                        mQuery(that).parent('.choice-wrapper').find('.ms-selection').first().sortable({
+                            items: '.ms-elem-selection',
+                            helper: function (e, ui) {
+                                ui.width(mQuery(this).width());
+                                return ui;
+                            },
+                            axis: 'y',
+                            scroll: false,
+                            update: function(event, ui) {
+                                var prev      = ui.item.prev();
+                                var prevValue = (prev.length) ? prev.data('ms-value') : '';
+                                moveOption(ui.item.data('ms-value'), prevValue);
+                            }
+                        });
+                    }
+                },
+                afterSelect: function(value) {
+                    var funcName = mQuery(that).data('afterSelect');
+                    if (funcName) {
+                        alert('est');
+                        Mautic[funcName]('select', value);
+                    }
+                    this.qs1.cache();
+                    this.qs2.cache();
+
+                    moveOption(value);
+                },
+                afterDeselect: function(value) {
+                    var funcName = mQuery(that).data('afterDeselect');
+                    if (funcName) {
+                        Mautic[funcName]('deselect', value);
+                    }
+
+                    this.qs1.cache();
+                    this.qs2.cache();
+                },
+                selectableHeader: "<input type='text' class='ms-search form-control' autocomplete='off'>",
+                selectionHeader:  "<input type='text' class='ms-search form-control' autocomplete='off'>",
+                keepOrder: true
             });
         });
 
