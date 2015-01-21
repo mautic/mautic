@@ -40,43 +40,38 @@ Mautic.addFilterRow = function() {
 
 	// Render the new row
 	prototypeHolder.append(output);
+
+	Mautic.activateChosenSelect(mQuery('#report_filters_'+index+'_column'));
 };
 
 Mautic.removeFilterRow = function(container) {
 	mQuery('#' + container).remove();
 };
 
-Mautic.updateColumnList = function (el) {
-	var el = mQuery(el)
-	var form = el.closest('form');
-	var data = {};
-	data[el.attr('name')] = el.val();
+Mautic.updateColumnList = function (source) {
+	Mautic.activateLabelLoadingIndicator('report_source');
 	mQuery.ajax({
-	    url : mauticAjaxUrl + "?action=report:getForm",
+	    url : mauticAjaxUrl,
 	    type: 'post',
-	    data : data,
+		data: "action=report:getColumnList&source=" + source,
 	    success: function(response) {
-	    	if (response.newContent) {
-	    		var html = response.newContent;
-
-	    		// update Columns multiselect
-		    	var columnElement = mQuery('#report_columns');
-				columnElement.children().replaceWith(
-					mQuery(html).find('#report_columns').children()
-				);
-				columnElement.trigger('chosen:updated');
+	    	if (response.columns) {
+				mQuery('#report_columns').html(response.columns);
+				mQuery('#report_columns').multiSelect('refresh');
 
 				// Remove any filters, they're no longer valid with different column lists
 				mQuery('#report_filters').find('div').remove().end();
 
-				// Update column select at filters prototype
-				mQuery('#report_filters').replaceWith(
-					mQuery(html).find('#report_filters')
-				);
+				var prototype = mQuery('#report_filters').data('prototype');
+				prototype = prototype.replace(/([\s|\S]*?)class="form-control filter-columns">([\s|\S]*?)<\/select>([\s|\S]*?)/m, '$1class="form-control filter-columns">'+response.columns+"<\select>$3");
+				mQuery('#report_filters').data('prototype', prototype);
 			}
 		},
 		error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
+		},
+		complete: function() {
+			Mautic.removeLabelLoadingIndicator();
 		}
 	});
 };
