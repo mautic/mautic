@@ -53,7 +53,7 @@ $startCount  = 1;
     <?php else: ?>
         <tr>
             <td>&nbsp;</td>
-            <?php foreach ($columns as $key => $details): ?>
+            <?php foreach ($columnOrder as $key): ?>
                 <td>&nbsp;</td>
             <?php endforeach; ?>
         </tr>
