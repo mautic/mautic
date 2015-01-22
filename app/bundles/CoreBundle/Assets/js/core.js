@@ -510,7 +510,9 @@ var Mautic = {
     activateMultiSelect: function(el) {
         var moveOption = function(v, prev) {
             var theOption = mQuery(el).find('option[value="' + v + '"]').first();
-            var lastSelected = mQuery(el).find('option[selected]').last();
+            var lastSelected = mQuery(el).find('option:not(:disabled)').filter(function () {
+                return mQuery(this).prop('selected');
+            }).last();
 
             if (typeof prev !== 'undefined') {
                 if (prev) {
@@ -522,7 +524,6 @@ var Mautic = {
                 theOption.insertAfter(lastSelected);
                 return;
             }
-
             theOption.prependTo(el);
         };
 
