@@ -16,6 +16,8 @@ $header = ($report->getId()) ?
     $view['translator']->trans('mautic.report.report.header.new');
 
 $view['slots']->set("headerTitle", $header);
+
+$showGraphTab = count($form['graphs']->children);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -31,7 +33,7 @@ $view['slots']->set("headerTitle", $header);
                     <li class="">
                         <a href="#data-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.data'); ?></a>
                     </li>
-                    <li class="">
+                    <li class="<?php if (!$showGraphTab) echo "hide"; ?>" id="graphs-tab">
                         <a href="#graphs-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.graphs'); ?></a>
                     </li>
                 </ul>
@@ -85,7 +87,7 @@ $view['slots']->set("headerTitle", $header);
                         </div>
                     </div>
 
-                    <div class="tab-pane fade bdr-w-0" id="graphs-container">
+                    <div class="tab-pane fade bdr-w-0<?php if (!$showGraphTab) echo "hide"; ?>" id="graphs-container">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">

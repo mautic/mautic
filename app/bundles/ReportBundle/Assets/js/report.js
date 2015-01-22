@@ -78,6 +78,14 @@ Mautic.updateReportSourceData = function (context) {
 
 			mQuery('#report_graphs').html(response.graphs);
 			mQuery('#report_graphs').multiSelect('refresh');
+
+			if (!response.graphs) {
+				mQuery('#graphs-container').addClass('hide');
+				mQuery('#graphs-tab').addClass('hide');
+			} else {
+				mQuery('#graphs-container').removeClass('hide');
+				mQuery('#graphs-tab').removeClass('hide');
+			}
 		},
 		error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
