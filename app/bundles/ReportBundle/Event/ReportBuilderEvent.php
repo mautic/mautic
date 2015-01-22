@@ -18,14 +18,19 @@ use Symfony\Component\Translation\Translator;
  */
 class ReportBuilderEvent extends Event
 {
+    /**
+     * @var string
+     */
+    private $context = '';
 
     /**
      * @var Translator
      */
     private $translator;
 
-    public function __construct(Translator $translator)
+    public function __construct(Translator $translator, $context = '')
     {
+        $this->context     = $context;
         $this->translator = $translator;
     }
 
@@ -239,5 +244,35 @@ class ReportBuilderEvent extends Event
                 'type'  => 'string'
             ),
         );
+    }
+
+    /**
+     * Get the context
+     *
+     * @return string
+     */
+    public function getcontext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param $context
+     *
+     * @return bool
+     */
+    public function checkContext($context)
+    {
+        if (empty($this->context)) {
+            return true;
+        }
+
+        if (is_array($context)) {
+            return in_array($this->context, $context);
+        } else if($this->context == $context) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

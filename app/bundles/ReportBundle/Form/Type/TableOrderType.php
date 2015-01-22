@@ -63,7 +63,7 @@ class TableOrderType extends AbstractType
             'empty_value' => false,
             'required'    => false,
             'attr'        => array(
-                'class' => 'form-control'
+                'class' => 'form-control not-chosen'
             )
         ));
     }

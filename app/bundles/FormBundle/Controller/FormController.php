@@ -481,6 +481,11 @@ class FormController extends CommonFormController
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
 
+                // Clear session items in case columns changed
+                $session->remove('mautic.formresult.' . $entity->getId() . '.orderby');
+                $session->remove('mautic.formresult.' . $entity->getId() . '.orderbydir');
+                $session->remove("mautic.formresult.' . $entity->getId() . '.filters");
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $returnUrl,

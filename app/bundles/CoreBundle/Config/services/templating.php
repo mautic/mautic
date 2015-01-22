@@ -94,3 +94,14 @@ $container->setDefinition('mautic.helper.template.button',
     ))
     ->addTag('templating.helper', array('alias' => 'buttons'))
     ->setScope('request');
+
+//Formatter helper
+$container->setDefinition('mautic.helper.template.formatter',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
+        array(
+            new Reference('mautic.factory')
+        )
+    ))
+    ->addTag('templating.helper', array('alias' => 'formatter'))
+    ->setScope('request');

@@ -12,7 +12,7 @@
     <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
 </a>
 <?php else: ?>
-<a href="<?php echo $this->container->get('router')->generate('mautic_report_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+<a href="<?php echo $this->container->get('router')->generate('mautic_report_view', array('objectId' => $item->getId())); ?>" data-toggle="ajax">
     <?php echo $item->getName(); ?>
 </a>
 <?php endif; ?>

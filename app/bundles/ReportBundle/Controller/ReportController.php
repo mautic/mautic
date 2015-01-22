@@ -26,9 +26,9 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function indexAction($page = 1)
+    public function indexAction ($page = 1)
     {
-	    /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model = $this->factory->getModel('report');
 
         //set some permissions
@@ -86,7 +86,7 @@ class ReportController extends FormController
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.report.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_report_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -105,7 +105,7 @@ class ReportController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
+            'viewParameters'  => array(
                 'searchValue' => $search,
                 'items'       => $reports,
                 'totalItems'  => $count,
@@ -118,9 +118,9 @@ class ReportController extends FormController
             ),
             'contentTemplate' => 'MauticReportBundle:Report:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_report_index',
-                'mauticContent'  => 'report',
-                'route'          => $this->generateUrl('mautic_report_index', array('page' => $page))
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report',
+                'route'         => $this->generateUrl('mautic_report_index', array('page' => $page))
             )
         ));
     }
@@ -132,11 +132,11 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction ($objectId)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
-        $entity  = $model->getEntity($objectId);
+        $model  = $this->factory->getModel('report');
+        $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
             if (!$this->factory->getSecurity()->isGranted('report:reports:create') ||
@@ -163,7 +163,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction ($objectId)
     {
         $page      = $this->factory->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $page));
@@ -192,9 +192,9 @@ class ReportController extends FormController
             $model->deleteEntity($entity);
 
             $identifier = $this->get('translator')->trans($entity->getName());
-            $flashes[] = array(
-                'type' => 'notice',
-                'msg'  => 'mautic.core.notice.deleted',
+            $flashes[]  = array(
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId
@@ -214,10 +214,11 @@ class ReportController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.report.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_report_index', array('page' => $page));
-        $flashes     = array();
+    public function batchDeleteAction ()
+    {
+        $page      = $this->factory->getSession()->get('mautic.report.page', 1);
+        $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -246,7 +247,8 @@ class ReportController extends FormController
                     );
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
                     'report:reports:deleteown', 'report:reports:deleteother', $entity->getCreatedBy()
-                )) {
+                )
+                ) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'report', true);
@@ -260,8 +262,8 @@ class ReportController extends FormController
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = array(
-                    'type' => 'notice',
-                    'msg'  => 'mautic.report.report.notice.batch_deleted',
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.report.report.notice.batch_deleted',
                     'msgVars' => array(
                         '%count%' => count($entities)
                     )
@@ -284,7 +286,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction ($objectId, $ignorePost = false)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model   = $this->factory->getModel('report');
@@ -335,11 +337,10 @@ class ReportController extends FormController
                         ))
                     ));
 
-                    $returnUrl  = $this->generateUrl('mautic_report_action', array(
-                        'objectAction' => 'view',
-                        'reportId'     => $entity->getId()
+                    $returnUrl  = $this->generateUrl('mautic_report_view', array(
+                        'objectId' => $entity->getId()
                     ));
-                    $viewParams = array('reportId' => $entity->getId());
+                    $viewParams = array('objectId' => $entity->getId());
                     $template   = 'MauticReportBundle:Report:view';
                 } else {
                     //reset old columns
@@ -357,6 +358,11 @@ class ReportController extends FormController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                // Clear session items in case columns changed
+                $session->remove('mautic.report.' . $entity->getId() . '.orderby');
+                $session->remove('mautic.report.' . $entity->getId() . '.orderbydir');
+                $session->remove("mautic.report.' . $entity->getId() . '.filters");
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $returnUrl,
@@ -395,7 +401,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction ()
     {
         if (!$this->factory->getSecurity()->isGranted('report:reports:create')) {
             return $this->accessDenied();
@@ -433,16 +439,15 @@ class ReportController extends FormController
                     }
 
                     $viewParameters = array(
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId()
+                        'objectId' => $entity->getId()
                     );
-                    $returnUrl = $this->generateUrl('mautic_report_action', $viewParameters);
-                    $template  = 'MauticReportBundle:Report:index';
+                    $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
+                    $template       = 'MauticReportBundle:Report:index';
                 }
             } else {
-                $viewParameters  = array('page' => $page);
-                $returnUrl = $this->generateUrl('mautic_report_index', $viewParameters);
-                $template  = 'MauticReportBundle:Report:index';
+                $viewParameters = array('page' => $page);
+                $returnUrl      = $this->generateUrl('mautic_report_index', $viewParameters);
+                $template       = 'MauticReportBundle:Report:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -460,8 +465,8 @@ class ReportController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'report'      => $entity,
-                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report')
+                'report' => $entity,
+                'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report')
             ),
             'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
             'passthroughVars' => array(
@@ -477,22 +482,21 @@ class ReportController extends FormController
     /**
      * Shows a report
      *
-     * @param int $reportId Report ID
+     * @param int $objectId Report ID
+     * @param int $reportPage
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\Response
      */
-    public function viewAction($reportId)
+    public function viewAction ($objectId, $reportPage = 1)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model    = $this->factory->getModel('report');
-        $entity   = $model->getEntity($reportId);
+        $entity   = $model->getEntity($objectId);
         $security = $this->factory->getSecurity();
 
-        //set the page we came from
-        $page       = $this->factory->getSession()->get('mautic.report.page', 1);
-        $reportPage = $this->request->get('reportPage', 1);
-
         if ($entity === null) {
+            $page = $this->factory->getSession()->get('mautic.report.page', 1);
+
             return $this->postActionRedirect(array(
                 'returnUrl'       => $this->generateUrl('mautic_report_index', array('page' => $page)),
                 'viewParameters'  => array('page' => $page),
@@ -505,7 +509,7 @@ class ReportController extends FormController
                     array(
                         'type'    => 'error',
                         'msg'     => 'mautic.report.report.error.notfound',
-                        'msgVars' => array('%id%' => $reportId)
+                        'msgVars' => array('%id%' => $objectId)
                     )
                 )
             ));
@@ -513,51 +517,32 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
+        // Set filters
         if ($this->request->getMethod() == 'POST') {
             $this->setListFilters();
         }
 
-        $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
-        $orderByDir = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+        $reportData = $this->getReportData($entity, true, $reportPage);
 
-        $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($reportPage === 1) ? 0 : (($reportPage-1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity);
-
-        // Build the options array to pass into the query
-        $options = array(
-            'start'      => $start,
-            'limit'      => $limit,
-            'orderBy'    => $orderBy,
-            'orderByDir' => $orderByDir,
-            'dispatcher' => $this->factory->getDispatcher()
-        );
-
-        $query           = $reportGenerator->getQuery($options);
-        $result          = $query->getConnection()->executeQuery((string) $query)->fetchAll();
-        $contentTemplate = $reportGenerator->getContentTemplate();
-
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
-
-        $event = new ReportGraphEvent($entity);
-        $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
-        $graphs = $event->getGraphs();
+        $totalResults    = $reportData['totalResults'];
+        $data            = $reportData['data'];
+        $graphs          = $reportData['graphs'];
+        $contentTemplate = $reportData['contentTemplate'];
+        $viewColumns     = $reportData['viewColumns'];
+        $limit           = $reportData['limit'];
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'result'     => $result,
-                'report'     => $entity,
-                'reportPage' => $page,
-                'graphs'     => $graphs,
-                'tmpl'       => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'limit'      => $limit,
-                'security'   => $security,
-                'permissions'   => $security->isGranted(array(
+            'viewParameters'  => array(
+                'data'         => $data,
+                'columns'      => $viewColumns,
+                'totalResults' => $totalResults,
+                'report'       => $entity,
+                'reportPage'   => $reportPage,
+                'graphs'       => $graphs,
+                'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'limit'        => $limit,
+                'security'     => $security,
+                'permissions'  => $security->isGranted(array(
                     'report:reports:viewown',
                     'report:reports:viewother',
                     'report:reports:create',
@@ -571,10 +556,9 @@ class ReportController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',
-                'route'         => $this->generateUrl('mautic_report_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $entity->getId(),
-                    'reportPage'   => $reportPage
+                'route'         => $this->generateUrl('mautic_report_view', array(
+                    'objectId'   => $entity->getId(),
+                    'reportPage' => $reportPage
                 ))
             )
         ));
@@ -591,21 +575,21 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|void
      */
-    private function checkEntityAccess($postActionVars, $entity, $objectId, array $permissions, $model, $modelName)
+    private function checkEntityAccess ($postActionVars, $entity, $objectId, array $permissions, $model, $modelName)
     {
         if ($entity === null) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, array(
                     'flashes' => array(
                         array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.report.report.error.notfound',
+                            'type'    => 'error',
+                            'msg'     => 'mautic.report.report.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
                 ))
             );
-        }  elseif (!$this->factory->getSecurity()->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -613,5 +597,161 @@ class ReportController extends FormController
         }
 
         return true;
+    }
+
+
+    /**
+     * @param int    $objectId
+     * @param string $format
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @throws \Exception
+     */
+    public function exportAction ($objectId, $format = 'csv')
+    {
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model    = $this->factory->getModel('report');
+        $entity   = $model->getEntity($objectId);
+        $security = $this->factory->getSecurity();
+
+        if ($this->request->getMethod() == 'POST') {
+            $this->setListFilters();
+        }
+
+        if ($entity === null) {
+            $page = $this->factory->getSession()->get('mautic.report.page', 1);
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $this->generateUrl('mautic_report_index', array('page' => $page)),
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticReportBundle:Report:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_report_index',
+                    'mauticContent' => 'report'
+                ),
+                'flashes'         => array(
+                    array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.report.report.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    )
+                )
+            ));
+        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
+        $reportData = $this->getReportData($entity, false);
+
+        return $model->exportResults($format, $entity, $reportData);
+    }
+
+    /**
+     * Shared between viewAction and exportAction to get report data
+     *
+     * @param     $entity
+     * @param int $reportPage
+     *
+     * @return array
+     */
+    protected function getReportData ($entity, $paginate = true, $reportPage = 1)
+    {
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model = $this->factory->getModel('report');
+
+        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity);
+
+        $data         = $entity->getColumns();
+        $viewColumns  = array();
+        $totalResults = 0;
+        if (!empty($data)) {
+            if ($paginate) {
+                // Build the options array to pass into the query
+                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
+                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
+                if ($start < 0) {
+                    $start = 0;
+                }
+            }
+
+            $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
+            $orderByDir = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+
+            $columns = $model->getTableData($entity->getSource());
+            $options = array(
+                //'start'      => $start,
+                //'limit'      => $limit,
+                'order'      => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
+                'dispatcher' => $this->factory->getDispatcher(),
+                'columns'    => $columns['columns']
+            );
+
+            // Rekey by label
+            foreach ($columns['columns'] as $k => $c) {
+                $c['column']              = $k;
+                $viewColumns[$c['label']] = $c;
+            }
+            $query = $reportGenerator->getQuery($options);
+
+            if ($paginate) {
+                // Must make two queries here, one to get count and one to select data
+                $parts  = $query->getQueryParts();
+                $select = $parts['select'];
+
+                // Get the count
+                $query->select('COUNT(*) as count');
+                $result       = $query->execute()->fetchAll();
+                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
+
+                // Set the limit and get the results
+                if ($limit > 0) {
+                    $query->setFirstResult($start)
+                        ->setMaxResults($limit);
+                }
+                $query->select($select);
+            }
+
+            $filters = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.filters', array());
+            if (!empty($filters)) {
+                $filterParameters  = array();
+                $filterExpressions = $query->expr()->andX();
+                $repo = $model->getRepository();
+                foreach ($filters as $f) {
+                    list ($expr, $parameters) = $repo->getFilterExpr($query, $f);
+                    $filterExpressions->add($expr);
+                    if (is_array($parameters)) {
+                        $filterParameters = array_merge($filterParameters, $parameters);
+                    }
+                }
+                $query->andWhere($filterExpressions);
+                $query->setParameters($parameters);
+            }
+
+            $data = $query->execute()->fetchAll();
+
+            if (!$paginate) {
+                $totalResults = count($data);
+            }
+        }
+        $contentTemplate = $reportGenerator->getContentTemplate();
+
+        //set what page currently on so that we can return here after form submission/cancellation
+        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+
+        $graphs = $entity->getGraphs();
+        if (!empty($graphs)) {
+            $event = new ReportGraphEvent($entity);
+            $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+            $graphs = $event->getGraphs();
+        }
+
+        return array(
+            'totalResults'    => $totalResults,
+            'data'            => $data,
+            'graphs'          => $graphs,
+            'contentTemplate' => $contentTemplate,
+            'viewColumns'     => $viewColumns,
+            'limit'           => ($paginate) ? $limit : 0
+        );
     }
 }

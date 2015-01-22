@@ -45,102 +45,106 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $prefix = 'e.';
-        $variantParent = 'vp.';
-        $columns = array(
-            $prefix . 'subject' => array(
-                'label' => 'mautic.email.report.subject',
-                'type'  => 'string'
-            ),
-            $prefix . 'lang' => array(
-                'label' => 'mautic.report.field.lang',
-                'type'  => 'string'
-            ),
-            $prefix . 'read_count' => array(
-                'label' => 'mautic.email.report.read_count',
-                'type'  => 'int'
-            ),
-            $prefix . 'read_in_browser' => array(
-                'label' => 'mautic.email.report.read_in_browser',
-                'type'  => 'int'
-            ),
-            $prefix . 'revision' => array(
-                'label' => 'mautic.email.report.revision',
-                'type'  => 'int'
-            ),
-            $variantParent . 'id' => array(
-                'label' => 'mautic.email.report.variant_parent_id',
-                'type'  => 'int'
-            ),
-            $variantParent . 'subject' => array(
-                'label' => 'mautic.email.report.variant_parent_subject',
-                'type'  => 'string'
-            ),
-            $prefix . 'variant_start_date' => array(
-                'label' => 'mautic.email.report.variant_start_date',
-                'type'  => 'datetime'
-            ),
-            $prefix . 'variant_sent_count' => array(
-                'label' => 'mautic.email.report.variant_sent_count',
-                'type'  => 'int'
-            ),
-            $prefix . 'variant_read_count' => array(
-                'label' => 'mautic.email.report.variant_read_count',
-                'type'  => 'int'
-            )
-        );
-        $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
-        $data = array(
-            'display_name' => 'mautic.email.email.report.table',
-            'columns'      => $columns
-        );
-        $event->addTable('emails', $data);
+        if ($event->checkContext(array('emails', 'email.stats'))) {
+            $prefix        = 'e.';
+            $variantParent = 'vp.';
+            $columns       = array(
+                $prefix . 'subject'            => array(
+                    'label' => 'mautic.email.report.subject',
+                    'type'  => 'string'
+                ),
+                $prefix . 'lang'               => array(
+                    'label' => 'mautic.report.field.lang',
+                    'type'  => 'string'
+                ),
+                $prefix . 'read_count'         => array(
+                    'label' => 'mautic.email.report.read_count',
+                    'type'  => 'int'
+                ),
+                $prefix . 'read_in_browser'    => array(
+                    'label' => 'mautic.email.report.read_in_browser',
+                    'type'  => 'int'
+                ),
+                $prefix . 'revision'           => array(
+                    'label' => 'mautic.email.report.revision',
+                    'type'  => 'int'
+                ),
+                $variantParent . 'id'          => array(
+                    'label' => 'mautic.email.report.variant_parent_id',
+                    'type'  => 'int'
+                ),
+                $variantParent . 'subject'     => array(
+                    'label' => 'mautic.email.report.variant_parent_subject',
+                    'type'  => 'string'
+                ),
+                $prefix . 'variant_start_date' => array(
+                    'label' => 'mautic.email.report.variant_start_date',
+                    'type'  => 'datetime'
+                ),
+                $prefix . 'variant_sent_count' => array(
+                    'label' => 'mautic.email.report.variant_sent_count',
+                    'type'  => 'int'
+                ),
+                $prefix . 'variant_read_count' => array(
+                    'label' => 'mautic.email.report.variant_read_count',
+                    'type'  => 'int'
+                )
+            );
+            $columns       = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
+            $data          = array(
+                'display_name' => 'mautic.email.email.report.table',
+                'columns'      => $columns
+            );
+            $event->addTable('emails', $data);
 
-        $statPrefix = 'es.';
-        $statColumns = array(
-            $statPrefix . 'email_address' => array(
-                'label' => 'mautic.email.report.stat.email_address',
-                'type'  => 'email'
-            ),
-            $statPrefix . 'date_sent' => array(
-                'label' => 'mautic.email.report.stat.date_sent',
-                'type'  => 'datetime'
-            ),
-            $statPrefix . 'is_read' => array(
-                'label' => 'mautic.email.report.stat.is_read',
-                'type'  => 'bool'
-            ),
-            $statPrefix . 'is_failed' => array(
-                'label' => 'mautic.email.report.stat.is_failed',
-                'type'  => 'bool'
-            ),
-            $statPrefix . 'viewed_in_browser' => array(
-                'label' => 'mautic.email.report.stat.viewed_in_browser',
-                'type'  => 'bool'
-            ),
-            $statPrefix . 'date_read' => array(
-                'label' => 'mautic.email.report.stat.date_read',
-                'type'  => 'datetime'
-            ),
-            $statPrefix . 'retry_count' => array(
-                'label' => 'mautic.email.report.stat.retry_count',
-                'type'  => 'int'
-            ),
-            $statPrefix . 'source' => array(
-                'label' => 'mautic.report.field.source',
-                'type'  => 'string'
-            ),
-            $statPrefix . 'source_id' => array(
-                'label' => 'mautic.report.field.source_id',
-                'type'  => 'int'
-            )
-        );
+            if ($event->checkContext('email.stats')) {
+                $statPrefix  = 'es.';
+                $statColumns = array(
+                    $statPrefix . 'email_address'     => array(
+                        'label' => 'mautic.email.report.stat.email_address',
+                        'type'  => 'email'
+                    ),
+                    $statPrefix . 'date_sent'         => array(
+                        'label' => 'mautic.email.report.stat.date_sent',
+                        'type'  => 'datetime'
+                    ),
+                    $statPrefix . 'is_read'           => array(
+                        'label' => 'mautic.email.report.stat.is_read',
+                        'type'  => 'bool'
+                    ),
+                    $statPrefix . 'is_failed'         => array(
+                        'label' => 'mautic.email.report.stat.is_failed',
+                        'type'  => 'bool'
+                    ),
+                    $statPrefix . 'viewed_in_browser' => array(
+                        'label' => 'mautic.email.report.stat.viewed_in_browser',
+                        'type'  => 'bool'
+                    ),
+                    $statPrefix . 'date_read'         => array(
+                        'label' => 'mautic.email.report.stat.date_read',
+                        'type'  => 'datetime'
+                    ),
+                    $statPrefix . 'retry_count'       => array(
+                        'label' => 'mautic.email.report.stat.retry_count',
+                        'type'  => 'int'
+                    ),
+                    $statPrefix . 'source'            => array(
+                        'label' => 'mautic.report.field.source',
+                        'type'  => 'string'
+                    ),
+                    $statPrefix . 'source_id'         => array(
+                        'label' => 'mautic.report.field.source_id',
+                        'type'  => 'int'
+                    )
+                );
 
-        $data = array(
-            'display_name' => 'mautic.email.stats.report.table',
-            'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn())
-        );
-        $event->addTable('email.stats', $data);
+                $data = array(
+                    'display_name' => 'mautic.email.stats.report.table',
+                    'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn())
+                );
+                $event->addTable('email.stats', $data);
+            }
+        }
     }
 
     /**

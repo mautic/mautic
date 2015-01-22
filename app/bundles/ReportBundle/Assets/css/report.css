@@ -1,7 +1,11 @@
 /* ReportBundle */
 
-.col-report-actions {
+.col-report-actions, .col-report-count {
     width: 25px;
+}
+
+#reportTable th:not(.col-report-count) {
+	min-width: 125px;
 }
 
 .columnSelectorButtons {

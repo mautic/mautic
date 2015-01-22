@@ -32,11 +32,10 @@ class AjaxController extends CommonAjaxController
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model   = $this->factory->getModel('report');
-        $source  = $request->get('source');
-        list($list, $types) = $model->getColumnList($source, true);
+        $context = $request->get('context');
+        list($list, $types) = $model->getColumnList($context, true);
 
         return $this->sendJsonResponse(array('columns' => $list, 'types' => $types));
-
     }
 
     /**

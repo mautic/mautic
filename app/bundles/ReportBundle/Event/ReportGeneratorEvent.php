@@ -99,7 +99,7 @@ class ReportGeneratorEvent extends Event
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details.html.php';
+        return 'MauticReportBundle:Report:details_data.html.php';
     }
 
     /**

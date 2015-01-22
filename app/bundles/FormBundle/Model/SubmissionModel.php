@@ -408,6 +408,8 @@ class SubmissionModel extends CommonFormModel
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+            default:
+                return new Response();
         }
     }
 }

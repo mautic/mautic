@@ -45,47 +45,50 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        // Forms
-        $prefix          = 'f.';
-        $columns         = array(
-            $prefix . 'alias' => array(
-                'label' => 'mautic.report.field.alias',
-                'type'  => 'int'
-            )
-        );
-        $data = array(
-            'display_name' => 'mautic.form.form.report.table',
-            'columns'      => array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns())
-        );
-        $event->addTable('forms', $data);
+        if ($event->checkContext(array('forms', 'form.submissions'))) {
+            // Forms
+            $prefix  = 'f.';
+            $columns = array(
+                $prefix . 'alias' => array(
+                    'label' => 'mautic.report.field.alias',
+                    'type'  => 'int'
+                )
+            );
+            $data    = array(
+                'display_name' => 'mautic.form.form.report.table',
+                'columns'      => array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns())
+            );
+            $event->addTable('forms', $data);
+            if ($event->checkContext('form.submissions')) {
+                // Form submissions
+                $submissionPrefix = 'fs.';
+                $pagePrefix       = 'p.';
 
-        // Form submissions
-        $submissionPrefix = 'fs.';
-        $pagePrefix       = 'p.';
-
-        $submissionColumns = array(
-            $submissionPrefix . 'date_submitted' => array(
-                'label' => 'mautic.form.report.submit.date_submitted',
-                'type'  => 'datetime'
-            ),
-            $submissionPrefix . 'referer' => array(
-                'label' => 'mautic.form.report.submit.referer',
-                'type'  => 'string'
-            ),
-            $pagePrefix . 'id' => array(
-                'label' => 'mautic.form.report.page_id',
-                'type'  => 'int'
-            ),
-            $pagePrefix . 'name' => array(
-                'label' => 'mautic.form.report.page_name',
-                'type'  => 'string'
-            )
-        );
-        $data = array(
-            'display_name' => 'mautic.form.report.submission.table',
-            'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
-        );
-        $event->addTable('form.submissions', $data);
+                $submissionColumns = array(
+                    $submissionPrefix . 'date_submitted' => array(
+                        'label' => 'mautic.form.report.submit.date_submitted',
+                        'type'  => 'datetime'
+                    ),
+                    $submissionPrefix . 'referer'        => array(
+                        'label' => 'mautic.form.report.submit.referer',
+                        'type'  => 'string'
+                    ),
+                    $pagePrefix . 'id'                   => array(
+                        'label' => 'mautic.form.report.page_id',
+                        'type'  => 'int'
+                    ),
+                    $pagePrefix . 'name'                 => array(
+                        'label' => 'mautic.form.report.page_name',
+                        'type'  => 'string'
+                    )
+                );
+                $data              = array(
+                    'display_name' => 'mautic.form.report.submission.table',
+                    'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
+                );
+                $event->addTable('form.submissions', $data);
+            }
+        }
     }
 
     /**

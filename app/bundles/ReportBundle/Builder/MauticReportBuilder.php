@@ -86,12 +86,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $source   = $this->entity->getSource();
         $fields   = $this->entity->getColumns();
-
-        $selectColumns = array();
-
-        foreach ($fields as $field) {
-            $selectColumns[] = $field;
-        }
+        $order    = $this->entity->getTableOrder();
 
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
         /** @type \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $dispatcher */
@@ -101,14 +96,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
         $queryBuilder = $event->getQueryBuilder();
 
+        $selectColumns = array();
+        foreach ($fields as $field) {
+            if (isset($options['columns'][$field])) {
+                $selectColumns[] = "$field as `{$options['columns'][$field]['label']}`";
+            }
+        }
+
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
 
-        if ($selectColumns) {
-            $queryBuilder->select(implode(', ', $selectColumns));
-        } else {
-            $queryBuilder->select('*');
-        }
+        $queryBuilder->select(implode(', ', $selectColumns));
 
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
@@ -142,14 +140,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $queryBuilder->where($and);
         }
 
-        // TODO - We might not always want to apply these options, expand the array to make the options optional
-        if ($options['orderBy'] != '' && $options['orderByDir'] != '') {
-            $queryBuilder->orderBy($options['orderBy'], $options['orderByDir']);
-        } elseif (isset($selectColumns[0])) {
-            $queryBuilder->orderBy($selectColumns[0], 'ASC');
+        if (!empty($options['order'])) {
+            if (is_array($options['order'])) {
+                list($column, $dir) = $options['order'];
+            } else {
+                $column = $options['order'];
+                $dir    = 'ASC';
+            }
+            $queryBuilder->orderBy($column, $dir);
+        } elseif (!empty($order)) {
+            foreach ($order as $o) {
+                $queryBuilder->orderBy($o['column'], $o['direction']);
+            }
         }
 
-        if ($options['limit'] > 0) {
+        if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
                 ->setMaxResults($options['limit']);
         }

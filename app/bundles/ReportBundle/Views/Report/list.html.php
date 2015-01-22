@@ -63,9 +63,7 @@ if ($tmpl == 'index')
                                 'item'       => $item,
                                 'model'      => 'report.report'
                             )); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_report_action',
-                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                               data-toggle="ajax">
+                            <a href="<?php echo $view['router']->generate('mautic_report_view', array("objectId" => $item->getId())); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -85,7 +83,7 @@ if ($tmpl == 'index')
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_report_index',
             "baseUrl"         => $view['router']->generate('mautic_report_index'),
-            'sessionVar'      => 'page'
+            'sessionVar'      => 'report'
         )); ?>
         </div>
     </div>

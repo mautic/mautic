@@ -45,66 +45,70 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        // Assets
-        $prefix          = 'a.';
-        $columns         = array(
-            $prefix . 'download_count' => array(
-                'label' => 'mautic.asset.report.download_count',
-                'type'  => 'int'
-            ),
-            $prefix . 'unique_download_count' => array(
-                'label' => 'mautic.asset.report.unique_download_count',
-                'type'  => 'int'
-            ),
-            $prefix . 'alias' => array(
-                'label' => 'mautic.report.field.alias',
-                'type'  => 'string'
-            ),
-            $prefix . 'lang' => array(
-                'label' => 'mautic.report.field.lang',
-                'type'  => 'string'
-            ),
-            $prefix . 'title' => array(
-                'label' => 'mautic.asset.report.title',
-                'type'  => 'string'
-            )
-        );
+        if ($event->checkContext(array('assets', 'asset.downloads'))) {
+            // Assets
+            $prefix  = 'a.';
+            $columns = array(
+                $prefix . 'download_count'        => array(
+                    'label' => 'mautic.asset.report.download_count',
+                    'type'  => 'int'
+                ),
+                $prefix . 'unique_download_count' => array(
+                    'label' => 'mautic.asset.report.unique_download_count',
+                    'type'  => 'int'
+                ),
+                $prefix . 'alias'                 => array(
+                    'label' => 'mautic.report.field.alias',
+                    'type'  => 'string'
+                ),
+                $prefix . 'lang'                  => array(
+                    'label' => 'mautic.report.field.lang',
+                    'type'  => 'string'
+                ),
+                $prefix . 'title'                 => array(
+                    'label' => 'mautic.asset.report.title',
+                    'type'  => 'string'
+                )
+            );
 
-        $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
-        $event->addTable('assets',  array(
-            'display_name' => 'mautic.asset.report.table',
-            'columns'      => $columns
-        ));
+            $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
+            $event->addTable('assets', array(
+                'display_name' => 'mautic.asset.report.table',
+                'columns'      => $columns
+            ));
 
-        // Downloads
-        $downloadPrefix = 'ad.';
-        $downloadColumns        = array(
-            $downloadPrefix . 'date_download' => array(
-                'label' => 'mautic.asset.report.download.date_download',
-                'type'  => 'datetime'
-            ),
-            $downloadPrefix . 'code' => array(
-                'label' => 'mautic.asset.report.download.code',
-                'type'  => 'string'
-            ),
-            $downloadPrefix . 'referer' => array(
-                'label' => 'mautic.asset.report.download.referer',
-                'type'  => 'string'
-            ),
-            $downloadPrefix . 'source' => array(
-                'label' => 'mautic.report.field.source',
-                'type'  => 'string'
-            ),
-            $downloadPrefix . 'source_id' => array(
-                'label' => 'mautic.report.field.source_id',
-                'type'  => 'int'
-            )
-        );
+            if ($event->checkContext(array('asset.downloads'))) {
+                // Downloads
+                $downloadPrefix  = 'ad.';
+                $downloadColumns = array(
+                    $downloadPrefix . 'date_download' => array(
+                        'label' => 'mautic.asset.report.download.date_download',
+                        'type'  => 'datetime'
+                    ),
+                    $downloadPrefix . 'code'          => array(
+                        'label' => 'mautic.asset.report.download.code',
+                        'type'  => 'string'
+                    ),
+                    $downloadPrefix . 'referer'       => array(
+                        'label' => 'mautic.asset.report.download.referer',
+                        'type'  => 'string'
+                    ),
+                    $downloadPrefix . 'source'        => array(
+                        'label' => 'mautic.report.field.source',
+                        'type'  => 'string'
+                    ),
+                    $downloadPrefix . 'source_id'     => array(
+                        'label' => 'mautic.report.field.source_id',
+                        'type'  => 'int'
+                    )
+                );
 
-        $event->addTable('asset.downloads',  array(
-            'display_name' => 'mautic.asset.report.downloads.table',
-            'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
-        ));
+                $event->addTable('asset.downloads', array(
+                    'display_name' => 'mautic.asset.report.downloads.table',
+                    'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
+                ));
+            }
+        }
     }
 
     /**

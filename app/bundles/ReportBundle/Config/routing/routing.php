@@ -21,13 +21,30 @@ $collection->add('mautic_report_index', new Route('/reports/{page}',
     )
 ));
 
-$collection->add('mautic_report_action', new Route('/reports/{objectAction}/{objectId}/{reportPage}',
+$collection->add('mautic_report_export', new Route('/reports/view/{objectId}/export/{format}',
     array(
-        '_controller' => 'MauticReportBundle:Report:execute',
-        'objectId'    => 0,
+        '_controller' => 'MauticReportBundle:Report:export',
+        'format'      => 'csv'
+    )
+));
+
+$collection->add('mautic_report_view', new Route('/reports/view/{objectId}/{reportPage}',
+    array(
+        '_controller' => 'MauticReportBundle:Report:view',
         'reportPage'  => 1
     ), array(
+        'objectId'   => '\d+',
         'reportPage' => '\d+'
+    )
+));
+
+
+$collection->add('mautic_report_action', new Route('/reports/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticReportBundle:Report:execute',
+        'objectId'    => 0
+    ), array(
+        'objectId' => '\d+'
     )
 ));
 

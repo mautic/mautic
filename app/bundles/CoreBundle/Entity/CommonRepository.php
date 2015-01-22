@@ -297,7 +297,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    protected function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
         $unique    = ($parameterName) ? $parameterName : $this->generateRandomParameterName();
         $parameter = false;

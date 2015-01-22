@@ -43,6 +43,11 @@ Mautic.addReportRow = function(elId) {
 	// Render the new row
 	prototypeHolder.append(output);
 
+	// Update the column options if applicable
+	if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
+		mQuery('#' + elId + '_' + index + '_column').html(Mautic.reportPrototypeColumnOptions);
+	}
+
 	Mautic.activateChosenSelect(mQuery('#'+elId+'_'+index+'_column'));
 	mQuery("#"+elId+" *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 };
@@ -52,12 +57,12 @@ Mautic.removeReportRow = function(container) {
 	mQuery('#' + container).remove();
 };
 
-Mautic.updateReportColumnList = function (source) {
+Mautic.updateReportColumnList = function (context) {
 	Mautic.activateLabelLoadingIndicator('report_source');
 	mQuery.ajax({
 	    url : mauticAjaxUrl,
 	    type: 'post',
-		data: "action=report:getColumnList&source=" + source,
+		data: "action=report:getColumnList&context=" + context,
 	    success: function(response) {
 	    	if (response.columns) {
 				mQuery('#report_columns').html(response.columns);
@@ -66,9 +71,12 @@ Mautic.updateReportColumnList = function (source) {
 				// Remove any filters, they're no longer valid with different column lists
 				mQuery('#report_filters').find('div').remove().end();
 
-				var prototype = mQuery('#report_filters').data('prototype');
-				prototype = prototype.replace(/([\s|\S]*?)class="form-control filter-columns">([\s|\S]*?)<\/select>([\s|\S]*?)/m, '$1class="form-control filter-columns">'+response.columns+"<\select>$3");
-				mQuery('#report_filters').data('prototype', prototype);
+				// Remove order
+				mQuery('#report_tableOrder').find('div').remove().end();
+
+				// Store options to update prototype
+				Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
+
 			}
 		},
 		error: function (request, textStatus, errorThrown) {

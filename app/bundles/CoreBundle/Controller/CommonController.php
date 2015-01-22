@@ -351,8 +351,8 @@ class CommonController extends Controller implements MauticController
         if (!empty($name)) {
             if ($this->request->query->has('orderby')) {
                 $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
-                $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
-                $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
+                $dir     = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
+                $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
                 $session->set("mautic.$name.orderby", $orderBy);
                 $session->set("mautic.$name.orderbydir", $dir);
             }
@@ -363,9 +363,9 @@ class CommonController extends Controller implements MauticController
             }
 
             if ($this->request->query->has('filterby')) {
-                $filter = InputHelper::clean($this->request->query->get("filterby"), true);
-                $value  = InputHelper::clean($this->request->query->get("value"), true);
-                $filters = $this->get("session")->get("mautic.$name.filters", '');
+                $filter  = InputHelper::clean($this->request->query->get("filterby"), true);
+                $value   = InputHelper::clean($this->request->query->get("value"), true);
+                $filters = $session->get("mautic.$name.filters", array());
                 if (empty($value)) {
                     if (isset($filters[$filter])) {
                         unset($filters[$filter]);

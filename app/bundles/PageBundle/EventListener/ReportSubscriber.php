@@ -43,157 +43,160 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $prefix            = 'p.';
-        $translationPrefix = 'tp.';
-        $variantPrefix     = 'vp.';
+        if ($event->checkContext(array('pages', 'page.hits'))) {
+            $prefix            = 'p.';
+            $translationPrefix = 'tp.';
+            $variantPrefix     = 'vp.';
 
-        $columns = array(
-            $prefix . 'title' => array(
-                'label' => 'mautic.page.report.title',
-                'type'  => 'string'
-            ),
-            $prefix . 'alias' => array(
-                'label' => 'mautic.report.field.alias',
-                'type'  => 'string'
-            ),
-            $prefix . 'revision' => array(
-                'label' => 'mautic.page.report.revision',
-                'type'  => 'string'
-            ),
-            $prefix . 'hits' => array(
-                'label' => 'mautic.page.field.hits',
-                'type'  => 'int'
-            ),
-            $prefix . 'unique_hits' => array(
-                'label' => 'mautic.page.field.unique_hits',
-                'type'  => 'int'
-            ),
-            $translationPrefix . 'id' => array(
-                'label' => 'mautic.page.report.translation_parent_id',
-                'type'  => 'int'
-            ),
-            $translationPrefix . 'title' => array(
-                'label' => 'mautic.page.report.translation_parent_title',
-                'type'  => 'string'
-            ),
-            $variantPrefix . 'id' => array(
-                'label' => 'mautic.page.report.variant_parent_id',
-                'type'  => 'string'
-            ),
-            $variantPrefix . 'title' => array(
-                'label' => 'mautic.page.report.variant_parent_title',
-                'type'  => 'string'
-            ),
-            $prefix . 'lang' => array(
-                'label' => 'mautic.report.field.lang',
-                'type'  => 'string'
-            ),
-            $prefix . 'variant_start_date' => array(
-                'label' => 'mautic.page.report.variant_start_date',
-                'type'  => 'datetime'
-            ),
-            $prefix . 'variant_hits' => array(
-                'label' => 'mautic.page.report.variant_hits',
-                'type'  => 'int'
-            )
-        );
-        $data = array(
-            'display_name' => 'mautic.page.report.table',
-            'columns'      => array_merge($columns, $event->getCategoryColumns())
-        );
-        $event->addTable('pages', $data);
+            $columns = array(
+                $prefix . 'title'              => array(
+                    'label' => 'mautic.page.report.title',
+                    'type'  => 'string'
+                ),
+                $prefix . 'alias'              => array(
+                    'label' => 'mautic.report.field.alias',
+                    'type'  => 'string'
+                ),
+                $prefix . 'revision'           => array(
+                    'label' => 'mautic.page.report.revision',
+                    'type'  => 'string'
+                ),
+                $prefix . 'hits'               => array(
+                    'label' => 'mautic.page.field.hits',
+                    'type'  => 'int'
+                ),
+                $prefix . 'unique_hits'        => array(
+                    'label' => 'mautic.page.field.unique_hits',
+                    'type'  => 'int'
+                ),
+                $translationPrefix . 'id'      => array(
+                    'label' => 'mautic.page.report.translation_parent_id',
+                    'type'  => 'int'
+                ),
+                $translationPrefix . 'title'   => array(
+                    'label' => 'mautic.page.report.translation_parent_title',
+                    'type'  => 'string'
+                ),
+                $variantPrefix . 'id'          => array(
+                    'label' => 'mautic.page.report.variant_parent_id',
+                    'type'  => 'string'
+                ),
+                $variantPrefix . 'title'       => array(
+                    'label' => 'mautic.page.report.variant_parent_title',
+                    'type'  => 'string'
+                ),
+                $prefix . 'lang'               => array(
+                    'label' => 'mautic.report.field.lang',
+                    'type'  => 'string'
+                ),
+                $prefix . 'variant_start_date' => array(
+                    'label' => 'mautic.page.report.variant_start_date',
+                    'type'  => 'datetime'
+                ),
+                $prefix . 'variant_hits'       => array(
+                    'label' => 'mautic.page.report.variant_hits',
+                    'type'  => 'int'
+                )
+            );
+            $data    = array(
+                'display_name' => 'mautic.page.report.table',
+                'columns'      => array_merge($columns, $event->getCategoryColumns())
+            );
+            $event->addTable('pages', $data);
 
-        $hitPrefix   = 'h.';
-        $redirectHit = 'r.';
-        $emailPrefix = 'e.';
-        $hitColumns  = array(
-            $hitPrefix . 'date_hit' => array(
-                'label' => 'mautic.page.report.hits.date_hit',
-                'type'  => 'datetime'
-            ),
-            $hitPrefix . 'date_left' => array(
-                'label' => 'mautic.page.report.hits.date_left',
-                'type'  => 'datetime'
-            ),
-            $hitPrefix . 'country' => array(
-                'label' => 'mautic.page.report.hits.country',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'region' => array(
-                'label' => 'mautic.page.report.hits.region',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'city' => array(
-                'label' => 'mautic.page.report.hits.city',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'isp' => array(
-                'label' => 'mautic.page.report.hits.isp',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'organization' => array(
-                'label' => 'mautic.page.report.hits.organization',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'code' => array(
-                'label' => 'mautic.page.report.hits.code',
-                'type'  => 'int'
-            ),
-            $hitPrefix . 'referer' => array(
-                'label' => 'mautic.page.report.hits.referer',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'url' => array(
-                'label' => 'mautic.page.report.hits.url',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'user_agent' => array(
-                'label' => 'mautic.page.report.hits.user_agent',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'remote_host' => array(
-                'label' => 'mautic.page.report.hits.remote_host',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'browser_languages' => array(
-                'label' => 'mautic.page.report.hits.browser_languages',
-                'type'  => 'array'
-            ),
-            $hitPrefix . 'source' => array(
-                'label' => 'mautic.report.field.source',
-                'type'  => 'string'
-            ),
-            $hitPrefix . 'source_id' => array(
-                'label' => 'mautic.report.field.source_id',
-                'type'  => 'int'
-            ),
-            $redirectHit . 'url' => array(
-                'label' => 'mautic.page.report.hits.redirect_url',
-                'type'  => 'string'
-            ),
-            $redirectHit . 'hits' => array(
-                'label' => 'mautic.page.report.hits.redirect_hit_count',
-                'type'  => 'int'
-            ),
-            $redirectHit . 'unique_hits' => array(
-                'label' => 'mautic.page.report.hits.redirect_unique_hits',
-                'type'  => 'string'
-            ),
-            $emailPrefix . 'id' => array(
-                'label' => 'mautic.page.report.hits.email_id',
-                'type'  => 'int'
-            ),
-            $emailPrefix . 'subject' => array(
-                'label' => 'mautic.page.report.hits.email_subject',
-                'type'  => 'string'
-            )
-        );
-        $data = array(
-            'display_name' => 'mautic.page.report.hits.table',
-            'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
-        );
-        $event->addTable('page.hits', $data);
-
+            if ($event->checkContext('page.hits')) {
+                $hitPrefix   = 'h.';
+                $redirectHit = 'r.';
+                $emailPrefix = 'e.';
+                $hitColumns  = array(
+                    $hitPrefix . 'date_hit'          => array(
+                        'label' => 'mautic.page.report.hits.date_hit',
+                        'type'  => 'datetime'
+                    ),
+                    $hitPrefix . 'date_left'         => array(
+                        'label' => 'mautic.page.report.hits.date_left',
+                        'type'  => 'datetime'
+                    ),
+                    $hitPrefix . 'country'           => array(
+                        'label' => 'mautic.page.report.hits.country',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'region'            => array(
+                        'label' => 'mautic.page.report.hits.region',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'city'              => array(
+                        'label' => 'mautic.page.report.hits.city',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'isp'               => array(
+                        'label' => 'mautic.page.report.hits.isp',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'organization'      => array(
+                        'label' => 'mautic.page.report.hits.organization',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'code'              => array(
+                        'label' => 'mautic.page.report.hits.code',
+                        'type'  => 'int'
+                    ),
+                    $hitPrefix . 'referer'           => array(
+                        'label' => 'mautic.page.report.hits.referer',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'url'               => array(
+                        'label' => 'mautic.page.report.hits.url',
+                        'type'  => 'url'
+                    ),
+                    $hitPrefix . 'user_agent'        => array(
+                        'label' => 'mautic.page.report.hits.user_agent',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'remote_host'       => array(
+                        'label' => 'mautic.page.report.hits.remote_host',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'browser_languages' => array(
+                        'label' => 'mautic.page.report.hits.browser_languages',
+                        'type'  => 'array'
+                    ),
+                    $hitPrefix . 'source'            => array(
+                        'label' => 'mautic.report.field.source',
+                        'type'  => 'string'
+                    ),
+                    $hitPrefix . 'source_id'         => array(
+                        'label' => 'mautic.report.field.source_id',
+                        'type'  => 'int'
+                    ),
+                    $redirectHit . 'url'             => array(
+                        'label' => 'mautic.page.report.hits.redirect_url',
+                        'type'  => 'url'
+                    ),
+                    $redirectHit . 'hits'            => array(
+                        'label' => 'mautic.page.report.hits.redirect_hit_count',
+                        'type'  => 'int'
+                    ),
+                    $redirectHit . 'unique_hits'     => array(
+                        'label' => 'mautic.page.report.hits.redirect_unique_hits',
+                        'type'  => 'string'
+                    ),
+                    $emailPrefix . 'id'              => array(
+                        'label' => 'mautic.page.report.hits.email_id',
+                        'type'  => 'int'
+                    ),
+                    $emailPrefix . 'subject'         => array(
+                        'label' => 'mautic.page.report.hits.email_subject',
+                        'type'  => 'string'
+                    )
+                );
+                $data        = array(
+                    'display_name' => 'mautic.page.report.hits.table',
+                    'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
+                );
+                $event->addTable('page.hits', $data);
+            }
+        }
     }
 
     /**
@@ -219,7 +222,7 @@ class ReportSubscriber extends CommonSubscriber
             $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
             $qb->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
-                ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id.id = p.id')
+                ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.id = p.id')
                 ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'tp', 'p.id = tp.id')
                 ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'vp', 'p.id = vp.id')
                 ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = h.email_id')
@@ -227,7 +230,7 @@ class ReportSubscriber extends CommonSubscriber
 
             $event->addIpAddressLeftJoin($qb, 'h');
             $event->addCategoryLeftJoin($qb, 'p');
-            $event->addLeadLeftJoin($qb, 'l');
+            $event->addLeadLeftJoin($qb, 'h');
 
             $event->setQueryBuilder($qb);
         }

@@ -2316,6 +2316,51 @@ label {
   vertical-align: middle;
   border-bottom: 1px solid #ebedf0;
 }
+.table-responsive-force {
+  width: 100%;
+  margin-bottom: 13.5px;
+  overflow-y: hidden;
+  overflow-x: auto;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  border: 1px solid #ebedf0;
+  -webkit-overflow-scrolling: touch;
+}
+.table-responsive-force > .table {
+  margin-bottom: 0;
+}
+.table-responsive-force > .table > thead > tr > th,
+.table-responsive-force > .table > tbody > tr > th,
+.table-responsive-force > .table > tfoot > tr > th,
+.table-responsive-force > .table > thead > tr > td,
+.table-responsive-force > .table > tbody > tr > td,
+.table-responsive-force > .table > tfoot > tr > td {
+  white-space: nowrap;
+}
+.table-responsive-force > .table-bordered {
+  border: 0;
+}
+.table-responsive-force > .table-bordered > thead > tr > th:first-child,
+.table-responsive-force > .table-bordered > tbody > tr > th:first-child,
+.table-responsive-force > .table-bordered > tfoot > tr > th:first-child,
+.table-responsive-force > .table-bordered > thead > tr > td:first-child,
+.table-responsive-force > .table-bordered > tbody > tr > td:first-child,
+.table-responsive-force > .table-bordered > tfoot > tr > td:first-child {
+  border-left: 0;
+}
+.table-responsive-force > .table-bordered > thead > tr > th:last-child,
+.table-responsive-force > .table-bordered > tbody > tr > th:last-child,
+.table-responsive-force > .table-bordered > tfoot > tr > th:last-child,
+.table-responsive-force > .table-bordered > thead > tr > td:last-child,
+.table-responsive-force > .table-bordered > tbody > tr > td:last-child,
+.table-responsive-force > .table-bordered > tfoot > tr > td:last-child {
+  border-right: 0;
+}
+.table-responsive-force > .table-bordered > tbody > tr:last-child > th,
+.table-responsive-force > .table-bordered > tfoot > tr:last-child > th,
+.table-responsive-force > .table-bordered > tbody > tr:last-child > td,
+.table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
+  border-bottom: 0;
+}
 .progress {
   background-color: #ebedf0;
   -webkit-box-shadow: none;
