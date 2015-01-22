@@ -106,6 +106,9 @@ class ReportSubscriber extends CommonSubscriber
             );
             $event->addTable('leads', $data);
 
+            // Add graphs
+            $event->addGraph('leads', 'line', 'mautic.lead.graph.line.leads');
+
             if ($event->checkContext('lead.pointlog')) {
                 $pointPrefix  = 'lp.';
                 $pointColumns = array(
@@ -187,7 +190,7 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate (ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext('lead.pointlog')) {
+        if (!$event->checkContext(array('leads', 'lead.pointlog'))) {
             return;
         }
 
@@ -200,6 +203,31 @@ class ReportSubscriber extends CommonSubscriber
             $queryBuilder = clone $qb;
 
             switch ($g) {
+                case 'mautic.lead.graph.line.leads':
+                    // Generate data for leads line graph
+                    $unit = 'D';
+                    $amount = 30;
+
+                    if (isset($options['amount'])) {
+                        $amount = $options['amount'];
+                    }
+
+                    if (isset($options['unit'])) {
+                        $unit = $options['unit'];
+                    }
+
+                    $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('leads', 'emails'));
+                    $queryBuilder->select('l.id as lead, l.date_added as dateAdded, LENGTH(l.email) > 0 as email');
+                    $queryBuilder->andwhere($queryBuilder->expr()->gte('l.date_added', ':date'))
+                        ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
+                    $leads = $queryBuilder->execute()->fetchAll();
+
+                    $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 0, 'dateAdded');
+                    $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 1, 'dateAdded', 'email');
+                    $timeStats['name'] = 'mautic.lead.graph.line.leads';
+                    $event->setGraph($g, $timeStats);
+                    break;
+
                 case 'mautic.lead.graph.line.points':
 
                     // Generate data for points line graph
