@@ -17,7 +17,7 @@ $header = ($report->getId()) ?
 
 $view['slots']->set("headerTitle", $header);
 
-$showGraphTab = count($form['graphs']->children);
+$showGraphTab = count($form['graphs']->vars['choices']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
