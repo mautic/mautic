@@ -98,7 +98,7 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 )
             );
-            $columns = array_merge($columns, $event->getStandardColumns('p.', array('name')), $event->getCategoryColumns());
+            $columns = array_merge($columns, $event->getStandardColumns('p.', array('name', 'description')), $event->getCategoryColumns());
             $data    = array(
                 'display_name' => 'mautic.page.report.table',
                 'columns'      => $columns
@@ -173,6 +173,10 @@ class ReportSubscriber extends CommonSubscriber
                     $redirectHit . 'url'             => array(
                         'label' => 'mautic.page.report.hits.redirect_url',
                         'type'  => 'url'
+                    ),
+                    $redirectHit . 'url_title'       => array(
+                        'label' => 'mautic.page.report.hits.url_title',
+                        'type'  => 'string'
                     ),
                     $redirectHit . 'hits'            => array(
                         'label' => 'mautic.page.report.hits.redirect_hit_count',
