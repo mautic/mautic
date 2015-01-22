@@ -264,32 +264,18 @@ var Mautic = {
             });
         });
 
+
         //initialize date/time
-        mQuery(container + " *[data-toggle='datetime']").datetimepicker({
-            format: 'Y-m-d H:i',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollInput: false
+        mQuery(container + " *[data-toggle='datetime']").each(function() {
+            Mautic.activateDateTimeInputs(this, 'datetime');
         });
 
-        mQuery(container + " *[data-toggle='date']").datetimepicker({
-            timepicker: false,
-            format: 'Y-m-d',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollInput: false,
-            closeOnDateSelect: true
+        mQuery(container + " *[data-toggle='date']").each(function() {
+            Mautic.activateDateTimeInputs(this, 'date');
         });
 
-        mQuery(container + " *[data-toggle='time']").datetimepicker({
-            datepicker: false,
-            format: 'H:i',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollInput: false
+        mQuery(container + " *[data-toggle='time']").each(function() {
+            Mautic.activateDateTimeInputs(this, 'time');
         });
 
         mQuery(container + " input[data-toggle='color']").pickAColor({
@@ -619,6 +605,47 @@ var Mautic = {
             selectionHeader:  "<input type='text' class='ms-search form-control' autocomplete='off'>",
             keepOrder: true
         });
+    },
+
+    /**
+     * Activate containers datetime inputs
+     * @param container
+     */
+    activateDateTimeInputs: function(el, type) {
+        if (typeof type == 'undefined') {
+            type = 'datetime';
+        }
+
+        if (type == 'datetime') {
+            mQuery(el).datetimepicker({
+                format: 'Y-m-d H:i',
+                lazyInit: true,
+                validateOnBlur: false,
+                allowBlank: true,
+                scrollInput: false
+            });
+        } else if(type == 'date') {
+            mQuery(el).datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d',
+                lazyInit: true,
+                validateOnBlur: false,
+                allowBlank: true,
+                scrollInput: false,
+                closeOnDateSelect: true
+            });
+        } else if (type == 'time') {
+            mQuery(el).datetimepicker({
+                datepicker: false,
+                format: 'H:i',
+                lazyInit: true,
+                validateOnBlur: false,
+                allowBlank: true,
+                scrollInput: false
+            });
+        }
+
+        mQuery(el).addClass('calendar-activated');
     },
 
     /**

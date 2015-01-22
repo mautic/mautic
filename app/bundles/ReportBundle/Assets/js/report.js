@@ -10,6 +10,12 @@ Mautic.reportOnLoad = function (container) {
 		mQuery('div[id=report_filters]').data('index', mQuery('#report_filters > div').length);
 
 		mQuery('div[id=report_tableOrder]').data('index', mQuery('#report_tableOrder > div').length);
+
+		if (mQuery('.filter-columns').length) {
+			mQuery('.filter-columns').each(function () {
+				Mautic.updateReportFilterValueInput(this, true);
+			});
+		}
 	}
 
 	Mautic.initReportGraphs();
@@ -43,13 +49,71 @@ Mautic.addReportRow = function(elId) {
 	// Render the new row
 	prototypeHolder.append(output);
 
+	var newColumnId = '#' + elId + '_' + index + '_column';
+
 	// Update the column options if applicable
 	if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
-		mQuery('#' + elId + '_' + index + '_column').html(Mautic.reportPrototypeColumnOptions);
+		mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
+	}
+
+	if (elId == 'report_filters') {
+		mQuery(newColumnId).on('change', function() {
+			Mautic.updateReportFilterValueInput(this);
+		});
+		Mautic.updateReportFilterValueInput(newColumnId);
 	}
 
 	Mautic.activateChosenSelect(mQuery('#'+elId+'_'+index+'_column'));
 	mQuery("#"+elId+" *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+
+};
+
+Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
+	var types      = mQuery('#report_filters').data('column-types');
+	var newValue   = mQuery(filterColumn).val();
+	var filterId   = mQuery(filterColumn).attr('id');
+	var filterType = types[newValue];
+
+	// Get the value element
+	var valueEl = mQuery(filterColumn).parent().parent().find('.filter-value');
+	var valueVal = valueEl.val();
+
+	var idParts = filterId.split("_");
+
+	var valueId   = 'report_filters_' + idParts[2] + '_value';
+	var valueName = 'report[filters][' + idParts[2] + '][value]';
+
+	if (filterType == 'bool') {
+		if (mQuery(valueEl).attr('type') != 'radio') {
+			var template = mQuery('#filterValueYesNoTemplate .btn-group').clone(true);
+			mQuery(template).find('input[type="radio"]').each(function () {
+				mQuery(this).attr('name', valueName);
+				var radioVal = mQuery(this).val();
+				mQuery(this).attr('id', valueId + '_' + radioVal);
+			});
+			mQuery(valueEl).replaceWith(template);
+		}
+
+		if (setup) {
+			mQuery('#' + valueId + '_' + valueVal).click();
+		}
+	} else if (mQuery(valueEl).attr('type') != 'text') {
+		var newValueEl = mQuery('<input type="text" />').attr({
+			id: valueId,
+			name: valueName,
+			'class': "form-control filter-value"
+		});
+
+		var replaceMe = (mQuery(valueEl).attr('type') == 'radio') ? mQuery(valueEl).parent().parent() : mQuery(valueEl);
+		replaceMe.replaceWith(newValueEl);
+	}
+
+	// Activate datetime
+	if (filterType == 'datetime' || filterType == 'date' || filterType == 'time') {
+		Mautic.activateDateTimeInputs('#' + valueId, filterType);
+	} else if (mQuery('#' + valueId).hasClass('calendar-activated')) {
+		mQuery('#' + valueId).datetimepicker('destroy');
+	}
 };
 
 Mautic.removeReportRow = function(container) {

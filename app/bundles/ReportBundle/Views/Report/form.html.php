@@ -83,6 +83,11 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                     <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.filterselector'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['filters']); ?>
                                 </div>
+                                <div class="hide">
+                                    <div id="filterValueYesNoTemplate">
+                                        <?php echo $view['form']->widget($form['value_template_yesno']); ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

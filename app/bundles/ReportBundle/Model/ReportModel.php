@@ -9,6 +9,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
