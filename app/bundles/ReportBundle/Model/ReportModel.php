@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
+use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\HttpFoundation\Response;
@@ -130,7 +131,7 @@ class ReportModel extends FormModel
      *
      * @return mixed
      */
-    public function buildAvailableReports($context)
+    public function buildAvailableReports ($context)
     {
         static $data = array();
 
@@ -282,7 +283,7 @@ class ReportModel extends FormModel
 
                     //build the data rows
                     foreach ($reportData['data'] as $count => $data) {
-                        $row   = array();
+                        $row = array();
                         foreach ($data as $k => $v) {
                             if ($count === 0) {
                                 //set the header
@@ -337,7 +338,7 @@ class ReportModel extends FormModel
 
                         //build the data rows
                         foreach ($reportData['data'] as $count => $data) {
-                            $row   = array();
+                            $row = array();
                             foreach ($data as $k => $v) {
                                 if ($count === 0) {
                                     //set the header
@@ -377,5 +378,126 @@ class ReportModel extends FormModel
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * Get report data for view rendering
+     *
+     * @param     $entity
+     * @param int $reportPage
+     *
+     * @return array
+     */
+    public function getReportData ($entity, $formFactory, $options = array())
+    {
+        $paginate   = !empty($options['paginate']);
+        $reportPage = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
+        $data       = $graphs = array();;
+        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity);
+
+        $selectedColumns = $entity->getColumns();
+        $totalResults    = 0;
+
+        // Prepare the query builder
+        $columns = $this->getTableData($entity->getSource());
+
+        $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
+        $orderByDir = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+
+        $dataOptions = array(
+            //'start'      => $start,
+            //'limit'      => $limit,
+            'order'      => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
+            'dispatcher' => $this->factory->getDispatcher(),
+            'columns'    => $columns['columns']
+        );
+
+        $query   = $reportGenerator->getQuery($dataOptions);
+        $filters = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.filters', array());
+        if (!empty($filters)) {
+            $filterParameters  = array();
+            $filterExpressions = $query->expr()->andX();
+            $repo              = $this->getRepository();
+            foreach ($filters as $f) {
+                list ($expr, $parameters) = $repo->getFilterExpr($query, $f);
+                $filterExpressions->add($expr);
+                if (is_array($parameters)) {
+                    $filterParameters = array_merge($filterParameters, $parameters);
+                }
+            }
+            $query->andWhere($filterExpressions);
+            $query->setParameters($parameters);
+        }
+        $contentTemplate = $reportGenerator->getContentTemplate();
+
+        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+            if ($paginate) {
+                // Build the options array to pass into the query
+                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
+                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
+                if ($start < 0) {
+                    $start = 0;
+                }
+
+                // Must make two queries here, one to get count and one to select data
+                $parts  = $query->getQueryParts();
+                $select = $parts['select'];
+
+                // Get the count
+                $query->select('COUNT(*) as count');
+                $result       = $query->execute()->fetchAll();
+                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
+
+                // Set the limit and get the results
+                if ($limit > 0) {
+                    $query->setFirstResult($start)
+                        ->setMaxResults($limit);
+                }
+                $query->select($select);
+            }
+
+            $data = $query->execute()->fetchAll();
+
+            if (!$paginate) {
+                $totalResults = count($data);
+            }
+        }
+
+        //set what page currently on so that we can return here after form submission/cancellation
+        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+
+        if (empty($options['ignoreGraphData'])) {
+            // Check to see if this is an update from AJAX
+            $selectedGraphs = (!empty($options['graphName'])) ? array($options['graphName']) : $entity->getGraphs();
+            if (!empty($selectedGraphs)) {
+                $availableGraphs = $this->getGraphData($entity->getSource());
+                if (empty($query)) {
+                    $query = $reportGenerator->getQuery();
+                }
+
+                $graphOptions = array();
+                foreach ($selectedGraphs as $g) {
+                    if (isset($availableGraphs[$g])) {
+                        $graphOptions[$g] = array(
+                            'options' => !empty($options['graphName']) ? $options : array(),
+                            'type'    => $availableGraphs[$g]
+                        );
+                    }
+                }
+
+                $event = new ReportGraphEvent($entity, $graphOptions, $query);
+                $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+                $graphs = $event->getGraphs();
+            }
+        }
+
+        return array(
+            'totalResults'    => $totalResults,
+            'data'            => $data,
+            'graphs'          => $graphs,
+            'contentTemplate' => $contentTemplate,
+            'columns'         => $columns['columns'],
+            'limit'           => ($paginate) ? $limit : 0
+        );
     }
 }

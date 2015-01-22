@@ -12,8 +12,6 @@ namespace Mautic\ReportBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Mautic\ReportBundle\ReportEvents;
 
 /**
  * Class AjaxController
@@ -54,11 +52,11 @@ class AjaxController extends CommonAjaxController
         $model    = $this->factory->getModel('report');
         $report   = $model->getEntity($reportId);
 
-        $event = new ReportGraphEvent($report);
-        $event->setOptions($options);
-        $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
-        $dataArray['graph'] = $event->getGraphs();
-        $dataArray['success']  = 1;
+        $options['ignoreTableData'] = true;
+        $reportData = $model->getReportData($report, $this->container->get('form.factory'), $options);
+
+        $dataArray['graph']   = $reportData['graphs'][$options['graphName']]['data'];
+        $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);
     }

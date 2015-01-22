@@ -525,7 +525,7 @@ class ReportController extends FormController
             $this->setListFilters();
         }
 
-        $reportData = $this->getReportData($entity, true, $reportPage);
+        $reportData = $model->getReportData($entity, $this->container->get('form.factory'), array('paginate' => true, 'reportPage' => $reportPage));
 
         $totalResults    = $reportData['totalResults'];
         $data            = $reportData['data'];
@@ -644,126 +644,8 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        $reportData = $this->getReportData($entity, false);
+        $reportData = $model->getReportData($entity, $this->container->get('form.factory'));
 
         return $model->exportResults($format, $entity, $reportData);
-    }
-
-    /**
-     * Shared between viewAction and exportAction to get report data
-     *
-     * @param     $entity
-     * @param int $reportPage
-     *
-     * @return array
-     */
-    protected function getReportData ($entity, $paginate = true, $reportPage = 1)
-    {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model = $this->factory->getModel('report');
-
-        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity);
-
-        $data         = $entity->getColumns();
-        $columns      = array();
-        $totalResults = 0;
-        if (!empty($data)) {
-            if ($paginate) {
-                // Build the options array to pass into the query
-                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
-                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
-
-            $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
-            $orderByDir = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
-
-            $columns = $model->getTableData($entity->getSource());
-            $options = array(
-                //'start'      => $start,
-                //'limit'      => $limit,
-                'order'      => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
-                'dispatcher' => $this->factory->getDispatcher(),
-                'columns'    => $columns['columns']
-            );
-
-            $query = $reportGenerator->getQuery($options);
-
-            if ($paginate) {
-                // Must make two queries here, one to get count and one to select data
-                $parts  = $query->getQueryParts();
-                $select = $parts['select'];
-
-                // Get the count
-                $query->select('COUNT(*) as count');
-                $result       = $query->execute()->fetchAll();
-                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
-
-                // Set the limit and get the results
-                if ($limit > 0) {
-                    $query->setFirstResult($start)
-                        ->setMaxResults($limit);
-                }
-                $query->select($select);
-            }
-
-            $filters = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.filters', array());
-            if (!empty($filters)) {
-                $filterParameters  = array();
-                $filterExpressions = $query->expr()->andX();
-                $repo = $model->getRepository();
-                foreach ($filters as $f) {
-                    list ($expr, $parameters) = $repo->getFilterExpr($query, $f);
-                    $filterExpressions->add($expr);
-                    if (is_array($parameters)) {
-                        $filterParameters = array_merge($filterParameters, $parameters);
-                    }
-                }
-                $query->andWhere($filterExpressions);
-                $query->setParameters($parameters);
-            }
-
-            $data = $query->execute()->fetchAll();
-
-            if (!$paginate) {
-                $totalResults = count($data);
-            }
-        }
-        $contentTemplate = $reportGenerator->getContentTemplate();
-
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
-
-        $graphs = $entity->getGraphs();
-        if (!empty($graphs)) {
-            $availableGraphs = $model->getGraphData($entity->getSource());
-            if (empty($query)) {
-                $query = $reportGenerator->getQuery();
-            }
-
-            $graphOptions = array();
-            foreach ($graphs as $g) {
-                if (isset($availableGraphs[$g])) {
-                    $graphOptions[$g] = array(
-                        'options' => array(),
-                        'type'    => $availableGraphs[$g]
-                    );
-                }
-            }
-            $event = new ReportGraphEvent($entity, $graphOptions, $query);
-            $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
-            $graphs = $event->getGraphs();
-        }
-
-        return array(
-            'totalResults'    => $totalResults,
-            'data'            => $data,
-            'graphs'          => $graphs,
-            'contentTemplate' => $contentTemplate,
-            'columns'         => $columns['columns'],
-            'limit'           => ($paginate) ? $limit : 0
-        );
     }
 }

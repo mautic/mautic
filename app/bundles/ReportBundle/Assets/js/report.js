@@ -142,8 +142,8 @@ Mautic.updateReportGraph = function(element, options) {
             	Mautic.reportGraphs[id].destroy();
             	delete Mautic.reportGraphs[id];
             	var mGraph = mQuery('#' + id);
-            	if (typeof response.graph.line != 'undefined') {
-            		Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph.line[0]);
+            	if (typeof response.graph.datasets != 'undefined') {
+            		Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph);
             	}
             }
         },

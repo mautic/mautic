@@ -268,6 +268,7 @@ class ReportSubscriber extends CommonSubscriber
         $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
         foreach ($graphs as $g) {
+            $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
 
             switch ($g) {
