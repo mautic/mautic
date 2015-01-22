@@ -15,6 +15,7 @@ $graphOrder  = $report->getGraphs();
 $startCount  = ($reportPage * $limit) - ($dataCount - 1);
 ?>
 
+<?php if (!empty($columnOrder)): ?>
 <!-- table section -->
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <div class="page-list"">
@@ -79,9 +80,9 @@ $startCount  = ($reportPage * $limit) - ($dataCount - 1);
     </div>
 </div>
 <!--/ table section -->
+<?php endif; ?>
 
-
-<?php if (!empty($graphs)): ?>
+<?php if (!empty($graphOrder) && !empty($graphs)): ?>
 <div class="mt-lg">
     <div class="row">
         <div class="pa-md">

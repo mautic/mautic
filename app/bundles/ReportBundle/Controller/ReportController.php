@@ -527,23 +527,16 @@ class ReportController extends FormController
 
         $reportData = $model->getReportData($entity, $this->container->get('form.factory'), array('paginate' => true, 'reportPage' => $reportPage));
 
-        $totalResults    = $reportData['totalResults'];
-        $data            = $reportData['data'];
-        $graphs          = $reportData['graphs'];
-        $contentTemplate = $reportData['contentTemplate'];
-        $columns         = $reportData['columns'];
-        $limit           = $reportData['limit'];
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'data'         => $data,
-                'columns'      => $columns,
-                'totalResults' => $totalResults,
+                'data'         => $reportData['data'],
+                'columns'      => $reportData['columns'],
+                'totalResults' => $reportData['totalResults'],
                 'report'       => $entity,
                 'reportPage'   => $reportPage,
-                'graphs'       => $graphs,
+                'graphs'       => $reportData['graphs'],
                 'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'limit'        => $limit,
+                'limit'        => $reportData['limit'],
                 'security'     => $security,
                 'permissions'  => $security->isGranted(array(
                     'report:reports:viewown',
@@ -555,7 +548,7 @@ class ReportController extends FormController
                     'report:reports:deleteother'
                 ), "RETURN_ARRAY"),
             ),
-            'contentTemplate' => $contentTemplate,
+            'contentTemplate' => $reportData['contentTemplate'],
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',

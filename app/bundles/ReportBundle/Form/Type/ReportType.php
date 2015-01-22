@@ -107,7 +107,13 @@ class ReportType extends AbstractType
             /** @var \Mautic\ReportBundle\Model\ReportModel $model */
             $model   = $this->factory->getModel('report');
             $report  = $options['data'];
-            $formModifier = function (FormInterface $form, $source = '') use ($model, $report) {
+            $formModifier = function (FormInterface $form, $source = '') use ($model, $report, $tables) {
+                if(empty($source)) {
+                    reset($tables);
+                    $first_key = key($tables);
+                    $source    = $first_key;
+                }
+
                 list($columnList, $types) = $model->getColumnList($source);
                 $currentColumns = $report->getColumns();
                 if (is_array($currentColumns)) {

@@ -16,7 +16,7 @@ $columnOrder = $report->getColumns();
 $graphOrder  = $report->getGraphs();
 $startCount  = 1;
 ?>
-<?php if (!empty($graphs)): ?>
+<?php if (!empty($graphOrder) && !empty($graphs)): ?>
     <div class="mt-lg">
         <div class="row">
             <div class="pa-md">
@@ -29,6 +29,7 @@ $startCount  = 1;
     </div>
 <?php endif; ?>
 
+<?php if (!empty($columnOrder)):?>
 <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
     <thead>
     <tr>
@@ -59,3 +60,4 @@ $startCount  = 1;
     <?php endif; ?>
     </tbody>
 </table>
+<?php endif; ?>

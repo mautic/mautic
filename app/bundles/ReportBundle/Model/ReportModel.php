@@ -181,8 +181,7 @@ class ReportModel extends FormModel
     public function getTableData ($context = 'all')
     {
         $data = $this->buildAvailableReports($context);
-
-        return $data['tables'];
+        return (!isset($data['tables'])) ? array() : $data['tables'];
     }
 
     /**
@@ -194,7 +193,7 @@ class ReportModel extends FormModel
     {
         $data = $this->buildAvailableReports($context);
 
-        return $data['graphs'];
+        return (!isset($data['graphs'])) ? array() : $data['graphs'];
     }
 
     /**
@@ -396,7 +395,7 @@ class ReportModel extends FormModel
         $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity);
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = 0;
+        $totalResults    = $limit = 0;
 
         // Prepare the query builder
         $columns = $this->getTableData($entity->getSource());
