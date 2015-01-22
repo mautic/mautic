@@ -41,7 +41,7 @@ class ReportBuilderEvent extends Event
      * @var array
      */
     private $supportedGraphs = array(
-        'top',
+        'table',
         'bar',
         'pie',
         'line'
