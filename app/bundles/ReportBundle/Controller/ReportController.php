@@ -324,6 +324,9 @@ class ReportController extends FormController
                 // Columns have to be reset in order for Symfony to honor the new submitted order
                 $oldColumns = $entity->getColumns();
                 $entity->setColumns(array());
+
+                $oldGraphs  = $entity->getGraphs();
+                $entity->setGraphs(array());
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -345,7 +348,7 @@ class ReportController extends FormController
                 } else {
                     //reset old columns
                     $entity->setColumns($oldColumns);
-
+                    $entity->setGraphs($oldGraphs);
                     $this->addFlash('mautic.core.error.not.valid', array(), 'error');
                 }
             } else {
@@ -361,7 +364,7 @@ class ReportController extends FormController
                 // Clear session items in case columns changed
                 $session->remove('mautic.report.' . $entity->getId() . '.orderby');
                 $session->remove('mautic.report.' . $entity->getId() . '.orderbydir');
-                $session->remove("mautic.report.' . $entity->getId() . '.filters");
+                $session->remove('mautic.report.' . $entity->getId() . '.filters');
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
@@ -528,13 +531,13 @@ class ReportController extends FormController
         $data            = $reportData['data'];
         $graphs          = $reportData['graphs'];
         $contentTemplate = $reportData['contentTemplate'];
-        $viewColumns     = $reportData['viewColumns'];
+        $columns         = $reportData['columns'];
         $limit           = $reportData['limit'];
 
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'data'         => $data,
-                'columns'      => $viewColumns,
+                'columns'      => $columns,
                 'totalResults' => $totalResults,
                 'report'       => $entity,
                 'reportPage'   => $reportPage,
@@ -662,7 +665,7 @@ class ReportController extends FormController
         $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity);
 
         $data         = $entity->getColumns();
-        $viewColumns  = array();
+        $columns      = array();
         $totalResults = 0;
         if (!empty($data)) {
             if ($paginate) {
@@ -686,11 +689,6 @@ class ReportController extends FormController
                 'columns'    => $columns['columns']
             );
 
-            // Rekey by label
-            foreach ($columns['columns'] as $k => $c) {
-                $c['column']              = $k;
-                $viewColumns[$c['label']] = $c;
-            }
             $query = $reportGenerator->getQuery($options);
 
             if ($paginate) {
@@ -740,7 +738,21 @@ class ReportController extends FormController
 
         $graphs = $entity->getGraphs();
         if (!empty($graphs)) {
-            $event = new ReportGraphEvent($entity);
+            $availableGraphs = $model->getGraphData($entity->getSource());
+            if (empty($query)) {
+                $query = $reportGenerator->getQuery();
+            }
+
+            $graphOptions = array();
+            foreach ($graphs as $g) {
+                if (isset($availableGraphs[$g])) {
+                    $graphOptions[$g] = array(
+                        'options' => array(),
+                        'type'    => $availableGraphs[$g]
+                    );
+                }
+            }
+            $event = new ReportGraphEvent($entity, $graphOptions, $query);
             $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
             $graphs = $event->getGraphs();
         }
@@ -750,7 +762,7 @@ class ReportController extends FormController
             'data'            => $data,
             'graphs'          => $graphs,
             'contentTemplate' => $contentTemplate,
-            'viewColumns'     => $viewColumns,
+            'columns'         => $columns['columns'],
             'limit'           => ($paginate) ? $limit : 0
         );
     }

@@ -28,18 +28,37 @@ class ReportBuilderEvent extends Event
      */
     private $translator;
 
+    /**
+     * Container with registered tables and columns
+     *
+     * @var array
+     */
+    private $tableArray = array();
+
+    /**
+     * Supported graphs
+     *
+     * @var array
+     */
+    private $supportedGraphs = array(
+        'top',
+        'bar',
+        'pie',
+        'line'
+    );
+
+    /**
+     * Container with registered graphs
+     *
+     * @var array
+     */
+    private $graphArray = array();
+
     public function __construct(Translator $translator, $context = '')
     {
         $this->context     = $context;
         $this->translator = $translator;
     }
-
-    /**
-     * Container with all registered tables and columns
-     *
-     * @var array
-     */
-    private $tableArray = array();
 
     /**
      * Add a table with the specified columns to the lookup.
@@ -48,12 +67,12 @@ class ReportBuilderEvent extends Event
      * 'display_name' => The translation key to display in the select list
      * 'columns'      => An array containing the table's columns
      *
-     * @param string $tableName Table to add
+     * @param string $context   Context for data
      * @param array  $data      Data array for the table
      *
      * @return void
      */
-    public function addTable($tableName, array $data)
+    public function addTable($context, array $data)
     {
         foreach ($data['columns'] as &$d) {
             $d['label'] = $this->translator->trans($d['label']);
@@ -63,7 +82,7 @@ class ReportBuilderEvent extends Event
            return strnatcmp($a['label'], $b['label']);
         });
 
-        $this->tableArray[$tableName] = $data;
+        $this->tableArray[$context] = $data;
     }
 
     /**
@@ -251,7 +270,7 @@ class ReportBuilderEvent extends Event
      *
      * @return string
      */
-    public function getcontext()
+    public function getContext()
     {
         return $this->context;
     }
@@ -274,5 +293,27 @@ class ReportBuilderEvent extends Event
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param $context
+     * @param $type
+     * @param $name
+     */
+    public function addGraph($context, $type, $graphId)
+    {
+        if (in_array($type, $this->supportedGraphs)) {
+            $this->graphArray[$context][$graphId] = $type;
+        }
+    }
+
+    /**
+     * Get graphs
+     *
+     * @return array
+     */
+    public function getGraphs()
+    {
+        return $this->graphArray;
     }
 }

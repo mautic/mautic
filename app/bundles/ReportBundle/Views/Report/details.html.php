@@ -11,60 +11,60 @@ $header = $view['translator']->trans('mautic.report.report.header.view', array('
 
 if ($tmpl == 'index') {
     $view->extend('MauticCoreBundle:Default:content.html.php');
-}
-$view['slots']->set('mauticContent', 'report');
+    $view['slots']->set('mauticContent', 'report');
 
-$view['slots']->set("headerTitle", $header);
+    $view['slots']->set("headerTitle", $header);
 
-if (!empty($data) || !empty($graphs)) {
-    $buttons = array();
+    if (!empty($data) || !empty($graphs)) {
+        $buttons = array();
 
-    $buttons[] = array(
-        'attr' => array(
-            'target'      => '_new',
-            'data-toggle' => '',
-            'class'       => 'btn btn-default btn-nospin',
-            'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'html'))
-        ),
-        'btnText' => $view['translator']->trans('mautic.form.result.export.html'),
-        'iconClass' => 'fa fa-file-code-o'
-    );
-
-    if (!empty($data)) {
         $buttons[] = array(
             'attr'      => array(
-                'data-toggle' => 'download',
+                'target'      => '_new',
+                'data-toggle' => '',
                 'class'       => 'btn btn-default btn-nospin',
-                'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'csv'))
+                'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'html'))
             ),
-            'btnText'   => $view['translator']->trans('mautic.form.result.export.csv'),
-            'iconClass' => 'fa fa-file-text-o'
+            'btnText'   => $view['translator']->trans('mautic.form.result.export.html'),
+            'iconClass' => 'fa fa-file-code-o'
         );
 
-        if (class_exists('PHPExcel')) {
+        if (!empty($data)) {
             $buttons[] = array(
                 'attr'      => array(
                     'data-toggle' => 'download',
                     'class'       => 'btn btn-default btn-nospin',
-                    'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'xlsx'))
+                    'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'csv'))
                 ),
-                'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
-                'iconClass' => 'fa fa-file-excel-o'
+                'btnText'   => $view['translator']->trans('mautic.form.result.export.csv'),
+                'iconClass' => 'fa fa-file-text-o'
             );
+
+            if (class_exists('PHPExcel')) {
+                $buttons[] = array(
+                    'attr'      => array(
+                        'data-toggle' => 'download',
+                        'class'       => 'btn btn-default btn-nospin',
+                        'href'        => $view['router']->generate('mautic_report_export', array('objectId' => $report->getId(), 'format' => 'xlsx'))
+                    ),
+                    'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
+                    'iconClass' => 'fa fa-file-excel-o'
+                );
+            }
         }
     }
-}
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item' => $report,
-    'templateButtons' => array(
-        'edit'    => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $report->getCreatedBy()),
-        'delete'  => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $report->getCreatedBy())
-    ),
-    'routeBase' => 'report',
-    'langVar'   => 'report.report',
-    'postCustomButtons' => $buttons
-)));
+    $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+        'item'              => $report,
+        'templateButtons'   => array(
+            'edit'   => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $report->getCreatedBy()),
+            'delete' => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $report->getCreatedBy())
+        ),
+        'routeBase'         => 'report',
+        'langVar'           => 'report.report',
+        'postCustomButtons' => $buttons
+    )));
+}
 ?>
 
 <!-- start: box layout -->
@@ -109,59 +109,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!--/ report detail collapseable toggler -->
         </div>
 
-        <?php if (!empty($graphs)): ?>
-        <div class="bg-auto bg-dark-xs">
-            <?php if (isset($graphs['line']) && $graphs['line']) : ?>
-            <?php foreach ($graphs['line'] as $graph) : ?>
-            <!-- Overview Chart -->
-            <div class="pa-md mb-lg">
-                <!-- area spline chart -->
-                <?php echo $view->render('MauticReportBundle:Graph:Line.html.php', array('graph' => $graph)); ?>
-                <!--/ area spline chart -->
-            </div>
-            <!--/ Overview Chart -->
-            <?php endforeach; ?>
-            <?php endif; ?>
+        <div class="report-content">
+            <?php $view['slots']->output('_content'); ?>
         </div>
-
-        <div class="pa-md">
-            <div class="row">
-                <?php if (isset($graphs['pie']) && $graphs['pie']) : ?>
-                <?php foreach ($graphs['pie'] as $graph) : ?>
-                <!-- Overview Chart -->
-                <div class="col-md-4">
-                    <!-- area spline chart -->
-                    <?php echo $view->render('MauticReportBundle:Graph:Pie.html.php', array('graph' => $graph)); ?>
-                    <!--/ area spline chart -->
-                </div>
-                <!--/ Overview Chart -->
-                <?php endforeach; ?>
-                <?php endif; ?>
-
-                <?php if (isset($graphs['table']) && $graphs['table']) : ?>
-                <?php foreach ($graphs['table'] as $graph) : ?>
-                <!-- Overview Chart -->
-                <div class="col-md-4">
-                    <!-- area spline chart -->
-                    <?php echo $view->render('MauticReportBundle:Graph:Table.html.php', array('graph' => $graph, 'report' => $report)); ?>
-                    <!--/ area spline chart -->
-                </div>
-                <!--/ Overview Chart -->
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-        <?php endif; ?>
-
-
-        <!-- table section -->
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
-            <div class="page-list"">
-                <?php $view['slots']->output('_content'); ?>
-            </div>
-        </div>
-        <!--/ table section -->
-
     </div>
     <!--/ left section -->
 </div>

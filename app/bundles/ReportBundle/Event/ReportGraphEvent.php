@@ -10,6 +10,7 @@
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -32,20 +33,27 @@ class ReportGraphEvent extends Event
     private $report;
 
     /**
-     * Options of graphs
-     *
      * @var array
      */
-    private $options = array();
+    private $requestedGraphs = array();
+
+    /**
+     * @var QueryBuilder
+     */
+    private $queryBuilder;
 
     /**
      * Constructor
      *
-     * @param Report $report Entity
+     * @param Report $report
+     * @param array  $graphs
      */
-    public function __construct($report)
+    public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
     {
-        $this->report = $report;
+        $this->report          = $report;
+        $this->context         = $report->getSource();
+        $this->requestedGraphs = $graphs;
+        $this->queryBuilder    = $queryBuilder;
     }
 
     /**
@@ -59,64 +67,72 @@ class ReportGraphEvent extends Event
     }
 
     /**
-     * Fetch the QueryBuilder object
+     * Fetch the graphs
      *
      * @return array
      */
     public function getGraphs()
     {
-        return $this->graphs;
+        return $this->requestedGraphs;
     }
 
     /**
      * Set the graph array
      *
-     * @param string $type (line, bar, pie, ..)
+     * @param string $graph
      * @param array $data prepared for this chart
      *
      * @return void
      */
-    public function setGraph($type, $data)
+    public function setGraph($graph, $data)
     {
-        if (!isset($this->graphs[$type])) {
-            $this->graphs[$type] = array();
+        if (!isset($this->requestedGraphs[$graph]['data'])) {
+            $this->requestedGraphs[$graph]['data'] = array();
         }
-        $this->graphs[$type][] = $data;
+        $this->requestedGraphs[$graph]['data'] = $data;
     }
 
     /**
-     * Fetch the options array
+     * Fetch the options array for the graph
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions($graph)
     {
-        return $this->options;
+        if (isset($this->requestedGraphs[$graph]['options'])) {
+            return $this->requestedGraphs[$graph]['options'];
+        }
+        return array();
     }
 
     /**
-     * Set the option
+     * Set an option for the graph
      *
+     * @param string $graph
      * @param string $key
      * @param string $value
      *
      * @return void
      */
-    public function setOption($key, $value)
+    public function setOption($graph, $key, $value)
     {
-        $this->options[$key] = $value;
+        if (!isset($this->requestedGraphs[$graph]['options'])) {
+            $this->requestedGraphs[$graph]['options'] = array();
+        }
+        $this->requestedGraphs[$graph]['options'][$key] = $value;
     }
 
     /**
-     * Set the options
+     * Set the options for a graph
      *
-     * @param array $options
+     * @param string $graph
+     * @param array  $options
      *
      * @return void
      */
-    public function setOptions($options)
+    public function setOptions($graph, $options)
     {
-        $this->options = $options;
+        $this->requestedGraphs[$graph]['options'] = $options;
     }
 
     /**
@@ -130,42 +146,40 @@ class ReportGraphEvent extends Event
     }
 
     /**
-     * Build where clause according to Report filter settings
+     * @param $context
      *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return bool
      */
-    public function buildWhere(\Doctrine\DBAL\Query\QueryBuilder &$queryBuilder)
+    public function checkContext($context)
     {
-        // Add filters as AND values to the WHERE clause if present
-        $filters = $this->report->getFilters();
-
-        if (count($filters)) {
-            $expr = $queryBuilder->expr();
-            $and  = $expr->andX();
-
-            foreach ($filters as $filter) {
-                if ($filter['condition'] == 'notEmpty') {
-                    $and->add(
-                        $expr->isNotNull($filter['column'])
-                    );
-                    $and->add(
-                        $expr->neq($filter['column'], $expr->literal(''))
-                    );
-                } elseif ($filter['condition'] == 'empty') {
-                    $and->add(
-                        $expr->isNull($filter['column'])
-                    );
-                    $and->add(
-                        $expr->eq($filter['column'], $expr->literal(''))
-                    );
-                } else {
-                    $and->add(
-                        $expr->{$filter['condition']}($filter['column'], $expr->literal($filter['value']))
-                    );
-                }
-            }
-
-            $queryBuilder->where($and);
+        if (empty($this->context)) {
+            return true;
         }
+
+        if (is_array($context)) {
+            return in_array($this->context, $context);
+        } else if($this->context == $context) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get graphs that are requested
+     *
+     * @return array
+     */
+    public function getRequestedGraphs ()
+    {
+        return array_keys($this->requestedGraphs);
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getQueryBuilder ()
+    {
+        return $this->queryBuilder;
     }
 }

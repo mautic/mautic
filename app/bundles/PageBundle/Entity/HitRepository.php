@@ -368,18 +368,19 @@ class HitRepository extends CommonRepository
     public function getDwellTimes(array $options, $q = null)
     {
         if (!$q) {
-            $q = $this->_em->getConnection()->createQueryBuilder();
+            $q = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
+                ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id');
         }
 
-        $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id, h.page_language, p.title')
-            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id');
+        $q->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title');
+
 
         if (isset($options['pageIds']) && $options['pageIds']) {
             $inIds = (!is_array($options['pageIds'])) ? array($options['pageIds']) : $options['pageIds'];
             $q->andWhere(
                 $q->expr()->andX(
-                    $q->expr()->in('h.page_id', $inIds)
+                    $q->expr()->in('ph.page_id', $inIds)
                 )
             );
         }
@@ -387,7 +388,7 @@ class HitRepository extends CommonRepository
         if (isset($options['urls']) && $options['urls']) {
             $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
             foreach ($inUrls as $k => $u) {
-                $q->andWhere($q->expr()->like('h.url', ':url_'.$k))
+                $q->andWhere($q->expr()->like('ph.url', ':url_'.$k))
                     ->setParameter('url_'.$k, $u);
             }
         }
@@ -396,17 +397,17 @@ class HitRepository extends CommonRepository
             //make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(
-                $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
+                $q->expr()->gte('ph.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
 
         if (isset($options['leadId']) && $options['leadId']) {
             $q->andWhere(
-                $q->expr()->eq('h.lead_id', (int) $options['leadId'])
+                $q->expr()->eq('ph.lead_id', (int) $options['leadId'])
             );
         }
 
-        $q->orderBy('h.date_hit', 'ASC');
+        $q->orderBy('ph.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
         //loop to structure
@@ -584,10 +585,8 @@ class HitRepository extends CommonRepository
      */
     public function getReferers($query, $limit = 10, $offset = 0)
     {
-        $query->select('h.referer, count(h.referer) as sessions')
-            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id')
-            ->groupBy('h.referer')
+        $query->select('ph.referer, count(ph.referer) as sessions')
+            ->groupBy('ph.referer')
             ->orderBy('sessions', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -615,8 +614,6 @@ class HitRepository extends CommonRepository
         }
 
         $query->select('p.title, p.id, ' . $column . $as)
-            ->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
-            ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'page_hits', 'h', 'h.page_id = p.id')
             ->groupBy('p.id')
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)

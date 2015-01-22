@@ -124,6 +124,53 @@ class ReportModel extends FormModel
     }
 
     /**
+     * Build the table and graph data
+     *
+     * @param $context
+     *
+     * @return mixed
+     */
+    public function buildAvailableReports($context)
+    {
+        static $data = array();
+
+        if (empty($data[$context])) {
+            // Check to see if all has been obtained
+            if (isset($data['all'])) {
+                $data[$context]['tables'] =& $data['all']['tables'][$context];
+                $data[$context]['graphs'] =& $data['all']['graphs'][$context];
+            } else {
+                //build them
+                $eventContext = ($context == 'all') ? '' : $context;
+                $event        = new ReportBuilderEvent($this->factory->getTranslator(), $eventContext);
+                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
+
+                $tables = $event->getTables();
+                $graphs = $event->getGraphs();
+
+                if ($context == 'all') {
+                    $data[$context]['tables'] = $tables;
+                    $data[$context]['graphs'] = $graphs;
+                } else {
+                    if (isset($tables[$context])) {
+                        $data[$context]['tables'] = $tables[$context];
+                    } else {
+                        $data[$context]['tables'] = $tables;
+                    }
+
+                    if (isset($graphs[$context])) {
+                        $data[$context]['graphs'] = $graphs[$context];
+                    } else {
+                        $data[$context]['graphs'] = $graphs;
+                    }
+                }
+            }
+        }
+
+        return $data[$context];
+    }
+
+    /**
      * Builds the table lookup data for the report forms
      *
      * @param string $context
@@ -132,27 +179,21 @@ class ReportModel extends FormModel
      */
     public function getTableData ($context = 'all')
     {
-        static $tableData = array();
+        $data = $this->buildAvailableReports($context);
 
-        if (empty($tableData[$context])) {
-            // Check to see if all has been obtained
-            if (isset($tableData['all'])) {
-                $tableData[$context] =& $tableData['all'][$context];
-            } else {
-                //build them
-                $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->factory->getTranslator(), $eventContext);
-                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
-                $data = $event->getTables();
-                if (isset($data[$context])) {
-                    $tableData[$context] = $data[$context];
-                } else {
-                    $tableData[$context] = $data;
-                }
-            }
-        }
+        return $data['tables'];
+    }
 
-        return $tableData[$context];
+    /**
+     * @param string $context
+     *
+     * @return mixed
+     */
+    public function getGraphData ($context = 'all')
+    {
+        $data = $this->buildAvailableReports($context);
+
+        return $data['graphs'];
     }
 
     /**
@@ -189,6 +230,35 @@ class ReportModel extends FormModel
     }
 
     /**
+     * @param string $context
+     * @param bool   $asOptionHtml
+     *
+     * @return array
+     */
+    public function getGraphList ($context, $asOptionHtml = false)
+    {
+        $graphData = $this->getGraphData($context);
+
+        // First sort
+        $translated = array();
+        foreach ($graphData as $key => $type) {
+            $translated[$key] = $this->translator->trans($key) . " (" . $this->translator->trans('mautic.report.graph.' . $type);
+        }
+        asort($translated);
+
+        if ($asOptionHtml) {
+            $graphList = '';
+            foreach ($translated as $key => $value) {
+                $graphList .= '<option value="' . $key . '">' . $value . ")</option>\n";
+            }
+
+            return $graphList;
+        }
+
+        return $translated;
+    }
+
+    /**
      * Export report
      *
      * @param $format
@@ -218,7 +288,7 @@ class ReportModel extends FormModel
                                 //set the header
                                 $header[] = $k;
                             }
-                            $row[] = $formatter->_($v, $reportData['viewColumns'][$k]['type'], true);
+                            $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
                         }
 
                         if ($count === 0) {
@@ -248,7 +318,7 @@ class ReportModel extends FormModel
                     'MauticReportBundle:Report:export.html.php',
                     array(
                         'data'      => $reportData['data'],
-                        'columns'   => $reportData['viewColumns'],
+                        'columns'   => $reportData['columns'],
                         'pageTitle' => $name,
                         'graphs'    => $reportData['graphs'],
                         'report'    => $report
@@ -273,7 +343,7 @@ class ReportModel extends FormModel
                                     //set the header
                                     $header[] = $k;
                                 }
-                                $row[] = $formatter->_($v, $reportData['viewColumns'][$k]['type'], true);
+                                $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
                             }
 
                             //write the row

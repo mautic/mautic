@@ -57,27 +57,27 @@ Mautic.removeReportRow = function(container) {
 	mQuery('#' + container).remove();
 };
 
-Mautic.updateReportColumnList = function (context) {
+Mautic.updateReportSourceData = function (context) {
 	Mautic.activateLabelLoadingIndicator('report_source');
 	mQuery.ajax({
 	    url : mauticAjaxUrl,
 	    type: 'post',
-		data: "action=report:getColumnList&context=" + context,
+		data: "action=report:getSourceData&context=" + context,
 	    success: function(response) {
-	    	if (response.columns) {
-				mQuery('#report_columns').html(response.columns);
-				mQuery('#report_columns').multiSelect('refresh');
+			mQuery('#report_columns').html(response.columns);
+			mQuery('#report_columns').multiSelect('refresh');
 
-				// Remove any filters, they're no longer valid with different column lists
-				mQuery('#report_filters').find('div').remove().end();
+			// Remove any filters, they're no longer valid with different column lists
+			mQuery('#report_filters').find('div').remove().end();
 
-				// Remove order
-				mQuery('#report_tableOrder').find('div').remove().end();
+			// Remove order
+			mQuery('#report_tableOrder').find('div').remove().end();
 
-				// Store options to update prototype
-				Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
+			// Store options to update prototype
+			Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
 
-			}
+			mQuery('#report_graphs').html(response.graphs);
+			mQuery('#report_graphs').multiSelect('refresh');
 		},
 		error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);

@@ -29,7 +29,10 @@ $view['slots']->set("headerTitle", $header);
                         <a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.details'); ?></a>
                     </li>
                     <li class="">
-                        <a href="#filters-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.filters'); ?></a>
+                        <a href="#data-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.data'); ?></a>
+                    </li>
+                    <li class="">
+                        <a href="#graphs-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.graphs'); ?></a>
                     </li>
                 </ul>
                 <!--/ tabs controls -->
@@ -57,7 +60,7 @@ $view['slots']->set("headerTitle", $header);
                         </div>
                     </div>
 
-                    <div class="tab-pane fade bdr-w-0" id="filters-container">
+                    <div class="tab-pane fade bdr-w-0" id="data-container">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">
@@ -81,6 +84,17 @@ $view['slots']->set("headerTitle", $header);
                             </div>
                         </div>
                     </div>
+
+                    <div class="tab-pane fade bdr-w-0" id="graphs-container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    <?php echo $view['form']->row($form['graphs']); ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

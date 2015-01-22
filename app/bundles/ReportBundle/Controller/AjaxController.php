@@ -22,20 +22,22 @@ class AjaxController extends CommonAjaxController
 {
 
     /**
-     * Get updated column list
+     * Get updated data for context
      *
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function getColumnListAction(Request $request)
+    public function getSourceDataAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model   = $this->factory->getModel('report');
         $context = $request->get('context');
-        list($list, $types) = $model->getColumnList($context, true);
 
-        return $this->sendJsonResponse(array('columns' => $list, 'types' => $types));
+        list($list, $types) = $model->getColumnList($context, true);
+        $graphs             = $model->getGraphList($context, true);
+
+        return $this->sendJsonResponse(array('columns' => $list, 'types' => $types, 'graphs' => $graphs));
     }
 
     /**
@@ -44,7 +46,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateGraphAction(Request $request)
     {
-        $reportId   = InputHelper::int($request->request->get('reportId'));
+        $reportId  = InputHelper::int($request->request->get('reportId'));
         $options   = InputHelper::clean($request->request->all());
         $dataArray = array('success' => 0);
 

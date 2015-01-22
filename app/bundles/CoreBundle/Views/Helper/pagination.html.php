@@ -22,8 +22,6 @@ if ($page <= 0) {
     $page = (int) $page;
 }
 
-$baseUrl .= "/";
-
 $totalPages = ($limit) ? (int) ceil($totalItems / $limit) : 1;
 
 $pageClass = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";
@@ -76,7 +74,7 @@ endif;
     <div class="<?php echo $paginationWrapper; ?>">
         <ul class="pagination nm <?php echo $pageClass; ?>">
             <?php
-            $urlPage = $page - $range;
+            $urlPage = "/" . $page - $range;
             $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
             $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
@@ -89,7 +87,7 @@ endif;
             </li>
 
             <?php
-            $urlPage = $page - 1;
+            $urlPage = "/" . $page - 1;
             $url     = ($urlPage >= 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
             $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
@@ -114,7 +112,7 @@ endif;
             <?php for ($i=$startPage; $i<=$lastPage; $i++): ?>
             <?php
             $class = ($page === (int) $i) ? ' class="active"' : '';
-            $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl . $i . $queryString;
+            $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl . "/" . $i . $queryString;
             $data  = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
             ?>
             <li<?php echo $class; ?>>
@@ -125,7 +123,7 @@ endif;
             <?php endfor; ?>
 
             <?php
-            $urlPage = $page + 1;
+            $urlPage = "/" . $page + 1;
             $url     = ($urlPage <= $totalPages) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : 'data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
             $class   = ($urlPage > $totalPages) ? ' class="disabled"' : '';
@@ -138,7 +136,7 @@ endif;
             </li>
 
             <?php
-            $urlPage = $page + $range;
+            $urlPage = "/" . $page + $range;
             if ($urlPage > $totalPages)
                 $urlPage = $totalPages;
             $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';

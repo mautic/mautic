@@ -27,11 +27,11 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0),
+            ReportEvents::REPORT_ON_BUILD          => array('onReportBuilder', 0),
+            ReportEvents::REPORT_ON_GENERATE       => array('onReportGenerate', 0),
             ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
         );
     }
@@ -43,7 +43,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder (ReportBuilderEvent $event)
     {
         if ($event->checkContext(array('emails', 'email.stats'))) {
             $prefix        = 'e.';
@@ -143,6 +143,15 @@ class ReportSubscriber extends CommonSubscriber
                     'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn())
                 );
                 $event->addTable('email.stats', $data);
+
+                // Register Graphs
+                $context = 'email.stats';
+                $event->addGraph($context, 'line', 'mautic.email.graph.line.stats');
+                $event->addGraph($context, 'pie', 'mautic.email.graph.pie.ignored.read.failed');
+                $event->addGraph($context, 'table', 'mautic.email.table.most.emails.sent');
+                $event->addGraph($context, 'table', 'mautic.email.table.most.emails.read');
+                $event->addGraph($context, 'table', 'mautic.email.table.most.emails.failed');
+                $event->addGraph($context, 'table', 'mautic.email.table.most.emails.read.percent');
             }
         }
     }
@@ -154,7 +163,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate (ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
         if ($context == 'emails') {
@@ -186,128 +195,121 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate (ReportGraphEvent $event)
     {
-        $report = $event->getReport();
-        // Context check, we only want to fire for Email reports
-        if ($report->getSource() != 'email.stats')
-        {
+        // Context check, we only want to fire for Lead reports
+        if (!$event->checkContext('email.stats')) {
             return;
         }
 
-        $options = $event->getOptions();
+        $graphs   = $event->getRequestedGraphs();
+        $qb       = $event->getQueryBuilder();
         $statRepo = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.line.stats') {
-            // Generate data for Stats line graph
-            $unit = 'D';
-            $amount = 30;
+        foreach ($graphs as $g) {
+            $options      = $event->getOptions($g);
+            $queryBuilder = clone $qb;
 
-            if (isset($options['amount'])) {
-                $amount = $options['amount'];
+            switch ($g) {
+                case 'mautic.email.graph.line.stats':
+                    // Generate data for Stats line graph
+                    $unit   = 'D';
+                    $amount = 30;
+
+                    if (isset($options['amount'])) {
+                        $amount = $options['amount'];
+                    }
+
+                    if (isset($options['unit'])) {
+                        $unit = $options['unit'];
+                    }
+
+                    $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('sent', 'read', 'failed'));
+
+                    $queryBuilder->select('es.email_id as email, es.date_sent as dateSent, es.date_read as dateRead, es.is_failed');
+                    $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
+                        ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
+                    $stats = $queryBuilder->execute()->fetchAll();
+
+                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 0, 'dateSent');
+                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateRead');
+                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 2, 'dateSent', 'is_failed');
+                    $timeStats['name'] = 'mautic.email.graph.line.stats';
+
+                    $event->setGraph($g, $timeStats);
+                    break;
+
+                case 'mautic.email.graph.pie.ignored.read.failed':
+                    $items                  = $statRepo->getIgnoredReadFailed($queryBuilder);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.email.graph.pie.ignored.read.failed';
+                    $graphData['iconClass'] = 'fa-flag-checkered';
+                    $event->setGraph($g, $graphData);
+                    break;
+
+                case 'mautic.email.table.most.emails.sent':
+                    $queryBuilder->select('e.id, e.subject as title, count(es.id) as sent')
+                        ->groupBy('e.id')
+                        ->orderBy('sent', 'DESC');
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.email.table.most.emails.sent';
+                    $graphData['iconClass'] = 'fa-paper-plane-o';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+
+                case 'mautic.email.table.most.emails.read':
+                    $queryBuilder->select('e.id, e.subject as title, sum(es.is_read) as "read"')
+                        ->groupBy('e.id')
+                        ->orderBy('"read"', 'DESC');
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.email.table.most.emails.read';
+                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+
+                case 'mautic.email.table.most.emails.failed':
+                    $queryBuilder->select('e.id, e.subject as title, sum(es.is_failed) as failed')
+                        ->andWhere('es.is_failed > 0')
+                        ->groupBy('e.id')
+                        ->orderBy('failed', 'DESC');
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.email.table.most.emails.failed';
+                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+
+                case 'mautic.email.table.most.emails.read.percent':
+                    $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
+                        ->groupBy('e.id')
+                        ->orderBy('ratio', 'DESC');
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.email.table.most.emails.read.percent';
+                    $graphData['iconClass'] = 'fa-tachometer';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
             }
-
-            if (isset($options['unit'])) {
-                $unit = $options['unit'];
-            }
-
-            $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('sent', 'read', 'failed'));
-
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es');
-            $queryBuilder->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id');
-            $queryBuilder->select('es.email_id as email, es.date_sent as dateSent, es.date_read as dateRead, is_failed');
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
-                ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
-            $stats = $queryBuilder->execute()->fetchAll();
-
-            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 0, 'dateSent');
-            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateRead');
-            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 2, 'dateSent', 'is_failed');
-            $timeStats['name'] = 'mautic.email.graph.line.stats';
-
-            $event->setGraph('line', $timeStats);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.pie.ignored.read.failed') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $items = $statRepo->getIgnoredReadFailed($queryBuilder);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.graph.pie.ignored.read.failed';
-            $graphData['iconClass'] = 'fa-flag-checkered';
-            $event->setGraph('pie', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.sent') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->select('e.id, e.subject as title, count(es.id) as sent')
-                ->groupBy('e.id')
-                ->orderBy('sent', 'DESC');
-            $limit = 10;
-            $offset = 0;
-            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.table.most.emails.sent';
-            $graphData['iconClass'] = 'fa-paper-plane-o';
-            $graphData['link'] = 'mautic_email_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.read') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->select('e.id, e.subject as title, sum(es.is_read) as "read"')
-                ->groupBy('e.id')
-                ->orderBy('"read"', 'DESC');
-            $limit = 10;
-            $offset = 0;
-            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.table.most.emails.read';
-            $graphData['iconClass'] = 'fa-eye';
-            $graphData['link'] = 'mautic_email_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.failed') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->select('e.id, e.subject as title, sum(es.is_failed) as failed')
-                ->andWhere('es.is_failed > 0')
-                ->groupBy('e.id')
-                ->orderBy('failed', 'DESC');
-            $limit = 10;
-            $offset = 0;
-            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.table.most.emails.failed';
-            $graphData['iconClass'] = 'fa-exclamation-triangle';
-            $graphData['link'] = 'mautic_email_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.read.percent') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
-                ->groupBy('e.id')
-                ->orderBy('ratio', 'DESC');
-            $limit = 10;
-            $offset = 0;
-            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.table.most.emails.read.percent';
-            $graphData['iconClass'] = 'fa-tachometer';
-            $graphData['link'] = 'mautic_email_action';
-            $event->setGraph('table', $graphData);
+            unset($queryBuilder);
         }
     }
 }

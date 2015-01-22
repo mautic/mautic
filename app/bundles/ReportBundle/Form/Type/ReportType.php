@@ -100,7 +100,7 @@ class ReportType extends AbstractType
                 'attr'        => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.report.report.form.source.help',
-                    'onchange' => 'Mautic.updateReportColumnList(this.value)'
+                    'onchange' => 'Mautic.updateReportSourceData(this.value)'
                 )
             ));
 
@@ -160,6 +160,29 @@ class ReportType extends AbstractType
                     'allow_delete' => true,
                     'prototype'    => true,
                     'required'     => false
+                ));
+
+                $graphList = $model->getGraphList($source);
+                $currentGraphs   = $report->getGraphs();
+                if (is_array($currentGraphs)) {
+                    $orderColumns = array_values($currentGraphs);
+                    $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+                } else {
+                    $order = '[]';
+                }
+
+                $form->add('graphs', 'choice', array(
+                    'choices'    => $graphList,
+                    'label'      => 'mautic.report.report.form.graphs',
+                    'label_attr' => array('class' => 'control-label'),
+                    'required'   => false,
+                    'multiple'   => true,
+                    'expanded'   => false,
+                    'attr'       => array(
+                        'class'         => 'form-control multiselect',
+                        'data-order'    => $order,
+                        'data-sortable' => 'true'
+                    )
                 ));
             };
 

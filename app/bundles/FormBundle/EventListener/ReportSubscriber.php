@@ -27,11 +27,11 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0),
+            ReportEvents::REPORT_ON_BUILD          => array('onReportBuilder', 0),
+            ReportEvents::REPORT_ON_GENERATE       => array('onReportGenerate', 0),
             ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
         );
     }
@@ -43,7 +43,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder (ReportBuilderEvent $event)
     {
         if ($event->checkContext(array('forms', 'form.submissions'))) {
             // Forms
@@ -87,6 +87,12 @@ class ReportSubscriber extends CommonSubscriber
                     'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
                 );
                 $event->addTable('form.submissions', $data);
+
+                // Register graphs
+                $context = 'form.submissions';
+                $event->addGraph($context, 'line', 'mautic.form.graph.line.submissions');
+                $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
+                $event->addGraph($context, 'table', 'autic.form.table.most.submitted');
             }
         }
     }
@@ -98,7 +104,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate (ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
         if ($context == 'forms') {
@@ -129,74 +135,74 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate (ReportGraphEvent $event)
     {
-        $report = $event->getReport();
-        // Context check, we only want to fire for Forms reports
-        if ($report->getSource() != 'form.submissions')
-        {
+        // Context check, we only want to fire for Lead reports
+        if (!$event->checkContext('form.submissions')) {
             return;
         }
 
-        $options = $event->getOptions();
+        $graphs         = $event->getRequestedGraphs();
+        $qb             = $event->getQueryBuilder();
         $submissionRepo = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.graph.line.submissions') {
-            // Generate data for submissions line graph
-            $unit = 'D';
-            $amount = 30;
+        foreach ($graphs as $g) {
+            $options      = $event->getOptions($g);
+            $queryBuilder = clone $qb;
 
-            if (isset($options['amount'])) {
-                $amount = $options['amount'];
+            switch ($g) {
+                case 'mautic.form.graph.line.submissions':
+                    // Generate data for submissions line graph
+                    $unit   = 'D';
+                    $amount = 30;
+
+                    if (isset($options['amount'])) {
+                        $amount = $options['amount'];
+                    }
+
+                    if (isset($options['unit'])) {
+                        $unit = $options['unit'];
+                    }
+
+                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
+
+                    $queryBuilder->select('fs.form_id as form, fs.date_submitted as dateSubmitted');
+                    $event->buildWhere($queryBuilder);
+                    $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
+                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+                    $submissions = $queryBuilder->execute()->fetchAll();
+
+                    $timeStats         = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
+                    $timeStats['name'] = 'mautic.form.graph.line.submissions';
+
+                    $event->setGraph($g, $timeStats);
+                    break;
+
+                case 'mautic.form.table.top.referrers':
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.form.table.top.referrers';
+                    $graphData['iconClass'] = 'fa-sign-in';
+                    $graphData['link']      = 'mautic_form_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+
+                case 'mautic.form.table.most.submitted':
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.form.table.most.submitted';
+                    $graphData['iconClass'] = 'fa-check-square-o';
+                    $graphData['link']      = 'mautic_form_action';
+                    $event->setGraph($g, $graphData);
+                    break;
             }
-
-            if (isset($options['unit'])) {
-                $unit = $options['unit'];
-            }
-
-            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
-
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
-            $queryBuilder->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id');
-            $queryBuilder->select('fs.form_id as form, fs.date_submitted as dateSubmitted');
-            $event->buildWhere($queryBuilder);
-            $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
-                ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-            $submissions = $queryBuilder->execute()->fetchAll();
-
-            $timeStats = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
-            $timeStats['name'] = 'mautic.form.graph.line.submissions';
-
-            $event->setGraph('line', $timeStats);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.table.top.referrers') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $limit = 10;
-            $offset = 0;
-            $items = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.form.table.top.referrers';
-            $graphData['iconClass'] = 'fa-sign-in';
-            $graphData['link'] = 'mautic_form_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.table.most.submitted') {
-            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($queryBuilder);
-            $limit = 10;
-            $offset = 0;
-            $items = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.form.table.most.submitted';
-            $graphData['iconClass'] = 'fa-check-square-o';
-            $graphData['link'] = 'mautic_form_action';
-            $event->setGraph('table', $graphData);
+            unset($queryBuilder);
         }
     }
 }

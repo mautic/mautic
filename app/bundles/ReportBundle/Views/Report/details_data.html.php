@@ -8,52 +8,88 @@
  */
 if ($tmpl == 'index')
     $view->extend('MauticReportBundle:Report:details.html.php');
+
+$dataCount   = count($data);
+$columnOrder = $report->getColumns();
+$graphOrder  = $report->getGraphs();
+$startCount  = ($reportPage * $limit) - ($dataCount - 1);
 ?>
 
-<?php if ($dataCount = count($data)): ?>
-    <?php $startCount = ($reportPage * $limit) - ($dataCount - 1); ?>
-    <div class="table-responsive table-responsive-force">
-        <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
-            <thead>
-            <tr>
-                <th class="col-report-count"></th>
-                <?php foreach ($data[0] as $key => $value): ?>
-                    <?php
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                        'sessionVar' => 'report.' . $report->getId(),
-                        'orderBy'    => $columns[$key]['column'],
-                        'text'       => $key,
-                        'class'      => 'col-report-' . $columns[$key]['type'],
-                        'filterBy'   => $columns[$key]['column'],
-                        'dataToggle' => in_array($columns[$key]['type'], array('date', 'datetime')) ? 'date' : ''
-                    )); ?>
-                <?php endforeach; ?>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($data as $row) : ?>
+<!-- table section -->
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <div class="page-list"">
+        <div class="table-responsive table-responsive-force">
+            <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                <thead>
                 <tr>
-                    <td><?php echo $startCount; ?></td>
-                    <?php foreach ($row as $key => $cell) : ?>
-                        <td><?php echo $view['formatter']->_($cell, $columns[$key]['type']); ?></td>
+                    <th class="col-report-count"></th>
+                    <?php foreach ($columnOrder as $key): ?>
+                        <?php
+                        if (isset($columns[$key])):
+                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                                'sessionVar' => 'report.' . $report->getId(),
+                                'orderBy'    => $key,
+                                'text'       => $columns[$key]['label'],
+                                'class'      => 'col-report-' . $columns[$key]['type'],
+                                'filterBy'   => $key,
+                                'dataToggle' => in_array($columns[$key]['type'], array('date', 'datetime')) ? 'date' : '',
+                                'target'     => '.report-content'
+                            ));
+                        else:
+                            unset($columnOrder[$key]);
+                        endif;
+                        ?>
                     <?php endforeach; ?>
                 </tr>
-                <?php $startCount++; ?>
+                </thead>
+                <tbody>
+                <?php if ($dataCount): ?>
+                    <?php foreach ($data as $row): ?>
+                        <tr>
+                            <td><?php echo $startCount; ?></td>
+                            <?php foreach ($columnOrder as $key): ?>
+                                <td><?php echo $view['formatter']->_($row[$columns[$key]['label']], $columns[$key]['type']); ?></td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <?php $startCount++; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <?php foreach ($columns as $key => $details): ?>
+                            <td>&nbsp;</td>
+                        <?php endforeach; ?>
+                    </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+                'totalItems'      => $totalResults,
+                'page'            => $reportPage,
+                'limit'           => $limit,
+                'baseUrl'         => $view['router']->generate('mautic_report_view', array(
+                    'objectId' => $report->getId()
+                )),
+                'sessionVar'      => 'report.' . $report->getId(),
+                'target'          => '.report-content'
+            )); ?>
+        </div>
+    </div>
+</div>
+<!--/ table section -->
+
+
+<?php if (!empty($graphs)): ?>
+<div class="mt-lg">
+    <div class="row">
+        <div class="pa-md">
+            <?php foreach ($graphOrder as $key): ?>
+            <?php $details =  $graphs[$key]; ?>
+            <?php echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'report' => $report)); ?>
             <?php endforeach; ?>
-            </tbody>
-        </table>
+        </div>
     </div>
-    <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => $totalResults,
-            "page"            => $reportPage,
-            "limit"           => $limit,
-            "baseUrl"         => $view['router']->generate('mautic_report_view', array(
-                "objectId" => $report->getId()
-            )),
-            'sessionVar'      => 'report.' . $report->getId()
-        )); ?>
-    </div>
-<?php else: ?>
-    <h4><?php echo $view['translator']->trans('mautic.core.noresults', array('message' => 'mautic.report.table.noresults')); ?></h4>
+</div>
 <?php endif; ?>

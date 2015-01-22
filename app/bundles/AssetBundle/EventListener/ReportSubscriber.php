@@ -27,11 +27,11 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0),
+            ReportEvents::REPORT_ON_BUILD          => array('onReportBuilder', 0),
+            ReportEvents::REPORT_ON_GENERATE       => array('onReportGenerate', 0),
             ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
         );
     }
@@ -43,7 +43,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder (ReportBuilderEvent $event)
     {
         if ($event->checkContext(array('assets', 'asset.downloads'))) {
             // Assets
@@ -107,6 +107,13 @@ class ReportSubscriber extends CommonSubscriber
                     'display_name' => 'mautic.asset.report.downloads.table',
                     'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
                 ));
+
+                // Add Graphs
+                $context = 'asset.downloads';
+                $event->addGraph($context, 'line', 'mautic.asset.graph.line.downloads');
+                $event->addGraph($context, 'table', 'mautic.asset.table.most.downloaded');
+                $event->addGraph($context, 'table', 'mautic.asset.table.top.referrers');
+                $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses');
             }
         }
     }
@@ -118,26 +125,26 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate (ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
         if ($context == 'assets') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
-            $event->addCategoryLeftJoin($qb, 'a');
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
+            $event->addCategoryLeftJoin($queryBuilder, 'a');
 
-            $event->setQueryBuilder($qb);
+            $event->setQueryBuilder($queryBuilder);
         } elseif ($context == 'asset.downloads') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad')
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad')
                 ->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
-            $event->addCategoryLeftJoin($qb, 'a');
-            $event->addLeadLeftJoin($qb, 'ad');
-            $event->addIpAddressLeftJoin($qb, 'ad');
+            $event->addCategoryLeftJoin($queryBuilder, 'a');
+            $event->addLeadLeftJoin($queryBuilder, 'ad');
+            $event->addIpAddressLeftJoin($queryBuilder, 'ad');
 
-            $event->setQueryBuilder($qb);
+            $event->setQueryBuilder($queryBuilder);
         }
     }
 
@@ -148,85 +155,80 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate (ReportGraphEvent $event)
     {
-        $report = $event->getReport();
-        // Context check, we only want to fire for Asset reports
-        if ($report->getSource() != 'asset.downloads')
-        {
+        // Context check, we only want to fire for Lead reports
+        if (!$event->checkContext('asset.downloads')) {
             return;
         }
 
-        $options = $event->getOptions();
+        $graphs       = $event->getRequestedGraphs();
+        $qb           = $event->getQueryBuilder();
         $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.line.downloads') {
-            // Generate data for Downloads line graph
-            $unit = 'D';
-            $amount = 30;
+        foreach ($graphs as $g) {
+            $options      = $event->getOptions($g);
+            $queryBuilder = clone $qb;
 
-            if (isset($options['amount'])) {
-                $amount = $options['amount'];
+            switch ($g) {
+                case 'mautic.asset.graph.line.downloads':
+                    // Generate data for Downloads line graph
+                    $unit   = 'D';
+                    $amount = 30;
+
+                    if (isset($options['amount'])) {
+                        $amount = $options['amount'];
+                    }
+
+                    if (isset($options['unit'])) {
+                        $unit = $options['unit'];
+                    }
+
+                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
+
+                    $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
+                    $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
+                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+                    $downloads = $queryBuilder->execute()->fetchAll();
+
+                    $timeStats         = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
+                    $timeStats['name'] = 'mautic.asset.graph.line.downloads';
+
+                    $event->setGraph($g, $timeStats);
+                    break;
+                case 'mautic.asset.table.most.downloaded':
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.asset.table.most.downloaded';
+                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['link']      = 'mautic_asset_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+                case 'mautic.asset.table.top.referrers':
+                    $limit                  = 10;
+                    $offset                 = 0;
+                    $items                  = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.asset.table.top.referrers';
+                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['link']      = 'mautic_asset_action';
+                    $event->setGraph($g, $graphData);
+                    break;
+                case 'mautic.asset.graph.pie.statuses':
+                    $items                  = $downloadRepo->getHttpStatuses($queryBuilder);
+                    $graphData              = array();
+                    $graphData['data']      = $items;
+                    $graphData['name']      = 'mautic.asset.graph.pie.statuses';
+                    $graphData['iconClass'] = 'fa-globe';
+                    $event->setGraph($g, $graphData);
+                    break;
             }
 
-            if (isset($options['unit'])) {
-                $unit = $options['unit'];
-            }
-
-            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
-
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $qb->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
-            $qb->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
-            $qb->select('ad.asset_id as asset, ad.date_download as dateDownload');
-            $event->buildWhere($qb);
-            $qb->andwhere($qb->expr()->gte('ad.date_download', ':date'))
-                ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-            $downloads = $qb->execute()->fetchAll();
-
-            $timeStats = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
-            $timeStats['name'] = 'mautic.asset.graph.line.downloads';
-
-            $event->setGraph('line', $timeStats);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.most.downloaded') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($qb);
-            $limit = 10;
-            $offset = 0;
-            $items = $downloadRepo->getMostDownloaded($qb, $limit, $offset);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.asset.table.most.downloaded';
-            $graphData['iconClass'] = 'fa-download';
-            $graphData['link'] = 'mautic_asset_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.top.referrers') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($qb);
-            $limit = 10;
-            $offset = 0;
-            $items = $downloadRepo->getTopReferrers($qb, $limit, $offset);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.asset.table.top.referrers';
-            $graphData['iconClass'] = 'fa-download';
-            $graphData['link'] = 'mautic_asset_action';
-            $event->setGraph('table', $graphData);
-        }
-
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.pie.statuses') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $event->buildWhere($qb);
-            $items = $downloadRepo->getHttpStatuses($qb);
-            $graphData = array();
-            $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.asset.graph.pie.statuses';
-            $graphData['iconClass'] = 'fa-globe';
-            $event->setGraph('pie', $graphData);
+            unset($queryBuilder);
         }
     }
 }
