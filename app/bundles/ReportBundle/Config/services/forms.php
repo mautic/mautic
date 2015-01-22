@@ -36,3 +36,12 @@ $container->setDefinition('mautic.form.type.table_order', new Definition(
     ->addTag('form.type', array(
         'alias' => 'table_order',
     ));
+
+$container->setDefinition('mautic.form.type.report_filters', new Definition(
+    'Mautic\ReportBundle\Form\Type\ReportFiltersType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'report_filters',
+    ));
+

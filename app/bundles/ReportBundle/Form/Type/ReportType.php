@@ -107,7 +107,8 @@ class ReportType extends AbstractType
             /** @var \Mautic\ReportBundle\Model\ReportModel $model */
             $model   = $this->factory->getModel('report');
             $report  = $options['data'];
-            $formModifier = function (FormInterface $form, $source = '') use ($model, $report, $tables) {
+            $tableList = $options['table_list'];
+            $formModifier = function (FormInterface $form, $source = '') use ($model, $report, $tables, $tableList) {
                 if(empty($source)) {
                     reset($tables);
                     $first_key = key($tables);
@@ -139,7 +140,7 @@ class ReportType extends AbstractType
                 ));
 
                 // Build the filter selector
-                $form->add('filters', 'collection', array(
+                $form->add('filters', 'report_filters', array(
                     'type'         => 'filter_selector',
                     'label'        => false,
                     'options'      => array(
@@ -152,7 +153,9 @@ class ReportType extends AbstractType
                     'required'     => false,
                     'attr'         => array(
                         'data-column-types' => $types
-                    )
+                    ),
+                    'columns'      => $tableList[$source]['columns'],
+                    'report'       => $report
                 ));
 
                 $form->add('tableOrder', 'collection', array(
@@ -167,6 +170,21 @@ class ReportType extends AbstractType
                     'prototype'    => true,
                     'required'     => false
                 ));
+
+                // Templates for values
+                $form->add('value_template_yesno', 'yesno_button_group', array(
+                    'label'  => false,
+                    'mapped' => false,
+                    'attr'   => array(
+                        'class' => 'filter-value'
+                    ),
+                    'data'   => 1,
+                    'choice_list' => new ChoiceList(
+                        array(0, 1),
+                        array('mautic.core.form.no', 'mautic.core.form.yes')
+                    ),
+                ));
+
 
                 $graphList = $model->getGraphList($source);
                 $currentGraphs   = $report->getGraphs();
@@ -192,8 +210,7 @@ class ReportType extends AbstractType
                 ));
             };
 
-            $builder->addEventListener(
-                FormEvents::PRE_SET_DATA,
+            $builder->addEventListener(FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier) {
                     $formModifier($event->getForm(), $event->getData()->getSource());
                 }

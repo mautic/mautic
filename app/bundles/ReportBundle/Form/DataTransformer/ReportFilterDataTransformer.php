@@ -1,0 +1,73 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\ReportBundle\Form\DataTransformer;
+
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Symfony\Component\Form\DataTransformerInterface;
+
+class ReportFilterDataTransformer implements DataTransformerInterface
+{
+    /**
+     * @var string
+     */
+    private $columns;
+
+    /**
+     * @param array $columns
+     */
+    public function __construct($columns)
+    {
+        $this->columns = $columns;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function transform($filters)
+    {
+        if (!is_array($filters)) {
+            return array();
+        }
+
+        foreach ($filters as &$f) {
+            $type = $this->columns[$f['column']]['type'];
+            if (in_array($type, array('datetime', 'date', 'time'))) {
+                $dt = new DateTimeHelper($f['value'], '', 'utc');
+                $f['value'] = $dt->toLocalString();
+            }
+        }
+
+        return $filters;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function reverseTransform($filters)
+    {
+        if (!is_array($filters)) {
+            return array();
+        }
+
+        foreach ($filters as &$f) {
+            $type = $this->columns[$f['column']]['type'];
+            if (in_array($type, array('datetime', 'date', 'time'))) {
+                $dt = new DateTimeHelper($f['value'], '', 'local');
+                $f['value'] = $dt->toUtcString();
+            }
+        }
+
+        return $filters;
+    }
+}

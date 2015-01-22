@@ -49,7 +49,7 @@ class FilterSelectorType extends AbstractType
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => array('class' => 'control-label'),
+            'label_attr'  => array('class' => 'control-label filter-column'),
             'empty_value' => false,
             'required'    => false,
             'attr'        => array(
@@ -63,7 +63,7 @@ class FilterSelectorType extends AbstractType
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercondition',
-            'label_attr'  => array('class' => 'control-label'),
+            'label_attr'  => array('class' => 'control-label filter-condition'),
             'empty_value' => false,
             'required'    => false,
             'attr'        => array(
@@ -74,7 +74,7 @@ class FilterSelectorType extends AbstractType
         $builder->add('value', 'text', array(
             'label'      => 'mautic.report.report.label.filtervalue',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control filter-value'),
             'required'   => false
         ));
     }
