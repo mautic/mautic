@@ -100,9 +100,10 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => $type
                 );
             }
+            $columns = array_merge($columns, $fieldColumns);
             $data = array(
                 'display_name' => 'mautic.lead.lead.report.table',
-                'columns'      => array_merge($columns, $fieldColumns)
+                'columns'      => $columns
             );
             $event->addTable('leads', $data);
 

@@ -98,9 +98,10 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 )
             );
+            $columns = array_merge($columns, $event->getStandardColumns('p.', array('name')), $event->getCategoryColumns());
             $data    = array(
                 'display_name' => 'mautic.page.report.table',
-                'columns'      => array_merge($columns, $event->getCategoryColumns())
+                'columns'      => $columns
             );
             $event->addTable('pages', $data);
 

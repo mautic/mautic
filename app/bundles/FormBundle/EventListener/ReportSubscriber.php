@@ -54,9 +54,10 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 )
             );
+            $columns = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
             $data    = array(
                 'display_name' => 'mautic.form.form.report.table',
-                'columns'      => array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns())
+                'columns'      => $columns
             );
             $event->addTable('forms', $data);
             if ($event->checkContext('form.submissions')) {
