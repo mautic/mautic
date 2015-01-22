@@ -105,10 +105,9 @@ class ReportType extends AbstractType
             ));
 
             /** @var \Mautic\ReportBundle\Model\ReportModel $model */
-            $model   = $this->factory->getModel('report');
-            $report  = $options['data'];
+            $model     = $this->factory->getModel('report');
             $tableList = $options['table_list'];
-            $formModifier = function (FormInterface $form, $source = '') use ($model, $report, $tables, $tableList) {
+            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($model, $tables, $tableList) {
                 if(empty($source)) {
                     reset($tables);
                     $first_key = key($tables);
@@ -116,7 +115,6 @@ class ReportType extends AbstractType
                 }
 
                 list($columnList, $types) = $model->getColumnList($source);
-                $currentColumns = $report->getColumns();
                 if (is_array($currentColumns)) {
                     $orderColumns = array_values($currentColumns);
                     $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
@@ -155,7 +153,7 @@ class ReportType extends AbstractType
                         'data-column-types' => $types
                     ),
                     'columns'      => $tableList[$source]['columns'],
-                    'report'       => $report
+                    'report'       => $formData
                 ));
 
                 $form->add('tableOrder', 'collection', array(
@@ -187,7 +185,6 @@ class ReportType extends AbstractType
 
 
                 $graphList = $model->getGraphList($source);
-                $currentGraphs   = $report->getGraphs();
                 if (is_array($currentGraphs)) {
                     $orderColumns = array_values($currentGraphs);
                     $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
@@ -212,16 +209,17 @@ class ReportType extends AbstractType
 
             $builder->addEventListener(FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier) {
-                    $formModifier($event->getForm(), $event->getData()->getSource());
+                    $data = $event->getData();
+                    $formModifier($event->getForm(), $data->getSource(), $data->getColumns(), $data->getGraphs(), $data);
                 }
             );
 
-            $builder->get('source')->addEventListener(
-                FormEvents::POST_SUBMIT,
+            $builder->addEventListener(FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier) {
-                    // since we've added the listener to the child, we'll have to pass on
-                    // the parent to the callback functions!
-                    $formModifier($event->getForm()->getParent(), $event->getForm()->getData());
+                    $data    = $event->getData();
+                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : array();
+                    $columns = (isset($data['columns'])) ? $data['columns'] : array();
+                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }
             );
 
