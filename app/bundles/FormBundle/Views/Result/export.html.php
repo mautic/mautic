@@ -9,13 +9,12 @@
 
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 $view['slots']->set('pageTitle', $pageTitle);
-$view['slots']->set('mauticContent', 'formresult');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
     '%name%' => $form->getName()
 )));
 ?>
 
-<div class="table-responsive formresults">
+<div class="formresults">
     <table class="table table-hover table-striped table-bordered formresult-list">
         <thead>
         <tr>
@@ -27,7 +26,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
             foreach ($fields as $f):
             if (in_array($f->getType(), array('button', 'freetext'))) continue;
             ?>
-            <th class="col-formresult-field col-formresult-field<?php echo $f->getId(); ?>"><?php echo $f->getLabel(); ?></th>
+            <th class="col-formresult-field col-formresult-<?php echo $f->getType(); ?> col-formresult-field<?php echo $f->getId(); ?>"><?php echo $f->getLabel(); ?></th>
             <?php endforeach; ?>
         </tr>
         </thead>

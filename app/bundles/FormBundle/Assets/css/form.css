@@ -54,10 +54,10 @@ textarea.form-html {
     width: 100px;
 }
 
-.col-formresult-ip {
-    width: 125px;
-}
-
 .formresult-list th .input-group {
     margin-top: 10px;
+}
+
+.formresult-list th:not(.col-formresult-id) {
+    min-width: 125px;
 }

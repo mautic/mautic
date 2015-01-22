@@ -17,6 +17,8 @@ $buttons = array(
     array(
         'attr' => array(
             'target' => '_new',
+            'data-toggle' => '',
+            'class'       => 'btn btn-default btn-nospin',
             'href'   => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'html'))
         ),
         'btnText' => $view['translator']->trans('mautic.form.result.export.html'),
@@ -27,6 +29,8 @@ $buttons = array(
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'download',
+        'data-toggle' => '',
+        'class'       => 'btn btn-default btn-nospin',
         'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'csv'))
     ),
     'btnText' => $view['translator']->trans('mautic.form.result.export.csv'),
@@ -37,6 +41,8 @@ if (class_exists('PHPExcel')) {
     $buttons[] = array(
         'attr' => array(
             'data-toggle' => 'download',
+            'data-toggle' => '',
+            'class'       => 'btn btn-default btn-nospin',
             'href'        => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'xlsx'))
         ),
         'btnText' => $view['translator']->trans('mautic.form.result.export.xlsx'),

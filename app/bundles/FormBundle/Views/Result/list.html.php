@@ -12,7 +12,7 @@ endif;
 
 $formId = $form->getId();
 ?>
-<div class="table-responsive">
+<div class="table-responsive table-responsive-force">
     <table class="table table-hover table-striped table-bordered formresult-list">
         <thead>
             <tr>
@@ -74,13 +74,13 @@ $formId = $form->getId();
         <?php endif; ?>
         </tbody>
     </table>
-    <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems" => $totalCount,
-            "page"       => $page,
-            "limit"      => $limit,
-            "baseUrl"    =>  $view['router']->generate('mautic_form_results', array('objectId' => $form->getId())),
-            'sessionVar' => 'formresult.'.$formId
-        )); ?>
-    </div>
+</div>
+<div class="panel-footer">
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+        "totalItems" => $totalCount,
+        "page"       => $page,
+        "limit"      => $limit,
+        "baseUrl"    =>  $view['router']->generate('mautic_form_results', array('objectId' => $form->getId())),
+        'sessionVar' => 'formresult.'.$formId
+    )); ?>
 </div>
