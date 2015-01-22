@@ -15,9 +15,8 @@ if ($tmpl == 'index') {
 
     $view['slots']->set("headerTitle", $header);
 
+    $buttons = array();
     if (!empty($data) || !empty($graphs)) {
-        $buttons = array();
-
         $buttons[] = array(
             'attr'      => array(
                 'target'      => '_new',
