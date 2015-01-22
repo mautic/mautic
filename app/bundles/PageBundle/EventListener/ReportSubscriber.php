@@ -150,6 +150,10 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.page.report.hits.url',
                         'type'  => 'url'
                     ),
+                    $hitPrefix . 'url_title'       => array(
+                        'label' => 'mautic.page.report.hits.url_title',
+                        'type'  => 'string'
+                    ),
                     $hitPrefix . 'user_agent'        => array(
                         'label' => 'mautic.page.report.hits.user_agent',
                         'type'  => 'string'
@@ -173,10 +177,6 @@ class ReportSubscriber extends CommonSubscriber
                     $redirectHit . 'url'             => array(
                         'label' => 'mautic.page.report.hits.redirect_url',
                         'type'  => 'url'
-                    ),
-                    $redirectHit . 'url_title'       => array(
-                        'label' => 'mautic.page.report.hits.url_title',
-                        'type'  => 'string'
                     ),
                     $redirectHit . 'hits'            => array(
                         'label' => 'mautic.page.report.hits.redirect_hit_count',
