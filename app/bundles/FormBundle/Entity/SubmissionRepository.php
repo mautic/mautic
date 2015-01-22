@@ -172,7 +172,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
         if ($filter['column'] == 's.date_submitted') {
             $date  = $this->factory->getDate($filter['value'], 'Y-m-d')->toUtcString();
