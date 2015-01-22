@@ -445,7 +445,7 @@ class ReportController extends FormController
                         'objectId' => $entity->getId()
                     );
                     $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
-                    $template       = 'MauticReportBundle:Report:index';
+                    $template       = 'MauticReportBundle:Report:view';
                 }
             } else {
                 $viewParameters = array('page' => $page);
