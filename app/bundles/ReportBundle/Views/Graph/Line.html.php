@@ -20,7 +20,7 @@
                 <div class="pull-left pl-20">
                     <?php foreach ($graph['datasets'] as $dataset) : ?>
                         <span class="label label-default" style="background:<?php echo $dataset['strokeColor']; ?>">
-                            <?php echo $dataset['label']; ?>
+                            <?php echo $view['translator']->trans($graph['name'] . '.' . $dataset['label']); ?>
                         </span>
                     <?php endforeach; ?>
                 </div>
