@@ -1,7 +1,11 @@
 /* EmailBundle */
 
-.col-email-id, .col-email-abtest-sentcount, .col-email-abtest-readcount {
+.col-email-id {
     width: 75px;
+}
+
+.col-email-readcount, .col-email-pending, .col-email-sentcount {
+    width: 100px;
 }
 
 .col-email-actions {
@@ -13,7 +17,7 @@
 }
 
 .table-bordered {
-	border-left: 0; 
+	border-left: 0;
 }
 
 .table-bordered.email-list > thead > tr > th:first-child, .table-bordered.email-list > thead > tr > th:first-child, .table-bordered.email-list > tbody > tr > td:first-child {

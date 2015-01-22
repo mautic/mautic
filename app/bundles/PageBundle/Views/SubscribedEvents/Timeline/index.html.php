@@ -34,6 +34,10 @@ if ($event['extra']['hit']['dateLeft']) {
 					   data-toggle="ajax">
 					    <?php echo $item->getTitle(); ?>
 					</a>
+				<?php elseif (!empty($event['extra']['hit']['urlTitle'])) : ?>
+					<a href="<?php echo $event['extra']['hit']['url']; ?>" target="_blank">
+					    <?php echo $event['extra']['hit']['urlTitle']; ?>
+					</a>
 				<?php else : ?>
 					<?php echo $view['assets']->makeLinks($event['extra']['hit']['url']); ?>
 				<?php endif; ?>
@@ -47,6 +51,8 @@ if ($event['extra']['hit']['dateLeft']) {
 					<dd><?php echo $timeOnPage; ?></dd>
 					<dt><?php echo $view['translator']->trans('mautic.page.referrer'); ?>:</dt>
 					<dd><?php echo $event['extra']['hit']['referer'] ? $view['assets']->makeLinks($event['extra']['hit']['referer']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
+					<dt><?php echo $view['translator']->trans('mautic.page.url'); ?>:</dt>
+					<dd><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
 					<?php if (isset($event['extra']['hit']['sourceName'])) : ?>
 					<dt><?php echo $view['translator']->trans('mautic.core.source'); ?>:</dt>
 					<dd>

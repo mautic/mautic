@@ -106,6 +106,11 @@ class Hit
     private $url;
 
     /**
+     * @ORM\Column(name="url_title", type="string", nullable=true)
+     */
+    private $urlTitle;
+
+    /**
      * @ORM\Column(name="user_agent", type="string", nullable=true)
      */
     private $userAgent;
@@ -390,6 +395,30 @@ class Hit
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Set url title
+     *
+     * @param string $urlTitle
+     *
+     * @return Hit
+     */
+    public function setUrlTitle($urlTitle)
+    {
+        $this->urlTitle = $urlTitle;
+
+        return $this;
+    }
+
+    /**
+     * Get url title
+     *
+     * @return string
+     */
+    public function getUrlTitle()
+    {
+        return $this->urlTitle;
     }
 
     /**

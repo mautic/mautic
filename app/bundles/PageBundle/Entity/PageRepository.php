@@ -56,6 +56,7 @@ class PageRepository extends CommonRepository
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
             ->orderBy('hits', 'DESC')
             ->groupBy('p.id')
+            ->where('p.id > 0')
             ->setMaxResults($limit);
 
         return $q->execute()->fetchAll();

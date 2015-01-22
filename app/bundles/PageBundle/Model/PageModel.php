@@ -447,6 +447,25 @@ class PageModel extends FormModel
                     if (isset($query['language'])) {
                         $hit->setPageLanguage($query['language']);
                     }
+                    if (isset($query['title'])) {
+                        $hit->setUrlTitle($query['title']);
+                    }
+
+                    // Update lead fields if some data were sent in the URL query
+                    $leadFields = array();
+                    if (isset($query['email']) && $query['email']) {
+                        $leadFields['email'] = $query['email'];
+                    }
+                    if (isset($query['firstname']) && $query['firstname']) {
+                        $leadFields['firstname'] = $query['firstname'];
+                    }
+                    if (isset($query['lastname']) && $query['lastname']) {
+                        $leadFields['lastname'] = $query['lastname'];
+                    }
+                    if (count($leadFields)) {
+                        $leadModel->setFieldValues($lead, $leadFields);
+                        $leadModel->saveEntity($lead);
+                    }
                 }
             } else {
                 $pageURL = 'http';

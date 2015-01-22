@@ -59,7 +59,10 @@ class FormSubmitHelper
 				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead);
 			} elseif (isset($currentLead)) {
 				// Lead email
-		    	$leadFields = $currentLead->getFields();
+                if (!isset($leadFields) && $currentLead instanceof Lead) {
+                    $leadFields = $currentLead->getFields();
+                }
+		    	
 		    	if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
 
 		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), array('form', $form->getId()));
