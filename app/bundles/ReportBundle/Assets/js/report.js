@@ -69,7 +69,7 @@ Mautic.addReportRow = function(elId) {
 };
 
 Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
-	var types      = mQuery('#report_filters').data('column-types');
+	var types      = (typeof Mautic.reportPrototypeColumnTypes != 'undefined') ? Mautic.reportPrototypeColumnTypes : mQuery('#report_filters').data('column-types');
 	var newValue   = mQuery(filterColumn).val();
 	var filterId   = mQuery(filterColumn).attr('id');
 	var filterType = types[newValue];
@@ -133,6 +133,9 @@ Mautic.updateReportSourceData = function (context) {
 
 			// Remove any filters, they're no longer valid with different column lists
 			mQuery('#report_filters').find('div').remove().end();
+
+			// Update types
+			Mautic.reportPrototypeColumnTypes = response.types;
 
 			// Remove order
 			mQuery('#report_tableOrder').find('div').remove().end();

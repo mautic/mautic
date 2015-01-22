@@ -225,9 +225,11 @@ class ReportModel extends FormModel
                     $typeList[$column]   = $data['type'];
                 }
             }
+
+            $typeList = htmlspecialchars(json_encode($typeList), ENT_QUOTES, 'UTF-8');
         }
 
-        return array($columnList, htmlspecialchars(json_encode($typeList), ENT_QUOTES, 'UTF-8'));
+        return array($columnList, $typeList);
     }
 
     /**
