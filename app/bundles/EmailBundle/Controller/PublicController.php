@@ -68,9 +68,10 @@ class PublicController extends CommonFormController
 
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-                $event = new EmailSendEvent($content, $entity, $lead, $idHash);
+                $tokens = $stat->getTokens();
+                $event  = new EmailSendEvent($content, $entity, $lead, $idHash, array(), $tokens);
                 $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-                $content = $event->getContent();
+                $content = $event->getContent(true);
             }
 
             return new Response($content);

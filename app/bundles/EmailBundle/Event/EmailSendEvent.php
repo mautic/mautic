@@ -43,19 +43,25 @@ class EmailSendEvent extends CommonEvent
     private $source;
 
     /**
+     * @var array
+     */
+    private $tokens;
+
+    /**
      * @param string $content
      * @param Email  $email
      * @param Lead   $lead
      * @param string $idHash
      * @param array  $source
      */
-    public function __construct($content, Email $email = null, $lead = null, $idHash = '', $source = array())
+    public function __construct($content, Email $email = null, $lead = null, $idHash = '', $source = array(), $tokens = array())
     {
         $this->content = $content;
         $this->entity  = $email;
         $this->idHash  = $idHash;
         $this->lead    = $lead;
         $this->source  = $source;
+        $this->tokens  = $tokens;
     }
 
     /**
@@ -83,8 +89,12 @@ class EmailSendEvent extends CommonEvent
      *
      * @return array
      */
-    public function getContent()
+    public function getContent($finalContent = false)
     {
+        if ($finalContent && !empty($this->tokens)) {
+            // Parse custom tokens
+            $this->content = str_ireplace($this->tokens['search'], $this->tokens['replace'], $this->content);
+        }
         return $this->content;
     }
 

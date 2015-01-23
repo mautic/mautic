@@ -64,6 +64,10 @@ class MailHelper
      */
     private $email = null;
 
+    /**
+     * @var array
+     */
+    private $tokens = array();
 
     /**
      * @param MauticFactory $factory
@@ -111,9 +115,9 @@ class MailHelper
                 $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
                 if ($hasListeners) {
                     $content = $this->message->getBody();
-                    $event   = new EmailSendEvent($content, $this->email, $this->lead, $this->idHash, $this->source);
+                    $event   = new EmailSendEvent($content, $this->email, $this->lead, $this->idHash, $this->source, $this->tokens);
                     $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
-                    $content = $event->getContent();
+                    $content = $event->getContent(true);
                     $this->message->setBody($content);
                 }
             }
@@ -264,5 +268,13 @@ class MailHelper
     public function setEmail ($email)
     {
         $this->email = $email;
+    }
+
+    /**
+     * @param array $tokens
+     */
+    public function setCustomTokens(array $tokens)
+    {
+        $this->tokens = array_merge($this->tokens, $tokens);
     }
 }

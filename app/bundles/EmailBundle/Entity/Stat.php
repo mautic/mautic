@@ -105,6 +105,11 @@ class Stat
     private $sourceId;
 
     /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $tokens = array();
+
+    /**
      * @return mixed
      */
     public function getDateRead ()
@@ -358,5 +363,21 @@ class Stat
     public function setSourceId ($sourceId)
     {
         $this->sourceId = (int) $sourceId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTokens ()
+    {
+        return $this->tokens;
+    }
+
+    /**
+     * @param mixed $tokens
+     */
+    public function setTokens ($tokens)
+    {
+        $this->tokens = $tokens;
     }
 }
