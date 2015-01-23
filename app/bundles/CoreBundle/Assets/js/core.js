@@ -1490,6 +1490,13 @@ var Mautic = {
             var overlayTarget = mQuery(el).attr('data-overlay-target');
             if (!overlayTarget) overlayTarget = target;
 
+            if (overlayEnabled) {
+                mQuery(el).off('blur.livesearchOverlay');
+                mQuery(el).on('blur.livesearchOverlay', function() {
+                    mQuery(overlayTarget + ' .content-overlay').remove();
+                });
+            }
+
             if (!deleteKeyPressed && overlayEnabled) {
                 var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
                 if (mQuery(el).attr('data-overlay-background')) {
