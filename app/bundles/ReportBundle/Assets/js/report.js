@@ -134,11 +134,17 @@ Mautic.updateReportSourceData = function (context) {
 			// Remove any filters, they're no longer valid with different column lists
 			mQuery('#report_filters').find('div').remove().end();
 
+			// Reset index
+			mQuery('#report_filters').data('index', 0);
+
 			// Update types
 			Mautic.reportPrototypeColumnTypes = response.types;
 
 			// Remove order
 			mQuery('#report_tableOrder').find('div').remove().end();
+
+			// Reset index
+			mQuery('#report_tableOrder').data('index', 0);
 
 			// Store options to update prototype
 			Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
