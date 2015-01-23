@@ -496,7 +496,9 @@ var Mautic = {
      */
     activateChosenSelect: function(el) {
         mQuery(el).chosen({
-            placeholder_text_multiple: ' ',
+            placeholder_text_multiple: mauticLang['chosenChooseMore'],
+            placeholder_text_single: mauticLang['chosenChooseOne'],
+            no_results_text: mauticLang['chosenNoResults'],
             width: "100%",
             allow_single_deselect: true
         });
