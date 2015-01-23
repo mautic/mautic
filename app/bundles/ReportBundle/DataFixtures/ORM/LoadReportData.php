@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\DataFixtures\ORM;
+namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -48,12 +48,13 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
             foreach ($rows as $col => $val) {
                 if ($val != "NULL") {
                     $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('columns', 'filters'))) {
+                    if (in_array($col, array('columns', 'filters', 'graphs', 'tableOrder'))) {
                         $val = unserialize(stripslashes($val));
                     }
                     $report->$setter($val);
                 }
             }
+
             $manager->persist($report);
 
             $this->setReference('report-' . $key, $report);
