@@ -3,6 +3,14 @@
 $buildBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'Mautic\\') !== false) {
         $bundleBase = str_replace('Mautic', '', $bundle);
+        $directory  = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
+
+        // Check for a single config file
+        if (file_exists($directory.'/Config/config.php')) {
+            $config = include $directory.'/Config/config.php';
+        } else {
+            $config = array();
+        }
 
         return array(
             "base"              => str_replace('Bundle', '', $bundleBase),
@@ -11,7 +19,8 @@ $buildBundles = function($namespace, $bundle) use ($container) {
             "symfonyBundleName" => $bundle,
             "bundleClass"       => $namespace,
             "relative"          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
-            "directory"         => $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase
+            "directory"         => $directory,
+            "config"            => $config
         );
     }
     return false;
@@ -20,6 +29,15 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 // Note MauticAddon bundles so they can be applied as needed
 $buildAddonBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'MauticAddon\\') !== false) {
+        $directory = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
+
+        // Check for a single config file
+        if (file_exists($directory.'/Config/config.php')) {
+            $config = include $directory.'/Config/config.php';
+        } else {
+            $config = array();
+        }
+
         return array(
             "base"              => str_replace('Bundle', '', $bundle),
             "bundle"            => $bundle,
@@ -27,7 +45,8 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
             "symfonyBundleName" => $bundle,
             "bundleClass"       => $namespace,
             "relative"          => 'addons/' . $bundle,
-            "directory"         => dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle
+            "directory"         => $directory,
+            "config"            => $config
         );
     }
     return false;
