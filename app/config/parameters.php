@@ -29,15 +29,10 @@ foreach ($addons as $bundle) {
         $mauticParams = array_merge($mauticParams, $bundleParams);
     }
 }
-
-$mauticParams['supported_languages'] = array(
-    'en_US' => 'English - United States'
-);
-
-//include path settings
+// Include path settings
 $root  = $container->getParameter('kernel.root_dir');
 
-//Closure to replace %kernel_root_dir% placeholders
+// Closure to replace %kernel_root_dir% placeholders
 $replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder) {
     if (is_array($value)) {
         foreach ($value as &$v) {
@@ -48,21 +43,50 @@ $replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder
     }
 };
 
-//Include local paths
+// Include local paths
 require 'paths.php';
 $replaceRootPlaceholder($paths);
 
-//load parameters array from local configuration
+// Find available translations
+$locales = array();
+
+$extractLocales = function($dir) use (&$locales) {
+    $locale = $dir->getFilename();
+
+    // Check config
+    $configFile = $dir->getRealpath() . '/config.php';
+    if (file_exists($configFile)) {
+        $config           = include $configFile;
+        $locales[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
+    }
+};
+
+$defaultLocalesDir = new \Symfony\Component\Finder\Finder();
+$defaultLocalesDir->directories()->in($root . '/bundles/CoreBundle/Translations')->ignoreDotFiles(true)->depth('== 0');
+foreach ($defaultLocalesDir as $dir) {
+    $extractLocales($dir);
+}
+
+$installedLocales = new \Symfony\Component\Finder\Finder();
+$installedLocales->directories()->in($root . '/../' . $paths['translations'])->ignoreDotFiles(true)->depth('== 0');
+
+foreach ($installedLocales as $dir) {
+    $extractLocales($dir);
+}
+
+$mauticParams['supported_languages'] = $locales;
+
+// Load parameters array from local configuration
 if (isset($paths['local_config'])) {
     if (file_exists($paths['local_config'])) {
         include $paths['local_config'];
 
-        //override default with local
+        // Override default with local
         $mauticParams = array_merge($mauticParams, $parameters);
     }
 }
 
-//force local specific params
+// Force local specific params
 if (file_exists(__DIR__ . '/parameters_local.php')) {
     include __DIR__ . '/parameters_local.php';
 
@@ -70,17 +94,17 @@ if (file_exists(__DIR__ . '/parameters_local.php')) {
     $mauticParams = array_merge($mauticParams, $parameters);
 }
 
-//Set the paths
+// Set the paths
 $mauticParams['paths'] = $paths;
 
-//Add to the container
+// Add to the container
 foreach ($mauticParams as $k => &$v) {
-    //update the file paths in case $factory->getParameter() is used
+    // Update the file paths in case $factory->getParameter() is used
     $replaceRootPlaceholder($v);
 
-    //add to the container
+    // Add to the container
     $container->setParameter("mautic.{$k}", $v);
 }
 
-//used for passing params into factory/services
+// Used for passing params into factory/services
 $container->setParameter('mautic.parameters', $mauticParams);

@@ -39,10 +39,15 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $bundles   = $this->factory->getParameter('bundles');
-        $addons    = $this->factory->getEnabledAddons();
+        $core   = $this->factory->getParameter('bundles');
+        $addons = $this->factory->getEnabledAddons();
+
+        $bundles = array_merge($core, $addons);
+        unset($core, $addons);
+
         $catalogue = new MessageCatalogue($locale);
 
+        //Bundle translations
         foreach ($bundles as $name => $bundle) {
             //load translations
             $translations = $bundle['directory'] . '/Translations/' . $locale;
@@ -52,50 +57,60 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
                 $iniFiles->files()->in($translations)->name('*.ini');
 
                 foreach ($iniFiles as $file) {
-                    $iniFile = $file->getRealpath();
-                    $messages = parse_ini_file($iniFile, true);
-                    $domain  = substr($file->getFilename(), 0, -4);
-
-                    $thisCatalogue = parent::load($messages, $locale, $domain);
-                    $catalogue->addCatalogue($thisCatalogue);
+                    $this->loadTranslations($catalogue, $locale, $file);
                 }
             }
         }
 
-        foreach ($addons as $name => $bundle) {
-            //load translations
-            $translations = $bundle['directory'] . '/Translations/' . $locale;
-            if (file_exists($translations)) {
-
-                $iniFiles = new Finder();
-                $iniFiles->files()->in($translations)->name('*.ini');
-
-                foreach ($iniFiles as $file) {
-                    $iniFile = $file->getRealpath();
-                    $messages = parse_ini_file($iniFile, true);
-                    $domain  = substr($file->getFilename(), 0, -4);
-
-                    $thisCatalogue = parent::load($messages, $locale, $domain);
-                    $catalogue->addCatalogue($thisCatalogue);
-                }
-            }
-        }
-
-        //get some values for translation loading
+        //Theme translations
         $themeDir = $this->factory->getSystemPath('currentTheme', true);
-        if (file_exists($override = $themeDir . '/translations/' . $locale)) {
+        if (file_exists($themeTranslation = $themeDir . '/translations/' . $locale)) {
             $iniFiles = new Finder();
-            $iniFiles->files()->in($override)->name('*.ini');
+            $iniFiles->files()->in($themeTranslation)->name('*.ini');
             foreach ($iniFiles as $file) {
-                $iniFile  = $file->getRealPath();
-                $messages = parse_ini_file($iniFile, true);
-                $domain   = substr($file->getFilename(), 0, -4);
+                $this->loadTranslations($catalogue, $locale, $file);
+            }
+        }
 
-                $thisCatalogue = parent::load($messages, $locale, $domain);
-                $catalogue->addCatalogue($thisCatalogue);
+        //3rd Party translations
+        $translationsDir = $this->factory->getSystemPath('translations', true) . '/' . $locale;
+        if (file_exists($translationsDir)) {
+            $iniFiles = new Finder();
+            $iniFiles->files()->in($translationsDir)->name('*.ini');
+
+            foreach ($iniFiles as $file) {
+                $this->loadTranslations($catalogue, $locale, $file);
+            }
+        }
+
+        //Overrides
+        $overridesDir = $this->factory->getSystemPath('translations', true) . '/overrides/' . $locale;
+        if (file_exists($overridesDir)) {
+            $iniFiles = new Finder();
+            $iniFiles->files()->in($overridesDir)->name('*.ini');
+
+            foreach ($iniFiles as $file) {
+                $this->loadTranslations($catalogue, $locale, $file);
             }
         }
 
         return $catalogue;
+    }
+
+    /**
+     * Load the translation into the catalogue
+     *
+     * @param $catalogue
+     * @param $locale
+     * @param $file
+     */
+    private function loadTranslations($catalogue, $locale, $file)
+    {
+        $iniFile  = $file->getRealpath();
+        $messages = parse_ini_file($iniFile, true);
+        $domain   = substr($file->getFilename(), 0, -4);
+
+        $thisCatalogue = parent::load($messages, $locale, $domain);
+        $catalogue->addCatalogue($thisCatalogue);
     }
 }
