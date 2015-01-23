@@ -55,6 +55,12 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        // Set the user's default locale
+        $request = $event->getRequest();
+        if (!$request->hasPreviousSession()) {
+            return;
+        }
+
         $currentUser = $this->factory->getUser();
 
         //set the user's timezone
@@ -68,26 +74,16 @@ class CoreSubscriber extends CommonSubscriber
 
         date_default_timezone_set($tz);
 
-        //set the user's default locale
-        $request = $event->getRequest();
-        if (!$request->hasPreviousSession()) {
-            return;
-        }
-
-        // try to see if the locale has been set as a _locale routing parameter
-        if ($locale = $request->attributes->get('_locale')) {
-            $request->getSession()->set('_locale', $locale);
-        } else {
+        if (!$locale = $request->attributes->get('_locale')) {
             if (is_object($currentUser)) {
                 $locale = $currentUser->getLocale();
             }
             if (empty($locale)) {
                 $locale = $this->params['locale'];
             }
-
-            // if no explicit locale has been set on this request, use one from the session
-            $request->setLocale($request->getSession()->get('_locale', $locale));
         }
+
+        $request->setLocale($locale);
     }
 
     /**
