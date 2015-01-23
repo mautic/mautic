@@ -54,7 +54,7 @@
             </div>
         <?php else : ?>
             <div class="panel-body">
-                <p class="text-muted"><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+                <p class="text-muted"><?php echo $view['translator']->trans('mautic.report.table.noresults'); ?></p>
             </div>
         <?php endif; ?>
     </div>
