@@ -101,6 +101,9 @@ $contentMode = $form['contentMode']->vars['data'];
                     </div>
                 </div>
             <?php endforeach; ?>
+
+            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_feedback.html.php'); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
         </div>
     </div>
 </div>

@@ -26,5 +26,3 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
         </div>
     </a>
 </div>
-
-<?php echo $view->render('MauticCoreBundle:Helper:link_modal.html.php'); ?>

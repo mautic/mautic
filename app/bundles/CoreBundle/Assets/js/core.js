@@ -2649,5 +2649,44 @@ var Mautic = {
         mQuery('#BuilderLinkModal input[name="link"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
+    },
+
+
+    showBuilderFeedbackModal: function (event, ui, editorId) {
+        // Reset in case the modal wasn't closed via cancel
+        mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
+        mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', '');
+
+        var token  = mQuery(ui.draggable).data('token');
+        mQuery('#BuilderFeedbackModal input[name="editor"]').val(editorId);
+        mQuery('#BuilderFeedbackModal input[name="token"]').val(token);
+
+        var placeholder = token.match(/%(.*?)%/);
+        if (placeholder && placeholder[1]) {
+            mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', placeholder[1]);
+        }
+
+        //append the modal to the builder or else it won't display
+        mQuery('#BuilderFeedbackModal').appendTo('body');
+        mQuery('#BuilderFeedbackModal').modal('show');
+    },
+
+    /**
+     * Insert input feedback into ckeditor
+     */
+    insertBuilderFeedback: function () {
+        var editorId = mQuery('#BuilderFeedbackModal input[name="editor"]').val();
+        var token    = mQuery('#BuilderFeedbackModal input[name="token"]').val();
+        var feedback = mQuery('#BuilderFeedbackModal input[name="feedback"]').val();
+
+        if (feedback) {
+            token = token.replace(/%(.*?)%/, feedback);
+            Mautic.insertBuilderEditorToken(editorId, token);
+        }
+
+        mQuery('#BuilderFeedbackModal').modal('hide');
+        mQuery('#BuilderFeedbackModal input[name="editor"]').val('');
+        mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
+        mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', '');
     }
 };
