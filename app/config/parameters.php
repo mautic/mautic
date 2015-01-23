@@ -13,20 +13,20 @@ $addons  = $container->getParameter('mautic.addon.bundles');
 
 $mauticParams = array();
 foreach ($bundles as $bundle) {
-    if (file_exists($bundle['directory'].'/Config/parameters.php')) {
+    if (!empty($bundle['config']['parameters'])) {
+        $mauticParams = array_merge($mauticParams, $bundle['config']['parameters']);
+    } else if (file_exists($bundle['directory'].'/Config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Config/parameters.php';
-        foreach ($bundleParams as $k => $v) {
-            $mauticParams[$k] = $v;
-        }
+        $mauticParams = array_merge($mauticParams, $bundleParams);
     }
 }
 
 foreach ($addons as $bundle) {
-    if (file_exists($bundle['directory'].'/Config/parameters.php')) {
+    if (!empty($bundle['config']['parameters'])) {
+        $mauticParams = array_merge($mauticParams, $bundle['config']['parameters']);
+    } elseif (file_exists($bundle['directory'].'/Config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Config/parameters.php';
-        foreach ($bundleParams as $k => $v) {
-            $mauticParams[$k] = $v;
-        }
+        $mauticParams = array_merge($mauticParams, $bundleParams);
     }
 }
 
