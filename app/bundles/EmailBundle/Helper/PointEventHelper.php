@@ -62,7 +62,8 @@ class PointEventHelper
                     'firstname' => $leadFields['core']['firstname']['value'],
                     'lastname'  => $leadFields['core']['lastname']['value']
                 );
-                $model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('trigger', $trigger->getId()));
+                $options = array('source' => array('trigger', $trigger->getId()));
+                $model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
             }
         }
     }

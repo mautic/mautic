@@ -20,7 +20,7 @@ class FormSubmitHelper
      *
      * @return array
      */
-    public static function sendEmail(Action $action, MauticFactory $factory, $feedback)
+    public static function sendEmail($tokens, Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
         $emailId    = (isset($properties['useremail'])) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
@@ -56,16 +56,15 @@ class FormSubmitHelper
 
 			if (isset($properties['user_id']) && $properties['user_id']) {
 				// User email
-				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead);
+				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $tokens);
 			} elseif (isset($currentLead)) {
-				// Lead email
-                if (!isset($leadFields) && $currentLead instanceof Lead) {
-                    $leadFields = $currentLead->getFields();
-                }
-		    	
-		    	if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-
-		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), array('form', $form->getId()));
+		    	if (isset($leadFields['email'])) {
+					$options = array(
+						'source' 		   => array('form', $form->getId()),
+						'tokens' 		   => $tokens,
+						'ignoreLeadChecks' => true
+					);
+		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), $options);
 		    	}
 		    }
 		}

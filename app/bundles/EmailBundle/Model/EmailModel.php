@@ -559,10 +559,16 @@ class EmailModel extends FormModel
         //get email settings such as templates, weights, etc
         $emailSettings = $this->getEmailSettings($email);
         $saveEntities  = array();
-
+        $options       = array(
+            'source'          => array('email', $email->getId()),
+            'emailSettings'   => $emailSettings,
+            'returnEntities'  => true,
+            'ignoreLeadCheck' => true
+        );
         foreach ($lists as $list) {
-            $leads = $this->getPendingLeads($email, $list->getId());
-            $listSaveEntities = $this->sendEmail($email, $leads, array('email', $email->getId()), $emailSettings, $list->getId(), true, false);
+            $options['listId'] = $list->getId();
+            $leads             = $this->getPendingLeads($email, $list->getId());
+            $listSaveEntities  = $this->sendEmail($email, $leads, $options);
             if (!empty($listSaveEntities)) {
                 $saveEntities = array_merge($saveEntities, $listSaveEntities);
             }
@@ -667,17 +673,25 @@ class EmailModel extends FormModel
      *
      * @param       $email
      * @param       $leads
-     * @param       $source array('model', 'id')
-     * @param array $emailSettings
-     * @param null  $listId
-     * @param bool  $returnEntities
-     * @param bool  $ignoreLeadChecks  If true, do not contact and already sent checks will be ignored
+     * @param       $options = array()
+     *     array source array('model', 'id')
+     *     array emailSettings
+     *     int   listId
+     *     bool  returnEntities; defaults to false
+     *     bool  ignoreLeadChecks  If true, do not contact and already sent checks will be ignored, defaults to false
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmail ($email, $leads, $source = null, $emailSettings = array(), $listId = null, $returnEntities = false, $ignoreLeadChecks = false)
+    public function sendEmail ($email, $leads, $options = array())
     {
+        $source           = (isset($options['source'])) ? $options['source'] : null;
+        $emailSettings    = (isset($options['emailSettings'])) ? $options['emailSettings'] : array();
+        $listId           = (isset($options['listId'])) ? $options['listId'] : null;
+        $returnEntities   = (isset($options['returnEntities'])) ? $options['returnEntities'] : false;
+        $ignoreLeadChecks = (isset($options['ignoreLeadChecks'])) ? $options['ignoreLeadChecks'] : false;
+        $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
+
         if (!$email->getId()) {
             return ($returnEntities) ? array() : false;
         }
@@ -752,6 +766,7 @@ class EmailModel extends FormModel
             $mailer->setIdHash($idHash);
             $mailer->setSource($source);
             $mailer->setEmail($useEmail['entity']);
+            $mailer->setCustomTokens($tokens);
 
             if ($useEmail['entity']->getContentMode() == 'builder') {
                 $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
@@ -796,7 +811,8 @@ class EmailModel extends FormModel
                 $stat->setSource($source[0]);
                 $stat->setSourceId($source[1]);
             }
-
+            //Set custom tokens specific to this email
+            $stat->setTokens($tokens);
             $saveEntities[] = $stat;
 
             //increase the sent counts
@@ -827,11 +843,12 @@ class EmailModel extends FormModel
      * @param       $email
      * @param       $users
      * @param mixed $lead
+     * @param array $tokens
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser ($email, $users, $lead = null)
+    public function sendEmailToUser ($email, $users, $lead = null, $tokens = array())
     {
         if (!$emailId = $email->getId()) {
             return false;
@@ -871,6 +888,7 @@ class EmailModel extends FormModel
 
             $mailer = $this->factory->getMailer();
             $mailer->setLead($lead);
+            $mailer->setCustomTokens($tokens);
 
             if ($email->getContentMode() == 'builder') {
                 $mailer->setTemplate('MauticEmailBundle::public.html.php', array(

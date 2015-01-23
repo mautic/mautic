@@ -24,7 +24,7 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateEmailTrigger(Email $eventDetails = null, $event)
+    public static function validateEmailTrigger (Email $eventDetails = null, $event)
     {
         if ($eventDetails == null) {
             return true;
@@ -47,6 +47,7 @@ class CampaignEventHelper
             return false;
         }
         */
+
         return true;
     }
 
@@ -57,7 +58,7 @@ class CampaignEventHelper
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public static function sendEmailAction(MauticFactory $factory, $lead, $event)
+    public static function sendEmailAction (MauticFactory $factory, $lead, $event)
     {
         $emailSent = false;
 
@@ -65,10 +66,10 @@ class CampaignEventHelper
             $fields = $lead->getFields();
 
             $leadCredentials = array(
-                'id' 		=> $lead->getId(),
-                'email' 	=> $fields['core']['email']['value'],
+                'id'        => $lead->getId(),
+                'email'     => $fields['core']['email']['value'],
                 'firstname' => $fields['core']['firstname']['value'],
-                'lastname' 	=> $fields['core']['lastname']['value']
+                'lastname'  => $fields['core']['lastname']['value']
             );
         } else {
             $leadCredentials = $lead;
@@ -78,12 +79,13 @@ class CampaignEventHelper
             /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
             $emailModel = $factory->getModel('email');
 
-            $emailId = (int) $event['properties']['email'];
+            $emailId = (int)$event['properties']['email'];
 
-            $email   = $emailModel->getEntity($emailId);
+            $email = $emailModel->getEntity($emailId);
 
             if ($email != null && $email->isPublished()) {
-                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('campaign', $event['campaign']['id']));
+                $options = array('source' => array('campaign', $event['campaign']['id']));
+                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
                 $emailSent = true;
             }
         }
