@@ -93,7 +93,7 @@ class ReportSubscriber extends CommonSubscriber
                 $context = 'form.submissions';
                 $event->addGraph($context, 'line', 'mautic.form.graph.line.submissions');
                 $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
-                $event->addGraph($context, 'table', 'autic.form.table.most.submitted');
+                $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
             }
         }
     }
@@ -168,7 +168,6 @@ class ReportSubscriber extends CommonSubscriber
                     $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
 
                     $queryBuilder->select('fs.form_id as form, fs.date_submitted as dateSubmitted');
-                    $event->buildWhere($queryBuilder);
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
                         ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
                     $submissions = $queryBuilder->execute()->fetchAll();
