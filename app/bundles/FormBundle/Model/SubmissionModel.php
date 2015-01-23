@@ -70,6 +70,7 @@ class SubmissionModel extends CommonFormModel
         $errors     = array();
         $fieldArray = array();
         $results    = array();
+        $tokens     = array();
 
         foreach ($fields as $f) {
             $id    = $f->getId();
@@ -154,6 +155,10 @@ class SubmissionModel extends CommonFormModel
 
             //save the result
             $results[$alias] = $value;
+
+            $tokens['search'][$alias]  = "{formfield={$alias}}";
+            $tokens['replace'][$alias] = $value;
+
         }
 
         $submission->setResults($results);
@@ -184,7 +189,8 @@ class SubmissionModel extends CommonFormModel
             'factory'  => $this->factory,
             'feedback' => array(),
             'fields'   => $fieldArray,
-            'form'     => $form
+            'form'     => $form,
+            'tokens'   => $tokens
         );
 
         foreach ($actions as $action) {
