@@ -12,7 +12,7 @@ if ($tmpl == 'index')
 $dataCount   = count($data);
 $columnOrder = $report->getColumns();
 $graphOrder  = $report->getGraphs();
-$startCount  = ($reportPage * $limit) - ($dataCount - 1);
+$startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1) : 1;
 ?>
 
 <?php if (!empty($columnOrder)): ?>
