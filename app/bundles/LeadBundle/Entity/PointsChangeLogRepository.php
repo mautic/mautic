@@ -108,10 +108,8 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function getMostPoints($query, $limit = 10, $offset = 0)
     {
-        $query->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lp.lead_id = l.id')
-            ->setMaxResults($limit)
-            ->setFirstResult($offset);
+        $query->setMaxResults($limit)
+                ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
         return $results;
@@ -128,10 +126,8 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function getMostLeads($query, $limit = 10, $offset = 0)
     {
-        $query->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp', 'lp.lead_id = l.id')
-            ->setMaxResults($limit)
-            ->setFirstResult($offset);
+        $query->setMaxResults($limit)
+                ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
         return $results;
