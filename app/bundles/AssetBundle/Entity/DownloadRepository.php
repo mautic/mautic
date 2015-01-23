@@ -114,8 +114,6 @@ class DownloadRepository extends CommonRepository
     public function getMostDownloaded($query, $limit = 10, $offset = 0)
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
-            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
-            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
             ->groupBy('a.id')
             ->orderBy('downloads', 'DESC')
             ->setMaxResults($limit)
@@ -140,8 +138,6 @@ class DownloadRepository extends CommonRepository
     public function getTopReferrers($query, $limit = 10, $offset = 0)
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
-            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
-            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
             ->groupBy('ad.referer')
             ->orderBy('downloads', 'DESC')
             ->setMaxResults($limit)
@@ -164,8 +160,6 @@ class DownloadRepository extends CommonRepository
     public function getHttpStatuses($query)
     {
         $query->select('ad.code as status, count(ad.code) as count')
-            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
-            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
