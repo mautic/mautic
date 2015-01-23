@@ -22,6 +22,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
         'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.form.form.help.searchcommands',
         'action'      => $currentRoute,
         'routeBase'   => 'form',
         'templateButtons' => array(

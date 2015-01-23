@@ -12,7 +12,7 @@ if ($tmpl == 'index'):
 endif;
 ?>
 
-<div class="table-responsive">
+<div class="table-responsive panel-collapse pull out page-list">
     <table class="table table-hover table-striped table-bordered client-list">
         <thead>
         <tr>
@@ -65,6 +65,7 @@ endif;
         <?php endforeach; ?>
         </tbody>
     </table>
+    <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems" => count($items),
         "page"       => $page,
@@ -73,4 +74,5 @@ endif;
         'sessionVar' => 'client',
         'tmpl'       => $tmpl
     )); ?>
+    </div>
 </div>

@@ -19,5 +19,17 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'langVar'   => 'api.client'
 )));
 
-$view['slots']->output('_content');
 ?>
+
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
+        'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.api.client.help.searchcommands',
+        'action'      => $currentRoute,
+        'routeBase'   => 'client',
+        'templateButtons' => array()
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>

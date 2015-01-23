@@ -85,7 +85,8 @@ class ClientController extends FormController
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
-            'tmpl'        => $tmpl
+            'tmpl'        => $tmpl,
+            'searchValue' => $filter
         );
 
         return $this->delegateView(array(

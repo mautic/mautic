@@ -14,7 +14,11 @@ include 'action_button_helper.php';
     <div class="box-layout">
         <div class="col-xs-6 va-m">
             <?php if (isset($searchValue)): ?>
-            <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $action)); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
+                    'searchValue' => $searchValue,
+                    'action'      => $action,
+                    'searchHelp'  => (isset($searchHelp)) ? $searchHelp : ''
+                )); ?>
             <?php endif; ?>
         </div>
         <div class="col-xs-6 va-m text-right">

@@ -22,6 +22,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
 <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
     'searchValue' => $searchValue,
+    'searchHelp'  => 'mautic.user.user.help.searchcommands',
     'action'      => $currentRoute,
     'langVar'     => 'user.user',
     'routeBase'   => 'user',

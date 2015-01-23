@@ -30,6 +30,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     </div>*/ ?>
     <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
         'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.category.help.searchcommands',
         'action'      => $currentRoute,
         'routeBase'   => 'category',
         'templateButtons' => array(
