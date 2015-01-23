@@ -444,20 +444,32 @@ class MauticFactory
                     if ($e instanceof FileNotFoundException) {
                         //theme wasn't found so just use the first available
                         $themes = $this->getInstalledThemes();
-                        foreach ($themes as $installedTheme => $name) {
-                            try {
-                                if (isset($themeHelpers[$installedTheme])) {
-                                    //theme found so return it
-                                    return $themeHelpers[$installedTheme];
-                                } else {
-                                    $themeHelpers[$installedTheme] = new ThemeHelper($this, $installedTheme);
-                                    //found so use this theme
-                                    $theme = $installedTheme;
-                                    $found = true;
-                                    break;
+
+                        if ($theme !== 'current') {
+                            //first try the default theme
+                            $default = $this->getParameter('theme');
+                            if (isset($themes[$default])) {
+                                $themeHelpers[$default] = new ThemeHelper($this, $default);
+                                $found                  = true;
+                            }
+                        }
+
+                        if (empty($found)) {
+                            foreach ($themes as $installedTheme => $name) {
+                                try {
+                                    if (isset($themeHelpers[$installedTheme])) {
+                                        //theme found so return it
+                                        return $themeHelpers[$installedTheme];
+                                    } else {
+                                        $themeHelpers[$installedTheme] = new ThemeHelper($this, $installedTheme);
+                                        //found so use this theme
+                                        $theme = $installedTheme;
+                                        $found = true;
+                                        break;
+                                    }
+                                } catch (\Exception $e) {
+                                    continue;
                                 }
-                            } catch (\Exception $e) {
-                                continue;
                             }
                         }
                     }

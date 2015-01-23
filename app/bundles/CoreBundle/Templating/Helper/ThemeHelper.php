@@ -79,6 +79,16 @@ class ThemeHelper
     }
 
     /**
+     * Return  name of the template
+     *
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->config['name'];
+    }
+
+    /**
      * Get the theme's config
      *
      * @return mixed
