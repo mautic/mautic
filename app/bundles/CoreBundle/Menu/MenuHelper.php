@@ -9,6 +9,9 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\ItemInterface;
@@ -104,11 +107,33 @@ class MenuHelper extends Helper
      *
      * @param $items
      */
-    static public function createMenuStructure(&$items, $depth = 0)
+    static public function createMenuStructure(&$items, CorePermissions $security, Request $request, User $user, $depth = 0)
     {
         foreach ($items as &$i) {
             if (!is_array($i) || empty($i)) {
                 continue;
+            }
+
+            // Category shortcut
+            if (isset($i['category'])) {
+                $bundleName = $i['category']['bundle'];
+                $i = array(
+                    'access'          => $bundleName . ':categories:view',
+                    'route'           => 'mautic_category_index',
+                    'id'              => 'mautic_{$bundleName}category_index',
+                    'routeParameters' => array('bundle' => $bundleName),
+                );
+            }
+
+            // Check to see if menu is restricted
+            if (isset($i['access'])) {
+                if ($i['access'] == 'admin') {
+                    if (!$user->isAdmin()) {
+                        continue;
+                    }
+                } elseif (!$security->isGranted($i['access'], 'MATCH_ONE')) {
+                    continue;
+                }
             }
 
             //Set ID to route name
@@ -140,7 +165,7 @@ class MenuHelper extends Helper
 
             //Repeat for sub items
             if (isset($i['children'])) {
-                self::createMenuStructure($i['children'], $depth + 1);
+                self::createMenuStructure($i['children'], $security, $request, $user, $depth + 1);
             }
         }
     }

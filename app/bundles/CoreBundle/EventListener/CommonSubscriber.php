@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Symfony\Component\Routing\Route;
 
 /**
  * Class CoreSubscriber
@@ -107,15 +108,19 @@ class CommonSubscriber implements EventSubscriberInterface
         $bundles   = $this->factory->getParameter('bundles');
         $menuItems = array();
         foreach ($bundles as $bundle) {
-            //check common place
-            $path = $bundle['directory'] . "/Config/menu/$name.php";
+            if (!empty($bundle['config']['menu'][$name])) {
+                $this->loadMenuFromConfig($bundle['config']['menu'][$name]);
+            } else {
+                //check common place
+                $path = $bundle['directory'] . "/Config/menu/$name.php";
 
-            if (file_exists($path)) {
-                $config      = include $path;
-                $menuItems[] = array(
-                    'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
-                    'items'    => !isset($config['items']) ? $config : $config['items']
-                );
+                if (file_exists($path)) {
+                    $config      = include $path;
+                    $menuItems[] = array(
+                        'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
+                        'items'    => !isset($config['items']) ? $config : $config['items']
+                    );
+                }
             }
         }
 
@@ -126,15 +131,19 @@ class CommonSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            //check common place
-            $path = $bundle['directory'] . "/Config/menu/$name.php";
+            if (!empty($bundle['config']['menu'][$name])) {
+                $this->loadMenuFromConfig($bundle['config']['menu'][$name]);
+            } else {
+                //check common place
+                $path = $bundle['directory'] . "/Config/menu/$name.php";
 
-            if (file_exists($path)) {
-                $config      = include $path;
-                $menuItems[] = array(
-                    'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
-                    'items'    => !isset($config['items']) ? $config : $config['items']
-                );
+                if (file_exists($path)) {
+                    $config      = include $path;
+                    $menuItems[] = array(
+                        'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
+                        'items'    => !isset($config['items']) ? $config : $config['items']
+                    );
+                }
             }
         }
 
@@ -155,6 +164,19 @@ class CommonSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Add menu items from Mautic config file
+     *
+     * @param $menu
+     */
+    private function loadMenuFromConfig($menu)
+    {
+        return array(
+            'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
+            'items'    => !isset($menu['items']) ? $menu : $menu['items']
+        );
+    }
+
+    /**
      * Find and add menu items
      *
      * @param MauticEvents\IconEvent $event
@@ -165,29 +187,37 @@ class CommonSubscriber implements EventSubscriberInterface
     {
         $security = $event->getSecurity();
         $request  = $this->factory->getRequest();
+        $user     = $this->factory->getUser();
         $bundles  = $this->factory->getParameter('bundles');
 
-        $fetchIcons = function($bundle) use (&$event, $security, $request) {
-            //check common place
-            $path = $bundle['directory'] . "/Config/menu/main.php";
+        $fetchIcons = function($bundle) use (&$event, $security, $request, $user) {
+            if (!empty($bundle['config']['menu']['main'])) {
+                $items = (!isset($bundle['config']['menu']['items']['main']) ? $bundle['config']['menu']['main'] : $bundle['config']['menu']['items']['main']);
+            } else {
+                //check common place
+                $path = $bundle['directory'] . "/Config/menu/main.php";
 
-            if (file_exists($path)) {
-                $config = include $path;
-                $items  = (!isset($config['items']) ? $config : $config['items']);
-                    MenuHelper::createMenuStructure($items);
-                    foreach ($items as $item) {
-                        if (isset($item['iconClass']) && isset($item['id'])) {
-                            $id = explode('_', $item['id']);
-                            if (isset($id[1])) {
-                                // some bundle names are in plural, create also singular item
-                                if (substr($id[1], -1) == 's') {
-                                    $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
-                                }
-                                $event->addIcon($id[1], $item['iconClass']);
+                if (file_exists($path)) {
+                    $config = include $path;
+                    $items  = (!isset($config['items']) ? $config : $config['items']);
+                }
+            }
+
+            if (!empty($items)) {
+                MenuHelper::createMenuStructure($items, $security, $request, $user);
+                foreach ($items as $item) {
+                    if (isset($item['iconClass']) && isset($item['id'])) {
+                        $id = explode('_', $item['id']);
+                        if (isset($id[1])) {
+                            // some bundle names are in plural, create also singular item
+                            if (substr($id[1], -1) == 's') {
+                                $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                             }
+                            $event->addIcon($id[1], $item['iconClass']);
                         }
                     }
                 }
+            }
         };
 
         foreach ($bundles as $bundle) {
@@ -217,9 +247,14 @@ class CommonSubscriber implements EventSubscriberInterface
     {
         $bundles = $this->factory->getParameter('bundles');
         foreach ($bundles as $bundle) {
-            $routing = $bundle['directory'] . "/Config/routing/$name.php";
-            if (file_exists($routing)) {
-                $event->addRoutes($routing);
+            if (!empty($bundle['config']['routes'])) {
+                $collection = $event->getCollection();
+                $this->loadRoutesFromConfig($collection, $bundle['config']['routes']);
+            } else {
+                $routing = $bundle['directory'] . "/Config/routing/$name.php";
+                if (file_exists($routing)) {
+                    $event->addRoutes($routing);
+                }
             }
         }
 
@@ -227,11 +262,37 @@ class CommonSubscriber implements EventSubscriberInterface
         $addons = $this->factory->getParameter('addon.bundles');
         foreach ($addons as $bundle) {
             if ($this->addonHelper->isEnabled($bundle['bundle'])) {
-                $routing = $bundle['directory'] . "/Config/routing/$name.php";
-                if (file_exists($routing)) {
-                    $event->addRoutes($routing);
+                if (!empty($bundle['config']['routes'])) {
+                    $collection = $event->getCollection();
+                    $this->loadRoutesFromConfig($collection, $bundle['config']['routes']);
+                } else {
+                    $routing = $bundle['directory'] . "/Config/routing/$name.php";
+                    if (file_exists($routing)) {
+                        $event->addRoutes($routing);
+                    }
                 }
             }
+        }
+    }
+
+    /**
+     * Adds routes from a Mautic config file
+     *
+     * @param $collection
+     * @param $routes
+     */
+    private function loadRoutesFromConfig($collection, $routes)
+    {
+        foreach ($routes as $name => $details) {
+            // Set defaults and controller
+            $defaults = (!empty($details['defaults'])) ? $details['defaults'] : array();
+            $defaults['_controller'] = $details['controller'];
+
+            // Set requirements
+            $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+
+            // Add the route
+            $collection->add($name, new Route($details['path'], $defaults, $requirements));
         }
     }
 }

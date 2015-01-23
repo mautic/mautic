@@ -71,7 +71,7 @@ class MenuEvent extends Event
     {
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
         if (!$isRoot) {
-            MenuHelper::createMenuStructure($items);
+            MenuHelper::createMenuStructure($items, $this->getSecurity(), $this->getRequest(), $this->getUser());
         }
 
         if ($isRoot) {
