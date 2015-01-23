@@ -35,10 +35,18 @@ class TranslationsPass implements CompilerPassInterface
         $translator = $container->findDefinition('translator.default');
         $factory    = $container->get('mautic.factory');
         if ($translator !== null) {
+
+            // Disable cache for dev environment
+            if ($factory->getEnvironment() == 'dev') {
+                $translatorOptions = $translator->getArgument(3);
+                $translatorOptions['cache_dir'] = null;
+                $translator->replaceArgument(3, $translatorOptions);
+            }
+
             $supportedLanguages = $factory->getParameter('supported_languages');
 
             foreach ($supportedLanguages as $locale => $name) {
-                //force the mautic translation loader
+                //force the Mautic translation loader
                 $translator->addMethodCall('addResource', array(
                     'mautic', null, $locale, 'messages'
                 ));
