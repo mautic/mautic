@@ -10,9 +10,6 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\ReportBundle\Generator\ReportGenerator;
-use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\HttpFoundation;
 
 /**

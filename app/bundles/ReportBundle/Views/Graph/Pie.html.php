@@ -36,7 +36,8 @@
                         <?php endif; ?>
                         <?php $style .= '"'; ?>
                         <span class="label label-default" <?php echo $style; ?>>
-                            <?php echo $item['label'] ?>:
+                            <?php $label = (isset($options['translate']) && $options['translate'] === false) ? $item['label'] : $view['translator']->trans($graph['name'] . '.' . $item['label']); ?>
+                            <?php echo $label; ?>:
                             <?php if (isset($item['value'])) : ?>
                                 <?php echo $item['value'] ?>x
                             <?php endif; ?>

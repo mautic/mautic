@@ -205,11 +205,9 @@ class ReportSubscriber extends CommonSubscriber
                 $context = 'page.hits';
                 $event->addGraph($context, 'line',  'mautic.page.graph.line.hits');
                 $event->addGraph($context, 'line',  'mautic.page.graph.line.time.on.site');
-                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.time.on.site');
-                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.time.on.site');
-                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.time.on.site');
+                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.time.on.site', array('translate' => false));
                 $event->addGraph($context, 'pie',   'mautic.page.graph.pie.new.vs.returning');
-                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.languages');
+                $event->addGraph($context, 'pie',   'mautic.page.graph.pie.languages', array('translate' => false));
                 $event->addGraph($context, 'table', 'mautic.page.table.referrers');
                 $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
                 $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');

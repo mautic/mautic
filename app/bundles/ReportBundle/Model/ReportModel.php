@@ -244,8 +244,8 @@ class ReportModel extends FormModel
 
         // First sort
         $translated = array();
-        foreach ($graphData as $key => $type) {
-            $translated[$key] = $this->translator->trans($key) . " (" . $this->translator->trans('mautic.report.graph.' . $type);
+        foreach ($graphData as $key => $details) {
+            $translated[$key] = $this->translator->trans($key) . " (" . $this->translator->trans('mautic.report.graph.' . $details['type']);
         }
         asort($translated);
 
@@ -477,17 +477,22 @@ class ReportModel extends FormModel
                     $query = $reportGenerator->getQuery();
                 }
 
-                $graphOptions = array();
+                $eventGraphs = array();
                 foreach ($selectedGraphs as $g) {
                     if (isset($availableGraphs[$g])) {
-                        $graphOptions[$g] = array(
-                            'options' => !empty($options['graphName']) ? $options : array(),
-                            'type'    => $availableGraphs[$g]
+                        $graphOptions = isset($availableGraphs[$g]['options']) ? $availableGraphs[$g]['options'] : array();
+
+                        if (!empty($options['graphName'])) {
+                            $graphOptions = array_merge($graphOptions, $options);
+                        }
+                        $eventGraphs[$g] = array(
+                            'options' => $graphOptions,
+                            'type'    => $availableGraphs[$g]['type']
                         );
                     }
                 }
 
-                $event = new ReportGraphEvent($entity, $graphOptions, $query);
+                $event = new ReportGraphEvent($entity, $eventGraphs, $query);
                 $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
                 $graphs = $event->getGraphs();
             }

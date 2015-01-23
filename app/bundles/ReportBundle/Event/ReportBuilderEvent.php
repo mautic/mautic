@@ -300,10 +300,13 @@ class ReportBuilderEvent extends Event
      * @param $type
      * @param $name
      */
-    public function addGraph($context, $type, $graphId)
+    public function addGraph($context, $type, $graphId, $options = array())
     {
         if (in_array($type, $this->supportedGraphs)) {
-            $this->graphArray[$context][$graphId] = $type;
+            $this->graphArray[$context][$graphId] = array(
+                'options' => $options,
+                'type'    => $type
+            );
         }
     }
 

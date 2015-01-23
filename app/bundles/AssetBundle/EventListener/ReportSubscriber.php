@@ -113,7 +113,7 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addGraph($context, 'line', 'mautic.asset.graph.line.downloads');
                 $event->addGraph($context, 'table', 'mautic.asset.table.most.downloaded');
                 $event->addGraph($context, 'table', 'mautic.asset.table.top.referrers');
-                $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses');
+                $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses', array('translate' => false));
             }
         }
     }

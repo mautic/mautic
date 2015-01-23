@@ -18,12 +18,6 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ReportGraphEvent extends Event
 {
-    /**
-     * Array of graphs
-     *
-     * @var QueryBuilder
-     */
-    private $graphs = array();
 
     /**
      * Report entity
