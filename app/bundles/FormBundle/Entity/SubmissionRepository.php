@@ -266,8 +266,6 @@ class SubmissionRepository extends CommonRepository
     public function getTopReferrers($query, $limit = 10, $offset = 0)
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
             ->groupBy('fs.referer')
             ->orderBy('sessions', 'DESC')
             ->setMaxResults($limit)
@@ -295,8 +293,6 @@ class SubmissionRepository extends CommonRepository
             $as = ' as ' . $as;
         }
         $query->select('f.name as title, f.id, count(' . $column . ')' . $as)
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
             ->groupBy('f.id')
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)
