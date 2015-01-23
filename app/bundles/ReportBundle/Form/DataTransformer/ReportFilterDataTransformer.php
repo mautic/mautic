@@ -39,6 +39,10 @@ class ReportFilterDataTransformer implements DataTransformerInterface
         }
 
         foreach ($filters as &$f) {
+            if (!isset($this->columns[$f['column']])) {
+                // Likely being called by form.pre_set_data after post
+                return $filters;
+            }
             $type = $this->columns[$f['column']]['type'];
             if (in_array($type, array('datetime', 'date', 'time'))) {
                 $dt = new DateTimeHelper($f['value'], '', 'utc');
