@@ -46,3 +46,14 @@ a:hover, a:focus {
     font: 11px/40px Arial, Helvetica, sans-serif;
     color: #fff;
 }
+
+.form-container {
+    margin-top: 50px;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mauticform-selectbox, .mauticform-input, .mauticform-textarea {
+    width: 100% !important;
+}

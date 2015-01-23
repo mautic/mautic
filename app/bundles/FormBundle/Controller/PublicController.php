@@ -182,6 +182,28 @@ class PublicController extends CommonFormController
 
         $model->populateValuesWithGetParameters($form, $html);
 
+        $template = $form->getTemplate();
+        if (!empty($template)) {
+            $theme = $this->factory->getTheme($template);
+            if ($theme->getName() != $template) {
+                $config = $theme->getConfig();
+                if (in_array('form', $config['features'])) {
+                    $template = $theme->getName();
+                } else {
+                    $templateNotFound = true;
+                }
+            }
+
+            if (empty($templateNotFound)) {
+                $viewParams = array(
+                    'template' => $template,
+                    'content'  => $html,
+                );
+
+                return $this->render('MauticFormBundle::form.html.php', $viewParams);
+            }
+        }
+
         $response = new Response();
         $response->setContent('<html><head><title>' . $form->getName() . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
         $response->setStatusCode(Response::HTTP_OK);

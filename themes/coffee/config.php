@@ -11,7 +11,8 @@ $config = array(
     "name"        => "Coffee",
     "features"    => array(
         "page",
-        "email"
+        "email",
+        "form"
     ),
     "slots"       => array(
         "page" => array(

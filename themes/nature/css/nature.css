@@ -32,3 +32,14 @@ body > .container {
     color: #fff;
     text-decoration: underline;
 }
+
+.form-container {
+    margin-top: 50px;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mauticform-selectbox, .mauticform-input, .mauticform-textarea {
+    width: 100% !important;
+}

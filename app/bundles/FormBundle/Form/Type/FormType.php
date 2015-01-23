@@ -36,7 +36,8 @@ class FormType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct (MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
     }
@@ -44,7 +45,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
@@ -68,6 +69,15 @@ class FormType extends AbstractType
             'bundle' => 'form'
         ));
 
+        $builder->add('template', 'theme_list', array(
+            'feature'     => 'form',
+            'empty_value' => ' ',
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.form.form.template.help'
+            )
+        ));
+
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(
                 'form:forms:publishown',
@@ -85,8 +95,8 @@ class FormType extends AbstractType
         }
 
         $builder->add('isPublished', 'yesno_button_group', array(
-            'read_only'     => $readonly,
-            'data'          => $data
+            'read_only' => $readonly,
+            'data'      => $data
         ));
 
         $builder->add('publishUp', 'datetime', array(
@@ -94,10 +104,10 @@ class FormType extends AbstractType
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
 
@@ -106,26 +116,26 @@ class FormType extends AbstractType
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
 
         $builder->add('postAction', 'choice', array(
-            'choices' => array(
+            'choices'     => array(
                 'return'   => 'mautic.form.form.postaction.return',
                 'redirect' => 'mautic.form.form.postaction.redirect',
                 'message'  => 'mautic.form.form.postaction.message'
             ),
-            'label'      => 'mautic.form.form.postaction',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label'       => 'mautic.form.form.postaction',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);'
             ),
-            'required' => false,
+            'required'    => false,
             'empty_value' => false
         ));
 
@@ -152,10 +162,10 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\FormBundle\Entity\Form',
+            'data_class'        => 'Mautic\FormBundle\Entity\Form',
             'validation_groups' => array(
                 'Mautic\FormBundle\Entity\Form',
                 'determineValidationGroups',
@@ -166,7 +176,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return "mauticform";
     }

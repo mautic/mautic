@@ -121,6 +121,15 @@ class Form extends FormEntity
     private $actions;
 
     /**
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
+     */
+    private $template;
+
+
+    /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", cascade={"all"}, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      */
@@ -562,5 +571,21 @@ class Form extends FormEntity
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplate ()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param mixed $template
+     */
+    public function setTemplate ($template)
+    {
+        $this->template = $template;
     }
 }

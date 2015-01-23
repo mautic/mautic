@@ -11,7 +11,8 @@ $config = array(
     "name"        => "Nature",
     "features"    => array(
         "page",
-        "email"
+        "email",
+        "form"
     ),
     "slots"       => array(
         "page" => array(

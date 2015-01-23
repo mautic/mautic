@@ -119,33 +119,50 @@ class PublicController extends CommonFormController
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
 
             $message = $translator->trans('mautic.email.unsubscribed.success', array(
-                '%email%' => $stat->getEmailAddress(),
+                '%email%'          => $stat->getEmailAddress(),
                 '%resubscribeUrl%' => $this->generateUrl('mautic_email_resubscribe', array('idHash' => $idHash))
             ));
 
             /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
             $unsubscribeForm = $email->getUnsubscribeForm();
 
-            if ($unsubscribeForm !=  null) {
-                $content = '<div class="mautic-unsubscribeform">' . $unsubscribeForm->getCachedHtml() . '</div>';
+            if ($unsubscribeForm != null) {
+                $formTemplate = $unsubscribeForm->getTemplate();
+                $formContent  = '<div class="mautic-unsubscribeform">' . $unsubscribeForm->getCachedHtml() . '</div>';
             }
         } else {
             $email = $lead = false;
+            $message = '';
         }
+
+        if (empty($template) && empty($formTemplate)) {
+            $template = $this->factory->getParameter('theme');
+        } else if (!empty($formTemplate)) {
+            $template = $formTemplate;
+        }
+        $theme  = $this->factory->getTheme($template);
+        if ($theme->getName() != $template) {
+            $template = $theme->getName();
+        }
+        $config = $theme->getConfig();
 
         $viewParams = array(
-            'message'  => $message,
-            'type'     => 'notice',
             'email'    => $email,
             'lead'     => $lead,
-            'template' => $template
+            'template' => $template,
+            'message'  => $message,
+            'type'     => 'notice',
         );
+        $contentTemplate = 'MauticEmailBundle::message.html.php';
 
-        if (!empty($content)) {
-            $viewParams['content'] = $content;
+        if (!empty($formContent)) {
+            $viewParams['content'] = $formContent;
+            if (in_array('form', $config['features'])) {
+                $contentTemplate = 'MauticFormBundle::form.html.php';
+            }
         }
 
-        return $this->render('MauticEmailBundle::message.html.php', $viewParams);
+        return $this->render($contentTemplate, $viewParams);
     }
 
     /**
@@ -172,6 +189,17 @@ class PublicController extends CommonFormController
             ));
         } else {
             $email = $lead = false;
+        }
+
+        $theme  = $this->factory->getTheme($template);
+        if ($theme->getName() != $template) {
+            $template = $theme->getName();
+        }
+
+        // Ensure template still exists
+        $theme = $this->factory->getTheme($template);
+        if (empty($theme) || $theme->getName() !== $template) {
+            $template = $this->factory->getParameter('theme');
         }
 
         return $this->render('MauticEmailBundle::message.html.php', array(

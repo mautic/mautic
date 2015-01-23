@@ -484,7 +484,7 @@ class FormController extends CommonFormController
                 // Clear session items in case columns changed
                 $session->remove('mautic.formresult.' . $entity->getId() . '.orderby');
                 $session->remove('mautic.formresult.' . $entity->getId() . '.orderbydir');
-                $session->remove("mautic.formresult.' . $entity->getId() . '.filters");
+                $session->remove('mautic.formresult.' . $entity->getId() . '.filters');
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
@@ -625,6 +625,28 @@ class FormController extends CommonFormController
             $html = $form->getCachedHtml();
         }
         $model->populateValuesWithGetParameters($form, $html);
+
+        $template = $form->getTemplate();
+        if (!empty($template)) {
+            $theme = $this->factory->getTheme($template);
+            if ($theme->getName() != $template) {
+                $config = $theme->getConfig();
+                if (in_array('form', $config['features'])) {
+                    $template = $theme->getName();
+                } else {
+                    $templateNotFound = true;
+                }
+            }
+
+            if (empty($templateNotFound)) {
+                $viewParams = array(
+                    'template' => $template,
+                    'content'  => $html,
+                );
+
+                return $this->render('MauticFormBundle::form.html.php', $viewParams);
+            }
+        }
 
         $response = new Response();
         $response->setContent('<html><head><title>' . $form->getName() . '</title></head><body>' . $html . '</body></html>');
