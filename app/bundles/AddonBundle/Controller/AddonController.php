@@ -136,7 +136,7 @@ class AddonController extends FormController
                     $persistUpdate = true;
                 }
 
-                $file = $addons[$bundle]['directory'] . '/Config/details.php';
+                $file = $addons[$bundle]['directory'] . '/Config/config.php';
 
                 //update details of the bundle
                 if (file_exists($file)) {
@@ -182,7 +182,7 @@ class AddonController extends FormController
             $entity->setBundle($addon['bundle']);
             $entity->setIsEnabled(false);
 
-            $file = $addon['directory'] . '/Config/details.php';
+            $file = $addon['directory'] . '/Config/config.php';
 
             //update details of the bundle
             if (file_exists($file)) {
