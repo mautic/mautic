@@ -27,12 +27,13 @@ class AjaxController extends CommonAjaxController
      */
     protected function reorderFieldsAction(Request $request, $name = 'fields')
     {
-        $dataArray  = array('success' => 0);
-        $sessionId  = InputHelper::clean($request->request->get('formId'));
+        $dataArray   = array('success' => 0);
+        $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.' . $name . '.modified';
-        $session    = $this->factory->getSession();
-        $order      = InputHelper::clean($request->request->get('mauticform_action'));
-        $components = $session->get($sessionName);
+        $session     = $this->factory->getSession();
+        $orderName   = ($name == 'fields') ? 'mauticform' : 'mauticform_action';
+        $order       = InputHelper::clean($request->request->get($orderName));
+        $components  = $session->get($sessionName);
 
         if (!empty($order) && !empty($components)) {
             $components = array_replace(array_flip($order), $components);
