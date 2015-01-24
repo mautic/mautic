@@ -11,10 +11,9 @@ namespace MauticAddon\MauticChatBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
-use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 /**
- * Class BuilderSubscriber
+ * Class ConfigSubscriber
  *
  * @package Mautic\ApiBundle\EventListener
  */
@@ -37,7 +36,7 @@ class ConfigSubscriber extends CommonSubscriber
             'bundle'     => 'MauticChatBundle',
             'formAlias'  => 'chatconfig',
             'formTheme'  => 'MauticChatBundle:FormTheme\Config',
-            'parameters' => $event->getParameters('/../addons/MauticChatBundle/Config/parameters.php')
+            'parameters' => $event->getParametersFromConfig('MauticChatBundle')
         ));
     }
 }

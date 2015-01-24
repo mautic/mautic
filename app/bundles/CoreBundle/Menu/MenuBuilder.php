@@ -36,24 +36,14 @@ class MenuBuilder
     private $matcher;
 
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    private $security;
-
-    /**
      * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var Request
+     * @var \Mautic\CoreBundle\Menu\MenuHelper
      */
-    private $request;
-
-    /**
-     * @var \Mautic\UserBundle\Entity\User
-     */
-    private $user;
+    private $menuHelper;
 
     /**
      * @param FactoryInterface $knpFactory
@@ -64,10 +54,8 @@ class MenuBuilder
     {
         $this->factory    = $knpFactory;
         $this->matcher    = $matcher;
-        $this->security   = $factory->getSecurity();
         $this->dispatcher = $factory->getDispatcher();
-        $this->request    = $factory->getRequest();
-        $this->user       = $factory->getUser(true);
+        $this->menuHelper = $factory->getHelper('menu');
     }
 
     /**
@@ -83,7 +71,7 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->security, $this->user, $this->request);
+            $event = new MenuEvent($this->menuHelper, 'main');
             $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems = $event->getMenuItems();
             $menu      = $loader->load($menuItems);
@@ -105,8 +93,8 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->security, $this->user, $this->request);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
+            $event = new MenuEvent($this->menuHelper, 'admin');
+            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems = $event->getMenuItems();
             $adminMenu = $loader->load($menuItems);
         }

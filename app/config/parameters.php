@@ -8,27 +8,20 @@
  */
 
 //load default parameters from bundle files
-$bundles = $container->getParameter('mautic.bundles');
+$core    = $container->getParameter('mautic.bundles');
 $addons  = $container->getParameter('mautic.addon.bundles');
 
+$bundles = array_merge($core, $addons);
+unset($core, $addons);
+
 $mauticParams = array();
+
 foreach ($bundles as $bundle) {
     if (!empty($bundle['config']['parameters'])) {
         $mauticParams = array_merge($mauticParams, $bundle['config']['parameters']);
-    } else if (file_exists($bundle['directory'].'/Config/parameters.php')) {
-        $bundleParams = include $bundle['directory'].'/Config/parameters.php';
-        $mauticParams = array_merge($mauticParams, $bundleParams);
     }
 }
 
-foreach ($addons as $bundle) {
-    if (!empty($bundle['config']['parameters'])) {
-        $mauticParams = array_merge($mauticParams, $bundle['config']['parameters']);
-    } elseif (file_exists($bundle['directory'].'/Config/parameters.php')) {
-        $bundleParams = include $bundle['directory'].'/Config/parameters.php';
-        $mauticParams = array_merge($mauticParams, $bundleParams);
-    }
-}
 // Include path settings
 $root  = $container->getParameter('kernel.root_dir');
 
@@ -73,6 +66,8 @@ $installedLocales->directories()->in($root . '/../' . $paths['translations'])->i
 foreach ($installedLocales as $dir) {
     $extractLocales($dir);
 }
+unset($defaultLocalesDir, $installedLocales, $extractLocales);
+
 
 $mauticParams['supported_languages'] = $locales;
 
@@ -108,3 +103,5 @@ foreach ($mauticParams as $k => &$v) {
 
 // Used for passing params into factory/services
 $container->setParameter('mautic.parameters', $mauticParams);
+
+unset($mauticParams, $replaceRootPlaceholder, $bundles);

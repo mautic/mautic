@@ -38,6 +38,8 @@ class CacheHelper
      */
     public function clearCache($noWarmup = false)
     {
+        $this->clearSessionItems();
+
         // Force a refresh of enabled addon bundles so they are picked up by the events
         $addonHelper = $this->factory->getHelper('addon');
         $addonHelper->buildAddonCache();
@@ -73,6 +75,8 @@ class CacheHelper
      */
     public function nukeCache()
     {
+        $this->clearSessionItems();
+
         $cacheDir = $this->factory->getSystemPath('cache', true);
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
@@ -93,5 +97,16 @@ class CacheHelper
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
         }
+    }
+
+    /**
+     * Clear cache related session items
+     */
+    protected function clearSessionItems()
+    {
+        // Clear the menu items and icons so they can be rebuilt
+        $session = $this->factory->getSession();
+        $session->remove('mautic.menu.items');
+        $session->remove('mautic.menu.icons');
     }
 }

@@ -39,7 +39,6 @@ class CoreSubscriber extends CommonSubscriber
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
             KernelEvents::REQUEST             => array('onKernelRequest', 0),
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
-            CoreEvents::BUILD_ADMIN_MENU      => array('onBuildAdminMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
             CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
             SecurityEvents::INTERACTIVE_LOGIN => array('onSecurityInteractiveLogin', 0)
@@ -200,17 +199,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MenuEvent $event)
     {
-        $this->buildMenu($event, 'main');
-    }
-
-    /**
-     * @param MenuEvent $event
-     *
-     * @return void
-     */
-    public function onBuildAdminMenu(MenuEvent $event)
-    {
-        $this->buildMenu($event, 'admin');
+        $this->buildMenu($event);
     }
 
     /**
@@ -220,7 +209,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onBuildRoute(RouteEvent $event)
     {
-        $this->buildRoute($event, 'routing');
+        $this->buildRoute($event);
     }
 
     /**

@@ -27,16 +27,16 @@ class RouteLoader extends Loader
     private $loaded = false;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var MauticFactory
      */
-    protected $dispatcher;
+    private $factory;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->dispatcher = $factory->getDispatcher();
+        $this->factory  = $factory;
     }
 
     /**
@@ -54,12 +54,39 @@ class RouteLoader extends Loader
             throw new \RuntimeException('Do not add the "mautic" loader twice');
         }
 
+        $dispatcher = $this->factory->getDispatcher();
+
+        //Main
         $event = new RouteEvent($this);
-        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $collection = $event->getCollection();
+
+        //Public
+        $event = new RouteEvent($this, 'public');
+        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $publicCollection = $event->getCollection();
+        $publicCollection->addPrefix('/p');
+        $collection->addCollection($publicCollection);
+
+        if ($this->factory->getParameter('api_enabled')) {
+            //API
+            $event = new RouteEvent($this, 'api');
+            $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+            $apiCollection = $event->getCollection();
+            $apiCollection->addPrefix('/api');
+            $collection->addCollection($apiCollection);
+
+            if ($this->factory->getEnvironment() == 'dev') {
+                //Load API doc routing
+                $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
+                $apiDoc->addPrefix('/docs/api');
+                $collection->addCollection($apiDoc);
+            }
+        }
 
         $this->loaded = true;
 
-        return $event->getCollection();
+        return $collection;
     }
 
     /**

@@ -12,8 +12,9 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+
 /**
- * Class BuilderSubscriber
+ * Class ConfigSubscriber
  *
  * @package Mautic\AssetBundle\EventListener
  */
@@ -23,20 +24,20 @@ class ConfigSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE   => array('onConfigGenerate', 0)
+            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0)
         );
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate (ConfigBuilderEvent $event)
     {
         $event->addForm(array(
-            'bundle' => 'AssetBundle',
-            'formAlias' => 'assetconfig',
+            'bundle'     => 'AssetBundle',
+            'formAlias'  => 'assetconfig',
             'formTheme'  => 'MauticAssetBundle:FormTheme\Config',
-            'parameters' => $event->getParameters('/bundles/AssetBundle/Config/parameters.php')
+            'parameters' => $event->getParametersFromConfig('MauticAssetBundle')
         ));
     }
 }

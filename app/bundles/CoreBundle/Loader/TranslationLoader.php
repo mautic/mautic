@@ -39,12 +39,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $core   = $this->factory->getParameter('bundles');
-        $addons = $this->factory->getEnabledAddons();
-
-        $bundles = array_merge($core, $addons);
-        unset($core, $addons);
-
+        $bundles   = $this->factory->getMauticBundles(true);
         $catalogue = new MessageCatalogue($locale);
 
         //Bundle translations

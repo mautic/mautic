@@ -30,12 +30,18 @@ class RouteEvent extends Event
     protected $collection;
 
     /**
+     * @var
+     */
+    protected $type;
+
+    /**
      * @param Loader $loader
      */
-    public function __construct(Loader &$loader)
+    public function __construct (Loader $loader, $type = 'main')
     {
-        $this->loader     =& $loader;
+        $this->loader     = $loader;
         $this->collection = new RouteCollection();
+        $this->type       = $type;
     }
 
     /**
@@ -43,7 +49,7 @@ class RouteEvent extends Event
      *
      * @return void
      */
-    public function addRoutes($path)
+    public function addRoutes ($path)
     {
         $this->collection->addCollection($this->loader->import($path));
     }
@@ -51,8 +57,16 @@ class RouteEvent extends Event
     /**
      * @return RouteCollection
      */
-    public function getCollection()
+    public function getCollection ()
     {
         return $this->collection;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType ()
+    {
+        return $this->type;
     }
 }

@@ -63,4 +63,12 @@ class IconEvent extends Event
     {
         return $this->icons;
     }
+
+    /**
+     * @param array $icons
+     */
+    public function setIcons(array $icons)
+    {
+        $this->icons = $icons;
+    }
 }

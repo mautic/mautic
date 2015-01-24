@@ -27,8 +27,7 @@ class ApiSubscriber extends CommonSubscriber
     {
         return array(
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0),
-            //CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
+            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
         );
     }
 

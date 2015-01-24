@@ -33,7 +33,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->container);
+        $event      = new ConfigBuilderEvent($this->factory);
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $formConfigs            = $event->getForms();

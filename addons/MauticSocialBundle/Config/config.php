@@ -16,20 +16,20 @@ return array(
     'services'    => array(
         'forms' => array(
             'mautic.form.type.social.facebook'   => array(
-                'definition' => 'MauticAddon\MauticSocialBundle\Form\Type\FacebookType',
-                'alias'      => 'socialmedia_facebook'
+                'class' => 'MauticAddon\MauticSocialBundle\Form\Type\FacebookType',
+                'alias' => 'socialmedia_facebook'
             ),
             'mautic.form.type.social.twitter'    => array(
-                'definition' => 'MauticAddon\MauticSocialBundle\Form\Type\TwitterType',
-                'alias'      => 'socialmedia_twitter'
+                'class' => 'MauticAddon\MauticSocialBundle\Form\Type\TwitterType',
+                'alias' => 'socialmedia_twitter'
             ),
             'mautic.form.type.social.googleplus' => array(
-                'definition' => 'MauticAddon\MauticSocialBundle\Form\Type\GooglePlusType',
-                'alias'      => 'socialmedia_googleplus'
+                'class' => 'MauticAddon\MauticSocialBundle\Form\Type\GooglePlusType',
+                'alias' => 'socialmedia_googleplus'
             ),
             'mautic.form.type.social.linkedin'   => array(
-                'definition' => 'MauticAddon\MauticSocialBundle\Form\Type\LinkedInType',
-                'alias'      => 'socialmedia_linkedin'
+                'class' => 'MauticAddon\MauticSocialBundle\Form\Type\LinkedInType',
+                'alias' => 'socialmedia_linkedin'
             )
         )
     )

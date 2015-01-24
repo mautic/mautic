@@ -47,7 +47,7 @@ class TranslationDebugCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure ()
     {
         $this
             ->setName('mautic:translation:debug')
@@ -84,37 +84,33 @@ You can only display unused messages:
 <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
 EOF
-            )
-        ;
+            );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute (InputInterface $input, OutputInterface $output)
     {
-        $locale  = $input->getOption('locale');
-        $domain  = $input->getOption('domain');
-        $bundle  = $input->getOption('bundle');
-        $log     = $input->getOption('logfile');
-        $loader  = $this->getContainer()->get('mautic.translation.loader');
-        $factory = $this->getContainer()->get('mautic.factory');
-        $viewsOnly  = $input->getOption('only-views');
+        $locale    = $input->getOption('locale');
+        $domain    = $input->getOption('domain');
+        $bundle    = $input->getOption('bundle');
+        $log       = $input->getOption('logfile');
+        $loader    = $this->getContainer()->get('mautic.translation.loader');
+        $factory   = $this->getContainer()->get('mautic.factory');
+        $viewsOnly = $input->getOption('only-views');
         $dupsOnly  = $input->getOption('only-dups');
-        $core    = $factory->getParameter('bundles');
-        $addons  = $factory->getParameter('addon.bundles');
+        $bundles   = $factory->getMauticBundles(true);
 
         if (!empty($log)) {
             $logfile = fopen($log, 'w+');
             $output  = new StreamOutput($logfile, null, false, new OutputFormatter(false));
         }
 
-        $bundles = array_merge($core, $addons);
-        unset($core, $addons);
-
         if (!empty($bundle)) {
             if (!isset($bundles[$bundle])) {
                 $output->writeln('Bundle not found');
+
                 return;
             }
 
@@ -143,14 +139,14 @@ EOF
                 }
             }
 
-            if (is_dir($bundle['directory']  . '/Translations')) {
+            if (is_dir($bundle['directory'] . '/Translations')) {
                 $currentCatalogue = $loader->load(null, $locale, $domain);
             }
         }
 
         // Merge defined and extracted messages to get all message ids
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
-        $allMessages = $mergeOperation->getResult()->all($domain);
+        $allMessages    = $mergeOperation->getResult()->all($domain);
         if (null !== $domain) {
             $allMessages = array($domain => $allMessages);
         }
@@ -182,7 +178,7 @@ EOF
             foreach (array_keys($messages) as $messageId) {
                 $value = $currentCatalogue->get($messageId, $domain);
 
-                $duplicateKey= strtolower($value);
+                $duplicateKey = strtolower($value);
                 if (!isset($duplicateCheck[$duplicateKey])) {
                     $duplicateCheck[$duplicateKey] = array();
                 }
@@ -202,7 +198,8 @@ EOF
                 }
 
                 if (!in_array(self::MESSAGE_UNUSED, $states) && true === $input->getOption('only-unused')
-                    || !in_array(self::MESSAGE_MISSING, $states) && true === $input->getOption('only-missing')) {
+                    || !in_array(self::MESSAGE_MISSING, $states) && true === $input->getOption('only-missing')
+                ) {
                     continue;
                 }
 
@@ -241,7 +238,7 @@ EOF
                 $table->addRow(array('', '', ''));
                 $table->addRow(array($this->sanitizeString($value), $count, ''));
                 foreach ($dups as $dup) {
-                    $table->addRow( array('', $dup['domain'], $dup['id']));
+                    $table->addRow(array('', $dup['domain'], $dup['id']));
                 }
             }
         }
@@ -253,7 +250,7 @@ EOF
 
     }
 
-    private function formatState($state)
+    private function formatState ($state)
     {
         if (self::MESSAGE_MISSING === $state) {
             return '<fg=red>x</>';
@@ -270,7 +267,7 @@ EOF
         return $state;
     }
 
-    private function formatStates(array $states)
+    private function formatStates (array $states)
     {
         $result = array();
         foreach ($states as $state) {
@@ -280,21 +277,21 @@ EOF
         return implode(' ', $result);
     }
 
-    private function formatId($id)
+    private function formatId ($id)
     {
         return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
     }
 
-    private function sanitizeString($string, $length = 40)
+    private function sanitizeString ($string, $length = 40)
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
         if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
             if (mb_strlen($string, $encoding) > $length) {
-                return mb_substr($string, 0, $length - 3, $encoding).'...';
+                return mb_substr($string, 0, $length - 3, $encoding) . '...';
             }
         } elseif (strlen($string) > $length) {
-            return substr($string, 0, $length - 3).'...';
+            return substr($string, 0, $length - 3) . '...';
         }
 
         return $string;

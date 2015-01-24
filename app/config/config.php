@@ -13,6 +13,7 @@ $buildBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
+            "isAddon"           => false,
             "base"              => str_replace('Bundle', '', $bundleBase),
             "bundle"            => $bundleBase,
             "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
@@ -39,6 +40,7 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
+            "isAddon"           => true,
             "base"              => str_replace('Bundle', '', $bundle),
             "bundle"            => $bundle,
             "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
@@ -58,10 +60,13 @@ $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
+unset($buildBundles);
+
 $addonBundles  = array_filter(
     array_map($buildAddonBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
+unset($buildAddonBundles, $buildBundles);
 
 $setBundles = array();
 
@@ -80,6 +85,8 @@ $setBundles = array_merge(array('MauticCoreBundle' => $coreBundle), $setBundles)
 
 $container->setParameter('mautic.bundles', $setBundles);
 $container->setParameter('mautic.addon.bundles', $setAddonBundles);
+unset($setBundles, $setAddonBundles);
+
 
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
@@ -133,7 +140,7 @@ $container->loadFromExtension('doctrine', array(
         'user'     => '%mautic.db_user%',
         'password' => '%mautic.db_password%',
         'charset'  => 'UTF8',
-        //if using pdo_sqlite as your database driver, add the path in parameters.php
+        //if using pdo_sqlite as your database driver, add the path in config file
         //e.g. 'database_path' => '%kernel.root_dir%/data/data.db3'
         //'path'    => '%db_path%'
         'types'    => array(

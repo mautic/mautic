@@ -658,9 +658,14 @@ class MauticFactory
      *
      * @return mixed
      */
-    public function getMauticBundles()
+    public function getMauticBundles($includeAddons = false)
     {
-        return $this->container->getParameter('mautic.bundles');
+        $bundles = $this->container->getParameter('mautic.bundles');
+        if ($includeAddons) {
+            $addons = $this->container->getParameter('mautic.addon.bundles');
+            $bundles = array_merge($bundles, $addons);
+        }
+        return $bundles;
     }
 
     /**

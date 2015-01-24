@@ -215,49 +215,46 @@ class AppKernel extends Kernel
             }
         }
 
+        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $this->container->get('mautic.factory');
 
         $dispatcher = $factory->getDispatcher();
-        $listeners  = $dispatcher->getListeners();
-
-        // addon listeners have to be removed if disabled so loop to find MauticAddon listeners
-        $addonListeners = array();
-
-        foreach ($listeners as $event => $subscribers) {
-            foreach ($subscribers as $subscriber) {
-                if (is_array($subscriber)) {
-                    $name = is_object($subscriber[0]) ? get_class($subscriber[0]) : $subscriber[0];
-                } else {
-                    $name = $subscriber;
-                }
-
-                if (strpos($name, 'MauticAddon') !== false) {
-                    //get the name of the bundle
-                    $parts                         = explode('\\', $name);
-                    $bundlePath                    = $parts[0] . '\\' . $parts[1];
-                    $addonListeners[$bundlePath][] = array($event, $subscriber);
-                }
-            }
-        }
 
         // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled then deal with them accordingly
         foreach ($addonBundles as $name => $bundle) {
             if (!$bundle->isEnabled()) {
                 unset($this->bundles[$name]);
                 unset($this->bundleMap[$name]);
-                unset($registeredAddonBundles[$name]);
 
                 // remove listeners as well
-                $bundleClass = get_class($bundle);
+                if (isset($registeredAddonBundles[$name]['config']['services'])) {
+                    foreach ($registeredAddonBundles[$name]['config']['services'] as $serviceGroup => $services) {
+                        foreach ($services as $serviceName => $details) {
+                            if ($serviceGroup == 'events') {
+                                $details['tag'] = 'kernel.event_subscriber';
+                            }
 
-                $parts      = explode('\\', $bundleClass);
-                $bundlePath = $parts[0] . '\\' . $parts[1];
-
-                if (isset($addonListeners[$bundlePath])) {
-                    foreach ($addonListeners[$bundlePath] as $listener) {
-                        $dispatcher->removeListener($listener[0], $listener[1]);
+                            if (isset($details['tag'])) {
+                                if ($details['tag'] == 'kernel.event_subscriber') {
+                                    $service = $this->container->get($serviceName);
+                                    $dispatcher->removeSubscriber($service);
+                                } elseif ($details['tag'] == 'kernel.event_listener') {
+                                    $service = $this->container->get($serviceName);
+                                    $dispatcher->removeListener($details['tagArguments']['event'], $service);
+                                }
+                            } elseif (isset($details['tags'])) {
+                                foreach ($details['tags'] as $k => $tag) {
+                                    if ($tag == 'kernel.event_listener') {
+                                        $service = $this->container->get($serviceName);
+                                        $dispatcher->removeListener($details['tagArguments'][$k]['event'], $service);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+
+                unset($registeredAddonBundles[$name]);
             } else {
                 // boot the bundle
                 $bundle->boot();

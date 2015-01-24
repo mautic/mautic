@@ -32,167 +32,124 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $bundles       = $container->getParameter('mautic.bundles');
+        $core    = $container->getParameter('mautic.bundles');
+        $addons  = $container->getParameter('mautic.addon.bundles');
+        $bundles = array_merge($core, $addons);
+        unset($core, $addons);
 
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
-                // Bundle has a single config file
-                $this->loadConfig($container, $bundle['config']);
-            } else {
-                //load services
-                $directory = $bundle['directory'] . '/Config/services';
-                if (file_exists($directory)) {
-                    //PHP config files
-                    $finder = new Finder();
-                    $finder->files()->in($directory)->name('*.php');
-                    if (count($finder)) {
-                        $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
-                        foreach ($finder as $file) {
-                            $loader->load($file->getFilename());
-                        }
+                $config = $bundle['config']['services'];
+                foreach ($config as $type => $services) {
+                    switch ($type) {
+                        case 'events':
+                            $defaultTag = 'kernel.event_subscriber';
+                            break;
+                        case 'forms':
+                            $defaultTag = 'form.type';
+                            break;
+                        case 'helpers':
+                            $defaultTag = 'templating.helper';
+                            break;
+                        default:
+                            $defaultTag = false;
+                            break;
                     }
 
-                    //YAML config files
-                    $finder = new Finder();
-                    $finder->files()->in($directory)->name('*.yaml');
-                    if (count($finder)) {
-                        $loader = new Loader\YamlFileLoader($container, new FileLocator($directory));
-                        foreach ($finder as $file) {
-                            $loader->load($file->getFilename());
+                    foreach ($services as $name => $details) {
+                        if (!is_array($details)) {
+                            // Set parameter
+                            $container->setParameter($name, $details);
+                            continue;
                         }
-                    }
 
-                    //XML config files
-                    $finder = new Finder();
-                    $finder->files()->in($directory)->name('*.xml');
-                    if (count($finder)) {
-                        $loader = new Loader\XmlFileLoader($container, new FileLocator($directory));
-                        foreach ($finder as $file) {
-                            $loader->load($file->getFilename());
+                        // Generate definition arguments
+                        $definitionArguments = array();
+                        if (!isset($details['arguments'])) {
+                            $details['arguments'] = array();
+                        } elseif (!is_array($details['arguments'])) {
+                            $details['arguments'] = array($details['arguments']);
                         }
-                    }
-                }
-            }
 
-            $addons  = $container->getParameter('mautic.addon.bundles');
-            foreach ($addons as $bundle) {
-                if (!empty($bundle['config']['services'])) {
-                    // Bundle has a single config file
-                    $this->loadConfig($container, $bundle['config']);
-                } else {
-                    //load services
-                    $directory = $bundle['directory'] . '/Config/services';
-                    if (file_exists($directory)) {
+                        // Add MauticFactory to events
+                        if ($type == 'events' && !in_array('mautic.factory', $details['arguments'])) {
+                            $details['arguments'][] = 'mautic.factory';
+                        }
 
-                        //PHP config files
-                        $finder = new Finder();
-                        $finder->files()->in($directory)->name('*.php');
-                        if (count($finder)) {
-                            $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
-                            foreach ($finder as $file) {
-                                $loader->load($file->getFilename());
+                        foreach ($details['arguments'] as $argument) {
+                            if (is_array($argument) || is_object($argument)) {
+                                foreach ($argument as $k => &$v) {
+                                    if (strpos($v, '%') === 0) {
+                                        $v = $container->getParameter(substr($v, 1, -1));
+                                    }
+                                }
+                                $definitionArguments[] = $argument;
+                            } elseif (is_bool($argument) || strpos($argument, '%') === 0 || strpos($argument, '\\') !== false) {
+                                // Parameter or Class
+                                $definitionArguments[] = $argument;
+                            } elseif (strpos($argument, '"') === 0) {
+                                // String
+                                $definitionArguments[] = substr($argument, 1, -1);
+                            } else {
+                                // Reference
+                                $definitionArguments[] = new Reference($argument);
                             }
                         }
 
-                        //YAML config files
-                        $finder = new Finder();
-                        $finder->files()->in($directory)->name('*.yaml');
-                        if (count($finder)) {
-                            $loader = new Loader\YamlFileLoader($container, new FileLocator($directory));
-                            foreach ($finder as $file) {
-                                $loader->load($file->getFilename());
+                        // Add the service
+                        $definition = $container->setDefinition($name, new Definition(
+                            $details['class'],
+                            $definitionArguments
+                        ));
+
+                        // Generate tag and tag arguments
+                        if (isset($details['tags'])) {
+                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : array();
+                            foreach ($details['tags'] as $k => $tag) {
+                                if (!isset($tagArguments[$k])) {
+                                    $tagArguments[$k] = array();
+                                }
+
+                                if (!empty($details['alias'])) {
+                                    $tagArguments[$k]['alias'] = $details['alias'];
+                                }
+
+                                $definition->addTag($tag, $tagArguments[$k]);
+                            }
+                        } else {
+                            $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
+                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : array();
+
+                            if (!empty($tag)) {
+                                if (!empty($details['alias'])) {
+                                    $tagArguments['alias'] = $details['alias'];
+                                }
+
+                                $definition->addTag($tag, $tagArguments);
                             }
                         }
 
-                        //XML config files
-                        $finder = new Finder();
-                        $finder->files()->in($directory)->name('*.xml');
-                        if (count($finder)) {
-                            $loader = new Loader\XmlFileLoader($container, new FileLocator($directory));
-                            foreach ($finder as $file) {
-                                $loader->load($file->getFilename());
-                            }
+                        if (!empty($details['scope'])) {
+                            $definition->setScope($details['scope']);
+                        } elseif ($type == 'templating') {
+                            $definition->setScope('request');
                         }
+
+
+                        if (!empty($details['factoryService'])) {
+                            $definition->setFactoryService($details['factoryService']);
+                        }
+
+                        if (!empty($details['factoryMethod'])) {
+                            $definition->setFactoryMethod($details['factoryMethod']);
+                        }
+
+                        unset($definition);
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Register services from Mautic bundle config file
-     *
-     * @param $container
-     * @param $config
-     */
-    private function loadConfig($container, $config)
-    {
-
-        foreach ($config['services'] as $type => $services) {
-            switch ($type) {
-                case 'events':
-                    $defaultTag = 'kernel.event_subscriber';
-                    break;
-                case 'forms':
-                    $defaultTag = 'form.type';
-                    break;
-                default:
-                    $defaultTag = false;
-                    break;
-            }
-
-            foreach ($services as $name => $details) {
-                // Generate definition arguments
-                $definitionArguments = array();
-                if (isset($details['references'])) {
-                    if (is_array($details['references'])) {
-                        foreach ($details['references'] as $reference) {
-                            $definitionArguments[] = new Reference($reference);
-                        }
-                    } else {
-                        $definitionArguments[] = new Reference($details['references']);
-                    }
-                }
-                if (isset($details['parameters'])) {
-                    if (is_array($details['parameters'])) {
-                        foreach ($details['parameters'] as $param) {
-                            if (strpos($param, '%' !== 0)) {
-                                $param = "%{$param}%";
-                            }
-                            $definitionArguments[] = $param;
-                        }
-                    } else {
-                        if (strpos($details['parameters'], '%' !== 0)) {
-                            $details['parameters'] = "%{$details['parameters']}%";
-                        }
-                        $definitionArguments[] = $details['parameters'];
-                    }
-                }
-
-                // Generate tag and tag arguments
-                $tag                 = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
-                $tagArguments        = (!empty($details['tagArguments'])) ? $details['tagArguments'] : array();
-                if (!empty($details['alias'])) {
-                    $tagArguments['alias'] = $details['alias'];
-                }
-
-                // Add the service
-                $definition = new Definition(
-                    $details['definition'],
-                    $definitionArguments
-                );
-
-                if (!empty($tag)) {
-                    $definition->addTag($tag, $tagArguments);
-                }
-
-                if (!empty($details['scope'])) {
-                    $definition->setScope($details['scope']);
-                }
-
-                $container->setDefinition($name, $definition);
-                unset($definition);
             }
         }
+
+        unset($bundles);
     }
 }

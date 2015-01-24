@@ -11,10 +11,10 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
-use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+
 /**
- * Class BuilderSubscriber
+ * Class ConfigSubscriber
  *
  * @package Mautic\ApiBundle\EventListener
  */
@@ -24,20 +24,20 @@ class ConfigSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
             ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0)
         );
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate (ConfigBuilderEvent $event)
     {
         $event->addForm(array(
-            'bundle' => 'ApiBundle',
-            'formAlias' => 'apiconfig',
-            'formTheme'     => 'MauticApiBundle:FormTheme\Config',
-            'parameters' => $event->getParameters('/bundles/ApiBundle/Config/parameters.php')
+            'bundle'     => 'ApiBundle',
+            'formAlias'  => 'apiconfig',
+            'formTheme'  => 'MauticApiBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticApiBundle')
         ));
     }
 }

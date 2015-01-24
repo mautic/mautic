@@ -641,23 +641,19 @@ class InstallController extends CommonController
             $paths = $namespaces = array();
 
             //build entity namespaces
-            $bundles = $this->factory->getParameter('bundles');
+            $bundles = $this->factory->getMauticBundles(true);
             foreach ($bundles as $b) {
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
-                    $paths[]                             = $entityPath;
-                    $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
+                    $paths[] = $entityPath;
+                    if ($b['isAddon']) {
+                        $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
+                    } else {
+                        $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
+                    }
                 }
             }
 
-            $addons = $this->factory->getParameter('addon.bundles');
-            foreach ($addons as $b) {
-                $entityPath = $b['directory'] . '/Entity';
-                if (file_exists($entityPath)) {
-                    $paths[]                  = $entityPath;
-                    $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
-                }
-            }
             $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
             foreach ($namespaces as $alias => $namespace) {
                 $config->addEntityNamespace($alias, $namespace);

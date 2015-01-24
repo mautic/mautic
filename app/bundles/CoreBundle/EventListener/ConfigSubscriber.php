@@ -9,12 +9,11 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 /**
- * Class BuilderSubscriber
+ * Class ConfigSubscriber
  *
  * @package Mautic\CoreBundle\EventListener
  */
@@ -38,7 +37,7 @@ class ConfigSubscriber extends CommonSubscriber
             'bundle'        => 'CoreBundle',
             'formAlias'     => 'coreconfig',
             'formTheme'     => 'MauticCoreBundle:FormTheme\Config',
-            'parameters'    => $event->getParameters('/bundles/CoreBundle/Config/parameters.php')
+            'parameters'    => $event->getParametersFromConfig('MauticCoreBundle')
         ));
     }
 

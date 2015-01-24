@@ -28,36 +28,25 @@ class MenuEvent extends Event
     protected $menuItems = array('children' => array());
 
     /**
-     * @var CorePermissions
+     * @var
      */
-    protected $security;
-
-    /**
-     * @var User|string
-     */
-    protected $user;
-
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected $type;
 
     /**
      * @param CorePermissions $security
      */
-    public function __construct(CorePermissions $security, $user, Request $request)
+    public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
-        $this->security = $security;
-        $this->user     = $user;
-        $this->request  = $request;
+        $this->helper = $menuHelper;
+        $this->type   = $type;
     }
 
     /**
-     * @return CorePermissions
+     * @param array $menuItems
      */
-    public function getSecurity()
+    public function setMenuItems(array $menuItems)
     {
-        return $this->security;
+        $this->menuItems = $menuItems;
     }
 
     /**
@@ -71,7 +60,7 @@ class MenuEvent extends Event
     {
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
         if (!$isRoot) {
-            MenuHelper::createMenuStructure($items, $this->getSecurity(), $this->getRequest(), $this->getUser());
+            $this->helper->createMenuStructure($items);
         }
 
         if ($isRoot) {
@@ -100,18 +89,10 @@ class MenuEvent extends Event
     }
 
     /**
-     * @return Request
+     * @return string
      */
-    public function getRequest ()
+    public function getType()
     {
-        return $this->request;
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser ()
-    {
-        return $this->user;
+        return $this->type;
     }
 }

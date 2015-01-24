@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,51 @@ use Knp\Menu\ItemInterface;
  */
 class MenuHelper extends Helper
 {
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getUser()
+    {
+        return $this->factory->getUser();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSecurity()
+    {
+        return $this->factory->getSecurity();
+    }
+
+    /**
+     * @return Request
+     */
+    protected function getRequest()
+    {
+       return $this->factory->getRequest();
+    }
+
+    /**
+     * @param      $name
+     */
+    protected function getParameter($name)
+    {
+        return $this->factory->getParameter($name);
+    }
 
     /**
      * @return string
@@ -107,20 +153,20 @@ class MenuHelper extends Helper
      *
      * @param $items
      */
-    static public function createMenuStructure(&$items, CorePermissions $security, Request $request, User $user, $depth = 0)
+    public function createMenuStructure(&$items, $depth = 0)
     {
-        foreach ($items as &$i) {
+        foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
                 continue;
             }
 
-            // Category shortcut
-            if (isset($i['category'])) {
-                $bundleName = $i['category']['bundle'];
+            if (isset($i['bundle'])) {
+                // Category shortcut
+                $bundleName = $i['bundle'];
                 $i = array(
                     'access'          => $bundleName . ':categories:view',
                     'route'           => 'mautic_category_index',
-                    'id'              => 'mautic_{$bundleName}category_index',
+                    'id'              => 'mautic_'.$bundleName.'category_index',
                     'routeParameters' => array('bundle' => $bundleName),
                 );
             }
@@ -128,10 +174,35 @@ class MenuHelper extends Helper
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
-                    if (!$user->isAdmin()) {
+                    if (!$this->getUser()->isAdmin()) {
+                        unset($items[$k]);
                         continue;
                     }
-                } elseif (!$security->isGranted($i['access'], 'MATCH_ONE')) {
+                } elseif (!$this->getSecurity()->isGranted($i['access'], 'MATCH_ONE')) {
+                    unset($items[$k]);
+                    continue;
+                }
+            }
+
+            if (isset($i['checks'])) {
+                $passChecks = true;
+                foreach ($i['checks'] as $checkGroup => $checks) {
+                    foreach ($checks as $name => $value) {
+                        if ($checkGroup == 'parameters') {
+                            if ($this->getParameter($name) != $value) {
+                                $passChecks = false;
+                                break;
+                            }
+                        } elseif ($checkGroup == 'request') {
+                            if ($this->getRequest()->get($name) != $value) {
+                                $passChecks = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!$passChecks) {
+                    unset($items[$k]);
                     continue;
                 }
             }
@@ -165,7 +236,7 @@ class MenuHelper extends Helper
 
             //Repeat for sub items
             if (isset($i['children'])) {
-                self::createMenuStructure($i['children'], $security, $request, $user, $depth + 1);
+                $this->createMenuStructure($i['children'], $depth + 1);
             }
         }
     }
