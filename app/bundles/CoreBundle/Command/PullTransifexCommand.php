@@ -56,8 +56,9 @@ EOT
             return 0;
         }
 
-        $options = $input->getOptions();
-        $files   = $this->getLanguageFiles();
+        $options        = $input->getOptions();
+        $files          = $this->getLanguageFiles();
+        $translationDir = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/translations/';
 
         /** @var \BabDev\Transifex\Transifex $transifex */
         $transifex = $this->getContainer()->get('transifex');
@@ -84,15 +85,28 @@ EOT
                         if ($completed >= 80) {
                             $translation = $transifex->translations->getTranslation('mautic', $alias, $language);
 
-                            $path = str_replace('en_US', $language, $file);
+                            $path = $translationDir . $language . '/' . $bundle . '/' . basename($file);
 
-                            // Verify the language's directory exists
-                            if (!is_dir(dirname($path))) {
-                                if (!mkdir(dirname($path))) {
+                            // Verify the directories exist
+                            if (!is_dir($translationDir . $language)) {
+                                if (!mkdir($translationDir . $language)) {
                                     $output->writeln(
                                         $translator->trans(
                                             'mautic.core.command.transifex_error_creating_directory',
-                                            array('%directory%' => dirname($path), '%language%' => $language)
+                                            array('%directory%' => $translationDir . $language, '%language%' => $language)
+                                        )
+                                    );
+
+                                    continue;
+                                }
+                            }
+
+                            if (!is_dir($translationDir . $language . '/' . $bundle)) {
+                                if (!mkdir($translationDir . $language . '/' . $bundle)) {
+                                    $output->writeln(
+                                        $translator->trans(
+                                            'mautic.core.command.transifex_error_creating_directory',
+                                            array('%directory%' => $translationDir . $language . '/' . $bundle, '%language%' => $language)
                                         )
                                     );
 
