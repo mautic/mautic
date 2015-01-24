@@ -3,10 +3,13 @@ var mQuery      = jQuery.noConflict(true);
 window.jQuery   = mQuery;
 
 //set default ajax options
+MauticVars.activeRequests = 0;
+
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
             mQuery('.loading-bar').addClass('active');
+            MauticVars.activeRequests++;
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -107,7 +110,23 @@ var Mautic = {
      * Stops the ajax page loading indicator
      */
     stopPageLoadingBar: function () {
-        mQuery('.loading-bar').removeClass('active');
+        if (MauticVars.activeRequests < 1) {
+            MauticVars.activeRequests = 0;
+        } else {
+            MauticVars.activeRequests--;
+        }
+
+        if (MauticVars.activeRequests == 0) {
+            mQuery('.loading-bar').removeClass('active');
+        }
+    },
+
+    /**
+     * Activate page loading bar
+     */
+    startPageLoadingBar: function() {
+        mQuery('.loading-bar').addClass('active');
+        MauticVars.activeRequests++;
     },
 
     /**
@@ -486,7 +505,9 @@ var Mautic = {
         Mautic.stopIconSpinPostEvent();
 
         //stop loading bar
-        Mautic.stopPageLoadingBar();
+        if (container == '#app-content' || container == '.page-list') {
+            Mautic.stopPageLoadingBar();
+        }
     },
 
     /**
@@ -1662,6 +1683,10 @@ var Mautic = {
     togglePublishStatus: function (event, el, model, id, extra) {
         event.preventDefault();
 
+        var wasPublished = mQuery(el).hasClass('fa-check-circle-o');
+
+        mQuery(el).removeClass('fa-check-circle-o fa-times-circle-o').addClass('fa-spin fa-spinner');
+
         //destroy tooltips so it can be regenerated
         mQuery(el).tooltip('destroy');
         //clear the lookup cache
@@ -1671,22 +1696,27 @@ var Mautic = {
             extra = '&' + extra;
         }
         mQuery.ajax({
-            showLoadingBar: true,
             url: mauticAjaxUrl,
             type: "POST",
             data: "action=togglePublishStatus&model=" + model + '&id=' + id + extra,
             dataType: "json",
             success: function (response) {
-                Mautic.stopIconSpinPostEvent();
-                Mautic.stopPageLoadingBar();
                 if (response.reload) {
-                    location.reload();
+                    mQuery('<div />', {
+                        'class': "modal-backdrop fade in"
+                    }).appendTo('body');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 50);
                 } else if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
                 }
             },
             error: function (request, textStatus, errorThrown) {
+                var addClass = (wasPublished) ? 'fa-check-circle-o' : 'fa-times-circle-o';
+                mQuery(el).removeClass('fa-spin fa-spinner').addClass(addClass);
+
                 Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
