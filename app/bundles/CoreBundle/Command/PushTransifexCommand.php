@@ -105,6 +105,7 @@ EOT
     {
         $files = array();
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
+        $addonBundles  = $this->getContainer()->getParameter('mautic.addon.bundles');
 
         foreach ($mauticBundles as $bundle) {
             // Parse the namespace into a filepath
@@ -123,6 +124,25 @@ EOT
                 }
             }
         }
+
+        foreach ($addonBundles as $bundle) {
+            // Parse the namespace into a filepath
+            $translationsDir = $bundle['directory'] . '/Translations/en_US';
+
+            if (is_dir($translationsDir)) {
+                $files[$bundle['bundle']] = array();
+
+                // Get files within the directory
+                $finder = new Finder();
+                $finder->files()->in($translationsDir)->name('*.ini');
+
+                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $files[$bundle['bundle']][] = $file->getPathname();
+                }
+            }
+        }
+
         return $files;
     }
 
