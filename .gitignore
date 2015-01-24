@@ -6,8 +6,6 @@
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
 !/app/bundles/CoreBundle/Assets/css/*.css
-/app/bundles/*Bundle/Translations/
-!/app/bundles/*Bundle/Translations/en_US/
 /app/cache/*
 /app/logs/*
 /app/config/local*.php
