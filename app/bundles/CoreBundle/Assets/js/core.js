@@ -754,7 +754,14 @@ var Mautic = {
      * @param callback
      */
     loadContent: function (route, link, method, target, showPageLoading, callback) {
-        mQuery.ajax({
+        var xhrVar = (target) ? target : 'none';
+        if (typeof Mautic.loadContentXhr == 'undefined') {
+            Mautic.loadContentXhr = {};
+        } else if (typeof Mautic.loadContentXhr[target] != 'undefined') {
+            Mautic.loadContentXhr[target].abort();
+        }
+
+        Mautic.loadContentXhr[target] = mQuery.ajax({
             showLoadingBar: (typeof showPageLoading == 'undefined' || showPageLoading) ? true : false,
             url: route,
             type: method,
@@ -1487,7 +1494,12 @@ var Mautic = {
         });
         mQuery(el).on('change keyup paste', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
-            if (Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
+
+            var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
+            var enterKeyPressed = (event.which == 13 || event.keyCode == 13);
+            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+
+            if (!enterKeyPressed && Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
                 return;
             }
 
@@ -1497,11 +1509,6 @@ var Mautic = {
             if (diff < 0) {
                 diff = parseInt(diff) * -1;
             }
-
-            var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
-            var enterKeyPressed = (event.which == 13 || event.keyCode == 13);
-            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
-
 
             var overlayEnabled = mQuery(el).attr('data-overlay');
             if (!overlayEnabled || overlayEnabled == 'false') {
@@ -1529,18 +1536,8 @@ var Mautic = {
                     overlay.css('color', mQuery(el).attr('data-overlay-color'));
                 }
             }
-
-            if (
-                !MauticVars.searchIsActive &&
-                (
-                    //searchStr in MauticVars[liveCacheVar] ||
-                (!searchStr && MauticVars[searchStrVar].length) ||
-                diff >= 3 ||
-                spaceKeyPressed ||
-                enterKeyPressed
-                )
-            ) {
-                MauticVars.searchIsActive = true;
+            //searchStr in MauticVars[liveCacheVar] ||
+            if ((!searchStr && MauticVars[searchStrVar].length) || diff >= 3 || spaceKeyPressed || enterKeyPressed) {
                 MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
 
@@ -1625,14 +1622,17 @@ var Mautic = {
                 response.overlayTarget = overlayTarget;
 
                 Mautic.processPageContent(response);
-                MauticVars.searchIsActive = false;
             } else {
                 var searchName = el.attr('name');
                 if (searchName == 'undefined') {
                     searchName = 'search';
                 }
 
-                mQuery.ajax({
+                if (typeof Mautic.liveSearchXhr !== 'undefined') {
+                    //ensure current search request is aborted
+                    Mautic['liveSearchXhr'].abort();
+                }
+                Mautic.liveSearchXhr = mQuery.ajax({
                     showLoadingBar: true,
                     url: route,
                     type: "GET",
@@ -1649,12 +1649,11 @@ var Mautic = {
                         response.overlayTarget = overlayTarget;
 
                         Mautic.processPageContent(response);
-
-                        MauticVars.searchIsActive = false;
                     },
                     error: function (request, textStatus, errorThrown) {
                         Mautic.processAjaxError(request, textStatus, errorThrown);
                     }
+
                 });
             }
         }
@@ -1815,6 +1814,13 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
+        if (textStatus == 'abort') {
+            Mautic.stopPageLoadingBar();
+            Mautic.stopCanvasLoadingBar();
+            Mautic.stopIconSpinPostEvent();
+            return;
+        }
+
         var inDevMode = typeof mauticEnv !== 'undefined' && mauticEnv == 'dev';
 
         if (inDevMode) {
