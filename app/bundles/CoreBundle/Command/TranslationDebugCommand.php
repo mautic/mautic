@@ -132,10 +132,14 @@ EOF
                     $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Controller', $extractedCatalogue);
 
                     // Extract used messages from models
-                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Model', $extractedCatalogue);
+                    if (file_exists($bundle['directory'] . '/Model')) {
+                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Model', $extractedCatalogue);
+                    }
 
                     // Extract used messages from event listeners
-                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/EventListener', $extractedCatalogue);
+                    if (file_exists($bundle['directory'] . '/EventListener')) {
+                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/EventListener', $extractedCatalogue);
+                    }
                 }
             }
 
