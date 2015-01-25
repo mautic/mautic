@@ -104,7 +104,7 @@ $contentMode = $form['contentMode']->vars['data'];
     </div>
     <div class="builder-panel">
         <p>
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('page');"><?php echo $view['translator']->trans('mautic.core.builder.close'); ?></button>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('page');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
         </p>
         <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.token.help'); ?></div>
         <div class="panel-group margin-sm-top" id="pageTokensPanel">

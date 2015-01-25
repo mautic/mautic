@@ -316,7 +316,7 @@ class ConfigType extends AbstractType
             'attr'       => array(
                 'class'        => 'form-control',
                 'data-hide-on' => $spoolConditions,
-                'tooltip'      => 'mautic.core.config.form.mailer.spool.clear.tooltip'
+                'tooltip'      => 'mautic.core.config.form.mailer.spool.clear.timeout.tooltip'
             ),
             'required'   => false
         ));

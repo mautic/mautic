@@ -21,6 +21,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -126,26 +127,28 @@ EOF
         // Extract used messages from Views
         $extractedCatalogue = new MessageCatalogue($locale);
 
+        $phpFormExtractor = new PhpFormTranslationExtractor();
+
         foreach ($bundles as $bundle) {
             if (!$dupsOnly) {
                 if (file_exists($bundle['directory'] . '/Views')) {
+                    $phpFormExtractor->extract($bundle['directory'] . '/Views', $extractedCatalogue);
                     $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Views', $extractedCatalogue);
                 }
 
                 if (!$viewsOnly) {
-                    // Extract used messages from Controllers
-                    if (file_exists($bundle['directory'] . '/EventListener')) {
-                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Controller', $extractedCatalogue);
-                    }
-
-                    // Extract used messages from models
-                    if (file_exists($bundle['directory'] . '/Model')) {
-                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Model', $extractedCatalogue);
-                    }
-
-                    // Extract used messages from event listeners
-                    if (file_exists($bundle['directory'] . '/EventListener')) {
-                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/EventListener', $extractedCatalogue);
+                    $directories = array(
+                        '/Form/Type',
+                        '/EventListener',
+                        '/Model',
+                        '/EventListener',
+                        '/Controller'
+                    );
+                    foreach ($directories as $d) {
+                        if (file_exists($bundle['directory'] . $d)) {
+                            $phpFormExtractor->extract($bundle['directory'] . $d, $extractedCatalogue);
+                            $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . $d, $extractedCatalogue);
+                        }
                     }
                 }
             }
@@ -307,4 +310,31 @@ EOF
 
         return $string;
     }
+}
+
+class PhpFormTranslationExtractor extends PhpExtractor
+{
+    /**
+     * The sequence that captures translation messages.
+     *
+     * @var array
+     */
+    protected $sequences = array(
+        array(
+            "'label'",
+            '=>',
+            self::MESSAGE_TOKEN,
+        ),
+        array(
+            "placeholder'",
+            '=>',
+            self::MESSAGE_TOKEN,
+        ),
+        array(
+            "'tooltip'",
+            '=>',
+            self::MESSAGE_TOKEN,
+        )
+
+    );
 }

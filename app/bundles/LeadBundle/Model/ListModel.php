@@ -251,7 +251,7 @@ class ListModel extends FormModel
                 )
             ),
             'points'     => array(
-                'label'      => $this->translator->trans('mautic.lead.list.points'),
+                'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => array('type' => 'number')
             )
         );

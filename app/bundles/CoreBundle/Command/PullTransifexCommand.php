@@ -91,11 +91,10 @@ EOT
                             if (!is_dir($translationDir . $language)) {
                                 if (!mkdir($translationDir . $language)) {
                                     $output->writeln(
-                                        $translator->trans(
-                                            'mautic.core.command.transifex_error_creating_directory',
-                                            array('%directory%' => $translationDir . $language, '%language%' => $language)
-                                        )
-                                    );
+                                        $translator->trans('mautic.core.command.transifex_error_creating_directory', array(
+                                            '%directory%' => $translationDir . $language,
+                                            '%language%' => $language
+                                        )));
 
                                     continue;
                                 }
@@ -104,11 +103,10 @@ EOT
                             if (!is_dir($translationDir . $language . '/' . $bundle)) {
                                 if (!mkdir($translationDir . $language . '/' . $bundle)) {
                                     $output->writeln(
-                                        $translator->trans(
-                                            'mautic.core.command.transifex_error_creating_directory',
-                                            array('%directory%' => $translationDir . $language . '/' . $bundle, '%language%' => $language)
-                                        )
-                                    );
+                                        $translator->trans('mautic.core.command.transifex_error_creating_directory', array(
+                                            '%directory%' => $translationDir . $language . '/' . $bundle,
+                                            '%language%' => $language
+                                        )));
 
                                     continue;
                                 }
@@ -117,8 +115,7 @@ EOT
                             // Write the file to the system
                             if (!file_put_contents($path, $translation->content)) {
                                 $output->writeln(
-                                    $translator->trans(
-                                        'mautic.core.command.transifex_error_creating_file',
+                                    $translator->trans('mautic.core.command.transifex_error_creating_file',
                                         array('%file%' => $path, '%language%' => $language)
                                     )
                                 );

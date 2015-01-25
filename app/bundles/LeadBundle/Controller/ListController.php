@@ -52,7 +52,7 @@ class ListController extends FormController
         if (!$permissions['lead:lists:viewother']) {
             $translator      = $this->get('translator');
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
-            $global          = $translator->trans('mautic.lead.lists.searchcommand.isglobal');
+            $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
             $filter["force"] = " ($mine or $global)";
         }
 

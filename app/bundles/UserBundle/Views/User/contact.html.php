@@ -9,10 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
-$view['slots']->set("headerTitle", $view['translator']->trans(
-    'mautic.user.user.header.contact',
-    array('%name%' => $user->getName()))
-);
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.user.header.contact', array('%name%' => $user->getName())));
 ?>
 
 <?php echo $view['form']->form($form); ?>

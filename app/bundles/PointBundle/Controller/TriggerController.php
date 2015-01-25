@@ -211,7 +211,7 @@ class TriggerController extends FormController
                     if ('point.trigger' == 'point' && empty($events)) {
                         //set the error
                         $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.point.form.events.notempty', array(), 'validators')
+                            $this->get('translator')->trans('mautic.core.value.required', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
@@ -362,7 +362,7 @@ class TriggerController extends FormController
                     if ('point.trigger' == 'point' && empty($addEvents)) {
                         //set the error
                         $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.point.form.events.notempty', array(), 'validators')
+                            $this->get('translator')->trans('mautic.core.value.required', array(), 'validators')
                         ));
                         $valid = false;
                     } else {

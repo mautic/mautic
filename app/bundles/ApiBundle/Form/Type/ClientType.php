@@ -111,11 +111,7 @@ class ClientType extends AbstractType
                         $urlConstraint = new Assert\Url(array(
                             'protocols' => array('http','https')
                         ));
-                        $urlConstraint->message = $translator->trans(
-                            'mautic.api.client.redirecturl.invalid',
-                            array('%url%' => $uri),
-                            'validators'
-                        );
+                        $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', array('%url%' => $uri), 'validators');
 
                         $errors = $validator->validateValue(
                             $uri,
@@ -170,11 +166,7 @@ class ClientType extends AbstractType
                     $urlConstraint = new Assert\Url(array(
                         'protocols' => array('http','https')
                     ));
-                    $urlConstraint->message = $translator->trans(
-                        'mautic.api.client.redirecturl.invalid',
-                        array('%url%' => $uri),
-                        'validators'
-                    );
+                    $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', array('%url%' => $uri), 'validators');
 
                     $errors = $validator->validateValue(
                         $uri,

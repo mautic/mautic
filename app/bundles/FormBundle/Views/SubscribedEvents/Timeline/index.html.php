@@ -43,7 +43,7 @@ if ($page->getId()) {
 					<dd><?php echo $form->getDescription(); ?></dd>
 				    <?php if (isset($event['extra'])) : ?>
                         <?php if ($descr = $form->getDescription()): ?>
-	                    <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $descr)); ?></p>
+	                    <p><?php echo $descr; ?></p>
                     <?php endif; ?>
                     <?php endif; ?>
 				<?php endif; ?>
