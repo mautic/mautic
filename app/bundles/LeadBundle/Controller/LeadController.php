@@ -67,7 +67,6 @@ class LeadController extends FormController
 
         $filter      = array('string' => $search, 'force' => '');
         $translator  = $this->factory->getTranslator();
-        $isCommand   = $translator->trans('mautic.core.searchcommand.is');
         $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
         $mine        = $translator->trans('mautic.core.searchcommand.ismine');
@@ -78,11 +77,11 @@ class LeadController extends FormController
         // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
         if ($indexMode != 'list') {
             //remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$isCommand:$anonymous";
+            $filter['force'] .= " !$anonymous";
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $isCommand:$mine";
+            $filter['force'] .= " $mine";
         }
 
         $results = $model->getEntities(

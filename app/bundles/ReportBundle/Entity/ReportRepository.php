@@ -69,23 +69,20 @@ class ReportRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch ($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("r.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("r.isPublished", 0);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("IDENTITY(r.createdBy)", $this->currentUser->getId());
-                        break;
-                }
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                $expr            = $q->expr()->eq("r.isPublished", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                $expr            = $q->expr()->eq("r.isPublished", 0);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                $expr            = $q->expr()->eq("IDENTITY(r.createdBy)", $this->currentUser->getId());
                 $returnParameter = false;
                 break;
         }
@@ -112,11 +109,9 @@ class ReportRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isunpublished',
-                'mautic.core.searchcommand.ismine',
-            )
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.ismine'
         );
     }
 

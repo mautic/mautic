@@ -101,66 +101,61 @@ class FormRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("f.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("f.isPublished", 0);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                        $expr = $q->expr()->orX(
-                            $q->expr()->isNull('f.category'),
-                            $q->expr()->eq('f.category', $q->expr()->literal(''))
-                        );
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("f.createdBy", $this->currentUser->getId());
-                        break;
-                    case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
-                        $expr = $q->expr()->andX(
-                            $q->expr()->eq('f.isPublished', 1),
-                            $q->expr()->isNotNull('f.publishDown'),
-                            $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
-                            $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
-                        );
-                        break;
-                    case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
-                        $expr = $q->expr()->andX(
-                            $q->expr()->eq('f.isPublished', 1),
-                            $q->expr()->isNotNull('f.publishUp'),
-                            $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
-                            $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
-                        );
-                        break;
-                }
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                $expr = $q->expr()->eq("f.isPublished", 1);
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.core.searchcommand.has'):
-                switch ($string) {
-                    case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
-                        $sq = $this->getEntityManager()->createQueryBuilder();
-                        $subquery = $sq->select("count(s.id)")
-                            ->from('MauticFormBundle:Submission', 's')
-                            ->leftJoin('MauticFormBundle:Form', 'f2',
-                                Join::WITH,
-                                $sq->expr()->eq('s.form', "f2")
-                            )
-                            ->where(
-                                $q->expr()->eq('s.form', 'f')
-                            )
-                            ->getDql();
-                        $expr = $q->expr()->gt(sprintf("(%s)",$subquery), 1);
-                        break;
-                }
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                $expr = $q->expr()->eq("f.isPublished", 0);
                 $returnParameter = false;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
+                $expr = $q->expr()->orX(
+                    $q->expr()->isNull('f.category'),
+                    $q->expr()->eq('f.category', $q->expr()->literal(''))
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                $expr = $q->expr()->eq("f.createdBy", $this->currentUser->getId());
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('f.isPublished', 1),
+                    $q->expr()->isNotNull('f.publishDown'),
+                    $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
+                    $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('f.isPublished', 1),
+                    $q->expr()->isNotNull('f.publishUp'),
+                    $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
+                    $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
+                $sq = $this->getEntityManager()->createQueryBuilder();
+                $subquery = $sq->select("count(s.id)")
+                    ->from('MauticFormBundle:Submission', 's')
+                    ->leftJoin('MauticFormBundle:Form', 'f2',
+                        Join::WITH,
+                        $sq->expr()->eq('s.form', "f2")
+                    )
+                    ->where(
+                        $q->expr()->eq('s.form', 'f')
+                    )
+                    ->getDql();
+                $expr = $q->expr()->gt(sprintf("(%s)",$subquery), 1);
+                $returnParameter = false;
             case $this->translator->trans('mautic.core.searchcommand.category'):
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
@@ -186,17 +181,13 @@ class FormRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isunpublished',
-                'mautic.core.searchcommand.isuncategorized',
-                'mautic.core.searchcommand.ismine',
-                'mautic.form.form.searchcommand.isexpired',
-                'mautic.form.form.searchcommand.ispending'
-            ),
-            'mautic.core.searchcommand.has' => array(
-                'mautic.form.form.searchcommand.hasresults'
-            ),
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.isuncategorized',
+            'mautic.core.searchcommand.ismine',
+            'mautic.form.form.searchcommand.isexpired',
+            'mautic.form.form.searchcommand.ispending',
+            'mautic.form.form.searchcommand.hasresults',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
         );

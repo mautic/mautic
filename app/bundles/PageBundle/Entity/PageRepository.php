@@ -198,30 +198,27 @@ class PageRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 0);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                        $expr = $q->expr()->orX(
-                            $q->expr()->isNull('p.category'),
-                            $q->expr()->eq('p.category', $q->expr()->literal(''))
-                        );
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("IDENTITY(p.createdBy)", $this->currentUser->getId());
-                        break;
-
-                }
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                $expr = $q->expr()->eq("p.isPublished", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                $expr = $q->expr()->eq("p.isPublished", 0);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
+                $expr = $q->expr()->orX(
+                    $q->expr()->isNull('p.category'),
+                    $q->expr()->eq('p.category', $q->expr()->literal(''))
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                $expr = $q->expr()->eq("IDENTITY(p.createdBy)", $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
@@ -264,12 +261,10 @@ class PageRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isunpublished',
-                'mautic.core.searchcommand.isuncategorized',
-                'mautic.core.searchcommand.ismine',
-            ),
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.isuncategorized',
+            'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang'
         );

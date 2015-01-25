@@ -134,30 +134,27 @@ class AssetRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.cora.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.cora.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("a.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.cora.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("a.isPublished", 0);
-                        break;
-                    case $this->translator->trans('mautic.cora.searchcommand.isuncategorized'):
-                        $expr = $q->expr()->orX(
-                            $q->expr()->isNull('a.category'),
-                            $q->expr()->eq('a.category', $q->expr()->literal(''))
-                        );
-                        break;
-                    case $this->translator->trans('mautic.cora.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("IDENTITY(a.createdBy)", $this->currentUser->getId());
-                        break;
-
-                }
+            case $this->translator->trans('mautic.cora.searchcommand.ispublished'):
+                $expr = $q->expr()->eq("a.isPublished", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.cora.searchcommand.isunpublished'):
+                $expr = $q->expr()->eq("a.isPublished", 0);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.cora.searchcommand.isuncategorized'):
+                $expr = $q->expr()->orX(
+                    $q->expr()->isNull('a.category'),
+                    $q->expr()->eq('a.category', $q->expr()->literal(''))
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.cora.searchcommand.ismine'):
+                $expr = $q->expr()->eq("IDENTITY(a.createdBy)", $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.cora.searchcommand.category'):
@@ -200,12 +197,10 @@ class AssetRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.cora.searchcommand.is' => array(
-                'mautic.cora.searchcommand.ispublished',
-                'mautic.cora.searchcommand.isunpublished',
-                'mautic.cora.searchcommand.isuncategorized',
-                'mautic.cora.searchcommand.ismine',
-            ),
+            'mautic.cora.searchcommand.ispublished',
+            'mautic.cora.searchcommand.isunpublished',
+            'mautic.cora.searchcommand.isuncategorized',
+            'mautic.cora.searchcommand.ismine',
             'mautic.cora.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang'
         );

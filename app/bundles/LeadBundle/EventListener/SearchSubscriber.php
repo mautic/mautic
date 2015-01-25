@@ -43,14 +43,13 @@ class SearchSubscriber extends CommonSubscriber
             return;
         }
 
-        $isCommand = $this->translator->trans('mautic.core.searchcommand.is');
         $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
         $filter    = array("string" => $str, "force" => '');
 
         //only show results that are not anonymous so as to not clutter up things
-        if (strpos($str, "$isCommand:$anonymous") === false) {
-            $filter['force'] = " !$isCommand:$anonymous";
+        if (strpos($str, "$anonymous") === false) {
+            $filter['force'] = " !$anonymous";
         }
 
         $permissions = $this->security->isGranted(
@@ -61,7 +60,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
             //only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $isCommand:$mine";
+                $filter['force'] .= " $mine";
             }
 
             $results = $this->factory->getModel('lead.lead')->getEntities(

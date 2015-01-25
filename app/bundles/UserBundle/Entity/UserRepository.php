@@ -263,23 +263,20 @@ class UserRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("u.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("u.isPublished", 0);
-                        break;
-                    case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                        $expr = $q->expr()->eq("r.isAdmin", 1);
-                        break;
-                }
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                $expr = $q->expr()->eq("u.isPublished", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                $expr = $q->expr()->eq("u.isPublished", 0);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
+                $expr = $q->expr()->eq("r.isAdmin", 1);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
@@ -320,17 +317,14 @@ class UserRepository extends CommonRepository
     {
          return array(
             'mautic.core.searchcommand.email',
-            'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isunpublished',
-                'mautic.user.user.searchcommand.isadmin'
-            ),
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.user.user.searchcommand.isadmin',
             'mautic.core.searchcommand.name',
             'mautic.user.user.searchcommand.position',
             'mautic.user.user.searchcommand.role',
             'mautic.user.user.searchcommand.username'
         );
-
     }
 
     /**

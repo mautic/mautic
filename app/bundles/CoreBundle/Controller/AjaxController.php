@@ -141,12 +141,17 @@ class AjaxController extends CommonController
         $translator = $this->get('translator');
         foreach ($commands as $k => $c) {
             if (is_array($c)) {
-                $k = $translator->trans($k);
                 foreach ($c as $subc) {
-                    $dataArray[] = array('value' => $k . ":" . $translator->trans($subc));
+                    $command = $translator->trans($k);
+                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+
+                    $dataArray[] = array('value' => $command . $translator->trans($subc));
                 }
             } else {
-                $dataArray[] = array('value' => $translator->trans($c) . ":");
+                $command = $translator->trans($c);
+                $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+
+                $dataArray[] = array('value' => $command);
             }
         }
         sort($dataArray);
@@ -173,16 +178,20 @@ class AjaxController extends CommonController
             //$dataArray[$header] = array();
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
-                    $k = $translator->trans($k);
+                    $command = $translator->trans($k);
+                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+
                     foreach ($c as $subc) {
-                        $command = $k . ":" . $translator->trans($subc);
-                        if (!in_array($command, $dupChecker)) {
-                            $dataArray[] = array('value' => $command);
-                            $dupChecker[] = $command;
+                        $subcommand = $command . $translator->trans($subc);
+                        if (!in_array($subcommand, $dupChecker)) {
+                            $dataArray[] = array('value' => $subcommand);
+                            $dupChecker[] = $subcommand;
                         }
                     }
                 } else {
-                    $command = $translator->trans($c) . ":";
+                    $command = $translator->trans($k);
+                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[] = array('value' => $command);
                         $dupChecker[] = $command;

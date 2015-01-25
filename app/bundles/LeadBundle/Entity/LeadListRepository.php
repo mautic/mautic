@@ -579,27 +579,25 @@ class LeadListRepository extends CommonRepository
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("l.createdBy", $this->currentUser->getId());
-                        break;
-                    case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
-                        $expr = $q->expr()->eq("l.isGlobal", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("l.isPublished", 1);
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("l.isPublished", 0);
-                        break;
-                }
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                $expr = $q->expr()->eq("l.createdBy", $this->currentUser->getId());
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
+                $expr = $q->expr()->eq("l.isGlobal", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                $expr = $q->expr()->eq("l.isPublished", 1);
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                $expr = $q->expr()->eq("l.isPublished", 0);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
@@ -623,12 +621,10 @@ class LeadListRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.lead.list.searchcommand.isglobal',
-                'mautic.core.searchcommand.ismine',
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isinactive'
-            ),
+            'mautic.lead.list.searchcommand.isglobal',
+            'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isinactive',
             'mautic.core.searchcommand.name'
         );
     }

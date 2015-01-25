@@ -460,38 +460,36 @@ class LeadRepository extends CommonRepository
         }
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
-                    case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
-                        $expr = $q->expr()->$xFunc(
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.firstname")
-                            ),
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.lastname")
-                            ),
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.company")
-                            ),
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.email")
-                            )
-                        );
-                        break;
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->$eqFunc("l.owner_id", $this->currentUser->getId());
-                        break;
-                    case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
-                        $expr = $q->expr()->$xFunc(
-                            $q->expr()->$eqFunc("l.owner_id", 0),
-                            $q->expr()->$nullFunc("l.owner_id")
-                        );
-                        break;
-                }
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
+                $expr = $q->expr()->$xFunc(
+                    $q->expr()->$xSubFunc(
+                        $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
+                        $q->expr()->$nullFunc("l.firstname")
+                    ),
+                    $q->expr()->$xSubFunc(
+                        $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
+                        $q->expr()->$nullFunc("l.lastname")
+                    ),
+                    $q->expr()->$xSubFunc(
+                        $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
+                        $q->expr()->$nullFunc("l.company")
+                    ),
+                    $q->expr()->$xSubFunc(
+                        $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
+                        $q->expr()->$nullFunc("l.email")
+                    )
+                );
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                $expr = $q->expr()->$eqFunc("l.owner_id", $this->currentUser->getId());
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
+                $expr = $q->expr()->$xFunc(
+                    $q->expr()->$eqFunc("l.owner_id", 0),
+                    $q->expr()->$nullFunc("l.owner_id")
+                );
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
@@ -543,11 +541,9 @@ class LeadRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.lead.lead.searchcommand.isanonymous',
-                'mautic.core.searchcommand.ismine',
-                'mautic.lead.lead.searchcommand.isunowned',
-            ),
+            'mautic.lead.lead.searchcommand.isanonymous',
+            'mautic.core.searchcommand.ismine',
+            'mautic.lead.lead.searchcommand.isunowned',
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
