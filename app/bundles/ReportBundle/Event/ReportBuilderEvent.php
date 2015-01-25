@@ -106,15 +106,15 @@ class ReportBuilderEvent extends Event
     {
         $columns = array(
             $prefix . 'id' => array(
-                'label' => 'mautic.report.field.id',
+                'label' => 'mautic.core.id',
                 'type'  => 'int'
             ),
             $prefix . 'name' => array(
-                'label' => 'mautic.report.field.name',
+                'label' => 'mautic.core.name',
                 'type'  => 'string'
             ),
             $prefix . 'created_by_user' => array(
-                'label' => 'mautic.report.field.created_by_user',
+                'label' => 'mautic.core.createdby',
                 'type'  => 'string'
             ),
             $prefix . 'date_added' => array(
@@ -130,7 +130,7 @@ class ReportBuilderEvent extends Event
                 'type'  => 'datetime'
             ),
             $prefix . 'description' => array(
-                'label' => 'mautic.report.field.description',
+                'label' => 'mautic.core.description',
                 'type'  => 'string'
             ),
             $prefix . 'publish_up' => array(
@@ -238,7 +238,7 @@ class ReportBuilderEvent extends Event
     {
         return array(
             $prefix . 'ip_address' => array(
-                'label' => 'mautic.report.field.ip_address',
+                'label' => 'mautic.core.ipaddress',
                 'type'  => 'string'
             )
         );

@@ -64,7 +64,7 @@ if ($security->isGranted('campaign:campaigns:edit')) {
             'data-header' => $view['translator']->trans('mautic.lead.lead.header.campaigns', array('%name%' => $lead->getPrimaryIdentifier())),
             'href'        => $view['router']->generate('mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "campaign"))
         ),
-        'btnText'   => $view['translator']->trans('mautic.lead.lead.campaigns'),
+        'btnText'   => $view['translator']->trans('mautic.campaign.campaigns'),
         'iconClass' => 'fa fa-clock-o'
     );
 }
@@ -172,8 +172,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="bg-auto bg-dark-xs">
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?>">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></a>
+                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
             <!--/ lead detail collapseable toggler -->
@@ -285,7 +285,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
                 </address>
 
-                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.email'); ?></h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.email'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.home'); ?></h6>

@@ -44,20 +44,20 @@ class CategoryType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
         $builder->add('title', 'text', array(
-            'label'      => 'mautic.category.form.title',
+            'label'      => 'mautic.core.title',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.category.form.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('alias', 'text', array(
-            'label'      => 'mautic.category.form.alias',
+            'label'      => 'mautic.core.alias',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
@@ -67,7 +67,7 @@ class CategoryType extends AbstractType
         ));
 
         $builder->add('color', 'text', array(
-            'label'      => 'mautic.category.form.color',
+            'label'      => 'mautic.core.color',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'       => 'form-control',

@@ -30,7 +30,7 @@ $item = $event['extra']['log'];
 			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['campaignDescription'])); ?></p>
 			<?php endif; ?>
 			<?php if ($item['eventDescription']): ?>
-			<p><?php echo $view['translator']->trans('mautic.campaign.user.event.description', array('%description%' => $item['eventDescription'])); ?></p>
+			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['eventDescription'])); ?></p>
 			<?php endif; ?>
         </div>
 	</div>

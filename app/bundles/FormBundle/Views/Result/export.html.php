@@ -20,7 +20,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
         <tr>
             <th class="col-formresult-id"></th>
             <th class="col-formresult-date"><?php echo $view['translator']->trans('mautic.form.result.thead.date'); ?></th>
-            <th class="col-formresult-ip"><?php echo $view['translator']->trans('mautic.form.result.thead.ip'); ?></th>
+            <th class="col-formresult-ip"><?php echo $view['translator']->trans('mautic.core.ipaddress'); ?></th>
             <?php
             $fields = $form->getFields();
             foreach ($fields as $f):

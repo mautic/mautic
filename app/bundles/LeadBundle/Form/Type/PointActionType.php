@@ -26,7 +26,7 @@ class PointActionType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('points', 'number', array(
-            'label'      => 'mautic.lead.lead.event.pointaction',
+            'label'      => 'mautic.lead.lead.event.points',
             'attr'       => array('class' => 'form-control'),
             'label_attr' => array('class' => 'control-label'),
             'precision'  => 0,

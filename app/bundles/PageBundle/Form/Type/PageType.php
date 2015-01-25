@@ -64,7 +64,7 @@ class PageType extends AbstractType
         $isVariant     = !empty($variantParent);
 
         $builder->add('title', 'text', array(
-            'label'      => 'mautic.page.form.title',
+            'label'      => 'mautic.core.title',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
@@ -155,7 +155,7 @@ class PageType extends AbstractType
             ));
         } else {
             $builder->add('alias', 'text', array(
-                'label'      => 'mautic.page.form.alias',
+                'label'      => 'mautic.core.alias',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',
@@ -172,7 +172,7 @@ class PageType extends AbstractType
             ));
 
             $builder->add('language', 'locale', array(
-                'label'      => 'mautic.page.form.language',
+                'label'      => 'mautic.core.language',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',

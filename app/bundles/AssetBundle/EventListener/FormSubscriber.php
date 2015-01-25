@@ -40,7 +40,7 @@ class FormSubscriber extends CommonSubscriber
     {
         //add form submit actions
         $action = array(
-            'group'        => 'mautic.asset.asset.submitaction',
+            'group'        => 'mautic.asset.actions',
             'label'        => 'mautic.asset.asset.submitaction.downloadfile',
             'description'  => 'mautic.asset.asset.submitaction.downloadfile_descr',
             'formType'     => 'asset_submitaction_downloadfile',

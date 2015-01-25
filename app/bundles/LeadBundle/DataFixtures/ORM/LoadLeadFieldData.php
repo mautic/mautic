@@ -75,7 +75,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
 
         foreach ($textfields as $key => $name) {
             $entity = new LeadField();
-            $entity->setLabel($translator->trans('mautic.lead.field.'.$name, array(), 'fixtures'));
+            $entity->setLabel(ucfirst($name));
             if (in_array($name, array('title', 'company', 'city', 'zipcode'))) {
                 $type = 'lookup';
             } elseif ($name == 'country') {

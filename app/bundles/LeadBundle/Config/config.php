@@ -108,7 +108,7 @@ return array(
         'main' => array(
             'priority' => 3,
             'items'    => array(
-                'mautic.lead.lead.menu.root' => array(
+                'mautic.lead.leads' => array(
                     'id'        => 'menu_lead_parent',
                     'iconClass' => 'fa-user',
                     'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),

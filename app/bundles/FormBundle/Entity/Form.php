@@ -174,7 +174,7 @@ class Form extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.form.form.name.notblank',
+            'message' => 'mautic.core.name.required',
             'groups'  => array('form')
         )));
 

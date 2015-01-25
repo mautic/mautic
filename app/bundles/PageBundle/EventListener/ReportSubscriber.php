@@ -50,11 +50,11 @@ class ReportSubscriber extends CommonSubscriber
 
             $columns = array(
                 $prefix . 'title'              => array(
-                    'label' => 'mautic.page.report.title',
+                    'label' => 'mautic.core.title',
                     'type'  => 'string'
                 ),
                 $prefix . 'alias'              => array(
-                    'label' => 'mautic.report.field.alias',
+                    'label' => 'mautic.core.alias',
                     'type'  => 'string'
                 ),
                 $prefix . 'revision'           => array(
@@ -86,7 +86,7 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'string'
                 ),
                 $prefix . 'lang'               => array(
-                    'label' => 'mautic.report.field.lang',
+                    'label' => 'mautic.core.language',
                     'type'  => 'string'
                 ),
                 $prefix . 'variant_start_date' => array(
@@ -100,7 +100,7 @@ class ReportSubscriber extends CommonSubscriber
             );
             $columns = array_merge($columns, $event->getStandardColumns('p.', array('name', 'description')), $event->getCategoryColumns());
             $data    = array(
-                'display_name' => 'mautic.page.report.table',
+                'display_name' => 'mautic.page.pages',
                 'columns'      => $columns
             );
             $event->addTable('pages', $data);
@@ -196,7 +196,7 @@ class ReportSubscriber extends CommonSubscriber
                     )
                 );
                 $data        = array(
-                    'display_name' => 'mautic.page.report.hits.table',
+                    'display_name' => 'mautic.page.hits',
                     'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
                 );
                 $event->addTable('page.hits', $data);

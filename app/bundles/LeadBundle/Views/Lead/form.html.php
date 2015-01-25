@@ -37,7 +37,7 @@ $groups = array_keys($fields);
                                         $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
                                         ?>
                                         <span class="label label-default"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></span>
-                                        <?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?>
+                                        <?php echo $view['translator']->trans('mautic.lead.points'); ?>
                                     </span>
                                 </p>
                             </div>
@@ -93,7 +93,7 @@ $groups = array_keys($fields);
                             <hr class="mnr-md mnl-md">
 
                             <div class="form-group mb-0">
-                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.name'); ?></label>
+                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.name'); ?></label>
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <?php echo $view['form']->widget($form['title'], array('attr' => array('placeholder' => $form['title']->vars['label']))); ?>
@@ -119,10 +119,10 @@ $groups = array_keys($fields);
                             <hr class="mnr-md mnl-md">
 
                             <div class="form-group mb-0">
-                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.company'); ?></label>
+                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.company'); ?></label>
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <?php echo $view['form']->widget($form['company'], array('attr' => array('placeholder' => $view['translator']->trans('mautic.lead.field.companyname')))); ?>
+                                        <?php echo $view['form']->widget($form['company'], array('attr' => array('placeholder' => $view['translator']->trans('mautic.core.company')))); ?>
                                     </div>
                                     <div class="col-sm-4">
                                         <?php echo $view['form']->widget($form['position'], array('attr' => array('placeholder' => $form['position']->vars['label']))); ?>

@@ -77,7 +77,7 @@ class Category extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.category.title.notblank'
+            'message' => 'mautic.core.title.required'
         )));
     }
 

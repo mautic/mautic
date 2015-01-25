@@ -84,7 +84,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $pageResults['count'] = count($pages);
-                $event->addResults('mautic.page.header.index', $pageResults);
+                $event->addResults('mautic.page.pages', $pageResults);
             }
         }
     }
@@ -96,7 +96,7 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted(array('page:pages:viewown', 'page:pages:viewother'), "MATCH_ONE")) {
             $event->addCommands(
-                'mautic.page.header.index',
+                'mautic.page.pages',
                 $this->factory->getModel('page.page')->getCommandList()
             );
         }

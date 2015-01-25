@@ -82,7 +82,7 @@ class EmailStepType extends AbstractType
         ));
 
         $builder->add('mailer_user', 'text', array(
-            'label'      => 'mautic.install.form.email.mailer_user',
+            'label'      => 'mautic.core.username',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class' => 'form-control'
@@ -90,7 +90,7 @@ class EmailStepType extends AbstractType
         ));
 
         $builder->add('mailer_password', 'password', array(
-            'label'      => 'mautic.install.form.email.mailer_password',
+            'label'      => 'mautic.core.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class' => 'form-control',
@@ -101,7 +101,7 @@ class EmailStepType extends AbstractType
         $builder->add('mailer_encryption', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array('tls', 'ssl'),
-                array('mautic.install.form.email.encryption_tls', 'mautic.install.form.email.encryption_ssl')
+                array('mautic.core.config.mailer_encryption.tls', 'mautic.core.config.mailer_encryption.ssl')
             ),
             'label'       => 'mautic.install.form.email.encryption',
             'expanded'    => true,
@@ -116,9 +116,9 @@ class EmailStepType extends AbstractType
                     'cram-md5'
                 ),
                 array(
-                    'mautic.install.form.email.auth_mode_plain',
-                    'mautic.install.form.email.auth_mode_login',
-                    'mautic.install.form.email.auth_mode_cram-md5'
+                    'mautic.core.config.mailer_auth_mode.plain',
+                    'mautic.core.config.mailer_auth_mode.login',
+                    'mautic.core.config.mailer_auth_mode.cram-md5'
                 )
             ),
             'label'       => 'mautic.install.form.email.auth_mode',
@@ -134,8 +134,8 @@ class EmailStepType extends AbstractType
             'choice_list' => new ChoiceList(
                 array('memory', 'file'),
                 array(
-                    'mautic.install.form.email.spool_memory',
-                    'mautic.install.form.email.spool_file'
+                    'mautic.core.config.mailer_spool_type.memory',
+                    'mautic.core.config.mailer_spool_type.file'
                 )
             ),
             'label'       => 'mautic.install.form.email.spool_type',

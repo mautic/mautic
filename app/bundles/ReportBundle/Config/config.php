@@ -42,7 +42,7 @@ return array(
         'main' => array(
             'priority' => 11,
             'items'    => array(
-                'mautic.report.report.menu.root' => array(
+                'mautic.report.reports' => array(
                     'route'     => 'mautic_report_index',
                     'iconClass' => 'fa-line-chart',
                     'access'    => array(

@@ -47,13 +47,13 @@ class ListType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.lead.list.form.name',
+            'label'      => 'mautic.core.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('alias', 'text', array(
-            'label'      => 'mautic.lead.list.form.alias',
+            'label'      => 'mautic.core.alias',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
@@ -64,7 +64,7 @@ class ListType extends AbstractType
         ));
 
         $builder->add('description', 'textarea', array(
-            'label'      => 'mautic.lead.list.form.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
             'required'   => false

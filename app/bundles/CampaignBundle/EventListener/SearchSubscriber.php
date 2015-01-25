@@ -70,7 +70,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $campaignResults['count'] = count($campaigns);
-                $event->addResults('mautic.campaigns.header.index', $campaignResults);
+                $event->addResults('mautic.campaign.campaigns', $campaignResults);
             }
         }
     }
@@ -83,7 +83,7 @@ class SearchSubscriber extends CommonSubscriber
         $security   = $this->security;
         if ($security->isGranted('campaign:campaigns:view')) {
             $event->addCommands(
-                'mautic.campaigns.header.index',
+                'mautic.campaign.campaigns',
                 $this->factory->getModel('campaign')->getCommandList()
             );
         }

@@ -40,10 +40,10 @@ $form['filters']->setRendered();
                 <div class="col-xs-12">
                     <ul class="bg-auto nav nav-tabs pr-md pl-md">
                         <li class="active">
-                            <a href="#details" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.list.tab.details'); ?></a>
+                            <a href="#details" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                         </li>
                         <li>
-                            <a href="#filters" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.list.tab.filters'); ?></a></a>
+                            <a href="#filters" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.filters'); ?></a></a>
                         </li>
                     </ul>
 

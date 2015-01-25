@@ -32,13 +32,13 @@ class RoleType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.user.role.form.name',
+            'label'      => 'mautic.core.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'textarea', array(
-            'label'      => 'mautic.user.role.form.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
             'required'   => false
@@ -57,7 +57,7 @@ class RoleType extends AbstractType
 
         $builder->add(
             'permissions', 'permissions', array(
-                'label'             => 'mautic.user.role.form.permissions',
+                'label'             => 'mautic.user.role.permissions',
                 'mapped'            => false, //we'll have to manually build the permissions for persisting
                 'required'          => false,
                 'attr'              => array(

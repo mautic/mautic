@@ -53,7 +53,7 @@ return array(
         'main' => array(
             'priority' => 6,
             'items'    => array(
-                'mautic.email.menu.root' => array(
+                'mautic.email.emails' => array(
                     'id'        => 'mautic_email_root',
                     'iconClass' => 'fa-send',
                     'access'    => array('email:emails:viewown', 'email:emails:viewother'),

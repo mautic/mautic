@@ -494,7 +494,7 @@ class LeadRepository extends CommonRepository
                 }
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.email'):
+            case $this->translator->trans('mautic.core.searchcommand.email'):
                 $expr = $q->expr()->$likeFunc('l.email', ":$unique");
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
@@ -551,7 +551,7 @@ class LeadRepository extends CommonRepository
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
-            'mautic.lead.lead.searchcommand.email',
+            'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner'
         );
     }

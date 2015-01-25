@@ -52,7 +52,7 @@ class OAuthEventListener
         if ($user = $this->getUser($event)) {
             //check to see if user has api access
             if (!$this->mauticSecurity->isGranted("api:access:full")) {
-                throw new AccessDeniedException($this->translator->trans('mautic.core.accessdenied'));
+                throw new AccessDeniedException($this->translator->trans('mautic.core.error.accessdenied', array(), 'flashes'));
             }
             $client = $event->getClient();
             $event->setAuthorizedClient(

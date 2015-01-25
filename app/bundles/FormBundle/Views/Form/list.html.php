@@ -27,7 +27,7 @@ if ($tmpl == 'index') {
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'f.name',
-                    'text'       => 'mautic.form.form.thead.name',
+                    'text'       => 'mautic.core.name',
                     'class'      => 'col-form-name',
                     'default'    => true
                 ));
@@ -35,21 +35,21 @@ if ($tmpl == 'index') {
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'c.title',
-                    'text'       => 'mautic.form.form.thead.category',
+                    'text'       => 'mautic.core.category',
                     'class'      => 'visible-md visible-lg col-form-category'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'submissionCount',
-                    'text'       => 'mautic.form.form.thead.submissions',
+                    'text'       => 'mautic.form.form.results',
                     'class'      => 'visible-md visible-lg col-form-submissions'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'f.id',
-                    'text'       => 'mautic.form.form.thead.id',
+                    'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-form-id'
                 ));
                 ?>

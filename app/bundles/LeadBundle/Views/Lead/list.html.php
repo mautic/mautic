@@ -27,7 +27,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.lastname, l.firstname, l.company, l.email',
-                    'text'       => 'mautic.lead.lead.thead.name',
+                    'text'       => 'mautic.core.name',
                     'class'      => 'col-lead-name',
                     'default'    => true
                 ));
@@ -35,7 +35,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.email',
-                    'text'       => 'mautic.lead.lead.thead.email',
+                    'text'       => 'mautic.core.email',
                     'class'      => 'col-lead-email visible-md visible-lg'
                 ));
 
@@ -49,7 +49,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.points',
-                    'text'       => 'mautic.lead.lead.thead.points',
+                    'text'       => 'mautic.lead.points',
                     'class'      => 'col-lead-points'
                 ));
                 ?>

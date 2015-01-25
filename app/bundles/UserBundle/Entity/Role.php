@@ -88,7 +88,7 @@ class Role extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.user.role.name.notblank')
+            array('message' => 'mautic.core.name.required')
         ));
     }
 

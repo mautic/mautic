@@ -19,11 +19,11 @@ class FormFieldHelper
      */
     static private $types = array(
         'text'   => array(
-            'label'       => 'mautic.lead.field.type.text',
+            'label'       => 'mautic.core.text',
             'properties'  => array()
         ),
         'select' => array(
-            'label'       => 'mautic.lead.field.type.select',
+            'label'       => 'mautic.core.select',
             'properties'  => array(
                 'list' => array(
                     'required'  => true,
@@ -32,7 +32,7 @@ class FormFieldHelper
             )
         ),
         'boolean'=> array(
-            'label'      => 'mautic.lead.field.type.boolean',
+            'label'      => 'mautic.core.boolean',
             'properties' => array(
                 'yes' => array(
                     'required'  => true,
@@ -51,7 +51,7 @@ class FormFieldHelper
             )
         ),
         'date'   => array(
-            'label'       => 'mautic.lead.field.type.date',
+            'label'       => 'mautic.core.date',
             'properties'  => array(
                 'format' => array()
             )
@@ -71,11 +71,11 @@ class FormFieldHelper
             'properties'  => array()
         ),
         'email'  => array(
-            'label'       => 'mautic.lead.field.type.email',
+            'label'       => 'mautic.core.email',
             'properties'  => array()
         ),
         'number' => array(
-            'label' => 'mautic.lead.field.type.number',
+            'label' => 'mautic.core.number',
             'properties'  => array(
                 'roundmode' => array(),
                 'precision' => array()
@@ -86,7 +86,7 @@ class FormFieldHelper
             'properties'  => array()
         ),
         'url'    => array(
-            'label'       => 'mautic.lead.field.type.url',
+            'label'       => 'mautic.core.url',
             'properties'  => array()
         ),
         'country' => array(

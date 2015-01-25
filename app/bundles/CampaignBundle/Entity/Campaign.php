@@ -122,15 +122,15 @@ class Campaign extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.campaign.name.notblank'
+            'message' => 'mautic.core.name.required'
         )));
 
         $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
-            'message' => 'mautic.campaign.lists.notblank'
+            'message' => 'mautic.lead.lists.required'
         )));
 
         $metadata->addPropertyConstraint('lists', new Assert\NotBlank(array(
-            'message' => 'mautic.campaign.lists.notblank'
+            'message' => 'mautic.lead.lists.required'
         )));
     }
 

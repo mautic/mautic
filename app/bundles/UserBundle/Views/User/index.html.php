@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.user.header.index'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.users'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(

@@ -70,7 +70,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $userResults['count'] = count($users);
-                $event->addResults('mautic.user.user.header.index', $userResults);
+                $event->addResults('mautic.user.users', $userResults);
             }
         }
 
@@ -104,7 +104,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $roleResults['count'] = count($roles);
-                $event->addResults('mautic.user.role.header.index', $roleResults);
+                $event->addResults('mautic.user.roles', $roleResults);
             }
         }
     }
@@ -116,13 +116,13 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(
-                'mautic.user.user.header.index',
+                'mautic.user.users',
                 $this->factory->getModel('user.user')->getCommandList()
             );
         }
         if ($this->security->isGranted('user:roles:view')) {
             $event->addCommands(
-                'mautic.user.role.header.index',
+                'mautic.user.roles',
                 $this->factory->getModel('user.role')->getCommandList()
             );
         }

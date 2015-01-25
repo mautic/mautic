@@ -45,6 +45,6 @@ class EmailSubscriber extends CommonSubscriber
 
         //add email token
         $content = $this->templating->render('MauticFormBundle:SubscribedEvents\EmailToken:token.html.php');
-        $event->addTokenSection('form.submissions', 'mautic.form.builder.index', $content);
+        $event->addTokenSection('form.submissions', 'mautic.form.forms', $content);
     }
 }

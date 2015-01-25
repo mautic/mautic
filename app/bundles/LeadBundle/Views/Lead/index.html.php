@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.leads'));
 
 $buttons = $preButtons = array();
 if ($permissions['lead:leads:create']) {

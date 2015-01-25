@@ -227,7 +227,7 @@ class Page extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.page.title.notblank'
+            'message' => 'mautic.core.title.required'
         )));
 
         $metadata->addConstraint(new Callback(array(

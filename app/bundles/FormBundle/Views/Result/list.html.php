@@ -31,7 +31,7 @@ $formId = $form->getId();
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'formresult.'.$formId,
                     'orderBy'    => 'i.ip_address',
-                    'text'       => 'mautic.form.result.thead.ip',
+                    'text'       => 'mautic.core.ipaddress',
                     'class'      => 'col-formresult-ip',
                     'filterBy'   => 'i.ip_address'
                 ));

@@ -28,8 +28,8 @@ $view['slots']->set("headerTitle", $header);
 	<div class="col-xs-12 bg-white height-auto">
 		<!-- tabs controls -->
 		<ul class="bg-auto nav nav-tabs pr-md pl-md">
-			<li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.user.role.tab.details'); ?></a></li>
-			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.user.role.tab.permissions'); ?></a></li>
+			<li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.details'); ?></a></li>
+			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.user.role.permissions'); ?></a></li>
 		</ul>
 		<!--/ tabs controls -->
 

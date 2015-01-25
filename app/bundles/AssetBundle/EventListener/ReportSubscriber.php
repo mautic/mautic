@@ -58,22 +58,22 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 ),
                 $prefix . 'alias'                 => array(
-                    'label' => 'mautic.report.field.alias',
+                    'label' => 'mautic.core.alias',
                     'type'  => 'string'
                 ),
                 $prefix . 'lang'                  => array(
-                    'label' => 'mautic.report.field.lang',
+                    'label' => 'mautic.core.language',
                     'type'  => 'string'
                 ),
                 $prefix . 'title'                 => array(
-                    'label' => 'mautic.asset.report.title',
+                    'label' => 'mautic.core.title',
                     'type'  => 'string'
                 )
             );
 
             $columns = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
             $event->addTable('assets', array(
-                'display_name' => 'mautic.asset.report.table',
+                'display_name' => 'mautic.asset.assets',
                 'columns'      => $columns
             ));
 
@@ -90,7 +90,7 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'string'
                     ),
                     $downloadPrefix . 'referer'       => array(
-                        'label' => 'mautic.asset.report.download.referer',
+                        'label' => 'mautic.core.referer',
                         'type'  => 'string'
                     ),
                     $downloadPrefix . 'source'        => array(

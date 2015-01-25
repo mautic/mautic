@@ -71,10 +71,10 @@ class MiscStepType extends AbstractType
         // If we're installing a non-stable version, show a choice list to select an update channel
         if (\AppKernel::EXTRA_VERSION) {
             $choices = array(
-                'alpha'  => 'mautic.install.form.stability.alpha',
-                'beta'   => 'mautic.install.form.stability.beta',
-                'rc'     => 'mautic.install.form.stability.rc',
-                'stable' => 'mautic.install.form.stability.stable'
+                'alpha'  => 'mautic.core.config.update_stability.alpha',
+                'beta'   => 'mautic.core.config.update_stability.beta',
+                'rc'     => 'mautic.core.config.update_stability.rc',
+                'stable' => 'mautic.core.config.update_stability.stable'
             );
 
             $builder->add('update_stability', 'choice', array(

@@ -282,7 +282,7 @@ class UserRepository extends CommonRepository
                 }
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.user.user.searchcommand.email'):
+            case $this->translator->trans('mautic.core.searchcommand.email'):
                 $expr = $q->expr()->like("u.email", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
@@ -319,7 +319,7 @@ class UserRepository extends CommonRepository
     public function getSearchCommands()
     {
          return array(
-            'mautic.user.user.searchcommand.email',
+            'mautic.core.searchcommand.email',
             'mautic.core.searchcommand.is' => array(
                 'mautic.core.searchcommand.ispublished',
                 'mautic.core.searchcommand.isunpublished',

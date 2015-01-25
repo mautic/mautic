@@ -620,7 +620,7 @@ class FormController extends CommonFormController
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             'form:forms:editown', 'form:forms:editother', $form->getCreatedBy()
         ))  {
-            $html = '<h1>' . $this->get('translator')->trans('mautic.core.accessdenied') . '</h1>';
+            $html = '<h1>' . $this->get('translator')->trans('mautic.core.error.accessdenied', array(), 'flashes') . '</h1>';
         } else {
             $html = $form->getCachedHtml();
         }

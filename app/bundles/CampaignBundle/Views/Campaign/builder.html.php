@@ -19,7 +19,7 @@
     </div>
     <div class="builder-panel" id="CampaignEvents">
         <p>
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeCampaignBuilder();"><?php echo $view['translator']->trans('mautic.campaign.campaign.close.builder'); ?></button>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeCampaignBuilder();"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
         </p>
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>

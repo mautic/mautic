@@ -21,7 +21,7 @@ endif;
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.name',
-                'text'       => 'mautic.api.client.thead.name',
+                'text'       => 'mautic.core.name',
                 'default'    => true,
                 'class'      => 'col-client-name'
             ));
@@ -31,7 +31,7 @@ endif;
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.id',
-                'text'       => 'mautic.api.client.thead.id',
+                'text'       => 'mautic.core.id',
                 'class'      => 'visible-md visible-lg col-client-id'
             ));
             ?>

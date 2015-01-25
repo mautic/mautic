@@ -27,10 +27,10 @@ endif;
     </div>
     <div class="input-group mb-md">
         <span class="input-group-addon"><i class="fa fa-key"></i></span>
-        <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>:</label>
+        <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.core.password'); ?>:</label>
         <input type="password" id="password" name="_password"
                class="form-control input-lg" required
-               placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
+               placeholder='<?php echo $view['translator']->trans('mautic.core.password'); ?>' />
     </div>
 
     <div class="checkbox-inline custom-primary pull-left mb-md">

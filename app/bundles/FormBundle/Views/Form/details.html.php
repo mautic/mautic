@@ -153,8 +153,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
-                  <li class="active"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.details.actions'); ?></a></li>
-                  <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.details.fields'); ?></a></li>
+                  <li class="active"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.actions'); ?></a></li>
+                  <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.fields'); ?></a></li>
               </ul>
               <!--/ tabs controls -->
           </div>
@@ -209,7 +209,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                           <li class="list-group-item bg-auto bg-light-xs">
                               <div class="box-layout">
                                   <div class="col-md-1 va-m">
-                                      <?php $requiredTitle = $field->getIsRequired() ? 'mautic.form.details.required' : 'mautic.form.details.not_required'; ?>
+                                      <?php $requiredTitle = $field->getIsRequired() ? 'mautic.core.required' : 'mautic.core.not_required'; ?>
                                       <h3><span class="fa fa-<?php echo $field->getIsRequired() ? 'check' : 'times'; ?> text-white dark-xs" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans($requiredTitle); ?>"></span></h3>
                                   </div>
                                   <div class="col-md-7 va-m">

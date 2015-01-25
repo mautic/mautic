@@ -44,7 +44,7 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.email.point.action',
+            'group'       => 'mautic.email.actions',
             'label'       => 'mautic.email.point.action.open',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'),
             'formType'    => 'emailopen_list'
@@ -53,7 +53,7 @@ class PointSubscriber extends CommonSubscriber
         $event->addAction('email.open', $action);
 
         $action = array(
-            'group'       => 'mautic.email.point.action',
+            'group'       => 'mautic.email.actions',
             'label'       => 'mautic.email.point.action.send',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'),
             'formType'    => 'emailopen_list'

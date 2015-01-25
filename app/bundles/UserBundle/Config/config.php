@@ -10,12 +10,12 @@
 return array(
     'menu'     => array(
         'admin' => array(
-            'mautic.user.user.menu.index' => array(
+            'mautic.user.users' => array(
                 'access'    => 'user:users:view',
                 'route'     => 'mautic_user_index',
                 'iconClass' => 'fa-users',
             ),
-            'mautic.user.role.menu.index' => array(
+            'mautic.user.roles' => array(
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
                 'iconClass' => 'fa-lock'

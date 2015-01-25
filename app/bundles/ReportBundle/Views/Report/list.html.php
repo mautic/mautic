@@ -26,7 +26,7 @@ if ($tmpl == 'index')
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.name',
-                        'text'       => 'mautic.report.report.thead.name',
+                        'text'       => 'mautic.core.name',
                         'class'      => 'col-report-name',
                         'default'    => true
                     ));
@@ -34,7 +34,7 @@ if ($tmpl == 'index')
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.id',
-                        'text'       => 'mautic.report.report.thead.id',
+                        'text'       => 'mautic.core.id',
                         'class'      => 'col-report-id'
                     ));
                     ?>

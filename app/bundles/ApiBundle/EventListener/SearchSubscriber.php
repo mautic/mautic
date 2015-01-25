@@ -72,7 +72,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $clientResults['count'] = count($clients);
-                $event->addResults('mautic.api.client.header.gs', $clientResults);
+                $event->addResults('mautic.api.client.menu.index', $clientResults);
             }
         }
     }

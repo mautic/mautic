@@ -47,7 +47,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
 
         $cat    = new Category();
         $cat->setBundle('page');
-        $events = $trans->trans('mautic.page.category.events', array(), 'fixtures');
+        $events = 'Events';
 
         $cat->setDateAdded($today);
         $cat->setTitle($events);

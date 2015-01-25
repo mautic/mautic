@@ -24,7 +24,7 @@ class FormFieldTextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('text', 'textarea', array(
-            'label'      => 'mautic.form.field.form.property_text',
+            'label'      => 'mautic.form.field.type.freetext',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true

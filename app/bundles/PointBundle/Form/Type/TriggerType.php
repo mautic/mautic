@@ -51,13 +51,13 @@ class TriggerType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.point.trigger.form.name',
+            'label'      => 'mautic.core.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'textarea', array(
-            'label'      => 'mautic.point.trigger.form.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
             'required'   => false

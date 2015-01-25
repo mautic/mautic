@@ -120,7 +120,7 @@ class Trigger extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.point.trigger.name.notblank'
+            'message' => 'mautic.core.name.required'
         )));
     }
 

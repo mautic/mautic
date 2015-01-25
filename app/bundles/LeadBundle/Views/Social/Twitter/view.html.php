@@ -12,7 +12,7 @@
     <ul class="nav nav-tabs pr-md pl-md">
         <li class="active">
             <a href="#TwitterProfile" role="tab" data-toggle="tab">
-                <?php echo $view['translator']->trans('mautic.lead.lead.social.twitter.profile'); ?>
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
             </a>
         </li>
         <li>
@@ -22,12 +22,12 @@
         </li>
         <li>
             <a href="#TwitterPhotos" role="tab" data-toggle="tab">
-                <?php echo $view['translator']->trans('mautic.lead.lead.social.twitter.photos'); ?>
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
             </a>
         </li>
         <li>
             <a href="#TwitterTags" role="tab" data-toggle="tab">
-               <?php echo $view['translator']->trans('mautic.lead.lead.social.twitter.tags'); ?>
+               <?php echo $view['translator']->trans('mautic.lead.lead.social.tags'); ?>
             </a>
         </li>
     </ul>

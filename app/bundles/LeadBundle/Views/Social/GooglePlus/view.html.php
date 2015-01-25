@@ -14,22 +14,22 @@
         <ul class="nav nav-tabs nav-justified">
             <li class="active">
                 <a href="#GoogleProfile" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.google.profile'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
                 </a>
             </li>
             <li>
                 <a href="#GooglePosts" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.google.posts'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.posts'); ?>
                 </a>
             </li>
             <li>
                 <a href="#GooglePhotos" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.google.photos'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
                 </a>
             </li>
             <li>
                 <a href="#GoogleTags" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.google.tags'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.tags'); ?>
                 </a>
             </li>
         </ul>

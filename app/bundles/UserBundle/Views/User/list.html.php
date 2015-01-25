@@ -29,7 +29,7 @@ endif;
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.lastName, u.firstName, u.username',
-                'text'       => 'mautic.user.user.thead.name',
+                'text'       => 'mautic.core.name',
                 'class'      => 'visible-md visible-lg col-user-name',
                 'default'    => true
             ));
@@ -37,28 +37,28 @@ endif;
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.username',
-                'text'       => 'mautic.user.user.thead.username',
+                'text'       => 'mautic.core.username',
                 'class'      => 'col-user-username',
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.email',
-                'text'       => 'mautic.user.user.thead.email',
+                'text'       => 'mautic.core.email',
                 'class'      => 'visible-md visible-lg col-user-email'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'r.name',
-                'text'       => 'mautic.user.user.thead.role',
+                'text'       => 'mautic.user.role',
                 'class'      => 'visible-md visible-lg col-user-role'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.id',
-                'text'       => 'mautic.user.user.thead.id',
+                'text'       => 'mautic.core.id',
                 'class'      => 'visible-md visible-lg col-user-id'
             ));
             ?>

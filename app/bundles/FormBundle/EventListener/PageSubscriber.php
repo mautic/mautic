@@ -40,7 +40,7 @@ class PageSubscriber extends CommonSubscriber
     public function onPageBuild (PageBuilderEvent $event)
     {
         $tokenHelper = new PageTokenHelper($this->factory);
-        $event->addTokenSection('form.pagetokens', 'mautic.form.form.header.index', $tokenHelper->getTokenContent());
+        $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
 
         //add AB Test Winner Criteria
         $formSubmissions = array(

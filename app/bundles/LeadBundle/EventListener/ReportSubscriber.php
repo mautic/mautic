@@ -54,7 +54,7 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'datetime'
                 ),
                 $prefix . 'points'          => array(
-                    'label' => 'mautic.lead.report.points',
+                    'label' => 'mautic.lead.points',
                     'type'  => 'int'
                 ),
                 $prefix . 'owner_id'        => array(
@@ -102,7 +102,7 @@ class ReportSubscriber extends CommonSubscriber
             }
             $columns = array_merge($columns, $fieldColumns);
             $data = array(
-                'display_name' => 'mautic.lead.lead.report.table',
+                'display_name' => 'mautic.lead.leads',
                 'columns'      => $columns
             );
             $event->addTable('leads', $data);

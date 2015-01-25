@@ -61,14 +61,14 @@ class ReportType extends AbstractType
         if (!$options['read_only']) {
 
             $builder->add('name', 'text', array(
-                'label'      => 'mautic.report.report.form.name',
+                'label'      => 'mautic.core.name',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => true
             ));
 
             $builder->add('description', 'textarea', array(
-                'label'      => 'mautic.report.report.form.description',
+                'label'      => 'mautic.core.description',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control editor'),
                 'required'   => false

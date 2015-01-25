@@ -227,9 +227,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <h5 class="fw-sb text-primary">
                                             <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getTitle(); ?>
                                                 <?php if ($variants['parent']->getId() == $activePage->getId()) : ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                 <?php endif; ?>
-                                                <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
+                                                <span>[<?php echo $view['translator']->trans('mautic.core.parent'); ?>]</span>
                                             </a>
                                         </h5>
                                         <span class="text-white dark-sm"><?php echo $variants['parent']->getAlias(); ?></span>
@@ -291,7 +291,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <h5 class="fw-sb text-primary">
                                             <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getTitle(); ?>
                                                 <?php if ($variant->getId() == $activePage->getId()) : ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                 <?php endif; ?>
                                             </a>
                                         </h5>
@@ -342,9 +342,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <h5 class="fw-sb text-primary">
                                             <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>" data-toggle="ajax"><?php echo $translations['parent']->getTitle(); ?>
                                                 <?php if ($translations['parent']->getId() == $activePage->getId()) : ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                 <?php endif; ?>
-                                                <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
+                                                <span>[<?php echo $view['translator']->trans('mautic.core.parent'); ?>]</span>
                                             </a>
                                         </h5>
                                         <span class="text-white dark-sm"><?php echo $translations['parent']->getAlias(); ?></span>
@@ -373,7 +373,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <h5 class="fw-sb text-primary">
                                                 <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translation->getId())); ?>" data-toggle="ajax"><?php echo $translation->getTitle(); ?>
                                                     <?php if ($translation->getId() == $activePage->getId()) : ?>
-                                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                        <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                     <?php endif; ?>
                                                 </a>
                                             </h5>

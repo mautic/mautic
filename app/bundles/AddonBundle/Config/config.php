@@ -41,15 +41,15 @@ return array(
         'admin' => array(
             'priority' => 50,
             'items'    => array(
-                'mautic.addon.menu.root' => array(
+                'mautic.addon.addons' => array(
                     'id'        => 'mautic_addon_root',
                     'iconClass' => 'fa-plus-circle',
                     'access'    => 'addon:addons:manage',
                     'children'  => array(
-                        'mautic.addon.menu.index'           => array(
+                        'mautic.addon.manage.addons'           => array(
                             'route' => 'mautic_addon_index',
                         ),
-                        'mautic.addon.integration.menu.index' => array(
+                        'mautic.addon.manage.integrations' => array(
                             'route' => 'mautic_addon_integration_index'
                         ),
                     )

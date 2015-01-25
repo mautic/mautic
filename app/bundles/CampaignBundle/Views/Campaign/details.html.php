@@ -145,7 +145,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 </li>
                 <li class="">
                     <a href="#leads-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.campaign.event.leads.header'); ?>
+                        <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
             </ul>

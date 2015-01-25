@@ -57,7 +57,7 @@ class ProfileController extends FormController
                         $overrides['lastName']  = $me->getLastName();
                         $form->remove('firstName');
                         $form->add('firstName_unbound', 'text', array(
-                            'label'      => 'mautic.user.user.form.firstname',
+                            'label'      => 'mautic.core.firstname',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
@@ -68,7 +68,7 @@ class ProfileController extends FormController
 
                         $form->remove('lastName');
                         $form->add('lastName_unbound', 'text', array(
-                            'label'      => 'mautic.user.user.form.lastname',
+                            'label'      => 'mautic.core.lastname',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
@@ -82,7 +82,7 @@ class ProfileController extends FormController
                         $overrides['username'] = $me->getUsername();
                         $form->remove('username');
                         $form->add('username_unbound', 'text', array(
-                            'label'      => 'mautic.user.user.form.username',
+                            'label'      => 'mautic.core.username',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
@@ -95,7 +95,7 @@ class ProfileController extends FormController
                         $overrides['position'] = $me->getPosition();
                         $form->remove('position');
                         $form->add('position_unbound', 'text', array(
-                            'label'      => 'mautic.user.user.form.position',
+                            'label'      => 'mautic.core.position',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
@@ -108,7 +108,7 @@ class ProfileController extends FormController
                         $overrides['email'] = $me->getEmail();
                         $form->remove('email');
                         $form->add('email_unbound', 'text', array(
-                            'label'      => 'mautic.user.user.form.email',
+                            'label'      => 'mautic.core.email',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,

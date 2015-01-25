@@ -10,7 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'integration');
 
-$header = $view['translator']->trans('mautic.addon.integration.header.index');
+$header = $view['translator']->trans('mautic.addon.manage.integrations');
 if ($addonFilter) {
     $filterValue = $addonFilter['id'];
     $header     .= ' - ' . $addonFilter['name'];

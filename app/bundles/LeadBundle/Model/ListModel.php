@@ -240,7 +240,7 @@ class ListModel extends FormModel
         //field choices
         $choices = array(
             'dateAdded' => array(
-                'label'       => $this->translator->trans('mautic.lead.list.filter.dateadded'),
+                'label'       => $this->translator->trans('mautic.core.date.added'),
                 'properties'  => array('type' => 'date')
             ),
             'owner'     => array(
@@ -251,7 +251,7 @@ class ListModel extends FormModel
                 )
             ),
             'points'     => array(
-                'label'      => $this->translator->trans('mautic.lead.list.filter.points'),
+                'label'      => $this->translator->trans('mautic.lead.list.points'),
                 'properties' => array('type' => 'number')
             )
         );

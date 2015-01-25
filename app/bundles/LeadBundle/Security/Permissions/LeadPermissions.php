@@ -74,7 +74,7 @@ class LeadPermissions extends AbstractPermissions
 
         $builder->add('lead:fields', 'permissionlist', array(
             'choices'  => array(
-                'full' => 'mautic.lead.field.permissions.full'
+                'full' => 'mautic.core.permissions.manage'
             ),
             'label'    => 'mautic.lead.permissions.fields',
             'data'     => (!empty($data['fields']) ? $data['fields'] : array()),

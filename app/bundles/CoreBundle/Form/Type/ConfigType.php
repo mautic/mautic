@@ -50,7 +50,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -64,7 +64,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -78,7 +78,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -92,7 +92,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -114,7 +114,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -128,10 +128,10 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.emailinvalid'
+                    'message' => 'mautic.core.email.required'
                 )),
                 new Email(array(
-                    'message' => 'mautic.config.emailinvalid'
+                    'message' => 'mautic.core.email.required'
                 ))
             )
         ));
@@ -366,7 +366,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -380,7 +380,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -394,7 +394,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -454,7 +454,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -468,7 +468,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -482,7 +482,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -496,7 +496,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));
@@ -582,7 +582,7 @@ class ConfigType extends AbstractType
             ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));

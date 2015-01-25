@@ -17,7 +17,7 @@ $baseUrl = $view['router']->generate('mautic_chat_list');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'chat.user',
                 'orderBy'    => 'u.lastName, u.firstName, u.username',
-                'text'       => 'mautic.chat.user.thead.name',
+                'text'       => 'mautic.core.name',
                 'class'      => 'col-user-name',
                 'default'    => true,
                 'target'     => '.chat-user-list',

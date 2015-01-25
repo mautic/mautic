@@ -54,7 +54,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         //add email tokens
         $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('asset.emailtokens', 'mautic.asset.builder.header.index', $tokenHelper->getTokenContent(), -255);
+        $event->addTokenSection('asset.emailtokens', 'mautic.asset.assets', $tokenHelper->getTokenContent(), -255);
     }
 
     public function onEmailGenerate (EmailSendEvent $event)

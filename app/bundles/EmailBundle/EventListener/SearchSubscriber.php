@@ -83,7 +83,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $emailResults['count'] = count($emails);
-                $event->addResults('mautic.email.header.index', $emailResults);
+                $event->addResults('mautic.email.emails', $emailResults);
             }
         }
     }
@@ -95,7 +95,7 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted(array('email:emails:viewown', 'email:emails:viewother'), "MATCH_ONE")) {
             $event->addCommands(
-                'mautic.email.header.index',
+                'mautic.email.emails',
                 $this->factory->getModel('email')->getCommandList()
             );
         }

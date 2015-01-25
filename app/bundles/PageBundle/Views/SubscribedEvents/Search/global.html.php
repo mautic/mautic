@@ -14,7 +14,7 @@
 <?php else: ?>
 <a href="<?php echo $this->container->get('router')->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page->getId())); ?>" data-toggle="ajax">
     <?php echo $page->getTitle(); ?>
-    <span class="label label-default pull-right" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.hitcount'); ?>" data-placement="left">
+    <span class="label label-default pull-right" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.hits'); ?>" data-placement="left">
         <?php echo $page->getHits(); ?>
     </span>
 </a>

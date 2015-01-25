@@ -40,11 +40,9 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $translator = $this->container->get('translator');
-
         $user = new User();
-        $user->setFirstName($translator->trans('mautic.user.user.admin.name', array(), 'fixtures'));
-        $user->setLastName($translator->trans('mautic.user.user.admin.name', array(), 'fixtures'));
+        $user->setFirstName('Admin');
+        $user->setLastName('User');
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
         $encoder = $this->container
@@ -59,8 +57,8 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
         $this->addReference('admin-user', $user);
 
         $user = new User();
-        $user->setFirstName($translator->trans('mautic.user.user.sales.name', array(), 'fixtures'));
-        $user->setLastName($translator->trans('mautic.user.user.sales.name', array(), 'fixtures'));
+        $user->setFirstName('Sales');
+        $user->setLastName('User');
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
         $encoder = $this->container
@@ -73,22 +71,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
         $manager->flush();
 
         $this->addReference('sales-user', $user);
-
-        $user = new User();
-        $user->setFirstName($translator->trans('mautic.user.user.limitedsales.name', array(), 'fixtures'));
-        $user->setLastName($translator->trans('mautic.user.user.limitedsales.name', array(), 'fixtures'));
-        $user->setUsername('limitedsales');
-        $user->setEmail('limitedsales@yoursite.com');
-        $encoder = $this->container
-            ->get('security.encoder_factory')
-            ->getEncoder($user)
-        ;
-        $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
-        $user->setRole($this->getReference('limitedsales-role'));
-        $manager->persist($user);
-        $manager->flush();
-
-        $this->addReference('limitedsales-user', $user);
     }
 
     /**

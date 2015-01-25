@@ -40,10 +40,9 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $translator = $this->container->get('translator');
         $role = new Role();
-        $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
-        $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
+        $role->setName('Administrators');
+        $role->setDescription('Has access to everything.');
         $role->setIsAdmin(1);
         $manager->persist($role);
         $manager->flush();
@@ -51,8 +50,8 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $this->addReference('admin-role', $role);
 
         $role = new Role();
-        $role->setName($translator->trans('mautic.user.role.sales.name', array(), 'fixtures'));
-        $role->setDescription($translator->trans('mautic.user.role.sales.description', array(), 'fixtures'));
+        $role->setName('Sales Team');
+        $role->setDescription('Has access to sales');
         $role->setIsAdmin(0);
 
         $permissions = array(
@@ -65,11 +64,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $manager->flush();
 
         $this->addReference('sales-role', $role);
-
-        $role = new Role();
-        $role->setName($translator->trans('mautic.user.role.limitedsales.name', array(), 'fixtures'));
-        $role->setDescription($translator->trans('mautic.user.role.limitedsales.description', array(), 'fixtures'));
-        $role->setIsAdmin(0);
 
         //@todo - add more permissions
         $permissions = array(

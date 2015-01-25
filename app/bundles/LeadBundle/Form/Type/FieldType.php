@@ -49,7 +49,7 @@ class FieldType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
         $builder->add('label', 'text', array(
-            'label'      => 'mautic.lead.field.form.label',
+            'label'      => 'mautic.lead.field.label',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control', 'length' => 50)
         ));
@@ -69,7 +69,7 @@ class FieldType extends AbstractType
             ),
             'expanded'    => false,
             'multiple'    => false,
-            'label'       => 'mautic.lead.field.form.group',
+            'label'       => 'mautic.lead.field.group',
             'empty_value' => false,
             'required'    => false,
             'disabled'    => $disabled
@@ -83,7 +83,7 @@ class FieldType extends AbstractType
             'choices'     => $fieldHelper->getChoiceList(),
             'expanded'    => false,
             'multiple'    => false,
-            'label'       => 'mautic.lead.field.form.type',
+            'label'       => 'mautic.lead.field.type',
             'empty_value' => false,
             'disabled'    => ($disabled || !$new),
             'attr'        => array(
@@ -101,7 +101,7 @@ class FieldType extends AbstractType
         ));
 
         $builder->add('defaultValue', 'text', array(
-            'label'      => 'mautic.lead.field.form.defaultvalue',
+            'label'      => 'mautic.core.defaultvalue',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
@@ -111,7 +111,7 @@ class FieldType extends AbstractType
         $transformer = new FieldToOrderTransformer($this->em);
         $builder->add(
             $builder->create('order', 'entity', array(
-                'label'         => 'mautic.lead.field.form.order',
+                'label'         => 'mautic.core.order',
                 'class'         => 'MauticLeadBundle:LeadField',
                 'property'      => 'label',
                 'label_attr'    => array('class' => 'control-label'),
@@ -125,7 +125,7 @@ class FieldType extends AbstractType
         );
 
         $builder->add('alias', 'text', array(
-            'label'      => 'mautic.lead.field.form.alias',
+            'label'      => 'mautic.core.alias',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
@@ -143,7 +143,7 @@ class FieldType extends AbstractType
         ));
 
         $builder->add('isRequired', 'yesno_button_group', array(
-            'label' => 'mautic.lead.field.form.isrequired'
+            'label' => 'mautic.core.required'
         ));
 
         $builder->add('isVisible', 'yesno_button_group', array(

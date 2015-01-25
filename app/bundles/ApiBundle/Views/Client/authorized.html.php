@@ -11,7 +11,7 @@
     <thead>
         <tr>
             <th style="width: 50px;"></th>
-            <th><?php echo $view['translator']->trans('mautic.api.client.thead.name'); ?></th>
+            <th><?php echo $view['translator']->trans('mautic.core.name'); ?></th>
         </tr>
     </thead>
     <tbody>

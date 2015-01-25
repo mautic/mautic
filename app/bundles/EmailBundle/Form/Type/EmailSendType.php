@@ -42,7 +42,7 @@ class EmailSendType extends AbstractType
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.email.send.selectemails_descr'
+                'tooltip' => 'mautic.email.choose.emails_descr'
             ),
             'multiple'    => false,
             'constraints' => array(

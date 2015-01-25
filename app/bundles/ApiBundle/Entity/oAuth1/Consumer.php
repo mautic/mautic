@@ -61,7 +61,7 @@ class Consumer implements ConsumerInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.api.client.name.notblank')
+            array('message' => 'mautic.core.name.required')
         ));
 
         $metadata->addPropertyConstraint('callback', new Assert\NotBlank(

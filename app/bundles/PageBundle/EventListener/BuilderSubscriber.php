@@ -50,7 +50,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         //add email tokens
         $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('page.pagetokens', 'mautic.page.builder.header.index', $tokenHelper->getTokenContent(), -254);
+        $event->addTokenSection('page.pagetokens', 'mautic.page.pages', $tokenHelper->getTokenContent(), -254);
 
         //add AB Test Winner Criteria
         $bounceRate = array(
@@ -191,7 +191,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         //add email tokens
         $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('page.emailtokens', 'mautic.page.builder.header.index', $tokenHelper->getTokenContent(), -254);
+        $event->addTokenSection('page.emailtokens', 'mautic.page.pages', $tokenHelper->getTokenContent(), -254);
     }
 
     /**

@@ -26,7 +26,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
                     'orderBy'    => 'a.title',
-                    'text'       => 'mautic.asset.asset.thead.title',
+                    'text'       => 'mautic.core.title',
                     'class'      => 'col-asset-title',
                     'default'    => true
                 ));
@@ -34,7 +34,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
                     'orderBy'    => 'c.title',
-                    'text'       => 'mautic.asset.asset.thead.category',
+                    'text'       => 'mautic.core.category',
                     'class'      => 'visible-md visible-lg col-asset-category'
                 ));
 
@@ -48,7 +48,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
                     'orderBy'    => 'a.id',
-                    'text'       => 'mautic.asset.asset.thead.id',
+                    'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-asset-id'
                 ));
                 ?>

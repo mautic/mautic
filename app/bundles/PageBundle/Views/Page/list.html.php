@@ -27,7 +27,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.title',
-                        'text'       => 'mautic.page.thead.title',
+                        'text'       => 'mautic.core.title',
                         'class'      => 'col-page-title',
                         'default'    => true
                     ));
@@ -35,7 +35,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'c.title',
-                        'text'       => 'mautic.page.thead.category',
+                        'text'       => 'mautic.core.category',
                         'class'      => 'visible-md visible-lg col-page-category'
                     ));
 
@@ -49,7 +49,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.id',
-                        'text'       => 'mautic.page.thead.id',
+                        'text'       => 'mautic.core.id',
                         'class'      => 'col-page-id'
                     ));
                     ?>

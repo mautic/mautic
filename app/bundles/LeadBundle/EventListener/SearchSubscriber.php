@@ -95,7 +95,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $leadResults['count'] = $results['count'];
-                $event->addResults('mautic.lead.lead.header.index', $leadResults);
+                $event->addResults('mautic.lead.leads', $leadResults);
             }
         }
     }
@@ -107,7 +107,7 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), "MATCH_ONE")) {
             $event->addCommands(
-                'mautic.lead.lead.header.index',
+                'mautic.lead.leads',
                 $this->factory->getModel('lead.lead')->getCommandList()
             );
         }

@@ -104,7 +104,7 @@ class LeadList extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.lead.list.name.notblank')
+            array('message' => 'mautic.core.name.required')
         ));
 
         $metadata->addConstraint(new UniqueUserAlias(array(

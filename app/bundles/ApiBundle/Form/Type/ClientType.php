@@ -61,7 +61,7 @@ class ClientType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.api.client.form.name',
+            'label'      => 'mautic.core.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
@@ -71,7 +71,7 @@ class ClientType extends AbstractType
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();
             $builder->add(
                 $builder->create('redirectUris', 'text', array(
-                    'label'      => 'mautic.api.client.form.redirecturis',
+                    'label'      => 'mautic.api.client.redirecturis',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
                         'class'   => 'form-control',

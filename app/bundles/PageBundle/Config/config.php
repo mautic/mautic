@@ -57,7 +57,7 @@ return array(
         'main' => array(
             'priority' => 9,
             'items'    => array(
-                'mautic.page.menu.root' => array(
+                'mautic.page.pages' => array(
                     'id'        => 'mautic_page_root',
                     'iconClass' => 'fa-file-text-o',
                     'access'    => array('page:pages:viewown', 'page:pages:viewother'),

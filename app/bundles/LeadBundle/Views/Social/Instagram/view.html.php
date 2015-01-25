@@ -13,12 +13,12 @@
         <ul class="nav nav-tabs nav-justified">
             <li class="active">
                 <a href="#InstagramProfile" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.instagram.profile'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
                 </a>
             </li>
             <li>
                 <a href="#InstagramPhotos" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.instagram.photos'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
                 </a>
             </li>
         </ul>

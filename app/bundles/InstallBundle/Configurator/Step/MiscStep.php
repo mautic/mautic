@@ -21,7 +21,7 @@ class MiscStep implements StepInterface
      * Absolute path to cache directory
      *
      * @var string
-     * @Assert\NotBlank(message = "mautic.install.notblank")
+     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $cache_path = '%kernel.root_dir%/cache';
 
@@ -29,7 +29,7 @@ class MiscStep implements StepInterface
      * Absolute path to log directory
      *
      * @var string
-     * @Assert\NotBlank(message = "mautic.install.notblank")
+     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $log_path   = '%kernel.root_dir%/logs';
 

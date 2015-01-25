@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.email.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.email.emails'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(

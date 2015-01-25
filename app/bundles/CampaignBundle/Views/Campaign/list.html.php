@@ -26,7 +26,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'c.name',
-                    'text'       => 'mautic.campaign.thead.name',
+                    'text'       => 'mautic.core.name',
                     'class'      => 'col-campaign-name',
                     'default'    => true
                 ));
@@ -34,14 +34,14 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'cat.title',
-                    'text'       => 'mautic.campaign.thead.category',
+                    'text'       => 'mautic.core.category',
                     'class'      => 'visible-md visible-lg col-campaign-category'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'c.id',
-                    'text'       => 'mautic.campaign.thead.id',
+                    'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-campaign-id'
                 ));
                 ?>

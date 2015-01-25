@@ -104,7 +104,7 @@ class Report extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank(array(
-            'message' => 'mautic.report.name.notblank'
+            'message' => 'mautic.core.name.required'
         )));
     }
 

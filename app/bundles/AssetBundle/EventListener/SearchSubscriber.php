@@ -83,7 +83,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $assetResults['count'] = count($assets);
-                $event->addResults('mautic.asset.header.index', $assetResults);
+                $event->addResults('mautic.asset.assets', $assetResults);
             }
         }
     }
@@ -95,7 +95,7 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted(array('asset:assets:viewown', 'asset:assets:viewother'), "MATCH_ONE")) {
             $event->addCommands(
-                'mautic.asset.header.index',
+                'mautic.asset.assets',
                 $this->factory->getModel('asset')->getCommandList()
             );
         }

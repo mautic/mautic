@@ -50,11 +50,11 @@ class ReportSubscriber extends CommonSubscriber
             $variantParent = 'vp.';
             $columns       = array(
                 $prefix . 'subject'            => array(
-                    'label' => 'mautic.email.report.subject',
+                    'label' => 'mautic.email.subject',
                     'type'  => 'string'
                 ),
                 $prefix . 'lang'               => array(
-                    'label' => 'mautic.report.field.lang',
+                    'label' => 'mautic.core.language',
                     'type'  => 'string'
                 ),
                 $prefix . 'read_count'         => array(
@@ -92,7 +92,7 @@ class ReportSubscriber extends CommonSubscriber
             );
             $columns       = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
             $data          = array(
-                'display_name' => 'mautic.email.email.report.table',
+                'display_name' => 'mautic.email.emails',
                 'columns'      => $columns
             );
             $event->addTable('emails', $data);

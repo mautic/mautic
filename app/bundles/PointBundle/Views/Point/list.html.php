@@ -27,7 +27,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'point',
                 'orderBy'    => 'p.name',
-                'text'       => 'mautic.point.thead.name',
+                'text'       => 'mautic.core.name',
                 'class'      => 'col-point-name',
                 'default'    => true
             ));
@@ -35,7 +35,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'point',
                 'orderBy'    => 'c.title',
-                'text'       => 'mautic.point.thead.category',
+                'text'       => 'mautic.core.category',
                 'class'      => 'visible-md visible-lg col-point-category'
             ));
 
@@ -51,7 +51,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'point',
                 'orderBy'    => 'p.id',
-                'text'       => 'mautic.point.thead.id',
+                'text'       => 'mmautic.core.id',
                 'class'      => 'visible-md visible-lg col-point-id'
             ));
             ?>

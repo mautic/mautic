@@ -76,7 +76,7 @@ class Channel extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank(
-            array('message' => 'mautic.chat.channel.name.notblank')
+            array('message' => 'mautic.core.name.required')
         ));
 
         $metadata->addConstraint(new UniqueEntity(array(

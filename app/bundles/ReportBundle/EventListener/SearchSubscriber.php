@@ -85,7 +85,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $results['count'] = $count;
-                $event->addResults('mautic.report.header.index', $results);
+                $event->addResults('mautic.report.reports', $results);
             }
         }
     }
@@ -97,7 +97,7 @@ class SearchSubscriber extends CommonSubscriber
     {
         if ($this->security->isGranted(array('report:reports:viewown', 'report:reports:viewother'), "MATCH_ONE")) {
             $event->addCommands(
-                'mautic.report.header.index',
+                'mautic.report.reports',
                 $this->factory->getModel('report')->getCommandList()
             );
         }

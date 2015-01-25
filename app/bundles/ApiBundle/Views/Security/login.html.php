@@ -17,8 +17,8 @@ $view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.heade
         <input type="text" id="username" name="_username" class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>' />
     </div>
     <div class="margin-md">
-        <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>:</label>
-        <input type="password" id="password" name="_password" class="form-control input-lg" required placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
+        <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.core.password'); ?>:</label>
+        <input type="password" id="password" name="_password" class="form-control input-lg" required placeholder='<?php echo $view['translator']->trans('mautic.core.password'); ?>' />
     </div>
 
     <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>

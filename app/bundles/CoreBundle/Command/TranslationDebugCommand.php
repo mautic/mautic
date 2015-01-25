@@ -52,7 +52,7 @@ class TranslationDebugCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:translation:debug')
             ->setDefinition(array(
-                new InputOption('locale', 'l', InputOption::VALUE_REQUIRED, 'The locale'),
+                new InputOption('locale', 'l', InputOption::VALUE_OPTIONAL, 'The locale'),
                 new InputOption('bundle', 'b', InputOption::VALUE_OPTIONAL, 'The bundle name'),
                 new InputOption('logfile', 'log', InputOption::VALUE_OPTIONAL, 'Optional log file'),
                 new InputOption('only-views', null, InputOption::VALUE_NONE, 'Extract from Views only.  Otherise it will check Controller, Model, and EventListener as well'),
@@ -93,6 +93,9 @@ EOF
     protected function execute (InputInterface $input, OutputInterface $output)
     {
         $locale    = $input->getOption('locale');
+        if (empty($locale)) {
+            $locale = 'en_US';
+        }
         $domain    = $input->getOption('domain');
         $bundle    = $input->getOption('bundle');
         $log       = $input->getOption('logfile');
@@ -125,11 +128,15 @@ EOF
 
         foreach ($bundles as $bundle) {
             if (!$dupsOnly) {
-                $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Views', $extractedCatalogue);
+                if (file_exists($bundle['directory'] . '/Views')) {
+                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Views', $extractedCatalogue);
+                }
 
                 if (!$viewsOnly) {
                     // Extract used messages from Controllers
-                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Controller', $extractedCatalogue);
+                    if (file_exists($bundle['directory'] . '/EventListener')) {
+                        $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Controller', $extractedCatalogue);
+                    }
 
                     // Extract used messages from models
                     if (file_exists($bundle['directory'] . '/Model')) {

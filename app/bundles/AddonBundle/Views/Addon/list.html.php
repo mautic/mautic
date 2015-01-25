@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'addon',
                         'orderBy'    => 'i.name',
-                        'text'       => 'mautic.addon.thead.name',
+                        'text'       => 'mautic.core.name',
                         'class'      => 'col-addon-name',
                         'default'    => true
                     ));
@@ -37,7 +37,7 @@ if ($tmpl == 'index') {
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'addon',
                         'orderBy'    => 'i.id',
-                        'text'       => 'mautic.addon.thead.id',
+                        'text'       => 'mautic.core.id',
                         'class'      => 'col-addon-id'
                     ));
                     ?>

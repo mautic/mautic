@@ -54,13 +54,13 @@ class AssetType extends AbstractType
         ));
 
         $builder->add('title', 'text', array(
-            'label'      => 'mautic.asset.asset.form.title',
+            'label'      => 'mautic.core.title',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('alias', 'text', array(
-            'label'      => 'mautic.asset.asset.form.alias',
+            'label'      => 'mautic.core.alias',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
@@ -70,7 +70,7 @@ class AssetType extends AbstractType
         ));
 
         $builder->add('description', 'textarea', array(
-            'label'      => 'mautic.asset.asset.form.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
             'required'   => false
@@ -81,7 +81,7 @@ class AssetType extends AbstractType
         ));
 
         $builder->add('language', 'locale', array(
-            'label'      => 'mautic.asset.asset.form.language',
+            'label'      => 'mautic.core.language',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',

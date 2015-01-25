@@ -43,7 +43,7 @@ return array(
         'main' => array(
             'priority' => 4,
             'items'    => array(
-                'mautic.campaigns.menu.root' => array(
+                'mautic.campaign.campaigns' => array(
                     'id'        => 'mautic_campaigns_root',
                     'iconClass' => 'fa-clock-o',
                     'access'    => 'campaign:campaigns:view',

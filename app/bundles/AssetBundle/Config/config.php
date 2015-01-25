@@ -48,7 +48,7 @@ return array(
         'main' => array(
             'priority' => 10,
             'items'    => array(
-                'mautic.asset.asset.menu.root' => array(
+                'mautic.asset.assets' => array(
                     'id'        => 'mautic_asset_root',
                     'iconClass' => 'fa-folder-open-o',
                     'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),

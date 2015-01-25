@@ -58,7 +58,7 @@ class TableOrderType extends AbstractType
             ),
             'expanded'    => false,
             'multiple'    => false,
-            'label'       => 'mautic.report.report.label.tableorder_dir',
+            'label'       => 'mautic.core.order',
             'label_attr'  => array('class' => 'control-label'),
             'empty_value' => false,
             'required'    => false,

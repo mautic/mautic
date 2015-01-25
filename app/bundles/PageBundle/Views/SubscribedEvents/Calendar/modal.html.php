@@ -25,7 +25,7 @@
 	<a href="<?php echo $view['router']->generate('mautic_page_action',
 	    array("objectAction" => "view", "objectId" => $entity->getId())); ?>"
 	    data-toggle="ajax">
-	    <?php echo $view['translator']->trans('mautic.page.details'); ?>
+	    <?php echo $view['translator']->trans('mautic.core.details'); ?>
 	</a>
 	|
 	<a href="<?php echo $model->generateUrl($entity); ?>" target="_blank">

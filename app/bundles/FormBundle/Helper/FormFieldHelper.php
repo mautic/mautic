@@ -28,7 +28,7 @@ class FormFieldHelper
      */
     private $types = array(
         'text' => array(
-            'label' => 'mautic.form.field.type.text'
+            'label' => 'mautic.core.text'
         ),
         'textarea' => array(
             'label' => 'mautic.form.field.type.textarea'
@@ -40,13 +40,13 @@ class FormFieldHelper
             'label' => 'mautic.form.field.type.button'
         ),
         'select' => array(
-            'label' => 'mautic.form.field.type.select'
+            'label' => 'mautic.core.select'
         ),
         'date' => array(
-            'label' => 'mautic.form.field.type.date'
+            'label' => 'mautic.core.date'
         ),
         'email' => array(
-            'label'  => 'mautic.form.field.type.email',
+            'label'  => 'mautic.core.email',
             'filter' => 'email',
             'constraints' => array(
                 '\Symfony\Component\Validator\Constraints\Email' =>
@@ -54,14 +54,14 @@ class FormFieldHelper
             )
         ),
         'number' => array(
-            'label'  => 'mautic.form.field.type.number',
+            'label'  => 'mautic.core.number',
             'filter' => 'float'
         ),
         'tel' => array(
             'label' => 'mautic.form.field.type.tel'
         ),
         'url' => array(
-            'label'  => 'mautic.form.field.type.url',
+            'label'  => 'mautic.core.url',
             'filter' => 'url',
             'constraints' => array(
                 '\Symfony\Component\Validator\Constraints\Url' =>

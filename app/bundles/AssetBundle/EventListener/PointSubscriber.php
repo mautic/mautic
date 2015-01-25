@@ -39,7 +39,7 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.asset.point.action',
+            'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
             'callback'    => array('\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'),

@@ -43,7 +43,7 @@ class PointActionUrlHitType extends AbstractType
         ));
 
         $builder->add('page_hits', 'integer', array(
-            'label'       => 'mautic.page.point.action.form.page.hits',
+            'label'       => 'mautic.page.hits',
             'label_attr'  => array('class' => 'control-label'),
             'required'    => false,
             'attr'        => array(

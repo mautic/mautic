@@ -116,7 +116,7 @@ class Point extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.point.name.notblank'
+            'message' => 'mautic.core.name.required'
         )));
 
         $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(

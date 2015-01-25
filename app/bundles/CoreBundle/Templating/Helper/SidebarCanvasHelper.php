@@ -44,7 +44,7 @@ class SidebarCanvasHelper extends Helper
 
         if (!empty($adminMenuContent)) {
             $settingsMenu = array(
-                'header'  => 'mautic.core.menu.settings',
+                'header'  => 'mautic.core.settings',
                 'content' => '<nav class="nav-sidebar">' . $adminMenuContent . '</nav>',
                 'footer'  => ''
             );

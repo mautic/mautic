@@ -58,7 +58,7 @@ class Client extends BaseClient
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.api.client.name.notblank')
+            array('message' => 'mautic.core.name.required')
         ));
 
         $metadata->addPropertyConstraint('redirectUris', new Assert\NotBlank(

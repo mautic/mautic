@@ -60,7 +60,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             <tbody>
                                 <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $email)); ?>
                                 <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.form.template'); ?></span></td>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></span></td>
                                     <td><?php echo $email->getTemplate(); ?></td>
                                 </tr>
                             </tbody>
@@ -162,9 +162,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <h5 class="fw-sb text-primary">
                                                 <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getSubject(); ?>
                                                     <?php if ($variants['parent']->getId() == $email->getId()) : ?>
-                                                        <span>[<?php echo $view['translator']->trans('mautic.email.current'); ?>]</span>
+                                                        <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                     <?php endif; ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.email.parent'); ?>]</span>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.core.parent'); ?>]</span>
                                                 </a>
                                             </h5>
                                         </div>
@@ -225,7 +225,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                                 <h5 class="fw-sb text-primary">
                                                     <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getSubject(); ?>
                                                         <?php if ($variant->getId() == $email->getId()) : ?>
-                                                            <span>[<?php echo $view['translator']->trans('mautic.email.current'); ?>]</span>
+                                                            <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                         <?php endif; ?>
                                                     </a>
                                                 </h5>

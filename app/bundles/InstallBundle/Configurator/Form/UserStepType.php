@@ -42,7 +42,7 @@ class UserStepType extends AbstractType
         $storedData = $this->session->get('mautic.installer.user', new \stdClass());
 
         $builder->add('firstname', 'text', array(
-            'label'      => 'mautic.install.form.user.firstname',
+            'label'      => 'mautic.core.firstname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true,
@@ -50,7 +50,7 @@ class UserStepType extends AbstractType
         ));
 
         $builder->add('lastname', 'text', array(
-            'label'      => 'mautic.install.form.user.lastname',
+            'label'      => 'mautic.core.lastname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true,

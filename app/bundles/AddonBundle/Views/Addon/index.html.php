@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'addon');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.addon.header.index'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.addon.manage.addons'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'customButtons' => array(

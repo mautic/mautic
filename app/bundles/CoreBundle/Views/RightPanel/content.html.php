@@ -39,7 +39,7 @@ if ($canvas == 'Main') {
 
     <?php elseif ($canvas == 'Main'): ?>
         <?php if ($hasLeft): ?>
-            <?php $icon = ($canvasContent['header'] != 'mautic.core.menu.settings') ? 'fa-gears' : 'fa-arrow-left'; ?>
+            <?php $icon = ($canvasContent['header'] != 'mautic.core.settings') ? 'fa-gears' : 'fa-arrow-left'; ?>
             <div class="col-xs-1 pt-lg text-left">
                 <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
             </div>

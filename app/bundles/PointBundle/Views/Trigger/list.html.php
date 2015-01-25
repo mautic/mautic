@@ -27,7 +27,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.name',
-                'text'       => 'mautic.point.trigger.thead.name',
+                'text'       => 'mautic.core.name',
                 'class'      => 'col-pointtrigger-name',
                 'default'    => true
             ));
@@ -35,7 +35,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 'c.title',
-                'text'       => 'mautic.point.trigger.thead.category',
+                'text'       => 'mautic.core.category',
                 'class'      => 'col-pointtrigger-category'
             ));
 
@@ -46,12 +46,12 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                 'class'      => 'col-pointtrigger-points'
             ));
 
-            echo "<th class='col-pointtrigger-color'>" . $view['translator']->trans('mautic.point.trigger.thead.color') . '</th>';
+            echo "<th class='col-pointtrigger-color'>" . $view['translator']->trans('mautic.core.color') . '</th>';
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.id',
-                'text'       => 'mautic.point.trigger.thead.id',
+                'text'       => 'mautic.core.id',
                 'class'      => 'col-pointtrigger-id'
             ));
             ?>

@@ -12,7 +12,7 @@
     <ul class="nav nav-tabs pr-md pl-md">
         <li class="active">
             <a href="#FoursquareProfile" role="tab" data-toggle="tab">
-                <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.profile'); ?>
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
             </a>
         </li>
         <li>

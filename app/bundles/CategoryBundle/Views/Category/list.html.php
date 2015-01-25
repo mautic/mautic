@@ -34,7 +34,7 @@ if ($tmpl == 'index')
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
                         'orderBy'    => 'c.title',
-                        'text'       => 'mautic.category.thead.title',
+                        'text'       => 'mautic.core.title',
                         'class'      => 'col-category-title',
                         'default'    => true
                     ));
@@ -42,7 +42,7 @@ if ($tmpl == 'index')
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
                         'orderBy'    => 'c.id',
-                        'text'       => 'mautic.category.thead.id',
+                        'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-page-id'
                     ));
                     ?>

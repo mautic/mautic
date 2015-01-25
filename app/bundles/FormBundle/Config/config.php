@@ -76,7 +76,7 @@ return array(
         'main' => array(
             'priority' => 7,
             'items'    => array(
-                'mautic.form.form.menu.root' => array(
+                'mautic.form.forms' => array(
                     'id'        => 'mautic_form_root',
                     'iconClass' => 'fa-pencil-square-o',
                     'access'    => array('form:forms:viewown', 'form:forms:viewother'),

@@ -28,14 +28,14 @@ class ActionType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.form.action.name',
+            'label'      => 'mautic.core.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('description', 'textarea', array(
-            'label'      => 'mautic.form.action.description',
+            'label'      => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control editor'),
             'required'   => false

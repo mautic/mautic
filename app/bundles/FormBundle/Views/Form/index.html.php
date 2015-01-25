@@ -8,7 +8,7 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.form.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.forms'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(

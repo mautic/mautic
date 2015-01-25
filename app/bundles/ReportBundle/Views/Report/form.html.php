@@ -28,7 +28,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active">
-                        <a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.details'); ?></a>
+                        <a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                     </li>
                     <li class="">
                         <a href="#data-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.data'); ?></a>
@@ -72,7 +72,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                             </div>
                             <div class="col-md-6">
                                 <div class="pa-md">
-                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.tableorder'); ?></strong></h4>
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.core.order'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['tableOrder']); ?>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pa-md">
-                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.filterselector'); ?></strong></h4>
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.core.filters'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['filters']); ?>
                                 </div>
                                 <div class="hide">

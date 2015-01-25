@@ -67,7 +67,7 @@ class CategoryListType extends AbstractType
                 $choices['new'] = $createNew;
                 return $choices;
             },
-            'label'      => 'mautic.category.form.category',
+            'label'      => 'mautic.core.category',
             'label_attr' => array('class' => 'control-label'),
             'multiple'   => false,
             'empty_value'=> 'mautic.core.form.uncategorized',

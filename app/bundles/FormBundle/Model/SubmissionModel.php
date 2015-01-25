@@ -286,9 +286,9 @@ class SubmissionModel extends CommonFormModel
                     //build the header row
                     $fields = $form->getFields();
                     $header = array(
-                        $translator->trans('mautic.form.result.thead.id'),
+                        $translator->trans('mautic.core.id'),
                         $translator->trans('mautic.form.result.thead.date'),
-                        $translator->trans('mautic.form.result.thead.ip'),
+                        $translator->trans('mautic.core.ipaddress'),
                         $translator->trans('mautic.form.result.thead.referrer')
                     );
                     foreach ($fields as $f) {
@@ -357,9 +357,9 @@ class SubmissionModel extends CommonFormModel
                         //build the header row
                         $fields = $form->getFields();
                         $header = array(
-                            $translator->trans('mautic.form.result.thead.id'),
+                            $translator->trans('mautic.core.id'),
                             $translator->trans('mautic.form.result.thead.date'),
-                            $translator->trans('mautic.form.result.thead.ip'),
+                            $translator->trans('mautic.core.ipaddress'),
                             $translator->trans('mautic.form.result.thead.referrer')
                         );
                         foreach ($fields as $f) {

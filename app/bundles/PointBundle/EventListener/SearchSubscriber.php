@@ -72,7 +72,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $pointsResults['count'] = $pointCount;
-                $event->addResults('mautic.point.header.actions.index', $pointsResults);
+                $event->addResults('mautic.point.actions.header.index', $pointsResults);
             }
         }
 
@@ -111,7 +111,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 $results['count'] = $count;
-                $event->addResults('mautic.point.header.triggers.index', $results);
+                $event->addResults('mautic.point.trigger.header.index', $results);
             }
         }
     }
@@ -124,7 +124,7 @@ class SearchSubscriber extends CommonSubscriber
         $security = $this->security;
         if ($security->isGranted('point:points:view')) {
             $event->addCommands(
-                'mautic.point.header.actions.index',
+                'mautic.point.actions.header.index',
                 $this->factory->getModel('point')->getCommandList()
             );
         }

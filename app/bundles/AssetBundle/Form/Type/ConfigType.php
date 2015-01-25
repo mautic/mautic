@@ -40,7 +40,7 @@ class ConfigType extends AbstractType
                 ),
             'constraints' => array(
                 new NotBlank(array(
-                    'message' => 'mautic.config.requiredvalue'
+                    'message' => 'mautic.core.value.required'
                 ))
             )
         ));

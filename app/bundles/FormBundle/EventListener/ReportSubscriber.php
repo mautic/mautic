@@ -50,13 +50,13 @@ class ReportSubscriber extends CommonSubscriber
             $prefix  = 'f.';
             $columns = array(
                 $prefix . 'alias' => array(
-                    'label' => 'mautic.report.field.alias',
+                    'label' => 'mautic.core.alias',
                     'type'  => 'int'
                 )
             );
             $columns = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
             $data    = array(
-                'display_name' => 'mautic.form.form.report.table',
+                'display_name' => 'mautic.form.forms',
                 'columns'      => $columns
             );
             $event->addTable('forms', $data);
@@ -71,7 +71,7 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'datetime'
                     ),
                     $submissionPrefix . 'referer'        => array(
-                        'label' => 'mautic.form.report.submit.referer',
+                        'label' => 'mautic.core.referer',
                         'type'  => 'string'
                     ),
                     $pagePrefix . 'id'                   => array(

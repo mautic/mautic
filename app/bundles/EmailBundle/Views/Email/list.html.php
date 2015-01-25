@@ -28,7 +28,7 @@ if ($tmpl == 'index') {
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.subject',
-                'text'       => 'mautic.email.thead.subject',
+                'text'       => 'mautic.email.subject',
                 'class'      => 'col-email-subject',
                 'default'    => true
             ));
@@ -36,7 +36,7 @@ if ($tmpl == 'index') {
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'c.title',
-                'text'       => 'mautic.email.thead.category',
+                'text'       => 'mautic.core.category',
                 'class'      => 'visible-md visible-lg col-email-category'
             ));
 
@@ -60,7 +60,7 @@ if ($tmpl == 'index') {
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.id',
-                'text'       => 'mautic.email.thead.id',
+                'text'       => 'mautic.core.id',
                 'class'      => 'visible-md visible-lg col-email-id'
             ));
             ?>

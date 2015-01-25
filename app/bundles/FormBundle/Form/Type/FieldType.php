@@ -132,7 +132,7 @@ class FieldType extends AbstractType
 
         if ($addDefaultValue) {
             $builder->add('defaultValue', 'text', array(
-                'label'      => 'mautic.form.field.form.defaultvalue',
+                'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => false
@@ -151,7 +151,7 @@ class FieldType extends AbstractType
         if ($addIsRequired) {
             $default = (!isset($options['data']['isRequired'])) ? false : (boolean) $options['data']['isRequired'];
             $builder->add('isRequired', 'yesno_button_group', array(
-                'label'       => 'mautic.lead.field.form.isrequired',
+                'label'       => 'mautic.core.required',
                 'data'        => $default
             ));
 
