@@ -8,18 +8,14 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
 
 /**
  * Class SalesforceIntegration
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
-    /**
-     * @var \MauticAddon\MauticCrmBundle\Crm\Salesforce\Api\Auth\Auth
-     */
-    protected $auth;
 
     /**
      * {@inheritdoc}
@@ -38,7 +34,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getClientIdKey()
     {
-        return 'client_key';
+        return 'client_id';
     }
 
     /**
@@ -52,6 +48,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get the array key for the auth token
+     *
+     * @return string
+     */
+    public function getAuthTokenKey ()
+    {
+        return 'access_token';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return array
@@ -59,7 +65,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return array(
-            'client_key'     => 'mautic.integration.keyfield.consumerid',
+            'client_id'      => 'mautic.integration.keyfield.consumerid',
             'client_secret'  => 'mautic.integration.keyfield.consumersecret'
         );
     }
@@ -85,11 +91,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getOAuthLoginUrl()
+    public function getApiUrl()
     {
-        return $this->getCrmLoginUrl(true);
+        return sprintf('%s/services/data/v32.0/sobjects',$this->keys['instance_url']);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param bool $inAuthorization
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        if (!$inAuthorization) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return false;
     }
 
     /**
@@ -103,19 +123,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
-     */
-    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
-    {
-        $salesForceSettings                     = $this->getDecryptedApiKeys();
-        $salesForceSettings['callback']         = $this->getOauthCallbackUrl();
-        $salesForceSettings['accessTokenUrl']   = 'https://login.salesforce.com/services/oauth2/token';
-        $salesForceSettings['authorizationUrl'] = 'https://login.salesforce.com/services/oauth2/authorize';
-
-        parent::createApiAuth($salesForceSettings);
-    }
-
-    /**
      * @return array|mixed
      */
     public function getAvailableFields($silenceExceptions = true)
@@ -123,25 +130,26 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $salesFields = array();
 
         try {
-            if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this, 'lead', $this->auth)->getInfo();
+            if ($this->isAuthorized()) {
+                $leadObject  = CrmApi::getContext($this, "lead")->getInfo();
 
                 if ($leadObject != null && isset($leadObject['fields'])) {
+
                     foreach ($leadObject['fields'] as $fieldInfo) {
                         if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], array('reference', 'boolean'))) {
                             continue;
                         }
 
                         $salesFields[$fieldInfo['name']] = array(
-                            'type' => 'string',
-                            'label' => $fieldInfo['label']
+                            'type'     => 'string',
+                            'label'    => $fieldInfo['label'],
+                            'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], array('Status')))
                         );
                     }
                 }
             }
         } catch (\Exception $e) {
-            $logger = $this->factory->getLogger();
-            $logger->addError('INTEGRATION CONNECT ERROR: ' . $this->getName() . ' - ' . $e->getMessage());
+            $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
                 throw $e;

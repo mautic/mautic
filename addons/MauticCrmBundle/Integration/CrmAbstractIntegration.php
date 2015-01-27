@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alan
- * Date: 12/1/14
- * Time: 7:12 PM
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
@@ -29,16 +30,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
-        $keys = $settings->getApiKeys();
+        $keys = $this->getDecryptedApiKeys($settings);
         if (isset($keys['url']) && substr($keys['url'], -1) == '/') {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
 
         parent::setIntegrationSettings($settings);
-
-        //build auth object
-        $this->createApiAuth();
     }
 
     /**
@@ -48,7 +46,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getAuthenticationType()
     {
-        return 'callback';
+        return 'rest';
     }
 
     /**
@@ -57,112 +55,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getSupportedFeatures()
     {
         return array('push_lead');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOAuthLoginUrl ()
-    {
-        return $this->getCrmLoginUrl();
-    }
-
-    /**
-     * @param bool $oauth
-     *
-     * @return string
-     */
-    public function getCrmLoginUrl($oauth = false)
-    {
-        if ($oauth) {
-            return parent::getOAuthLoginUrl();
-        } else {
-            return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param string $clientId
-     * @param string $clientSecret
-     *
-     * @return array
-     */
-    public function oAuthCallback($clientId = '', $clientSecret = '')
-    {
-        $entity = $this->getIntegrationSettings();
-
-        if ($entity == null) {
-            $entity = new Integration();
-            $entity->setName($this->getName());
-        }
-
-        if (!empty($clientId)) {
-            $keys = $this->getDecryptedApiKeys($entity);
-
-            $keys[$this->getClientIdKey()]     = $clientId;
-            $keys[$this->getClientSecretKey()] = $clientSecret;
-
-            $this->encryptAndSetApiKeys($keys, $entity);
-            $this->setIntegrationSettings($entity);
-        }
-
-        $error  = '';
-        try {
-            if (!$this->authorizeApi()) {
-                $error = 'authorization failed';
-            }
-        } catch (\Exception $e) {
-            $error = $e->getMessage() . " (" . $e->getCode() . ")";
-        }
-
-        //save the data
-        $em = $this->factory->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-
-        return array($entity, $error);
-    }
-
-    /**
-     * @param array  $parameters
-     * @param string $authMethod
-     *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth
-     */
-    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
-    {
-        $class = sprintf('\\MauticAddon\\MauticCrmBundle\\Crm\\%s\\Api\\Auth\\%s', $this->getName(), $authMethod);
-        $this->auth = new $class();
-
-        $reflection = new \ReflectionMethod($class, 'setup');
-        $pass       = array();
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($parameters[$param->getName()])) {
-                $pass[] = $parameters[$param->getName()];
-            } else {
-                $pass[] = null;
-            }
-        }
-
-        $reflection->invokeArgs($this->auth, $pass);
-    }
-
-    /**
-     * Authorizes the API
-     */
-    public function authorizeApi()
-    {
-        if ($this->auth->validateAccessToken()) {
-            if ($this->auth->accessTokenUpdated()) {
-                $accessTokenData = $this->auth->getAccessTokenData();
-                $this->mergeApiKeys($accessTokenData);
-            }
-
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -198,7 +90,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $availableFields = $this->getAvailableFields();
 
         $unknown = $this->factory->getTranslator()->trans('mautic.crm.form.lead.unknown');
-
+        $matched = array();
         foreach ($availableFields as $key => $field) {
             $crmKey = $this->convertLeadFieldKey($key, $field);
 
@@ -218,26 +110,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Check API Authentication
-     */
-    public function checkApiAuth($silenceExceptions = true)
-    {
-        try {
-            if (!$this->auth->isAuthorized()) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (ErrorException $exception) {
-            $this->logIntegrationError($exception);
-            if (!$silenceExceptions) {
-                throw $exception;
-            }
-            return false;
-        }
-    }
-
-    /**
      * @param $lead
      */
     public function pushLead($lead)
@@ -251,8 +123,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         try {
-            if ($this->checkApiAuth(false)) {
-                CrmApi::getContext($this, "lead", $this->auth)->create($mappedData);
+            if ($this->isAuthorized()) {
+                CrmApi::getContext($this, "lead")->create($mappedData);
                 return true;
             }
         } catch (\Exception $e) {
@@ -276,7 +148,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getClientIdKey()
     {
-        return 'client_key';
+        return 'client_id';
     }
 
     /**

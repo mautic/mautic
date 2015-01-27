@@ -36,8 +36,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields ()
     {
         return array(
-            'email_id' => 'mautic.zoho.form.email',
-            'password' => 'mautic.zoho.form.password'
+            $this->getClientIdKey()     => 'mautic.zoho.form.email',
+            $this->getClientSecretKey() => 'mautic.zoho.form.password'
         );
     }
 
@@ -46,7 +46,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getClientIdKey ()
     {
-        return 'email_id';
+        return 'EMAIL_ID';
     }
 
     /**
@@ -54,7 +54,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getClientSecretKey ()
     {
-        return 'password';
+        return 'PASSWORD';
     }
 
     /**
@@ -62,20 +62,79 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getAuthTokenKey ()
     {
-        return 'authtoken';
+        return 'AUTHTOKEN';
     }
 
     /**
-     * @param array  $parameters
-     * @param string $authMethod
-     *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
+     * @return string
      */
-    public function createApiAuth ($parameters = array(), $authMethod = 'Auth')
+    public function getApiUrl()
     {
-        $zohoSettings = $this->getDecryptedApiKeys();
+        return 'https://crm.zoho.com/crm/private/json';
+    }
 
-        parent::createApiAuth($zohoSettings);
+    /**
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        return array(
+            'requires_callback'      => false,
+            'requires_authorization' => true
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function authCallback($settings = array(), $parameters = array())
+    {
+        $request_url = 'https://accounts.zoho.com/apiauthtoken/nb/create';
+        $parameters  = array(
+            'SCOPE'    => 'ZohoCRM/crmapi',
+            'EMAIL_ID' => $this->keys[$this->getClientIdKey()],
+            'PASSWORD' => $this->keys[$this->getClientSecretKey()]
+        );
+
+        $response = $this->makeRequest($request_url, $parameters, 'GET', array('authorize_session' => true));
+
+        if ($response['RESULT'] == 'FALSE') {
+            return $this->factory->getTranslator()->trans("mautic.integration.error.genericerror", array(), "flashes");
+        }
+
+        return $this->extractAuthKeys($response);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $data
+     * @param bool   $postAuthorization
+     *
+     * @return mixed
+     */
+    public function parseCallbackResponse($data, $postAuthorization = false)
+    {
+        if ($postAuthorization) {
+            /*
+            #
+            #Wed Feb 29 03:07:33 PST 2012
+            AUTHTOKEN=bad18eba1ff45jk7858b8ae88a77fa30
+            RESULT=TRUE
+            */
+            preg_match_all('(\w*=\w*)', $data, $matches);
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $string_attribute) {
+                    $parts                 = explode('=', $string_attribute);
+                    $attributes[$parts[0]] = $parts[1];
+                }
+                return $attributes;
+            } else {
+                return array();
+            }
+        } else {
+            return parent::parseCallbackResponse($data, $postAuthorization);
+        }
     }
 
     /**
@@ -86,8 +145,8 @@ class ZohoIntegration extends CrmAbstractIntegration
         $zohoFields = array();
 
         try {
-            if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this, "lead", $this->auth)->getFields('Leads');
+            if ($this->isAuthorized()) {
+                $leadObject = CrmApi::getContext($this, 'lead')->getFields('Leads');
 
                 if ($leadObject == null || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                     return array();
@@ -152,7 +211,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $xmlData = '<Leads>';
         $xmlData .= '<row no="1">';
         foreach ($mappedData as $name => $value) {
-            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $mappedData, $value);
+            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $value);
         }
         $xmlData .= '</row>';
         $xmlData .= '</Leads>';

@@ -8,16 +8,11 @@ use MauticAddon\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 class CrmApi
 {
-    /**
-     * @var ApiAuth
-     */
-    protected $auth;
 
     protected $integration;
 
-    public function __construct($auth, CrmAbstractIntegration $integration)
+    public function __construct(CrmAbstractIntegration $integration)
     {
-        $this->auth        = $auth;
         $this->integration = $integration;
     }
 
@@ -28,16 +23,16 @@ class CrmApi
      * @param string                  $apiContext     API context (leads, forms, etc)
      * @param AbstractAuth            $auth           API Auth object
      */
-    static function getContext($crm, $apiContext, AbstractAuth $auth)
+    static function getContext($crm, $apiContext)
     {
         $apiContext = ucfirst($apiContext);
 
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'MauticAddon\\MauticCrmBundle\\Crm\\'.$crm->getName().'\\Api\\Object\\' . $apiContext;
+            $class = 'MauticAddon\\MauticCrmBundle\\Crm\\'.$crm->getName().'\\' . $apiContext;
             if (class_exists($class)) {
-                $contexts[$apiContext] = new $class($auth, $crm);
+                $contexts[$apiContext] = new $class($crm);
             } else {
                 throw new ContextNotFoundException("A context of '$apiContext' was not found.");
             }
