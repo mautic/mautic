@@ -12,25 +12,27 @@ namespace Mautic\AddonBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class PointEventHelper
+ * Class EventHelper
  *
  * @package Mautic\AddonBundle\Helper
  */
-class PointEventHelper
+class EventHelper
 {
 
     /**
      * @param               $lead
      * @param MauticFactory $factory
      */
-    static public function pushLead($lead, MauticFactory $factory)
+    static public function pushLead($config, $lead, MauticFactory $factory)
     {
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $factory->getHelper('integration');
 
-        $services = $integrationHelper->getIntegrationObjects(null, 'push_lead');
+        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
+        $feature     = (empty($integration)) ? 'push_lead' : null;
 
-        $success = false;
+        $services = $integrationHelper->getIntegrationObjects($integration, $feature);
+        $success  = false;
 
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();

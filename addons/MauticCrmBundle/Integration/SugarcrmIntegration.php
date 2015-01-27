@@ -10,6 +10,7 @@
 namespace MauticAddon\MauticCrmBundle\Integration;
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -273,9 +274,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param FormBuilder $builder
+     * @param FormBuilder|Form $builder
      */
-    public function appendToForm(FormBuilder &$builder, $formArea)
+    public function appendToForm(&$builder, $formArea)
     {
         if ($formArea == 'keys') {
             $builder->add('version', 'button_group', array(

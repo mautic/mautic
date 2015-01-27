@@ -81,19 +81,7 @@ class IntegrationController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //get a list of addons for filter
-        $addons = $addonModel->getEntities(array(
-            'hydration_mode' => 'hydrate_array',
-            'orderBy'        => 'i.name',
-            'filter'         => array(
-                'force' => array(
-                    array(
-                        'column' => 'i.isEnabled',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    )
-                )
-            )
-        ))->getIterator()->getArrayCopy();
+        $addons = $addonModel->getEnabledList();
 
         return $this->delegateView(array(
             'viewParameters'  => array(

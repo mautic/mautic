@@ -12,14 +12,15 @@ namespace MauticAddon\MauticSocialBundle\Integration;
 
 use Mautic\AddonBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Form;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
 
     /**
-     * @param FormBuilder $builder
+     * @param FormBuilder|Form $builder
      */
-    public function appendToForm(FormBuilder &$builder, $formArea)
+    public function appendToForm(&$builder, $formArea)
     {
         if ($formArea == 'features') {
             $name = strtolower($this->getName());

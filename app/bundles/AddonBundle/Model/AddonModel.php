@@ -53,4 +53,24 @@ class AddonModel extends FormModel
 
         return true;
     }
+
+    /**
+     * @return array
+     */
+    public function getEnabledList()
+    {
+        return $this->getEntities(array(
+            'hydration_mode' => 'hydrate_array',
+            'orderBy'        => 'i.name',
+            'filter'         => array(
+                'force' => array(
+                    array(
+                        'column' => 'i.isEnabled',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    )
+                )
+            )
+        ))->getIterator()->getArrayCopy();
+    }
 }

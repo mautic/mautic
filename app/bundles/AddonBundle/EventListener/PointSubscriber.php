@@ -22,7 +22,7 @@ class PointSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
             PointEvents::TRIGGER_ON_BUILD => array('onTriggerBuild', 0)
@@ -32,12 +32,13 @@ class PointSubscriber extends CommonSubscriber
     /**
      * @param TriggerBuilderEvent $event
      */
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild (TriggerBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.addon.point.action',
-            'label'       => 'mautic.addon.point.action.push',
-            'callback'    => array('\\Mautic\\AddonBundle\\Helper\\PointEventHelper', 'pushLead')
+            'group'    => 'mautic.addon.point.action',
+            'label'    => 'mautic.addon.actions.push_lead',
+            'formType' => 'integration_list',
+            'callback' => array('\\Mautic\\AddonBundle\\Helper\\EventHelper', 'pushLead')
         );
 
         $event->addEvent('addon.leadpush', $action);

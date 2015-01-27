@@ -8,36 +8,36 @@
  */
 
 return array(
-    'routes' => array(
+    'routes'   => array(
         'main' => array(
             'mautic_integration_auth_callback' => array(
-                'path' => '/addon/integrations/authcallback/{integration}',
+                'path'       => '/addon/integrations/authcallback/{integration}',
                 'controller' => 'MauticAddonBundle:Auth:authCallback'
             ),
             'mautic_integration_auth_postauth' => array(
-                'path' => '/addon/integrations/authstatus',
+                'path'       => '/addon/integrations/authstatus',
                 'controller' => 'MauticAddonBundle:Auth:authStatus'
             ),
-            'mautic_addon_integration_index' => array(
-                'path' => '/addon/integrations',
+            'mautic_addon_integration_index'   => array(
+                'path'       => '/addon/integrations',
                 'controller' => 'MauticAddonBundle:Integration:index'
             ),
-            'mautic_addon_integration_edit' => array(
-                'path' => '/addon/integrations/edit/{name}',
+            'mautic_addon_integration_edit'    => array(
+                'path'       => '/addon/integrations/edit/{name}',
                 'controller' => 'MauticAddonBundle:Integration:edit'
             ),
-            'mautic_addon_index' => array(
-                'path' => '/addon/{page}',
+            'mautic_addon_index'               => array(
+                'path'       => '/addon/{page}',
                 'controller' => 'MauticAddonBundle:Addon:index'
             ),
-            'mautic_addon_action' => array(
-                'path' => '/addon/{objectAction}/{objectId}',
+            'mautic_addon_action'              => array(
+                'path'       => '/addon/{objectAction}/{objectId}',
                 'controller' => 'MauticAddonBundle:Addon:execute'
             )
         )
     ),
 
-    'menu' => array(
+    'menu'     => array(
         'admin' => array(
             'priority' => 50,
             'items'    => array(
@@ -46,7 +46,7 @@ return array(
                     'iconClass' => 'fa-plus-circle',
                     'access'    => 'addon:addons:manage',
                     'children'  => array(
-                        'mautic.addon.manage.addons'           => array(
+                        'mautic.addon.manage.addons'       => array(
                             'route' => 'mautic_addon_index',
                         ),
                         'mautic.addon.manage.integrations' => array(
@@ -62,34 +62,45 @@ return array(
         'events' => array(
             'mautic.addon.pointbundle.subscriber' => array(
                 'class' => 'Mautic\AddonBundle\EventListener\PointSubscriber'
+            ),
+            'mautic.addon.formbundle.subscriber' => array(
+                'class' => 'Mautic\AddonBundle\EventListener\FormSubscriber'
+            ),
+            'mautic.addon.campaignbundle.subscriber' => array(
+                'class' => 'Mautic\AddonBundle\EventListener\CampaignSubscriber'
             )
         ),
-        'forms' => array(
-            'mautic.form.type.integration.details' => array(
+        'forms'  => array(
+            'mautic.form.type.integration.details'  => array(
                 'class' => 'Mautic\AddonBundle\Form\Type\DetailsType',
                 'alias' => 'integration_details'
             ),
             'mautic.form.type.integration.settings' => array(
-                'class' => 'Mautic\AddonBundle\Form\Type\FeatureSettingsType',
+                'class'     => 'Mautic\AddonBundle\Form\Type\FeatureSettingsType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'integration_featuresettings'
+                'alias'     => 'integration_featuresettings'
             ),
-            'mautic.form.type.integration.fields' => array(
+            'mautic.form.type.integration.fields'   => array(
                 'class' => 'Mautic\AddonBundle\Form\Type\FieldsType',
                 'alias' => 'integration_fields'
             ),
-            'mautic.form.type.integration.keys' => array(
+            'mautic.form.type.integration.keys'     => array(
                 'class' => 'Mautic\AddonBundle\Form\Type\KeysType',
                 'alias' => 'integration_keys'
+            ),
+            'mautic.form.type.integration.list'     => array(
+                'class'     => 'Mautic\AddonBundle\Form\Type\IntegrationsListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'integration_list'
             )
         ),
-        'other' => array(
+        'other'  => array(
             'mautic.helper.integration' => array(
-                'class' => 'Mautic\AddonBundle\Helper\IntegrationHelper',
+                'class'     => 'Mautic\AddonBundle\Helper\IntegrationHelper',
                 'arguments' => 'mautic.factory'
             ),
-            'mautic.helper.addon' => array(
-                'class' => 'Mautic\AddonBundle\Helper\AddonHelper',
+            'mautic.helper.addon'       => array(
+                'class'     => 'Mautic\AddonBundle\Helper\AddonHelper',
                 'arguments' => 'mautic.factory'
             )
         )

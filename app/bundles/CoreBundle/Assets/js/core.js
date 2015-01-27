@@ -10,6 +10,15 @@ mQuery.ajaxSetup({
         if (settings.showLoadingBar) {
             mQuery('.loading-bar').addClass('active');
             MauticVars.activeRequests++;
+
+            var currentRequests = MauticVars.activeRequests;
+            MauticVars.loadingBarTimeout = setTimeout(function() {
+                if (MauticVars.activeRequests == currentRequests) {
+                    // Seems to be stuck
+                    MauticVars.activeRequests = 0;
+                    Mautic.stopPageLoadingBar();
+                }
+            }, 1000);
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -114,6 +123,10 @@ var Mautic = {
             MauticVars.activeRequests = 0;
         } else {
             MauticVars.activeRequests--;
+        }
+
+        if (MauticVars.loadingBarTimeout) {
+            clearTimeout(MauticVars.loadingBarTimeout);
         }
 
         if (MauticVars.activeRequests == 0) {
