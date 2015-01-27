@@ -499,7 +499,8 @@ class EventModel extends CommonFormModel
             'event'           => $event,
             'lead'            => $lead,
             'factory'         => $this->factory,
-            'systemTriggered' => $systemTriggered
+            'systemTriggered' => $systemTriggered,
+            'config'          => $event['properties']
         );
 
         if ($lead instanceof Lead) {

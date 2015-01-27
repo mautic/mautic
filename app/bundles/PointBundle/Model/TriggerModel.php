@@ -301,7 +301,8 @@ class TriggerModel extends CommonFormModel
         $args     = array(
             'event'    => $event,
             'lead'     => $lead,
-            'factory'  => $this->factory
+            'factory'  => $this->factory,
+            'config'   => $event->getProperties()
         );
 
         if (is_callable($settings['callback'])) {

@@ -201,6 +201,7 @@ class SubmissionModel extends CommonFormModel
 
             $settings       = $availableActions[$key];
             $args['action'] = $action;
+            $args['config'] = $action->getProperties();
             $callback       = $settings['callback'];
             if (is_callable($callback)) {
                 if (is_array($callback)) {
