@@ -60,17 +60,6 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getRequiredKeyFields()
-    {
-        return array(
-            'clientId'      => 'mautic.integration.keyfield.clientid',
-            'clientSecret'  => 'mautic.integration.keyfield.clientsecret'
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'oauth2';
@@ -84,9 +73,20 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function getApiUrl($endpoint, $m = 'foursquare')
     {
-        $keys = $this->getDecryptedApiKeys();
-        $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
-        return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}&oauth_token={$token}";
+        return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
+    }
+
+    /**
+     * @param        $url
+     * @param array  $parameters
+     * @param string $method
+     * @param array  $settings
+     */
+    public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
+    {
+        $settings[$this->getAuthTokenKey()] = 'oauth_token';
+
+        return parent::makeRequest($url, $parameters, $method, $settings);
     }
 
     /**
@@ -101,7 +101,7 @@ class FoursquareIntegration extends SocialIntegration
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("users/{$id}");
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
             if (!empty($data) && isset($data->response->user)) {
                 $result = $data->response->user;
                 $socialCache['profile'] = $this->matchUpData($result);
@@ -133,7 +133,7 @@ class FoursquareIntegration extends SocialIntegration
             /*
             //mayorships
             $url  = $this->getApiUrl("users/{$id}/mayorships");
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
 
             if (isset($data->response->mayorships) && count($data->response->mayorships->items)) {
                 $limit = 5;
@@ -163,7 +163,7 @@ class FoursquareIntegration extends SocialIntegration
 
             //tips
             $url  = $this->getApiUrl("users/{$id}/tips") . "&limit=5&sort=recent";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
 
             if (isset($data->response->tips) && count($data->response->tips->items)) {
                 foreach ($data->response->tips->items as $t) {
@@ -191,7 +191,7 @@ class FoursquareIntegration extends SocialIntegration
             /*
             //lists
             $url  = $this->getApiUrl("users/{$id}/lists") . "&limit=5&group=created";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
 
             if (isset($data->response->lists) && count($data->response->lists->items)) {
                 foreach ($data->response->lists->items as $l) {
@@ -210,7 +210,7 @@ class FoursquareIntegration extends SocialIntegration
 
                     //get a sample of the list items
                     $url      = "https://api.foursquare.com/v2/lists/{$l->id}?limit=5&sort=recent&v=20140719&oauth_token={$keys['access_token']}";
-                    $listData = $this->makeCall($url);
+                    $listData = $this->makeRequest($url);
 
                     if (isset($listData->response->list->listItems) && count($listData->response->list->listItems->items)) {
                         foreach ($listData->response->list->listItems->items as $li) {
@@ -320,16 +320,13 @@ class FoursquareIntegration extends SocialIntegration
             $cleaned = array($cleaned);
         }
 
-        $keys  = $this->getDecryptedApiKeys();
+        foreach ($cleaned as $type => $c) {
+            $url  = $this->getApiUrl("users/search") . "&{$type}={$c}";
+            $data = $this->makeRequest($url);
 
-        if (!empty($keys['access_token'])) {
-            foreach ($cleaned as $type => $c) {
-                $url  = $this->getApiUrl("users/search") . "&{$type}={$c}";
-                $data = $this->makeCall($url);
-                if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
-                    $socialCache['id'] = $data->response->results[0]->id;
-                    return $socialCache['id'];
-                }
+            if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
+                $socialCache['id'] = $data->response->results[0]->id;
+                return $socialCache['id'];
             }
         }
 

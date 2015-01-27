@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alan
- * Date: 1/14/15
- * Time: 7:42 PM
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
@@ -18,14 +19,16 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * @param FormBuilder $builder
      */
-    public function appendToFeatureForm(FormBuilder &$builder)
+    public function appendToForm(FormBuilder &$builder, $formArea)
     {
-        $name = strtolower($this->getName());
-        if ($this->factory->serviceExists('mautic.form.type.social.'.$name)) {
-            $builder->add('shareButton', 'socialmedia_' . $name, array(
-                'label'    => 'mautic.integration.form.sharebutton',
-                'required' => false
-            ));
+        if ($formArea == 'features') {
+            $name = strtolower($this->getName());
+            if ($this->factory->serviceExists('mautic.form.type.social.' . $name)) {
+                $builder->add('shareButton', 'socialmedia_' . $name, array(
+                    'label'    => 'mautic.integration.form.sharebutton',
+                    'required' => false
+                ));
+            }
         }
     }
 
@@ -101,5 +104,63 @@ abstract class SocialIntegration extends AbstractIntegration
     public function getAuthenticationType()
     {
         return 'oauth2';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredKeyFields()
+    {
+        return array(
+            'client_id'      => 'mautic.integration.keyfield.clientid',
+            'client_secret'  => 'mautic.integration.keyfield.clientsecret'
+        );
+    }
+
+    /**
+     * Get the array key for clientId
+     *
+     * @return string
+     */
+    public function getClientIdKey ()
+    {
+        return 'client_id';
+    }
+
+    /**
+     * Get the array key for client secret
+     *
+     * @return string
+     */
+    public function getClientSecretKey ()
+    {
+        return 'client_secret';
+    }
+
+    /**
+     * Get the array key for the auth token
+     *
+     * @return string
+     */
+    public function getAuthTokenKey ()
+    {
+        return 'access_token';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $data
+     * @param bool   $postAuthorization
+     *
+     * @return mixed
+     */
+    public function parseCallbackResponse ($data, $postAuthorization = false)
+    {
+        if ($postAuthorization) {
+            return json_decode($data, true);
+        } else {
+            return json_decode($data);
+        }
     }
 }

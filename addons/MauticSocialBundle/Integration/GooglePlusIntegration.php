@@ -22,6 +22,11 @@ class GooglePlusIntegration extends SocialIntegration
         return 'GooglePlus';
     }
 
+    public function getDisplayName()
+    {
+        return 'Google+';
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -61,7 +66,7 @@ class GooglePlusIntegration extends SocialIntegration
     {
         if ($userid = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userid}");
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
             $info = $this->matchUpData($data);
 
             if (isset($data->url)) {
@@ -85,8 +90,7 @@ class GooglePlusIntegration extends SocialIntegration
     public function getPublicActivity ($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
-            $url  = $this->getApiUrl("people/$id/activities/public") . "&maxResults=10";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
                 $socialCache['activity'] = array(
@@ -330,6 +334,15 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getAuthenticationType ()
     {
+
+        return 'key';
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthTokenKey()
+    {
         return 'key';
     }
 
@@ -340,10 +353,7 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getApiUrl ($endpoint)
     {
-        $keys = $this->getDecryptedApiKeys();
-        $key  = (isset($keys['key'])) ? $keys['key'] : '';
-
-        return "https://www.googleapis.com/plus/v1/$endpoint?key=" . $key;
+        return "https://www.googleapis.com/plus/v1/$endpoint";
     }
 
     /**
@@ -374,8 +384,7 @@ class GooglePlusIntegration extends SocialIntegration
                 return $id;
             }
 
-            $url  = $this->getApiUrl('people') . "&query={$id}";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
                 $socialCache['id'] = $data->items[0]->id;

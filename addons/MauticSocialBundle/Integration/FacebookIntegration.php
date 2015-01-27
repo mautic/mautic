@@ -69,26 +69,21 @@ class FacebookIntegration extends SocialIntegration
 
     /**
      * {@inheritdoc}
-     */
-    public function getRequiredKeyFields()
-    {
-        return array(
-            'clientId'     => 'mautic.integration.keyfield.appid',
-            'clientSecret' => 'mautic.integration.keyfield.appsecret'
-        );
-    }
-
-    /**
-     * Extract the tokens returned by the oauth2 callback
      *
-     * @param $data
+     * @param string $data
+     * @param bool   $postAuthorization
      *
      * @return mixed
      */
-    protected function parseCallbackResponse($data)
+    public function parseCallbackResponse($data, $postAuthorization = false)
     {
-        parse_str($data, $values);
-        return $values;
+        if ($postAuthorization) {
+            parse_str($data, $values);
+
+            return $values;
+        } else {
+            return parent::parseCallbackResponse($data, $postAuthorization);
+        }
     }
 
     /**
@@ -121,7 +116,8 @@ class FacebookIntegration extends SocialIntegration
             } else {
                 $fields = array_merge(array_keys($this->getAvailableFields()), array('id', 'link'));
                 $url    = $this->getApiUrl("$id") . "?fields=" . implode(',',$fields);
-                $data   = $this->makeCall($url);
+                //@todo - can't use access token to do a global search; may not work after April
+                $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
             }
 
             if (is_object($data) && !isset($data->error)) {
@@ -155,11 +151,11 @@ class FacebookIntegration extends SocialIntegration
 
         $identifiers = $this->cleanIdentifier($identifier);
 
-        //try a global search first using the twitter handle if
         if (isset($identifiers['facebook'])) {
             $fields = array_merge(array_keys($this->getAvailableFields()), array('id', 'link'));
             $url    = $this->getApiUrl($identifiers["facebook"]) . "?fields=" . implode(',',$fields);
-            $data   = $this->makeCall($url);
+            //@todo - can't use access token to do a global search; may not work after April
+            $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
 
             if ($data && isset($data->id)) {
                 $socialCache['id'] = $data->id;
@@ -170,17 +166,6 @@ class FacebookIntegration extends SocialIntegration
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrorsFromResponse($response)
-    {
-        if (is_object($response) && isset($response->error)) {
-            return $response->error->message . ' (' . $response->error->code . ')';
-        }
-        return '';
     }
 
     /**

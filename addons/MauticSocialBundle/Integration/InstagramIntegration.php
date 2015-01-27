@@ -8,7 +8,6 @@
  */
 
 namespace MauticAddon\MauticSocialBundle\Integration;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
  * Class InstagramIntegration
@@ -59,26 +58,13 @@ class InstagramIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getRequiredKeyFields()
-    {
-        return array(
-            'clientId'      => 'mautic.integration.keyfield.clientid',
-            'clientSecret'  => 'mautic.integration.keyfield.clientsecret'
-        );
-    }
-
-    /**
      * @param $endpoint
      *
      * @return string
      */
     public function getApiUrl($endpoint)
     {
-        $keys  = $this->getDecryptedApiKeys();
-        $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
-        return "https://api.instagram.com/v1/$endpoint?access_token=$token";
+        return "https://api.instagram.com/v1/$endpoint";
     }
 
     /**
@@ -88,7 +74,8 @@ class InstagramIntegration extends SocialIntegration
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl('users/'.$id);
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($url);
+
             if (isset($data->data)) {
                 $info = $this->matchUpData($data->data);
 
@@ -107,8 +94,7 @@ class InstagramIntegration extends SocialIntegration
         $socialCache['has']['activity'] = false;
         if ($id = $this->getUserId($identifier, $socialCache)) {
             //get more than 10 so we can weed out videos
-            $url  = $this->getApiUrl("users/$id/media/recent"). "&count=20";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), array('count' => 20));
 
             $socialCache['activity'] = array(
                 "photos" => array(),
@@ -161,8 +147,7 @@ class InstagramIntegration extends SocialIntegration
 
         $identifier = $this->cleanIdentifier($identifier);
 
-        $url  = $this->getApiUrl('users/search') . "&q=$identifier";
-        $data = $this->makeCall($url);
+        $data = $this->makeRequest($this->getApiUrl('users/search'), array('q' => $identifier));
 
         if (!empty($data->data)) {
             foreach ($data->data as $user) {

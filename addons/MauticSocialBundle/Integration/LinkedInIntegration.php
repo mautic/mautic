@@ -48,4 +48,12 @@ class LinkedInIntegration extends SocialIntegration
     {
         return 'none';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredKeyFields()
+    {
+        return array();
+    }
 }

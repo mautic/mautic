@@ -27,7 +27,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return 'Twitter';
     }
@@ -35,7 +35,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority ()
     {
         return 5000;
     }
@@ -43,7 +43,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields ()
     {
         return 'twitter';
     }
@@ -51,7 +51,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures ()
     {
         return array(
             'public_profile',
@@ -63,15 +63,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getOAuthLoginUrl()
-    {
-        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('integration' => $this->getName()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl ()
     {
         return 'https://api.twitter.com/oauth2/token';
     }
@@ -79,124 +71,28 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function oAuthCallback($clientId = '', $clientSecret = '')
+    public function getAuthenticationType ()
     {
-        $url      = $this->getAccessTokenUrl();
-        $keys     = $this->getDecryptedApiKeys();
-
-        if (!empty($clientId)) {
-            //callback from JS
-            $keys['clientId']     = $clientId;
-            $keys['clientSecret'] = $clientSecret;
-        }
-
-        if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return array(false, $this->factory->getTranslator()->trans('mautic.integration.missingkeys'));
-        }
-
-        $bearer = $this->getBearerToken($keys);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: Basic {$bearer}",
-            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-        ));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
-        $curlError = curl_error($ch);
-        $data = curl_exec($ch);
-
-        //get the body response
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $body        = substr($data, $header_size);
-
-        curl_close($ch);
-
-        //check to see if an entity exists
-        $entity = $this->getIntegrationSettings();
-        if ($entity == null) {
-            $entity = new Integration();
-            $entity->setName($this->getName());
-        }
-
-        if (empty($curlError)) {
-            $values = json_decode($body, true);
-
-            if (isset($values['access_token'])) {
-                $keys['access_token'] = $values['access_token'];
-                $error                = false;
-            } else {
-                $error = $this->getErrorsFromResponse($values);
-            }
-
-            $this->encryptAndSetApiKeys($keys, $entity);
-        } else {
-            $error = $curlError;
-        }
-
-        //save the data
-        $em = $this->factory->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-
-        return array($entity, $error);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
-    {
-        return 'oauth1a';
+        return 'oauth2';
     }
 
     /**
      * Generate a Twitter bearer token
      *
-     * @param $keys
+     * @param $inAuthorization
      *
      * @return string
      */
-    private function getBearerToken($keys)
+    public function getBearerToken ($inAuthorization = false)
     {
-        //Per Twitter's recommendations
-        $consumer_key    = rawurlencode($keys['clientId']);
-        $consumer_secret = rawurlencode($keys['clientSecret']);
+        if ($inAuthorization) {
+            $consumer_key    = rawurlencode($this->keys[$this->getClientIdKey()]);
+            $consumer_secret = rawurlencode($this->keys[$this->getClientSecretKey()]);
 
-        return base64_encode($consumer_key . ':' . $consumer_secret);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrorsFromResponse($response)
-    {
-        if (is_object($response) && !empty($response->errors)) {
-            $errors = array();
-            foreach ($response->errors as $e) {
-                $errors[] = $e->message . ' ('.$e->code.')';
-            }
-
-            return implode('; ', $errors);
+            return base64_encode($consumer_key . ':' . $consumer_secret);
+        } else {
+            return $this->keys[$this->getAuthTokenKey()];
         }
-
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequiredKeyFields()
-    {
-        return array(
-            'clientId'     => 'mautic.integration.keyfield.clientid',
-            'clientSecret' => 'mautic.integration.keyfield.clientsecret'
-        );
     }
 
     /**
@@ -204,7 +100,7 @@ class TwitterIntegration extends SocialIntegration
      *
      * @return string
      */
-    public function getApiUrl($endpoint)
+    public function getApiUrl ($endpoint)
     {
         return "https://api.twitter.com/1.1/$endpoint.json";
     }
@@ -212,7 +108,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData ($identifier, &$socialCache)
     {
         //tell getUserId to return a user array if it obtains it
         $this->preventDoubleCall = true;
@@ -222,16 +118,18 @@ class TwitterIntegration extends SocialIntegration
                 //getUserId has alread obtained the data
                 $data = $id;
             } else {
-                $url  = $this->getApiUrl("users/lookup") . "?user_id={$id}&include_entities=false";
-                $data = $this->makeCall($url);
+                $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
+                    'user_id'          => $id,
+                    'include_entities' => false
+                ));
             }
 
             if (isset($data[0])) {
                 $info                  = $this->matchUpData($data[0]);
                 $info['profileHandle'] = $data[0]['screen_name'];
                 //remove the size variant
-                $image = $data[0]['profile_image_url_https'];
-                $image = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
+                $image                = $data[0]['profile_image_url_https'];
+                $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
                 $info['profileImage'] = $image;
 
                 $socialCache['profile'] = $info;
@@ -243,16 +141,20 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity ($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             //due to the way Twitter filters, get more than 10 tweets
-            $url  = $this->getApiUrl("/statuses/user_timeline")  . "?user_id={$id}&exclude_replies=true&count=25&trim_user=true";
-            $data = $this->makeCall($url);
+            $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
+                'user_id'         => $id,
+                'exclude_replies' => true,
+                'count'           => 25,
+                'trim_user'       => true
+            ));
 
             if (!empty($data) && count($data)) {
                 $socialCache['has']['activity'] = true;
-                $socialCache['activity'] = array(
+                $socialCache['activity']        = array(
                     'tweets' => array(),
                     'photos' => array(),
                     'tags'   => array()
@@ -263,7 +165,7 @@ class TwitterIntegration extends SocialIntegration
                         break;
                     }
 
-                    $tweet = array(
+                    $tweet                               = array(
                         'tweet'       => $d['text'],
                         'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                         'coordinates' => $d['coordinates'],
@@ -292,7 +194,7 @@ class TwitterIntegration extends SocialIntegration
                             } else {
                                 $socialCache['activity']['tags'][$h['text']] = array(
                                     'count' => 1,
-                                    'url'   => 'https://twitter.com/search?q=%23'.$h['text']
+                                    'url'   => 'https://twitter.com/search?q=%23' . $h['text']
                                 );
                             }
                         }
@@ -305,39 +207,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function makeCall($url) {
-        $referer = $this->getRefererUrl();
-
-        $keys = $this->getDecryptedApiKeys();
-        if (empty($keys['access_token'])) {
-            return null;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_REFERER, $referer);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: Bearer {$keys['access_token']}",
-            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-        ));
-
-        $data = curl_exec($ch);
-
-        //get the body response
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $body        = substr($data, $header_size);
-
-        curl_close($ch);
-
-        $values = json_decode($body, true);
-        return $values;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableFields ($silenceExceptions = true)
     {
         return array(
             "profileHandle" => array("type" => "string"),
@@ -355,9 +225,10 @@ class TwitterIntegration extends SocialIntegration
      *
      * @param $identifier
      * @param $socialCache
+     *
      * @return mixed|null
      */
-    public function getUserId($identifier, &$socialCache)
+    public function getUserId ($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
@@ -365,8 +236,11 @@ class TwitterIntegration extends SocialIntegration
             return false;
         }
 
-        $url  = $this->getApiUrl("users/lookup") . "?screen_name={$identifier}&include_entities=false";
-        $data = $this->makeCall($url);
+        $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
+            'screen_name'      => $identifier,
+            'include_entities' => false
+        ));
+
         if (isset($data[0])) {
             $socialCache['id'] = $data[0]['id'];
 
@@ -380,7 +254,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function cleanIdentifier($identifier)
+    public function cleanIdentifier ($identifier)
     {
         if (strpos($identifier, 'http') !== false) {
             //extract the handle
@@ -388,5 +262,18 @@ class TwitterIntegration extends SocialIntegration
         }
 
         return urlencode($identifier);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $data
+     * @param bool   $postAuthorization
+     *
+     * @return mixed
+     */
+    public function parseCallbackResponse ($data, $postAuthorization = false)
+    {
+        return json_decode($data, true);
     }
 }
