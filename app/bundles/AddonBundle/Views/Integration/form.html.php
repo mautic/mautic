@@ -6,9 +6,9 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$leadFields  = (isset($form['featureSettings']) && isset($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$hasFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
+$formSettings = $integration->getFormSettings();
+$leadFields   = (isset($form['featureSettings']) && isset($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$hasFeatures  = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
 ?>
 
 <ul class="nav nav-tabs pr-md pl-md">
@@ -34,13 +34,17 @@ $hasFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatu
                 <?php echo $view['translator']->trans($specialInstructions); ?>
             </div>
         <?php endif; ?>
-        <?php if (strpos($integration->getAuthenticationType(), 'oauth') !== false): ?>
+        <?php if (!empty($formSettings['requires_callback'])): ?>
         <div class="well well-sm">
             <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
-            <input type="text" readonly value="<?php echo $integration->getOauthCallbackUrl(); ?>" class="form-control" />
+            <input type="text" readonly value="<?php echo $integration->getAuthCallbackUrl(); ?>" class="form-control" />
         </div>
         <?php endif; ?>
-        <?php echo $view['form']->row($form['authButton']); ?>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <?php echo $view['form']->widget($form['authButton']); ?>
+            </div>
+        </div>
         <?php endif; ?>
     </div>
 

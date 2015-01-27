@@ -13,15 +13,14 @@ if ($tmpl == 'index')
 <div class="pa-md bg-auto">
     <div class="row shuffle-integrations">
             <?php foreach ($items as $item): ?>
-                <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration integration<?php echo $item['addon']; ?>">
+                <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration addon<?php echo $item['addon']; ?> integration-<?php echo $item['name']; ?>">
                     <div class="panel ovf-h pa-10">
-                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['name']; ?>">
+                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>">
                             <p><img class="img img-responsive" src="<?php echo $view['assets']->getUrl($item['icon']); ?>" /></p>
                             <h5 class="mt-20">
-                                <span><?php echo $item['name']; ?>
-                                <?php if ($item['enabled']): ?>
-                                    <i class="fa fa-2x fa-check text-success" style="position: absolute; top: -10px; right: -5px;"></i>
-                                <?php endif; ?>
+                                <span class="ellipsis" data-toggle="tooltip" title="<?php echo $addons[$item['addon']]['name'] . ' - ' . $item['display']; ?>"><?php echo $item['display']; ?>
+                                    <?php $class = (!$item['enabled']) ? ' hide' : '';?>
+                                    <i class="fa fa-2x fa-check text-success<?php echo $class; ?>" style="position: absolute; top: -10px; right: -5px;"></i>
                                 </span>
                             </h5>
                         </a>

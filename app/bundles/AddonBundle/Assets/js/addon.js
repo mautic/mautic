@@ -7,15 +7,20 @@ Mautic.initiateIntegrationAuthorization = function() {
 };
 
 Mautic.loadIntegrationAuthWindow = function(response) {
-    Mautic.stopPageLoadingBar();
-    Mautic.stopIconSpinPostEvent();
-    mQuery('#integration_details_in_auth').val(0);
+    if (response.newContent) {
+        response.target = '#IntegrationEditModal .modal-body-content';
+        Mautic.processPageContent(response);
+    } else {
+        Mautic.stopPageLoadingBar();
+        Mautic.stopIconSpinPostEvent();
+        mQuery('#integration_details_in_auth').val(0);
 
-    if (response.authUrl) {
-        var generator = window.open(response.authUrl, 'integrationauth','height=500,width=500');
+        if (response.authUrl) {
+            var generator = window.open(response.authUrl, 'integrationauth', 'height=500,width=500');
 
-        if(!generator || generator.closed || typeof generator.closed=='undefined') {
-            alert(response.popupBlockerMessage);
+            if (!generator || generator.closed || typeof generator.closed == 'undefined') {
+                alert(response.popupBlockerMessage);
+            }
         }
     }
 };
@@ -37,7 +42,16 @@ Mautic.refreshIntegrationForm = function() {
 };
 
 Mautic.integrationOnLoad = function(container, response) {
-   Mautic.filterIntegrations();
+    if (response && response.name) {
+        var integration = '.integration-' + response.name + ' .fa-check';
+        if (response.enabled) {
+            mQuery(integration).removeClass('hide');
+        } else {
+            mQuery(integration).addClass('hide');
+        }
+    } else {
+        Mautic.filterIntegrations();
+    }
 };
 
 Mautic.filterIntegrations = function(update) {
@@ -59,7 +73,7 @@ Mautic.filterIntegrations = function(update) {
         setTimeout(function () {
             grid.shuffle('shuffle', function($el, shuffle) {
                 if (filter) {
-                    return $el.hasClass('integration' + filter);
+                    return $el.hasClass('addon' + filter);
                 } else {
                     return true;
                 }

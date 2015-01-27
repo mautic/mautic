@@ -30,7 +30,7 @@ class IntegrationController extends FormController
         $addonFilter = $this->request->get('addon', $session->get('mautic.integrations.filter', ''));
         $session->set('mautic.integrations.filter', $addonFilter);
 
-        $addonModel  = $this->factory->getModel('addon');
+        $addonModel = $this->factory->getModel('addon');
 
         if (!empty($addonFilter)) {
             //check to see if the addon is enabled; if not redirect back to addons with a message to enable
@@ -67,7 +67,8 @@ class IntegrationController extends FormController
         foreach ($integrationObjects as $name => $object) {
             $settings            = $object->getIntegrationSettings();
             $integrations[$name] = array(
-                'name'    => $name,
+                'name'    => $object->getName(),
+                'display' => $object->getDisplayName(),
                 'icon'    => $integrationHelper->getIconPath($object),
                 'enabled' => $settings->isPublished(),
                 'addon'   => $settings->getAddon()->getId()
@@ -82,8 +83,8 @@ class IntegrationController extends FormController
         //get a list of addons for filter
         $addons = $addonModel->getEntities(array(
             'hydration_mode' => 'hydrate_array',
-            'orderBy' => 'i.name',
-            'filter' => array(
+            'orderBy'        => 'i.name',
+            'filter'         => array(
                 'force' => array(
                     array(
                         'column' => 'i.isEnabled',
@@ -169,11 +170,12 @@ class IntegrationController extends FormController
         ));
 
         if ($this->request->getMethod() == 'POST') {
+            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
                 $currentFeatureSettings = $entity->getFeatureSettings();
 
-                if ($this->isFormValid($form)) {
+                if ($valid = $this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
                     $integration = $entity->getName();
 
@@ -189,17 +191,14 @@ class IntegrationController extends FormController
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
+                            $submittedFields = $this->request->request->get('integration_details[featureSettings][leadFields]', array(), true);
                             if (isset($featureSettings['leadFields'])) {
-                                $fields  = $integrationObject->getAvailableFields();
-                                if (!empty($fields)) {
-                                    $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
-                                    foreach ($featureSettings['leadFields'] as $f => $v) {
-                                        if (empty($v)) {
-                                            unset($featureSettings['leadFields'][$f]);
-                                        }
+                                foreach ($featureSettings['leadFields'] as $f => $v) {
+                                    if (empty($v) || !isset($submittedFields[$f])) {
+                                        unset($featureSettings['leadFields'][$f]);
                                     }
-                                    $entity->setFeatureSettings($featureSettings);
                                 }
+                                $entity->setFeatureSettings($featureSettings);
                             }
                         }
                     } else {
@@ -213,29 +212,33 @@ class IntegrationController extends FormController
                     if ($authorize) {
                         //redirect to the oauth URL
                         /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integrationObject */
-                        $oauthUrl = $integrationObject->getOAuthLoginUrl();
+                        $oauthUrl = $integrationObject->getAuthLoginUrl();
+
                         return new JsonResponse(array(
-                            'integration' => $integration,
-                            'authUrl' => $oauthUrl,
-                            'authorize' => 1,
+                            'integration'         => $integration,
+                            'authUrl'             => $oauthUrl,
+                            'authorize'           => 1,
                             'popupBlockerMessage' => $this->factory->getTranslator()->trans('mautic.integration.oauth.popupblocked')
                         ));
                     }
                 }
             }
 
-            // Close the modal and return back to the list view
-            $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-
-            return $response;
+            if (($cancelled || $valid) && !$authorize) {
+                // Close the modal and return back to the list view
+                return new JsonResponse(array(
+                    'closeModal'    => 1,
+                    'enabled'       => $entity->getIsPublished(),
+                    'name'          => $integrationObject->getName(),
+                    'mauticContent' => 'integration',
+                ));
+            }
         }
 
-        $template   = $integrationObject->getFormTemplate();
+        $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
-        $default = 'MauticAddonBundle:FormTheme\Integration';
-        $themes   = array($default);
+        $default     = 'MauticAddonBundle:FormTheme\Integration';
+        $themes      = array($default);
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
         } else if ($objectTheme !== $default) {

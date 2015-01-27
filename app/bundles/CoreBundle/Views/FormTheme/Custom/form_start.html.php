@@ -5,7 +5,7 @@
     <input type="hidden" name="_method" value="<?php echo $method ?>" />
 <?php endif ?>
 <?php if (count($form->vars['errors'])): ?>
-<div class="has-error">
+<div class="has-error pa-10">
     <?php echo $view['form']->errors($form); ?>
 </div>
 <?php endif; ?>
