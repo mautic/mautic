@@ -10,6 +10,7 @@
 namespace Mautic\AddonBundle\Integration;
 
 use Mautic\AddonBundle\Entity\Integration;
+use Mautic\AddonBundle\Helper\oAuthHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\FormBuilder;
 
@@ -28,6 +29,11 @@ abstract class AbstractIntegration
      * @var Integration
      */
     protected $settings;
+
+    /**
+     * @var array Decrypted keys
+     */
+    protected $keys;
 
     /**
      * @param MauticFactory $factory
@@ -63,6 +69,31 @@ abstract class AbstractIntegration
      * @return string
      */
     abstract public function getName ();
+
+    /**
+     * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
+     * (will call $this->authenticationTypeCallback)
+     *
+     * @return string
+     */
+    abstract public function getAuthenticationType ();
+
+    /**
+     * Get a list of supported features for this integration
+     *
+     * @return array
+     */
+    abstract public function getSupportedFeatures ();
+
+    /**
+     * Name to display for the integration.  Uses value of getName() by default
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->getName();
+    }
 
     /**
      * Returns the field the integration needs in order to find the user
@@ -102,6 +133,8 @@ abstract class AbstractIntegration
     public function setIntegrationSettings (Integration $settings)
     {
         $this->settings = $settings;
+
+        $this->keys = $this->getDecryptedApiKeys();
     }
 
     /**
@@ -136,7 +169,7 @@ abstract class AbstractIntegration
     {
         $settings = $this->settings;
         if (empty($withKeys)) {
-            $withKeys = $this->getDecryptedApiKeys($settings);
+            $withKeys = $this->keys;
         }
 
         foreach ($withKeys as $k => $v) {
@@ -150,6 +183,7 @@ abstract class AbstractIntegration
         $withKeys = array_merge($withKeys, $mergeKeys);
 
         if ($return) {
+            $this->keys = $withKeys;
             return $withKeys;
         } else {
             $this->encryptAndSetApiKeys($withKeys, $settings);
@@ -172,6 +206,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Returns already decrypted keys
+     *
+     * @return mixed
+     */
+    public function getKeys()
+    {
+        return $this->keys;
+    }
+
+    /**
      * Returns decrypted API keys
      *
      * @param bool $entity
@@ -180,12 +224,20 @@ abstract class AbstractIntegration
      */
     public function getDecryptedApiKeys ($entity = false)
     {
+        static $decryptedKeys = array();
+
         if (!$entity) {
             $entity = $this->settings;
         }
+
         $keys = $entity->getApiKeys();
 
-        return $this->decryptApiKeys($keys);
+        $serialized = serialize($keys);
+        if (empty($decryptedKeys[$serialized])) {
+            $decryptedKeys[$serialized] = $this->decryptApiKeys($keys);;
+        }
+
+        return $decryptedKeys[$serialized];
     }
 
     /**
@@ -231,37 +283,13 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Generate the oauth login URL
-     *
-     * @return string
-     */
-    public function getOAuthLoginUrl ()
-    {
-        $callback = $this->getOauthCallbackUrl();
-
-        $keys        = $this->getDecryptedApiKeys();
-        $clientIdKey = $this->getClientIdKey();
-
-        $clientId = $keys[$clientIdKey];
-        $state    = hash('sha1', uniqid(mt_rand()));
-        $url      = $this->getAuthenticationUrl()
-            . '?client_id=' . $clientId //placeholder to be replaced by whatever is the field
-            . '&response_type=code'
-            . '&redirect_uri=' . urlencode($callback)
-            . '&state=' . $state; //set a state to protect against CSRF attacks
-        $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
-
-        return $url;
-    }
-
-    /**
      * Get the array key for clientId
      *
      * @return string
      */
     public function getClientIdKey ()
     {
-        return 'clientId';
+        return '';
     }
 
     /**
@@ -271,7 +299,17 @@ abstract class AbstractIntegration
      */
     public function getClientSecretKey ()
     {
-        return 'clientSecret';
+        return '';
+    }
+
+    /**
+     * Array of keys to mask in the config form
+     *
+     * @return array
+     */
+    public function getSecretKeys()
+    {
+        return array($this->getClientSecretKey());
     }
 
     /**
@@ -281,155 +319,17 @@ abstract class AbstractIntegration
      */
     public function getAuthTokenKey ()
     {
-        return 'access_token';
+        return '';
     }
 
     /**
-     * Retrieves and stores tokens returned from oAuthLogin
-     *
-     * @param string $clientId
-     * @param string $clientSecret
+     * Get the keys for the refresh token and expiry
      *
      * @return array
      */
-    public function oAuthCallback ($clientId = '', $clientSecret = '')
-    {
-        $request  = $this->factory->getRequest();
-        $url      = $this->getAccessTokenUrl();
-        $keys     = $this->getDecryptedApiKeys();
-        $callback = $this->getOauthCallbackUrl();
-
-        if (!empty($clientId)) {
-            //callback from JS
-            $keys['clientId']     = $clientId;
-            $keys['clientSecret'] = $clientSecret;
-        }
-
-        if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return array(false, $this->factory->getTranslator()->trans('mautic.integration.missingkeys'));
-        }
-
-        $query = 'client_id=' . $keys['clientId']
-            . '&client_secret=' . $keys['clientSecret']
-            . '&grant_type=authorization_code'
-            . '&redirect_uri=' . urlencode($callback)
-            . '&code=' . $request->get('code');
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-
-        $data      = curl_exec($ch);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        //check to see if an entity exists
-        $entity = $this->getIntegrationSettings();
-        if ($entity == null) {
-            $entity = new Integration();
-            $entity->setName($this->getName());
-        }
-
-        if (empty($curlError)) {
-            //parse the response
-            $values = $this->parseCallbackResponse($data);
-
-            if (is_array($values) && isset($values['access_token'])) {
-                $keys['access_token'] = $values['access_token'];
-
-                if (isset($values['refresh_token'])) {
-                    $keys['refresh_token'] = $values['refresh_token'];
-                }
-                $error = false;
-            } else {
-                $error = $this->getErrorsFromResponse($values);
-                if (empty($error)) {
-                    $error = $this->factory->getTranslator()->trans("mautic.integration.error.genericerror", array(), "flashes");
-                }
-            }
-
-            $encrypted = $this->encryptApiKeys($keys);
-            $entity->setApiKeys($encrypted);
-        } else {
-            $error = $curlError;
-        }
-
-        //save the data
-        $em = $this->factory->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-
-        return array($entity, $error);
-    }
-
-    /**
-     * Gets the URL for the built in oauth callback
-     *
-     * @return string
-     */
-    public function getOauthCallbackUrl ()
-    {
-        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
-            array('integration' => $this->getName()),
-            true //absolute
-        );
-    }
-
-
-    /**
-     * Extract the tokens returned by the oauth2 callback
-     *
-     * @param string $data
-     *
-     * @return mixed
-     */
-    protected function parseCallbackResponse ($data)
-    {
-        return json_decode($data, true);
-    }
-
-    /**
-     * Make a basic call using cURL to get the data
-     *
-     * @param string $url
-     *
-     * @return mixed
-     */
-    public function makeCall ($url)
-    {
-        $referer = $this->getRefererUrl();
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_REFERER, $referer);
-        $data = @curl_exec($ch);
-
-        curl_close($ch);
-
-        return json_decode($data);
-    }
-
-    /**
-     * Get a list of available fields from the connecting API
-     *
-     * @return array
-     */
-    public function getAvailableFields ($silenceExceptions = true)
+    public function getRefreshTokenKeys ()
     {
         return array();
-    }
-
-    /**
-     * Sets whether fields should be sorted alphabetically or by the order the integration feeds
-     */
-    public function sortFieldsAlphabetically ()
-    {
-        return true;
     }
 
     /**
@@ -443,24 +343,382 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Get a list of supported features for this integration
+     * Extract the tokens returned by the oauth callback
      *
-     * @return array
+     * @param string $data
+     * @param bool   $postAuthorization
+     *
+     * @return mixed
      */
-    public function getSupportedFeatures ()
+    public function parseCallbackResponse ($data, $postAuthorization = false)
     {
-        return array();
+        return json_decode($data, true);
     }
 
     /**
-     * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
-     * (will call $this->authenticationTypeCallback)
+     * @param $response
+     */
+    public function getErrorsFromResponse($response)
+    {
+        if (is_object($response)) {
+            if (!empty($response->errors)) {
+                $errors = array();
+                foreach ($response->errors as $e) {
+                    $errors[] = $e->message;
+                }
+
+                return implode('; ', $errors);
+            } elseif (!empty($response->error->message)) {
+                return $response->error->message;
+            } else {
+                return (string) $response;
+            }
+        } elseif (is_array($response) && isset($response['error']['message'])) {
+            return $response['error']['message'];
+        } elseif (is_array($response)) {
+            if (isset($response['errors'])) {
+                $errors = array();
+                foreach ($response['errors'] as $err) {
+                    $errors[] = $err['message'];
+                }
+                return implode('; ', $errors);
+            }
+            return implode(' ', $response);
+        } else {
+            return $response;
+        }
+    }
+
+    /**
+     * Make a basic call using cURL to get the data
+     *
+     * @param        $url
+     * @param array  $parameters
+     * @param string $method
+     * @param array  $settings
+     *
+     * @return mixed|string
+     */
+    public function makeRequest ($url, $parameters = array(), $method = 'GET', $settings = array())
+    {
+        $method          = strtoupper($method);
+        $headers         = array();
+        $authType        = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
+        $clientIdKey     = $this->getClientIdKey();
+        $clientSecretKey = $this->getClientSecretKey();
+        $authTokenKey    = $this->getAuthTokenKey();
+        $authToken       = $this->keys[$authTokenKey];
+        $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
+
+        if (!$this->isConfigured()) {
+            return array('error' => array('message' => $this->factory->getTranslator()->trans('mautic.integration.missingkeys')));
+        }
+
+        if (!empty($settings['authorize_session'])) {
+            switch ($authType) {
+                case 'oauth1a':
+                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
+                    break;
+                case 'oauth2':
+                    if ($bearerToken = $this->getBearerToken(true)) {
+                        $headers                  = array(
+                            "Authorization: Basic {$bearerToken}",
+                            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
+                        );
+                        $parameters['grant_type'] = 'client_credentials';
+                    } else {
+                        $defaultGrantType   = (!empty($settings['refresh_token'])) ? 'refresh_token' : 'authorization_code';
+                        $grantType          = (!isset($settings['grant_type'])) ? $defaultGrantType : $settings['grant_type'];
+                        $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
+                        $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey : $settings[$clientSecretKey];
+                        $parameters         = array_merge($parameters, array(
+                            $useClientIdKey     => $this->keys[$clientIdKey],
+                            $useClientSecretKey => $this->keys[$clientSecretKey],
+                            'grant_type'        => $grantType
+                        ));
+                        if ($grantType == 'authorization_code') {
+                            $parameters['code'] = $this->factory->getRequest()->get('code');
+                        }
+                        if (empty($settings['ignore_redirecturi'])) {
+                            $callback                   = $this->getAuthCallbackUrl();
+                            $parameters['redirect_uri'] = $callback;
+                        }
+                    }
+                    break;
+            }
+        } else {
+            switch ($authType) {
+                case 'oauth1a':
+                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
+                    break;
+                case 'oauth2':
+                    if ($bearerToken = $this->getBearerToken()) {
+                        $headers = array(
+                            "Authorization: Bearer {$bearerToken}",
+                            //"Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
+                        );
+                    } else {
+                        $parameters[$authTokenKey] = $authToken;
+                        $headers                   = array(
+                            "oauth-token: $authTokenKey",
+                            "Authorization: OAuth {$authToken}",
+                        );
+                    }
+                    break;
+                case 'key':
+                    $parameters[$authTokenKey] = $authToken;
+                    break;
+            }
+        }
+
+        if ($method == 'GET' && !empty($parameters)) {
+            $query =  http_build_query($parameters);
+            $url .= (strpos($url, '?') === false) ? '?' . $query : '&' . $query;
+        }
+
+        $ch = curl_init();
+
+        if ($method == 'POST') {
+            curl_setopt($ch, CURLOPT_POST, 1);
+        } elseif ($method == 'PUT') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        } elseif ($method == 'DELETE') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        }
+
+        if ($method !== 'GET') {
+            if (!empty($parameters)) {
+                if ($authType == 'oauth1a') {
+                    $parameters = http_build_query($parameters);
+                }
+                if (!empty($settings['encode_parameters'])) {
+                    if ($settings['encode_parameters'] == 'json') {
+                        //encode the arguments as JSON
+                        $parameters = json_encode($parameters);
+                        $headers[]  = 'Content-Type: application/json';
+                    }
+                }
+            }
+
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
+        }
+
+        $headers = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
+        if (!empty($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        if (!empty($settings['ssl_verifypeer'])) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $settings['ssl_verifypeer']);
+        }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+
+        if (isset($settings['curl_options'])) {
+            foreach ($settings['curl_options'] as $k => $v) {
+                curl_setopt($ch, $k, $v);
+            }
+        }
+
+        $referer = $this->getRefererUrl();
+        curl_setopt($ch, CURLOPT_REFERER, $referer);
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        $result    = curl_exec($ch);
+        $curlError = curl_error($ch);
+
+        if ($curlError) {
+            return array('error' => array('message' => $curlError));
+        }
+
+        $responseArray = explode("\r\n\r\n", $result);
+        $result        = array_pop($responseArray);
+
+        curl_close($ch);
+
+        $response = $this->parseCallbackResponse($result, !empty($settings['authorize_session']));
+
+        return $response;
+    }
+
+    /**
+     * Generate the auth login URL.  Note that if oauth2, response_type=code is assumed.  If this is not the case,
+     * override this function.
      *
      * @return string
      */
-    public function getAuthenticationType ()
+    public function getAuthLoginUrl ()
     {
-        return 'none';
+        $authType = $this->getAuthenticationType();
+
+        if ($authType == 'oauth2') {
+            $callback    = $this->getAuthCallbackUrl();
+            $clientIdKey = $this->getClientIdKey();
+            $state       = hash('sha1', uniqid(mt_rand()));
+            $url         = $this->getAuthenticationUrl()
+                . '?client_id=' . $this->keys[$clientIdKey]
+                . '&response_type=code'
+                . '&redirect_uri=' . urlencode($callback)
+                . '&state=' . $state; //set a state to protect against CSRF attacks
+            $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
+
+            return $url;
+        } else {
+            return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+        }
+    }
+
+    /**
+     * Gets the URL for the built in oauth callback
+     *
+     * @return string
+     */
+    public function getAuthCallbackUrl ()
+    {
+        return $this->factory->getRouter()->generate('mautic_integration_auth_callback',
+            array('integration' => $this->getName()),
+            true //absolute
+        );
+    }
+
+    /**
+     * Retrieves and stores tokens returned from oAuthLogin
+     *
+     * @param array $settings
+     * @param array $parameters
+     *
+     * @return array
+     */
+    public function authCallback ($settings = array(), $parameters = array())
+    {
+        $url    = $this->getAccessTokenUrl();
+        $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
+
+        $settings['authorize_session'] = true;
+
+        $data = $this->makeRequest($url, $parameters, $method, $settings);
+
+        return $this->extractAuthKeys($data);
+    }
+
+    /**
+     * Extacts the auth keys from response and saves entity
+     *
+     * @param $data
+     *
+     * @return bool|string
+     */
+    public function extractAuthKeys($data, $tokenOverride = null)
+    {
+        //check to see if an entity exists
+        $entity = $this->getIntegrationSettings();
+        if ($entity == null) {
+            $entity = new Integration();
+            $entity->setName($this->getName());
+        }
+
+        // Prepare the keys for extraction such as renaming, setting expiry, etc
+        $data = $this->prepareResponseForExtraction($data);
+
+        //parse the response
+        $authTokenKey = ($tokenOverride) ? $tokenOverride : $this->getAuthTokenKey();
+        if (is_array($data) && isset($data[$authTokenKey])) {
+            $keys = $this->mergeApiKeys($data, null, true);
+            $encrypted = $this->encryptApiKeys($keys);
+            $entity->setApiKeys($encrypted);
+
+            $error = false;
+        } else {
+            $error = $this->getErrorsFromResponse($data);
+            if (empty($error)) {
+                $error = $this->factory->getTranslator()->trans("mautic.integration.error.genericerror", array(), "flashes");
+            }
+        }
+
+        //save the data
+        $em = $this->factory->getEntityManager();
+        $em->persist($entity);
+        $em->flush();
+
+        $this->setIntegrationSettings($entity);
+
+        return $error;
+    }
+
+    /**
+     * Called in extractAuthKeys before key comparison begins to give opportunity to set expiry, rename keys, etc
+     *
+     * @param $data
+     */
+    public function prepareResponseForExtraction($data)
+    {
+        return $data;
+    }
+
+    /**
+     * Checks to see if the integration is configured by checking that required keys are populated
+     *
+     * @return bool
+     */
+    public function isConfigured()
+    {
+        $requiredTokens = $this->getRequiredKeyFields();
+        foreach ($requiredTokens as $token => $label) {
+            if (!isset($this->keys[$token])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if an integration is authorized and/or authorizes the request
+     *
+     * @return bool
+     */
+    public function isAuthorized()
+    {
+        if (!$this->isConfigured()) {
+            return false;
+        }
+
+        $type         = $this->getAuthenticationType();
+        $authTokenKey = $this->getAuthTokenKey();
+
+        switch ($type) {
+            case 'oauth1a':
+            case 'oauth2':
+                $refreshTokenKeys = $this->getRefreshTokenKeys();
+                if (!isset($this->keys[$authTokenKey])) {
+                    $valid = false;
+                } elseif (!empty($refreshTokenKeys)) {
+                    list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
+                    if (!empty($expiryKey) && !empty($this->keys[$refreshTokenKey]) && isset($this->keys[$expiryKey]) && time() > $this->keys[$expiryKey]) {
+                        //token has expired so try to refresh it
+                        $error = $this->authCallback(array('refresh_token' => true));
+                        $valid = (empty($error));
+                    }
+                } else {
+                    $valid = true;
+                }
+                break;
+            case 'key':
+            case 'rest':
+                $valid = isset($this->keys[$authTokenKey]);
+                break;
+
+            default:
+                $valid = true;
+                break;
+        }
+
+        return $valid;
     }
 
     /**
@@ -484,19 +742,15 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Get a string formatted error from an API response
+     * Generate a bearer token
      *
-     * @param mixed $response
+     * @param $inAuthorization
      *
      * @return string
      */
-    public function getErrorsFromResponse ($response)
+    public function getBearerToken($inAuthorization = false)
     {
-        if (is_array($response)) {
-            return implode(' ', $response);
-        }
-
-        return $response;
+        return '';
     }
 
     /**
@@ -570,6 +824,24 @@ abstract class AbstractIntegration
     protected function getRefererUrl ()
     {
         return 'http' . (($_SERVER['SERVER_PORT'] == 443) ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Get a list of available fields from the connecting API
+     *
+     * @return array
+     */
+    public function getAvailableFields ($silenceExceptions = true)
+    {
+        return array();
+    }
+
+    /**
+     * Sets whether fields should be sorted alphabetically or by the order the integration feeds
+     */
+    public function sortFieldsAlphabetically ()
+    {
+        return true;
     }
 
     /**
@@ -685,13 +957,40 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Allows appending extra data to the featureSettings array
+     * Allows appending extra data to the config.
      *
      * @param FormBuilder $builder
+     * @param string      $formArea  Section of form being built keys|features
+     *                               keys can be used to store login/request related settings; keys are encrypted
+     *                               features can be used for configuring share buttons, etc
      */
-    public function appendToFeatureForm (FormBuilder &$builder)
+    public function appendToForm (FormBuilder &$builder, $formArea)
     {
 
+    }
+
+    /**
+     * Returns settings for the integration form
+     *
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        $type = $this->getAuthenticationType();
+        switch ($type) {
+            case 'oauth1a':
+            case 'oauth2':
+                $callback = $authorization = true;
+                break;
+            default:
+                $callback = $authorization = false;
+                break;
+        }
+
+        return array(
+            'requires_callback'      => $callback,
+            'requires_authorization' => $authorization
+        );
     }
 
     /**

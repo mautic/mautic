@@ -23,7 +23,7 @@ class AuthController extends FormController
      *
      * @return JsonResponse
      */
-    public function oAuth2CallbackAction ($integration)
+    public function authCallbackAction ($integration)
     {
         $isAjax = $this->request->isXmlHttpRequest();
 
@@ -44,9 +44,9 @@ class AuthController extends FormController
         if (!array_key_exists(strtolower($integration), $objects)) {
             $session->set('mautic.integration.postauth.message', array('mautic.integration.notfound', array('%name%' => $integration), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
             }
         }
 
@@ -56,13 +56,13 @@ class AuthController extends FormController
             $session->remove($integration . '_csrf_token');
             $session->set('mautic.integration.postauth.message', array('mautic.integration.auth.invalid.state', array(), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
             }
         }
 
-        list($entity, $error) = $integrationObjects[$integration]->oAuthCallback();
+        $error = $integrationObjects[$integration]->authCallback();
 
         //check for error
         if ($error) {
@@ -77,13 +77,13 @@ class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
-        return new RedirectResponse($this->generateUrl('mautic_integration_oauth_postauth'));
+        return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
     }
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function oAuthStatusAction ()
+    public function authStatusAction ()
     {
         $session     = $this->factory->getSession();
         $postMessage = $session->get('mautic.integration.postauth.message');

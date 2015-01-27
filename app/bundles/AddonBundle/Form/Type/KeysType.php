@@ -12,6 +12,7 @@ namespace Mautic\AddonBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SocialMediaKeysType
@@ -27,17 +28,22 @@ class KeysType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $object = $options['integration_object'];
+        $secretKeys = $object->getSecretKeys();
         foreach ($options['integration_keys'] as $key => $label) {
-            $type = ($key == $options['secret_key']) ? 'password' : 'text';
+            $type = (in_array($key, $secretKeys)) ? 'password' : 'text';
             $builder->add($key, $type, array(
                 'label'        => $label,
                 'label_attr'   => array('class' => 'control-label'),
                 'attr'         => array(
                     'class'       => 'form-control',
                     'placeholder' => ($type == 'password') ? '**************' : ''
-                )
+                ),
+                'required'     => false,
+                'error_bubbling' => false
             ));
         }
+        $object->appendToForm($builder, 'keys');
     }
 
     /**
@@ -45,8 +51,9 @@ class KeysType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('integration_keys'));
-        $resolver->setOptional(array('secret_key'));
+        $resolver->setRequired(array('integration_object', 'integration_keys'));
+        $resolver->setOptional(array('secret_keys'));
+        $resolver->setDefaults(array('secret_keys' => array()));
     }
 
     /**

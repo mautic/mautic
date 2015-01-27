@@ -30,7 +30,7 @@ class FieldsType extends AbstractType
     {
         foreach ($options['integration_fields'] as $field => $details) {
             $label = (is_array($details)) ? $details['label'] : $details;
-            $field = InputHelper::alphanum($field);
+            $field = InputHelper::alphanum($field, false, '_');
 
             $builder->add($field, 'choice', array(
                 'choices'    => $options['lead_fields'],

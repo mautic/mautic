@@ -32,15 +32,14 @@ class DetailsType extends AbstractType
         $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
 
         $builder->add('apiKeys', 'integration_keys', array(
-            'label'              => false,
-            'required'           => false,
-            'integration_keys'   => $keys,
-            'data'               => $decryptedKeys,
-            'secret_key'         => $options['integration_object']->getClientSecretKey()
+            'label'               => false,
+            'integration_keys'    => $keys,
+            'data'                => $decryptedKeys,
+            'integration_object'  => $options['integration_object']
         ));
 
-        $authType = $options['integration_object']->getAuthenticationType();
-        if (in_array($authType, array('oauth1a', 'oauth2', 'callback'))) {
+        $formSettings = $options['integration_object']->getFormSettings();
+        if (!empty($formSettings['requires_authorization'])) {
             $disabled     = false;
             $authTokenKey = $options['integration_object']->getAuthTokenKey();
             $label        = (!empty($decryptedKeys[$authTokenKey])) ? 'reauthorize' : 'authorize';

@@ -41,10 +41,10 @@ class FeatureSettingsType extends AbstractType
         $integration_object = $options['integration_object'];
 
         //add custom feature settings
-        $integration_object->appendToFeatureForm($builder);
+        $integration_object->appendToForm($builder, 'features');
 
         try {
-            $fields = $integration_object->getFormLeadFields($options['integration'], false);
+            $fields = $integration_object->getFormLeadFields(false);
             $error = '';
         } catch (\Exception $e) {
             $fields = array();
@@ -64,7 +64,7 @@ class FeatureSettingsType extends AbstractType
                 $form = $event->getForm();
 
                 if ($error) {
-                    $form['leadFields']->addError(new FormError($error));
+                    $form->addError(new FormError($error));
                 }
             });
         }

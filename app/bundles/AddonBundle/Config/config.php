@@ -10,13 +10,13 @@
 return array(
     'routes' => array(
         'main' => array(
-            'mautic_integration_oauth_callback' => array(
-                'path' => '/addon/integrations/oauth2callback/{integration}',
-                'controller' => 'MauticAddonBundle:Auth:oAuth2Callback'
+            'mautic_integration_auth_callback' => array(
+                'path' => '/addon/integrations/authcallback/{integration}',
+                'controller' => 'MauticAddonBundle:Auth:authCallback'
             ),
-            'mautic_integration_oauth_postauth' => array(
-                'path' => '/addon/integrations/oauth2/status',
-                'controller' => 'MauticAddonBundle:Auth:oAuthStatus'
+            'mautic_integration_auth_postauth' => array(
+                'path' => '/addon/integrations/authstatus',
+                'controller' => 'MauticAddonBundle:Auth:authStatus'
             ),
             'mautic_addon_integration_index' => array(
                 'path' => '/addon/integrations',
