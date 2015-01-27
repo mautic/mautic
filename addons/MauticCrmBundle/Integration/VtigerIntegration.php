@@ -8,8 +8,8 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class VtigerIntegration
@@ -24,6 +24,14 @@ class VtigerIntegration extends CrmAbstractIntegration
     public function getName()
     {
         return 'Vtiger';
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return 'vTiger';
     }
 
     /**
@@ -65,16 +73,47 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $parameters
-     * @param string $authMethod
-     *
-     * @return \MauticAddon\MauticCrmBundle\Api\Auth\AbstractAuth|void
+     * @return string
      */
-    public function createApiAuth($parameters = array(), $authMethod = 'Auth')
+    public function getApiUrl()
     {
-        $vtigerSettings = $this->getDecryptedApiKeys();
+        return sprintf('%s/webservice.php', $this->keys['url']);
+    }
 
-        parent::createApiAuth($vtigerSettings);
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function isAuthorized()
+    {
+        $url         = $this->getApiUrl();
+        $parameters  = array(
+            'operation' => 'getchallenge',
+            'username'  => $this->keys['username']
+        );
+
+        $response = $this->makeRequest($url, $parameters);
+
+        if (empty($response['success'])) {
+            return $this->getErrorsFromResponse($response);
+        }
+
+        $loginParameters = array(
+            'operation' => 'login',
+            'username'  => $this->keys['username'],
+            'accessKey' => md5($response['result']['token'] . $this->keys['accessKey'])
+        );
+
+        $response = $this->makeRequest($url, $loginParameters, 'POST');
+
+        if (empty($response['success'])) {
+            return false;
+        } else {
+            $error = $this->extractAuthKeys($response['result']);
+
+            return (empty($error));
+        }
     }
 
     /**
@@ -85,8 +124,8 @@ class VtigerIntegration extends CrmAbstractIntegration
         $vtigerFields = array();
 
         try {
-            if ($this->checkApiAuth($silenceExceptions)) {
-                $leadObject = CrmApi::getContext($this, "lead", $this->auth)->describe();
+            if ($this->isAuthorized()) {
+                $leadObject = CrmApi::getContext($this, "lead")->describe();
 
                 if ($leadObject == null || !isset($leadObject['fields'])) {
                     return array();
@@ -98,9 +137,9 @@ class VtigerIntegration extends CrmAbstractIntegration
                     }
 
                     $vtigerFields[$fieldInfo['name']] = array(
-                        'type'  => 'string',
-                        'label' => $fieldInfo['label'],
-                        'required' => $fieldInfo['mandatory']
+                        'type'      => 'string',
+                        'label'     => $fieldInfo['label'],
+                        'required'  => $fieldInfo['mandatory']
                     );
                 }
             }
@@ -142,9 +181,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     {
         if (!empty($mappedData)) {
             //vtiger requires assigned_user_id so default to authenticated user
-            $data = $this->getDecryptedApiKeys();
-
-            $mappedData['assigned_user_id'] = $data['userId'];
+            $mappedData['assigned_user_id'] = $this->keys['userId'];
         }
     }
 }
