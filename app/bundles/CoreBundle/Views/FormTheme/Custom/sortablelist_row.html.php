@@ -1,10 +1,10 @@
 <?php
 $hasErrors = count($form->vars['errors']);
 $list      = $form->children['list'];
-$feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? " has-error" : "";
+$feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
 $datePrototype = (isset($list->vars['prototype'])) ?
     $view->escape('<div class="sortable">'.$view['form']->widget($list->vars['prototype']).'</div>') : '';
-$feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? " has-error" : "";
+$feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
 ?>
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="<?php echo $form->vars['id']; ?>" class="form-group col-xs-12 <?php echo $feedbackClass; ?>" id="<?php echo $form->vars['id']; ?>_list">

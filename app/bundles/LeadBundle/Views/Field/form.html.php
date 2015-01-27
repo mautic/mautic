@@ -52,7 +52,7 @@ $view['slots']->set("headerTitle", $header);
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];
             $errors        = $form['properties']->vars['errors'];
-            $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error" : "";
+            $feedbackClass = (!empty($errors)) ? " has-error" : "";
             ?>
 
             <div class="row">

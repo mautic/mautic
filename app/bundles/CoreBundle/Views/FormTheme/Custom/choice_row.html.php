@@ -1,6 +1,6 @@
 <?php
-$hasErrors = count($form->vars['errors']);
-$feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? ' has-error' : '';
+$hasErrors     = count($form->vars['errors']);
+$feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 
 //apply attributes to radios
 $attr = $form->vars['attr'];
