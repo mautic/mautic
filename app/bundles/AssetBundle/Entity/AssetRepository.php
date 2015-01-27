@@ -138,26 +138,26 @@ class AssetRepository extends CommonRepository
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.cora.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
                 $expr = $q->expr()->eq("a.isPublished", 1);
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.cora.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
                 $expr = $q->expr()->eq("a.isPublished", 0);
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.cora.searchcommand.isuncategorized'):
+            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
                     $q->expr()->isNull('a.category'),
                     $q->expr()->eq('a.category', $q->expr()->literal(''))
                 );
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.cora.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
                 $expr = $q->expr()->eq("IDENTITY(a.createdBy)", $this->currentUser->getId());
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.cora.searchcommand.category'):
+            case $this->translator->trans('mautic.core.searchcommand.category'):
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
@@ -197,11 +197,11 @@ class AssetRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.cora.searchcommand.ispublished',
-            'mautic.cora.searchcommand.isunpublished',
-            'mautic.cora.searchcommand.isuncategorized',
-            'mautic.cora.searchcommand.ismine',
-            'mautic.cora.searchcommand.category',
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.isuncategorized',
+            'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang'
         );
     }

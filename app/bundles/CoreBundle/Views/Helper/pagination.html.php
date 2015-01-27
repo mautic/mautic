@@ -74,10 +74,10 @@ endif;
     <div class="<?php echo $paginationWrapper; ?>">
         <ul class="pagination nm <?php echo $pageClass; ?>">
             <?php
-            $urlPage = "/" . $page - $range;
-            $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $urlPage = "/" . ($page - $range);
+            $url     = (($page - $range) > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+            $class   = (($page - $range) <= 0) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>
@@ -87,10 +87,10 @@ endif;
             </li>
 
             <?php
-            $urlPage = "/" . $page - 1;
-            $url     = ($urlPage >= 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $urlPage = "/" . ($page - 1);
+            $url     = (($page - 1) >= 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+            $class   = (($page - 1) <= 0) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>
@@ -123,10 +123,10 @@ endif;
             <?php endfor; ?>
 
             <?php
-            $urlPage = "/" . $page + 1;
-            $url     = ($urlPage <= $totalPages) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $urlPage = "/" . ($page + 1);
+            $url     = (($page + 1) <= $totalPages) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : 'data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = ($urlPage > $totalPages) ? ' class="disabled"' : '';
+            $class   = (($page + 1) > $totalPages) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>
@@ -136,12 +136,12 @@ endif;
             </li>
 
             <?php
-            $urlPage = "/" . $page + $range;
-            if ($urlPage > $totalPages)
-                $urlPage = $totalPages;
+            $urlPage = "/" . ($page + $range);
+            if (($page + $range) > $totalPages)
+                $urlPage = "/" . $totalPages;
             $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = ($urlPage == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
+            $class   = (($page + $range) == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>

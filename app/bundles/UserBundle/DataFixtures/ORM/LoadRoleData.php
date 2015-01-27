@@ -64,18 +64,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $manager->flush();
 
         $this->addReference('sales-role', $role);
-
-        //@todo - add more permissions
-        $permissions = array(
-            'user:profile' => array('editname'),
-            'lead:leads'   => array('viewown', 'editown', 'deleteown', 'create')
-        );
-        $this->container->get('mautic.factory')->getModel('user.role')->setRolePermissions($role, $permissions);
-
-        $manager->persist($role);
-        $manager->flush();
-
-        $this->addReference('limitedsales-role', $role);
     }
 
     /**
