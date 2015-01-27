@@ -290,7 +290,7 @@ class TriggerModel extends CommonFormModel
         }
 
         $availableEvents = $this->getEvents();
-        $eventType = $event->getType();
+        $eventType       = $event->getType();
 
         //make sure the event still exists
         if (!isset($availableEvents[$eventType])) {

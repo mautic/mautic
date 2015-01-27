@@ -98,19 +98,24 @@ class InputHelper
      *
      * @return string
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesToHyphen = false)
+    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = array())
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
-        if ($convertSpacesToHyphen) {
-            $value = str_replace(' ', '-', $value);
-
-            return trim(preg_replace("/[^0-9a-z-]+/i", "", $value));
+        if ($convertSpacesTo) {
+            $value = str_replace(' ', $convertSpacesTo, $value);
+            $allowedCharacters[] = $convertSpacesTo;
         }
 
-        return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
+        if (!empty($allowedCharacters)) {
+            $regex = "/[^0-9a-z".implode('', $allowedCharacters)."]+/i";
+        } else {
+            $regex = "/[^0-9a-z]+/i";
+        }
+
+        return trim(preg_replace($regex, "", $value));
     }
 
     /**

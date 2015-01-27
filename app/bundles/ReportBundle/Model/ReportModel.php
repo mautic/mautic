@@ -275,7 +275,7 @@ class ReportModel extends FormModel
     {
         $formatter = $this->factory->getHelper('template.formatter');
         $date      = $this->factory->getDate()->toLocalString();
-        $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, true);
+        $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
