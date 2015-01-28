@@ -6,19 +6,20 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$formSettings = $integration->getFormSettings();
-$leadFields   = (isset($form['featureSettings']) && isset($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$hasFeatures  = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
+$formSettings  = $integration->getFormSettings();
+$hasFeatures   = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
+$hasFields     = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
+$fieldHtml     = (!empty($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields'], array('integration' => $integration)) : '';
+
+$fieldTabClass = ($hasFields) ? '' : ' hide';
 ?>
 
 <ul class="nav nav-tabs pr-md pl-md">
-    <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.details'); ?></a></li>
+    <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.details'); ?></a></li>
     <?php if ($hasFeatures): ?>
-    <li class=""><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.features'); ?></a></li>
+    <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.features'); ?></a></li>
     <?php endif; ?>
-    <?php if ($leadFields): ?>
-    <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.fieldmapping'); ?></a></li>
-    <?php endif; ?>
+    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.addon.integration.tab.fieldmapping'); ?></a></li>
 </ul>
 
 <?php echo $view['form']->start($form); ?>
@@ -60,7 +61,7 @@ $hasFeatures  = (isset($form['supportedFeatures']) && count($form['supportedFeat
 
         <?php echo $view['form']->row($form['supportedFeatures']); ?>
         <?php $featureSettings = count($form['featureSettings']->children); ?>
-        <?php if ($featureSettings > 1 || ($featureSettings === 1 && !$leadFields)): ?>
+        <?php if ($featureSettings > 1 || ($featureSettings === 1 && !$hasFields)): ?>
         <h4 class="mb-sm mt-lg"><?php echo $view['translator']->trans($form['featureSettings']->vars['label']); ?></h4>
         <?php echo $view['form']->row($form['featureSettings']); ?>
         <?php else: ?>
@@ -69,18 +70,9 @@ $hasFeatures  = (isset($form['supportedFeatures']) && count($form['supportedFeat
     </div>
     <?php endif; ?>
 
-    <?php if ($leadFields): ?>
     <div class="tab-pane fade bdr-w-0" id="fields-container">
         <h4 class="mb-sm"><?php echo $view['translator']->trans($form['featureSettings']['leadFields']->vars['label']); ?></h4>
-        <?php list($specialInstructions, $alertType) = $integration->getFormNotes('field_match'); ?>
-        <?php if (!empty($specialInstructions)): ?>
-        <div class="alert alert-<?php echo $alertType; ?>">
-            <?php echo $view['translator']->trans($specialInstructions); ?>
-        </div>
-        <?php endif; ?>
-        <?php echo $leadFields; ?>
+        <?php echo $fieldHtml; ?>
     </div>
-    <?php endif; ?>
 </div>
-
 <?php echo $view['form']->end($form); ?>

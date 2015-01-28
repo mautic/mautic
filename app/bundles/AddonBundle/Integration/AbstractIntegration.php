@@ -65,10 +65,21 @@ abstract class AbstractIntegration
 
     /**
      * Returns the name of the social integration that must match the name of the file
+     * For example, IcontactIntegration would need Icontact here
      *
      * @return string
      */
     abstract public function getName ();
+
+    /**
+     * Name to display for the integration. e.g. iContact  Uses value of getName() by default
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->getName();
+    }
 
     /**
      * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
@@ -84,16 +95,6 @@ abstract class AbstractIntegration
      * @return array
      */
     abstract public function getSupportedFeatures ();
-
-    /**
-     * Name to display for the integration.  Uses value of getName() by default
-     *
-     * @return string
-     */
-    public function getDisplayName()
-    {
-        return $this->getName();
-    }
 
     /**
      * Returns the field the integration needs in order to find the user
@@ -289,7 +290,14 @@ abstract class AbstractIntegration
      */
     public function getClientIdKey ()
     {
-        return '';
+        switch ($this->getAuthenticationType()) {
+            case 'oauth2':
+                return 'client_id';
+            case 'key':
+                return 'key';
+            default:
+                return '';
+        }
     }
 
     /**
@@ -299,7 +307,12 @@ abstract class AbstractIntegration
      */
     public function getClientSecretKey ()
     {
-        return '';
+        switch ($this->getAuthenticationType()) {
+            case 'oauth2':
+                return 'client_secret';
+            default:
+                return '';
+        }
     }
 
     /**
@@ -319,7 +332,12 @@ abstract class AbstractIntegration
      */
     public function getAuthTokenKey ()
     {
-        return '';
+        switch ($this->getAuthenticationType()) {
+            case 'oauth2':
+                return 'access_token';
+            default:
+                return '';
+        }
     }
 
     /**
@@ -339,7 +357,19 @@ abstract class AbstractIntegration
      */
     public function getRequiredKeyFields ()
     {
-        return array();
+        switch ($this->getAuthenticationType()) {
+            case 'oauth2':
+                return array(
+                    'client_id'      => 'mautic.integration.keyfield.clientid',
+                    'client_secret'  => 'mautic.integration.keyfield.clientsecret'
+                );
+            case 'key':
+                return array(
+                    'key' => 'mautic.integration.keyfield.api'
+                );
+            default:
+                return array();
+        }
     }
 
     /**
@@ -373,17 +403,36 @@ abstract class AbstractIntegration
             } else {
                 return (string) $response;
             }
-        } elseif (is_array($response) && isset($response['error']['message'])) {
-            return $response['error']['message'];
         } elseif (is_array($response)) {
-            if (isset($response['errors'])) {
+            if (isset($response['error_description'])) {
+                return $response['error_description'];
+            } elseif (isset($response['error'])) {
+                if (is_array($response['error'])) {
+                    if (isset($response['error']['message'])) {
+                        return $response['error']['message'];
+                    } else {
+                        return implode(', ', $response['error']);
+                    }
+                } else {
+                    return $response['error'];
+                }
+            } elseif (isset($response['errors'])) {
                 $errors = array();
                 foreach ($response['errors'] as $err) {
-                    $errors[] = $err['message'];
+                    if (is_array($err)) {
+                        if (isset($err['message'])) {
+                            $errors[] = $err['message'];
+                        } else {
+                            $errors[] = implode(', ', $err);
+                        }
+                    } else {
+                        $errors[] = $err;
+                    }
                 }
                 return implode('; ', $errors);
             }
-            return implode(' ', $response);
+
+            return $response;
         } else {
             return $response;
         }
@@ -407,7 +456,7 @@ abstract class AbstractIntegration
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
         $authTokenKey    = $this->getAuthTokenKey();
-        $authToken       = $this->keys[$authTokenKey];
+        $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
         $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
 
         if (!$this->isConfigured()) {
@@ -430,6 +479,7 @@ abstract class AbstractIntegration
                     } else {
                         $defaultGrantType   = (!empty($settings['refresh_token'])) ? 'refresh_token' : 'authorization_code';
                         $grantType          = (!isset($settings['grant_type'])) ? $defaultGrantType : $settings['grant_type'];
+
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey : $settings[$clientSecretKey];
                         $parameters         = array_merge($parameters, array(
@@ -437,6 +487,11 @@ abstract class AbstractIntegration
                             $useClientSecretKey => $this->keys[$clientSecretKey],
                             'grant_type'        => $grantType
                         ));
+
+                        if (!empty($settings['refresh_token']) && !empty($this->keys[$settings['refresh_token']])) {
+                            $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
+                        }
+
                         if ($grantType == 'authorization_code') {
                             $parameters['code'] = $this->factory->getRequest()->get('code');
                         }
@@ -541,9 +596,14 @@ abstract class AbstractIntegration
 
         curl_close($ch);
 
-        $response = $this->parseCallbackResponse($result, !empty($settings['authorize_session']));
+        if (!empty($settings['return_raw'])) {
 
-        return $response;
+            return $result;
+        } else {
+            $response = $this->parseCallbackResponse($result, !empty($settings['authorize_session']));
+
+            return $response;
+        }
     }
 
     /**
@@ -559,18 +619,43 @@ abstract class AbstractIntegration
         if ($authType == 'oauth2') {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
-            $state       = hash('sha1', uniqid(mt_rand()));
+            $state       = $this->getAuthLoginState();
             $url         = $this->getAuthenticationUrl()
                 . '?client_id=' . $this->keys[$clientIdKey]
                 . '&response_type=code'
                 . '&redirect_uri=' . urlencode($callback)
-                . '&state=' . $state; //set a state to protect against CSRF attacks
+                . '&state=' . $state;
+
+            if ($scope = $this->getAuthScope()) {
+                $url .= '&scope=' . urlencode($scope);
+            }
+
             $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
 
             return $url;
         } else {
             return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
         }
+    }
+
+    /**
+     * State variable to append to login url (usually used in oAuth flows)
+     *
+     * @return string
+     */
+    public function getAuthLoginState()
+    {
+        return hash('sha1', uniqid(mt_rand()));
+    }
+
+    /**
+     * Get the scope for auth flows
+     *
+     * @return string
+     */
+    public function getAuthScope()
+    {
+        return '';
     }
 
     /**
@@ -592,7 +677,7 @@ abstract class AbstractIntegration
      * @param array $settings
      * @param array $parameters
      *
-     * @return array
+     * @return bool|string false if no error; otherwise the error string
      */
     public function authCallback ($settings = array(), $parameters = array())
     {
@@ -600,6 +685,16 @@ abstract class AbstractIntegration
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
 
         $settings['authorize_session'] = true;
+
+        if (!empty($settings['use_refresh_token'])) {
+            // Try refresh token
+            $refreshTokenKeys = $this->getRefreshTokenKeys();
+            if (!empty($refreshTokenKeys)) {
+                list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
+
+                $settings['refresh_token'] = $refreshTokenKey;
+            }
+        }
 
         $data = $this->makeRequest($url, $parameters, $method, $settings);
 
@@ -611,7 +706,7 @@ abstract class AbstractIntegration
      *
      * @param $data
      *
-     * @return bool|string
+     * @return bool|string false if no error; otherwise the error string
      */
     public function extractAuthKeys($data, $tokenOverride = null)
     {
@@ -699,10 +794,13 @@ abstract class AbstractIntegration
                     $valid = false;
                 } elseif (!empty($refreshTokenKeys)) {
                     list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
-                    if (!empty($expiryKey) && !empty($this->keys[$refreshTokenKey]) && isset($this->keys[$expiryKey]) && time() > $this->keys[$expiryKey]) {
+                    if (!empty($this->keys[$refreshTokenKey]) && !empty($expiryKey) && isset($this->keys[$expiryKey]) && time() > $this->keys[$expiryKey]) {
                         //token has expired so try to refresh it
-                        $error = $this->authCallback(array('refresh_token' => true));
+                        $error = $this->authCallback(array('refresh_token' => $refreshTokenKey));
                         $valid = (empty($error));
+                    } else {
+                        // The refresh token doesn't have an expiry so the integration will have to check for expired sessions and request new token
+                        $valid = true;
                     }
                 } else {
                     $valid = true;
@@ -736,7 +834,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    protected function getAuthenticationUrl ()
+    public function getAuthenticationUrl ()
     {
         return '';
     }
@@ -831,9 +929,82 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getAvailableFields ($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
         return array();
+    }
+
+    /**
+     * Match lead data with integration fields
+     *
+     * @param $lead
+     * @param $featureSettings
+     *
+     * @return array
+     */
+    public function populateLeadData($lead, $config = array())
+    {
+        if (!isset($config['leadFields'])) {
+            $config = $this->mergeConfigToFeatureSettings($config);
+
+            if (empty($config['leadFields'])) {
+                return array();
+            }
+        }
+
+        $fields          = $lead->getFields(true);
+        $leadFields      = $config['leadFields'];
+        $availableFields = $this->getAvailableLeadFields($config);
+        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched         = array();
+
+        foreach ($availableFields as $key => $field) {
+            $integrationKey = $this->convertLeadFieldKey($key, $field);
+
+            if (isset($leadFields[$key])) {
+                $mauticKey = $leadFields[$key];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
+                    $matched[$integrationKey] = $fields[$mauticKey]['value'];
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$integrationKey])) {
+                $matched[$integrationKey] = $unknown;
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Merges a config from integration_list with feature settings
+     *
+     * @param array $config
+     *
+     * @return array|mixed
+     */
+    public function mergeConfigToFeatureSettings($config = array())
+    {
+        $featureSettings = $this->settings->getFeatureSettings();
+
+        if (empty($config['integration']) || (!empty($config['integration']) && $config['integration'] == $this->getName())) {
+            $featureSettings = array_merge($featureSettings, $config['properties']);
+        }
+
+        return $featureSettings;
+    }
+
+    /**
+     * Return key recognized by integration
+     *
+     * @param $key
+     * @param $field
+     *
+     * @return mixed
+     */
+    public function convertLeadFieldKey($key, $field)
+    {
+        return $key;
     }
 
     /**
@@ -871,7 +1042,7 @@ abstract class AbstractIntegration
     protected function matchUpData ($data)
     {
         $info      = array();
-        $available = $this->getAvailableFields();
+        $available = $this->getAvailableLeadFields();
 
         foreach ($available as $field => $fieldDetails) {
             if (is_array($data)) {
@@ -953,20 +1124,25 @@ abstract class AbstractIntegration
      */
     public function getFormNotes ($section)
     {
-        return array('', 'info');
+        if ($section == 'leadfield_match') {
+            return array('mautic.integration.form.field_match_notes', 'info');
+        } else {
+            return array('', 'info');
+        }
     }
 
     /**
      * Allows appending extra data to the config.
      *
      * @param FormBuilder|Form $builder
+     * @param array       $data
      * @param string      $formArea  Section of form being built keys|features|integration
      *                               keys can be used to store login/request related settings; keys are encrypted
      *                               features can be used for configuring share buttons, etc
      *                               integration is called when adding an integration to events like point triggers,
      *                                  campaigns actions, forms actions, etc
      */
-    public function appendToForm (&$builder, $formArea)
+    public function appendToForm (&$builder, $data, $formArea)
     {
 
     }
@@ -998,12 +1174,12 @@ abstract class AbstractIntegration
     /**
      * Get available fields for choices in the config UI
      *
-     * @param bool $silenceExceptions
+     * @param array $settings
      *
-     * @return mixed
+     * @return array
      */
-    public function getFormLeadFields ($silenceExceptions = true)
+    public function getFormLeadFields($settings = array())
     {
-        return $this->getAvailableFields($silenceExceptions);
+        return $this->getAvailableLeadFields($settings);
     }
 }

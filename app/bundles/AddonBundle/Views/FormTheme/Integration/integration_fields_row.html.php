@@ -14,6 +14,7 @@
             <?php echo $view['translator']->trans($specialInstructions); ?>
         </div>
     <?php endif; ?>
+
     <div class="form-group col-xs-12">
         <?php echo $view['form']->errors($form); ?>
         <?php $rowCount = 1; ?>

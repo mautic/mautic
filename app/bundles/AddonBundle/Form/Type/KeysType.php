@@ -43,7 +43,7 @@ class KeysType extends AbstractType
                 'error_bubbling' => false
             ));
         }
-        $object->appendToForm($builder, 'keys');
+        $object->appendToForm($builder, $options['data'], 'keys');
     }
 
     /**

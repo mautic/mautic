@@ -272,7 +272,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
         return array(
             "profileHandle" => array("type" => "string"),

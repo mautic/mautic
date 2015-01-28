@@ -134,7 +134,7 @@ class IntegrationHelper
 
                 return $specific;
             } else {
-                throw new MethodNotAllowedHttpException($available);
+                throw new MethodNotAllowedHttpException(array_keys($available));
             }
         } elseif (!empty($withFeatures)) {
             if (!is_array($withFeatures)) {
@@ -158,6 +158,19 @@ class IntegrationHelper
         }
 
         return $integrations;
+    }
+
+    /**
+     * Get a single integration object
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function getIntegrationObject($name)
+    {
+        $integrationObjects = $this->getIntegrationObjects($name);
+        return $integrationObjects[$name];
     }
 
     /**

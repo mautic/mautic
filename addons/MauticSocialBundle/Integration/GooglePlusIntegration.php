@@ -159,7 +159,7 @@ class GooglePlusIntegration extends SocialIntegration
     protected function matchUpData ($data)
     {
         $info              = array();
-        $available         = $this->getAvailableFields();
+        $available         = $this->getAvailableLeadFields();
         $translator        = $this->factory->getTranslator();
         $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
 
@@ -264,7 +264,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableFields ($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
         return array(
             "profileHandle"      => array("type" => "string"),

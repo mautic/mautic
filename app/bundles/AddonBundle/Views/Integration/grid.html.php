@@ -15,7 +15,7 @@ if ($tmpl == 'index')
             <?php foreach ($items as $item): ?>
                 <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration addon<?php echo $item['addon']; ?> integration-<?php echo $item['name']; ?>">
                     <div class="panel ovf-h pa-10">
-                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>">
+                        <a href="<?php echo $view['router']->generate('mautic_addon_integration_edit', array('name' => $item['name'])); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>">
                             <p><img class="img img-responsive" src="<?php echo $view['assets']->getUrl($item['icon']); ?>" /></p>
                             <h5 class="mt-20">
                                 <span class="ellipsis" data-toggle="tooltip" title="<?php echo $addons[$item['addon']]['name'] . ' - ' . $item['display']; ?>"><?php echo $item['display']; ?>

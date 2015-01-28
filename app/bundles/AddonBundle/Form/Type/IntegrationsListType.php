@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -62,28 +63,39 @@ class IntegrationsListType extends AbstractType
             'expanded'    => false,
             'label_attr'  => array('class' => 'control-label'),
             'multiple'    => false,
-            'label'       => 'mautic.integration.integrations',
+            'label'       => 'mautic.integration.integration',
             'attr'        => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.integration.integrations.tooltip',
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.integration.integration.tooltip',
+                'onchange' => 'Mautic.getIntegrationConfig(this);'
             ),
             'required'    => false
         ));
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationObjects) {
-            $form = $event->getForm();
-            $data = $event->getData();
+        $formModifier = function(FormInterface $form, $data) use ($integrationObjects) {
+            $form->add('config', 'integration_config', array(
+                'label'       => false,
+                'attr'        => array(
+                    'class' => 'integration-config-container'
+                ),
+                'integration' => (isset($integrationObjects[$data['integration']])) ? $integrationObjects[$data['integration']] : null,
+                'data'        => (isset($data['config'])) ? $data['config'] : array()
+            ));
+        };
 
-            if (isset($data['integration'])) {
-                if (isset($integrationObjects[$data['integration']])) {
-                    $integrationObjects[$data['integration']]->appendToForm($form['properties'], 'integration');
-                }
+        $builder->addEventListener(FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $data = $event->getData();
+                $formModifier($event->getForm(), $data);
             }
-        });
+        );
 
-        $builder->add('properties', 'collection', array(
-            'label' => false
-        ));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($formModifier) {
+                $data    = $event->getData();
+                $formModifier($event->getForm(), $data);
+            }
+        );
     }
 
     /**

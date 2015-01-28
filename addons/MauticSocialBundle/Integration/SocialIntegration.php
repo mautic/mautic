@@ -20,14 +20,15 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * @param FormBuilder|Form $builder
      */
-    public function appendToForm(&$builder, $formArea)
+    public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'features') {
             $name = strtolower($this->getName());
             if ($this->factory->serviceExists('mautic.form.type.social.' . $name)) {
                 $builder->add('shareButton', 'socialmedia_' . $name, array(
                     'label'    => 'mautic.integration.form.sharebutton',
-                    'required' => false
+                    'required' => false,
+                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : array()
                 ));
             }
         }
@@ -36,18 +37,18 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param bool $silenceExceptions
+     * @param array $settings
      *
      * @return array
      */
-    public function getFormLeadFields($silenceExceptions = true)
+    public function getFormLeadFields($settings = array())
     {
         static $fields = array();
 
         if (empty($fields)) {
-            $translator = $this->factory->getTranslator();
-            $s          = $this->getName();
-            $available  = $this->getAvailableFields($silenceExceptions);
+            $translator        = $this->factory->getTranslator();
+            $s                 = $this->getName();
+            $available         = $this->getAvailableLeadFields($settings);
             if (empty($available) || !is_array($available)) {
                 return array();
             }
@@ -163,5 +164,17 @@ abstract class SocialIntegration extends AbstractIntegration
         } else {
             return json_decode($data);
         }
+    }
+
+    /**
+     * Returns notes specific to sections of the integration form (if applicable)
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes ($section)
+    {
+        return array('', 'info');
     }
 }
