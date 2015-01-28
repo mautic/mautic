@@ -105,7 +105,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $leadFields = array();
         foreach ($fields as $f) {
             $leadFields[$f] = array(
-                'label' => 'mautic.emailmarketing.field.' . $f,
+                'label' => 'mautic.contantcontact.field.' . $f,
                 'type'  => 'string',
                 'required' => ($f == 'email' ) ? true : false
             );

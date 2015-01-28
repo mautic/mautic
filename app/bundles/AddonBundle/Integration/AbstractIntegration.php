@@ -565,7 +565,9 @@ abstract class AbstractIntegration
                     if ($settings['encode_parameters'] == 'json') {
                         //encode the arguments as JSON
                         $parameters = json_encode($parameters);
-                        $headers[]  = 'Content-Type: application/json';
+                        if (empty($settings['encoding_headers_set'])) {
+                            $headers[] = 'Content-Type: application/json';
+                        }
                     }
                 }
             }
@@ -608,7 +610,7 @@ abstract class AbstractIntegration
         $result        = array_pop($responseArray);
 
         curl_close($ch);
-die(var_dump($result, $parameters, $url, $method));
+
         if (!empty($settings['return_raw'])) {
 
             return $result;
@@ -1001,7 +1003,7 @@ die(var_dump($result, $parameters, $url, $method));
         $featureSettings = $this->settings->getFeatureSettings();
 
         if (empty($config['integration']) || (!empty($config['integration']) && $config['integration'] == $this->getName())) {
-            $featureSettings = array_merge($featureSettings, $config['properties']);
+            $featureSettings = array_merge($featureSettings, $config['config']);
         }
 
         return $featureSettings;

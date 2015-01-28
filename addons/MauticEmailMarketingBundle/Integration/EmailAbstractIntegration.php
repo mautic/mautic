@@ -72,4 +72,28 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
 
         return $helper;
     }
+
+    /**
+     * Merges a config from integration_list with feature settings
+     *
+     * @param array $config
+     *
+     * @return array|mixed
+     */
+    public function mergeConfigToFeatureSettings($config = array())
+    {
+        $featureSettings = $this->settings->getFeatureSettings();
+
+        if (isset($config['config']['list_settings']['leadFields'])) {
+            $config['config']['leadFields'] = $config['config']['list_settings']['leadFields'];
+            unset($config['config']['list_settings']['leadFields']);
+        }
+
+        if (empty($config['integration']) || (!empty($config['integration']) && $config['integration'] == $this->getName())) {
+            $featureSettings = array_merge($featureSettings, $config['config']);
+        }
+
+        return $featureSettings;
+    }
+
 }

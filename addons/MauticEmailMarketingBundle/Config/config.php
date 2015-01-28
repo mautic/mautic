@@ -24,6 +24,11 @@ return array(
                 'class'     => 'MauticAddon\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailmarketing_constantcontact'
+            ),
+            'mautic.form.type.emailmarketing.icontact' => array(
+                'class'     => 'MauticAddon\MauticEmailMarketingBundle\Form\Type\IcontactType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'emailmarketing_icontact'
             )
         )
     )

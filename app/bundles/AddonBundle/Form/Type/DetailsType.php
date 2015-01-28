@@ -41,8 +41,7 @@ class DetailsType extends AbstractType
         $formSettings = $options['integration_object']->getFormSettings();
         if (!empty($formSettings['requires_authorization'])) {
             $disabled     = false;
-            $authTokenKey = $options['integration_object']->getAuthTokenKey();
-            $label        = (!empty($decryptedKeys[$authTokenKey])) ? 'reauthorize' : 'authorize';
+            $label        = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
