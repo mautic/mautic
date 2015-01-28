@@ -1320,6 +1320,20 @@ var Mautic = {
      * Display confirmation modal
      */
     showConfirmation: function (el) {
+        var precheck = mQuery(el).data('precheck');
+
+        if (precheck) {
+            if (typeof precheck == 'function') {
+                if (!precheck()) {
+                    return;
+                }
+            } else if (typeof Mautic[precheck] == 'function') {
+                if (!Mautic[precheck]()) {
+                    return;
+                }
+            }
+        }
+
         var message = mQuery(el).data('message');
         var confirmText = mQuery(el).data('confirm-text');
         var confirmAction = mQuery(el).attr('href');
@@ -1469,6 +1483,15 @@ var Mautic = {
 
         // Hand over processing to the executeAction method
         Mautic.executeAction(action);
+    },
+
+    /**
+     * Checks that items are checked before showing confirmation
+     *
+     * @returns int
+     */
+    batchActionPrecheck: function() {
+        return mQuery('input[class=list-checkbox]:checked').length;
     },
 
     /**

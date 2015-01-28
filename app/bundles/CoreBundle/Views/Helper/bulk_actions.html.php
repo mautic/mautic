@@ -29,7 +29,8 @@ include 'action_button_helper.php';
                     'message'       => $view['translator']->trans('mautic.' . $langVar . '.form.confirmbatchdelete'),
                     'confirmAction' => $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array('objectAction' => 'batchDelete'), $query)),
                     'template'      => 'batchdelete',
-                    'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete')
+                    'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
+                    'precheck'      => 'batchActionPrecheck'
                 )); ?>
             <?php endif; ?>
         </div>
