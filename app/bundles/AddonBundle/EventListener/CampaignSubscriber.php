@@ -37,6 +37,7 @@ class CampaignSubscriber extends CommonSubscriber
         $action = array(
             'label'       => 'mautic.addon.actions.push_lead',
             'formType'    => 'integration_list',
+            'formTheme'   => 'MauticAddonBundle:FormTheme\Integration',
             'callback'    => array('\\Mautic\\AddonBundle\\Helper\\EventHelper', 'pushLead')
         );
 

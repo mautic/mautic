@@ -388,7 +388,7 @@ class CommonController extends Controller implements MauticController
      *
      * @param Form   $form
      * @param string $template
-     * @param string $theme
+     * @param mixed  $theme
      *
      * @return \Symfony\Component\Form\FormView
      */

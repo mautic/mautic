@@ -90,3 +90,51 @@ Mautic.filterIntegrations = function(update) {
         }, 500);
     }
 };
+
+Mautic.getIntegrationLeadFields = function (integration, el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    if (typeof settings == 'undefined') {
+        settings = {};
+    }
+
+    var data = {integration: integration, settings: settings};
+
+    Mautic.ajaxActionRequest('addon:getIntegrationLeadFields', data,
+        function(response) {
+            if (response.success) {
+                mQuery('#leadFieldsContainer').replaceWith(response.html);
+                Mautic.onPageLoad('#leadFieldsContainer');
+
+                mQuery('#fields-tab').removeClass('hide');
+            } else {
+                mQuery('#leadFieldsContainer').html('');
+                mQuery('#fields-tab').addClass('hide');
+            }
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
+};
+
+Mautic.getIntegrationConfig = function (el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    if (typeof settings == 'undefined') {
+        settings = {};
+    }
+
+    settings.name = mQuery(el).attr('name');
+    var data = {integration: mQuery(el).val(), settings: settings};
+
+    Mautic.ajaxActionRequest('addon:getIntegrationConfig', data,
+        function (response) {
+            if (response.success) {
+                mQuery('.integration-config-container').html(response.html);
+                Mautic.onPageLoad('.integration-config-container');
+            } else {
+                mQuery('.integration-config-container').html('');
+            }
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
+};

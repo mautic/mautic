@@ -822,6 +822,7 @@ var Mautic = {
                 if (typeof callback !== 'undefined') {
                     window["Mautic"][callback].apply('window', []);
                 }
+                delete Mautic.loadContentXhr[target];
             }
         });
 
@@ -1207,11 +1208,22 @@ var Mautic = {
             Mautic.onPageUnload(target);
 
             Mautic.resetModal(target);
+
+            if (typeof Mautic.modalContentXhr[target] != 'undefined') {
+                Mautic.modalContentXhr[target].abort();
+                delete Mautic.modalContentXhr[target];
+            }
         });
 
         mQuery(target).modal('show');
 
-        mQuery.ajax({
+        if (typeof Mautic.modalContentXhr == 'undefined') {
+            Mautic.modalContentXhr = {};
+        } else if (typeof Mautic.modalContentXhr[target] != 'undefined') {
+            Mautic.modalContentXhr[target].abort();
+        }
+
+        Mautic.modalContentXhr[target] = mQuery.ajax({
             url: route,
             type: method,
             dataType: "json",
@@ -1227,6 +1239,7 @@ var Mautic = {
             },
             complete: function () {
                 Mautic.stopModalLoadingBar(target);
+                delete Mautic.modalContentXhr[target];
             }
         });
     },
@@ -1665,8 +1678,10 @@ var Mautic = {
                     },
                     error: function (request, textStatus, errorThrown) {
                         Mautic.processAjaxError(request, textStatus, errorThrown);
+                    },
+                    complete: function() {
+                        delete Mautic.liveSearchXhr;
                     }
-
                 });
             }
         }
@@ -1859,7 +1874,7 @@ var Mautic = {
         if (response.newContent && mainContent) {
             //an error page was returned
             mQuery('#app-content .content-body').html(response.newContent);
-            if (response.route) {
+            if (response.route && response.route.indexOf("ajax") == -1) {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
@@ -2737,5 +2752,38 @@ var Mautic = {
         mQuery('#BuilderFeedbackModal input[name="editor"]').val('');
         mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
         mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', '');
+    },
+
+    /**
+     * Execute an action to AjaxController
+     *
+     * @param action
+     * @param data
+     * @param successClosure
+     */
+    ajaxActionRequest: function(action, data, successClosure) {
+        if (typeof Mautic.ajaxActionXhr == 'undefined') {
+            Mautic.ajaxActionXhr = {};
+        } else if (typeof Mautic.ajaxActionXhr[action] != 'undefined') {
+            Mautic.removeLabelLoadingIndicator();
+            Mautic.ajaxActionXhr[action].abort();
+        }
+
+        Mautic.ajaxActionXhr[action] = mQuery.ajax({
+            url: mauticAjaxUrl + '?action=' + action,
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                if (typeof successClosure == 'function') {
+                    successClosure(response);
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown, true);
+            },
+            complete: function () {
+                delete Mautic.ajaxActionXhr[action];
+            }
+        });
     }
 };

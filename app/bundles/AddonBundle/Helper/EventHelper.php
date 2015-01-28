@@ -41,7 +41,7 @@ class EventHelper
             }
 
             if (method_exists($s, 'pushLead')) {
-                if ($s->pushLead($lead)) {
+                if ($s->pushLead($lead, $config)) {
                     $success = true;
                 }
             }

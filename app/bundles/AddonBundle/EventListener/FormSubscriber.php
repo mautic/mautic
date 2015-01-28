@@ -38,6 +38,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.addon.form.actions',
             'label'       => 'mautic.addon.actions.push_lead',
             'formType'    => 'integration_list',
+            'formTheme'   => 'MauticAddonBundle:FormTheme\Integration',
             'callback'    => array('\\Mautic\\AddonBundle\\Helper\\EventHelper', 'pushLead')
         );
 

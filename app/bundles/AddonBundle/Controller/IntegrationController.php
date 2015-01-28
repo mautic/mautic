@@ -114,38 +114,14 @@ class IntegrationController extends FormController
 
         /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-
-        // We receive a lowercase name, so we need to convert the $integrationObjects array keys to lowercase
-        $objects = array();
-
-        foreach ($integrationObjects as $key => $value) {
-            $objects[strtolower($key)] = $value;
-        }
+        $integrationObject  = $integrationHelper->getIntegrationObject($name);
 
         // Verify that the requested integration exists
-        if (!array_key_exists($name, $objects)) {
+        if (empty($integrationObject)) {
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $integrationObject = $objects[$name];
-
-        // Get a list of custom form fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(array('filter' => array('isPublished' => true)));
-
-        $leadFields = array();
-
-        foreach ($fields as $f) {
-            $leadFields['mautic.lead.field.group.' . $f->getGroup()][$f->getAlias()] = $f->getLabel();
-        }
-
-        // Sort the groups
-        uksort($leadFields, 'strnatcmp');
-
-        // Sort each group by translation
-        foreach ($leadFields as $group => &$fieldGroup) {
-            uasort($fieldGroup, 'strnatcmp');
-        }
+        $leadFields = $this->factory->getModel('addon')->getLeadFields();
 
         /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();

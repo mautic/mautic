@@ -35,10 +35,11 @@ class PointSubscriber extends CommonSubscriber
     public function onTriggerBuild (TriggerBuilderEvent $event)
     {
         $action = array(
-            'group'    => 'mautic.addon.point.action',
-            'label'    => 'mautic.addon.actions.push_lead',
-            'formType' => 'integration_list',
-            'callback' => array('\\Mautic\\AddonBundle\\Helper\\EventHelper', 'pushLead')
+            'group'     => 'mautic.addon.point.action',
+            'label'     => 'mautic.addon.actions.push_lead',
+            'formType'  => 'integration_list',
+            'formTheme' => 'MauticAddonBundle:FormTheme\Integration',
+            'callback'  => array('\\Mautic\\AddonBundle\\Helper\\EventHelper', 'pushLead')
         );
 
         $event->addEvent('addon.leadpush', $action);

@@ -92,6 +92,10 @@ return array(
                 'class'     => 'Mautic\AddonBundle\Form\Type\IntegrationsListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'integration_list'
+            ),
+            'mautic.form.type.integration.config' => array(
+                'class'     => 'Mautic\AddonBundle\Form\Type\IntegrationConfigType',
+                'alias'     => 'integration_config'
             )
         ),
         'other'  => array(

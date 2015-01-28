@@ -107,6 +107,7 @@ class EventController extends CommonFormController
             if (isset($event['settings']['formTheme'])) {
                 $formThemes[] = $event['settings']['formTheme'];
             }
+
             $viewParams['form']        = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);;
             $header                    = $event['settings']['label'];
             $viewParams['eventHeader'] = $this->get('translator')->trans($header);
