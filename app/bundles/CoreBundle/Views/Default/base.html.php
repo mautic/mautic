@@ -63,14 +63,9 @@
                     if (mQuery('[class*="sf-tool"]').length) {
                         mQuery('[class*="sf-tool"]').remove();
                     }
-                    if (mQuery('[id*="sfTool"]').length) {
-                        mQuery('[id*="sfTool"]').remove();
-                    }
-                    if (mQuery('[id*="sfMini"]').length) {
-                        mQuery('[id*="sfMini"]').remove();
-                    }
+
                     mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
-                        mQuery('body').append(data);
+                        mQuery('body').append('<div class="sf-toolbar-reload">'+data+'</div>');
                     });
                 }
             });
