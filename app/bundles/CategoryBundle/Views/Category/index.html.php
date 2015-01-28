@@ -18,7 +18,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'routeBase' => 'category',
     'query'     => array('bundle' => $bundle),
     'editMode'  => 'ajaxmodal',
-    'editAttr'  => 'data-target="#CategoryFormModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"'
+    'editAttr'  => 'data-target="#MauticSharedModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"'
 )));
 ?>
 
@@ -44,9 +44,3 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php $view['slots']->output('_content'); ?>
     </div>
 </div>
-
-<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'            => 'CategoryFormModal',
-    'footerButtons' => true
-));
-?>

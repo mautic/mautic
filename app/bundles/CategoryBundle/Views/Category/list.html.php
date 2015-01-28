@@ -61,7 +61,7 @@ if ($tmpl == 'index')
                                 ),
                                 'editMode'  => 'ajaxmodal',
                                 'editAttr'  => array(
-                                    'data-target' => '#CategoryFormModal',
+                                    'data-target' => '#MauticSharedModal',
                                     'data-ignore-removemodal' => 'true',
                                     'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
                                 ),
@@ -82,7 +82,7 @@ if ($tmpl == 'index')
                                 'query' => 'bundle=' . $bundle
                             )); ?>
                             <?php if ($permissions[$bundle.':categories:edit']): ?>
-                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#CategoryFormModal" data-ignore-removemodal="true" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
+                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
                            <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
                             <?php if ($permissions[$bundle.':categories:edit']): ?>
