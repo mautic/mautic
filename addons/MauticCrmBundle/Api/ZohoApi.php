@@ -1,10 +1,9 @@
 <?php
-namespace MauticAddon\MauticCrmBundle\Crm\Zoho;
+namespace MauticAddon\MauticCrmBundle\Api;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
+use Mautic\AddonBundle\Exception\ApiErrorException;
 
-class Lead extends CrmApi
+class ZohoApi extends CrmApi
 {
     private $module = 'Leads';
 
@@ -26,7 +25,7 @@ class Lead extends CrmApi
             if (isset($response['uri'])) {
                 $errorMsg .= '; ' . $response['uri'];
             }
-            throw new ErrorException($errorMsg);
+            throw new ApiErrorException($errorMsg);
         }
 
         return $response;
@@ -37,7 +36,7 @@ class Lead extends CrmApi
      *
      * @return mixed
      */
-    public function getFields ()
+    public function getLeadFields ()
     {
         return $this->request('getFields');
     }
@@ -47,7 +46,7 @@ class Lead extends CrmApi
      *
      * @return array
      */
-    public function create ($data)
+    public function createLead ($data)
     {
         $parameters  = array(
             'xmlData'        => $data,

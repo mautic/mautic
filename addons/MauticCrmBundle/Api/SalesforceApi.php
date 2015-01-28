@@ -1,34 +1,42 @@
 <?php
-namespace MauticAddon\MauticCrmBundle\Crm\Salesforce;
+namespace MauticAddon\MauticCrmBundle\Api;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
+use Mautic\AddonBundle\Exception\ApiErrorException;
 
-class Lead extends CrmApi
+class SalesforceApi extends CrmApi
 {
     protected $object  = 'Lead';
     protected $requestSettings = array(
         'encode_parameters' => 'json'
     );
 
-    public function request($operation, $elementData = array(), $method = 'GET')
+    public function request($operation, $elementData = array(), $method = 'GET', $retry = false)
     {
         $request_url = sprintf($this->integration->getApiUrl() . '/%s/%s', $this->object, $operation);
 
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
-            throw new ErrorException(implode(', ', $response['errors']));
+            throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = array();
             foreach ($response as $r) {
                 if (is_array($r) && !empty($r['errorCode']) && !empty($r['message'])) {
+                    // Check for expired session then retry if we can refresh
+                    if ($r['errorCode'] == 'INVALID_SESSION_ID' && !$retry) {
+                        $refreshError = $this->integration->authCallback(array('use_refresh_token' => true));
+
+                        if (empty($refreshError)) {
+                            return $this->request($operation, $elementData, $method, true);
+                        }
+                    }
+
                     $errors[] = $r['message'];
                 }
             }
 
             if (!empty($errors)) {
-                throw new ErrorException(implode(', ', $errors));
+                throw new ApiErrorException(implode(', ', $errors));
             }
         }
 
@@ -38,19 +46,19 @@ class Lead extends CrmApi
     /**
      * @return mixed
      */
-    public function getInfo()
+    public function getLeadFields()
     {
         return $this->request('describe');
     }
 
     /**
-     * Insert Salesforce sObject
+     * Creates Salesforce lead
      *
      * @param array $data
      *
      * @return mixed
      */
-    public function create(array $data)
+    public function createLead(array $data)
     {
         return $this->request('', $data, 'POST');
     }

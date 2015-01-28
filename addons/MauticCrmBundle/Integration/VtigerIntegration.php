@@ -119,13 +119,13 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return mixed|void
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
-        $vtigerFields = array();
-
+        $vtigerFields      = array();
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadObject = CrmApi::getContext($this, "lead")->describe();
+                $leadObject = $this->getApiHelper()->getLeadFields();
 
                 if ($leadObject == null || !isset($leadObject['fields'])) {
                     return array();
@@ -164,7 +164,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormNotes ($section)
     {
-        if ($section == 'field_match') {
+        if ($section == 'leadfield_match') {
             return array('mautic.vtiger.form.field_match_notes', 'info');
         }
 

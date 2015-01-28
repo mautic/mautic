@@ -10,7 +10,7 @@
 namespace MauticAddon\MauticCrmBundle\Integration;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
+use Mautic\AddonBundle\Exception\ApiErrorException;
 
 /**
  * Class ZohoIntegration
@@ -140,13 +140,13 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function getAvailableFields ($silenceExceptions = true)
+    public function getAvailableLeadFields ($settings = array())
     {
-        $zohoFields = array();
-
+        $zohoFields        = array();
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadObject = CrmApi::getContext($this, 'lead')->getFields('Leads');
+                $leadObject = $this->getApiHelper()->getLeadFields();
 
                 if ($leadObject == null || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                     return array();
@@ -201,12 +201,13 @@ class ZohoIntegration extends CrmAbstractIntegration
      * {@inheritdoc}
      *
      * @param $lead
+     * @param $config
      *
      * @return array
      */
-    public function populateLeadData ($lead)
+    public function populateLeadData ($lead, $config = array())
     {
-        $mappedData = parent::populateLeadData($lead);
+        $mappedData = parent::populateLeadData($lead, $config);
 
         $xmlData = '<Leads>';
         $xmlData .= '<row no="1">';

@@ -147,13 +147,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @return array|mixed
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
-        $sugarFields = array();
-
+        $sugarFields       = array();
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadObject  = CrmApi::getContext($this, "lead")->getInfo();
+                $leadObject  = $this->getApiHelper()->getLeadFields();
                 if ($leadObject != null) {
                     if (isset($leadObject['module_fields'])) {
                         //6.x/community
@@ -276,7 +276,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param FormBuilder|Form $builder
      */
-    public function appendToForm(&$builder, $formArea)
+    public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'keys') {
             $builder->add('version', 'button_group', array(

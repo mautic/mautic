@@ -71,6 +71,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get the keys for the refresh token and expiry
+     *
+     * @return array
+     */
+    public function getRefreshTokenKeys ()
+    {
+        return array('refresh_token', '');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -88,6 +98,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getAuthenticationUrl()
     {
         return 'https://login.salesforce.com/services/oauth2/authorize';
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthScope()
+    {
+        return 'api refresh_token';
     }
 
     /**
@@ -125,13 +143,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array|mixed
      */
-    public function getAvailableFields($silenceExceptions = true)
+    public function getAvailableLeadFields($settings = array())
     {
         $salesFields = array();
-
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadObject  = CrmApi::getContext($this, "lead")->getInfo();
+                $leadObject  = $this->getApiHelper()->getLeadFields();
 
                 if ($leadObject != null && isset($leadObject['fields'])) {
 

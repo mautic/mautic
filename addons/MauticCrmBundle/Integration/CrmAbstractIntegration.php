@@ -12,7 +12,6 @@ namespace MauticAddon\MauticCrmBundle\Integration;
 
 use Mautic\AddonBundle\Entity\Integration;
 use Mautic\AddonBundle\Integration\AbstractIntegration;
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class CrmAbstractIntegration
@@ -58,63 +57,17 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Return key recognized by CRM
-     *
-     * @param $key
-     * @param $field
-     *
-     * @return mixed
-     */
-    public function convertLeadFieldKey($key, $field)
-    {
-        return $key;
-    }
-
-    /**
-     * Match lead data with CRM fields
-     *
-     * @param $lead
-     *
-     * @return array
-     */
-    public function populateLeadData($lead)
-    {
-        $featureSettings = $this->settings->getFeatureSettings();
-
-        if (empty($featureSettings['leadFields'])) {
-            return false;
-        }
-
-        $fields          = $lead->getFields(true);
-        $leadFields      = $featureSettings['leadFields'];
-        $availableFields = $this->getAvailableFields();
-
-        $unknown = $this->factory->getTranslator()->trans('mautic.crm.form.lead.unknown');
-        $matched = array();
-        foreach ($availableFields as $key => $field) {
-            $crmKey = $this->convertLeadFieldKey($key, $field);
-
-            if (isset($leadFields[$key])) {
-                $mauticKey = $leadFields[$key];
-                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$crmKey] = $fields[$mauticKey]['value'];
-                }
-            }
-
-            if (!empty($field['required']) && empty($matched[$crmKey])) {
-                $matched[$crmKey] = $unknown;
-            }
-        }
-
-        return $matched;
-    }
-
-    /**
      * @param $lead
      */
-    public function pushLead($lead)
+    public function pushLead($lead, $config = array())
     {
-        $mappedData = $this->populateLeadData($lead);
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        if (empty($config['leadFields'])) {
+            return array();
+        }
+
+        $mappedData = $this->populateLeadData($lead, $config);
 
         $this->amendLeadDataBeforePush($mappedData);
 
@@ -124,7 +77,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                CrmApi::getContext($this, "lead")->create($mappedData);
+                $this->getApiHelper()->createLead($mappedData);
                 return true;
             }
         } catch (\Exception $e) {
@@ -169,18 +122,18 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * Get the API helper
      *
-     * @param $section
-     *
-     * @return string
+     * @return Object
      */
-    public function getFormNotes ($section)
+    public function getApiHelper()
     {
-        if ($section == 'field_match') {
-            return array('mautic.crm.form.field_match_notes', 'info');
+        static $helper;
+        if (empty($helper)) {
+            $class = '\\MauticAddon\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
+            $helper = new $class($this);
         }
 
-        return parent::getFormNotes($section);
+        return $helper;
     }
 }

@@ -1,10 +1,9 @@
 <?php
-namespace MauticAddon\MauticCrmBundle\Crm\Vtiger;
+namespace MauticAddon\MauticCrmBundle\Api;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
+use Mautic\AddonBundle\Exception\ApiErrorException;
 
-class Lead extends CrmApi
+class VtigerApi extends CrmApi
 {
     protected $element = "Leads";
 
@@ -27,7 +26,7 @@ class Lead extends CrmApi
         if (!empty($response['error'])) {
             $error = $response['error']['message'];
 
-            throw new ErrorException($error);
+            throw new ApiErrorException($error);
         }
 
         return $response['result'];
@@ -48,7 +47,7 @@ class Lead extends CrmApi
      *
      * @return mixed
      */
-    public function describe ()
+    public function getLeadFields ()
     {
         return $this->request('describe', $this->element);
     }
@@ -58,7 +57,7 @@ class Lead extends CrmApi
      *
      * @return mixed
      */
-    public function create (array $data)
+    public function createLead (array $data)
     {
         return $this->request('create', $this->element, $data, 'POST');
     }

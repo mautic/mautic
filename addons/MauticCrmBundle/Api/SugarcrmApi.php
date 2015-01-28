@@ -1,10 +1,9 @@
 <?php
-namespace MauticAddon\MauticCrmBundle\Crm\Sugarcrm;
+namespace MauticAddon\MauticCrmBundle\Api;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use MauticAddon\MauticCrmBundle\Api\Exception\ErrorException;
+use Mautic\AddonBundle\Exception\ApiErrorException;
 
-class Lead extends CrmApi
+class SugarcrmApi extends CrmApi
 {
     private $module = 'Leads';
 
@@ -30,7 +29,7 @@ class Lead extends CrmApi
             $response = $this->integration->makeRequest($request_url, $parameters, $method);
 
             if (is_array($response) && !empty($response['name']) && !empty($response['number'])) {
-                throw new ErrorException($response['name']);
+                throw new ApiErrorException($response['name']);
             } else {
                 return $response;
             }
@@ -39,7 +38,7 @@ class Lead extends CrmApi
             $response    = $this->integration->makeRequest($request_url, $data, $method);
 
             if (isset($response['error'])) {
-                throw new ErrorException($response['error_message'], ($response['error'] == 'invalid_grant') ? 1 : 500);
+                throw new ApiErrorException($response['error_message'], ($response['error'] == 'invalid_grant') ? 1 : 500);
             }
 
             return $response;
@@ -51,9 +50,9 @@ class Lead extends CrmApi
      *
      * @return mixed
      */
-    public function getInfo ()
+    public function getLeadFields ()
     {
-        $tokenData   = $this->integration->getKeys();
+        $tokenData = $this->integration->getKeys();
 
         if ($tokenData['version'] == '6') {
             return $this->request('get_module_fields');
@@ -73,9 +72,9 @@ class Lead extends CrmApi
      * @param array $fields
      *
      * @return array
-     * @throws \MauticAddon\MauticCrmBundle\Api\Exception\ErrorException
+     * @throws \Mautic\AddonBundle\Exception\ApiErrorException
      */
-    public function create (array $fields)
+    public function createLead (array $fields)
     {
         $tokenData = $this->integration->getKeys();
 
