@@ -214,6 +214,11 @@ class CategoryController extends FormController
                     'closeModal'    => 1
                 )
             ));
+        } elseif (!empty($valid)) {
+
+            //return edit view to prevent duplicates
+            return $this->editAction($bundle, $entity->getId(), true);
+
         } else {
             return $this->ajaxAction(array(
                 'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
