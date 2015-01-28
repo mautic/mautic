@@ -94,7 +94,7 @@ class MailchimpType extends AbstractType
                     array(false, true),
                     array('mautic.core.form.no', 'mautic.core.form.yes')
                 ),
-                'label'       => 'mautic.mailchimp.send_welcome',
+                'label'       => 'mautic.emailmarketing.send_welcome',
                 'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
             ));
 
@@ -130,6 +130,7 @@ class MailchimpType extends AbstractType
                         $fields = array();
                         $error  = $e->getMessage();
                     }
+
                     list ($specialInstructions, $alertType) = $mailchimp->getFormNotes('leadfield_match');
                     $form->add('leadFields', 'integration_fields', array(
                         'label'                => 'mautic.integration.leadfield_matches',

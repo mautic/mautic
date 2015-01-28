@@ -121,6 +121,7 @@ class AjaxController extends CommonAjaxController
             if ($object) {
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
+
                 $form           = $this->createForm('integration_config', $defaults, array(
                     'integration'     => $object,
                     'csrf_protection' => false

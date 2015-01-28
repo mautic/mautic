@@ -459,6 +459,10 @@ abstract class AbstractIntegration
         $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
         $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
 
+        if (!isset($settings['query'])) {
+            $settings['query'] = array();
+        }
+
         if (!$this->isConfigured()) {
             return array('error' => array('message' => $this->factory->getTranslator()->trans('mautic.integration.missingkeys')));
         }
@@ -515,7 +519,12 @@ abstract class AbstractIntegration
                             //"Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
                         );
                     } else {
-                        $parameters[$authTokenKey] = $authToken;
+                        if (!empty($settings['append_auth_token'])) {
+                            $settings['query'][$authTokenKey] = $authToken;
+                        } else {
+                            $parameters[$authTokenKey] = $authToken;
+                        }
+
                         $headers                   = array(
                             "oauth-token: $authTokenKey",
                             "Authorization: OAuth {$authToken}",
@@ -529,7 +538,11 @@ abstract class AbstractIntegration
         }
 
         if ($method == 'GET' && !empty($parameters)) {
+            $parameters = array_merge($settings['query'], $parameters);
             $query =  http_build_query($parameters);
+            $url .= (strpos($url, '?') === false) ? '?' . $query : '&' . $query;
+        } elseif (!empty($settings['query'])) {
+            $query =  http_build_query($settings['query']);
             $url .= (strpos($url, '?') === false) ? '?' . $query : '&' . $query;
         }
 
@@ -595,7 +608,7 @@ abstract class AbstractIntegration
         $result        = array_pop($responseArray);
 
         curl_close($ch);
-
+die(var_dump($result, $parameters, $url, $method));
         if (!empty($settings['return_raw'])) {
 
             return $result;

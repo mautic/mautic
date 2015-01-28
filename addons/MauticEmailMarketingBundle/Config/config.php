@@ -19,6 +19,11 @@ return array(
                 'class'     => 'MauticAddon\MauticEmailMarketingBundle\Form\Type\MailchimpType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailmarketing_mailchimp'
+            ),
+            'mautic.form.type.emailmarketing.constantcontact' => array(
+                'class'     => 'MauticAddon\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'emailmarketing_constantcontact'
             )
         )
     )
