@@ -36,6 +36,7 @@ class FieldTypeTransformer implements DataTransformerInterface
         foreach ($keys as $k) {
             $filters[$k] = ${$k};
         }
+
         return $filters;
     }
 

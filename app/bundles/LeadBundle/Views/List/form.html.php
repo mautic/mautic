@@ -90,14 +90,13 @@ $form['filters']->setRendered();
                                     <div class="list-group" id="<?php echo $filterForm->vars['id']; ?>_right">
                                         <?php $i = 0; ?>
                                         <?php foreach ($filterValues as $filter): ?>
-                                            <?php if (!isset($choices[$filter['field']]))
-                                                continue; ?>
+                                            <?php if (!isset($choices[$filter['field']])) continue; ?>
                                             <?php $randomId = "id_" . hash('sha1', uniqid(mt_rand())); ?>
                                             <div class="panel">
                                                 <?php if ($i != 0): ?>
                                                     <div class="panel-footer">
                                                         <div class="col-sm-2 pl-0">
-                                                            <select name="leadlist[filters][glue][]" class="form-control ">
+                                                            <select name="leadlist[filters][glue][]" class="form-control not-chosen">
                                                                 <?php
                                                                 foreach ($glueOptions as $v => $l):
                                                                     $selected = ($v == $filter['glue']) ? ' selected' : '';
@@ -115,7 +114,7 @@ $form['filters']->setRendered();
                                                         <?php echo $choices[$filter['field']]['label']; ?>
                                                     </div>
                                                     <div class="col-xs-6 col-sm-3 padding-none">
-                                                        <select name="leadlist[filters][operator][]" class="form-control ">
+                                                        <select name="leadlist[filters][operator][]" class="form-control not-chosen ">
                                                             <?php foreach ($operatorOptions as $v => $l): ?>
                                                                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
                                                             <?php endforeach; ?>
@@ -126,8 +125,7 @@ $form['filters']->setRendered();
                                                             case 'lookup':
                                                             case 'select':
                                                                 ?>
-
-                                                                <input type="text" class="form-control" name="leadlist[filters][filter][]" data-toggle="field-lookup" data-target="<?php echo $filter['field']; ?>"<?php if (isset($choices[$filter['field']]['properties']['list'])): ?> data-options="<?php echo $choices[$filter['field']]['properties']['list']; ?>"<?php endif; ?> placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" id="<?php echo $randomId; ?>" />
+                                                                <input type="text" class="form-control" name="leadlist[filters][filter][]" data-toggle="field-lookup" data-target="<?php echo $filter['field']; ?>"<?php if (isset($choices[$filter['field']]['properties']['list'])): ?> data-options="<?php echo $choices[$filter['field']]['properties']['list']; ?>"<?php endif; ?> placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" id="<?php echo $randomId; ?>" value="<?php echo $filter['filter']; ?>"/>
                                                                 <input type="hidden" name="leadlist[filters][display][]" />
                                                                 <?php break; ?>
 
@@ -238,7 +236,7 @@ $form['filters']->setRendered();
     <div id="<?php echo $template; ?>-template" class="hide">
         <div class="panel-footer">
             <div class="col-sm-2 pl-0">
-                <select name="leadlist[filters][glue][]" class="form-control">
+                <select name="leadlist[filters][glue][]" class="form-control not-chosen">
                     <?php foreach ($glueOptions as $v => $l): ?>
                         <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
                     <?php endforeach; ?>
@@ -250,7 +248,7 @@ $form['filters']->setRendered();
 
             </div>
             <div class="col-xs-6 col-sm-3 padding-none">
-                <select name="leadlist[filters][operator][]" class="form-control ">
+                <select name="leadlist[filters][operator][]" class="form-control not-chosen">
                     <?php foreach ($operatorOptions as $v => $l): ?>
                         <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
                     <?php endforeach; ?>
@@ -261,7 +259,7 @@ $form['filters']->setRendered();
                     <input type="text" class="form-control" name="leadlist[filters][filter][]" placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
 
                 <?php elseif ($template == 'filter-country'): ?>
-                    <select class="form-control" name="leadlist[filters][filter][]">
+                    <select class="form-control not-chosen" name="leadlist[filters][filter][]">
                         <option value=""></option>
                         <?php foreach ($countries as $v => $l): ?>
                             <option value="<?php echo $v; ?>"><?php echo $l; ?></option>
@@ -270,7 +268,7 @@ $form['filters']->setRendered();
 
                 <?php
                 elseif ($template == 'filter-region'): ?>
-                    <select class="form-control" name="leadlist[filters][filter][]">
+                    <select class="form-control not-chosen" name="leadlist[filters][filter][]">
                         <option value=""></option>
                         <?php foreach ($regions as $country => $countryRegions): ?>
                             <optgroup label="<?php echo $country; ?>">
@@ -283,7 +281,7 @@ $form['filters']->setRendered();
 
                 <?php
                 elseif ($template == 'filter-timezone'): ?>
-                    <select class="form-control" name="leadlist[filters][filter][]">
+                    <select class="form-control not-chosen" name="leadlist[filters][filter][]">
                         <option value=""></option>
                         <?php foreach ($timezones as $continent => $zones): ?>
                             <optgroup label="<?php echo $continent; ?>" />

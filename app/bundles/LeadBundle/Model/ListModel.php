@@ -239,7 +239,7 @@ class ListModel extends FormModel
     {
         //field choices
         $choices = array(
-            'dateAdded' => array(
+            'date_added' => array(
                 'label'       => $this->translator->trans('mautic.core.date.added'),
                 'properties'  => array('type' => 'date')
             ),

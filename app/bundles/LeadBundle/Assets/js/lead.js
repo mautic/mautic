@@ -548,8 +548,7 @@ Mautic.renderEngagementChart = function() {
     Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
 };
 
-Mautic.showSocialMediaImageModal = function(imgSrc)
-{
+Mautic.showSocialMediaImageModal = function(imgSrc) {
     mQuery('#socialImageModal img').attr('src', imgSrc);
     mQuery('#socialImageModal').modal('show');
 };
