@@ -93,8 +93,12 @@ class TriggerEventController extends CommonFormController
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
+            $form = (isset($triggerEvent['settings']['formTheme'])) ?
+                $this->setFormTheme($form, 'MauticPointBundle:Event:form.html.php', $triggerEvent['settings']['formTheme']) :
+                $form->createView();
+
             $closeModal                = false;
-            $viewParams['form']        = $form->createView();
+            $viewParams['form']        = $form;
             $header                    = $triggerEvent['settings']['label'];
             $viewParams['eventHeader'] = $this->get('translator')->trans($header);
         }
@@ -209,8 +213,12 @@ class TriggerEventController extends CommonFormController
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
+                $form = (isset($triggerEvent['settings']['formTheme'])) ?
+                    $this->setFormTheme($form, 'MauticPointBundle:Event:form.html.php', $triggerEvent['settings']['formTheme']) :
+                    $form->createView();
+
                 $closeModal                = false;
-                $viewParams['form']        = $form->createView();
+                $viewParams['form']        = $form;
                 $viewParams['eventHeader'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
             }
 
