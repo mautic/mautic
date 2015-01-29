@@ -161,6 +161,24 @@ class FieldModel extends FormModel
         $leadsSchema->executeChanges();
     }
 
+    /**
+     * Delete an array of entities
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function deleteEntities($ids)
+    {
+        $entities = parent::deleteEntities($ids);
+
+        //remove the column from the leads table
+        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+        foreach ($entities as $e) {
+            $leadsSchema->dropColumn($e->getAlias());
+        }
+        $leadsSchema->executeChanges();
+    }
 
     /**
      * Reorder fields based on passed entity position
