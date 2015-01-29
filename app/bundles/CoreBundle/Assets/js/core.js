@@ -351,6 +351,9 @@ var Mautic = {
                                     return false;
                                 }
 
+                                // Disable the form buttons until this action is complete
+                                mQuery(this).parent().find('button').prop('disabled', true);
+
                                 event.preventDefault();
                                 Mautic.startIconSpinOnEvent(event);
                                 mQuery('#' + id).click();
@@ -376,6 +379,10 @@ var Mautic = {
 
                         var buttonClick = function (event) {
                             event.preventDefault();
+
+                            // Disable the form buttons until this action is complete
+                            mQuery(this).parent().find('button').prop('disabled', true);
+
                             Mautic.startIconSpinOnEvent(event);
                             mQuery('#' + id).click();
                         };
@@ -898,10 +905,6 @@ var Mautic = {
 
         var action = form.attr('action');
 
-        if (action.indexOf("ajax=1") == -1) {
-            form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
-        }
-
         if (!inMain) {
             Mautic.startModalLoadingBar();
         }
@@ -1281,9 +1284,11 @@ var Mautic = {
             alert(response.error);
             return;
         }
+
         if (response.sessionExpired || (response.closeModal && response.newContent)) {
             mQuery(target).modal('hide');
-            mQuery('.modal-backdrop').remove();
+
+            //mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app
              Mautic.processPageContent(response);
         } else {
@@ -1452,6 +1457,15 @@ var Mautic = {
      * @param action
      */
     executeAction: function (action) {
+        if (typeof Mautic.activeActions == 'undefined') {
+            Mautic.activeActions = {};
+        } else if (typeof Mautic.activeActions[action] != 'undefined') {
+            // Action is currently being executed
+            return;
+        }
+
+        Mautic.activeActions[action] = true;
+
         //dismiss modal if activated
         Mautic.dismissConfirmation();
         mQuery.ajax({
@@ -1463,6 +1477,9 @@ var Mautic = {
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
+            },
+            complete: function() {
+                delete Mautic.activeActions[action]
             }
         });
     },
@@ -1473,6 +1490,13 @@ var Mautic = {
      * @param action
      */
     executeBatchAction: function (action) {
+        if (typeof Mautic.activeActions == 'undefined') {
+            Mautic.activeActions = {};
+        } else if (typeof Mautic.activeActions[action] != 'undefined') {
+            // Action is currently being executed
+            return;
+        }
+
         // Retrieve all of the selected items
         var items = JSON.stringify(mQuery('input[class=list-checkbox]:checked').map(function () {
             return mQuery(this).val();
