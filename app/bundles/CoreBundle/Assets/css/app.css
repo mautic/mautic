@@ -2386,6 +2386,11 @@ label {
 .progress-bar {
   -webkit-box-shadow: none;
   box-shadow: none;
+  -webkit-transition: width 30s ease;
+  -moz-transition: width 30s ease;
+  -ms-transition: width 30s ease;
+  -o-transition: width 30s ease;
+  transition: width 30s ease;
 }
 .progress-bar-success {
   background-color: #00b49c;
