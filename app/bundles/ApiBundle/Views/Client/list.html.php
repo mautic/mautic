@@ -16,8 +16,12 @@ endif;
     <table class="table table-hover table-striped table-bordered client-list">
         <thead>
         <tr>
-            <th class="col-client-actions"></th>
             <?php
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                'checkall' => 'true',
+                'target'   => '.client-list'
+            ));
+
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.name',
@@ -54,7 +58,7 @@ endif;
                     ));
                     ?>
                 </td>
-                <td>
+                <td class="ellipsis">
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg">

@@ -15,15 +15,12 @@ if ($tmpl == 'index') {
     <table class="table table-hover table-striped table-bordered" id="formTable">
         <thead>
             <tr>
-                <th class="visible-md visible-lg col-form-actions pl-20">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#formTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
                 <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#formTable'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'f.name',
@@ -59,7 +56,7 @@ if ($tmpl == 'index') {
         <?php foreach ($items as $i): ?>
         <?php $item = $i[0]; ?>
             <tr>
-                <td class="visible-md visible-lg">
+                <td>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
@@ -92,17 +89,14 @@ if ($tmpl == 'index') {
                     ?>
                 </td>
                 <td>
-                    <div>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                            'item'       => $item,
-                            'model'      => 'form.form'
-                        )); ?>
+                    <div class="ellipsis">
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'form.form')); ?>
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                             <?php echo $item->getName() . ' (' . $item->getAlias() . ')'; ?>
                         </a>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">

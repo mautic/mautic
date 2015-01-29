@@ -15,14 +15,12 @@ if ($tmpl == 'index')
         <thead>
             <tr>
                 <th class="col-leadfield-orderhandle"></th>
-                <th class="col-leadfield-actions pl-20">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadFieldTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
+                <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#leadFieldTable'
+                ));
+                ?>
                 <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.label'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.core.alias'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.group'); ?></th>
@@ -51,11 +49,10 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                        'item'       => $item,
-                        'model'      => 'lead.field'
-                    )); ?>
-                    <?php echo $item->getLabel(); ?>
+                    <span class="ellipsis">
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field')); ?>
+                        <?php echo $item->getLabel(); ?>
+                    </span>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>

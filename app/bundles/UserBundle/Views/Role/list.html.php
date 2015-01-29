@@ -16,8 +16,12 @@ endif;
     <table class="table table-hover table-striped table-bordered role-list" id="roleTable">
         <thead>
         <tr>
-            <th class="col-role-actions"></th>
             <?php
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                'checkall' => 'true',
+                'target'   => '#roleTable'
+            ));
+
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
                 'orderBy'    => 'r.name',
@@ -58,9 +62,7 @@ endif;
                     ?>
                 </td>
                 <td>
-                    <a href="<?php echo $view['router']->generate('mautic_user_index',
-                        array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>"
-                       data-toggle="ajax">
+                    <a class="ellipsis" href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
                 </td>

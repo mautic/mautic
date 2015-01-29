@@ -16,15 +16,12 @@ if ($tmpl == 'index') {
     <table class="table table-hover table-striped table-bordered email-list">
         <thead>
         <tr>
-            <th class="col-email-actions pl-20">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0 pl-10">
-                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target=".email-list">
-                        <span></span>
-                    </label>
-                </div>
-            </th>
             <?php
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                'checkall' => 'true',
+                'target'   => '.email-list'
+            ));
+
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
                 'orderBy'    => 'e.subject',
@@ -101,20 +98,15 @@ if ($tmpl == 'index') {
                     ?>
                 </td>
                 <td>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                        'item'       => $item,
-                        'model'      => 'email'
-                    )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_email_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getSubject(); ?>
-                    </a>
-                    <?php if ($hasVariants): ?>
-                    <span>
-                        <i class="fa fa-fw fa-sitemap"></i>
-                    </span>
-                    <?php endif; ?>
+                    <div class="ellipsis">
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
+                        <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $item->getSubject(); ?>
+                            <?php if ($hasVariants): ?>
+                            <span><i class="fa fa-fw fa-sitemap"></i></span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $category = $item->getCategory(); ?>

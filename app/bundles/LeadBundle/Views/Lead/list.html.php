@@ -15,15 +15,12 @@ if ($tmpl == 'index')
     <table class="table table-hover table-striped table-bordered" id="leadTable">
         <thead>
             <tr>
-                <th class="col-lead-actions pl-20 visible-md visible-lg">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
                 <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#leadTable'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.lastname, l.firstname, l.company, l.email',
@@ -61,7 +58,7 @@ if ($tmpl == 'index')
             <?php /** @var \Mautic\LeadBundle\Entity\Lead $item */ ?>
             <?php $fields = $item->getFields(); ?>
             <tr>
-                <td class="visible-md visible-lg">
+                <td>
                     <?php
                     $hasEditAccess = $security->hasEntityAccess(
                         $permissions['lead:leads:editown'],
@@ -100,14 +97,12 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
-                    <?php if (in_array($item->getId(), $noContactList)) : ?>
-                    <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
-                    <?php endif; ?>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
-                        <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
-                        <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
+                    <a href="<?php echo $view['router']->generate('mautic_lead_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <?php if (in_array($item->getId(), $noContactList)) : ?>
+                            <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
+                        <?php endif; ?>
+                        <div class="ellipsis"><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
+                        <div class="small ellipsis"><?php echo $item->getSecondaryIdentifier(); ?></div>
                     </a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $fields['core']['email']['value']; ?></td>

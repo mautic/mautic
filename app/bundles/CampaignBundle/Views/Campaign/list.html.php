@@ -14,15 +14,12 @@ if ($tmpl == 'index')
     <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
         <thead>
             <tr>
-                <th class="visible-md visible-lg col-campaign-actions pl-20">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#campaignTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
                 <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#campaignTable'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'c.name',
@@ -50,7 +47,7 @@ if ($tmpl == 'index')
         <tbody>
         <?php foreach ($items as $item): ?>
             <tr>
-                <td class="visible-md visible-lg">
+                <td>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
@@ -64,7 +61,7 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
-                    <div>
+                    <div class="ellipsis">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
                             'item'       => $item,
                             'model'      => 'campaign'
@@ -74,7 +71,7 @@ if ($tmpl == 'index')
                         </a>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">

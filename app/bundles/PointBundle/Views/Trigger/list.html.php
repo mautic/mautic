@@ -15,15 +15,12 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
     <table class="table table-hover table-striped table-bordered pointtrigger-list" id="triggerTable">
         <thead>
         <tr>
-            <th class="col-pointtrigger-actions pl-20">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0 pl-10">
-                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#triggerTable">
-                        <span></span>
-                    </label>
-                </div>
-            </th>
             <?php
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                'checkall' => 'true',
+                'target'   => '#triggerTable'
+            ));
+
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.name',
@@ -36,7 +33,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 'c.title',
                 'text'       => 'mautic.core.category',
-                'class'      => 'col-pointtrigger-category'
+                'class'      => 'col-pointtrigger-category visible-md visible-lg'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -52,7 +49,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                 'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.id',
                 'text'       => 'mautic.core.id',
-                'class'      => 'col-pointtrigger-id'
+                'class'      => 'col-pointtrigger-id visible-md visible-lg'
             ));
             ?>
         </tr>
@@ -75,11 +72,8 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     ?>
                 </td>
                 <td>
-                    <div>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                            'item'       => $item,
-                            'model'      => 'point.trigger'
-                        )); ?>
+                    <div class="ellipsis">
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'point.trigger')); ?>
                         <?php if ($permissions['point:triggers:edit']): ?>
                         <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
@@ -89,7 +83,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                         <?php endif; ?>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
@@ -99,12 +93,12 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
                     <span><?php echo $catName; ?></span>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getPoints(); ?></td>
+                <td><?php echo $item->getPoints(); ?></td>
                 <?php
                 $color = $item->getColor();
                 $colorStyle = ($color) ? ' style="background-color: ' . $color . '"' : '';
                 ?>
-                <td<?php echo $colorStyle; ?> class="visible-md visible-lg"></td>
+                <td<?php echo $colorStyle; ?>></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>

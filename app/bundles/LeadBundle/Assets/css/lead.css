@@ -20,10 +20,6 @@
     color: #7D5B71;
 }
 
-.col-lead-actions, .col-leadlist-actions, .col-leadfield-actions {
-    width: 25px;
-}
-
 .leadlist-filter a {
     text-decoration: none;
 }

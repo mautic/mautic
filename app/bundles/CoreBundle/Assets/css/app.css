@@ -4310,3 +4310,6 @@ label.required:after {
 .search-container.active i {
   color: #4e5d9d;
 }
+.col-actions {
+  width: 100px;
+}

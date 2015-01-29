@@ -15,15 +15,12 @@ $view->extend('MauticPageBundle:Page:index.html.php');
             <table class="table table-hover table-striped table-bordered pagetable-list" id="pageTable">
                 <thead>
                 <tr>
-                    <th class="col-page-actions pl-20">
-                        <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#pageTable">
-                            <span></span>
-                        </label>
-                        </div>
-                    </th>
                     <?php
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'checkall' => 'true',
+                        'target'   => '#pageTable'
+                    ));
+
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.title',
@@ -43,14 +40,14 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.hits',
                         'text'       => 'mautic.page.thead.hits',
-                        'class'      => 'col-page-hits'
+                        'class'      => 'col-page-hits visible-md visible-lg'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'col-page-id'
+                        'class'      => 'col-page-id visible-md visible-lg'
                     ));
                     ?>
                 </tr>
@@ -77,28 +74,25 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                             ?>
                         </td>
                         <td>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                                'item'       => $item,
-                                'model'      => 'page.page'
-                            )); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_page_action',
-                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                               data-toggle="ajax">
-                                <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                            </a>
-                            <?php
-                            $hasVariants   = count($variantChildren);
-                            $hasTranslations = count($translationChildren);
-                            if ($hasVariants || $hasTranslations): ?>
-                            <span>
-                                <?php if ($hasVariants): ?>
-                                    <i class="fa fa-fw fa-sitemap"></i>
-                                <?php endif; ?>
-                                <?php if ($hasTranslations): ?>
-                                    <i class="fa fa-fw fa-language"></i>
-                                <?php endif; ?>
-                            </span>
-                        <?php endif; ?>
+                            <div class="ellipsis">
+                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'page.page')); ?>
+                                <a href="<?php echo $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                                    <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
+                                    <?php
+                                    $hasVariants   = count($variantChildren);
+                                    $hasTranslations = count($translationChildren);
+                                    if ($hasVariants || $hasTranslations): ?>
+                                        <span>
+                                    <?php if ($hasVariants): ?>
+                                        <i class="fa fa-fw fa-sitemap"></i>
+                                    <?php endif; ?>
+                                            <?php if ($hasTranslations): ?>
+                                                <i class="fa fa-fw fa-language"></i>
+                                            <?php endif; ?>
+                                     </span>
+                                    <?php endif; ?>
+                                </a>
+                            </div>
                         </td>
                         <td class="visible-md visible-lg">
                             <?php $category = $item->getCategory(); ?>

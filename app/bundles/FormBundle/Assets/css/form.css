@@ -42,10 +42,6 @@ textarea.form-html {
     height: 200px;
 }
 
-.col-form-actions {
-    width: 25px;
-}
-
 .col-form-id, .col-formresult-id {
     width: 75px;
 }

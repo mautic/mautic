@@ -18,14 +18,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         <table class="table table-hover table-striped table-bordered" id="leadListTable">
             <thead>
             <tr>
-                <th class="col-leadlist-actions pl-20">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadListTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
+                <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#leadListTable'
+                ));
+                ?>
                 <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.core.name'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-leadcount"><?php echo $view['translator']->trans('mautic.lead.list.thead.leadcount'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.core.id'); ?></th>
@@ -59,13 +57,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         ?>
                     </td>
                     <td>
-                        <div>
+                        <div class="ellipsis">
                             <?php if ($item->isGlobal()): ?>
                             <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
                             <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
-                                <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"
-                                   data-toggle="ajax">
+                                <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                                 </a>
                             <?php else : ?>
@@ -77,7 +74,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo count($item->getIncludedLeads()); ?></td>

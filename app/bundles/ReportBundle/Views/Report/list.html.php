@@ -14,15 +14,12 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
                 <tr>
-                    <th class="col-report-actions pl-20">
-                        <div class="checkbox-inline custom-primary">
-                            <label class="mb-0 pl-10">
-                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
-                                <span></span>
-                            </label>
-                        </div>
-                    </th>
                     <?php
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'checkall' => 'true',
+                        'target'   => '#reportTable'
+                    ));
+
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.name',
@@ -35,7 +32,7 @@ if ($tmpl == 'index')
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'col-report-id'
+                        'class'      => 'col-report-id visible-md visible-lg'
                     ));
                     ?>
                 </tr>
@@ -58,17 +55,14 @@ if ($tmpl == 'index')
                         ?>
                     </td>
                     <td>
-                        <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                                'item'       => $item,
-                                'model'      => 'report.report'
-                            )); ?>
+                        <div class="ellipsis">
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'report.report')); ?>
                             <a href="<?php echo $view['router']->generate('mautic_report_view', array("objectId" => $item->getId())); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
-                            <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                            <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

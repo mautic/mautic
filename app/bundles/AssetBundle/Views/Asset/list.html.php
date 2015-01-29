@@ -14,15 +14,12 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
         <table class="table table-hover table-striped table-bordered asset-list" id="assetTable">
             <thead>
             <tr>
-                <th class="visible-md visible-lg col-asset-actions pl-20">
-                    <div class="checkbox-inline custom-primary">
-                        <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#assetTable">
-                            <span></span>
-                        </label>
-                    </div>
-                </th>
                 <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#assetTable'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
                     'orderBy'    => 'a.title',
@@ -57,7 +54,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             <tbody>
             <?php foreach ($items as $k => $item): ?>
                 <tr>
-                    <td class="visible-md visible-lg">
+                    <td>
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'       => $item,
@@ -83,7 +80,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                         ?>
                     </td>
                     <td>
-                        <div>
+                        <div class="ellipsis">
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
                                 'item'       => $item,
                                 'model'      => 'asset.asset'
@@ -96,7 +93,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             <i class="<?php echo $item->getIconClass(); ?>"></i>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
-                            <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                            <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">

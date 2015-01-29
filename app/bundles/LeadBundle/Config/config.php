@@ -229,6 +229,10 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\NoteType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadnote'
+            ),
+            'mautic.form.type.lead_import'                    => array(
+                'class' => 'Mautic\LeadBundle\Form\Type\LeadImportType',
+                'alias' => 'lead_import'
             )
         ),
         'other'  => array(
