@@ -130,6 +130,9 @@ $container->loadFromExtension('framework', array(
     )*/
 ));
 
+//Use our extended Translator
+$container->setParameter('translator.class', 'Mautic\CoreBundle\Translation\Translator');
+
 //Doctrine Configuration
 $container->loadFromExtension('doctrine', array(
     'dbal' => array(
