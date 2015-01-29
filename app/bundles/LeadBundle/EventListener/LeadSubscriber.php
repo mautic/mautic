@@ -70,7 +70,7 @@ class LeadSubscriber extends CommonSubscriber
                 $this->factory->getModel('core.auditLog')->writeToLog($log);
 
                 //trigger the points change event
-                if (isset($details["points"])) {
+                if (!$lead->imported && isset($details["points"])) {
                     if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
                         $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
                         $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
@@ -78,7 +78,7 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 //regenerate the lists leads if there are changes AND the lead wasn't created by getCurrentLead
-                if (!$lead->isNewlyCreated()) {
+                if (!$lead->imported && !$lead->isNewlyCreated()) {
                     /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                     $model = $this->factory->getModel('lead');
                     $model->regenerateLeadLists($lead);
@@ -97,7 +97,7 @@ class LeadSubscriber extends CommonSubscriber
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
                     //trigger lead identified event
-                    if ($this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
+                    if (!$lead->imported && $this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
                         $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
                     }
                 }

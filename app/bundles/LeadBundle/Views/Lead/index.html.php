@@ -22,6 +22,14 @@ if ($permissions['lead:leads:create']) {
         'iconClass' => 'fa fa-bolt',
         'btnText'   => 'mautic.lead.lead.menu.quickadd'
     );
+
+    $buttons[] = array(
+        'attr'      => array(
+            'href'  => $view['router']->generate('mautic_lead_action', array('objectAction' => 'import')),
+        ),
+        'iconClass' => 'fa fa-upload',
+        'btnText'   => 'mautic.lead.lead.import'
+    );
 }
 
 $extraHtml = <<<button

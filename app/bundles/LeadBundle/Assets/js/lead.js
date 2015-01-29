@@ -552,3 +552,21 @@ Mautic.showSocialMediaImageModal = function(imgSrc) {
     mQuery('#socialImageModal img').attr('src', imgSrc);
     mQuery('#socialImageModal').modal('show');
 };
+
+Mautic.leadImportOnLoad = function (container, response) {
+    if (!mQuery('#leadImportProgress').length) {
+        Mautic.clearModeratedInterval('leadImportProgress');
+    } else {
+        Mautic.setModeratedInterval('leadImportProgress', 'reloadLeadImportProgress', 3000);
+    }
+};
+
+Mautic.reloadLeadImportProgress = function() {
+    if (!mQuery('#leadImportProgress').length) {
+        Mautic.clearModeratedInterval('leadImportProgress');
+    } else {
+        Mautic.loadContent(window.location, null, 'get', null, false, function () {
+            Mautic.moderatedIntervalCallbackIsComplete('leadImportProgress');
+        });
+    }
+};

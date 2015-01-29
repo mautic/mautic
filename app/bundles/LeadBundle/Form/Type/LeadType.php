@@ -57,8 +57,7 @@ class LeadType extends AbstractType
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.core.help.autocomplete',
+                        'class'   => 'form-control'
                     ),
                     'required'   => false,
                     'multiple'   => false

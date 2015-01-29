@@ -17,6 +17,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LeadController extends FormController
@@ -150,7 +151,7 @@ class LeadController extends FormController
 
         $listArgs = array();
         if (!$this->factory->getSecurity()->isGranted('lead:lists:viewother')) {
-            $listArgs["filter"]["force"] = " $isCommand:$mine";
+            $listArgs["filter"]["force"] = " $mine";
         }
 
         $lists = $this->factory->getModel('lead.list')->getUserLists();
@@ -775,5 +776,271 @@ class LeadController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.php'
         ));
+    }
+
+    /**
+     * @param $objectId
+     */
+    public function importAction ($objectId = 0, $ignorePost = false)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model   = $this->factory->getModel('lead');
+        $session = $this->factory->getSession();
+
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
+            return $this->accessDenied();
+        }
+
+        // Move the file to cache and rename it
+        $forceStop = $this->request->get('cancel', false);
+        $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
+        $cacheDir  = $this->factory->getSystemPath('cache', true);
+        $username  = $this->factory->getUser()->getUsername();
+        $fileName  = $username . '_leadimport.csv';
+        $fullPath  = $cacheDir . '/' . $fileName;
+        $complete  = false;
+        if (!file_exists($fullPath)) {
+            // Force step one if the file doesn't exist
+            $step = 1;
+            $session->set('mautic.lead.import.step', 1);
+        }
+
+        $progress = $session->get('mautic.lead.import.progress', array(0, 0));
+        $stats    = $session->get('mautic.lead.import.stats', array('merged' => 0, 'created' => 0, 'ignored' => 0));
+        $action   = $this->generateUrl('mautic_lead_action', array('objectAction' => 'import'));
+
+        switch ($step) {
+            case 1:
+                // Upload file
+
+                if ($forceStop) {
+                    $this->resetImport($fullPath);
+                }
+
+                $session->set('mautic.lead.import.headers', array());
+                $form = $this->get('form.factory')->create('lead_import', array(), array('action' => $action));
+                break;
+            case 2:
+                // Match fields
+
+                /** @var \Mautic\LeadBundle\Model\FieldModel $addonModel */
+                $fieldModel = $this->factory->getModel('lead.field');
+
+                $leadFields   = $fieldModel->getFieldList(false, false);
+                $importFields = $session->get('mautic.lead.import.importfields', array());
+
+                $form = $this->get('form.factory')->create('lead_field_import', array(), array(
+                    'action'        => $action,
+                    'lead_fields'   => $leadFields,
+                    'import_fields' => $importFields
+                ));
+                break;
+            case 3:
+                // Just show the progress form
+                $session->set('mautic.lead.import.step', 4);
+                break;
+
+            case 4:
+                $inProgress = $session->get('mautic.lead.import.inprogress', false);
+                if (!$inProgress) {
+                    $session->set('mautic.lead.import.inprogress', true);
+
+                    // Batch process
+                    $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
+                    $headers      = $session->get('mautic.lead.import.headers', array());
+                    $importFields = $session->get('mautic.lead.import.fields', array());
+
+                    $batchSize = 10;
+                    $file      = new \SplFileObject($fullPath);
+                    if ($file !== false) {
+                        $lineNumber = $progress[0];
+
+                        if ($lineNumber > 0) {
+                            $file->seek($lineNumber);
+                        }
+
+                        while ($batchSize && !$file->eof()) {
+                            $data = $file->fgetcsv();
+                            if ($lineNumber === 0) {
+                                $lineNumber++;
+                                continue;
+                            }
+
+                            // Increase progress count
+                            $progress[0]++;
+
+                            // Decrease batch count
+                            $batchSize--;
+
+                            if (is_array($data)) {
+                                $data = array_combine($headers, $data);
+
+                                if (empty($data)) {
+                                    $stats['ignored']++;
+                                } else {
+                                    $merged = $model->importLead($importFields, $data, $defaultOwner);
+
+                                    if ($merged) {
+                                        $stats['merged']++;
+                                    } else {
+                                        $stats['created']++;
+                                    }
+                                }
+                            }
+                        }
+
+                        $session->set('mautic.lead.import.stats', $stats);
+                    }
+
+                    // Close the file
+                    $file = null;
+
+                    // Clear in progress
+                    if ($progress[0] >= $progress[1]) {
+                        $progress[0] = $progress[1];
+                        $this->resetImport($fullPath);
+                        $complete = true;
+
+                    } else {
+                        $complete = false;
+                        $session->set('mautic.lead.import.inprogress', false);
+                        $session->set('mautic.lead.import.progress', $progress);
+                    }
+
+                    break;
+                }
+        }
+
+        ///Check for a submitted form and process it
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                $valid = $this->isFormValid($form);
+                switch ($step) {
+                    case 1:
+                        if ($valid) {
+                            if (file_exists($fullPath)) {
+                                unlink($fullPath);
+                            }
+
+                            $fileData = $form['file']->getData();
+                            if (!empty($fileData)) {
+                                try {
+                                    $fileData->move($cacheDir, $fileName);
+
+                                    $file = new \SplFileObject($fullPath);
+
+                                    if ($file !== false) {
+                                        // Get the headers for matching
+                                        $headers = $file->fgetcsv();
+
+                                        // Get the number of lines so we can track progress
+                                        $file->seek(PHP_INT_MAX);
+                                        $linecount = $file->key();
+
+                                        if (!empty($headers) && is_array($headers)) {
+                                            $session->set('mautic.lead.import.headers', $headers);
+                                            sort($headers);
+                                            $headers = array_combine($headers, $headers);
+                                            $session->set('mautic.lead.import.step', 2);
+                                            $session->set('mautic.lead.import.importfields', $headers);
+                                            $session->set('mautic.lead.import.progress', array(0, $linecount));
+
+                                            return $this->importAction(0, true);
+                                        }
+                                    }
+                                } catch (\Exception $e) {
+                                }
+                            }
+
+                            $form->addError(new FormError(
+                                $this->factory->getTranslator()->trans('mautic.lead.import.filenotreadable', array(), 'validators')
+                            ));
+                        }
+                        break;
+                    case 2:
+                        // Save matched fields
+                        $matchedFields = $form->getData();
+
+                        $owner = $matchedFields['owner'];
+                        unset($matchedFields['owner']);
+
+                        foreach ($matchedFields as $k => $f) {
+                            if (empty($f)) {
+                                unset($matchedFields[$k]);
+                            }
+                        }
+
+                        if (empty($matchedFields)) {
+                            $form->addError(new FormError(
+                                $this->factory->getTranslator()->trans('mautic.lead.import.matchfields', array(), 'validators')
+                            ));
+                        } else {
+
+                            $defaultOwner = ($owner) ? $owner->getId() : null;
+                            $session->set('mautic.lead.import.fields', $matchedFields);
+                            $session->set('mautic.lead.import.defaultowner', $defaultOwner);
+                            $session->set('mautic.lead.import.step', 3);
+
+                            return $this->importAction(0, true);
+                        }
+                        break;
+
+                    default:
+                        // Done or something wrong
+
+                        $this->resetImport($fullPath);
+
+                        break;
+                }
+            } else {
+                $this->resetImport($fullPath);
+
+                return $this->importAction(0, true);
+            }
+        }
+
+        if ($step === 1 || $step === 2) {
+            $contentTemplate = 'MauticLeadBundle:Import:form.html.php';
+            $viewParameters  = array('form' => $form->createView());
+        } else {
+            $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
+            $viewParameters  = array(
+                'progress' => $progress,
+                'stats'    => $stats,
+                'complete' => $complete
+            );
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => $viewParameters,
+            'contentTemplate' => $contentTemplate,
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'leadImport',
+                'route'         => $this->generateUrl('mautic_lead_action', array(
+                        'objectAction' => 'import'
+                    )
+                ),
+                'step'          => $step,
+                'progress'      => $progress
+            )
+        ));
+    }
+
+    /**
+     * @param $filepath
+     */
+    private function resetImport ($filepath)
+    {
+        $session = $this->factory->getSession();
+        $session->set('mautic.lead.import.stats', array('merged' => 0, 'created' => 0, 'ignored' => 0));
+        $session->set('mautic.lead.import.headers', array());
+        $session->set('mautic.lead.import.step', 1);
+        $session->set('mautic.lead.import.progress', array(0,0));
+        $session->set('mautic.lead.import.fields', array());
+        $session->set('mautic.lead.import.defaultowner', null);
+        $session->set('mautic.lead.import.inprogress', false);
+        $session->set('mautic.lead.import.importfields', array());
+        unlink($filepath);
     }
 }

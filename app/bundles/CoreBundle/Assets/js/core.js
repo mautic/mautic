@@ -831,7 +831,11 @@ var Mautic = {
             },
             complete: function () {
                 if (typeof callback !== 'undefined') {
-                    window["Mautic"][callback].apply('window', []);
+                    if (typeof callback == 'function') {
+                        callback();
+                    } else {
+                        window["Mautic"][callback].apply('window', []);
+                    }
                 }
                 delete Mautic.loadContentXhr[target];
             }
@@ -2226,7 +2230,12 @@ var Mautic = {
             if (typeof params == 'undefined') {
                 params = [];
             }
-            window["Mautic"][callback].apply('window', params);
+
+            if (typeof callback == 'function') {
+                callback(params);
+            } else {
+                window["Mautic"][callback].apply('window', params);
+            }
         }
 
         //schedule new timeout

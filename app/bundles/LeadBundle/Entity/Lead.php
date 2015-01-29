@@ -143,6 +143,8 @@ class Lead extends FormEntity
      */
     private $wasAnonymous = null;
 
+    public $imported = false;
+
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);

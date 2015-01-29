@@ -115,6 +115,26 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * @param $email
+     */
+    public function getLeadByEmail($email)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where("LOWER(email) = :search")
+            ->setParameter('search', strtolower($email));
+
+        $result = $q->execute()->fetchAll();
+
+        if (count($result)) {
+            return $result[0];
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get leads by IP address
      *
      * @param      $ip
@@ -170,6 +190,22 @@ class LeadRepository extends CommonRepository
         $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {
             $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $entity->getId()));
+        }
+    }
+
+
+    /**
+     * Persist an array of entities
+     *
+     * @param array $entities
+     *
+     * @return void
+     */
+    public function saveEntities($entities)
+    {
+        foreach ($entities as $k => $entity) {
+            // Leads cannot be batched due to requiring the ID to update the fields
+            $this->saveEntity($entity);
         }
     }
 

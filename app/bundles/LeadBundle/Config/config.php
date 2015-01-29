@@ -233,6 +233,11 @@ return array(
             'mautic.form.type.lead_import'                    => array(
                 'class' => 'Mautic\LeadBundle\Form\Type\LeadImportType',
                 'alias' => 'lead_import'
+            ),
+            'mautic.form.type.lead_field_import'                    => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_field_import'
             )
         ),
         'other'  => array(

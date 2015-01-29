@@ -169,10 +169,10 @@ class LeadModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        $fields = $entity->getFields();
-
         //check to see if we can glean information from ip address
-        if (count($ips = $entity->getIpAddresses())) {
+        if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
+            $fields = $entity->getFields();
+
             $details = $ips->first()->getIpDetails();
             if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
                 $entity->addUpdatedField('city', $details['city']);
@@ -752,5 +752,45 @@ class LeadModel extends FormModel
 
         //return the merged lead
         return $oldLead;
+    }
+
+    /**
+     * @param      $fields
+     * @param      $data
+     * @param null $owner
+     * @param bool $persist Persist to the database; otherwise return entity
+     *
+     * @return Lead
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function importLead($fields, $data, $owner = null, $persist = true)
+    {
+        // Let's check for an existing lead by email
+        if (!empty($fields['email']) && !empty($data[$fields['email']])) {
+            $leadFound = $this->getRepository()->getLeadByEmail($data[$fields['email']]);
+            $lead      = ($leadFound) ? $this->em->getReference('MauticLeadBundle:Lead', $leadFound['id']) : new Lead();
+            $merged    = $leadFound;
+        } else {
+            $lead   = new Lead();
+            $merged = false;
+        }
+
+        if ($owner !== null) {
+            $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
+        }
+
+        foreach ($fields as $leadField => $importField) {
+            if (!empty($data[$importField])) {
+                $lead->addUpdatedField($leadField, $data[$importField]);
+            }
+        }
+
+        $lead->imported = true;
+
+        if ($persist) {
+            $this->saveEntity($lead);
+
+            return $merged;
+        }
     }
 }

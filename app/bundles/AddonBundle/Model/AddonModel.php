@@ -79,23 +79,6 @@ class AddonModel extends FormModel
      */
     public function getLeadFields()
     {
-        // Get a list of custom form fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(array('filter' => array('isPublished' => true)));
-
-        $leadFields = array();
-
-        foreach ($fields as $f) {
-            $leadFields['mautic.lead.field.group.' . $f->getGroup()][$f->getAlias()] = $f->getLabel();
-        }
-
-        // Sort the groups
-        uksort($leadFields, 'strnatcmp');
-
-        // Sort each group by translation
-        foreach ($leadFields as $group => &$fieldGroup) {
-            uasort($fieldGroup, 'strnatcmp');
-        }
-
-        return $leadFields;
+        return $this->factory->getModel('lead.field')->getFieldList();
     }
 }

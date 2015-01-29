@@ -339,4 +339,46 @@ class FieldModel extends FormModel
             return false;
         }
     }
+
+    /**
+     * @param bool $byGroup
+     * @param bool $alphabetical
+     *
+     * @return array
+     */
+    public function getFieldList($byGroup = true, $alphabetical = true)
+    {
+        // Get a list of custom form fields
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'filter'     => array('isPublished' => true),
+            'orderBy'    => 'f.order',
+            'orderByDir' => 'asc'
+        ));
+
+        $leadFields = array();
+
+        foreach ($fields as $f) {
+            if ($byGroup) {
+                $fieldName = $this->factory->getTranslator()->trans('mautic.lead.field.group.' . $f->getGroup());
+                $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
+            } else {
+                $leadFields[$f->getAlias()] = $f->getLabel();
+            }
+
+        }
+
+        if ($alphabetical) {
+            // Sort the groups
+            uksort($leadFields, 'strnatcmp');
+
+            if ($byGroup) {
+                // Sort each group by translation
+                foreach ($leadFields as $group => &$fieldGroup) {
+                    uasort($fieldGroup, 'strnatcmp');
+                }
+            }
+        }
+
+        return $leadFields;
+    }
 }
