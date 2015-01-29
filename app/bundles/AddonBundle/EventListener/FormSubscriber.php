@@ -35,7 +35,8 @@ class FormSubscriber extends CommonSubscriber
     public function onFormBuild (FormBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.addon.form.actions',
+            'group'       => 'mautic.addon.actions',
+            'description' => 'mautic.addon.actions.tooltip',
             'label'       => 'mautic.addon.actions.push_lead',
             'formType'    => 'integration_list',
             'formTheme'   => 'MauticAddonBundle:FormTheme\Integration',

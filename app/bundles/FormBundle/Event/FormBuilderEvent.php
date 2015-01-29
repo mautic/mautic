@@ -83,6 +83,11 @@ class FormBuilderEvent extends Event
         );
 
         $action['label'] = $this->translator->trans($action['label']);
+
+        if (!isset($action['description'])) {
+            $action['description'] = '';
+        }
+
         $this->actions[$key] = $action;
     }
 
