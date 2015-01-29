@@ -352,7 +352,9 @@ var Mautic = {
                                 }
 
                                 // Disable the form buttons until this action is complete
-                                mQuery(this).parent().find('button').prop('disabled', true);
+                                if (!mQuery(this).hasClass('btn-dnd')) {
+                                    mQuery(this).parent().find('button').prop('disabled', true);
+                                }
 
                                 event.preventDefault();
                                 Mautic.startIconSpinOnEvent(event);
@@ -381,7 +383,9 @@ var Mautic = {
                             event.preventDefault();
 
                             // Disable the form buttons until this action is complete
-                            mQuery(this).parent().find('button').prop('disabled', true);
+                            if (!mQuery(this).hasClass('btn-dnd')) {
+                                mQuery(this).parent().find('button').prop('disabled', true);
+                            }
 
                             Mautic.startIconSpinOnEvent(event);
                             mQuery('#' + id).click();

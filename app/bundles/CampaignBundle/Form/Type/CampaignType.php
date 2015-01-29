@@ -139,7 +139,7 @@ class CampaignType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => array(
-                        'class'   => 'btn btn-default',
+                        'class'   => 'btn btn-default btn-dnd',
                         'icon'    => 'fa fa-cube',
                         'onclick' => "Mautic.launchCampaignEditor();"
                     )
