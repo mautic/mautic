@@ -291,7 +291,7 @@ class CategoryController extends FormController
             $model->lockEntity($entity);
         }
 
-        $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+        $closeModal = ($closeModal || $cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
 
         if ($closeModal) {
             $viewParameters = array(

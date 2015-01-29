@@ -153,4 +153,31 @@ class CategoryRepository extends CommonRepository
             array('c.title', 'ASC')
         );
     }
+
+    /**
+     * @param string $bundle
+     * @param string $alias
+     * @param object $entity
+     *
+     * @return mixed
+     */
+    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('count(e.id) as aliasCount')
+            ->where('e.alias = :alias')
+            ->andWhere('e.bundle = :bundle')
+            ->setParameter('alias', $alias)
+            ->setParameter('bundle', $bundle);
+
+        if (!empty($entity) && $entity->getId()) {
+            $q->andWhere('e.id != :id');
+            $q->setParameter('id', $entity->getId());
+        }
+
+        $results = $q->getQuery()->getSingleResult();
+
+        return $results['aliasCount'];
+    }
+
 }

@@ -48,29 +48,6 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param      $alias
-     * @param null $entity
-     * @return mixed
-     */
-    public function checkUniqueAlias($alias, $entity = null)
-    {
-        $q = $this->createQueryBuilder('a')
-            ->select('count(a.id) as aliasCount')
-            ->where('a.alias = :alias');
-        $q->setParameter('alias', $alias);
-
-        if (!empty($entity)) {
-            if ($entity->getId()) {
-                $q->andWhere('a.id != :id');
-                $q->setParameter('id', $entity->getId());
-            }
-        }
-
-        $results = $q->getQuery()->getSingleResult();
-        return $results['aliasCount'];
-    }
-
-    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start

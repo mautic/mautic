@@ -142,7 +142,7 @@ class CommonRepository extends EntityRepository
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
-        if (!empty($entity)) {
+        if (!empty($entity) && $entity->getId()) {
             $q->andWhere('e.id != :id');
             $q->setParameter('id', $entity->getId());
         }
