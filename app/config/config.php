@@ -132,6 +132,7 @@ $container->loadFromExtension('framework', array(
 
 //Use our extended Translator
 $container->setParameter('translator.class', 'Mautic\CoreBundle\Translation\Translator');
+$container->setParameter('templating.helper.translator.class', 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper');
 
 //Doctrine Configuration
 $container->loadFromExtension('doctrine', array(
