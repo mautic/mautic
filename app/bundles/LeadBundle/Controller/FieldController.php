@@ -142,17 +142,22 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        //form is valid so process the data
-                        $model->saveEntity($field);
+                        try {
+                            //form is valid so process the data
+                            $model->saveEntity($field);
 
-                        $this->addFlash('mautic.core.notice.created',  array(
-                            '%name%'      => $field->getLabel(),
-                            '%menu_link%' => 'mautic_leadfield_index',
-                            '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $field->getId()
-                            ))
-                        ));
+                            $this->addFlash('mautic.core.notice.created', array(
+                                '%name%'      => $field->getLabel(),
+                                '%menu_link%' => 'mautic_leadfield_index',
+                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $field->getId()
+                                ))
+                            ));
+                        } catch (\Exception $e) {
+                            $form['alias']->addError(new FormError($this->get('translator')->trans('mautic.lead.field.failed', array(), 'validators')));
+                            $valid = false;
+                        }
                     }
                 }
             }
@@ -416,7 +421,7 @@ class FieldController extends FormController
                         'msg'     => 'mautic.lead.field.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif ($field->isFixed()) {
+                } elseif ($entity->isFixed()) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.field', true);
