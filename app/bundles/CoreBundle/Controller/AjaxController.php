@@ -262,7 +262,7 @@ class AjaxController extends CommonController
                     $html                    = $this->renderView('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                         'item'  => $entity,
                         'model' => $name,
-                        'extra' => $extra
+                        'query' => $extra
 
                     ));
                     $dataArray['statusHtml'] = $html;
