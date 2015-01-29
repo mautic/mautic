@@ -111,7 +111,7 @@ $formId = $form['sessionId']->vars['data'];
                                             <?php foreach ($action as $k => $e): ?>
                                                 <li id="action_<?php echo $k; ?>">
                                                     <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
-                                                        <div data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
+                                                        <div data-toggle="tooltip" title="<?php echo $view['translator']->trans($e['description']); ?>">
                                                             <span><?php echo $view['translator']->trans($e['label']); ?></span>
                                                         </div>
                                                     </a>

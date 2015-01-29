@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Comparator;
+use Mautic\CoreBundle\Exception\SchemaUpdateException;
 
 /**
  * Class TableSchemaHelper
@@ -85,14 +85,14 @@ class TableSchemaHelper
      * @param array $tables
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws SchemaUpdateException
      */
     public function addTables(array $tables)
     {
         //ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
             if (empty($table['name'])) {
-                throw new \InvalidArgumentException('Table is missing required name key.');
+                throw new SchemaUpdateException('Table is missing required name key.');
             }
 
             $this->checkTableExists($table['name'], true);
@@ -128,12 +128,12 @@ class TableSchemaHelper
      * @param $dropExisting
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws SchemaUpdateException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false)
     {
         if (empty($table['name'])) {
-            throw new \InvalidArgumentException('Table is missing required name key.');
+            throw new SchemaUpdateException('Table is missing required name key.');
         }
 
         if ($checkExists || $dropExisting) {
@@ -155,7 +155,7 @@ class TableSchemaHelper
             $columnsAdded = array();
             foreach ($columns as $column) {
                 if (empty($column['name'])) {
-                    throw new \InvalidArgumentException('A column is missing required name key.');
+                    throw new SchemaUpdateException('A column is missing required name key.');
                 }
 
                 if (!isset($columns[$column['name']])) {
@@ -223,13 +223,13 @@ class TableSchemaHelper
      * @param bool   $throwException
      *
      * @return bool
-     * @throws \InvalidArgumentException
+     * @throws SchemaUpdateException
      */
     public function checkTableExists($table, $throwException = false)
     {
         if ($this->sm->tablesExist($this->prefix . $table)) {
             if ($throwException) {
-                throw new \InvalidArgumentException($this->prefix . "$table already exists");
+                throw new SchemaUpdateException($this->prefix . "$table already exists");
             }
 
             return true;

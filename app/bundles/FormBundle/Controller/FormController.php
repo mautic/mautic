@@ -266,31 +266,36 @@ class FormController extends CommonFormController
                     } else {
                         $model->setFields($entity, $fields);
 
-                        //save the form first so that new fields are available to actions
-                        $model->saveEntity($entity);
+                        try {
+                            //save the form first so that new fields are available to actions
+                            $model->saveEntity($entity);
 
-                        //now set the actions
-                        $model->setActions($entity, $actions, $fields);
+                            //now set the actions
+                            $model->setActions($entity, $actions, $fields);
 
-                        $this->addFlash('mautic.core.notice.created', array(
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_form_index',
-                            '%url%'       => $this->generateUrl('mautic_form_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
-                            ))
-                        ));
+                            $this->addFlash('mautic.core.notice.created', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_form_index',
+                                '%url%'       => $this->generateUrl('mautic_form_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $entity->getId()
+                                ))
+                            ));
 
-                        if ($form->get('buttons')->get('save')->isClicked()) {
-                            $viewParameters = array(
-                                'objectAction' => 'view',
-                                'objectId'     => $entity->getId()
-                            );
-                            $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
-                            $template  = 'MauticFormBundle:Form:view';
-                        } else {
-                            //return edit view so that all the session stuff is loaded
-                            return $this->editAction($entity->getId(), true);
+                            if ($form->get('buttons')->get('save')->isClicked()) {
+                                $viewParameters = array(
+                                    'objectAction' => 'view',
+                                    'objectId'     => $entity->getId()
+                                );
+                                $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
+                                $template  = 'MauticFormBundle:Form:view';
+                            } else {
+                                //return edit view so that all the session stuff is loaded
+                                return $this->editAction($entity->getId(), true);
+                            }
+                        } catch (\Exception $e) {
+                            $form['name']->addError(new FormError($this->get('translator')->trans('mautic.form.schema.failed', array(), 'validators')));
+                            $valid = false;
                         }
                     }
                 }

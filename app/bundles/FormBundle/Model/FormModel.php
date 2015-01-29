@@ -238,7 +238,6 @@ class FormModel extends CommonFormModel
         //save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
-
         //now build the form table
         if ($entity->getId()) {
             $this->createTableSchema($entity, $isNew);

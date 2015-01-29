@@ -121,7 +121,7 @@ class Form extends FormEntity
     private $actions;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
