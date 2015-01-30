@@ -72,6 +72,14 @@ class Lead extends FormEntity
     private $ipAddresses;
 
     /**
+     * @ORM\Column(type="datetime", name="last_active", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadDetails", "leadList"})
+     */
+    private $lastActive;
+
+    /**
      * @ORM\Column(type="array", nullable=true)
      */
     private $internal = array();
@@ -626,5 +634,21 @@ class Lead extends FormEntity
                 $this->changes['dateIdentified'] = array('', $this->dateIdentified);
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastActive ()
+    {
+        return $this->lastActive;
+    }
+
+    /**
+     * @param mixed $lastActive
+     */
+    public function setLastActive ($lastActive)
+    {
+        $this->lastActive = $lastActive;
     }
 }

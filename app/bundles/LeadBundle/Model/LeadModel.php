@@ -461,6 +461,13 @@ class LeadModel extends FormModel
             $this->currentLead = $lead;
             $this->setLeadCookie($leadId);
         }
+
+        // Log last active
+        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
+            $this->getRepository()->updateLastActive($this->currentLead->getId());
+            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
+        }
+
         return ($returnTracking) ? array($this->currentLead, $trackingId, $generated) : $this->currentLead;
     }
 

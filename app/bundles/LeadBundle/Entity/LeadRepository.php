@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PointBundle\Model\TriggerModel;
 
 /**
@@ -381,6 +382,8 @@ class LeadRepository extends CommonRepository
             //build the order by id since the order was applied above
             //unfortunately, doctrine does not have a way to natively support this and can't use MySQL's FIELD function
             //since we have to be cross-platform; it's way ugly
+
+            //We should probably totally ditch orm for leads
             $order = '(CASE';
             foreach ($ids as $count => $id) {
                 $order .= ' WHEN l.id = ' . $id . ' THEN ' . $count;
@@ -594,7 +597,20 @@ class LeadRepository extends CommonRepository
     protected function getDefaultOrder()
     {
        return array(
-           array('l.date_added', 'ASC')
+           array('l.last_active', 'DESC')
        );
+    }
+
+    /**
+     * Updates lead's lastActive with now date/time
+     *
+     * @param $leadId
+     */
+    public function updateLeadLastActive($leadId)
+    {
+        $dt     = new DateTimeHelper();
+        $fields = array('last_active' => $dt->toUtcString());
+
+        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $leadId));
     }
 }

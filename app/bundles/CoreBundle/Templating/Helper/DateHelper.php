@@ -56,10 +56,15 @@ class DateHelper extends Helper
      */
     protected function format($type, $datetime, $timezone, $fromFormat)
     {
-        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
-        return $this->helper->toLocalString(
-            $this->formats[$type]
-        );
+        if (empty($datetime)) {
+            return '';
+        } else {
+            $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+
+            return $this->helper->toLocalString(
+                $this->formats[$type]
+            );
+        }
     }
 
     /**
@@ -144,6 +149,10 @@ class DateHelper extends Helper
      */
     public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
+        if (empty($datetime)) {
+            return '';
+        }
+
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
         $textDate = $this->helper->getTextDate();
@@ -165,7 +174,7 @@ class DateHelper extends Helper
      *
      * @param   DateInterval    $range
      * @param   string          $format
-     * 
+     *
      * @return  string          $formatedRange
      */
     public function formatRange($range, $format = null)

@@ -25,8 +25,7 @@ if ($tmpl == 'index')
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.lastname, l.firstname, l.company, l.email',
                     'text'       => 'mautic.core.name',
-                    'class'      => 'col-lead-name',
-                    'default'    => true
+                    'class'      => 'col-lead-name'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -48,6 +47,14 @@ if ($tmpl == 'index')
                     'orderBy'    => 'l.points',
                     'text'       => 'mautic.lead.points',
                     'class'      => 'col-lead-points'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.last_active',
+                    'text'       => 'mautic.lead.lastactive',
+                    'class'      => 'col-lead-lastactive visible-md visible-lg',
+                    'default'    => true
                 ));
                 ?>
 
@@ -134,6 +141,7 @@ if ($tmpl == 'index')
                     ?>
                     <span class="label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                 </td>
+                <td class="visible-md visible-lg"><?php echo $view['date']->toText($item->getLastActive()); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

@@ -63,8 +63,8 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.date_added');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'ASC');
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = array('string' => $search, 'force' => '');
         $translator  = $this->factory->getTranslator();
