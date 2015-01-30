@@ -36,7 +36,7 @@ $header   = ($complete) ? 'mautic.lead.import.success': 'mautic.lead.import.dono
                 </div>
             </div>
             <div class="panel-footer">
-                <span class="small"><?php echo $progress[0] . '/' . $progress[1]; ?></span>
+                <span class="small"><span class="imported-count"><?php echo $progress[0]; ?></span> / <span class="total-count"><?php echo $progress[1]; ?></span></span>
 
                 <?php if (!$complete): ?>
                 <div>

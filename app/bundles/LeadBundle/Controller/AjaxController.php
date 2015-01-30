@@ -288,4 +288,22 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getImportProgressAction(Request $request)
+    {
+        $dataArray = array('success' => 1);
+
+        if ($this->factory->getSecurity()->isGranted('lead:leads:create')) {
+            $session               = $this->factory->getSession();
+            $dataArray['progress'] = $session->get('mautic.lead.import.progress', array(0, 0));
+            $dataArray['percent']  = ($dataArray['progress'][1]) ? ceil(($dataArray['progress'][0] / $dataArray['progress'][1]) * 100) : 100;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

@@ -1011,20 +1011,26 @@ class LeadController extends FormController
             );
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  => $viewParameters,
-            'contentTemplate' => $contentTemplate,
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
-                'mauticContent' => 'leadImport',
-                'route'         => $this->generateUrl('mautic_lead_action', array(
-                        'objectAction' => 'import'
-                    )
-                ),
-                'step'          => $step,
-                'progress'      => $progress
-            )
-        ));
+        if (!$complete && $this->request->query->has('importbatch')) {
+            // Ajax request to batch process so just return ajax response unless complete
+
+            return new JsonResponse(array('success' => 1, 'ignore_wdt' => 1));
+        } else {
+            return $this->delegateView(array(
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => $contentTemplate,
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_lead_index',
+                    'mauticContent' => 'leadImport',
+                    'route'         => $this->generateUrl('mautic_lead_action', array(
+                            'objectAction' => 'import'
+                        )
+                    ),
+                    'step'          => $step,
+                    'progress'      => $progress
+                )
+            ));
+        }
     }
 
     /**

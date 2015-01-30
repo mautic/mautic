@@ -2386,11 +2386,11 @@ label {
 .progress-bar {
   -webkit-box-shadow: none;
   box-shadow: none;
-  -webkit-transition: width 30s ease;
-  -moz-transition: width 30s ease;
-  -ms-transition: width 30s ease;
-  -o-transition: width 30s ease;
-  transition: width 30s ease;
+  -webkit-transition: width 4s ease;
+  -moz-transition: width 4s ease;
+  -ms-transition: width 4s ease;
+  -o-transition: width 4s ease;
+  transition: width 4s ease;
 }
 .progress-bar-success {
   background-color: #00b49c;
@@ -4227,29 +4227,15 @@ lesshat-selector {
 .builder .list-group-item.ui-draggable-dragging {
   background-color: #fff;
 }
-.confirmation-modal {
-  position: fixed;
-  font-family: Arial, Helvetica, sans-serif;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.8) url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
-  z-index: 9999;
-  height: 100%;
-  width: 100%;
-}
-.confirmation-inner-wrapper {
+.confirmation-modal .modal-content {
   width: 400px;
   font-size: 1.2em;
   font-weight: bold;
-  position: absolute;
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
   background: #fff;
   text-align: center;
-  z-index: 10000;
 }
 .content-overlay {
   position: absolute;

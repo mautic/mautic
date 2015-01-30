@@ -18,7 +18,7 @@ mQuery.ajaxSetup({
                     MauticVars.activeRequests = 0;
                     Mautic.stopPageLoadingBar();
                 }
-            }, 1000);
+            }, 20000);
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -1356,7 +1356,7 @@ var Mautic = {
 
         var confirmContainer = mQuery("<div />").attr({"class": "modal fade confirmation-modal"});
         var confirmDialogDiv = mQuery("<div />").attr({"class": "modal-dialog"});
-        var confirmContentDiv = mQuery("<div />").attr({"class": "modal-content confirmation-inner-wrapper"});
+        var confirmContentDiv = mQuery("<div />").attr({"class": "modal-content"});
         var confirmFooterDiv = mQuery("<div />").attr({"class": "modal-body text-center"});
         var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
         confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
@@ -1477,6 +1477,7 @@ var Mautic = {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
         mQuery.ajax({
+            showLoadingBar: true,
             url: action,
             type: "POST",
             dataType: "json",
