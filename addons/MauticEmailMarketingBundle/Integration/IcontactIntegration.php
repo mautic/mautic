@@ -154,6 +154,10 @@ class IcontactIntegration extends EmailAbstractIntegration
      */
     public function getAvailableLeadFields ($settings = array())
     {
+        if (!$this->isAuthorized()) {
+            return array();
+        }
+
         static $leadFields = array();
 
         if (empty($leadFields)) {
@@ -176,7 +180,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             $leadFields = array();
             foreach ($fields as $f) {
                 $leadFields[$f] = array(
-                    'label' => 'mautic.icontact.field.' . $f,
+                    'label' => $this->factory->getTranslator()->trans('mautic.icontact.field.' . $f),
                     'type'  => 'string',
                     'required' => ($f == 'email' ) ? true : false
                 );

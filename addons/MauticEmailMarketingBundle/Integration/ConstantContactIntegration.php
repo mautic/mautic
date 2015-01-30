@@ -83,6 +83,10 @@ class ConstantContactIntegration extends EmailAbstractIntegration
      */
     public function getAvailableLeadFields ($settings = array())
     {
+        if (!$this->isAuthorized()) {
+            return array();
+        }
+
         $fields = array(
             'email',
             'prefix_name',
@@ -105,8 +109,8 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $leadFields = array();
         foreach ($fields as $f) {
             $leadFields[$f] = array(
-                'label' => 'mautic.contantcontact.field.' . $f,
-                'type'  => 'string',
+                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.field.' . $f),
+                'type'     => 'string',
                 'required' => ($f == 'email' ) ? true : false
             );
         }
@@ -114,8 +118,8 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $c = 1;
         while ($c <= 15) {
             $leadFields['customfield_' . $c] = array(
-                'label' => 'mautic.constantcontact.customfield' .$c,
-                'type'  => 'string',
+                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.customfield.' . $f),
+                'type'     => 'string',
                 'required' => false
             );
             $c++;

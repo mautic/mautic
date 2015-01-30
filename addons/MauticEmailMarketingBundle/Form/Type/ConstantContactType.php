@@ -50,68 +50,66 @@ class ConstantContactType extends AbstractType
         /** @var \MauticAddon\MauticEmailMarketingBundle\Integration\ConstantContactIntegration $object */
         $object = $helper->getIntegrationObject('ConstantContact');
 
-        if ($object->isAuthorized()) {
-            $api = $object->getApiHelper();
-            try {
-                $lists = $api->getLists();
+        $api = $object->getApiHelper();
+        try {
+            $lists = $api->getLists();
 
-                $choices = array();
-                if (!empty($lists)) {
-                    foreach ($lists as $list) {
-                        $choices[$list['id']] = $list['name'];
-                    }
-
-                    asort($choices);
+            $choices = array();
+            if (!empty($lists)) {
+                foreach ($lists as $list) {
+                    $choices[$list['id']] = $list['name'];
                 }
-            } catch (\Exception $e) {
-                $choices = array();
-                $error   = $e->getMessage();
-            }
 
-            $builder->add('list', 'choice', array(
-                'choices'  => $choices,
-                'label'    => 'mautic.emailmarketing.list',
-                'required' => false,
-                'attr'     => array(
-                    'tooltip'  => 'mautic.emailmarketing.list.tooltip'
-                )
+                asort($choices);
+            }
+        } catch (\Exception $e) {
+            $choices = array();
+            $error   = $e->getMessage();
+        }
+
+        $builder->add('list', 'choice', array(
+            'choices'  => $choices,
+            'label'    => 'mautic.emailmarketing.list',
+            'required' => false,
+            'attr'     => array(
+                'tooltip'  => 'mautic.emailmarketing.list.tooltip'
+            )
+        ));
+
+        $builder->add('sendWelcome', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label'       => 'mautic.emailmarketing.send_welcome',
+            'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
+        ));
+
+        if (!empty($error)) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
+                $form = $event->getForm();
+
+                if ($error) {
+                    $form['list']->addError(new FormError($error));
+                }
+            });
+        }
+
+        if (isset($options['form_area']) && $options['form_area'] == 'integration') {
+            $leadFields = $this->factory->getModel('addon')->getLeadFields();
+
+            $fields = $object->getFormLeadFields();
+
+            list ($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
+            $builder->add('leadFields', 'integration_fields', array(
+                'label'                => 'mautic.integration.leadfield_matches',
+                'required'             => true,
+                'lead_fields'          => $leadFields,
+                'data'                 => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : array(),
+                'integration_fields'   => $fields,
+                'special_instructions' => $specialInstructions,
+                'alert_type'           => $alertType
             ));
-
-            $builder->add('sendWelcome', 'yesno_button_group', array(
-                'choice_list' => new ChoiceList(
-                    array(false, true),
-                    array('mautic.core.form.no', 'mautic.core.form.yes')
-                ),
-                'label'       => 'mautic.emailmarketing.send_welcome',
-                'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
-            ));
-
-            if (!empty($error)) {
-                $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
-                    $form = $event->getForm();
-
-                    if ($error) {
-                        $form['list']->addError(new FormError($error));
-                    }
-                });
-            }
-
-            if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-                $leadFields = $this->factory->getModel('addon')->getLeadFields();
-
-                $fields = $object->getFormLeadFields();
-
-                list ($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
-                $builder->add('leadFields', 'integration_fields', array(
-                    'label'                => 'mautic.integration.leadfield_matches',
-                    'required'             => true,
-                    'lead_fields'          => $leadFields,
-                    'data'                 => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : array(),
-                    'integration_fields'   => $fields,
-                    'special_instructions' => $specialInstructions,
-                    'alert_type'           => $alertType
-                ));
-            }
         }
     }
 

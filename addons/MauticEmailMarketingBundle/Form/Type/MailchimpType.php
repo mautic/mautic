@@ -50,117 +50,115 @@ class MailchimpType extends AbstractType
         /** @var \MauticAddon\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
         $mailchimp = $helper->getIntegrationObject('Mailchimp');
 
-        if ($mailchimp->isAuthorized()) {
-            $api = $mailchimp->getApiHelper();
-            try {
-                $lists = $api->getLists();
+        $api = $mailchimp->getApiHelper();
+        try {
+            $lists = $api->getLists();
 
-                $choices = array();
-                if (!empty($lists)) {
-                    if ($lists['total']) {
-                        foreach ($lists['data'] as $list) {
-                            $choices[$list['id']] = $list['name'];
-                        }
+            $choices = array();
+            if (!empty($lists)) {
+                if ($lists['total']) {
+                    foreach ($lists['data'] as $list) {
+                        $choices[$list['id']] = $list['name'];
                     }
-
-                    asort($choices);
                 }
-            } catch (\Exception $e) {
-                $choices = array();
-                $error   = $e->getMessage();
+
+                asort($choices);
             }
+        } catch (\Exception $e) {
+            $choices = array();
+            $error   = $e->getMessage();
+        }
 
-            $builder->add('list', 'choice', array(
-                'choices'  => $choices,
-                'label'    => 'mautic.emailmarketing.list',
-                'required' => false,
-                'attr'     => array(
-                    'tooltip'  => 'mautic.emailmarketing.list.tooltip',
-                    'onchange' => 'Mautic.getIntegrationLeadFields(\'Mailchimp\', this, {"list": this.value});'
-                )
-            ));
+        $builder->add('list', 'choice', array(
+            'choices'  => $choices,
+            'label'    => 'mautic.emailmarketing.list',
+            'required' => false,
+            'attr'     => array(
+                'tooltip'  => 'mautic.emailmarketing.list.tooltip',
+                'onchange' => 'Mautic.getIntegrationLeadFields(\'Mailchimp\', this, {"list": this.value});'
+            )
+        ));
 
-            $builder->add('doubleOptin', 'yesno_button_group', array(
-                'choice_list' => new ChoiceList(
-                    array(false, true),
-                    array('mautic.core.form.no', 'mautic.core.form.yes')
-                ),
-                'label'       => 'mautic.mailchimp.double_optin',
-                'data'        => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin']
-            ));
+        $builder->add('doubleOptin', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label'       => 'mautic.mailchimp.double_optin',
+            'data'        => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin']
+        ));
 
-            $builder->add('sendWelcome', 'yesno_button_group', array(
-                'choice_list' => new ChoiceList(
-                    array(false, true),
-                    array('mautic.core.form.no', 'mautic.core.form.yes')
-                ),
-                'label'       => 'mautic.emailmarketing.send_welcome',
-                'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
-            ));
+        $builder->add('sendWelcome', 'yesno_button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label'       => 'mautic.emailmarketing.send_welcome',
+            'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
+        ));
 
-            if (!empty($error)) {
-                $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
-                    $form = $event->getForm();
+        if (!empty($error)) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
+                $form = $event->getForm();
 
-                    if ($error) {
-                        $form['list']->addError(new FormError($error));
-                    }
-                });
-            }
+                if ($error) {
+                    $form['list']->addError(new FormError($error));
+                }
+            });
+        }
 
-            if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-                $leadFields = $this->factory->getModel('addon')->getLeadFields();
+        if (isset($options['form_area']) && $options['form_area'] == 'integration') {
+            $leadFields = $this->factory->getModel('addon')->getLeadFields();
 
-                $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields) {
-                    $settings = array(
-                        'silence_exceptions' => false,
-                        'feature_settings'   => array(
-                            'list_settings' => $data
-                        )
-                    );
+            $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields) {
+                $settings = array(
+                    'silence_exceptions' => false,
+                    'feature_settings'   => array(
+                        'list_settings' => $data
+                    )
+                );
 
-                    try {
-                        $fields = $mailchimp->getFormLeadFields($settings);
+                try {
+                    $fields = $mailchimp->getFormLeadFields($settings);
 
-                        if (!is_array($fields)) {
-                            $fields = array();
-                        }
-                        $error = '';
-                    } catch (\Exception $e) {
+                    if (!is_array($fields)) {
                         $fields = array();
-                        $error  = $e->getMessage();
                     }
+                    $error = '';
+                } catch (\Exception $e) {
+                    $fields = array();
+                    $error  = $e->getMessage();
+                }
 
-                    list ($specialInstructions, $alertType) = $mailchimp->getFormNotes('leadfield_match');
-                    $form->add('leadFields', 'integration_fields', array(
-                        'label'                => 'mautic.integration.leadfield_matches',
-                        'required'             => true,
-                        'lead_fields'          => $leadFields,
-                        'data'                 => isset($data['leadFields']) ? $data['leadFields'] : array(),
-                        'integration_fields'   => $fields,
-                        'special_instructions' => $specialInstructions,
-                        'alert_type'           => $alertType
-                    ));
+                list ($specialInstructions, $alertType) = $mailchimp->getFormNotes('leadfield_match');
+                $form->add('leadFields', 'integration_fields', array(
+                    'label'                => 'mautic.integration.leadfield_matches',
+                    'required'             => true,
+                    'lead_fields'          => $leadFields,
+                    'data'                 => isset($data['leadFields']) ? $data['leadFields'] : array(),
+                    'integration_fields'   => $fields,
+                    'special_instructions' => $specialInstructions,
+                    'alert_type'           => $alertType
+                ));
 
-                    if ($error) {
-                        $form->addError(new FormError($error));
-                    }
-                };
+                if ($error) {
+                    $form->addError(new FormError($error));
+                }
+            };
 
-                $builder->addEventListener(FormEvents::PRE_SET_DATA,
-                    function (FormEvent $event) use ($formModifier) {
-                        $data = $event->getData();
-                        $formModifier($event->getForm(), $data);
-                    }
-                );
+            $builder->addEventListener(FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($formModifier) {
+                    $data = $event->getData();
+                    $formModifier($event->getForm(), $data);
+                }
+            );
 
-                $builder->addEventListener(FormEvents::PRE_SUBMIT,
-                    function (FormEvent $event) use ($formModifier) {
-                        $data = $event->getData();
-                        $formModifier($event->getForm(), $data);
-                    }
-                );
-            }
+            $builder->addEventListener(FormEvents::PRE_SUBMIT,
+                function (FormEvent $event) use ($formModifier) {
+                    $data = $event->getData();
+                    $formModifier($event->getForm(), $data);
+                }
+            );
         }
     }
 

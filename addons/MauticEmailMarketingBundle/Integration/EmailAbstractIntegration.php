@@ -35,16 +35,18 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'features' || $formArea == 'integration') {
-            $name = strtolower($this->getName());
-            if ($this->factory->serviceExists('mautic.form.type.emailmarketing.' . $name)) {
-                if ($formArea == 'integration' && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
-                    $data['list_settings']['leadFields'] = $data['leadFields'];
+            if ($this->isAuthorized()) {
+                $name = strtolower($this->getName());
+                if ($this->factory->serviceExists('mautic.form.type.emailmarketing.' . $name)) {
+                    if ($formArea == 'integration' && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
+                        $data['list_settings']['leadFields'] = $data['leadFields'];
+                    }
+                    $builder->add('list_settings', 'emailmarketing_' . $name, array(
+                        'label'     => false,
+                        'form_area' => $formArea,
+                        'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : array()
+                    ));
                 }
-                $builder->add('list_settings', 'emailmarketing_' . $name, array(
-                    'label'     => false,
-                    'form_area' => $formArea,
-                    'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : array()
-                ));
             }
         }
     }
