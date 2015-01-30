@@ -116,7 +116,7 @@ $form['filters']->setRendered();
                                                     <div class="col-xs-6 col-sm-3 padding-none">
                                                         <select name="leadlist[filters][operator][]" class="form-control not-chosen ">
                                                             <?php foreach ($operatorOptions as $v => $l): ?>
-                                                                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
+                                                                <option<?php if ($v == $filter['operator']) echo ' selected'; ?> value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
                                                     </div>
