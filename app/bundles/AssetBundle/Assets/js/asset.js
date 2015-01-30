@@ -85,3 +85,22 @@ Mautic.previewBeforeUpload = function(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+Mautic.updateRemoteBrowser = function(provider) {
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: "action=asset:fetchRemoteFiles&provider=" + provider,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                mQuery('div#remoteFileBrowser').html(response.output);
+            } else {
+                // TODO - Add error handler
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    })
+}

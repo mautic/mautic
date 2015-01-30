@@ -12,4 +12,18 @@ return array(
     'description' => 'Enables integrations with Mautic supported cloud storage services.',
     'version'     => '1.0',
     'author'      => 'Mautic',
+
+    'services'    => array(
+        'events' => array(
+            'mautic.cloudstorage.remoteassetbrowse.subscriber' => array(
+                'class' => 'MauticAddon\MauticCloudStorageBundle\EventListener\RemoteAssetBrowseSubscriber'
+            )
+        ),
+        'forms'  => array(
+            'mautic.form.type.cloudstorage.amazons3' => array(
+                'class' => 'MauticAddon\MauticCloudStorageBundle\Form\Type\AmazonS3Type',
+                'alias' => 'cloudstorage_amazons3'
+            )
+        )
+    ),
 );

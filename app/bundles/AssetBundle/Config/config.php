@@ -18,6 +18,10 @@ return array(
                 'path' => '/assets/{page}',
                 'controller' => 'MauticAssetBundle:Asset:index'
             ),
+            'mautic_asset_remote' => array(
+                'path' => '/assets/remote',
+                'controller' => 'MauticAssetBundle:Asset:remote',
+            ),
             'mautic_asset_action' => array(
                 'path' => '/assets/{objectAction}/{objectId}',
                 'controller' => 'MauticAssetBundle:Asset:execute',

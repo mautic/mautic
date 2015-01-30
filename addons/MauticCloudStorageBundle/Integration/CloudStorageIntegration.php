@@ -9,6 +9,7 @@
 
 namespace MauticAddon\MauticCloudStorageBundle\Integration;
 
+use Gaufrette\Adapter;
 use Mautic\AddonBundle\Integration\AbstractIntegration;
 
 /**
@@ -17,12 +18,36 @@ use Mautic\AddonBundle\Integration\AbstractIntegration;
 abstract class CloudStorageIntegration extends AbstractIntegration
 {
     /**
+     * @param FormBuilder|Form $builder
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $name = strtolower($this->getName());
+            if ($this->factory->serviceExists('mautic.form.type.cloudstorage.' . $name)) {
+                $builder->add('provider', 'cloudstorage_' . $name, array(
+                    'label'    => 'mautic.integration.form.provider.settings',
+                    'required' => false,
+                    'data'     => (isset($data['provider'])) ? $data['provider'] : array()
+                ));
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAuthenticationType()
     {
         return 'api';
     }
+
+    /**
+     * Retrieves a connector object for this integration
+     *
+     * @return Adapter
+     */
+    abstract public function getConnector();
 
     /**
      * {@inheritdoc}

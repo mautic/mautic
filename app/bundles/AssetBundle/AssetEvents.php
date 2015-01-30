@@ -28,6 +28,15 @@ final class AssetEvents
      */
     const ASSET_ON_DOWNLOAD   = 'mautic.asset_on_download';
 
+    /**
+     * The mautic.asset_on_remote_browse event is thrown when browsing a remote provider
+     *
+     * The event listener receives a
+     * Mautic\AssetBundle\Event\RemoteAssetBrowseEvent instance.
+     *
+     * @var string
+     */
+    const ASSET_ON_REMOTE_BROWSE = 'mautic.asset_on_remote_browse';
 
     /**
      * The mautic.asset_on_upload event is thrown before uploading a file
@@ -39,7 +48,7 @@ final class AssetEvents
      */
     const ASSET_ON_UPLOAD   = 'mautic.asset_on_upload';
 
-    /*
+    /**
      * The mautic.asset_on_display event is thrown before displaying the asset content
      *
      * The event listener receives a
@@ -78,7 +87,6 @@ final class AssetEvents
      * @var string
      */
     const ASSET_PRE_DELETE   = 'mautic.asset_pre_delete';
-
 
     /**
      * The mautic.asset_post_delete event is thrown after a asset is deleted.

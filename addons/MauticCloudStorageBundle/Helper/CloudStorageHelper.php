@@ -9,9 +9,6 @@
 
 namespace MauticAddon\MauticCloudStorageBundle\Integration;
 
-use Aws\S3\S3Client;
-use Gaufrette\Adapter\AwsS3;
-
 /**
  * Class AmazonS3Integration
  */
@@ -22,7 +19,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getName()
     {
-        return 'AmazonS3';
+        return 'amazons3';
     }
 
     /**
@@ -42,20 +39,5 @@ class AmazonS3Integration extends CloudStorageIntegration
             'client_id'      => 'mautic.integration.keyfield.clientid',
             'client_secret'  => 'mautic.integration.keyfield.clientsecret'
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return AwsS3
-     */
-    public function getConnector()
-    {
-        $settings = $this->settings->getFeatureSettings();
-        $keys     = $this->getDecryptedApiKeys();
-
-        $service = S3Client::factory(array('key' => $keys['client_id'], 'secret' => $keys['client_secret']));
-
-        return new AwsS3($service, $settings['provider']['bucket']);
     }
 }

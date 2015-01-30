@@ -9,6 +9,8 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,5 +57,45 @@ class AjaxController extends CommonAjaxController
             );
         }
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function fetchRemoteFilesAction(Request $request)
+    {
+        $provider   = InputHelper::string($request->request->get('provider'));
+        $dispatcher = $this->factory->getDispatcher();
+        $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
+
+        if (!$dispatcher->hasListeners($name)) {
+            return $this->sendJsonResponse(array('success' => 0));
+        }
+
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integration */
+        $integration = $integrationHelper->getIntegrationObject($provider);
+
+        $event = new RemoteAssetBrowseEvent($integration);
+
+        $dispatcher->dispatch($name, $event);
+
+        if (!$connector = $event->getConnector()) {
+            return $this->sendJsonResponse(array('success' => 0));
+        }
+
+        $output = $this->renderView(
+            'MauticAssetBundle:Remote:list.html.php',
+            array(
+                'connector' => $connector,
+                'integration' => $integration,
+                'items' => $connector->keys()
+            )
+        );
+
+        return $this->sendJsonResponse(array('success' => 1, 'output' => $output));
     }
 }

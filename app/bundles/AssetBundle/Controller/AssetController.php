@@ -655,4 +655,33 @@ class AssetController extends FormController
             ))
         );
     }
+
+    /**
+     * Renders the container for the remote file browser
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function remoteAction ()
+    {
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'integrations' => $integrations,
+                'tmpl'         => $tmpl
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_asset_index',
+                'mauticContent' => 'asset',
+                'route'         => $this->generateUrl('mautic_asset_index', array('page' => $this->factory->getSession()->get('mautic.asset.page', 1)))
+            )
+        ));
+    }
 }

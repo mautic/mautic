@@ -24,9 +24,9 @@ $view['slots']->set('mauticContent', 'asset');
 		        <div class="col-md-6">
 				    <?php echo $view['form']->row($form['file']); ?>
 			        <?php if ($integrations) : ?>
-				        <hr />
-				        <h4>Reference remote file</h4>
-				        <span>//TODO - Integrate this in ;-)</span>
+				        <a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
+				            <?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
+				        </a>
 					<?php endif; ?>
 		    	</div>
 		    	<div class="col-md-6">
@@ -65,3 +65,12 @@ $view['slots']->set('mauticContent', 'asset');
 	</div>
 </div>
 <?php echo $view['form']->end($form); ?>
+
+<?php if ($integrations) : ?>
+	<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+	    'id'            => 'RemoteFileModal',
+	    'size'          => 'lg',
+	    'header'        => $view['translator']->trans('mautic.asset.remote.file.browse'),
+	    'footerButtons' => true
+	)); ?>
+<?php endif; ?>
