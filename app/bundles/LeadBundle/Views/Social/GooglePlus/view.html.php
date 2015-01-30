@@ -9,31 +9,29 @@
 
 ?>
 
-<div class="panel-toolbar-wrapper">
-    <div class="panel-toolbar">
-        <ul class="nav nav-tabs nav-justified">
-            <li class="active">
-                <a href="#GoogleProfile" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
-                </a>
-            </li>
-            <li>
-                <a href="#GooglePosts" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.posts'); ?>
-                </a>
-            </li>
-            <li>
-                <a href="#GooglePhotos" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
-                </a>
-            </li>
-            <li>
-                <a href="#GoogleTags" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.tags'); ?>
-                </a>
-            </li>
-        </ul>
-    </div>
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs nav-justified pr-md pl-md">
+        <li class="active">
+            <a href="#GoogleProfile" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
+            </a>
+        </li>
+        <li>
+            <a href="#GooglePosts" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.posts'); ?>
+            </a>
+        </li>
+        <li>
+            <a href="#GooglePhotos" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
+            </a>
+        </li>
+        <li>
+            <a href="#GoogleTags" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.tags'); ?>
+            </a>
+        </li>
+    </ul>
 </div>
 <div class="panel-body tab-content">
     <div class="tab-pane active" id="GoogleProfile">
