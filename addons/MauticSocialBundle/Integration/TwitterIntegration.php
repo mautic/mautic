@@ -69,6 +69,16 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
+     * Get the authentication/login URL for oauth2 access
+     *
+     * @return string
+     */
+    public function getAuthenticationUrl ()
+    {
+        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAuthenticationType ()
