@@ -24,7 +24,7 @@ class DoctrineStep implements StepInterface
      *
      * @Assert\Choice(callback="getDriverKeys")
      */
-    public $driver = 'mysqli';
+    public $driver = 'pdo_mysql';
 
     /**
      * Database host
