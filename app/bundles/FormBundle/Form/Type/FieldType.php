@@ -27,7 +27,7 @@ class FieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('labelAttributes' => 'string', 'inputAttributes' => 'string')));
 
         $builder->add('label', 'text', array(
             'label'      => 'mautic.form.field.form.label',
