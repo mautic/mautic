@@ -103,8 +103,7 @@ if ($tmpl == 'index') {
                     <?php $category = $item->getCategory(); ?>
                     <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
                     <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
-                    <span class="label label-default pa-5" style="background: <?php echo $color; ?>;"> </span>
-                    <span><?php echo $catName; ?></span>
+                    <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-md visible-lg">
                     <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index"><?php echo $i['submissionCount']; ?></a>
