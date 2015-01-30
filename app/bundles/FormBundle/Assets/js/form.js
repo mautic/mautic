@@ -101,6 +101,9 @@ Mautic.formFieldOnLoad = function (container, response) {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.mauticformfields', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        }).on('dblclick.mauticformfields', function(event) {
+            event.preventDefault();
+            mQuery(this).find('.btn-edit').first().click();
         });
 
         //show fields panel
@@ -152,6 +155,9 @@ Mautic.formActionOnLoad = function (container, response) {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.mauticformactions', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        }).on('dblclick.mauticformactions', function(event) {
+            event.preventDefault();
+            mQuery(this).find('.btn-edit').first().click();
         });
 
         //show actions panel
