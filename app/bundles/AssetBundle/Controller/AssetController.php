@@ -325,11 +325,18 @@ class AssetController extends FormController
             }
         }
 
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity)
+                'assetDownloadUrl' => $model->generateUrl($entity),
+                'integrations'     => $integrations
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
@@ -455,11 +462,18 @@ class AssetController extends FormController
             $model->lockEntity($entity);
         }
 
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity)
+                'assetDownloadUrl' => $model->generateUrl($entity),
+                'integrations'     => $integrations
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

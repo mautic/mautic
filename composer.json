@@ -50,6 +50,9 @@
         "doctrine/migrations": "dev-master",
         "doctrine/doctrine-migrations-bundle": "dev-master",
 
+        "knplabs/gaufrette": "dev-master",
+        "aws/aws-sdk-php": "~2.7",
+
         "knplabs/knp-menu": "2.0.*@dev",
         "knplabs/knp-menu-bundle":"dev-master",
         "friendsofsymfony/oauth-server-bundle": "dev-master",

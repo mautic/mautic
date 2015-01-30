@@ -23,6 +23,11 @@ $view['slots']->set('mauticContent', 'asset');
 	        <div class="row">
 		        <div class="col-md-6">
 				    <?php echo $view['form']->row($form['file']); ?>
+			        <?php if ($integrations) : ?>
+				        <hr />
+				        <h4>Reference remote file</h4>
+				        <span>//TODO - Integrate this in ;-)</span>
+					<?php endif; ?>
 		    	</div>
 		    	<div class="col-md-6">
 		    		<div class="row">
