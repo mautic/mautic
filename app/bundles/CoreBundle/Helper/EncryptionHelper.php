@@ -19,8 +19,18 @@ class EncryptionHelper
 
     private $key;
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @throws \RuntimeException if the mcrypt extension is not enabled
+     */
     public function __construct(MauticFactory $factory)
     {
+        // Toss an Exception back if mcrypt is not found
+        if (!extension_loaded('mcrypt')) {
+            throw new \RuntimeException($factory->getTranslator()->trans('mautic.core.error.no.mcrypt'));
+        }
+
         $this->key = $factory->getParameter('secret_key');
     }
 

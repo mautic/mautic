@@ -226,6 +226,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.module.phpxml';
         }
 
+        if (!extension_loaded('mcrypt')) {
+            $messages[] = 'mautic.install.extension.mcrypt';
+        }
+
         if (!function_exists('mb_strlen')) {
             $messages[] = 'mautic.install.function.mbstring';
         }
