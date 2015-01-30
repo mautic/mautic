@@ -62,7 +62,7 @@ abstract class SocialIntegration extends AbstractIntegration
                     case 'string':
                     case 'boolean':
                         $fields[$fn] = (!$label)
-                            ? ($translator->hasId("mautic.integration.common.{$fn}") ? $translator->trans("mautic.integration.common.{$fn}") : $translator->trans("mautic.integration.{$s}.{$fn}"))
+                            ? $translator->transComparison("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                             : $label;
                         break;
                     case 'object':
@@ -70,12 +70,12 @@ abstract class SocialIntegration extends AbstractIntegration
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
                                 $fields[$fn] = (!$label)
-                                    ? ($translator->hasId("mautic.integration.common.{$fn}") ? $translator->trans("mautic.integration.common.{$fn}") : $translator->trans("mautic.integration.{$s}.{$fn}"))
+                                    ? $translator->transComparison("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                     : $label;
                             }
                         } else {
                             $fields[$field] = (!$label)
-                                ? ($translator->hasId("mautic.integration.common.{$fn}") ? $translator->trans("mautic.integration.common.{$fn}") : $translator->trans("mautic.integration.{$s}.{$fn}"))
+                                ? $translator->transComparison("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                 : $label;
                         }
                         break;
@@ -83,24 +83,24 @@ abstract class SocialIntegration extends AbstractIntegration
                         if ($field == "urls" || $field == "url") {
                             foreach ($socialProfileUrls as $p => $d) {
                                 $fields["{$p}ProfileHandle"] = (!$label)
-                                    ? ($translator->hasId("mautic.integration.common.{$p}ProfileHandle") ? $translator->trans("mautic.integration.common.{$p}ProfileHandle") : $translator->trans("mautic.integration.{$s}.{$p}ProfileHandle"))
+                                    ? $translator->transComparison("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
                                     : $label;
                             }
                             foreach ($details['fields'] as $f) {
                                 $fields["{$p}Urls"] = (!$label)
-                                    ? ($translator->hasId("mautic.integration.common.{$f}Urls") ? $translator->trans("mautic.integration.common.{$f}Urls") : $translator->trans("mautic.integration.{$s}.{$f}Urls"))
+                                    ? $translator->transComparison("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
                                     : $label;
                             }
                         } elseif (isset($details['fields'])) {
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
                                 $fields[$fn] = (!$label)
-                                    ? ($translator->hasId("mautic.integration.common.{$fn}") ? $translator->trans("mautic.integration.common.{$fn}") : $translator->trans("mautic.integration.{$s}.{$fn}"))
+                                    ? $translator->transComparison("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                     : $label;
                             }
                         } else {
                             $fields[$fn] = (!$label)
-                                ? ($translator->hasId("mautic.integration.common.{$fn}") ? $translator->trans("mautic.integration.common.{$fn}") : $translator->trans("mautic.integration.{$s}.{$fn}"))
+                                ? $translator->transComparison("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                 : $label;
                         }
                         break;

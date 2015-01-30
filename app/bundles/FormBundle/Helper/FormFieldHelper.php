@@ -27,26 +27,13 @@ class FormFieldHelper
      * @var array
      */
     private $types = array(
-        'text' => array(
-            'label' => 'mautic.core.text'
-        ),
-        'textarea' => array(
-            'label' => 'mautic.form.field.type.textarea'
-        ),
-        'country'  => array(
-            'label' => 'mautic.form.field.type.country'
-        ),
-        'button'  => array(
-            'label' => 'mautic.form.field.type.button'
-        ),
-        'select' => array(
-            'label' => 'mautic.core.select'
-        ),
-        'date' => array(
-            'label' => 'mautic.core.date'
-        ),
+        'text' => array(),
+        'textarea' => array(),
+        'country'  => array(),
+        'button'  => array(),
+        'select' => array(),
+        'date' => array(),
         'email' => array(
-            'label'  => 'mautic.core.email',
             'filter' => 'email',
             'constraints' => array(
                 '\Symfony\Component\Validator\Constraints\Email' =>
@@ -54,34 +41,21 @@ class FormFieldHelper
             )
         ),
         'number' => array(
-            'label'  => 'mautic.core.number',
             'filter' => 'float'
         ),
-        'tel' => array(
-            'label' => 'mautic.form.field.type.tel'
-        ),
+        'tel' => array(),
         'url' => array(
-            'label'  => 'mautic.core.url',
             'filter' => 'url',
             'constraints' => array(
                 '\Symfony\Component\Validator\Constraints\Url' =>
                     array('message' => 'mautic.form.submission.url.invalid')
             )
         ),
-        'freetext' => array(
-            'label' => 'mautic.form.field.type.freetext'
-        ),
-        'checkboxgrp' => array(
-            'label' => 'mautic.form.field.type.checkboxgrp'
-        ),
-        'radiogrp' => array(
-            'label' => 'mautic.form.field.type.radiogrp'
-        ),
-        'hidden' => array(
-            'label' => 'mautic.form.field.type.hidden'
-        ),
+        'freetext' => array(),
+        'checkboxgrp' => array(),
+        'radiogrp' => array(),
+        'hidden' => array(),
         'captcha' => array(
-            'label' => 'mautic.form.field.type.captcha',
             'constraints' => array(
                 '\Symfony\Component\Validator\Constraints\NotBlank' =>
                     array('message' => 'mautic.form.submission.captcha.invalid'),
@@ -110,7 +84,7 @@ class FormFieldHelper
         $choices = array();
 
         foreach ($this->types as $v => $type) {
-            $choices[$v] = $this->translator->trans($type['label']);
+            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.form.field.type.{$v}");
         }
 
         foreach ($customFields as $v => $f) {

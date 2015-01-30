@@ -42,7 +42,7 @@ endif;
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.email',
-                'text'       => 'mautic.core.email',
+                'text'       => 'mautic.core.type.email',
                 'class'      => 'visible-md visible-lg col-user-email'
             ));
 

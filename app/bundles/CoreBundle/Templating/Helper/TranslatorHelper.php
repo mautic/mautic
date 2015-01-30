@@ -29,4 +29,21 @@ class TranslatorHelper extends BaseHelper
     {
         return $this->translator->hasId($id, $domain, $locale);
     }
+
+    /**
+     * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
+     * $alternative
+     *
+     * @param      $preferred
+     * @param      $alternative
+     * @param      $parameters
+     * @param null $domain
+     * @param null $locale
+     *
+     * @return string
+     */
+    public function transConditional($preferred, $alternative, $parameters = array(), $domain = null, $locale = null)
+    {
+        return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
+    }
 }

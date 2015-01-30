@@ -56,7 +56,7 @@ if ($tmpl == 'index')
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>
-                <td><?php echo $view['translator']->trans('mautic.lead.field.type.'.$item->getType()); ?></td>
+                <td><?php echo $view['translator']->transConditional('mautic.core.type.'.$item->getType(), 'mautic.lead.field.type.'.$item->getType()); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
                     <?php if ($item->isRequired()): ?>

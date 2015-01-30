@@ -32,7 +32,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.email',
-                    'text'       => 'mautic.core.email',
+                    'text'       => 'mautic.core.type.email',
                     'class'      => 'col-lead-email visible-md visible-lg'
                 ));
 

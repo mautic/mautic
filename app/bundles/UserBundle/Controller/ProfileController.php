@@ -108,7 +108,7 @@ class ProfileController extends FormController
                         $overrides['email'] = $me->getEmail();
                         $form->remove('email');
                         $form->add('email_unbound', 'text', array(
-                            'label'      => 'mautic.core.email',
+                            'label'      => 'mautic.core.type.email',
                             'label_attr' => array('class' => 'control-label'),
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,

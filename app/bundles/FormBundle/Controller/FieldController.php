@@ -106,8 +106,7 @@ class FieldController extends CommonFormController
             $closeModal                = false;
             $viewParams['tmpl']        = 'field';
             $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:field.html.php', $customParams['formTheme']) : $form->createView();
-            $header                    = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.' . $fieldType;
-            $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
+            $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->get('translator')->trans($customParams['label']) : $this->get('translator')->transConditional('mautic.core.type.' . $fieldType, 'mautic.form.field.type.' . $fieldType);
         }
 
         $passthroughVars = array(
@@ -226,8 +225,7 @@ class FieldController extends CommonFormController
                 $closeModal                = false;
                 $viewParams['tmpl']        = 'field';
                 $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:field.html.php', $customParams['formTheme']) : $form->createView();
-                $header                    = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.' . $fieldType;
-                $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
+                $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->get('translator')->trans($customParams['label']) : $this->get('translator')->transConditional('mautic.core.type.' . $fieldType, 'mautic.form.field.type.' . $fieldType);
             }
 
             $passthroughVars = array(

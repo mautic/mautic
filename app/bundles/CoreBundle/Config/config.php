@@ -153,72 +153,44 @@ return array(
         ),
         'other'   => array(
             // Template helper overrides
-            'templating.helper.assets.class'  => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
-            'templating.helper.slots.class'   => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
-            'templating.name_parser.class'    => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-            'templating.helper.form.class'    => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
+            'templating.helper.assets.class'     => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
+            'templating.helper.slots.class'      => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
+            'templating.name_parser.class'       => 'Mautic\CoreBundle\Templating\TemplateNameParser',
+            'templating.helper.form.class'       => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
 
-            'mautic.factory'                  => array(
+            // Translator overrides
+            'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
+            'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
+
+            // System uses
+            'mautic.factory'                     => array(
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container'
             ),
-            'mautic.templating.name_parser'   => array(
+            'mautic.templating.name_parser'      => array(
                 'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
                 'arguments' => 'kernel'
             ),
-            'mautic.route_loader'             => array(
+            'mautic.route_loader'                => array(
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
                 'arguments' => 'mautic.factory',
                 'tag'       => 'routing.loader'
             ),
-            'mautic.security'                 => array(
+            'mautic.security'                    => array(
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
                 'arguments' => 'mautic.factory'
             ),
-            'mautic.translation.loader'       => array(
+            'mautic.translation.loader'          => array(
                 'class'     => 'Mautic\CoreBundle\Loader\TranslationLoader',
                 'arguments' => 'mautic.factory',
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic'
             ),
-            'mautic.helper.assetgeneration'   => array(
-                'class'     => 'Mautic\CoreBundle\Helper\AssetGenerationHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'transifex'                       => array(
-                'class'     => 'BabDev\Transifex\Transifex',
-                'arguments' => array(
-                    array(
-                        'api.username' => '%mautic.transifex_username%',
-                        'api.password' => '%mautic.transifex_password%'
-                    )
-                )
-            ),
-            'mautic.helper.cookie'            => array(
-                'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.update'            => array(
-                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.cache'             => array(
-                'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.theme'             => array(
-                'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.encryption'        => array(
-                'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.tblprefix_subscriber'     => array(
+            'mautic.tblprefix_subscriber'        => array(
                 'class' => 'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
                 'tag'   => 'doctrine.event_subscriber'
             ),
-            'mautic.exception.listener'       => array(
+            'mautic.exception.listener'          => array(
                 'class'        => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments'    => array(
                     '"MauticCoreBundle:Exception:show"',
@@ -231,23 +203,58 @@ return array(
                     'priority' => 255
                 )
             ),
+            'transifex'                          => array(
+                'class'     => 'BabDev\Transifex\Transifex',
+                'arguments' => array(
+                    array(
+                        'api.username' => '%mautic.transifex_username%',
+                        'api.password' => '%mautic.transifex_password%'
+                    )
+                )
+            ),
+
+            // Helpers
+            'mautic.helper.assetgeneration'      => array(
+                'class'     => 'Mautic\CoreBundle\Helper\AssetGenerationHelper',
+                'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.cookie'               => array(
+                'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
+                'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.update'               => array(
+                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
+                'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.cache'                => array(
+                'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
+                'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.theme'                => array(
+                'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
+                'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.encryption'           => array(
+                'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
+                'arguments' => 'mautic.factory'
+            ),
 
             // Mailers
-            'mautic.transport.amazon'         => array(
+            'mautic.transport.amazon'            => array(
                 'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport'
             ),
-            'mautic.transport.mandrill'       => array(
+            'mautic.transport.mandrill'          => array(
                 'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport'
             ),
-            'mautic.transport.sendgrid'       => array(
+            'mautic.transport.sendgrid'          => array(
                 'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport'
             ),
-            'mautic.transport.postmark'       => array(
+            'mautic.transport.postmark'          => array(
                 'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport'
             ),
 
             // Menu
-            'mautic.menu_renderer'            => array(
+            'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => array(
                     'knp_menu.matcher',
@@ -257,7 +264,7 @@ return array(
                 'tag'       => 'knp_menu.renderer',
                 'alias'     => 'mautic'
             ),
-            'mautic.menu.builder'             => array(
+            'mautic.menu.builder'                => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuBuilder',
                 'arguments' => array(
                     'knp_menu.factory',
@@ -265,22 +272,22 @@ return array(
                     'mautic.factory'
                 )
             ),
-            'mautic.menu.main'                => array(
+            'mautic.menu.main'                   => array(
                 'class'          => 'Knp\Menu\MenuItem',
                 'factoryService' => 'mautic.menu.builder',
                 'factoryMethod'  => 'mainMenu',
                 'tag'            => 'knp_menu.menu',
                 'alias'          => 'main'
             ),
-            'mautic.menu.admin'               => array(
+            'mautic.menu.admin'                  => array(
                 'class'          => 'Knp\Menu\MenuItem',
                 'factoryService' => 'mautic.menu.builder',
                 'factoryMethod'  => 'adminMenu',
                 'tag'            => 'knp_menu.menu',
                 'alias'          => 'admin'
             ),
-            'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler'
+            'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
+            'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler'
         )
     ),
 

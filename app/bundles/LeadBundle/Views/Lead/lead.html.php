@@ -285,7 +285,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
                 </address>
 
-                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.email'); ?></h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.home'); ?></h6>

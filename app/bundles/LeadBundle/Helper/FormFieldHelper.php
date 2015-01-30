@@ -18,21 +18,18 @@ class FormFieldHelper
      * @var array
      */
     static private $types = array(
-        'text'   => array(
-            'label'       => 'mautic.core.text',
-            'properties'  => array()
+        'text'     => array(
+            'properties' => array()
         ),
-        'select' => array(
-            'label'       => 'mautic.core.select',
-            'properties'  => array(
+        'select'   => array(
+            'properties' => array(
                 'list' => array(
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.select.listmissing'
                 )
             )
         ),
-        'boolean'=> array(
-            'label'      => 'mautic.core.boolean',
+        'boolean'  => array(
             'properties' => array(
                 'yes' => array(
                     'required'  => true,
@@ -44,62 +41,50 @@ class FormFieldHelper
                 )
             )
         ),
-        'lookup' => array(
-            'label'       => 'mautic.lead.field.type.lookup',
-            'properties'  => array(
+        'lookup'   => array(
+            'properties' => array(
                 'list' => array()
             )
         ),
-        'date'   => array(
-            'label'       => 'mautic.core.date',
-            'properties'  => array(
+        'date'     => array(
+            'properties' => array(
                 'format' => array()
             )
         ),
-        'datetime'   => array(
-            'label'       => 'mautic.lead.field.type.datetime',
-            'properties'  => array(
+        'datetime' => array(
+            'properties' => array(
                 'format' => array()
             )
         ),
-        'time'   => array(
-            'label'       => 'mautic.lead.field.type.time',
-            'properties'  => array()
+        'time'     => array(
+            'properties' => array()
         ),
         'timezone' => array(
-            'label'       => 'mautic.lead.field.type.timezone',
-            'properties'  => array()
+            'properties' => array()
         ),
-        'email'  => array(
-            'label'       => 'mautic.core.email',
-            'properties'  => array()
+        'email'    => array(
+            'properties' => array()
         ),
-        'number' => array(
-            'label' => 'mautic.core.number',
-            'properties'  => array(
+        'number'   => array(
+            'properties' => array(
                 'roundmode' => array(),
                 'precision' => array()
             )
         ),
-        'tel'    => array(
-            'label'       => 'mautic.lead.field.type.tel',
-            'properties'  => array()
+        'tel'      => array(
+            'properties' => array()
         ),
-        'url'    => array(
-            'label'       => 'mautic.core.url',
-            'properties'  => array()
+        'url'      => array(
+            'properties' => array()
         ),
-        'country' => array(
-            'label'       => 'mautic.lead.field.type.country',
-            'properties'  => array()
+        'country'  => array(
+            'properties' => array()
         ),
-        'region' => array(
-            'label'       => 'mautic.lead.field.type.region',
-            'properties'  => array()
+        'region'   => array(
+            'properties' => array()
         ),
         'timezone' => array(
-            'label'       => 'mautic.lead.field.type.timezone',
-            'properties'  => array()
+            'properties' => array()
         )
     );
 
@@ -110,7 +95,7 @@ class FormFieldHelper
      *
      * @param TranslatorInterface $translator
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator (TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -118,22 +103,24 @@ class FormFieldHelper
     /**
      * @return array
      */
-    public function getChoiceList()
+    public function getChoiceList ()
     {
         $choices = array();
         foreach (self::$types as $v => $type) {
-            $choices[$v] = $this->translator->trans($type['label']);
+            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.lead.field.type.{$v}");
         }
         asort($choices);
+
         return $choices;
     }
 
     /**
      * @param $type
      * @param $properties
+     *
      * @return bool
      */
-    static public function validateProperties($type, &$properties)
+    static public function validateProperties ($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
             //ensure the field type is supported
@@ -151,28 +138,30 @@ class FormFieldHelper
                 return array(false, $fieldType['properties'][$key]['error_msg']);
             }
         }
+
         return array(true, '');
     }
 
     /**
      * @return array
      */
-    static public function getCountryChoices()
+    static public function getCountryChoices ()
     {
         $countryJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/countries.json');
-        $countries = json_decode($countryJson);
+        $countries   = json_decode($countryJson);
 
         $choices = array_combine($countries, $countries);
+
         return $choices;
     }
 
     /**
      * @return array
      */
-    static public function getRegionChoices()
+    static public function getRegionChoices ()
     {
         $regionJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/regions.json');
-        $regions = json_decode($regionJson);
+        $regions    = json_decode($regionJson);
 
         $choices = array();
         foreach ($regions as $country => &$regionGroup) {
@@ -185,7 +174,7 @@ class FormFieldHelper
     /**
      * @return array
      */
-    static public function getTimezonesChoices()
+    static public function getTimezonesChoices ()
     {
         $tz        = new \Symfony\Component\Form\Extension\Core\Type\TimezoneType();
         $timezones = $tz->getTimezones();

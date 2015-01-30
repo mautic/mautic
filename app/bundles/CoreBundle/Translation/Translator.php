@@ -43,4 +43,27 @@ class Translator extends BaseTranslator
 
         return $this->catalogues[$locale]->has((string) $id, $domain);
     }
+
+    /**
+     * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
+     * $alternative
+     *
+     * @param      $preferred
+     * @param      $alternative
+     * @param      $parameters
+     * @param null $domain
+     * @param null $locale
+     *
+     * @return string
+     */
+    public function transConditional($preferred, $alternative, $parameters = array(), $domain = null, $locale = null)
+    {
+        if ($this->hasId($preferred, $domain, $locale)) {
+
+            return $this->trans($preferred, $parameters, $domain, $locale);
+        } else {
+
+            return $this->trans($alternative, $parameters, $domain, $locale);
+        }
+    }
 }
