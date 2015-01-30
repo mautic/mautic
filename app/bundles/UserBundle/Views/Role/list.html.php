@@ -62,7 +62,7 @@ endif;
                     ?>
                 </td>
                 <td>
-                    <a class="ellipsis" href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
                 </td>

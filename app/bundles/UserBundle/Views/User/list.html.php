@@ -83,8 +83,8 @@ endif;
                     <img class="img img-responsive img-thumbnail" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
-                    <div class="ellipsis"><?php echo $item->getName(true); ?></div>
-                    <div class="ellipsis"><em><?php echo $item->getPosition(); ?></em></div>
+                    <div><?php echo $item->getName(true); ?></div>
+                    <div class="small"><em><?php echo $item->getPosition(); ?></em></div>
                 </td>
                 <td><?php echo $item->getUsername(); ?></td>
                 <td class="visible-md visible-lg">

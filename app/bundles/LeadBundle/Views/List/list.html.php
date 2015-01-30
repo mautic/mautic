@@ -57,7 +57,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         ?>
                     </td>
                     <td>
-                        <div class="ellipsis">
+                        <div>
                             <?php if ($item->isGlobal()): ?>
                             <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
@@ -74,7 +74,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo count($item->getIncludedLeads()); ?></td>

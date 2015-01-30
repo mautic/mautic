@@ -72,7 +72,7 @@ if ($tmpl == 'index')
                         <span class="label label-default pa-10" style="background: #<?php echo $item->getColor(); ?>;"> </span>
                     </td>
                     <td>
-                        <div class="ellipsis">
+                        <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'category', 'query' => 'bundle=' . $bundle)); ?>
                             <?php if ($permissions[$bundle . ':categories:edit']): ?>
                             <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
@@ -83,7 +83,7 @@ if ($tmpl == 'index')
                             <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4 ellipsis">
+                        <div class="text-muted mt-4">
                             <small><?php echo $description; ?></small>
                         </div>
                         <?php endif; ?>

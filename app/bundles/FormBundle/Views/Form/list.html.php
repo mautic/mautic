@@ -89,14 +89,14 @@ if ($tmpl == 'index') {
                     ?>
                 </td>
                 <td>
-                    <div class="ellipsis">
+                    <div>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'form.form')); ?>
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                             <?php echo $item->getName() . ' (' . $item->getAlias() . ')'; ?>
                         </a>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">

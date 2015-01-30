@@ -98,15 +98,13 @@ if ($tmpl == 'index') {
                     ?>
                 </td>
                 <td>
-                    <div class="ellipsis">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
-                            <?php echo $item->getSubject(); ?>
-                            <?php if ($hasVariants): ?>
-                            <span><i class="fa fa-fw fa-sitemap"></i></span>
-                            <?php endif; ?>
-                        </a>
-                    </div>
+                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
+                    <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <?php echo $item->getSubject(); ?>
+                        <?php if ($hasVariants): ?>
+                        <span><i class="fa fa-fw fa-sitemap"></i></span>
+                        <?php endif; ?>
+                    </a>
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $category = $item->getCategory(); ?>

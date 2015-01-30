@@ -58,7 +58,7 @@ endif;
                     ));
                     ?>
                 </td>
-                <td class="ellipsis">
+                <td>
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg">

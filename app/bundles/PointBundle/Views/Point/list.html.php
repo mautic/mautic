@@ -71,12 +71,12 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                     ?>
                 </td>
                 <td>
-                    <div class="ellipsis">
+                    <div>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'point')); ?>
                         <?php echo $item->getName(); ?>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">

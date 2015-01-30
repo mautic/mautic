@@ -101,8 +101,8 @@ if ($tmpl == 'index')
                         <?php if (in_array($item->getId(), $noContactList)) : ?>
                             <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                         <?php endif; ?>
-                        <div class="ellipsis"><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
-                        <div class="small ellipsis"><?php echo $item->getSecondaryIdentifier(); ?></div>
+                        <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
+                        <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
                     </a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $fields['core']['email']['value']; ?></td>

@@ -72,7 +72,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     ?>
                 </td>
                 <td>
-                    <div class="ellipsis">
+                    <div>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'point.trigger')); ?>
                         <?php if ($permissions['point:triggers:edit']): ?>
                         <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
@@ -83,7 +83,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                         <?php endif; ?>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4 ellipsis"><small><?php echo $description; ?></small></div>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                     <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
