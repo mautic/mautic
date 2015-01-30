@@ -153,7 +153,7 @@ class InstagramIntegration extends SocialIntegration
             foreach ($data->data as $user) {
                 //its possible that instagram may return multiple users if the username is a base of another
                 //for example, search for alan may return alanh, alanhartless, etc
-                if ($user->username == $identifier) {
+                if (strtolower($user->username) == strtolower($identifier)) {
                     $socialCache['id'] = $user->id;
                     break;
                 }

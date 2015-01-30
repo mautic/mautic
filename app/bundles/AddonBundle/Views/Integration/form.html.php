@@ -61,7 +61,7 @@ $fieldTabClass = ($hasFields) ? '' : ' hide';
 
         <?php echo $view['form']->row($form['supportedFeatures']); ?>
         <?php $featureSettings = count($form['featureSettings']->children); ?>
-        <?php if ($featureSettings > 1 || ($featureSettings === 1 && !$hasFields)): ?>
+        <?php if ($featureSettings > 1 || ($featureSettings === 1 && !isset($form['featureSettings']['leadFields']))): ?>
         <h4 class="mb-sm mt-lg"><?php echo $view['translator']->trans($form['featureSettings']->vars['label']); ?></h4>
         <?php echo $view['form']->row($form['featureSettings']); ?>
         <?php else: ?>
