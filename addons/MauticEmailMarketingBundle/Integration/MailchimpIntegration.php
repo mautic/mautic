@@ -8,7 +8,6 @@
  */
 
 namespace MauticAddon\MauticEmailMarketingBundle\Integration;
-use MauticAddon\MauticEmailMarketingBundle\Api\MailchimpApi;
 
 /**
  * Class MailchimpIntegration
