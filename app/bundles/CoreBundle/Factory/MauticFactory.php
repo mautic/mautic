@@ -221,7 +221,7 @@ class MauticFactory
     /**
      * Retrieves Translator
      *
-     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @return \Mautic\CoreBundle\Translation\Translator
      */
     public function getTranslator()
     {
