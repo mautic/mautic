@@ -182,15 +182,15 @@ class DoctrineStep implements StepInterface
     public static function getDrivers()
     {
         $supported = array(
-            'pdo_mysql'  => 'MySQL (PDO)',
-            'pdo_sqlite' => 'SQLite (PDO)',
-            'pdo_pgsql'  => 'PosgreSQL (PDO)',
-            'pdo_oci'    => 'Oracle (PDO)',
-            'pdo_ibm'    => 'IBM DB2 (PDO)',
-            'pdo_sqlsrv' => 'SQLServer (PDO)',
-            'oci8'       => 'Oracle (native)',
-            'ibm_db2'    => 'IBM DB2 (native)',
+            'pdo_mysql'  => 'MySQL PDO (Recommended)',
             'mysqli'     => 'MySQLi',
+            'pdo_sqlite' => 'SQLite',
+            'pdo_pgsql'  => 'PosgreSQL',
+            //'pdo_oci'    => 'Oracle (PDO)',
+            //'pdo_ibm'    => 'IBM DB2 (PDO)',
+            'pdo_sqlsrv' => 'SQLServer',
+            //'oci8'       => 'Oracle (native)',
+            //'ibm_db2'    => 'IBM DB2 (native)',
         );
 
         $available = array();
