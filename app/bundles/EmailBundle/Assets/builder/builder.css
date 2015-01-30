@@ -21,5 +21,7 @@
 }
 
 div[contentEditable=true]:empty:not(:focus):before {
-    content: attr(data-placeholder)
+    content: attr(data-placeholder);
+    padding: 5px;
+    display: table-cell;
 }
