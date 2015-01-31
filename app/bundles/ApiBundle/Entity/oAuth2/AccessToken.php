@@ -9,7 +9,7 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use FOS\OAuthServerBundle\Entity\AccessToken as BaseAccessToken;
+use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use FOS\OAuthServerBundle\Model\ClientInterface;
@@ -39,6 +39,21 @@ class AccessToken extends BaseAccessToken
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $user;
+
+    /**
+     * @ORM\Column(type="string", unique=true)
+     */
+    protected $token;
+
+    /**
+     * @ORM\Column(type="integer", name="expires_at", nullable=true)
+     */
+    protected $expiresAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $scope;
 
     /**
      * Get id

@@ -9,7 +9,7 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use FOS\OAuthServerBundle\Entity\Client as BaseClient;
+use FOS\OAuthServerBundle\Model\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
@@ -41,6 +41,26 @@ class Client extends BaseClient
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $users;
+
+    /**
+     * @ORM\Column(type="string", name="random_id")
+     */
+    protected $randomId;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $secret;
+
+    /**
+     * @ORM\Column(type="array", name="redirect_uris")
+     */
+    protected $redirectUris = array();
+
+    /**
+     * @ORM\Column(type="array", name="allowed_grant_types")
+     */
+    protected $allowedGrantTypes;
 
     public function __construct()
     {
