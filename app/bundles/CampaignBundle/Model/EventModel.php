@@ -107,7 +107,7 @@ class EventModel extends CommonFormModel
             $children = $entity->getChildren();
             $id       = $entity->getId();
         } else {
-            $children = $entity['children'];
+            $children = (isset($entity['children'])) ? $entity['children'] : array();
             $id       = $entity['id'];
         }
         $hasChildren = count($children) ? true : false;
