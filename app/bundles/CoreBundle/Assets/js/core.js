@@ -792,7 +792,14 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 if (response) {
-                    if (target || response.target) {
+                    if (response.redirect) {
+                        mQuery('<div />', {
+                            'class': "modal-backdrop fade in"
+                        }).appendTo('body');
+                        setTimeout(function() {
+                            window.location = response.redirect;
+                        }, 50);
+                    } else if (target || response.target) {
                         if (target) response.target = target;
                         Mautic.processPageContent(response);
                     } else {
@@ -921,28 +928,37 @@ var Mautic = {
         form.ajaxSubmit({
             showLoadingBar: showLoading,
             success: function (data) {
-                MauticVars.formSubmitInProgress = false;
-                if (!inMain) {
-                    var modalId = mQuery(modalParent).attr('id');
-                }
-
-                if (data.sessionExpired) {
+                if (data.redirect) {
+                    mQuery('<div />', {
+                        'class': "modal-backdrop fade in"
+                    }).appendTo('body');
+                    setTimeout(function() {
+                        window.location = data.redirect;
+                    }, 50);
+                } else {
+                    MauticVars.formSubmitInProgress = false;
                     if (!inMain) {
-                        mQuery('#' + modalId).modal('hide');
-                        mQuery('.modal-backdrop').remove();
-                    }
-                    Mautic.processPageContent(data);
-                } else if (callback) {
-                    data.inMain = inMain;
-
-                    if (!inMain) {
-                        data.modalId = modalId;
+                        var modalId = mQuery(modalParent).attr('id');
                     }
 
-                    if (typeof callback == 'function') {
-                        callback(data);
-                    } else if (typeof Mautic[callback] == 'function') {
-                        Mautic[callback](data);
+                    if (data.sessionExpired) {
+                        if (!inMain) {
+                            mQuery('#' + modalId).modal('hide');
+                            mQuery('.modal-backdrop').remove();
+                        }
+                        Mautic.processPageContent(data);
+                    } else if (callback) {
+                        data.inMain = inMain;
+
+                        if (!inMain) {
+                            data.modalId = modalId;
+                        }
+
+                        if (typeof callback == 'function') {
+                            callback(data);
+                        } else if (typeof Mautic[callback] == 'function') {
+                            Mautic[callback](data);
+                        }
                     }
                 }
             },
