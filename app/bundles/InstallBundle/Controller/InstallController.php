@@ -324,7 +324,6 @@ class InstallController extends CommonController
             if ((isset($params['db_driver']) && $params['db_driver'])
                 && (isset($params['db_user']) && $params['db_user'])
                 && (isset($params['db_name']) && $params['db_name'])
-                && (isset($params['send_server_stats']) && $params['send_server_stats'])
             ) {
                 // We need to allow users to the final step, so one last check here
                 if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
