@@ -31,13 +31,13 @@ class Chat
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="from_user", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="from_user", referencedColumnName="id")
      */
     private $fromUser;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="to_user", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="to_user", referencedColumnName="id", nullable=true)
      */
     private $toUser;
 

@@ -129,7 +129,7 @@ class Event
 
     /**
      * @ORM\ManyToOne(targetEntity="Event", inversedBy="children", cascade={"persist"})
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})

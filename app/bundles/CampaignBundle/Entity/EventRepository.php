@@ -340,4 +340,22 @@ class EventRepository extends CommonRepository
 
         return $events;
     }
+
+    /**
+     * Null parents
+     *
+     * @param $parents
+     */
+    public function nullParents($parents)
+    {
+        $q = $this->_em->createQueryBuilder();
+        $q->update('MauticCampaignBundle:Event', 'e')
+            ->set('e.parent', ':null')
+            ->where(
+                $q->expr()->in('e.parent', ':ids')
+            )
+            ->setParameter('ids', $parents)
+            ->setParameter('null', null);
+        $q->getQuery()->execute();
+    }
 }
