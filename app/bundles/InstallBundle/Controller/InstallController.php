@@ -640,7 +640,7 @@ class InstallController extends CommonController
 
             $paths = $namespaces = array();
 
-            //build entity namespaces
+            // Build entity namespaces
             $bundles = $this->factory->getMauticBundles(true);
             foreach ($bundles as $b) {
                 $entityPath = $b['directory'] . '/Entity';
@@ -655,9 +655,7 @@ class InstallController extends CommonController
             }
 
             $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
-            foreach ($namespaces as $alias => $namespace) {
-                $config->addEntityNamespace($alias, $namespace);
-            }
+            $config->setEntityNamespaces($namespaces);
 
             //set the table prefix
             define('MAUTIC_TABLE_PREFIX', $dbParams['table_prefix']);
