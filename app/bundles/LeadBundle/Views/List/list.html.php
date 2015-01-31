@@ -68,9 +68,9 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php else : ?>
                                 <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                             <?php endif; ?>
-                            <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
+                            <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
                             <br />
-                            <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                            <span class="small">(<?php echo $item->getCreatedByUser(); ?>)</span>
                             <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>

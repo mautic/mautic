@@ -41,8 +41,7 @@ class FormEntity extends CommonEntity
     private $dateAdded = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\Column(name="created_by", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -66,8 +65,7 @@ class FormEntity extends CommonEntity
     private $dateModified;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="modified_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\Column(name="modified_by", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -88,8 +86,7 @@ class FormEntity extends CommonEntity
     private $checkedOut;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="checked_out_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\Column(name="checked_out_by", nullable=true, type="integer")
      */
     private $checkedOutBy;
 
@@ -250,7 +247,7 @@ class FormEntity extends CommonEntity
      */
     public function setCreatedBy(User $createdBy = null)
     {
-        $this->createdBy = $createdBy;
+        $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
         if ($createdBy != null) {
             $this->createdByUser = $createdBy->getName();
         }
@@ -277,7 +274,7 @@ class FormEntity extends CommonEntity
      */
     public function setModifiedBy(User $modifiedBy = null)
     {
-        $this->modifiedBy = $modifiedBy;
+        $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
 
         if ($modifiedBy != null) {
             $this->modifiedByUser = $modifiedBy->getName();
@@ -305,7 +302,7 @@ class FormEntity extends CommonEntity
      */
     public function setCheckedOutBy(User $checkedOutBy = null)
     {
-        $this->checkedOutBy = $checkedOutBy;
+        $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
 
         if ($checkedOutBy != null) {
             $this->checkedOutByUser = $checkedOutBy->getName();
