@@ -7,25 +7,46 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\Migrations;
+namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class Version20141102181850 extends AbstractMigration implements ContainerAwareInterface
+abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
 {
 
     /**
      * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
     /**
+     * Supported platforms
+     *
      * @var array
      */
-    private $supported = array('mysql', 'postgresql');
+    protected $supported = array('mysql', 'postgresql', 'mssql', 'sqlite');
+
+    /**
+     * Database prefix
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * Database platform
+     *
+     * @var string
+     */
+    protected $platform;
+
+    /**
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
+    protected $factory;
 
     /**
      * @param Schema $schema
@@ -40,16 +61,8 @@ class Version20141102181850 extends AbstractMigration implements ContainerAwareI
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
 
-        $prefix = $this->container->getParameter('mautic.db_table_prefix');
-
-        switch ($platform) {
-            case 'mysql':
-                $this->addSql('ALTER TABLE ' . $prefix . 'users ADD city LONGTEXT DEFAULT NULL');
-                break;
-            case 'postgresql':
-                $this->addSql('ALTER TABLE ' . $prefix . 'users ADD city TEXT DEFAULT NULL');
-                break;
-        }
+        $function = $this->platform . "Up";
+        $this->$function($schema);
     }
 
     /**
@@ -65,16 +78,8 @@ class Version20141102181850 extends AbstractMigration implements ContainerAwareI
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
 
-        $prefix = $this->container->getParameter('mautic.db_table_prefix');
-
-        switch ($platform) {
-            case 'mysql':
-                $this->addSql('ALTER TABLE ' . $prefix . 'users DROP city');
-                break;
-            case 'postgresql':
-                $this->addSql('ALTER TABLE ' . $prefix . 'users DROP city');
-                break;
-        }
+        $function = $this->platform . "Down";
+        $this->$function($schema);
     }
 
     /**
@@ -83,5 +88,20 @@ class Version20141102181850 extends AbstractMigration implements ContainerAwareI
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+        $this->prefix    = $container->getParameter('mautic.db_table_prefix');
+        $this->platform  = $this->connection->getDatabasePlatform()->getName();
+        $this->factory   = $container->get('mautic.factory');
     }
+
+    abstract public function mysqlUp(Schema $schema);
+    abstract public function mysqlDown(Schema $schema);
+
+    abstract public function postgresUp(Schema $schema);
+    abstract public function postgresDown(Schema $schema);
+
+    abstract public function mssqlUp(Schema $schema);
+    abstract public function mssqlDown(Schema $schema);
+
+    abstract public function sqliteUp(Schema $schema);
+    abstract public function sqliteDown(Schema $schema);
 }
