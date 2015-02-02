@@ -154,6 +154,14 @@ $container->loadFromExtension('doctrine', array(
     )
 ));
 
+//MigrationsBundle Configuration
+$container->loadFromExtension('doctrine_migrations', array(
+    'dir_name'   => '%kernel.root_dir%/migrations',
+    'namespace'  => 'Mautic\\Migrations',
+    'table_name' => '%mautic.db_table_prefix%migrations',
+    'name'       => 'Mautic Migrations'
+));
+
 //Swiftmailer Configuration
 $container->loadFromExtension('swiftmailer', array(
     'transport' => '%mautic.mailer_transport%',
@@ -174,14 +182,6 @@ $container->loadFromExtension('knp_menu', array(
     'twig' => false,
     'templating' => true,
     'default_renderer' => 'mautic'
-));
-
-//MigrationsBundle Configuration
-$container->loadFromExtension('doctrine_migrations', array(
-    'dir_name'   => '%kernel.root_dir%/migrations',
-    'namespace'  => 'Mautic\\Migrations',
-    'table_name' => 'migrations',
-    'name'       => 'Mautic Migrations'
 ));
 
 if ($container->getParameter('mautic.api_enabled')) {
