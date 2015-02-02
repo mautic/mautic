@@ -20,9 +20,13 @@ return array(
             )
         ),
         'forms'  => array(
-            'mautic.form.type.cloudstorage.amazons3' => array(
-                'class' => 'MauticAddon\MauticCloudStorageBundle\Form\Type\AmazonS3Type',
-                'alias' => 'cloudstorage_amazons3'
+            'mautic.form.type.cloudstorage.openstack' => array(
+                'class' => 'MauticAddon\MauticCloudStorageBundle\Form\Type\OpenStackType',
+                'alias' => 'cloudstorage_openstack'
+            ),
+            'mautic.form.type.cloudstorage.rackspace' => array(
+                'class' => 'MauticAddon\MauticCloudStorageBundle\Form\Type\RackspaceType',
+                'alias' => 'cloudstorage_rackspace'
             )
         )
     ),

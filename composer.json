@@ -52,6 +52,7 @@
 
         "knplabs/gaufrette": "dev-master",
         "aws/aws-sdk-php": "~2.7",
+        "rackspace/php-opencloud": "~1.12",
 
         "knplabs/knp-menu": "2.0.*@dev",
         "knplabs/knp-menu-bundle":"dev-master",

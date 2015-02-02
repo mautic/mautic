@@ -353,6 +353,18 @@ system('rm vendor/psr/log/.gitignore');
 system('rm vendor/psr/log/composer.json');
 system('rm vendor/psr/log/README.md');
 
+// rackspace/php-opencloud
+system('rm -rf vendor/rackspace/php-opencloud/docs');
+system('rm -rf vendor/rackspace/php-opencloud/samples');
+system('rm -rf vendor/rackspace/php-opencloud/tests');
+system('rm vendor/rackspace/php-opencloud/.coveralls.yml');
+system('rm vendor/rackspace/php-opencloud/.gitignore');
+system('rm vendor/rackspace/php-opencloud/.travis.yml');
+system('rm vendor/rackspace/php-opencloud/composer.json');
+system('rm vendor/rackspace/php-opencloud/CONTRIBUTING.md');
+system('rm vendor/rackspace/php-opencloud/phpunit.xml.dist');
+system('rm vendor/rackspace/php-opencloud/README.md');
+
 // sensio/distribution-bundle
 system('rm -rf vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin');
 system('rm vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/.gitignore');

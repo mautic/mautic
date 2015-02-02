@@ -13,20 +13,26 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class AmazonS3Type
+ * Class RackspaceType
  */
-class AmazonS3Type extends AbstractType
+class RackspaceType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('bucket', 'text', array(
-            'label'       => 'mautic.integration.AmazonS3.bucket.path',
-            'required'    => false,
+        $builder->add('serverLocation', 'choice', array(
+            'label'       => 'mautic.integration.Rackspace.server.location',
+            'choices'     => array(
+                'us' => 'mautic.integration.Rackspace.server.location.us',
+                'uk' => 'mautic.integration.Rackspace.server.location.uk',
+            ),
+            'required'    => true,
             'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array('class' => 'form-control')
+            'attr'        => array(
+                'class' => 'form-control'
+            )
         ));
     }
 
@@ -35,6 +41,6 @@ class AmazonS3Type extends AbstractType
      */
     public function getName()
     {
-        return 'cloudstorage_amazons3';
+        return 'cloudstorage_rackspace';
     }
 }

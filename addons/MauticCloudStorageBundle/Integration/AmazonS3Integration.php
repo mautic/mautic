@@ -34,13 +34,34 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
+     * Get the array key for clientId
+     *
+     * @return string
+     */
+    public function getClientIdKey()
+    {
+        return 'client_id';
+    }
+
+    /**
+     * Get the array key for client secret
+     *
+     * @return string
+     */
+    public function getClientSecretKey()
+    {
+        return 'client_secret';
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getRequiredKeyFields()
     {
         return array(
-            'client_id'      => 'mautic.integration.keyfield.clientid',
-            'client_secret'  => 'mautic.integration.keyfield.clientsecret'
+            'client_id'     => 'mautic.integration.keyfield.clientid',
+            'client_secret' => 'mautic.integration.keyfield.clientsecret',
+            'bucket'        => 'mautic.integration.keyfield.amazons3.bucket'
         );
     }
 
@@ -51,11 +72,10 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        $settings = $this->settings->getFeatureSettings();
-        $keys     = $this->getDecryptedApiKeys();
+        $keys = $this->getDecryptedApiKeys();
 
         $service = S3Client::factory(array('key' => $keys['client_id'], 'secret' => $keys['client_secret']));
 
-        return new AwsS3($service, $settings['provider']['bucket']);
+        return new AwsS3($service, $keys['bucket']);
     }
 }
