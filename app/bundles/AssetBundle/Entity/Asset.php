@@ -919,7 +919,9 @@ class Asset extends FormEntity
     {
         if ($object->getStorageLocation() == 'local') {
             // If the object is stored locally, we should have file data
-            if ($object->loadFile() === null) {
+            $method = $object->isNew() ? 'getFile' : 'loadFile';
+
+            if ($object->$method() === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
                     ->atPath('path')
                     ->setTranslationDomain('flashes')

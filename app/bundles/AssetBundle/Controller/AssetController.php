@@ -363,7 +363,9 @@ class AssetController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model   = $this->factory->getModel('asset.asset');
+        $model = $this->factory->getModel('asset.asset');
+
+        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
