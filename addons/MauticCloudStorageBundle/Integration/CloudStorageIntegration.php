@@ -17,6 +17,12 @@ use Mautic\AddonBundle\Integration\AbstractIntegration;
  */
 abstract class CloudStorageIntegration extends AbstractIntegration
 {
+
+    /**
+     * @var Adapter
+     */
+    protected $adapter;
+
     /**
      * @param FormBuilder|Form $builder
      */
@@ -48,6 +54,15 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      * @return Adapter
      */
     abstract public function getAdapter();
+
+    /**
+     * Retrieves the public URL for a given key
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    abstract public function getPublicUrl($key);
 
     /**
      * {@inheritdoc}

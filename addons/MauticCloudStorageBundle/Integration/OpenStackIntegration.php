@@ -66,20 +66,24 @@ class OpenStackIntegration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        $settings = $this->settings->getFeatureSettings();
-        $keys     = $this->getDecryptedApiKeys();
+        if (!$this->adapter) {
+            $settings = $this->settings->getFeatureSettings();
+            $keys     = $this->getDecryptedApiKeys();
 
-        $connection = new OpenStack(
-            $settings['provider']['serviceUrl'],
-            array(
-                'username' => $keys['username'],
-                'password' => $keys['password'],
-                'tenantName' => $keys['tenantName']
-            )
-        );
+            $connection = new OpenStack(
+                $settings['provider']['serviceUrl'],
+                array(
+                    'username' => $keys['username'],
+                    'password' => $keys['password'],
+                    'tenantName' => $keys['tenantName']
+                )
+            );
 
-        $factory = new ObjectStoreFactory($connection);
+            $factory = new ObjectStoreFactory($connection);
 
-        return new LazyOpenCloud($factory, $keys['containerName']);
+            $this->adapter = new LazyOpenCloud($factory, $keys['containerName']);
+        }
+
+        return $this->adapter;
     }
 }

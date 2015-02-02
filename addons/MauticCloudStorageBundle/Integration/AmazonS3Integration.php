@@ -72,10 +72,14 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        $keys = $this->getDecryptedApiKeys();
+        if (!$this->adapter) {
+            $keys = $this->getDecryptedApiKeys();
 
-        $service = S3Client::factory(array('key' => $keys['client_id'], 'secret' => $keys['client_secret']));
+            $service = S3Client::factory(array('key' => $keys['client_id'], 'secret' => $keys['client_secret']));
 
-        return new AwsS3($service, $keys['bucket']);
+            $this->adapter = new AwsS3($service, $keys['bucket']);
+        }
+
+        return $this->adapter;
     }
 }

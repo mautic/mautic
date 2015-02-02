@@ -65,29 +65,33 @@ class RackspaceIntegration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        $settings = $this->settings->getFeatureSettings();
-        $keys     = $this->getDecryptedApiKeys();
+        if (!$this->adapter) {
+            $settings = $this->settings->getFeatureSettings();
+            $keys     = $this->getDecryptedApiKeys();
 
-        switch ($settings['provider']['serverLocation']) {
-            case 'us':
-            default:
-                $url = Rackspace::US_IDENTITY_ENDPOINT;
-                break;
-            case 'uk':
-                $url = Rackspace::UK_IDENTITY_ENDPOINT;
-                break;
+            switch ($settings['provider']['serverLocation']) {
+                case 'us':
+                default:
+                    $url = Rackspace::US_IDENTITY_ENDPOINT;
+                    break;
+                case 'uk':
+                    $url = Rackspace::UK_IDENTITY_ENDPOINT;
+                    break;
+            }
+
+            $connection = new Rackspace(
+                $url,
+                array(
+                    'username' => $keys['username'],
+                    'apiKey'   => $keys['apiKey']
+                )
+            );
+
+            $factory = new ObjectStoreFactory($connection);
+
+            $this->adapter = new LazyOpenCloud($factory, $keys['containerName']);
         }
 
-        $connection = new Rackspace(
-            $url,
-            array(
-                'username' => $keys['username'],
-                'apiKey'   => $keys['apiKey']
-            )
-        );
-
-        $factory = new ObjectStoreFactory($connection);
-
-        return new LazyOpenCloud($factory, $keys['containerName']);
+        return $this->adapter;
     }
 }
