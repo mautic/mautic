@@ -18,6 +18,17 @@ use OpenCloud\Rackspace;
  */
 class RackspaceIntegration extends CloudStorageIntegration
 {
+
+    /**
+     * @var Rackspace
+     */
+    private $connection;
+
+    /**
+     * @var ObjectStoreFactory
+     */
+    private $storeFactory;
+
     /**
      * {@inheritdoc}
      */
@@ -79,7 +90,7 @@ class RackspaceIntegration extends CloudStorageIntegration
                     break;
             }
 
-            $connection = new Rackspace(
+            $this->connection = new Rackspace(
                 $url,
                 array(
                     'username' => $keys['username'],
@@ -87,11 +98,21 @@ class RackspaceIntegration extends CloudStorageIntegration
                 )
             );
 
-            $factory = new ObjectStoreFactory($connection);
+            $this->storeFactory = new ObjectStoreFactory($this->connection);
 
-            $this->adapter = new LazyOpenCloud($factory, $keys['containerName']);
+            $this->adapter = new LazyOpenCloud($this->storeFactory, $keys['containerName']);
         }
 
         return $this->adapter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicUrl($key)
+    {
+        $keys = $this->getDecryptedApiKeys();
+
+        return $this->storeFactory->getObjectStore()->getContainer($keys['containerName'])->getObject($key)->getPublicUrl();
     }
 }

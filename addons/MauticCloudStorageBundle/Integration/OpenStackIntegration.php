@@ -18,6 +18,17 @@ use OpenCloud\OpenStack;
  */
 class OpenStackIntegration extends CloudStorageIntegration
 {
+
+    /**
+     * @var OpenStack
+     */
+    private $connection;
+
+    /**
+     * @var ObjectStoreFactory
+     */
+    private $storeFactory;
+
     /**
      * {@inheritdoc}
      */
@@ -70,7 +81,7 @@ class OpenStackIntegration extends CloudStorageIntegration
             $settings = $this->settings->getFeatureSettings();
             $keys     = $this->getDecryptedApiKeys();
 
-            $connection = new OpenStack(
+            $this->connection = new OpenStack(
                 $settings['provider']['serviceUrl'],
                 array(
                     'username' => $keys['username'],
@@ -79,11 +90,21 @@ class OpenStackIntegration extends CloudStorageIntegration
                 )
             );
 
-            $factory = new ObjectStoreFactory($connection);
+            $this->storeFactory = new ObjectStoreFactory($this->connection, null, 'publicURL');
 
-            $this->adapter = new LazyOpenCloud($factory, $keys['containerName']);
+            $this->adapter = new LazyOpenCloud($this->storeFactory, $keys['containerName']);
         }
 
         return $this->adapter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicUrl($key)
+    {
+        $keys = $this->getDecryptedApiKeys();
+
+        return $this->storeFactory->getObjectStore()->getContainer($keys['containerName'])->getObject($key)->getPublicUrl();
     }
 }

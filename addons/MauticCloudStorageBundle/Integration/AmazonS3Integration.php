@@ -82,4 +82,12 @@ class AmazonS3Integration extends CloudStorageIntegration
 
         return $this->adapter;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicUrl($key)
+    {
+        return $this->getAdapter()->getUrl($key);
+    }
 }

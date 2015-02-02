@@ -7,6 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 /** @var \Gaufrette\Filesystem $connector */
+/** @var \MauticAddon\MauticCloudStorageBundle\Integration\CloudStorageIntegration $integration */
 if (count($items)): ?>
     <ul>
         <?php if (array_key_exists('dirs', $items)) : ?>
@@ -19,13 +20,9 @@ if (count($items)): ?>
             <?php endforeach; ?>
             <?php foreach ($items['keys'] as $item) : ?>
                 <li>
-                    <?php if (method_exists($connector->getAdapter(), 'getUrl')) : ?>
-                    <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $connector->getAdapter()->getUrl($item); ?>');">
+                    <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $integration->getPublicUrl($item); ?>');">
                         <?php echo $item; ?>
                     </a>
-                    <?php else : ?>
-                        <?php echo $item; ?>
-                    <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         <?php else : ?>
@@ -38,13 +35,9 @@ if (count($items)): ?>
                     </li>
                 <?php else : ?>
                     <li>
-                        <?php if (method_exists($connector->getAdapter(), 'getUrl')) : ?>
-                        <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $connector->getAdapter()->getUrl($item); ?>');">
+                        <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $integration->getPublicUrl($item); ?>');">
                             <?php echo $item; ?>
                         </a>
-                        <?php else : ?>
-                            <?php echo $item; ?>
-                        <?php endif; ?>
                     </li>
                 <?php endif; ?>
             <?php endforeach; ?>
