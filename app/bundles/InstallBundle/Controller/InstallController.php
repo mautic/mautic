@@ -59,7 +59,7 @@ class InstallController extends CommonController
         $minors = $configurator->getOptionalSettings();
 
         $session        = $this->factory->getSession();
-        $completedSteps = $session->get('mautic.install.completedsteps', array());
+        $completedSteps = $session->get('mautic.installer.completedsteps', array());
 
         if ('POST' === $this->request->getMethod()) {
             $form->handleRequest($this->request);
@@ -202,11 +202,15 @@ class InstallController extends CommonController
                         $session->set('mautic.installer.user', $originalData);
 
                         break;
+
+                    default:
+                        $success = true;
+
                 }
 
                 if ($success) {
                     $completedSteps[] = $index;
-                    $session->set('mautic.install.completedsteps', $completedSteps);
+                    $session->set('mautic.installer.completedsteps', $completedSteps);
                     $index++;
 
                     if ($index < $configurator->getStepCount()) {
@@ -254,8 +258,8 @@ class InstallController extends CommonController
                     // Clear the cache one final time with the updated config
                     $this->clearCacheFile();
 
-                    $session->remove('mautic.install.completedsteps');
-                    $session->remove('mautic.install.user');
+                    $session->remove('mautic.installer.completedsteps');
+                    $session->remove('mautic.installer.user');
 
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
@@ -370,8 +374,12 @@ class InstallController extends CommonController
             $configurator = $this->container->get('mautic.configurator');
             $params       = $configurator->getParameters();
 
+            if (empty($params['db_driver'])) {
+                return false;
+            }
+
             $dbParams = array(
-                'driver' => $params['db_driver'],
+                'driver'   => $params['db_driver'],
                 'host'     => $params['db_host'],
                 'port'     => $params['db_port'],
                 'dbname'   => $params['db_name'],
