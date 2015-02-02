@@ -161,7 +161,7 @@ class CampaignModel extends CommonFormModel
     {
         $existingEvents = $entity->getEvents();
 
-        $events = $tempIds = $hierarchy = $parentUpdated = array();
+        $events = $hierarchy = $parentUpdated = array();
 
         //set the events from session
         foreach ($sessionEvents as $id => $properties) {
@@ -185,82 +185,63 @@ class CampaignModel extends CommonFormModel
 
             $event->setCampaign($entity);
             $events[$id] = $event;
-
-            if (strpos($id, 'new') === false) {
-                $tempIds[$event->getTempId()] = $id;
-            }
         }
 
         foreach ($deletedEvents as $deleteMe) {
             if (isset($existingEvents[$deleteMe])) {
+                // Remove child from parent
+                $parent = $existingEvents[$deleteMe]->getParent();
+                if ($parent) {
+                    $parent->removeChild($events[$id]);
+                }
+
                 $entity->removeEvent($existingEvents[$deleteMe]);
+
                 unset($events[$deleteMe]);
             }
         }
 
-        //loop again now to assign parents and cleanup endpoints which must be done after $tempIds has been populated
+        $relationships = array();
+        if (isset($sessionConnections['connections'])) {
+            foreach ($sessionConnections['connections'] as $connection) {
+                $source = $connection['sourceId'];
+                $target = $connection['targetId'];
+
+                if (!empty($connection['anchors'])) {
+                    $sourceDecision = $connection['anchors'][0]['endpoint'];
+                    //list($targetDecision, $ignore) = explode(' ', $connection['anchors'][1]);
+                }
+
+                $relationships[$target] = array(
+                    'parent'   => $source,
+                    'decision' => $sourceDecision
+                );
+            }
+        }
+
+        // Assign parent/child relationships
         foreach ($events as $id => $e) {
-            $canvasSettings = $e->getCanvasSettings();
+            if (isset($relationships[$id])) {
+                // Has a parent
+                $anchor = in_array($relationships[$id]['decision'], array('yes', 'no')) ? $relationships[$id]['decision'] : null;
+                $events[$id]->setDecisionPath($anchor);
 
-            if (!isset($canvasSettings['endpoints'])) {
-                $canvasSettings['endpoints'] = array();
-            }
+                $parentId = $relationships[$id]['parent'];
+                $events[$id]->setParent($events[$parentId]);
+                $hierarchy[$id]  = $parentId;
+                $parentUpdated[] = $id;
+            } elseif ($events[$id]->getParent()) {
+                // No longer has a parent so null it out
 
-            if (isset($sessionConnections[$id])) {
-                foreach ($sessionConnections[$id] as $sourceEndpoint => $children) {
-                    foreach ($children as $child => $targetEndpoint) {
-                        if (!isset($events[$child])) {
-                            if (strpos($child, 'new') === false && in_array($child, $tempIds)) {
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-                                $childId = array_search($child, $tempIds);
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$childId]);
-                            } else {
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-                            }
-
-                            unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-
-                        } elseif (!empty($targetEndpoint)) {
-                            $anchor = in_array($sourceEndpoint, array('yes', 'no')) ? $sourceEndpoint : null;
-                            $events[$child]->setDecisionPath($anchor);
-
-                            $events[$child]->setParent($events[$id]);
-                            $hierarchy[$child] = $id;
-                            $parentUpdated[] = $child;
-                        } elseif (!in_array($child, $parentUpdated)) {
-                            if (strpos($child, 'new') === false && in_array($child, $tempIds)) {
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-                                $childId = array_search($child, $tempIds);
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$childId]);
-                            } else {
-                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-                            }
-
-                            unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
-
-                            $events[$child]->removeParent();
-                            $hierarchy[$child] = 'null';
-                        }
-                    }
-                }
-            } else {
-                //get the parent for ordering
+                // Remove child from parent
                 $parent = $events[$id]->getParent();
-                $hierarchy[$id] = ($parent !== null) ? $parent->getId() : 'null';
+                $parent->removeChild($events[$id]);
+
+                // Remove parent from child
+                $events[$id]->removeParent();
+                $hierarchy[$id] = 'null';
             }
 
-            //cleanup endpoints while here
-            foreach ($canvasSettings['endpoints'] as $sourceEndpoint => &$targets) {
-                foreach ($targets as $targetId => $targetEndpoint) {
-                    //check to see if there are both a temp ID and ID for target
-                    if (strpos($targetId, 'new') !== false && isset($tempIds[$targetId]) && isset($targets[$tempIds[$targetId]])) {
-                        //campaign has been edited
-                        unset($targets[$targetId]);
-                    }
-                }
-            }
-
-            $e->setCanvasSettings($canvasSettings);
             $entity->addEvent($id, $e);
         }
 
@@ -278,6 +259,66 @@ class CampaignModel extends CommonFormModel
         });
 
         return $events;
+    }
+
+    /**
+     * @param $entity
+     * @param $settings
+     */
+    public function setCanvasSettings($entity, $settings, $persist = true)
+    {
+        $events  = $entity->getEvents();
+        $tempIds = array();
+
+        foreach ($events as $e) {
+            $tempIds[$e->getTempId()] = $e->getId();
+        }
+
+        if (!isset($settings['nodes'])) {
+            $settings['nodes'] = array();
+        }
+
+        foreach ($settings['nodes'] as &$node) {
+            if (strpos($node['id'], 'new') !== false) {
+                // Find the real one and update the node
+                $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
+            }
+        }
+
+        if (!isset($settings['connections'])) {
+            $settings['connections'] = array();
+        }
+
+        foreach ($settings['connections'] as &$connection) {
+            // Check source
+            if (strpos($connection['sourceId'], 'new') !== false) {
+                // Find the real one and update the node
+                $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
+            }
+
+            // Check target
+            if (strpos($connection['targetId'], 'new') !== false) {
+                // Find the real one and update the node
+                $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
+            }
+
+            // Rebuild anchors
+            $anchors = array();
+            foreach ($connection['anchors'] as $k => $anchor) {
+                $type           = ($k === 0) ? 'source' : 'target';
+                $anchors[$type] = $anchor['endpoint'];
+            }
+            $connection['anchors'] = $anchors;
+        }
+
+        $entity->setCanvasSettings($settings);
+
+        if ($persist) {
+            $this->getRepository()->saveEntity($entity);
+        } else {
+
+            return $settings;
+        }
     }
 
     /**

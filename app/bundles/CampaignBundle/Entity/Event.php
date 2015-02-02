@@ -138,11 +138,6 @@ class Event
     private $parent = null;
 
     /**
-     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
-     */
-    private $canvasSettings = array();
-
-    /**
      * @ORM\Column(name="decision_path", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -543,22 +538,6 @@ class Event
     public function setTriggerMode ($triggerMode)
     {
         $this->triggerMode = $triggerMode;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCanvasSettings ()
-    {
-        return $this->canvasSettings;
-    }
-
-    /**
-     * @param array $canvasSettings
-     */
-    public function setCanvasSettings (array $canvasSettings)
-    {
-        $this->canvasSettings = $canvasSettings;
     }
 
     /**

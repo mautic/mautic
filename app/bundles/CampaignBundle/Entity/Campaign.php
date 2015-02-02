@@ -99,6 +99,11 @@ class Campaign extends FormEntity
     private $lists;
 
     /**
+     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
+     */
+    private $canvasSettings = array();
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -391,4 +396,19 @@ class Campaign extends FormEntity
         $this->lists->removeElement($list);
     }
 
+    /**
+     * @return mixed
+     */
+    public function getCanvasSettings ()
+    {
+        return $this->canvasSettings;
+    }
+
+    /**
+     * @param array $canvasSettings
+     */
+    public function setCanvasSettings (array $canvasSettings)
+    {
+        $this->canvasSettings = $canvasSettings;
+    }
 }

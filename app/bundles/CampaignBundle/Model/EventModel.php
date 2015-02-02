@@ -92,9 +92,6 @@ class EventModel extends CommonFormModel
             }
         }
 
-        // Null out parents before attempting to delete
-        $this->getRepository()->nullParents($orderedDelete);
-
         $this->deleteEntities($orderedDelete);
     }
 

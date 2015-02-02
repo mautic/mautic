@@ -279,7 +279,6 @@ class EventController extends CommonFormController
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
-                $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
             } else {
@@ -324,7 +323,7 @@ class EventController extends CommonFormController
             $events            = $this->factory->getModel('campaign')->getEvents();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
-            //add the field to the delete list
+            // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 $deletedEvents[] = $objectId;
                 $session->set('mautic.campaign.' . $campaignId . '.events.deleted', $deletedEvents);
@@ -343,7 +342,6 @@ class EventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
