@@ -12,11 +12,11 @@ $status = $item->getPublishStatus();
 $size   = (!isset($size)) ? 'fa-lg' : $size;
 switch ($status) {
     case 'published':
-        $icon = " fa-check-circle-o text-success";
+        $icon = " fa-toggle-on text-success";
         $text = $view['translator']->trans('mautic.core.form.published');
         break;
     case 'unpublished':
-        $icon = " fa-times-circle-o text-danger";
+        $icon = " fa-toggle-off text-danger";
         $text = $view['translator']->trans('mautic.core.form.unpublished');
         break;
     case 'expired':
@@ -37,4 +37,4 @@ $clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-
 $idClass     = str_replace('.', '-', $model) . '-publish-icon' . $item->getId();
 ?>
 
-<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" data-original-title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>');"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>');"<?php endif; ?>></i>

@@ -1782,9 +1782,9 @@ var Mautic = {
     togglePublishStatus: function (event, el, model, id, extra) {
         event.preventDefault();
 
-        var wasPublished = mQuery(el).hasClass('fa-check-circle-o');
+        var wasPublished = mQuery(el).hasClass('fa-toggle-on');
 
-        mQuery(el).removeClass('fa-check-circle-o fa-times-circle-o').addClass('fa-spin fa-spinner');
+        mQuery(el).removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
 
         //destroy tooltips so it can be regenerated
         mQuery(el).tooltip('destroy');
@@ -1794,6 +1794,7 @@ var Mautic = {
         if (extra) {
             extra = '&' + extra;
         }
+        mQuery(el).tooltip('destroy');
         mQuery.ajax({
             url: mauticAjaxUrl,
             type: "POST",
@@ -1813,7 +1814,7 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                var addClass = (wasPublished) ? 'fa-check-circle-o' : 'fa-times-circle-o';
+                var addClass = (wasPublished) ? 'fa-toggle-on' : 'fa-toggle-off';
                 mQuery(el).removeClass('fa-spin fa-spinner').addClass(addClass);
 
                 Mautic.processAjaxError(request, textStatus, errorThrown);
