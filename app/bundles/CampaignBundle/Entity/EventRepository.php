@@ -16,6 +16,28 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class EventRepository extends CommonRepository
 {
+
+    /**
+     * Get a list of entities
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this
+            ->createQueryBuilder('e')
+            ->select('e, ec, ep')
+            ->join('e.campaign', 'c')
+            ->leftJoin('e.children', 'ec')
+            ->leftJoin('e.parent', 'ep');
+
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
     /**
      * Get array of published events based on type
      *
@@ -314,10 +336,10 @@ class EventRepository extends CommonRepository
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
+            ->join('e.campaign', 'c')
             ->leftJoin('e.children', 'ec')
             ->leftJoin('e.parent', 'ep')
             ->orderBy('e.order');
-
 
         if (!empty($args['campaigns'])) {
             $q->andWhere($q->expr()->in('e.campaign', ':campaigns'))
