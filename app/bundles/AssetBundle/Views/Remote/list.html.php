@@ -9,14 +9,15 @@
 /** @var \Gaufrette\Filesystem $connector */
 if (count($items)): ?>
     <ul>
-        <?php foreach ($items as $item) : ?>
-            <?php if ($connector->getAdapter()->isDirectory($item)) : ?>
+        <?php if (array_key_exists('dirs', $items)) : ?>
+            <?php foreach ($items['dirs'] as $item) : ?>
                 <li>
-                    <!-- <a href="#" onclick="Mautic.updateRemoteBrowser('<?php //echo $integration->getName(); ?>');"> -->
+                    <a href="#" onclick="Mautic.updateRemoteBrowser('<?php echo $integration->getName(); ?>', '/<?php echo rtrim($item, '/'); ?>');">
                         <?php echo $item; ?>
-                    <!-- </a> -->
+                    </a>
                 </li>
-            <?php else : ?>
+            <?php endforeach; ?>
+            <?php foreach ($items['keys'] as $item) : ?>
                 <li>
                     <?php if (method_exists($connector->getAdapter(), 'getUrl')) : ?>
                     <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $connector->getAdapter()->getUrl($item); ?>');">
@@ -26,9 +27,29 @@ if (count($items)): ?>
                         <?php echo $item; ?>
                     <?php endif; ?>
                 </li>
-            <?php endif; ?>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <?php foreach ($items as $item) : ?>
+                <?php if ($connector->getAdapter()->isDirectory($item)) : ?>
+                    <li>
+                        <a href="#" onclick="Mautic.updateRemoteBrowser('<?php echo $integration->getName(); ?>', '/<?php echo rtrim($item, '/'); ?>');">
+                            <?php echo $item; ?>
+                        </a>
+                    </li>
+                <?php else : ?>
+                    <li>
+                        <?php if (method_exists($connector->getAdapter(), 'getUrl')) : ?>
+                        <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $connector->getAdapter()->getUrl($item); ?>');">
+                            <?php echo $item; ?>
+                        </a>
+                        <?php else : ?>
+                            <?php echo $item; ?>
+                        <?php endif; ?>
+                    </li>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </ul>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('tip' => 'mautic.asset.noresults.tip')); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>

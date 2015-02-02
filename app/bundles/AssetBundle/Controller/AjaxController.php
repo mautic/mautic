@@ -67,6 +67,7 @@ class AjaxController extends CommonAjaxController
     protected function fetchRemoteFilesAction(Request $request)
     {
         $provider   = InputHelper::string($request->request->get('provider'));
+        $path       = InputHelper::string($request->request->get('path', ''));
         $dispatcher = $this->factory->getDispatcher();
         $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
 
@@ -95,7 +96,7 @@ class AjaxController extends CommonAjaxController
             array(
                 'connector' => $connector,
                 'integration' => $integration,
-                'items' => $connector->keys()
+                'items' => $connector->listKeys($path)
             )
         );
 

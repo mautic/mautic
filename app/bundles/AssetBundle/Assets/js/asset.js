@@ -86,11 +86,13 @@ Mautic.previewBeforeUpload = function(input) {
     }
 };
 
-Mautic.updateRemoteBrowser = function(provider) {
+Mautic.updateRemoteBrowser = function(provider, path) {
+    path = typeof path !== 'undefined' ? path : '';
+
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
-        data: "action=asset:fetchRemoteFiles&provider=" + provider,
+        data: "action=asset:fetchRemoteFiles&provider=" + provider + "&path=" + path,
         dataType: "json",
         success: function (response) {
             if (response.success) {
