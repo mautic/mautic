@@ -105,21 +105,72 @@ class InstallController extends CommonController
                 switch ($index) {
                     case 1:
                         //let's create a dynamic details
-                        $dbParams           = (array)$originalData;
-                        $dbParams['dbname'] = $dbParams['name'];
-                        unset($dbParams['name']);
+                        $dbParams = (array)$originalData;
 
-                        $result = $this->performDatabaseInstallation($dbParams);
-                        if (is_array($result)) {
-                            $flashes[] = $result;
+                        //validate settings
+                        $dbValid    = false;
+                        $translator = $this->factory->getTranslator();
+                        if ($dbParams['driver'] == 'pdo_sqlite') {
+                            if (empty($dbParams['path'])) {
+                                $form['path']->addError(new FormError($translator->trans('mautic.core.value.required', array(), 'validators')));
+                            } elseif (!is_writable(dirname($dbParams['path'])) || substr($dbParams['path'], -4) != '.db3') {
+                                $form['path']->addError(new FormError($translator->trans('mautic.install.database.path.invalid', array(), 'validators')));
+                            } else {
+                                $root = $this->factory->getSystemPath('root');
+                                if (strpos(dirname($dbParams['path']), $root) !== false) {
+                                    $flashes[] = array(
+                                        'msg'     => 'mautic.install.database.path.warning',
+                                        'msgVars' => array('%root%' => $root),
+                                        'domain'  => 'validators'
+                                    );
+                                }
+                                $dbValid = true;
+                            }
+
+                            if (!file_exists($dbParams['path'])) {
+                                //create the file
+                                file_put_contents($dbParams['path'], '');
+                            }
                         } else {
-                            //write the working database details to the configuration file
-                            $configurator->mergeParameters($step->update($originalData));
-                            $configurator->write();
+                            $required = array(
+                                'host',
+                                'name',
+                                'user'
+                            );
+                            foreach ($required as $r) {
+                                if (empty($dbParams[$r])) {
+                                    $form[$r]->addError(new FormError($translator->trans('mautic.core.value.required', array(), 'validators')));
+                                }
+                            }
 
-                            $result = $this->performFixtureInstall($dbParams);
+                            if ((int) $dbParams['port'] <= 0) {
+                                $form['port']->addError(new FormError($translator->trans('mautic.install.database.port.invalid', array(), 'validators')));
+                            } else {
+                                $dbValid = true;
+                            }
+                        }
+
+                        if (!$dbValid) {
+                            $success = false;
+                        } else {
+                            $dbParams['dbname'] = $dbParams['name'];
+                            unset($dbParams['name']);
+
+                            $result = $this->performDatabaseInstallation($dbParams);
+
                             if (is_array($result)) {
                                 $flashes[] = $result;
+                                $success   = false;
+                            } else {
+                                //write the working database details to the configuration file
+                                $configurator->mergeParameters($step->update($originalData));
+                                $configurator->write();
+
+                                $result = $this->performFixtureInstall($dbParams);
+                                if (is_array($result)) {
+                                    $flashes[] = $result;
+                                    $success   = false;
+                                }
                             }
                         }
 
@@ -143,6 +194,7 @@ class InstallController extends CommonController
 
                         if (is_array($result)) {
                             $flashes[] = $result;
+                            $success   = false;
                         }
 
                         //store the data
@@ -153,27 +205,6 @@ class InstallController extends CommonController
                 }
 
                 if ($success) {
-                    // On a failure, the result will be an array; for success it will be a boolean
-                    if (!empty($flashes)) {
-                        return $this->postActionRedirect(array(
-                            'viewParameters'    => array(
-                                'form'       => $form->createView(),
-                                'index'      => $index,
-                                'count'      => $configurator->getStepCount(),
-                                'version'    => $this->factory->getVersion(),
-                                'tmpl'       => $tmpl,
-                                'majors'     => $majors,
-                                'minors'     => $minors,
-                                'appRoot'    => $this->container->getParameter('kernel.root_dir'),
-                                'configFile' => $this->factory->getLocalConfigFile()
-                            ),
-                            'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                            'contentTemplate'   => $step->getTemplate(),
-                            'flashes'           => $flashes,
-                            'forwardController' => false
-                        ));
-                    }
-
                     $completedSteps[] = $index;
                     $session->set('mautic.install.completedsteps', $completedSteps);
                     $index++;
@@ -196,6 +227,7 @@ class InstallController extends CommonController
                                 'appRoot'    => $this->container->getParameter('kernel.root_dir'),
                                 'configFile' => $this->factory->getLocalConfigFile()
                             ),
+                            'flashes'           => $flashes,
                             'returnUrl'         => $action,
                             'contentTemplate'   => $nextStep->getTemplate(),
                             'forwardController' => false
@@ -236,6 +268,24 @@ class InstallController extends CommonController
                         ),
                         'returnUrl'         => $this->generateUrl('mautic_installer_final'),
                         'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
+                        'flashes'           => $flashes,
+                        'forwardController' => false
+                    ));
+                } elseif (!empty($flashes)) {
+                    return $this->postActionRedirect(array(
+                        'viewParameters'    => array(
+                            'form'       => $form->createView(),
+                            'index'      => $index,
+                            'count'      => $configurator->getStepCount(),
+                            'version'    => $this->factory->getVersion(),
+                            'tmpl'       => $tmpl,
+                            'majors'     => $majors,
+                            'minors'     => $minors,
+                            'appRoot'    => $this->container->getParameter('kernel.root_dir'),
+                            'configFile' => $this->factory->getLocalConfigFile()
+                        ),
+                        'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                        'contentTemplate'   => $step->getTemplate(),
                         'flashes'           => $flashes,
                         'forwardController' => false
                     ));
@@ -320,15 +370,41 @@ class InstallController extends CommonController
             $configurator = $this->container->get('mautic.configurator');
             $params       = $configurator->getParameters();
 
-            // Check the DB Driver, Name, User, and send stats param
-            if ((isset($params['db_driver']) && $params['db_driver'])
-                && (isset($params['db_user']) && $params['db_user'])
-                && (isset($params['db_name']) && $params['db_name'])
-            ) {
-                // We need to allow users to the final step, so one last check here
-                if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
-                    return true;
+            $dbParams = array(
+                'driver' => $params['db_driver'],
+                'host'     => $params['db_host'],
+                'port'     => $params['db_port'],
+                'dbname'   => $params['db_name'],
+                'user'     => $params['db_user'],
+                'password' => $params['db_password'],
+                'path'     => $params['db_path']
+            );
+
+            // Test a database connection and a user
+            if (!empty($dbParams['driver'])) {
+                try {
+                    $db = DriverManager::getConnection($dbParams);
+                    $db->connect();
+
+                    $users = $db->createQueryBuilder()->select('count(u.id) as count')->from($params['db_table_prefix'].'users', 'u')->execute()->fetchAll();
+
+                    if (empty($users[0]['count'])) {
+                        return false;
+                    }
+                } catch (\Exception $exception) {
+                    return false;
                 }
+            }
+
+            // Check for mailer settings
+            if (empty($params['mailer_from_name']) && empty($params['mailer_from_email'])) {
+
+                return false;
+            }
+
+            // We need to allow users to the final step, so one last check here
+            if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
+                return true;
             }
         }
 

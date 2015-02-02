@@ -304,6 +304,7 @@ return array(
         'db_user'                      => '',
         'db_password'                  => '',
         'db_table_prefix'              => '',
+        'db_path'                      => '',
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_transport'             => 'mail',

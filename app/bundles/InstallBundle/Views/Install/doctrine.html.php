@@ -25,30 +25,40 @@ if ($tmpl == 'index') {
 
     <?php echo $view['form']->row($form['driver']); ?>
 
-    <div class="row">
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['host']); ?>
+    <?php $driver = $form['driver']->vars['data']; ?>
+    <div id="DatabaseSettings"<?php if ($driver == 'pdo_sqlite') echo ' class="hide"'; ?>>
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['host']); ?>
+            </div>
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['port']); ?>
+            </div>
         </div>
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['port']); ?>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['name']); ?>
+            </div>
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['table_prefix']); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['user']); ?>
+            </div>
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['password']); ?>
+            </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['name']); ?>
-        </div>
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['table_prefix']); ?>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['user']); ?>
-        </div>
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['password']); ?>
+    <div id="DatabaseSQLiteSettings"<?php if ($driver != 'pdo_sqlite') echo ' class="hide"'; ?>>
+        <div class="row">
+            <div class="col-sm-12">
+                <?php echo $view['form']->row($form['path']); ?>
+            </div>
         </div>
     </div>
 

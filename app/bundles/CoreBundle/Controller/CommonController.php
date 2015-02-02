@@ -143,7 +143,12 @@ class CommonController extends Controller implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->addFlash($flash['msg'], (!empty($flash['msgVars']) ? $flash['msgVars'] : array()), $flash['type']);
+                $this->addFlash(
+                    $flash['msg'],
+                    !empty($flash['msgVars']) ? $flash['msgVars'] : array(),
+                    !empty($flash['type']) ? $flash['type'] : 'notice',
+                    !empty($flash['domain']) ? $flash['domain'] : 'flashes'
+                );
             }
         }
 

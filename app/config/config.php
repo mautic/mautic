@@ -131,23 +131,27 @@ $container->loadFromExtension('framework', array(
 ));
 
 //Doctrine Configuration
-$container->loadFromExtension('doctrine', array(
-    'dbal' => array(
-        'driver'   => '%mautic.db_driver%',
-        'host'     => '%mautic.db_host%',
-        'port'     => '%mautic.db_port%',
-        'dbname'   => '%mautic.db_name%',
-        'user'     => '%mautic.db_user%',
-        'password' => '%mautic.db_password%',
-        'charset'  => 'UTF8',
-        //if using pdo_sqlite as your database driver, add the path in config file
-        //e.g. 'database_path' => '%kernel.root_dir%/data/data.db3'
-        //'path'    => '%db_path%'
-        'types'    => array(
-            'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
-        )
-    ),
+$dbalSettings = array(
+    'driver'   => '%mautic.db_driver%',
+    'host'     => '%mautic.db_host%',
+    'port'     => '%mautic.db_port%',
+    'dbname'   => '%mautic.db_name%',
+    'user'     => '%mautic.db_user%',
+    'password' => '%mautic.db_password%',
+    'charset'  => 'UTF8',
+    'types'    => array(
+        'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
+    )
+);
 
+// If using pdo_sqlite as the database driver, add the path to config file
+$dbDriver = $container->getParameter('mautic.db_driver');
+if ($dbDriver == 'pdo_sqlite') {
+    $dbalSettings['path'] = '%mautic.db_path%';
+}
+
+$container->loadFromExtension('doctrine', array(
+    'dbal' => $dbalSettings,
     'orm'  => array(
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true
@@ -155,10 +159,11 @@ $container->loadFromExtension('doctrine', array(
 ));
 
 //MigrationsBundle Configuration
+$prefix = $container->getParameter('mautic.db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', array(
     'dir_name'   => '%kernel.root_dir%/migrations',
     'namespace'  => 'Mautic\\Migrations',
-    'table_name' => '%mautic.db_table_prefix%migrations',
+    'table_name' => $prefix . 'migrations',
     'name'       => 'Mautic Migrations'
 ));
 

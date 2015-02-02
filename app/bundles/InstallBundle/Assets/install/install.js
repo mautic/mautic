@@ -50,5 +50,15 @@ var MauticInstaller = {
         } else {
         mQuery('#backupPrefix').removeClass('hide');
         }
+    },
+
+    toggleDatabaseSettings: function(driver) {
+        if (driver == 'pdo_sqlite') {
+            mQuery('#DatabaseSQLiteSettings').removeClass('hide');
+            mQuery('#DatabaseSettings').addClass('hide');
+        } else {
+            mQuery('#DatabaseSQLiteSettings').addClass('hide');
+            mQuery('#DatabaseSettings').removeClass('hide');
+        }
     }
 };
