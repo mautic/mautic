@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -254,6 +255,7 @@ class AssetController extends FormController
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->factory->getModel('asset.asset');
+
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
         $method  = $this->request->getMethod();
@@ -336,7 +338,8 @@ class AssetController extends FormController
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
-                'integrations'     => $integrations
+                'integrations'     => $integrations,
+                'startOnLocal'     => $entity->getStorageLocation() == 'local'
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
@@ -473,7 +476,8 @@ class AssetController extends FormController
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
-                'integrations'     => $integrations
+                'integrations'     => $integrations,
+                'startOnLocal'     => $entity->getStorageLocation() == 'local'
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

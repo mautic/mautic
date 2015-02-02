@@ -104,3 +104,13 @@ Mautic.updateRemoteBrowser = function(provider) {
         }
     })
 }
+
+Mautic.changeAssetStorageLocation = function() {
+    if (mQuery('#asset_storageLocation_0').prop('checked')) {
+        mQuery('#storage-local').removeClass('hide');
+        mQuery('#storage-remote').addClass('hide');
+    } else {
+        mQuery('#storage-local').addClass('hide');
+        mQuery('#storage-remote').removeClass('hide');
+    }
+}

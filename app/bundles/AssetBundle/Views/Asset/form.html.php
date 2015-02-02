@@ -22,12 +22,18 @@ $view['slots']->set('mauticContent', 'asset');
         <div class="pa-md">
 	        <div class="row">
 		        <div class="col-md-6">
-				    <?php echo $view['form']->row($form['file']); ?>
-			        <?php if ($integrations) : ?>
-				        <a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
-				            <?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
-				        </a>
-					<?php endif; ?>
+			        <?php echo $view['form']->row($form['storageLocation']); ?>
+			        <div id="storage-local"<?php if (!$startOnLocal) echo ' class="hide"'; ?>>
+				        <?php echo $view['form']->row($form['file']); ?>
+			        </div>
+			        <div id="storage-remote"<?php if ($startOnLocal) echo ' class="hide"'; ?>>
+				        <?php echo $view['form']->row($form['remotePath']); ?>
+				        <?php if ($integrations) : ?>
+					        <a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
+					            <?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
+					        </a>
+						<?php endif; ?>
+			        </div>
 		    	</div>
 		    	<div class="col-md-6">
 		    		<div class="row">
