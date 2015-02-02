@@ -301,17 +301,60 @@ class AppKernel extends Kernel
      */
     private function isInstalled()
     {
-        $params = $this->getLocalParams();
-        if (!empty($params)) {
-            // Check the DB Driver, Name, and User
-            if ((isset($params['db_driver']) && $params['db_driver'])
-                && (isset($params['db_user']) && $params['db_user'])
-                && (isset($params['db_name']) && $params['db_name'])) {
-                return true;
+        static $isInstalled;
+
+        if (empty($isInstalled)) {
+            $isInstalled = false;
+            $params      = $this->getLocalParams();
+            if (!empty($params)) {
+                try {
+                    $db    = $this->getDatabaseConnection($params);
+                    $users = $db->createQueryBuilder()->select('count(u.id) as count')->from($params['db_table_prefix'] . 'users', 'u')->execute()->fetchAll();
+                    $db->close();
+
+                    $isInstalled = (!empty($users[0]['count']));
+
+                } catch (\Exception $exception) {
+
+                }
             }
         }
 
-        return false;
+        return $isInstalled;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return bool|\Doctrine\DBAL\Connection
+     */
+    private function getDatabaseConnection($params = array())
+    {
+        if (empty($params)) {
+            $params = $this->getLocalParams();
+        }
+
+        if (!empty($params) && !empty($params['db_driver'])) {
+            $dbParams = array(
+                'driver'   => $params['db_driver'],
+                'host'     => $params['db_host'],
+                'port'     => $params['db_port'],
+                'dbname'   => $params['db_name'],
+                'user'     => $params['db_user'],
+                'password' => $params['db_password'],
+                'path'     => $params['db_path']
+            );
+
+            // Test a database connection and existence of a user
+            if (!empty($dbParams['driver'])) {
+                $db = \Doctrine\DBAL\DriverManager::getConnection($dbParams);
+                $db->connect();
+
+                return $db;
+            }
+        } else {
+            throw new \Exception('not configured');
+        }
     }
 
     /**
