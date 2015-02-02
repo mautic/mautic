@@ -18,9 +18,13 @@ if (count($items)): ?>
                 </li>
             <?php else : ?>
                 <li>
-                    <!-- <a href="#" onclick="Mautic.selectRemoteFile('<?php //echo ''; ?>');"> -->
+                    <?php if (method_exists($connector->getAdapter(), 'getUrl')) : ?>
+                    <a href="#" onclick="Mautic.selectRemoteFile('<?php echo $connector->getAdapter()->getUrl($item); ?>');">
                         <?php echo $item; ?>
-                    <!-- </a> -->
+                    </a>
+                    <?php else : ?>
+                        <?php echo $item; ?>
+                    <?php endif; ?>
                 </li>
             <?php endif; ?>
         <?php endforeach; ?>

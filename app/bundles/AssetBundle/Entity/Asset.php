@@ -696,7 +696,13 @@ class Asset extends FormEntity
     public function getFileSize()
     {
         if ($this->getStorageLocation() == 'remote') {
-            return round(filesize($this->getRemotePath()) / 1000);
+            $ch = curl_init($this->getRemotePath());
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_exec($ch);
+            return round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD) / 1000);
         }
 
         if ($this->loadFile() === null) {
