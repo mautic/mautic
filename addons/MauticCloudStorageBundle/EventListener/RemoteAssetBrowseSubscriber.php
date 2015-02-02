@@ -39,6 +39,6 @@ class RemoteAssetBrowseSubscriber extends CommonSubscriber
         /** @var \MauticAddon\MauticCloudStorageBundle\Integration\CloudStorageIntegration $integration */
         $integration = $event->getIntegration();
 
-        $event->setConnector($integration->getConnector());
+        $event->setAdapter($integration->getAdapter());
     }
 }

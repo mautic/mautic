@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Gaufrette\Filesystem;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -83,9 +84,11 @@ class AjaxController extends CommonAjaxController
 
         $dispatcher->dispatch($name, $event);
 
-        if (!$connector = $event->getConnector()) {
+        if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse(array('success' => 0));
         }
+
+        $connector = new Filesystem($adapter);
 
         $output = $this->renderView(
             'MauticAssetBundle:Remote:list.html.php',

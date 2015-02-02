@@ -43,11 +43,11 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     }
 
     /**
-     * Retrieves a connector object for this integration
+     * Retrieves an Adapter object for this integration
      *
      * @return Adapter
      */
-    abstract public function getConnector();
+    abstract public function getAdapter();
 
     /**
      * {@inheritdoc}

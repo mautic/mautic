@@ -22,7 +22,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
     /**
      * @var Adapter
      */
-    private $connector;
+    private $adapter;
 
     /**
      * @var AbstractIntegration
@@ -40,9 +40,9 @@ class RemoteAssetBrowseEvent extends CommonEvent
     /**
      * @return Adapter
      */
-    public function getConnector()
+    public function getAdapter()
     {
-        return $this->connector;
+        return $this->adapter;
     }
 
     /**
@@ -54,13 +54,13 @@ class RemoteAssetBrowseEvent extends CommonEvent
     }
 
     /**
-     * @param Adapter $connector
+     * @param Adapter $adapter
      *
      * @return $this
      */
-    public function setConnector(Adapter $connector)
+    public function setAdapter(Adapter $adapter)
     {
-        $this->connector = $connector;
+        $this->adapter = $adapter;
 
         return $this;
     }

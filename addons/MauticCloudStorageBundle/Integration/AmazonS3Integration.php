@@ -49,7 +49,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      *
      * @return AwsS3
      */
-    public function getConnector()
+    public function getAdapter()
     {
         $settings = $this->settings->getFeatureSettings();
         $keys     = $this->getDecryptedApiKeys();
