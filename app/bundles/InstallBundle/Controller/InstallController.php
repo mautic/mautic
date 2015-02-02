@@ -378,30 +378,32 @@ class InstallController extends CommonController
                 return false;
             }
 
-            $dbParams = array(
-                'driver'   => $params['db_driver'],
-                'host'     => $params['db_host'],
-                'port'     => $params['db_port'],
-                'dbname'   => $params['db_name'],
-                'user'     => $params['db_user'],
-                'password' => $params['db_password'],
-                'path'     => $params['db_path']
-            );
+            $testParams = array('driver', 'host', 'port', 'name', 'user', 'password', 'path');
+            $dbParams   = array();
+            foreach ($testParams as &$p) {
+                $param           = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
+                if ($p == 'port') {
+                    $param = (int) $param;
+                }
+                $name            = ($p == 'name') ? 'dbname' : $p;
+                $dbParams[$name] = $param;
+            }
 
             // Test a database connection and a user
-            if (!empty($dbParams['driver'])) {
-                try {
-                    $db = DriverManager::getConnection($dbParams);
-                    $db->connect();
+            try {
+                $db = DriverManager::getConnection($dbParams);
+                $db->connect();
 
-                    $users = $db->createQueryBuilder()->select('count(u.id) as count')->from($params['db_table_prefix'].'users', 'u')->execute()->fetchAll();
+                $prefix = (isset($params['db_table_prefix'])) ? $params['db_table_prefix'] : '';
+                $users  = $db->createQueryBuilder()->select('count(u.id) as count')->from($prefix.'users', 'u')->execute()->fetchAll();
 
-                    if (empty($users[0]['count'])) {
-                        return false;
-                    }
-                } catch (\Exception $exception) {
+                $db->close();
+
+                if (empty($users[0]['count'])) {
                     return false;
                 }
+            } catch (\Exception $exception) {
+                return false;
             }
 
             // Check for mailer settings
