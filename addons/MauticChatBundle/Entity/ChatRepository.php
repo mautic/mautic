@@ -300,4 +300,25 @@ class ChatRepository extends CommonRepository
         $results = new Paginator($query);
         return $results;
     }
+
+    /**
+     * Deletes messages from and to a user
+     *
+     * @param $userId
+     */
+    public function deleteUserMessages($userId)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->delete('MauticChatBundle:Chat', 'c')
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('IDENTITY(c.fromUser)', ':id'),
+                    $qb->expr()->eq('IDENTITY(c.toUser)', ':id')
+                )
+            )
+            ->setParameter('id', (int) $userId);
+
+        $qb->getQuery()->execute();
+    }
 }

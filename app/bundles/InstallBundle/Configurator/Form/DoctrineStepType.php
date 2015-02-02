@@ -36,7 +36,8 @@ class DoctrineStepType extends AbstractType
             'empty_value' => false,
             'required'    => true,
             'attr'        => array(
-                'class' => 'form-control'
+                'class'    => 'form-control',
+                'onchange' => 'MauticInstaller.toggleDatabaseSettings(this.value);'
             )
         ));
 
@@ -81,6 +82,16 @@ class DoctrineStepType extends AbstractType
             'attr'       => array(
                 'class'    => 'form-control',
                 'preaddon' => 'fa fa-lock'
+            ),
+            'required'   => true
+        ));
+
+        $builder->add('path', 'text', array(
+            'label'      => 'mautic.install.form.database.path',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.install.form.database.path.tooltip'
             ),
             'required'   => true
         ));

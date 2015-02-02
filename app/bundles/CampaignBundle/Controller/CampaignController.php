@@ -357,11 +357,14 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections     = $session->get('mautic.campaign.' . $sessionId . '.events.connections');
+                        $connections     = $session->get('mautic.campaign.' . $sessionId . '.events.canvassettings');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
+
+                        //update canvas settings with new event IDs then save
+                        $model->setCanvasSettings($entity, $connections);
 
                         //trigger the first action in dripflow if published and first event is an action
                         if ($entity->isPublished()) {
@@ -428,7 +431,6 @@ class CampaignController extends FormController
             'viewParameters'  => array(
                 'eventSettings'  => $eventSettings,
                 'campaignEvents' => $modifiedEvents,
-                'tempEventIds'   => $this->associateIdWithTempIds($modifiedEvents),
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
@@ -456,7 +458,7 @@ class CampaignController extends FormController
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->factory->getModel('campaign');
 
-        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
+        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
         $eventModel = $this->factory->getModel('campaign.event');
 
         $entity     = $model->getEntity($objectId);
@@ -518,11 +520,14 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections     = $session->get('mautic.campaign.' . $objectId . '.events.connections');
+                        $connections     = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        //update canvas settings with new event IDs then save
+                        $model->setCanvasSettings($entity, $connections);
 
                         //trigger the first action in dripflow if published and first event is an action
                         if ($entity->isPublished()) {
@@ -609,7 +614,6 @@ class CampaignController extends FormController
             'viewParameters'  => array(
                 'eventSettings'  => $eventSettings,
                 'campaignEvents' => $campaignEvents,
-                'tempEventIds'   => $this->associateIdWithTempIds($campaignEvents),
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
@@ -720,22 +724,7 @@ class CampaignController extends FormController
         $session = $this->factory->getSession();
         $session->remove('mautic.campaign.' . $id . '.events.modified');
         $session->remove('mautic.campaign.' . $id . '.events.deleted');
-        $session->remove('mautic.campaign.' . $id . '.events.connections');
-    }
-
-    /**
-     * @param $events
-     *
-     * @return array
-     */
-    private function associateIdWithTempIds ($events)
-    {
-        $tempIds = array();
-        foreach ($events as $e) {
-            $tempIds[$e['tempId']] = $e['id'];
-        }
-
-        return $tempIds;
+        $session->remove('mautic.campaign.' . $id . '.events.canvassettings');
     }
 
     /**

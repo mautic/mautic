@@ -68,7 +68,7 @@ class CommonController extends Controller implements MauticController
      *
      * @return JsonResponse|Response
      */
-    function delegateView($args)
+    public function delegateView($args)
     {
         if (!is_array($args)) {
             $args = array(
@@ -91,6 +91,21 @@ class CommonController extends Controller implements MauticController
         $template   = $args['contentTemplate'];
 
         return $this->render($template, $parameters);
+    }
+
+    /**
+     * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
+     * refresh
+     *
+     * @param $url
+     */
+    public function delegateRedirect($url)
+    {
+        if ($this->request->isXmlHttpRequest()) {
+            return new JsonResponse(array('redirect' => $url));
+        } else {
+            return $this->redirect($url);
+        }
     }
 
     /**
@@ -128,7 +143,12 @@ class CommonController extends Controller implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->addFlash($flash['msg'], (!empty($flash['msgVars']) ? $flash['msgVars'] : array()), $flash['type']);
+                $this->addFlash(
+                    $flash['msg'],
+                    !empty($flash['msgVars']) ? $flash['msgVars'] : array(),
+                    !empty($flash['type']) ? $flash['type'] : 'notice',
+                    !empty($flash['domain']) ? $flash['domain'] : 'flashes'
+                );
             }
         }
 

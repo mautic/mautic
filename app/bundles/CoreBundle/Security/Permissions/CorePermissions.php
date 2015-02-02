@@ -350,16 +350,20 @@ class CorePermissions
      *
      * @param string|bool $ownPermission
      * @param string|bool $otherPermission
-     * @param User        $owner
+     * @param User|int    $ownerId
      *
      * @return bool
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $owner)
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
     {
         $user = $this->getUser();
         if (!is_object($user)) {
             //user is likely anon. so assume no access and let controller handle via published status
             return false;
+        }
+
+        if ($ownerId instanceof User) {
+            $ownerId = $ownerId->getId();
         }
 
         if (!is_bool($ownPermission) && !is_bool($otherPermission)) {
@@ -383,7 +387,7 @@ class CorePermissions
             }
         }
 
-        $ownerId = (!empty($owner)) ? $owner->getId() : 0;
+        $ownerId = (int) $ownerId;
 
         if ($ownerId === 0) {
             if ($other) {

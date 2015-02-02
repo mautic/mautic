@@ -48,6 +48,9 @@ return array(
             ),
             'mautic.chat.search.subscriber'       => array(
                 'class'     => 'MauticAddon\MauticChatBundle\EventListener\SearchSubscriber'
+            ),
+            'mautic.chat.user.subscriber'       => array(
+                'class'     => 'MauticAddon\MauticChatBundle\EventListener\UserSubscriber'
             )
         ),
         'forms'  => array(

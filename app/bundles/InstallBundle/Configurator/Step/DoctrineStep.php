@@ -28,8 +28,6 @@ class DoctrineStep implements StepInterface
 
     /**
      * Database host
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $host = 'localhost';
 
@@ -42,21 +40,17 @@ class DoctrineStep implements StepInterface
 
     /**
      * Database connection port
-     *
-     * @Assert\Range(min = "0")
      */
     public $port = 3306;
 
     /**
      * Database name
      *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $name;
 
     /**
      * Database user
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $user;
 
@@ -184,29 +178,28 @@ class DoctrineStep implements StepInterface
         $supported = array(
             'pdo_mysql'  => 'MySQL PDO (Recommended)',
             'mysqli'     => 'MySQLi',
-            'pdo_sqlite' => 'SQLite',
             'pdo_pgsql'  => 'PosgreSQL',
+            'pdo_sqlite' => 'SQLite',
+            'pdo_sqlsrv' => 'SQLServer',
             //'pdo_oci'    => 'Oracle (PDO)',
             //'pdo_ibm'    => 'IBM DB2 (PDO)',
-            'pdo_sqlsrv' => 'SQLServer',
             //'oci8'       => 'Oracle (native)',
             //'ibm_db2'    => 'IBM DB2 (native)',
         );
 
-        $available = array();
-
         // Add PDO drivers if they're supported
-        foreach (\PDO::getAvailableDrivers() as $driver) {
-            if (array_key_exists('pdo_' . $driver, $supported)) {
-                $available['pdo_' . $driver] = $supported['pdo_' . $driver];
+        $pdoDrivers = \PDO::getAvailableDrivers();
+        foreach ($pdoDrivers as $driver) {
+            if (!array_key_exists('pdo_' . $driver, $supported)) {
+                unset($supported[$driver]);
             }
         }
 
         // Add MySQLi if available
-        if (function_exists('mysqli_connect')) {
-            $available['mysqli'] = 'MySQLi';
+        if (!function_exists('mysqli_connect')) {
+            unset($supported['mysqli']);
         }
 
-        return $available;
+        return $supported;
     }
 }

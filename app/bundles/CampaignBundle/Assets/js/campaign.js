@@ -127,7 +127,6 @@ Mautic.campaignEventOnLoad = function (container, response) {
             Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
         }
 
-
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
@@ -223,47 +222,6 @@ Mautic.launchCampaignEditor = function() {
     if (typeof Mautic.campaignBuilderInstance == 'undefined') {
         Mautic.campaignBuilderInstance = jsPlumb.getInstance({
             Container: document.querySelector("#CampaignCanvas")
-        });
-
-        Mautic.updateCampaignConnections = function (info, remove) {
-            remove = (remove) ? 1 : 0;
-
-            var sourceId = info.connection.sourceId;
-            var targetId = info.connection.targetId;
-            var sourceEndpoint = info.sourceEndpoint.anchor.cssClass;
-            var targetEndpoint = info.targetEndpoint.anchor.cssClass;
-            var campaignId     = mQuery('#campaignId').val();
-            var query = "action=campaign:updateConnections&campaignId=" + campaignId + "&source=" + sourceId + "&target=" + targetId + "&remove=" + remove + "&sourceEndpoint=" + sourceEndpoint + "&targetEndpoint=" + targetEndpoint;
-            mQuery.ajax({
-                url: mauticAjaxUrl,
-                type: "POST",
-                data: query,
-                dataType: "json",
-                success: function (response) {
-                    if (!remove && response.label) {
-                        info.connection.addOverlay(["Label", {
-                            label: response.label,
-                            location: 0.65,
-                            cssClass: '_jsPlumb_label',
-                            id: sourceId + "_" + targetId + "_connectionLabel"
-                        }]);
-                    }
-                },
-                error: function (request, textStatus, errorThrown) {
-                    Mautic.processAjaxError(request, textStatus, errorThrown);
-                }
-            });
-        };
-
-        Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
-
-            if (typeof originalEvent != 'undefined') {
-                Mautic.updateCampaignConnections(info);
-            }
-        });
-
-        Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
-            Mautic.updateCampaignConnections(info, true);
         });
 
         var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
@@ -470,7 +428,68 @@ Mautic.campaignToggleTimeframes = function() {
 };
 
 Mautic.closeCampaignBuilder = function() {
-    mQuery('.builder').addClass('hide');
+    var builderCss = {
+        margin: "0",
+        padding: "0",
+        border: "none",
+        width: "100%",
+        height: "100%"
+    };
+
+    var spinnerLeft = (mQuery(document).width() - 300) / 2;
+    var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var nodes       = [];
+
+    mQuery("#CampaignCanvas .list-campaign-event").each(function (idx, elem) {
+        var endpoints = jsPlumb.getEndpoints(mQuery(elem).attr('id'));
+        nodes.push({
+            id:        mQuery(elem).attr('id').replace('CampaignEvent_', ''),
+            positionX: parseInt(mQuery(elem).css('left'), 10),
+            positionY: parseInt(mQuery(elem).css('top'), 10)
+        });
+    });
+
+    var connections = [];
+    mQuery.each(Mautic.campaignBuilderInstance.getConnections(), function (idx, connection) {
+        connections.push({
+            sourceId:     connection.sourceId.replace('CampaignEvent_', ''),
+            targetId:     connection.targetId.replace('CampaignEvent_', ''),
+            anchors:      mQuery.map(connection.endpoints, function (endpoint) {
+                var parts = endpoint.anchor.cssClass.split(' ');
+                parts[1]  = parts[1].replace('CampaignEvent_', '');
+
+                return {
+                    'endpoint': parts[0],
+                    'eventId':  parts[1]
+                };
+            })
+        });
+    });
+
+    var chart          = {};
+    chart.nodes        = nodes;
+    chart.connections  = connections;
+    var canvasSettings = {canvasSettings: chart};
+
+    var campaignId     = mQuery('#campaignId').val();
+    var query          = "action=campaign:updateConnections&campaignId=" + campaignId;
+
+    mQuery.ajax({
+        url: mauticAjaxUrl + '?' + query,
+        type: "POST",
+        data: canvasSettings,
+        dataType: "json",
+        success: function (response) {
+            mQuery('#builder-overlay').remove();
+
+            if (response.success) {
+                mQuery('.builder').addClass('hide');
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
 };
 
 Mautic.submitCampaignEvent = function(e) {

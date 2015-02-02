@@ -74,7 +74,7 @@ class FormModel extends CommonModel
             if (!empty($checkedOut)) {
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
-                if (!empty($checkedOutBy) && $checkedOutBy->getId() !== $this->factory->getUser()->getId()) {
+                if (!empty($checkedOutBy) && $checkedOutBy !== $this->factory->getUser()->getId()) {
                     return true;
                 }
             }
@@ -225,16 +225,24 @@ class FormModel extends CommonModel
                 $entity->setDateAdded(new \DateTime());
             }
 
-            if ($user instanceof User && method_exists($entity, 'setCreatedBy')) {
-                $entity->setCreatedBy($user);
+            if ($user instanceof User) {
+                if (method_exists($entity, 'setCreatedBy')) {
+                    $entity->setCreatedBy($user);
+                } elseif (method_exists($entity, 'setCreatedByUser')) {
+                    $entity->setCreatedByUser($user->getName());
+                }
             }
         } else {
             if (method_exists($entity, 'setDateModified')) {
                 $entity->setDateModified(new \DateTime());
             }
 
-            if ($user instanceof User && method_exists($entity, 'setModifiedBy')) {
-                $entity->setModifiedBy($user);
+            if ($user instanceof User) {
+                if (method_exists($entity, 'setModifiedBy')) {
+                    $entity->setModifiedBy($user);
+                } elseif (method_exists($entity, 'setModifiedByUser')) {
+                    $entity->setModifiedByUser($user->getName());
+                }
             }
         }
 

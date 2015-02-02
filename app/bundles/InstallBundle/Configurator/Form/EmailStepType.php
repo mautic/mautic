@@ -142,7 +142,8 @@ class EmailStepType extends AbstractType
             'expanded'    => true,
             'empty_value' => false,
             'attr'        => array(
-                'onchange' => 'MauticInstaller.toggleSpoolQueue();'
+                'onchange' => 'MauticInstaller.toggleSpoolQueue();',
+                'tooltip'  => 'mautic.core.config.form.mailer.spool.type.tooltip'
             )
         ));
 

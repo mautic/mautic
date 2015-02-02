@@ -99,9 +99,9 @@ class ConfigController extends FormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    return $this->redirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
                 } else {
-                    return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                    return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }
             }
         }

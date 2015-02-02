@@ -13,12 +13,9 @@ $class = ($event['eventType'] == 'decision') ? 'list-campaign-decision' : 'list-
 if (empty($route))
     $route = 'mautic_campaignevent_action';
 
-//generate style if applicable
-$cs    = $event['canvasSettings'];
-$style = (!empty($cs['droppedX'])) ? ' style="' . "position: absolute; top: {$cs['droppedY']}px; left: {$cs['droppedX']}px;" . '"' : '';
 ?>
 <?php if (empty($update)): ?>
-<div <?php echo $style; ?> id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event <?php echo $class; ?>">
+<div id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event <?php echo $class; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
         <div><span class="campaign-event-name"><?php echo $event['name']; ?></span></div>

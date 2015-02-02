@@ -31,6 +31,7 @@ system('cp -r ../app packaging/');
 system('cp -r ../bin packaging/');
 system('cp -r ../media packaging/');
 system('cp -r ../themes packaging/');
+system('cp -r ../translations packaging/');
 system('cp -r ../vendor packaging/');
 system('cp ../.htaccess packaging/');
 system('cp ../index.php packaging/');
@@ -45,4 +46,4 @@ include_once __DIR__ . '/processfiles.php';
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');

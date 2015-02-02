@@ -24,9 +24,10 @@ class FormController extends CommonController
      *
      * @return int
      */
-    protected function isFormCancelled(Form &$form)
+    protected function isFormCancelled (Form &$form)
     {
         $name = $form->getName();
+
         return $this->request->request->get($name . '[buttons][cancel]', false, true) !== false;
     }
 
@@ -35,9 +36,10 @@ class FormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormApplied($form)
+    protected function isFormApplied ($form)
     {
         $name = $form->getName();
+
         return $this->request->request->get($name . '[buttons][apply]', false, true) !== false;
     }
 
@@ -48,7 +50,7 @@ class FormController extends CommonController
      *
      * @return int
      */
-    protected function isFormValid(Form &$form)
+    protected function isFormValid (Form &$form)
     {
         //bind request to the form
         $form->handleRequest($this->request);
@@ -66,7 +68,7 @@ class FormController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      */
-    protected function isLocked($postActionVars, $entity, $model, $batch = false)
+    protected function isLocked ($postActionVars, $entity, $model, $batch = false)
     {
         $date      = $entity->getCheckedOut();
         $returnUrl = !empty($postActionVars['returnUrl']) ?
@@ -78,7 +80,7 @@ class FormController extends CommonController
         $nameFunction = $model->getNameGetter();
 
         if ($this->factory->getUser()->isAdmin()) {
-            $override = $this->get('translator')->trans('mautic.core.override.lock',array(
+            $override = $this->get('translator')->trans('mautic.core.override.lock', array(
                 '%url%' => $this->generateUrl('mautic_core_form_action', array(
                         'objectAction' => 'unlock',
                         'objectModel'  => $model,
@@ -91,25 +93,25 @@ class FormController extends CommonController
         }
 
         $flash = array(
-            'type' => 'error',
-            'msg'  => 'mautic.core.error.locked',
+            'type'    => 'error',
+            'msg'     => 'mautic.core.error.locked',
             'msgVars' => array(
-                "%name%"        => $entity->$nameFunction(),
-                "%user%"        => $entity->getCheckedOutBy()->getName(),
-                '%contactUrl%'  => $this->generateUrl('mautic_user_action',
+                "%name%"       => $entity->$nameFunction(),
+                "%user%"       => $entity->getCheckedOutByUser(),
+                '%contactUrl%' => $this->generateUrl('mautic_user_action',
                     array(
                         'objectAction' => 'contact',
-                        'objectId'     => $entity->getCheckedOutBy()->getId(),
-                        'entity'    => $entityType,
-                        'id'        => $entity->getId(),
-                        'subject'   => 'locked',
-                        'returnUrl' => $returnUrl
+                        'objectId'     => $entity->getCheckedOutBy(),
+                        'entity'       => $model,
+                        'id'           => $entity->getId(),
+                        'subject'      => 'locked',
+                        'returnUrl'    => $returnUrl
                     )
                 ),
-                '%date%'        => $date->format($this->factory->getParameter('date_format_dateonly')),
-                '%time%'        => $date->format($this->factory->getParameter('date_format_timeonly')),
-                '%datetime%'    => $date->format($this->factory->getParameter('date_format_full')),
-                '%override%'    => $override
+                '%date%'       => $date->format($this->factory->getParameter('date_format_dateonly')),
+                '%time%'       => $date->format($this->factory->getParameter('date_format_timeonly')),
+                '%datetime%'   => $date->format($this->factory->getParameter('date_format_full')),
+                '%override%'   => $override
             )
         );
         if ($batch) {
@@ -124,47 +126,19 @@ class FormController extends CommonController
     }
 
     /**
-     * @param int                                  $id
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
+     * @param int    $id
+     * @param string $modelName
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function unlockAction($id, $model)
+    public function unlockAction ($id, $modelName)
     {
         if ($this->factory->getUser()->isAdmin()) {
-            $bundle = $object = $model;
-            if (strpos($model, ':')) {
-                list($bundle, $object) = explode(':', $model);
-            }
-            $model = $this->factory->getModel($object);
+            $model = $this->factory->getModel($modelName);
 
             $entity = $model->getEntity($id);
-            if ($entity !== null) {
-                if ($entity->getCheckedOutBy() !== null) {
-                    $serializer = $this->get('jms_serializer');
-                    $details    = $serializer->serialize(array(
-                        "checkedOut"   => array(
-                            $entity->getCheckedOut(),
-                            ""
-                        ),
-                        "checkedOutBy" => array(
-                            $entity->getCheckedOutBy()->getId(),
-                            ""
-                        )
-                    ), 'json');
-
-                    $log = array(
-                        "bundle"    => $bundle,
-                        "object"    => $object,
-                        "objectId"  => $id,
-                        "action"    => "update",
-                        "details"   => $details,
-                        "ipAddress" => $this->factory->getIpAddressFromRequest()
-                    );
-                    $this->factory->getModel('core.auditLog')->writeToLog($log);
-
-                    $model->unlockEntity($entity);
-                }
+            if ($entity !== null && $entity->getCheckedOutBy() !== null) {
+                $model->unlockEntity($entity);
             }
             $returnUrl = urldecode($this->request->get('returnUrl'));
             if (empty($returnUrl)) {
@@ -173,7 +147,8 @@ class FormController extends CommonController
 
             $this->addFlash('mautic.core.action.entity.unlocked',
                 array('%name%' => urldecode($this->request->get('name'))
-            ));
+                ));
+
             return $this->redirect($returnUrl);
         }
 

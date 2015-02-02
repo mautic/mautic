@@ -29,73 +29,17 @@ class AjaxController extends CommonAjaxController
     protected function updateConnectionsAction (Request $request)
     {
         $session        = $this->factory->getSession();
-        $campaignId     = InputHelper::clean($request->request->get('campaignId'));
-        $connections    = $session->get('mautic.campaign.'.$campaignId.'.events.connections', array());
-        $source         = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('source')));
-        $target         = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('target')));
-        $ep             = InputHelper::clean($request->request->get('sourceEndpoint'));
-        $sourceEndpoint = substr($ep, 0, strrpos($ep, ' '));
-        $ep             = InputHelper::clean($request->request->get('targetEndpoint'));
-        $targetEndpoint = substr($ep, 0, strrpos($ep, ' '));
-        $remove         = InputHelper::int($request->request->get('remove'));
+        $campaignId     = InputHelper::clean($request->query->get('campaignId'));
+        $canvasSettings = $this->request->request->get('canvasSettings', array(), true);
 
-        $connections[$source][$sourceEndpoint][$target] = ($remove) ? '' : $targetEndpoint;
-        $session->set('mautic.campaign.' . $campaignId . '.events.connections', $connections);
+        if (empty($campaignId) || empty($canvasSettings)) {
+            $dataArray = array('success' => 0);
+        } else {
+            $session->set('mautic.campaign.'.$campaignId.'.events.canvassettings', $canvasSettings);
 
-        //update the source's canvasSettings
-        $events = $session->get('mautic.campaign.' . $campaignId . '.events.modified', array());
-        if (isset($events[$source])) {
-            $events[$source]['canvasSettings']['endpoints'][$sourceEndpoint][$target] = $targetEndpoint;
-            $session->set('mautic.campaign.' . $campaignId . '.events.modified', $events);
+            $dataArray = array('success' => 1);
         }
 
-        $label = '';
-        if (!$remove) {
-            $event = $events[$target];
-            if (isset($event['triggerMode'])) {
-                $translator = $this->factory->getTranslator();
-
-                if ($event['triggerMode'] == 'interval') {
-                    $label = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
-                        '%number%' => $event['triggerInterval'],
-                        '%unit%'   => $translator->transChoice('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'], $event['triggerInterval'])
-                    ));
-                } elseif ($event['triggerMode'] == 'date') {
-                    /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                    $dh    = $this->container->get('mautic.helper.template.date');
-                    $label = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
-                        '%full%' => $dh->toFull($event['triggerDate']),
-                        '%time%' => $dh->toTime($event['triggerDate']),
-                        '%date%' => $dh->toShort($event['triggerDate'])
-                    ));
-                }
-            }
-        }
-
-        return $this->sendJsonResponse(array('connections' => $connections, 'events' => $events, 'label' => $label));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateCoordinatesAction (Request $request)
-    {
-        $session    = $this->factory->getSession();
-        $x          = InputHelper::int($request->request->get('droppedX'));
-        $y          = InputHelper::int($request->request->get('droppedY'));
-        $campaignId = InputHelper::int($request->request->get('campaignId'));
-        $id         = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('eventId')));
-
-        //update the source's canvasSettings
-        $events = $session->get('mautic.campaign.' . $campaignId . '.events.modified', array());
-        if (isset($events[$id])) {
-            $events[$id]['canvasSettings']['droppedX'] = $x;
-            $events[$id]['canvasSettings']['droppedY'] = $y;
-            $session->set('mautic.campaign.' . $campaignId . '.events.modified', $events);
-        }
-
-        return $this->sendJsonResponse(array('events' => $events));
+        return $this->sendJsonResponse($dataArray);
     }
 }
