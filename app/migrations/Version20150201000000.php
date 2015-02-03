@@ -301,6 +301,7 @@ class Version20150201000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'chats DROP FOREIGN KEY FK_6AE68922F8050BAA');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT FK_6AE689226A7DC786 FOREIGN KEY (to_user) REFERENCES '.$this->prefix.'users (id)');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT FK_6AE68922F8050BAA FOREIGN KEY (from_user) REFERENCES '.$this->prefix.'users (id)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'assets ADD storage_location VARCHAR(255) NOT NULL, ADD remote_path VARCHAR(255) DEFAULT NULL');
     }
 
     public function mysqlDown(Schema $schema)
@@ -435,6 +436,7 @@ class Version20150201000000 extends AbstractMauticMigration
         $this->addSql('CREATE INDEX IDX_530D34C4DE12AB56 ON '.$this->prefix.'users (created_by)');
         $this->addSql('CREATE INDEX IDX_530D34C425F94802 ON '.$this->prefix.'users (modified_by)');
         $this->addSql('CREATE INDEX IDX_530D34C487C0719F ON '.$this->prefix.'users (checked_out_by)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'assets DROP storage_location, DROP remote_path');
     }
 
     public function postgresUp(Schema $schema)
@@ -589,6 +591,7 @@ class Version20150201000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'chats DROP CONSTRAINT FK_6AE689226A7DC786');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT FK_6AE68922F8050BAA FOREIGN KEY (from_user) REFERENCES '.$this->prefix.'users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT FK_6AE689226A7DC786 FOREIGN KEY (to_user) REFERENCES '.$this->prefix.'users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'assets ADD storage_location VARCHAR(255) NOT NULL, ADD remote_path VARCHAR(255) DEFAULT NULL');
     }
 
     public function postgresDown(Schema $schema)
@@ -738,6 +741,7 @@ class Version20150201000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'chats DROP CONSTRAINT fk_6ae689226a7dc786');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT fk_6ae68922f8050baa FOREIGN KEY (from_user) REFERENCES '.$this->prefix.'users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE '.$this->prefix.'chats ADD CONSTRAINT fk_6ae689226a7dc786 FOREIGN KEY (to_user) REFERENCES '.$this->prefix.'users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'assets DROP storage_location, DROP remote_path');
     }
 
     /**
