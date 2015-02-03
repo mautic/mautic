@@ -256,6 +256,7 @@ system('rm vendor/joomla/uri/README.md');
 
 // knplabs/gaufrette
 system('rm -rf vendor/knplabs/gaufrette/bin');
+system('rm -rf vendor/knplabs/gaufrette/spec');
 system('rm -rf vendor/knplabs/gaufrette/tests');
 system('rm vendor/knplabs/gaufrette/.gitignore');
 system('rm vendor/knplabs/gaufrette/.travis.yml');
