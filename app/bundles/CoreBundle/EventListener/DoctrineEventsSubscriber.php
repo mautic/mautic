@@ -49,12 +49,30 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
             //if in the installer, use the prefix set by it rather than what is cached
             $prefix = MAUTIC_TABLE_PREFIX;
 
+            // Prefix indexes
+            $uniqueConstraints = array();
+            if (isset($classMetadata->table['uniqueConstraints'])) {
+                foreach ($classMetadata->table['uniqueConstraints'] as $name => $uc) {
+                    $uniqueConstraints[$prefix . $name] = $uc;
+                }
+            }
+
+            $indexes = array();
+            if (isset($classMetadata->table['indexes'])) {
+                foreach ($classMetadata->table['indexes'] as $name => $uc) {
+                    $indexes[$prefix . $name] = $uc;
+                }
+            }
+
             // Prefix the table
-            $classMetadata->setPrimaryTable(array('name' =>  $prefix . $classMetadata->getTableName()));
+            $classMetadata->setPrimaryTable(array(
+                'name'              => $prefix . $classMetadata->getTableName(),
+                'indexes'           => $indexes,
+                'uniqueConstraints' => $uniqueConstraints
+            ));
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
-                    && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
+                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
                     $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $prefix . $mappedTableName;
                 }
