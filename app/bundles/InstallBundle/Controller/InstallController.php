@@ -519,6 +519,17 @@ class InstallController extends CommonController
         $platform     = $schemaManager->getDatabasePlatform();
         $backupPrefix = (!empty($dbParams['backup_prefix'])) ? $dbParams['backup_prefix'] : 'bak_';
 
+        // Generate install schema
+        $entityManager = $this->getEntityManager($dbParams);
+        $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool    = new SchemaTool($entityManager);
+        $installSchema = $schemaTool->getSchemaFromMetadata($metadatas);
+        $mauticTables  = array();
+        foreach ($installSchema->getTables() as $m) {
+            $tableName                = $m->getName();
+            $mauticTables[$tableName] = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $tableName);;
+        }
+
         //backup sequences for databases that support
         try {
             $allSequences = $schemaManager->listSequences();
@@ -531,10 +542,11 @@ class InstallController extends CommonController
         foreach ($allSequences as $sequence) {
             $name      = $sequence->getName();
             $tableName = str_replace('_id_seq', '', $name);
-            if (strpos($tableName, $dbParams['table_prefix']) === 0 || (!empty($dbParams['backup_tables']) && strpos($tableName, $backupPrefix) === 0)) {
+            if (isset($mauticTables[$tableName]) || in_array($tableName, $mauticTables)) {
                 $applicableSequences[$tableName] = $sequence;
             }
         }
+        unset($allSequences);
 
         if ($dbParams['backup_tables']) {
             //backup existing tables
@@ -542,18 +554,17 @@ class InstallController extends CommonController
 
             //cycle through the first time to drop all the foreign keys
             foreach ($tables as $t) {
-                if (strpos($t, $dbParams['table_prefix']) !== 0 && strpos($t, $backupPrefix) !== 0) {
+                if (!isset($mauticTables[$t]) && !in_array($t, $mauticTables)) {
                     // Not an applicable table
                     continue;
                 }
 
-                $backup     = str_replace($dbParams['table_prefix'], $backupPrefix, $t);
                 $restraints = $schemaManager->listTableForeignKeys($t);
 
-                if ($t != $backup) {
+                if (isset($mauticTables[$t])) {
                     //to be backed up
-                    $backupRestraints[$backup] = $restraints;
-                    $backupTables[$t]          = $backup;
+                    $backupRestraints[$mauticTables[$t]] = $restraints;
+                    $backupTables[$t]          = $mauticTables[$t];
                     $backupIndexes[$t]         = $schemaManager->listTableIndexes($t);
 
                     if (isset($applicableSequences[$t])) {
@@ -590,7 +601,7 @@ class InstallController extends CommonController
                 if (isset($backupSequences[$t])) {
                     $oldSequence = $backupSequences[$t];
                     $name        = $oldSequence->getName();
-                    $newName     = str_replace($dbParams['table_prefix'], $backupPrefix, $name);
+                    $newName     = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $name);
                     $newSequence = new Sequence(
                         $newName,
                         $oldSequence->getAllocationSize(),
@@ -604,7 +615,7 @@ class InstallController extends CommonController
                 /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
                 foreach ($backupIndexes[$t] as $oldIndex) {
                     $oldName = $oldIndex->getName();
-                    $newName = $backupPrefix . $oldName;
+                    $newName = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $oldName);
 
                     $newIndex = new Index(
                         $newName,
@@ -654,7 +665,7 @@ class InstallController extends CommonController
             foreach ($backupRestraints as $table => $oldRestraints) {
                 foreach ($oldRestraints as $or) {
                     $foreignTable     = $or->getForeignTableName();
-                    $foreignTableName = str_replace($dbParams['table_prefix'], $backupPrefix, $foreignTable);
+                    $foreignTableName = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $foreignTable);
                     $r                = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(
                         $or->getLocalColumns(),
                         $foreignTableName,
@@ -665,7 +676,6 @@ class InstallController extends CommonController
                     $sql[] = $platform->getCreateForeignKeySQL($r, $table);
                 }
             }
-
         } else {
 
             //drop and create new sequences
@@ -676,14 +686,18 @@ class InstallController extends CommonController
 
             //drop tables
             foreach ($tables as $t) {
-                //drop foreign keys first in order to be able to drop the table
-                $restraints = $schemaManager->listTableForeignKeys($t);
-                foreach ($restraints as $restraint) {
-                    $sql[] = $platform->getDropForeignKeySQL($restraint, $t);
+                if (isset($mauticTables[$t])) {
+                    //drop foreign keys first in order to be able to drop the tables
+                    $restraints = $schemaManager->listTableForeignKeys($t);
+                    foreach ($restraints as $restraint) {
+                        $sql[] = $platform->getDropForeignKeySQL($restraint, $t);
+                    }
                 }
             }
             foreach ($tables as $t) {
-                $sql[] = $platform->getDropTableSQL($t);
+                if (isset($mauticTables[$t])) {
+                    $sql[] = $platform->getDropTableSQL($t);
+                }
             }
         }
 
@@ -705,12 +719,8 @@ class InstallController extends CommonController
             }
         }
 
-        $entityManager = $this->getEntityManager($dbParams);
-        $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
-
         if (!empty($metadatas)) {
-            $schemaTool = new SchemaTool($entityManager);
-            $queries    = $schemaTool->getCreateSchemaSql($metadatas);
+            $queries = $installSchema->toSql($platform);
 
             foreach ($queries as $q) {
                 try {
@@ -738,6 +748,24 @@ class InstallController extends CommonController
         $db->close();
 
         return true;
+    }
+
+    /**
+     * @param $prefix
+     * @param $backupPrefix
+     * @param $name
+     *
+     * @return mixed|string
+     */
+    private function generateBackupName($prefix, $backupPrefix, $name)
+    {
+        if (empty($prefix)) {
+
+            return $backupPrefix . $name;
+        } else {
+
+            return str_replace($prefix, $backupPrefix, $name);
+        }
     }
 
     /**
