@@ -13,6 +13,9 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Sequence;
+use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
@@ -512,39 +515,139 @@ class InstallController extends CommonController
             );
         }
 
+        $sql          = array();
+        $platform     = $schemaManager->getDatabasePlatform();
+        $backupPrefix = (!empty($dbParams['backup_prefix'])) ? $dbParams['backup_prefix'] : 'bak_';
+
+        //backup sequences for databases that support
+        try {
+            $allSequences = $schemaManager->listSequences();
+        } catch (\Exception $e) {
+            $allSequences = array();
+        }
+
+        // Collect list of sequences
+        /** @var \Doctrine\DBAL\Schema\Sequence $sequence */
+        foreach ($allSequences as $sequence) {
+            $name      = $sequence->getName();
+            $tableName = str_replace('_id_seq', '', $name);
+            if (strpos($tableName, $dbParams['table_prefix']) === 0 || (!empty($dbParams['backup_tables']) && strpos($tableName, $backupPrefix) === 0)) {
+                $applicableSequences[$tableName] = $sequence;
+            }
+        }
+
         if ($dbParams['backup_tables']) {
             //backup existing tables
-            $backupPrefix     = ($dbParams['backup_prefix']) ? $dbParams['backup_prefix'] : 'bak_';
-            $backupRestraints = $dropTables = $backupTables = array();
+            $backupRestraints = $backupSequences = $backupIndexes = $backupTables = $dropSequences = $dropTables = array();
 
             //cycle through the first time to drop all the foreign keys
             foreach ($tables as $t) {
-                $backup = str_replace($dbParams['table_prefix'], $backupPrefix, $t);
+                if (strpos($t, $dbParams['table_prefix']) !== 0 && strpos($t, $backupPrefix) !== 0) {
+                    // Not an applicable table
+                    continue;
+                }
 
+                $backup     = str_replace($dbParams['table_prefix'], $backupPrefix, $t);
                 $restraints = $schemaManager->listTableForeignKeys($t);
 
                 if ($t != $backup) {
                     //to be backed up
                     $backupRestraints[$backup] = $restraints;
                     $backupTables[$t]          = $backup;
+                    $backupIndexes[$t]         = $schemaManager->listTableIndexes($t);
+
+                    if (isset($applicableSequences[$t])) {
+                        //backup the sequence
+                        $backupSequences[$t] = $applicableSequences[$t];
+                    }
                 } else {
                     //existing backup to be dropped
                     $dropTables[] = $t;
+
+                    if (isset($applicableSequences[$t])) {
+                        //drop the sequence
+                        $dropSequences[$t] = $applicableSequences[$t];
+                    }
                 }
 
                 foreach ($restraints as $restraint) {
-                    $schemaManager->dropForeignKey($restraint, $t);
+                    $sql[] = $platform->getDropForeignKeySQL($restraint, $t);
                 }
             }
 
             //now drop all the backup tables
             foreach ($dropTables as $t) {
-                $schemaManager->dropTable($t);
+                $sql[] = $platform->getDropTableSQL($t);
+
+                if (isset($dropSequences[$t])) {
+                    $sql[] = $platform->getDropSequenceSQL($dropSequences[$t]);
+                }
             }
 
             //now backup tables
             foreach ($backupTables as $t => $backup) {
-                $schemaManager->renameTable($t, $backup);
+                //drop old sequences
+                if (isset($backupSequences[$t])) {
+                    $oldSequence = $backupSequences[$t];
+                    $name        = $oldSequence->getName();
+                    $newName     = str_replace($dbParams['table_prefix'], $backupPrefix, $name);
+                    $newSequence = new Sequence(
+                        $newName,
+                        $oldSequence->getAllocationSize(),
+                        $oldSequence->getInitialValue()
+                    );
+
+                    $sql[] = $platform->getDropSequenceSQL($oldSequence);
+                }
+
+                //drop old indexes
+                /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
+                foreach ($backupIndexes[$t] as $oldIndex) {
+                    $oldName = $oldIndex->getName();
+                    $newName = $backupPrefix . $oldName;
+
+                    $newIndex = new Index(
+                        $newName,
+                        $oldIndex->getColumns(),
+                        $oldIndex->isUnique(),
+                        $oldIndex->isPrimary(),
+                        $oldIndex->getFlags()
+                    );
+
+                    // Handle postgres primary key constraint
+                    if (strpos($oldName, '_pkey') !== false) {
+                        $newConstraint = $newIndex;
+                        $sql[] = $platform->getDropConstraintSQL($oldName, $t);
+                    } else {
+                        $newIndexes[] = $newIndex;
+                        $sql[]        = $platform->getDropIndexSQL($oldIndex);
+                    }
+                }
+
+                //rename table
+                $tableDiff = new TableDiff($t);
+                $tableDiff->newName = $backup;
+                $queries = $platform->getAlterTableSQL($tableDiff);
+                $sql     = array_merge($sql, $queries);
+
+                //create new index
+                if (!empty($newIndexes)) {
+                    foreach ($newIndexes as $newIndex) {
+                        $sql[] = $platform->getCreateIndexSQL($newIndex, $backup);
+                    }
+                    unset($newIndexes);
+                }
+
+                //create new sequence
+                if (!empty($newSequence)) {
+                    $sql[] = $platform->getCreateSequenceSQL($newSequence);
+                    unset($newSequence);
+                }
+
+                //create new constraint
+                if (!empty($newConstraint)) {
+                    $sql[] = $platform->getCreateConstraintSQL($newConstraint, $backup);
+                }
             }
 
             //apply foreign keys to backup tables
@@ -556,23 +659,49 @@ class InstallController extends CommonController
                         $or->getLocalColumns(),
                         $foreignTableName,
                         $or->getForeignColumns(),
-                        'BAK_' . $or->getName(),
+                        $backupPrefix . $or->getName(),
                         $or->getOptions()
                     );
-                    $schemaManager->createForeignKey($r, $table);
+                    $sql[] = $platform->getCreateForeignKeySQL($r, $table);
                 }
             }
+
         } else {
+
+            //drop and create new sequences
+            /** @var \Doctrine\DBAL\Schema\Sequence $sequence */
+            foreach ($applicableSequences as $sequence) {
+                $sql[] = $platform->getDropSequenceSQL($sequence);
+            }
+
             //drop tables
             foreach ($tables as $t) {
                 //drop foreign keys first in order to be able to drop the table
                 $restraints = $schemaManager->listTableForeignKeys($t);
                 foreach ($restraints as $restraint) {
-                    $schemaManager->dropForeignKey($restraint, $t);
+                    $sql[] = $platform->getDropForeignKeySQL($restraint, $t);
                 }
             }
             foreach ($tables as $t) {
-                $schemaManager->dropTable($t);
+                $sql[] = $platform->getDropTableSQL($t);
+            }
+        }
+
+        if (!empty($sql)) {
+            foreach ($sql as $q) {
+                try {
+                    $db->query($q);
+                } catch (\Exception $e) {
+                    $db->close();
+
+                    return array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.installer.error.installing.data',
+                        'msgVars' => array(
+                            '%exception%' => $e->getMessage()
+                        )
+                    );
+                }
             }
         }
 
@@ -585,7 +714,7 @@ class InstallController extends CommonController
 
             foreach ($queries as $q) {
                 try {
-                    $db->executeQuery($q);
+                    $db->query($q);
                 } catch (\Exception $e) {
                     $db->close();
 
