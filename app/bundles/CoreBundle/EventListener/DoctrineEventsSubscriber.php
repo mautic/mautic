@@ -37,6 +37,7 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
             return;
         }
 
+        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy.
@@ -48,6 +49,7 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
             //if in the installer, use the prefix set by it rather than what is cached
             $prefix = MAUTIC_TABLE_PREFIX;
 
+            // Prefix the table
             $classMetadata->setPrimaryTable(array('name' =>  $prefix . $classMetadata->getTableName()));
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
@@ -55,6 +57,25 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
                     $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $prefix . $mappedTableName;
+                }
+            }
+
+            // Prefix sequences if supported by the DB platform
+            if ($classMetadata->isIdGeneratorSequence()) {
+                $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
+                $newDefinition['sequenceName'] = $prefix . $newDefinition['sequenceName'];
+
+                $classMetadata->setSequenceGeneratorDefinition($newDefinition);
+                $em = $args->getEntityManager();
+                if (isset($classMetadata->idGenerator)) {
+                    $sequenceGenerator = new \Doctrine\ORM\Id\SequenceGenerator(
+                        $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
+                            $newDefinition,
+                            $classMetadata,
+                            $em->getConnection()->getDatabasePlatform()),
+                        $newDefinition['allocationSize']
+                    );
+                    $classMetadata->setIdGenerator($sequenceGenerator);
                 }
             }
 
