@@ -59,6 +59,17 @@ var MauticInstaller = {
         } else {
             mQuery('#DatabaseSQLiteSettings').addClass('hide');
             mQuery('#DatabaseSettings').removeClass('hide');
+
+            var port = '';
+            if (driver == 'pdo_mysql' || driver == 'mysqli') {
+                port = 3306;
+            } else if (driver == 'pdo_pgsql') {
+                port = 5432;
+            } else if (driver == 'pdo_sqlsrv') {
+                port = 1433;
+            }
+
+            mQuery('#install_doctrine_step_port').val(port);
         }
     }
 };
