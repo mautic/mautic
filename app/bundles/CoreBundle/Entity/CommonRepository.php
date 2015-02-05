@@ -138,7 +138,7 @@ class CommonRepository extends EntityRepository
     public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-            ->select('count(e.id) as aliasCount')
+            ->select('count(e.id) as aliascount')
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
@@ -149,7 +149,7 @@ class CommonRepository extends EntityRepository
 
         $results = $q->getQuery()->getSingleResult();
 
-        return $results['aliasCount'];
+        return $results['aliascount'];
     }
 
     /**
@@ -284,8 +284,14 @@ class CommonRepository extends EntityRepository
                 $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
 
                 if (!empty($filterCount)) {
-                    $q->where($expressions)
-                        ->setParameters($parameters);
+                    $q->where($expressions);
+                    foreach ($parameters as $k => $v) {
+                        if ($v === true || $v === false) {
+                            $q->setParameter($k, $v, 'boolean');
+                        }  else {
+                            $q->setParameter($k, $v);
+                        }
+                    }
                 }
             }
         }
@@ -556,12 +562,12 @@ class CommonRepository extends EntityRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("$prefix.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("$prefix.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $forceParameters = array($unique => false);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
@@ -612,21 +618,22 @@ class CommonRepository extends EntityRepository
 
     /**
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
-     * The Expr() sets a :now parameter that must be set in the calling function
+     * The Expr() sets a :now and :true parameter that must be set in the calling function
      *
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param string                     $alias
+     * @param Expr                       $includeExpr  Expression to include in the andX
      *
      * @return \Doctrine\ORM\Query\Expr\AndX
      */
-    public function getPublishedByDateExpression($q, $alias = null)
+    public function getPublishedByDateExpression($q, $alias = null, $includeExpr = null)
     {
         if ($alias === null) {
             $alias = $this->getTableAlias();
         }
 
-        return $q->expr()->andX(
-            $q->expr()->eq("$alias.isPublished", true),
+        $expr = $q->expr()->andX(
+            $q->expr()->eq("$alias.isPublished", ':true'),
             $q->expr()->orX(
                 $q->expr()->isNull("$alias.publishUp"),
                 $q->expr()->gte("$alias.publishUp", ':now')
@@ -636,6 +643,12 @@ class CommonRepository extends EntityRepository
                 $q->expr()->lte("$alias.publishDown", ':now')
             )
         );
+
+        if (!empty($includeExpr)) {
+            $expr->add($includeExpr);
+        }
+
+        return $expr;
     }
 
     /**
@@ -740,6 +753,14 @@ class CommonRepository extends EntityRepository
         return $args;
     }
 
+    /**
+     * @param $className
+     * @param $data
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Exception
+     */
     public function createFromArray($className, &$data)
     {
         $entity = new $className();
