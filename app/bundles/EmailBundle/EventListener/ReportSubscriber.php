@@ -280,7 +280,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.failed':
                     $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed')
-                        ->andWhere('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
+                        ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');
                     $limit                  = 10;
