@@ -51,12 +51,12 @@ class PageRepository extends CommonRepository
     {
         $q  = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(h.id) as hits, p.id AS page_id, p.title, h.url')
+        $q->select('count(h.id) as hits, h.page_id, p.title, h.url')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
             ->orderBy('hits', 'DESC')
-            ->groupBy('p.id')
-            ->where('p.id > 0')
+            ->groupBy('h.page_id, p.title, h.url')
+            ->where('h.page_id > 0')
             ->setMaxResults($limit);
 
         return $q->execute()->fetchAll();
@@ -71,7 +71,7 @@ class PageRepository extends CommonRepository
     public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-            ->select('count(e.id) as aliasCount')
+            ->select('count(e.id) as alias_count')
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
@@ -120,7 +120,7 @@ class PageRepository extends CommonRepository
 
         $results = $q->getQuery()->getSingleResult();
 
-        return $results['aliasCount'];
+        return $results['alias_count'];
     }
 
     /**
@@ -203,12 +203,12 @@ class PageRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("p.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("p.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("p.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("p.isPublished", ":$unique");
+                $forceParameters = array($unique => false);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(

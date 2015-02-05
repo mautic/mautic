@@ -290,7 +290,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
 
-                    $queryBuilder->select('ph.page_id as page, ph.date_hit as dateHit');
+                    $queryBuilder->select('ph.page_id as page, ph.date_hit as "dateHit"');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
                         ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
                     $hits = $queryBuilder->execute()->fetchAll();
@@ -316,7 +316,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
 
-                    $queryBuilder->select('ph.page_id as page, ph.date_hit as dateHit, ph.date_left as dateLeft');
+                    $queryBuilder->select('ph.page_id as page, ph.date_hit as "dateHit", ph.date_left as "dateLeft"');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
                         ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
                     $hits = $queryBuilder->execute()->fetchAll();

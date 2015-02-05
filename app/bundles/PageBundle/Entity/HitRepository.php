@@ -130,7 +130,7 @@ class HitRepository extends CommonRepository
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
     {
         $query = $this->createQueryBuilder('h');
-        $query->select("count(distinct(h.trackingId)) as hitCount");
+        $query->select("count(distinct(h.trackingId)) as \"hitCount\"");
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
         if ($sourceId != null) {
@@ -169,7 +169,7 @@ class HitRepository extends CommonRepository
             $emailIds = array($emailIds);
         }
 
-        $q->select('count(distinct(h.tracking_id)) as hitCount, h.email_id')
+        $q->select('count(distinct(h.tracking_id)) as hit_count, h.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->where($q->expr()->in('h.email_id', $emailIds))
             ->groupBy('h.email_id');
@@ -186,7 +186,7 @@ class HitRepository extends CommonRepository
 
         $hits = array();
         foreach ($results as $r) {
-            $hits[$r['email_id']] = $r['hitCount'];
+            $hits[$r['email_id']] = $r['hit_count'];
         }
 
         return $hits;
@@ -302,7 +302,7 @@ class HitRepository extends CommonRepository
         $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('h.page_id, count(*) as hits')
+        $sq->select('h.page_id, count(h.id) as hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
             ->andWhere($sq->expr()->in('h.page_id', $inIds))
@@ -326,7 +326,7 @@ class HitRepository extends CommonRepository
                 'rate'      => 0
             );
         }
-        $sq->groupBy('h.tracking_id');
+        $sq->groupBy('h.tracking_id, h.page_id');
 
         //get a total number of hits first
         $results = $sq->execute()->fetchAll();
@@ -610,11 +610,11 @@ class HitRepository extends CommonRepository
     public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = '')
     {
         if ($as) {
-            $as = ' as ' . $as;
+            $as = ' as "' . $as . '"';
         }
 
         $query->select('p.title, p.id, ' . $column . $as)
-            ->groupBy('p.id')
+            ->groupBy('p.id, p.title, ' . $column)
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
