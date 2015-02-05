@@ -608,7 +608,7 @@ class LeadRepository extends CommonRepository
      *
      * @param $leadId
      */
-    public function updateLeadLastActive($leadId)
+    public function updateLastActive($leadId)
     {
         $dt     = new DateTimeHelper();
         $fields = array('last_active' => $dt->toUtcString());
