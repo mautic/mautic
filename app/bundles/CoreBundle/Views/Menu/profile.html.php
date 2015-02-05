@@ -18,7 +18,7 @@
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
             <a href="<?php echo $view['router']->generate("mautic_user_account"); ?>" data-toggle="ajax">
-                <i class="fa fa-cog fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
+                <i class="fa fa-user fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
             </a>
         </li>
         <li>

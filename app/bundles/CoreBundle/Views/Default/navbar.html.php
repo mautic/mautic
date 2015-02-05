@@ -35,7 +35,7 @@
         <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
         <li>
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
-                <i class="fa fa-cogs fs-16"></i>
+                <i class="fa fa-cog fs-16"></i>
             </a>
         </li>
     </ul>
