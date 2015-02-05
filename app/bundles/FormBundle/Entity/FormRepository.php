@@ -31,7 +31,7 @@ class FormRepository extends CommonRepository
             ->where('fs.form = f');
         $q = $this->createQueryBuilder('f');
 
-        $q->select('f, ('.$sq->getDql().') as submissionCount');
+        $q->select('f, ('.$sq->getDql().') as submission_count');
         $q->leftJoin('f.category', 'c');
         $this->buildClauses($q, $args);
 
@@ -106,12 +106,12 @@ class FormRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("f.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("f.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("f.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("f.isPublished", ":$unique");
+                $forceParameters = array($unique => false);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
@@ -126,21 +126,21 @@ class FormRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
                 $expr = $q->expr()->andX(
-                    $q->expr()->eq('f.isPublished', 1),
+                    $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishDown'),
                     $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
                 );
-                $returnParameter = false;
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
                 $expr = $q->expr()->andX(
-                    $q->expr()->eq('f.isPublished', 1),
+                    $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishUp'),
                     $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
                 );
-                $returnParameter = false;
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
                 $sq = $this->getEntityManager()->createQueryBuilder();
@@ -156,6 +156,7 @@ class FormRepository extends CommonRepository
                     ->getDql();
                 $expr = $q->expr()->gt(sprintf("(%s)",$subquery), 1);
                 $returnParameter = false;
+                break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
@@ -165,13 +166,21 @@ class FormRepository extends CommonRepository
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
+
+        $parameters = array();
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = array("$unique" => $string);
+        }
+
         return array(
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
+            $parameters
         );
     }
 

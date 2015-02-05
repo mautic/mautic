@@ -167,7 +167,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
 
-                    $queryBuilder->select('fs.form_id as form, fs.date_submitted as dateSubmitted');
+                    $queryBuilder->select('fs.form_id as form, fs.date_submitted as "dateSubmitted"');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
                         ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
                     $submissions = $queryBuilder->execute()->fetchAll();

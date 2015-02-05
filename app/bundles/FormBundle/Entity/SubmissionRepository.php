@@ -66,7 +66,7 @@ class SubmissionRepository extends CommonRepository
         $fieldAliases = array_keys($fields);
 
         $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(*) as count')
+        $dq->select('count(r.submission_id) as count')
             ->from($table, 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id')
@@ -83,7 +83,8 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases));
+        $fieldAliasSql = (!empty($fieldAliases)) ? ', ' . implode(',r.', $fieldAliases) : '';
+        $dq->select('r.submission_id' . $fieldAliasSql);
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities
@@ -211,7 +212,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = array())
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->select('fs.id, fs.form_id, fs.page_id, fs.date_submitted AS dateSubmitted')
+        $query->select('fs.id, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
             ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
 
         if (!empty($options['ipIds'])) {
@@ -289,12 +290,11 @@ class SubmissionRepository extends CommonRepository
      */
     public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions')
     {
-        if ($as) {
-            $as = ' as ' . $as;
-        }
-        $query->select('f.name as title, f.id, count(' . $column . ')' . $as)
-            ->groupBy('f.id')
-            ->orderBy($column, 'DESC')
+        $asSelect = ($as) ? ' as ' . $as : '';
+
+        $query->select('f.name as title, f.id, count(distinct ' . $column . ')' . $asSelect)
+            ->groupBy('f.id, f.name')
+            ->orderBy($as, 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
@@ -312,7 +312,7 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($pageId)) {
             $q->where($q->expr()->in('s.page_id', $pageId))
-                ->groupBy('s.page_id');
+                ->groupBy('s.page_id, p.title, p.variant_hits');
 
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
@@ -350,7 +350,7 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($emailId)) {
             $q->where($q->expr()->in('e.id', $emailId))
-                ->groupBy('e.id');
+                ->groupBy('e.id, e.subject, e.variant_sent_count');
 
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))

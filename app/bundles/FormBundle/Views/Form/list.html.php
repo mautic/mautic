@@ -38,7 +38,7 @@ if ($tmpl == 'index') {
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
-                    'orderBy'    => 'submissionCount',
+                    'orderBy'    => 'submission_count',
                     'text'       => 'mautic.form.form.results',
                     'class'      => 'visible-md visible-lg col-form-submissions'
                 ));
@@ -106,7 +106,7 @@ if ($tmpl == 'index') {
                     <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-md visible-lg">
-                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index"><?php echo $i['submissionCount']; ?></a>
+                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index"><?php echo $i['submission_count']; ?></a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
