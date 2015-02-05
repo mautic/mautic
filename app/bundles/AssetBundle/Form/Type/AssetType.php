@@ -45,12 +45,30 @@ class AssetType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html', 'file' => 'raw')));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
+        $builder->add('storageLocation', 'button_group', array(
+            'label' => 'mautic.asset.asset.form.storageLocation',
+            'choice_list' => new ChoiceList(
+                array('local', 'remote'),
+                array('mautic.asset.asset.form.storageLocation.local', 'mautic.asset.asset.form.storageLocation.remote')
+            ),
+            'attr' => array(
+                'onchange' => 'Mautic.changeAssetStorageLocation();'
+            )
+        ));
 
         $builder->add('file', 'file', array(
             'label'      => 'mautic.asset.asset.form.file.upload',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
-            'required'   => true
+            'required'   => false
+        ));
+
+        $builder->add('remotePath', 'text', array(
+            'label'      => 'mautic.asset.asset.form.remotePath',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'read_only'  => true,
+            'required'   => false
         ));
 
         $builder->add('title', 'text', array(

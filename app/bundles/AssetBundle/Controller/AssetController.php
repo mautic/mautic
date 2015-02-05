@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -254,6 +255,7 @@ class AssetController extends FormController
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->factory->getModel('asset.asset');
+
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
         $method  = $this->request->getMethod();
@@ -325,11 +327,19 @@ class AssetController extends FormController
             }
         }
 
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity)
+                'assetDownloadUrl' => $model->generateUrl($entity),
+                'integrations'     => $integrations,
+                'startOnLocal'     => $entity->getStorageLocation() == 'local'
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
@@ -353,7 +363,9 @@ class AssetController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model   = $this->factory->getModel('asset.asset');
+        $model = $this->factory->getModel('asset.asset');
+
+        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
@@ -455,11 +467,19 @@ class AssetController extends FormController
             $model->lockEntity($entity);
         }
 
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity)
+                'assetDownloadUrl' => $model->generateUrl($entity),
+                'integrations'     => $integrations,
+                'startOnLocal'     => $entity->getStorageLocation() == 'local'
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
@@ -640,5 +660,34 @@ class AssetController extends FormController
                 'flashes' => $flashes
             ))
         );
+    }
+
+    /**
+     * Renders the container for the remote file browser
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function remoteAction ()
+    {
+        // Check for integrations to cloud providers
+        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'integrations' => $integrations,
+                'tmpl'         => $tmpl
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_asset_index',
+                'mauticContent' => 'asset',
+                'route'         => $this->generateUrl('mautic_asset_index', array('page' => $this->factory->getSession()->get('mautic.asset.page', 1)))
+            )
+        ));
     }
 }
