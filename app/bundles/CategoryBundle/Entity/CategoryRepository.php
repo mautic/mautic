@@ -57,7 +57,8 @@ class CategoryRepository extends CommonRepository
         $q = $this->createQueryBuilder('c');
         $q->select('partial c.{id, title, alias, color}');
 
-        $q->where('c.isPublished = true');
+        $q->where('c.isPublished = :true')
+            ->setParameter('true', true, 'boolean');
         $q->andWhere('c.bundle = :bundle')
             ->setParameter('bundle', $bundle);
 
@@ -110,26 +111,26 @@ class CategoryRepository extends CommonRepository
     {
         $command         = $field = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
+
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("c.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("c.isPublished", ":$unique");
+                $string = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("c.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("c.isPublished", ":$unique");
+                $string = false;
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
+
         return array(
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
+            array("$unique" => $string)
         );
     }
 
@@ -164,7 +165,7 @@ class CategoryRepository extends CommonRepository
     public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-            ->select('count(e.id) as aliasCount')
+            ->select('count(e.id) as aliascount')
             ->where('e.alias = :alias')
             ->andWhere('e.bundle = :bundle')
             ->setParameter('alias', $alias)
@@ -177,7 +178,7 @@ class CategoryRepository extends CommonRepository
 
         $results = $q->getQuery()->getSingleResult();
 
-        return $results['aliasCount'];
+        return $results['aliascount'];
     }
 
 }
