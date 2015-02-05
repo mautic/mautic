@@ -40,6 +40,9 @@ if ($exceptionMessage) {
                 <h2><i class="fa fa-quote-left"></i> <strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?><?php echo $exceptionMessage; ?> <i class="fa fa-quote-right"></i></h2>
                 <footer class="text-right">Mautibot</footer>
             </blockquote>
+            <div class="pull-right">
+                <a class="text-muted" href="http://mau.tc/report-issue" target="_new"><?php echo $view['translator']->trans('mautic.core.report_issue'); ?></a>
+            </div>
         </div>
     </div>
 

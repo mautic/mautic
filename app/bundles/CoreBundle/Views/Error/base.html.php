@@ -30,6 +30,9 @@ $message = $view['slots']->get('message', 'mautic.core.error.generic');
 
                 <footer class="text-right">Mautibot</footer>
             </blockquote>
+            <div class="pull-right">
+                <a class="text-muted" href="http://mau.tc/report-issue" target="_new"><?php echo $view['translator']->trans('mautic.core.report_issue'); ?></a>
+            </div>
         </div>
     </div>
 </div>
