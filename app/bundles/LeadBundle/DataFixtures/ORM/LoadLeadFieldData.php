@@ -43,8 +43,6 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
      */
     public function load(ObjectManager $manager)
     {
-        $translator = $this->container->get('translator');
-
         $textfields = array(
             'firstname',
             'lastname',

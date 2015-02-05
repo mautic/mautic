@@ -60,20 +60,16 @@ if ($tmpl == 'index')
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
                     <?php if ($item->isRequired()): ?>
-                        <i class="fa fa-asterisk" data-toggle="tooltip" data-placement="left"
-                           title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.required'); ?>"></i>
+                        <i class="fa fa-asterisk" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.required'); ?>"></i>
                     <?php endif; ?>
                     <?php if (!$item->isVisible()): ?>
-                        <i class="fa fa-eye-slash" data-toggle="tooltip" data-placement="left"
-                           title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.invisible'); ?>"></i>
+                        <i class="fa fa-eye-slash" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.invisible'); ?>"></i>
                     <?php endif; ?>
                     <?php if ($item->isFixed()): ?>
-                        <i class="fa fa-lock" data-toggle="tooltip" data-placement="left"
-                           title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.fixed'); ?>"></i>
+                        <i class="fa fa-lock" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.fixed'); ?>"></i>
                     <?php endif; ?>
                     <?php if ($item->isListable()): ?>
-                        <i class="fa fa-list "data-toggle="tooltip" data-placement="left"
-                           title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.listable'); ?>"></i>
+                        <i class="fa fa-list "data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.listable'); ?>"></i>
                     <?php endif; ?>
                 </td>
             </tr>

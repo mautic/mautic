@@ -46,17 +46,25 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             'title',
             'firstname',
             'lastname',
-            'position',
             'company',
+            'position',
             'email',
             'phone',
             'mobile',
+            'fax',
             'address1',
             'address2',
-            'country',
             'city',
             'state',
-            'zipcode'
+            'zipcode',
+            'country',
+            'website',
+            'twitter',
+            'facebook',
+            'googleplus',
+            'skype',
+            'instagram',
+            'foursquare'
         );
 
         $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('column', 'leads');
@@ -89,13 +97,23 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 'address1',
                 'address2',
                 'phone',
-                'mobile'
+                'mobile',
+                'fax',
+                'twitter',
+                'facebook',
+                'googleplus',
+                'skype',
+                'foursquare',
+                'instagram',
+                'website'
             )) ? false : true;
             $entity->setIsListable($listable);
 
             $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
             $entity->setIsShortVisible($shortVisible);
-            $entity->setGroup('core');
+
+            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
+            $entity->setGroup($group);
 
             $manager->persist($entity);
             $manager->flush();
