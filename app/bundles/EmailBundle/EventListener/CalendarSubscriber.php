@@ -52,7 +52,7 @@ class CalendarSubscriber extends CommonSubscriber
                 $query->expr()->gte('es.date_sent', ':start'),
                 $query->expr()->lte('es.date_sent', ':end')
             ))
-            ->groupBy('e.id')
+            ->groupBy('e.id, es.email_id, e.subject, es.date_sent, e.plain_text, cat.color')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)

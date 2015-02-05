@@ -226,7 +226,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('sent', 'read', 'failed'));
 
-                    $queryBuilder->select('es.email_id as email, es.date_sent as dateSent, es.date_read as dateRead, es.is_failed');
+                    $queryBuilder->select('es.email_id as email, es.date_sent as "dateSent", es.date_read as "dateRead", es.is_failed');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
                         ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
                     $stats = $queryBuilder->execute()->fetchAll();
@@ -250,7 +250,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.sent':
                     $queryBuilder->select('e.id, e.subject as title, count(es.id) as sent')
-                        ->groupBy('e.id')
+                        ->groupBy('e.id, e.subject')
                         ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
@@ -264,12 +264,12 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.read':
-                    $queryBuilder->select('e.id, e.subject as title, sum(es.is_read) as "read"')
-                        ->groupBy('e.id')
+                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read"')
+                        ->groupBy('e.id, e.subject')
                         ->orderBy('"read"', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
                     $graphData['name']      = 'mautic.email.table.most.emails.read';
@@ -279,13 +279,13 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.failed':
-                    $queryBuilder->select('e.id, e.subject as title, sum(es.is_failed) as failed')
-                        ->andWhere('es.is_failed > 0')
-                        ->groupBy('e.id')
+                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed')
+                        ->andWhere('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
+                        ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
                     $graphData['name']      = 'mautic.email.table.most.emails.failed';
@@ -296,11 +296,11 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.read.percent':
                     $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
-                        ->groupBy('e.id')
+                        ->groupBy('e.id, e.subject')
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
                     $graphData['name']      = 'mautic.email.table.most.emails.read.percent';

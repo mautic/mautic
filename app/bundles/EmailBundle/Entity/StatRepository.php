@@ -80,22 +80,23 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(*) as sentCount')
+        $q->select('count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
 
         if ($emailId) {
-            $q->where('email_id = ' . $emailId);
+            $q->where('s.email_id = ' . (int) $emailId);
         }
 
         if ($listId) {
-            $q->andWhere('list_id = ' . $listId);
+            $q->andWhere('s.list_id = ' . (int) $listId);
         }
 
-        $q->andWhere('is_failed = 0');
+        $q->andWhere('s.is_failed = :false')
+            ->setParameter('false', false, 'boolean');
 
         $results = $q->execute()->fetchAll();
 
-        return (isset($results[0])) ? $results[0]['sentCount'] : 0;
+        return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
 
     /**
@@ -106,14 +107,15 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(*) as readCount')
+        $q->select('count(s.id) as read_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where('email_id = ' . $emailId)
             ->andWhere('list_id = ' . $listId)
-            ->andWhere('is_read = 1');
+            ->andWhere('is_read = :true')
+            ->setParameter('true', true, 'boolean');
         $results = $q->execute()->fetchAll();
 
-        return (isset($results[0])) ? $results[0]['readCount'] : 0;
+        return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
 
     /**
@@ -127,7 +129,7 @@ class StatRepository extends CommonRepository
         $inIds = (!is_array($emailIds)) ? array($emailIds) : $emailIds;
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('e.email_id, count(*) as theCount')
+        $sq->select('e.email_id, count(e.id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where('e.is_failed = 0')
             ->andWhere($sq->expr()->in('e.email_id', $inIds));
@@ -155,16 +157,17 @@ class StatRepository extends CommonRepository
 
         foreach ($totalCounts as $t) {
             if ($t['email_id'] != null) {
-                $return[$t['email_id']]['totalCount'] = (int) $t['theCount'];
+                $return[$t['email_id']]['totalCount'] = (int) $t['the_count'];
             }
         }
 
         //now get a read count
-        $sq->andWhere('e.is_read = 1');
+        $sq->andWhere('e.is_read = :true')
+            ->setParameter('true', true, 'boolean');
         $readCounts = $sq->execute()->fetchAll();
 
         foreach ($readCounts as $r) {
-            $return[$r['email_id']]['readCount'] = (int) $r['theCount'];
+            $return[$r['email_id']]['readCount'] = (int) $r['thecount'];
             $return[$r['email_id']]['readRate']  = ($return[$r['email_id']]['totalCount']) ?
                 round(($r['theCount'] / $return[$r['email_id']]['totalCount']) * 100, 2) :
                 0;
@@ -181,14 +184,15 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(*) as failedCount')
+        $q->select('count(s.id) as failed_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where('email_id = ' . $emailId)
             ->andWhere('list_id = ' . $listId)
-            ->andWhere('is_failed = 1');
+            ->andWhere('is_failed = :true')
+            ->setParameter('true', true, 'boolean');
         $results = $q->execute()->fetchAll();
 
-        return (isset($results[0])) ? $results[0]['failedCount'] : 0;
+        return (isset($results[0])) ? $results[0]['failed_count'] : 0;
     }
 
     /**
@@ -204,7 +208,7 @@ class StatRepository extends CommonRepository
     public function getLeadStats($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('s')
-            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as listName')
+            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
             ->where('s.lead = ' . $leadId);
@@ -252,7 +256,7 @@ class StatRepository extends CommonRepository
                 ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id');
         }
 
-        $query->select('count(es.id) as sent, sum(es.is_read) as "read", sum(es.is_failed) as failed');
+        $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
         if (isset($args['source'])) {
             $query->andWhere($query->expr()->eq('es.source', $query->expr()->literal($args['source'])));
@@ -299,7 +303,7 @@ class StatRepository extends CommonRepository
     public function getSentCounts($emailIds = array(), \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('e.email_id, count(*) as sentCount')
+        $q->select('e.email_id, count(e.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where('e.is_failed = 0')
             ->andWhere($q->expr()->in('e.email_id', $emailIds));
@@ -319,7 +323,7 @@ class StatRepository extends CommonRepository
         $counts = array();
 
         foreach ($results as $r) {
-            $counts[$r['email_id']] = $r['sentCount'];
+            $counts[$r['email_id']] = $r['sentcount'];
         }
 
         return $counts;

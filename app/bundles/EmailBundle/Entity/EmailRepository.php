@@ -107,15 +107,15 @@ class EmailRepository extends CommonRepository
     public function getSentReadCount()
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sentCount, SUM(e.readCount) as readCount')
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from('MauticEmailBundle:Email', 'e');
-        $results = $q->getQuery()->getSingleResult();
+        $results = $q->getQuery()->getArrayResult();
 
-        if (!isset($results['sentCount'])) {
-            $results['sentCount'] = 0;
+        if (!isset($results['sent_count'])) {
+            $results['sent_count'] = 0;
         }
-        if (!isset($results['readCount'])) {
-            $results['readCount'] = 0;
+        if (!isset($results['read_count'])) {
+            $results['read_count'] = 0;
         }
 
         return $results;
@@ -244,12 +244,12 @@ class EmailRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("e.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("e.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("e.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("e.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(

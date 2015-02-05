@@ -38,8 +38,8 @@ $item = $event['extra']['stats'];
 	            <?php if (!empty($item['retryCount'])) : ?>
 	            	<?php echo $view['translator']->transChoice('mautic.email.timeline.event.retried', $item['retryCount'], array('%count%' => $item['retryCount'])); ?>
 	            <?php endif; ?>
-	            <?php if (!empty($item['listName'])) : ?>
-	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['listName'])); ?>
+	            <?php if (!empty($item['list_name'])) : ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['list_name'])); ?>
 	            <?php endif; ?>
 	            <?php if (!empty($item['isFailed'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
