@@ -45,29 +45,33 @@ if ($exceptionMessage) {
 
     <div class="row mt-20"">
         <h5 class="ml-lg text-danger"><?php echo $exception->getClass(); ?></h5>
-        <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
-            'traces' => $exception->getTrace()
-        )); ?>
+        <div class="well well-sm ma-md">
+            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
+                'traces' => $exception->getTrace()
+            )); ?>
+        </div>
     </div>
 
     <?php if (count($previousExceptions)): ?>
     <div class="row mt-20 slimscroll">
-        <h5><?php echo $view['translator']->trans('mautic.core.error.previousexceptions'); ?></h5>
+        <h5 class="ml-lg"><?php echo $view['translator']->trans('mautic.core.error.previousexceptions'); ?></h5>
         <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
         <?php foreach ($previousExceptions as $key => $e): ?>
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="previous_heading_<?php echo $key; ?>">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#previous" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            <?php echo $e->getClass(); ?>
+                    <h4 class="panel-title pa-sm">
+                        <a data-toggle="collapse" data-parent="#previous" href="#previous_body_<?php echo $key; ?>" aria-expanded="true" aria-controls="collapseOne">
+                            <?php echo $e->getMessage(); ?>
                         </a>
                     </h4>
                 </div>
-                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div id="previous_body_<?php echo $key; ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
-                        <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
-                            'traces' => $e->getTrace()
-                        )); ?>
+                        <div class="pa-sm">
+                            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
+                                'traces' => $e->getTrace()
+                            )); ?>
+                        </div>
                     </div>
                 </div>
             </div>

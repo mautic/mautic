@@ -34,7 +34,6 @@ $formatArgs = function($args) use (&$formatArgs) {
     return implode(', ', $result);
 };
 
-echo '<div class="well well-sm ma-md">'."\n";
 echo "<ol>\n";
 foreach($traces as $trace) {
     echo "<li class=\"pt-3 break-word\">";
@@ -51,4 +50,4 @@ foreach($traces as $trace) {
     }
     echo "</li>";
 }
-echo "</ol></div>";
+echo "</ol>\n";
