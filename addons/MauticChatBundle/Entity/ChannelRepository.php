@@ -132,16 +132,18 @@ class ChannelRepository extends CommonRepository
             ->leftJoin('c.privateUsers', 'u');
         $q->where(
             $q->expr()->orX(
-                $q->expr()->eq('c.isPrivate', 0),
+                $q->expr()->eq('c.isPrivate', ':false'),
                 $q->expr()->andX(
-                    $q->expr()->eq('c.isPrivate', 1),
+                    $q->expr()->eq('c.isPrivate', ':true'),
                     $q->expr()->eq('u.id', ':userId')
                 )
             )
         )
         ->setParameter('userId', $userId);
 
-        $q->andWhere('c.isPublished = true');
+        $q->andWhere('c.isPublished = :true')
+            ->setParameter(':true', true, 'boolean')
+            ->setParameter(':false', false, 'boolean');
 
         if (!empty($search)) {
             if (is_array($search)) {
@@ -329,7 +331,8 @@ class ChannelRepository extends CommonRepository
             )
             ->setParameter('userId', $userId);
 
-        $qb->andWhere('ch.isPublished = 1');
+        $qb->andWhere('ch.isPublished = :true')
+            ->setParameter(':true', true, 'boolean');
 
         $qb->groupBy('ch.id');
 
@@ -421,7 +424,8 @@ class ChannelRepository extends CommonRepository
             )
             ->setParameter('userId', (int) $userId);
 
-        $qb->andWhere('ch.isPublished = 1');
+        $qb->andWhere('ch.isPublished = :true')
+            ->setParameter(':true', true, 'boolean');
         $qb->orderBy('c.dateSent', 'ASC');
 
         if (!$includeNotified) {
@@ -465,7 +469,8 @@ class ChannelRepository extends CommonRepository
             ->setParameter('userId', (int) $userId)
             ->setParameter('filter', '%' . $filter . '%');
 
-        $qb->andWhere('ch.isPublished = 1');
+        $qb->andWhere('ch.isPublished = :true')
+            ->setParameter(':true', true, 'boolean');
         $qb->orderBy('c.dateSent', 'ASC');
 
         $qb->setMaxResults($limit);

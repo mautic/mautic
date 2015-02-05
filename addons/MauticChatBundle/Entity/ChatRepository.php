@@ -99,7 +99,8 @@ class ChatRepository extends CommonRepository
                 ->setParameter('currentUser', $currentUserId);
         }
 
-        $q->andWhere('u.isPublished = true');
+        $q->andWhere('u.isPublished = :true')
+            ->setParameter(':true', true, 'boolean');
 
         if (!empty($search)) {
             if (is_array($search)) {
