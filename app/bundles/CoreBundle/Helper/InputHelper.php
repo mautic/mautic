@@ -280,13 +280,30 @@ class InputHelper
      */
     public static function html($value, $urldecode = false)
     {
-        if ($urldecode) {
-            $value = urldecode($value);
-        }
-
         require_once __DIR__ . '/../Libraries/htmLawed/htmLawed.php';
+
         $config = array('tidy' => 4, 'safe' => 1);
 
-        return htmLawed($value, $config);
+        if (is_array($value)) {
+            foreach ($value as $k => &$v) {
+                if (is_array($v)) {
+                    $v = self::html($v, $urldecode);
+                } else {
+                    if ($urldecode) {
+                        $v = urldecode($v);
+                    }
+
+                    $v = htmLawed($v, $config);
+                }
+            }
+        } else {
+            if ($urldecode) {
+                $value = urldecode($value);
+            }
+
+            $value = htmLawed($value, $config);
+        }
+
+        return $value;
     }
 }

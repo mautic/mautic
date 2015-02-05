@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FormFieldTextType
@@ -23,11 +24,23 @@ class FormFieldTextType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $editor = ($options['editor']) ? ' editor' : '';
+
         $builder->add('text', 'textarea', array(
             'label'      => 'mautic.form.field.type.freetext',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control' . $editor),
             'required'   => true
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'editor' => false
         ));
     }
 

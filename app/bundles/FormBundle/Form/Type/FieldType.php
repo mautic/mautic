@@ -27,18 +27,11 @@ class FieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('labelAttributes' => 'string', 'inputAttributes' => 'string')));
-
-        $builder->add('label', 'text', array(
-            'label'      => 'mautic.form.field.form.label',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'constraints' => array(
-                new Assert\NotBlank(
-                    array('message' => 'mautic.form.field.label.notblank')
-                )
-            )
-        ));
+        // Populate settings
+        $cleanMasks = array(
+            'labelAttributes' => 'string',
+            'inputAttributes' => 'string'
+        );
 
         $addHelpMessage =
         $addShowLabel =
@@ -56,19 +49,62 @@ class FieldType extends AbstractType
             if (!empty($customParams['formTypeOptions'])) {
                 $formTypeOptions = array_merge($formTypeOptions, $customParams['formTypeOptions']);
             }
-            $builder->add('properties', $customParams['formType'], $formTypeOptions);
+
             $addFields = array(
+                'labelText',
                 'addHelpMessage',
                 'addShowLabel',
+                'labelText',
                 'addDefaultValue',
                 'addLabelAttributes',
+                'labelAttributesText',
                 'addInputAttributes',
+                'inputAttributesText',
                 'addIsRequired');
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
                     $$f = (boolean) $customParams['builderOptions'][$f];
                 }
             }
+        } else {
+            $type = $options['data']['type'];
+            switch ($type) {
+                case 'freetext':
+                    $addHelpMessage = $addDefaultValue = $addIsRequired = false;
+                    $labelText           = 'mautic.form.field.form.header';
+                    $showLabelText       = 'mautic.form.field.form.showheader';
+                    $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
+                    $labelAttributesText = 'mautic.form.field.form.header_attributes';
+
+                    // Allow html
+                    $cleanMasks['properties'] = 'html';
+                    break;
+                case 'button':
+                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = false;
+                    break;
+                case 'hidden':
+                    $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
+                    break;
+                case 'captcha':
+                    $addShowLabel = $addIsRequired = $addDefaultValue = false;
+                    break;
+            }
+        }
+
+        // Build form fields
+        $builder->add('label', 'text', array(
+            'label'      => !empty($labelText) ? $labelText : 'mautic.form.field.form.label',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'constraints' => array(
+                new Assert\NotBlank(
+                    array('message' => 'mautic.form.field.label.notblank')
+                )
+            )
+        ));
+
+        if (!empty($options['customParameters'])) {
+            $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
             $type = $options['data']['type'];
             switch ($type) {
@@ -90,18 +126,14 @@ class FieldType extends AbstractType
                 case 'freetext':
                     $builder->add('properties', 'formfield_text', array(
                         'required' => false,
-                        'label'    => false
+                        'label'    => false,
+                        'editor'   => true
                     ));
-                    $addHelpMessage = $addDefaultValue = $addIsRequired = false;
                     break;
                 case 'button':
                     $builder->add('properties', 'formfield_button', array(
                         'label' => false
                     ));
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = false;
-                    break;
-                case 'hidden':
-                    $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'date':
                 case 'email':
@@ -117,7 +149,6 @@ class FieldType extends AbstractType
                     $builder->add('properties', 'formfield_captcha', array(
                         'label' => false
                     ));
-                    $addShowLabel = $addIsRequired = $addDefaultValue = false;
                     break;
             }
         }
@@ -125,7 +156,7 @@ class FieldType extends AbstractType
         if ($addShowLabel) {
             $default = (!isset($options['data']['showLabel'])) ? true : (boolean) $options['data']['showLabel'];
             $builder->add('showLabel', 'yesno_button_group', array(
-                'label'       => 'mautic.form.field.form.showlabel',
+                'label'       => (!empty($showLabelText)) ? $showLabelText : 'mautic.form.field.form.showlabel',
                 'data'        => $default
             ));
         }
@@ -165,7 +196,7 @@ class FieldType extends AbstractType
 
         if ($addLabelAttributes) {
             $builder->add('labelAttributes', 'text', array(
-                'label'      => 'mautic.form.field.form.labelattr',
+                'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',
@@ -177,7 +208,7 @@ class FieldType extends AbstractType
 
         if ($addInputAttributes) {
             $builder->add('inputAttributes', 'text', array(
-                'label'      => 'mautic.form.field.form.inputattr',
+                'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',
@@ -208,6 +239,9 @@ class FieldType extends AbstractType
         $builder->add('formId', 'hidden', array(
             'mapped' => false
         ));
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
+
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

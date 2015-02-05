@@ -28,9 +28,9 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
         ));
     ?>
     <?php if ($field['showLabel']): ?>
-    <label <?php echo $labelAttr; ?> id="mauticform_label_<?php echo $field['alias'] ?>" for="mauticform_input_<?php echo $field['alias'] ?>"><?php echo $view->escape($field['label']); ?></label>
+    <h3 <?php echo $labelAttr; ?> id="mauticform_label_<?php echo $field['alias'] ?>" for="mauticform_input_<?php echo $field['alias'] ?>"><?php echo $view->escape($field['label']); ?></h3>
     <?php endif; ?>
-    <span <?php echo $inputAttr; ?> id="mauticform_input_<?php echo $field['alias'] ?>">
-        <?php echo $text; ?>
-    </span>
+    <div <?php echo $inputAttr; ?> id="mauticform_input_<?php echo $field['alias'] ?>">
+        <?php echo html_entity_decode($text); ?>
+    </div>
 </div>
