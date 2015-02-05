@@ -69,7 +69,20 @@ $template = '<div class="col-md-6">{content}</div>';
         <hr class="text-muted" />
         <?php endif; ?>
 
-        <?php echo $view['form']->rowIfExists($fields, 'mailer_transport', '<div class="row">'.$template.'</div>'); ?>
+        <?php if (isset($fields['mailer_transport'])): ?>
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($fields['mailer_transport']); ?>
+            </div>
+            <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_coreconfig_mailer_transport":["sendmail","mail"]}'>
+                <div class="button_container">
+                    <?php echo $view['form']->widget($fields['mailer_test_button']); ?>
+                    <span class="fa fa-spinner fa-spin hide"></span>
+                </div>
+                <div class="col-md-9 help-block"></div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>

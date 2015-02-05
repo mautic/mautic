@@ -2873,5 +2873,31 @@ var Mautic = {
                 delete Mautic.ajaxActionXhr[action];
             }
         });
+    },
+
+    /**
+     * Tests an email server connection
+     */
+    testEmailServerConnection: function() {
+        mQuery('#mailerTestButtonContainer .fa-spin').removeClass('hide');
+        mQuery('#mailerTestButtonContainer .help-block').html('');
+
+        var data = {
+            transport:  mQuery('#config_coreconfig_mailer_transport').val(),
+            host:       mQuery('#config_coreconfig_mailer_host').val(),
+            port:       mQuery('#config_coreconfig_mailer_port').val(),
+            encryption: mQuery('#config_coreconfig_mailer_encryption').val(),
+            authMode:   mQuery('#config_coreconfig_mailer_auth_mode').val(),
+            user:       mQuery('#config_coreconfig_mailer_user').val(),
+            password:   mQuery('#config_coreconfig_mailer_password').val()
+        };
+
+        Mautic.ajaxActionRequest('testEmailServerConnection', data, function(response) {
+            mQuery('#mailerTestButtonContainer .fa-spin').addClass('hide');
+            var theClass = (response.success) ? 'has-success' : 'has-error';
+            var theMessage = response.message;
+            mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);
+            mQuery('#mailerTestButtonContainer .help-block').html(theMessage);
+        });
     }
 };

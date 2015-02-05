@@ -13,6 +13,10 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport;
+use Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport;
+use Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport;
+use Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -534,5 +538,57 @@ class AjaxController extends CommonController
         $model->clearNotification($id);
 
         return $this->sendJsonResponse(array('success' => 1));
+    }
+
+    /**
+     * Tests mail transport settings
+     *
+     * @param Request $request
+     */
+    protected function testEmailServerConnectionAction(Request $request)
+    {
+        $dataArray = array('success' => 0, 'error' => '');
+
+        if ($this->factory->getUser()->isAdmin()) {
+            $settings = $request->request->all();
+
+            $transport = $settings['transport'];
+
+            switch($transport) {
+                case 'mautic.transport.mandrill':
+                    $mailer = new MandrillTransport();
+                    break;
+                case 'mautic.transport.sendgrid':
+                    $mailer = new SendgridTransport();
+                    break;
+                case 'mautic.transport.amazon':
+                    $mailer = new AmazonTransport();
+                    break;
+                case 'mautic.transport.postmark':
+                    $mailer = new PostmarkTransport();
+                    break;
+                case 'gmail':
+                    $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
+                    break;
+                case 'smtp':
+                    $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
+                    break;
+            }
+
+            if (!empty($mailer)) {
+                $mailer->setUsername($settings['user']);
+                $mailer->setPassword($settings['password']);
+
+                try {
+                    $mailer->start();
+                    $dataArray['success'] = 1;
+                    $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+                } catch (\Exception $e) {
+                    $dataArray['message'] = $e->getMessage();
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
     }
 }

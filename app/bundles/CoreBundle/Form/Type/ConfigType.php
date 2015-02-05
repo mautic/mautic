@@ -193,6 +193,13 @@ class ConfigType extends AbstractType
             ]
         }';
 
+        $mailerLoginHideConditions = '{
+         "config_coreconfig_mailer_transport":[
+                "mail",
+                "sendmail"
+            ]
+        }';
+
         $builder->add('mailer_auth_mode', 'choice', array(
             'choices'     => array(
                 'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
@@ -216,6 +223,7 @@ class ConfigType extends AbstractType
             'attr'       => array(
                 'class'        => 'form-control',
                 'data-show-on' => $mailerLoginShowConditions,
+                'data-hide-on' => $mailerLoginHideConditions,
                 'tooltip'      => 'mautic.core.config.form.mailer.user.tooltip'
             ),
             'required'   => false
@@ -229,6 +237,7 @@ class ConfigType extends AbstractType
                 'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
                 'preaddon'     => 'fa fa-lock',
                 'data-show-on' => $mailerLoginShowConditions,
+                'data-hide-on' => $mailerLoginHideConditions,
                 'tooltip'      => 'mautic.core.config.form.mailer.password.tooltip'
             ),
             'required'   => false
@@ -247,6 +256,15 @@ class ConfigType extends AbstractType
                 'tooltip'      => 'mautic.core.config.form.mailer.encryption.tooltip'
             ),
             'empty_value' => false
+        ));
+
+        $builder->add('mailer_test_button', 'standalone_button', array(
+            'label'       => 'mautic.core.config.form.mailer.transport.test_connection',
+            'required'    => false,
+            'attr'        => array(
+                'class'        => 'btn btn-success',
+                'onclick'      => 'Mautic.testEmailServerConnection()'
+            )
         ));
 
         $spoolConditions = '{"config_coreconfig_mailer_spool_type":["memory"]}';
