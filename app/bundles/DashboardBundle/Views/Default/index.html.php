@@ -26,7 +26,7 @@ $colspan = 12/$cols;
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
-                                <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
+                                <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sent_count'] ?>" data-read-count="<?php echo $sentReadCount['read_count'] ?>"></canvas>
         			            <div class="doughnut-inner-text doughnut-open-rate">
                                 <?php echo $view['translator']->trans('mautic.dashboard.label.open.rate'); ?>
                                 <br><?php echo $openRate ?>%
@@ -47,7 +47,7 @@ $colspan = 12/$cols;
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
     			            <div class="text-center doughnut-wrapper">
-                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $clickthroughCount ?>"></canvas>
+                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['read_count'] ?>" data-click-count="<?php echo $clickthroughCount ?>"></canvas>
                                 <div class="doughnut-inner-text doughnut-click-rate">
                                     <?php echo $view['translator']->trans('mautic.dashboard.label.click.rate'); ?>
                                     <br><?php echo $clickRate ?>%
@@ -237,10 +237,10 @@ $colspan = 12/$cols;
                             <div class="col-md-4 va-m">
                                 <h5 class="fw-sb text-primary">
                                     <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $email['campaign_id'])); ?>" data-toggle="ajax">
-                                        <?php echo $email['campaignName']; ?>
+                                        <?php echo $email['campaign_name']; ?>
                                     </a>
                                 </h5>
-                                <span class="text-white dark-sm"><?php echo $email['eventName']; ?></span>
+                                <span class="text-white dark-sm"><?php echo $email['event_name']; ?></span>
                             </div>
                             <div class="col-md-4 va-m text-right">
                                 <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">

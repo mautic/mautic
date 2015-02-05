@@ -46,14 +46,14 @@ class DefaultController extends CommonController
 
         $openRate = 0;
 
-        if ($sentReadCount['sentCount']) {
-            $openRate = round($sentReadCount['readCount'] / $sentReadCount['sentCount'] * 100);
+        if ($sentReadCount['sent_count']) {
+            $openRate = round($sentReadCount['read_count'] / $sentReadCount['sent_count'] * 100);
         }
 
         $clickRate = 0;
 
-        if ($sentReadCount['readCount']) {
-            $clickRate = round($clickthroughCount / $sentReadCount['readCount'] * 100);
+        if ($sentReadCount['read_count']) {
+            $clickRate = round($clickthroughCount / $sentReadCount['read_count'] * 100);
         }
 
         $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
