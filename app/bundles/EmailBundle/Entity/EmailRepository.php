@@ -154,7 +154,7 @@ class EmailRepository extends CommonRepository
                 $listIds = array($listIds);
             }
             $q->andWhere(
-                $q->expr()->notIn('ll.leadlist_id', $listIds)
+                $q->expr()->in('ll.leadlist_id', $listIds)
             );
         }
 
