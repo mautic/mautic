@@ -112,11 +112,11 @@ class LeadListRepository extends CommonRepository
             $q->select('partial l.{id, name, alias}');
         }
 
-        $q->where($q->expr()->eq('l.isPublished', true));
+        $q->where($q->expr()->eq('l.isPublished', ':true'))
+            ->setParameter('true', true, 'boolean');
 
         if (!empty($user)) {
-            $q->andWhere($q->expr()->eq('l.isGlobal', true));
-
+            $q->andWhere($q->expr()->eq('l.isGlobal', ':true'));
             $q->orWhere('l.createdBy = :user');
             $q->setParameter('user', $user);
         }
@@ -232,9 +232,10 @@ class LeadListRepository extends CommonRepository
             $q->select('partial l.{id, name, alias}');
         }
 
-        $q->where($q->expr()->eq('l.isPublished', true));
+        $q->where($q->expr()->eq('l.isPublished', 'true'))
+            ->setParameter(':true', true, 'boolean');
 
-        $q->andWhere($q->expr()->eq('l.isGlobal', true));
+        $q->andWhere($q->expr()->eq('l.isGlobal', ':true'));
         $q->orderBy('l.name');
 
         $results = $q->getQuery()->getArrayResult();
@@ -256,13 +257,13 @@ class LeadListRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(*) as recipientCount')
+        $q->select('count(l.lead_id) as recipient_count')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'l')
             ->where($q->expr()->eq('l.leadlist_id', (int) $listId));
 
         $result = $q->execute()->fetchAll();
 
-        return (!empty($result[0])) ? $result[0]['recipientCount'] : 0;
+        return (!empty($result[0])) ? $result[0]['recipient_count'] : 0;
     }
 
     /**
@@ -589,29 +590,33 @@ class LeadListRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
-                $expr = $q->expr()->eq("l.isGlobal", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("l.isGlobal", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("l.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("l.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("l.isPublished", 0);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("l.isPublished", ":$unique");
+                $forceParameters = array($unique => false);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $expr = $q->expr()->like('l.name', ':'.$unique);
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+        $parameters = array();
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = array("$unique" => $string);
         }
+
         return array(
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
+            $parameters
         );
     }
 

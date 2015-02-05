@@ -218,7 +218,7 @@ class ReportSubscriber extends CommonSubscriber
                     }
 
                     $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('leads', 'emails'));
-                    $queryBuilder->select('l.id as lead, l.date_added as dateAdded, LENGTH(l.email) > 0 as email');
+                    $queryBuilder->select('l.id as lead, l.date_added as "dateAdded", LENGTH(l.email) > 0 as email');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('l.date_added', ':date'))
                         ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
                     $leads = $queryBuilder->execute()->fetchAll();
@@ -258,7 +258,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.lead.table.most.points':
                     $queryBuilder->select('l.id, l.email as title, sum(lp.delta) as points')
-                        ->groupBy('l.id')
+                        ->groupBy('l.id, l.email')
                         ->orderBy('points', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;

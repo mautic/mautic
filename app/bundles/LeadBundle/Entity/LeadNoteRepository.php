@@ -51,7 +51,7 @@ class LeadNoteRepository extends CommonRepository
     {
         $q = $this
             ->createQueryBuilder('n');
-        $q->select('count(n.id) as noteCount')
+        $q->select('count(n.id) as note_count')
             ->where($q->expr()->eq('IDENTITY(n.lead)', ':lead'))
             ->setParameter('lead', $leadId);
 
@@ -68,7 +68,7 @@ class LeadNoteRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getArrayResult();
-        return $results[0]['noteCount'];
+        return $results[0]['note_count'];
     }
 
     /**

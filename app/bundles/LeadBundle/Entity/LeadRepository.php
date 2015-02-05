@@ -234,9 +234,10 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where('f.is_published = 1');
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -326,9 +327,10 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where('f.is_published = 1');
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -341,7 +343,7 @@ class LeadRepository extends CommonRepository
 
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(*) as count')
+        $dq->select('count(l.id) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
         $this->buildWhereClause($dq, $args);
