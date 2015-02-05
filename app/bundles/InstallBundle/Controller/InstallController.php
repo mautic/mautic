@@ -759,7 +759,7 @@ class InstallController extends CommonController
      */
     private function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix)) {
+        if (empty($prefix) || strpos($name, $prefix) === false) {
 
             return $backupPrefix . $name;
         } else {
