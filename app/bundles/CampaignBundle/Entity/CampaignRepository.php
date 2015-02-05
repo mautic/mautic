@@ -50,7 +50,6 @@ class CampaignRepository extends CommonRepository
         $q   = $this->_em->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
-        $now = new \DateTime();
         if ($forList) {
             $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
@@ -61,8 +60,8 @@ class CampaignRepository extends CommonRepository
             ->leftJoin('c.lists', 'll')
             ->leftJoin('c.events', 'e')
             ->leftJoin('e.log', 'o')
-            ->where($this->getPublishedByDateExpression($q))
-            ->setParameter('now', $now);
+            ->where($this->getPublishedByDateExpression($q));
+
 
         if (!empty($specificId)) {
             $q->andWhere(
@@ -97,7 +96,6 @@ class CampaignRepository extends CommonRepository
         $q   = $this->_em->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
-        $now = new \DateTime();
         if ($forList) {
             $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
@@ -106,8 +104,7 @@ class CampaignRepository extends CommonRepository
 
         $q->leftJoin('c.lists', 'll')
             ->leftJoin('c.leads', 'l')
-            ->where($this->getPublishedByDateExpression($q))
-            ->setParameter('now', $now);
+            ->where($this->getPublishedByDateExpression($q));
 
         $q->andWhere(
             $q->expr()->in('ll.id', ':lists')

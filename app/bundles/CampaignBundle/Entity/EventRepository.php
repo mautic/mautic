@@ -49,7 +49,6 @@ class EventRepository extends CommonRepository
      */
     public function getPublishedByType($type, array $campaigns = null, $leadId = null, $positivePathOnly = true)
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('c, e, ec, ep, ecc')
             ->join('e.campaign', 'c')
@@ -65,7 +64,6 @@ class EventRepository extends CommonRepository
         );
 
         $q->where($expr)
-            ->setParameter('now', $now)
             ->setParameter('type', $type);
 
         if (!empty($campaigns)) {
@@ -139,7 +137,6 @@ class EventRepository extends CommonRepository
             return array();
         }
 
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('c, e, ec, ep')
             ->join('e.campaign', 'c')
@@ -166,7 +163,6 @@ class EventRepository extends CommonRepository
         }
 
         $q->where($expr)
-            ->setParameter('now', $now)
             ->setParameter('type', $type);
 
         $results = $q->getQuery()->getArrayResult();
@@ -257,7 +253,7 @@ class EventRepository extends CommonRepository
             ->join('o.ipAddress', 'i')
             ->join('o.lead', 'l');
 
-        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr = $this->getPublishedByDateExpression($q, 'c', false);
         $expr->add(
             $q->expr()->eq('o.isScheduled', 1)
         );
@@ -287,7 +283,6 @@ class EventRepository extends CommonRepository
      */
     public function getNegativePendingEvents($campaignId = null)
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('c, e, ep, epp, l')
             ->join('e.campaign', 'c')
@@ -299,8 +294,7 @@ class EventRepository extends CommonRepository
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'c');
 
-        $q->where($expr)
-            ->setParameter('now', $now);
+        $q->where($expr);
 
         if (!empty($campaignId)) {
             $q->andWhere($q->expr()->eq('c.id', ':campaign'))

@@ -62,15 +62,15 @@ class PointRepository extends CommonRepository
      */
     public function getPublishedByType($type)
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('p')
-            ->select('partial p.{id, type, name, delta, properties}');
+            ->select('partial p.{id, type, name, delta, properties}')
+            ->setParameter('type', $type);
 
         //make sure the published up and down dates are good
-        $this->getPublishedByDateExpression($q, null, $q->expr()->eq('p.type', ':type'));
+        $expr = $this->getPublishedByDateExpression($q);
+        $expr->add($q->expr()->eq('p.type', ':type'));
 
-        $q->setParameter('now', $now)
-            ->setParameter('type', $type);
+        $q->where($expr);
 
         return $q->getQuery()->getResult();
     }

@@ -626,10 +626,19 @@ class CommonRepository extends EntityRepository
      *
      * @return \Doctrine\ORM\Query\Expr\AndX
      */
-    public function getPublishedByDateExpression($q, $alias = null, $includeExpr = null)
+    public function getPublishedByDateExpression($q, $alias = null, $setNowParameter = true, $setTrueParameter = true)
     {
         if ($alias === null) {
             $alias = $this->getTableAlias();
+        }
+
+        if ($setNowParameter) {
+            $now = new \DateTime();
+            $q->setParameter('now', $now);
+        }
+
+        if ($setTrueParameter) {
+            $q->setParameter('true', true, 'boolean');
         }
 
         $expr = $q->expr()->andX(
@@ -643,10 +652,6 @@ class CommonRepository extends EntityRepository
                 $q->expr()->lte("$alias.publishDown", ':now')
             )
         );
-
-        if (!empty($includeExpr)) {
-            $expr->add($includeExpr);
-        }
 
         return $expr;
     }

@@ -26,8 +26,6 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getPublishedByPointTotal($points = 0)
     {
-        $now = new \DateTime();
-
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
             ->leftJoin('a.trigger', 'r')
@@ -38,8 +36,7 @@ class TriggerEventRepository extends CommonRepository
         $expr->add(
             $q->expr()->gte('r.points', $points)
         );
-        $q->where($expr)
-            ->setParameter('now', $now);
+        $q->where($expr);
 
         return $q->getQuery()->getResult();
     }
@@ -53,7 +50,6 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getPublishedByType($type)
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('partial e.{id, type, name, properties}, partial t.{id, name, points, color}')
             ->join('e.trigger', 't')
@@ -65,7 +61,6 @@ class TriggerEventRepository extends CommonRepository
             $q->expr()->eq('e.type', ':type')
         );
         $q->where($expr)
-            ->setParameter('now', $now)
             ->setParameter('type', $type);
 
         $results = $q->getQuery()->getResult();

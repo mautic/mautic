@@ -51,14 +51,11 @@ class TriggerRepository extends CommonRepository
      */
     public function getTriggerColors()
     {
-        $now = new \DateTime();
-
         $q = $this->_em->createQueryBuilder()
             ->select('partial t.{id, color, points}')
             ->from('MauticPointBundle:Trigger', 't', 't.id');
 
-        $this->getPublishedByDateExpression($q)
-            ->setParameter('now', $now);
+        $q->where($this->getPublishedByDateExpression($q));
 
         $q->orderBy('t.points', 'ASC');
 
