@@ -2442,12 +2442,22 @@ var Mautic = {
                     delete list.ignore_wdt;
                 }
 
-                if (typeof list == 'object' && typeof list[0] != 'undefined') {
-                    //meant to be an array and not an object
-                    list = mQuery.map(list, function (el) {
-                        return el;
-                    });
+                if (typeof list.success != 'undefined') {
+                    delete list.success;
                 }
+
+                if (typeof list == 'object') {
+                    if (typeof list[0] != 'undefined') {
+                        //meant to be an array and not an object
+                        list = mQuery.map(list, function (el) {
+                            return el;
+                        });
+                    } else {
+                        //empty object so return empty array
+                        list = [];
+                    }
+                }
+
                 return list;
             };
 
