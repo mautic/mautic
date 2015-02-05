@@ -32,10 +32,10 @@ class LeadEventLogRepository extends EntityRepository
             ->select('IDENTITY(ll.event) AS event_id,
                     IDENTITY(e.campaign) AS campaign_id,
                     ll.dateTriggered,
-                    e.name AS eventName,
-                    e.description AS eventDescription,
-                    c.name AS campaignName,
-                    c.description AS campaignDescription')
+                    e.name AS event_name,
+                    e.description AS event_description,
+                    c.name AS campaign_name,
+                    c.description AS campaign_description')
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
             ->where('ll.lead = ' . (int) $leadId)
@@ -76,10 +76,10 @@ class LeadEventLogRepository extends EntityRepository
                     IDENTITY(e.campaign) AS campaign_id,
                     ll.triggerDate,
                     IDENTITY(ll.lead) AS lead_id,
-                    e.name AS eventName,
-                    e.description AS eventDescription,
-                    c.name AS campaignName,
-                    c.description AS campaignDescription')
+                    e.name AS event_name,
+                    e.description AS event_description,
+                    c.name AS campaign_name,
+                    c.description AS campaign_description')
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
             ->where($query->expr()->gte('ll.triggerDate', ':today'))

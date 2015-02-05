@@ -177,7 +177,7 @@ class CampaignRepository extends CommonRepository
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'cl.event_id = ce.id')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'ce.campaign_id = c.id')
             ->orderBy('hits', 'DESC')
-            ->groupBy('c.id')
+            ->groupBy('c.id, c.name')
             ->setMaxResults($limit);
 
         $results = $q->execute()->fetchAll();

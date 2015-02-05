@@ -80,7 +80,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'campaign.evented';
+        $eventTypeKey  = 'campaign.evented';
         $eventTypeName = $this->translator->trans('mautic.campaign.triggered');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
@@ -109,10 +109,10 @@ class LeadSubscriber extends CommonSubscriber
         // Add the hits to the event array
         foreach ($logs as $log) {
             $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateTriggered'],
-                'extra'     => array(
+                'event'           => $eventTypeKey,
+                'eventLabel'      => $eventTypeName,
+                'timestamp'       => $log['dateTriggered'],
+                'extra'           => array(
                     'log' => $log
                 ),
                 'contentTemplate' => 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php'
