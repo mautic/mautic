@@ -14,12 +14,13 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.addon.mana
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'customButtons' => array(
         array(
-            'attr' => array(
+            'attr'      => array(
                 'data-toggle' => 'ajax',
                 'href'        => $view['router']->generate('mautic_addon_action', array('objectAction' => 'reload'))
             ),
-            'btnText' => $view["translator"]->trans('mautic.addon.reload.addons'),
-            'iconClass' => 'fa fa-plus'
+            'btnText'   => $view["translator"]->trans('mautic.addon.reload.addons'),
+            'iconClass' => 'fa fa-cubes',
+            'tooltip'   => 'mautic.addon.reload.addons.tooltip'
         )
     )
 )));
