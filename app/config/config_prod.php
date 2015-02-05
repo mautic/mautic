@@ -30,6 +30,7 @@ $container->loadFromExtension("monolog", array(
     "handlers" => array(
         "main"    => array(
             "type"         => "fingers_crossed",
+            "buffer_size"  => "200",
             "action_level" => "error",
             "handler"      => "nested",
             "channels" => array(
