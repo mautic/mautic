@@ -114,7 +114,7 @@ class DownloadRepository extends CommonRepository
     public function getMostDownloaded($query, $limit = 10, $offset = 0)
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
-            ->groupBy('a.id')
+            ->groupBy('a.id, a.title')
             ->orderBy('downloads', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -200,7 +200,7 @@ class DownloadRepository extends CommonRepository
 
         if (is_array($pageId)) {
             $q->where($q->expr()->in('p.id', $pageId))
-                ->groupBy('p.id');
+                ->groupBy('p.id, a.source_id, p.title, p.hits');
 
         } else {
             $q->where($q->expr()->eq('p.id', ':page'))
@@ -245,7 +245,7 @@ class DownloadRepository extends CommonRepository
 
         if (is_array($emailId)) {
             $q->where($q->expr()->in('e.id', $emailId))
-                ->groupBy('e.id');
+                ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':email'))
                 ->setParameter('email', (int) $emailId);

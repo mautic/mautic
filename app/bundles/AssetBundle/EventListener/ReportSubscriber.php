@@ -186,7 +186,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
 
-                    $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
+                    $queryBuilder->select('ad.asset_id as asset, ad.date_download as "dateDownload"');
                     $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
                         ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
                     $downloads = $queryBuilder->execute()->fetchAll();

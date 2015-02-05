@@ -116,11 +116,12 @@ class AssetRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("a.isPublished", 1);
-                $returnParameter = false;
+                $expr = $q->expr()->eq("a.isPublished", ":$unique");
+                $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("a.isPublished", 0);
+                $expr = $q->expr()->eq("a.isPublished", ":$unique");
+                $forceParameters = array($unique => false);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
@@ -196,7 +197,7 @@ class AssetRepository extends CommonRepository
         $q->select('a.id, a.title, a.downloadCount')
             ->where('a.downloadCount > 0')
             ->orderBy('a.downloadCount', 'DESC')
-            ->groupBy('a.id')
+            ->groupBy('a.id, a.title, a.downloadCount')
             ->setMaxResults($limit);
 
         $results = $q->getQuery()->getArrayResult();
