@@ -91,15 +91,6 @@ class ButtonHelper extends Helper
      * @return string
      */
     public function buildCustom ($c, $buttonCount) {
-        //Add tooltip stuff
-        $tooltipAttr = '';
-        if (isset($tooltip)) {
-            if (!isset($tooltipPosition)) {
-                $tooltipPosition = 'left';
-            }
-            $tooltipAttr = ' data-toggle="tooltip" title="'.$tooltip.'" data-placement="'.$tooltipPosition.'"';
-        }
-
         $buttons = '';
 
         //Wrap links in a tag
@@ -128,9 +119,24 @@ class ButtonHelper extends Helper
                 $c['attr']['data-toggle'] = 'ajax';
             }
 
-            foreach ($c['attr'] as $k => $v):
+            $tooltipAttr = '';
+            if (isset($c['tooltip'])) {
+                $tooltipAttr .= ' data-toggle="tooltip"';
+                if (is_array($c['tooltip'])) {
+                    foreach ($c['tooltip'] as $k => $v) {
+                        if ($k == 'title') {
+                            $v = $this->translator->trans($v);
+                        }
+                        $tooltipAttr .= " $k=" . '"' . $v . '"';
+                    }
+                } else {
+                    $tooltipAttr .= ' title="' . $this->translator->trans($c['tooltip']) . '" data-placement="left"';
+                }
+            }
+
+            foreach ($c['attr'] as $k => $v) {
                 $attr .= " $k=" . '"' . $v . '"';
-            endforeach;
+            }
 
             $buttonContent  = (isset($c['iconClass'])) ? '<i class="' . $c['iconClass'] . '"></i> ' : '';
             $buttonContent .= $this->translator->trans($c['btnText']);
