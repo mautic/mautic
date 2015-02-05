@@ -414,6 +414,7 @@ class ReportModel extends FormModel
             'columns'    => $columns['columns']
         );
 
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
         $query   = $reportGenerator->getQuery($dataOptions);
         $filters = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.filters', array());
         if (!empty($filters)) {
@@ -432,41 +433,13 @@ class ReportModel extends FormModel
         }
         $contentTemplate = $reportGenerator->getContentTemplate();
 
-        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate) {
-                // Build the options array to pass into the query
-                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
-                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
-                if ($start < 0) {
-                    $start = 0;
-                }
-
-                // Must make two queries here, one to get count and one to select data
-                $parts  = $query->getQueryParts();
-                $select = $parts['select'];
-
-                // Get the count
-                $query->select('COUNT(*) as count');
-                $result       = $query->execute()->fetchAll();
-                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
-
-                // Set the limit and get the results
-                if ($limit > 0) {
-                    $query->setFirstResult($start)
-                        ->setMaxResults($limit);
-                }
-                $query->select($select);
-            }
-
-            $data = $query->execute()->fetchAll();
-
-            if (!$paginate) {
-                $totalResults = count($data);
-            }
-        }
-
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+
+        // Reset the orderBy as it causes errors in graphs and the count query in table data
+        $parts  = $query->getQueryParts();
+        $order  = $parts['orderBy'];
+        $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {
             // Check to see if this is an update from AJAX
@@ -495,6 +468,41 @@ class ReportModel extends FormModel
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
                 $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
                 $graphs = $event->getGraphs();
+            }
+        }
+
+        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+            if ($paginate) {
+                // Build the options array to pass into the query
+                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
+                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
+                if ($start < 0) {
+                    $start = 0;
+                }
+
+                // Must make two queries here, one to get count and one to select data
+                $select = $parts['select'];
+
+                // Get the count
+                $query->select('COUNT(*) as count');
+
+                $result       = $query->execute()->fetchAll();
+                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
+
+                // Set the limit and get the results
+                if ($limit > 0) {
+                    $query->setFirstResult($start)
+                        ->setMaxResults($limit);
+                }
+
+                $query->select($select);
+                $query->add('orderBy', $order);
+            }
+
+            $data = $query->execute()->fetchAll();
+
+            if (!$paginate) {
+                $totalResults = count($data);
             }
         }
 

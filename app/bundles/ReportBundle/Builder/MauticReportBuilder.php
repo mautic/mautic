@@ -99,7 +99,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $selectColumns = array();
         foreach ($fields as $field) {
             if (isset($options['columns'][$field])) {
-                $selectColumns[] = "$field as `{$options['columns'][$field]['label']}`";
+                $selectColumns[] = "$field as \"{$options['columns'][$field]['label']}\"";
             }
         }
 
