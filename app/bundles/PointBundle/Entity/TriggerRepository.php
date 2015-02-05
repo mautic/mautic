@@ -57,19 +57,7 @@ class TriggerRepository extends CommonRepository
             ->select('partial t.{id, color, points}')
             ->from('MauticPointBundle:Trigger', 't', 't.id');
 
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('t.isPublished', true),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishUp'),
-                    $q->expr()->gte('t.publishUp', ':now')
-                ),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishDown'),
-                    $q->expr()->lte('t.publishDown', ':now')
-                )
-            )
-        )
+        $this->getPublishedByDateExpression($q)
             ->setParameter('now', $now);
 
         $q->orderBy('t.points', 'ASC');
