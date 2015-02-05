@@ -55,7 +55,7 @@ class Asset extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(name="storage_location", type="string")
+     * @ORM\Column(name="storage_location", type="string", nullable=true)
      */
     private $storageLocation = 'local';
 
@@ -275,6 +275,9 @@ class Asset extends FormEntity
      */
     public function getStorageLocation()
     {
+        if ($this->storageLocation === null) {
+            $this->storageLocation = 'local';
+        }
         return $this->storageLocation;
     }
 
