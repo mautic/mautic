@@ -37,7 +37,7 @@ if (file_exists("$root/config/parameters_local.php")) {
 }
 
 if (isset($localParameters['cache_path'])) {
-    $cacheDir = str_replace('%kernel.root_dir%', $root, $localParameters['cache_path'] . 'prod');
+    $cacheDir = str_replace('%kernel.root_dir%', $root, $localParameters['cache_path'] . '/prod');
 } else {
     $cacheDir = "$root/cache/prod";
 }
@@ -148,12 +148,12 @@ function copy_directory($src, $dest)
  */
 function getVar($name, $default = '', $filter = FILTER_SANITIZE_STRING)
 {
-	if (isset($_REQUEST[$name]))
-	{
-		return filter_var($_REQUEST[$name], $filter);
-	}
+    if (isset($_REQUEST[$name]))
+    {
+        return filter_var($_REQUEST[$name], $filter);
+    }
 
-	return $default;
+    return $default;
 }
 
 /**
@@ -314,177 +314,43 @@ function move_mautic_core(array $status)
 {
     $errorLog = array();
 
-    // Move config files if any
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/app/config')) {
-        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . '/app/config');
+    // Single level directories with files only
+    $fileOnlyDirectories = array(
+        '/app/config',
+        '/app/migrations',
+        '/app',
+        '/bin'
+    );
 
-        /** @var FilesystemIterator $file */
-        foreach ($iterator as $file) {
-            // Sanity checks
-            if ($file->isFile()) {
-                $src  = $file->getPath() . '/' . $file->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
-
-                if (!@rename($src, $dest)) {
-                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
-            }
-        }
+    foreach ($fileOnlyDirectories as $dir) {
+        copy_files($dir, $errorLog);
 
         // At this point, we can remove the config directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/app/config');
+        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . $dir);
 
         if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/app/config');
+            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', $dir);
         }
     }
 
-    // Move migration files if any
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/app/migrations')) {
-        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . '/app/migrations');
+    // Multilevel directories
+    $nestedDirectories = array(
+        '/media',
+        '/themes',
+        '/translations'
+    );
 
-        /** @var FilesystemIterator $file */
-        foreach ($iterator as $file) {
-            // Sanity checks
-            if ($file->isFile()) {
-                $src  = $file->getPath() . '/' . $file->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+    foreach ($nestedDirectories as $dir) {
+        if (is_dir(MAUTIC_UPGRADE_ROOT . $dir)) {
 
-                if (!@rename($src, $dest)) {
-                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
+            copy_directories($dir, $errorLog);
+
+            // At this point, we can remove the media directory
+            $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . $dir);
+
+            if (!$deleteDir) {
+                $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', $dir);
             }
-        }
-
-        // At this point, we can remove the migration directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/app/migrations');
-
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/app/migrations');
-        }
-    }
-
-    // Move the top level app folder contents now
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/app')) {
-        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . '/app');
-
-        /** @var FilesystemIterator $file */
-        foreach ($iterator as $file) {
-            // Sanity checks
-            if ($file->isFile()) {
-                $src  = $file->getPath() . '/' . $file->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
-
-                if (!@rename($src, $dest)) {
-                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
-            }
-        }
-
-        // At this point, we can remove the app directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/app');
-
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/app');
-        }
-    }
-
-    // Move bin folder contents now
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/bin')) {
-        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . '/bin');
-
-        /** @var FilesystemIterator $file */
-        foreach ($iterator as $file) {
-            // Sanity checks
-            if ($file->isFile()) {
-                $src  = $file->getPath() . '/' . $file->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
-
-                if (!@rename($src, $dest)) {
-                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
-            }
-        }
-
-        // At this point, we can remove the app directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/bin');
-
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/bin');
-        }
-    }
-
-    // Move media files if any
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/media')) {
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/media');
-
-        /** @var DirectoryIterator $directory */
-        foreach ($iterator as $directory) {
-            // Sanity checks
-            if (!$directory->isDot() && $directory->isDir()) {
-                $src  = $directory->getPath() . '/' . $directory->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
-
-                $result = copy_directory($src, $dest);
-
-                if ($result !== true) {
-                    if (is_array($result)) {
-                        $errorLog += $result;
-                    } else {
-                        $errorLog[] = $result;
-                    }
-                }
-
-                $deleteDir = recursive_remove_directory($src);
-
-                if (!$deleteDir) {
-                    $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
-            }
-        }
-
-        // At this point, we can remove the media directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/media');
-
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/media');
-        }
-    }
-
-    // Move theme files if any
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/themes')) {
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/themes');
-
-        /** @var DirectoryIterator $directory */
-        foreach ($iterator as $directory) {
-            // Sanity checks
-            if (!$directory->isDot() && $directory->isDir()) {
-                $src  = $directory->getPath() . '/' . $directory->getFilename();
-                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
-
-                $result = copy_directory($src, $dest);
-
-                if ($result !== true) {
-                    if (is_array($result)) {
-                        $errorLog += $result;
-                    } else {
-                        $errorLog[] = $result;
-                    }
-                }
-
-                $deleteDir = recursive_remove_directory($src);
-
-                if (!$deleteDir) {
-                    $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
-                }
-            }
-        }
-
-        // At this point, we can remove the theme directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/themes');
-
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/themes');
         }
     }
 
@@ -706,6 +572,79 @@ function move_mautic_vendors(array $status)
 }
 
 /**
+ * Copy files from the directory
+ *
+ * @param $dir
+ * @param $errorLog
+ */
+function copy_files($dir, &$errorLog) {
+    if (is_dir(MAUTIC_UPGRADE_ROOT . $dir)) {
+        $iterator = new FilesystemIterator(MAUTIC_UPGRADE_ROOT . $dir);
+
+        /** @var FilesystemIterator $file */
+        foreach ($iterator as $file) {
+            // Sanity checks
+            if ($file->isFile()) {
+                $src  = $file->getPath() . '/' . $file->getFilename();
+                $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+                if (!@rename($src, $dest)) {
+                    $errorLog[] = sprintf('Could not move file %s to production.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Copy directories
+ *
+ * @param $dir
+ * @param $errorLog
+ * @param $createDest
+ */
+function copy_directories($dir, &$errorLog, $createDest = true) {
+    // Ensure the destination directory exists
+    $exists = file_exists(MAUTIC_ROOT . $dir);
+    if ($createDest && !$exists) {
+        mkdir(MAUTIC_ROOT . $dir, 0755);
+    } elseif (!$exists) {
+        $errorLog[] = sprintf('%s does not exist.', MAUTIC_ROOT . $dir);
+        return false;
+    }
+
+    // Copy root level files first
+    copy_files($dir, $errorLog);
+
+    $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . $dir);
+
+    /** @var DirectoryIterator $directory */
+    foreach ($iterator as $directory) {
+        // Sanity checks
+        if (!$directory->isDot() && $directory->isDir()) {
+            $src  = $directory->getPath() . '/' . $directory->getFilename();
+            $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
+
+            $result = copy_directory($src, $dest);
+
+            if ($result !== true) {
+                if (is_array($result)) {
+                    $errorLog += $result;
+                } else {
+                    $errorLog[] = $result;
+                }
+            }
+
+            $deleteDir = recursive_remove_directory($src);
+
+            if (!$deleteDir) {
+                $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
+            }
+        }
+    }
+}
+
+/**
  * Processes the error log for each step
  *
  * @param array $errorLog
@@ -749,11 +688,11 @@ function recursive_remove_directory($directory)
     if (!file_exists($directory) || !is_dir($directory)) {
         // ... we return false and exit the function
         return false;
-    // ... if the path is not readable
+        // ... if the path is not readable
     } elseif (!is_readable($directory)) {
         // ... we return false and exit the function
         return false;
-    // ... else if the path is readable
+        // ... else if the path is readable
     } else {
         // we open the directory
         $handle   = opendir($directory);
@@ -769,7 +708,7 @@ function recursive_remove_directory($directory)
                 if (is_dir($path)) {
                     // we call this function with the new path
                     recursive_remove_directory($path);
-                // if the new path is a file
+                    // if the new path is a file
                 } else {
                     // we remove the file
                     @unlink($path);
