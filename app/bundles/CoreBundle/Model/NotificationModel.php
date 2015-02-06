@@ -170,7 +170,9 @@ class NotificationModel extends FormModel
             // If the version key is set, we have an update
             if (isset($updateData['version'])) {
                 $translator    = $this->factory->getTranslator();
-                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+                $announcement  = $translator->trans('mautic.core.updater.update.announcement_link', array('%announcement%' => $updateData['announcement']));
+
+                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $announcement));
 
                 $alreadyNotified = $session->get('mautic.update.notified');
 
