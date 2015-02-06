@@ -35,7 +35,8 @@ class ApplyUpdatesCommand extends ContainerAwareCommand
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE,
                     'Bypasses the verification check.'
-                )
+                ),
+                new InputOption('update-package', 'p', InputOption::VALUE_OPTIONAL, 'Optional full path to the update package to apply.'),
             ))
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command updates the Mautic application.
@@ -45,6 +46,10 @@ The <info>%command.name%</info> command updates the Mautic application.
 You can optionally specify to bypass the verification check with the --force option:
 
 <info>php %command.full_name% --force</info>
+
+To force install a local package, pass the full path to the package as follows:
+
+<info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
 EOT
         );
     }
@@ -56,11 +61,21 @@ EOT
     {
         $options = $input->getOptions();
         $force   = $options['force'];
+        $package = $options['update-package'];
+
         $appRoot = dirname($this->getContainer()->getParameter('kernel.root_dir'));
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+
+        if ($package) {
+            if (!file_exists($package)) {
+                $output->writeln('<error>' . $translator->trans('mautic.core.update.archive_no_such_file') . '</error>');
+
+                return 1;
+            }
+        }
 
         if (!$force) {
             $dialog  = $this->getHelperSet()->get('dialog');
@@ -79,31 +94,37 @@ EOT
             }
         }
 
-        $updateHelper = $this->getContainer()->get('mautic.helper.update');
-        $update       = $updateHelper->fetchData();
+        if ($package) {
+            $zipFile = $package;
+            $version = basename($package);
+        } else {
+            $updateHelper = $this->getContainer()->get('mautic.helper.update');
+            $update       = $updateHelper->fetchData();
 
-        if (!isset($update['package'])) {
-            $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
+            if (!isset($update['package'])) {
+                $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
 
-            return 1;
+                return 1;
+            }
+
+            // Fetch the update package
+            $package = $updateHelper->fetchPackage($update['package']);
+
+            if ($package['error']) {
+                $output->writeln('<error>' . $translator->trans($package['message']) . '</error>');
+
+                return 1;
+            }
+
+            $zipFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/' . basename($update['package']);
+            $version = $update['version'];
         }
 
-        // Fetch the update package
-        $package = $updateHelper->fetchPackage($update['package']);
-
-        if ($package['error']) {
-            $output->writeln('<error>' . $translator->trans($package['message']) . '</error>');
-
-            return 1;
-        }
-
-        $zipFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/' . basename($update['package']);
-
-        $zipper = new \ZipArchive();
+        $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
-            $output->writeln('<error>' . $translator->trans('mautic.core.update.could_not_open_archive') . '</error>');
+            $output->writeln('<error>' . $translator->trans('mautic.core.update.archive_not_valid_zip') . '</error>');
 
             return 1;
         }
@@ -183,11 +204,16 @@ EOT
         }
 
         // Clear the cached update data and the download package now that we've updated
-        @unlink($this->getContainer()->getParameter('kernel.cache_dir') . '/lastUpdateCheck.txt');
-        @unlink($zipFile);
+        if (empty($package)) {
+            @unlink($zipFile);
+        } else {
+            @unlink($this->getContainer()->getParameter('kernel.cache_dir') . '/lastUpdateCheck.txt');
+        }
+        @unlink($appRoot . '/deleted_files.txt');
+        @unlink($appRoot . '/upgrade.php');
 
         // Update successful
-        $output->writeln('<info>' . $translator->trans('mautic.core.update.update_successful', array('%version%' => $update['version'])) . '</info>');
+        $output->writeln('<info>' . $translator->trans('mautic.core.update.update_successful', array('%version%' => $version)) . '</info>');
 
         return 0;
     }
