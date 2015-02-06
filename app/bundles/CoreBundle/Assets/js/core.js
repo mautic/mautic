@@ -2879,9 +2879,7 @@ var Mautic = {
      * Tests an email server connection
      */
     testEmailServerConnection: function() {
-        mQuery('#mailerTestButtonContainer .fa-spin').removeClass('hide');
-        mQuery('#mailerTestButtonContainer .help-block').html('');
-
+        mQuery('#mailerTestButtonContainer')
         var data = {
             transport:  mQuery('#config_coreconfig_mailer_transport').val(),
             host:       mQuery('#config_coreconfig_mailer_host').val(),
@@ -2893,7 +2891,6 @@ var Mautic = {
         };
 
         Mautic.ajaxActionRequest('testEmailServerConnection', data, function(response) {
-            mQuery('#mailerTestButtonContainer .fa-spin').addClass('hide');
             var theClass = (response.success) ? 'has-success' : 'has-error';
             var theMessage = response.message;
             mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);

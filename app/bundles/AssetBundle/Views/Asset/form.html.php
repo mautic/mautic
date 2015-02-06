@@ -22,17 +22,21 @@ $view['slots']->set('mauticContent', 'asset');
         <div class="pa-md">
 	        <div class="row">
 		        <div class="col-md-6">
-			        <?php echo $view['form']->row($form['storageLocation']); ?>
+					<div class="col-md-7 pl-0">
+						<?php echo $view['form']->row($form['storageLocation']); ?>
+					</div>
+			        <div class="col-md-5 text-left mt-lg<?php if ($startOnLocal) echo ' hide'; ?>" id="remote-button">
+						<?php if ($integrations) : ?>
+							<a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-header="<?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
+								<?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
+							</a>
+						<?php endif; ?>
+					</div>
 			        <div id="storage-local"<?php if (!$startOnLocal) echo ' class="hide"'; ?>>
 				        <?php echo $view['form']->row($form['file']); ?>
 			        </div>
 			        <div id="storage-remote"<?php if ($startOnLocal) echo ' class="hide"'; ?>>
 				        <?php echo $view['form']->row($form['remotePath']); ?>
-				        <?php if ($integrations) : ?>
-					        <a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
-					            <?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
-					        </a>
-						<?php endif; ?>
 			        </div>
 		    	</div>
 		    	<div class="col-md-6">
@@ -76,7 +80,6 @@ $view['slots']->set('mauticContent', 'asset');
 	<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
 	    'id'            => 'RemoteFileModal',
 	    'size'          => 'lg',
-	    'header'        => $view['translator']->trans('mautic.asset.remote.file.browse'),
 	    'footerButtons' => true
 	)); ?>
 <?php endif; ?>

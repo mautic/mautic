@@ -89,6 +89,9 @@ Mautic.previewBeforeUpload = function(input) {
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
+    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    spinner.appendTo('#tab' + provider + ' a');
+
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
@@ -97,12 +100,17 @@ Mautic.updateRemoteBrowser = function(provider, path) {
         success: function (response) {
             if (response.success) {
                 mQuery('div#remoteFileBrowser').html(response.output);
+
+                mQuery('.remote-file-search').quicksearch('#remoteFileBrowser .remote-file-list a');
             } else {
                 // TODO - Add error handler
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function() {
+            spinner.remove();
         }
     })
 };
@@ -116,8 +124,10 @@ Mautic.changeAssetStorageLocation = function() {
     if (mQuery('#asset_storageLocation_0').prop('checked')) {
         mQuery('#storage-local').removeClass('hide');
         mQuery('#storage-remote').addClass('hide');
+        mQuery('#remote-button').addClass('hide');
     } else {
         mQuery('#storage-local').addClass('hide');
         mQuery('#storage-remote').removeClass('hide');
+        mQuery('#remote-button').removeClass('hide');
     }
 };
