@@ -234,7 +234,7 @@ class Configurator
             if (is_array($value)) {
                 $string .= $this->renderArray($value, true);
             } else {
-                $string .= $value;
+                $string .= '"' . $value . '"';
             }
             $first = false;
         }
