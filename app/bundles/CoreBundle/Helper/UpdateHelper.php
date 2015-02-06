@@ -135,6 +135,10 @@ class UpdateHelper
             $data    = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
             $update  = json_decode($data->body);
         } catch (\Exception $exception) {
+            // Log the error
+            $logger = $this->factory->getLogger();
+            $logger->addError('An error occurred while attempting to fetch updates: ' . $exception->getMessage());
+
             return array(
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates'
@@ -142,6 +146,14 @@ class UpdateHelper
         }
 
         if ($data->code != 200) {
+            // Log the error
+            $logger = $this->factory->getLogger();
+            $logger->addError(sprintf(
+                'An unexpected %1$s code was returned while attempting to fetch updates.  The message received was: %2$s',
+                $data->code,
+                is_string($data->body) ? $data->body : implode('; ', $data->body)
+            ));
+
             return array(
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates'
