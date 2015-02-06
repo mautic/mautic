@@ -147,8 +147,12 @@ class NotificationModel extends FormModel
 
         // Check for updates
         $updateMessage = '';
+        $newUpdate     = false;
+
         if (!$this->factory->getParameter('security.disableUpdates') && $this->factory->getUser()->isAdmin()) {
-            $session = $this->factory->getSession();
+            $updateData = array();
+            $cacheFile  = $this->factory->getSystemPath('cache') . '/lastUpdateCheck.txt';
+            $session    = $this->factory->getSession();
 
             //check to see when we last checked for an update
             $lastChecked = $session->get('mautic.update.checked', 0);
@@ -159,15 +163,24 @@ class NotificationModel extends FormModel
                 /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
                 $updateHelper = $this->factory->getHelper('update');
                 $updateData   = $updateHelper->fetchData();
+            } elseif (file_exists($cacheFile)) {
+                $updateData = json_decode(file_get_contents($cacheFile), true);
+            }
 
-                // If the version key is set, we have an update
-                if (isset($updateData['version'])) {
-                    $translator    = $this->factory->getTranslator();
-                    $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+            // If the version key is set, we have an update
+            if (isset($updateData['version'])) {
+                $translator    = $this->factory->getTranslator();
+                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']));
+
+                $alreadyNotified = $session->get('mautic.update.notified');
+
+                if (empty($alreadyNotified) || $alreadyNotified != $updateData['version']) {
+                    $newUpdate = true;
+                    $session->set('mautic.update.notified', $updateData['version']);
                 }
             }
         }
 
-        return array($notifications, $showNewIndicator, $updateMessage);
+        return array($notifications, $showNewIndicator, array('isNew' => $newUpdate, 'message' => $updateMessage));
     }
 }
