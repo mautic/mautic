@@ -23,40 +23,38 @@ class ConfigSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
-            ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
+            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_PRE_SAVE    => array('onConfigBeforeSave', 0)
         );
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate (ConfigBuilderEvent $event)
     {
         $event->addForm(array(
-            'bundle'        => 'CoreBundle',
-            'formAlias'     => 'coreconfig',
-            'formTheme'     => 'MauticCoreBundle:FormTheme\Config',
-            'parameters'    => $event->getParametersFromConfig('MauticCoreBundle')
+            'bundle'     => 'CoreBundle',
+            'formAlias'  => 'coreconfig',
+            'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticCoreBundle')
         ));
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave (ConfigEvent $event)
     {
         $values = $event->getConfig();
 
         $passwords = array(
-            'mailer_password'       => $values['coreconfig']['mailer_password'],
-            'transifex_password'    => $values['coreconfig']['transifex_password']
+            'mailer_password',
+            'transifex_password'
         );
 
-        foreach ($passwords as $key => $password) {
+        foreach ($passwords as $key) {
             // Check to ensure we don't save a blank password to the config which may remove the user's old password
-            if ($password == '') {
+            if (isset($values['coreconfig'][$key]) && empty($values['coreconfig'][$key])) {
                 unset($values['coreconfig'][$key]);
             }
         }
-
-        $event->setConfig($values);
     }
 }
