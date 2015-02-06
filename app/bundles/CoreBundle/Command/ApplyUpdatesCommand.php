@@ -130,10 +130,12 @@ EOT
         }
 
         // Extract the archive file now in place
+        $output->writeln('<info>Extracting zip...</info>');
         $zipper->extractTo($appRoot);
         $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
+        $output->writeln('<info>Clearing the cache...</info>');
         $command = $this->getApplication()->find('cache:clear');
         $input = new ArrayInput(array(
             'command'          => 'cache:clear',
@@ -148,6 +150,7 @@ EOT
 
         // Make sure we have a deleted_files list otherwise we can't process this step
         if (file_exists(__DIR__ . '/deleted_files.txt')) {
+            $output->writeln('<info>Remove deleted files...</info>');
             $deletedFiles = json_decode(file_get_contents(__DIR__ . '/deleted_files.txt'), true);
             $errorLog     = array();
 
@@ -187,6 +190,7 @@ EOT
         }
 
         // Migrate the database to the current version if migrations exist
+        $output->writeln('<info>Migrate database schema...</info>');
         $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
@@ -203,6 +207,7 @@ EOT
             }
         }
 
+        $output->writeln('<info>Cleaning up...</info>');
         // Clear the cached update data and the download package now that we've updated
         if (empty($package)) {
             @unlink($zipFile);
