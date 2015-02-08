@@ -243,7 +243,6 @@ class IcontactIntegration extends EmailAbstractIntegration
                 return true;
             }
         } catch (\Exception $e) {
-            die(var_dump($e->getMessage()));
             $this->logIntegrationError($e);
         }
 
