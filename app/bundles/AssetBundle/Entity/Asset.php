@@ -898,16 +898,6 @@ class Asset extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $request       = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-        $assetFormData = $request->request->get('asset');
-
-        // only for first time
-        if (!isset($assetFormData['unlockId']) || !$assetFormData['unlockId']) {
-            $metadata->addPropertyConstraint('file', new Assert\NotBlank(array(
-                'message' => 'mautic.asset.file.notblank'
-            )));
-        }
-
         // Add a constraint to manage the file upload data
         $metadata->addConstraint(new Assert\Callback(array('\\Mautic\\AssetBundle\\Entity\\Asset', 'validateFile')));
     }
@@ -922,12 +912,10 @@ class Asset extends FormEntity
     {
         if ($object->getStorageLocation() == 'local') {
             // If the object is stored locally, we should have file data
-            $method = $object->isNew() ? 'getFile' : 'loadFile';
-
-            if ($object->$method() === null) {
+            if ($object->isNew() && $object->getFile() === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
-                    ->atPath('path')
-                    ->setTranslationDomain('flashes')
+                    ->atPath('file')
+                    ->setTranslationDomain('validators')
                     ->addViolation();
             }
 
@@ -937,8 +925,8 @@ class Asset extends FormEntity
             // If the object is stored remotely, we should have a remote path
             if ($object->getRemotePath() === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.remote.path')
-                    ->atPath('path')
-                    ->setTranslationDomain('flashes')
+                    ->atPath('remotePath')
+                    ->setTranslationDomain('validators')
                     ->addViolation();
             }
 
