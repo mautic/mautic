@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -109,7 +110,7 @@ class EmailRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from('MauticEmailBundle:Email', 'e');
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
             $results['sent_count'] = 0;
