@@ -29,11 +29,8 @@ class LeadNoteRepository extends CommonRepository
     {
         $q = $this
             ->createQueryBuilder('n')
-            ->select('n, a')
-            ->join('n.createdBy', 'a');
+            ->select('n');
         $args['qb'] = $q;
-
-
 
         return parent::getEntities($args);
     }
