@@ -42,7 +42,7 @@ class HitRepository extends CommonRepository
         }
 
         $q->andWhere('h.trackingId = :id')
-        ->setParameter('id', $trackingId);
+            ->setParameter('id', $trackingId);
 
         $count = $q->getQuery()->getSingleResult();
 
@@ -217,9 +217,9 @@ class HitRepository extends CommonRepository
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.email) as clicks');
-        $results = $q->getQuery()->getResult();
+        $results = $q->getQuery()->getSingleResult();
 
-        return count($results);
+        return $results['clicks'];
     }
 
     /**
@@ -369,7 +369,7 @@ class HitRepository extends CommonRepository
     {
         if (!$q) {
             $q = $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
+                ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
                 ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id');
         }
 
