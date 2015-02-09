@@ -32,7 +32,7 @@ class AjaxController extends CommonAjaxController
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
         $canvasSettings = $this->request->request->get('canvasSettings', array(), true);
 
-        if (empty($campaignId) || empty($canvasSettings)) {
+        if (empty($campaignId)) {
             $dataArray = array('success' => 0);
         } else {
             $session->set('mautic.campaign.'.$campaignId.'.events.canvassettings', $canvasSettings);
