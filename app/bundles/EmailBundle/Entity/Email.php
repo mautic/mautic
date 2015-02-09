@@ -58,7 +58,7 @@ class Email extends FormEntity
     private $language = 'en';
 
     /**
-     * @ORM\Column(name="content", type="array")
+     * @ORM\Column(name="content", type="array", nullable=true)
      */
     private $content = array();
 

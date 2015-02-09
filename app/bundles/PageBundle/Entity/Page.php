@@ -76,7 +76,7 @@ class Page extends FormEntity
     private $contentMode = 'builder';
 
     /**
-     * @ORM\Column(name="content", type="array")
+     * @ORM\Column(name="content", type="array", nullable=true)
      */
     private $content = array();
 
