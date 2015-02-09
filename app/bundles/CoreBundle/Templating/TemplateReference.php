@@ -49,7 +49,7 @@ class TemplateReference extends BaseTemplateReference
             if (!empty($match[1])) {
                 $theme = $this->factory->getTheme();
                 //check for an override and load it if there is
-                $themeDir = $theme->getThemePath(true);
+                $themeDir = $theme->getThemePath();
                 if (!file_exists($template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path)) {
                     $template = '@' . $this->get('bundle') . '/Views/' . $path;
                 }
