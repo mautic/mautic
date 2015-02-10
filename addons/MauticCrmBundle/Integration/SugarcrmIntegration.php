@@ -226,6 +226,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function isAuthorized()
     {
+        if (!isset($this->keys['version'])) {
+            return false;
+        }
+
         if ($this->keys['version'] == '6') {
             $loginParams = array(
                 'user_auth'        => array(
