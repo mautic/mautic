@@ -301,50 +301,51 @@ class HitRepository extends CommonRepository
     {
         $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
 
+        // Get the total number of hits
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('p.id, p.unique_hits')
+            ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
+            ->where($q->expr()->in('p.id', $inIds));
+        $results = $q->execute()->fetchAll();
+
+        $return  = array();
+        foreach ($results as $p) {
+            $return[$p['id']] = array(
+                'totalHits' => $p['unique_hits'],
+                'bounces'   => 0,
+                'rate'      => 0
+            );
+        }
+
+        // Find what sessions were bounces
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('h.page_id, count(h.id) as hits')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
-            ->andWhere($sq->expr()->in('h.page_id', $inIds))
-            ->andWhere($sq->expr()->eq('h.code', '200'));
+        $sq->select('b.tracking_id')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
+            ->leftJoin('b', MAUTIC_TABLE_PREFIX.'pages', 'p', 'b.page_id = p.id')
+            ->andWhere($sq->expr()->eq('b.code', '200'));
 
         if ($fromDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
-                $sq->expr()->gte('h.date_hit', $sq->expr()->literal($dt->toUtcString()))
+                $sq->expr()->gte('b.date_hit', $sq->expr()->literal($dt->toUtcString()))
             );
         }
 
-        //the total hits and bounce rates may return different pages based on available results so create an array
-        //to keep from having PHP notices of non-existant keys
-        $return  = array();
-        foreach ($inIds as $id) {
-            $return[$id] = array(
-                'totalHits' => 0,
-                'bounces'   => 0,
-                'rate'      => 0
-            );
-        }
-        $sq->groupBy('h.tracking_id, h.page_id');
+        // Group by tracking ID to determine if the same session visited multiple pages
+        $sq->groupBy('b.tracking_id');
 
-        //get a total number of hits first
-        $results = $sq->execute()->fetchAll();
+        // Include if a single hit to page or multiple hits to the same page
+        $sq->having('count(distinct(b.page_id)) = 1');
 
-        foreach ($results as $t) {
-            //if there are no hits, an array with a null page_id will be returned which must be accounted for
-            if ($t['page_id'] != null) {
-                $return[$t['page_id']]['totalHits'] += (int)$t['hits'];
-            }
-        }
-
-        //now get a bounce count
-        $sq->having('hits = 1');
-
+        // Now group bounced sessions by page_id to get the number of bounces per page
         $q  = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('h2.page_id, SUM(hits) as bounces')
-            ->from(sprintf('(%s)', $sq->getSQL()), 'h2')
-            ->groupBy('h2.page_id');
+        $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->where('h.tracking_id IN ' . sprintf('(%s)', $sq->getSQL()))
+            ->andWhere($q->expr()->in('h.page_id', $inIds))
+            ->groupBy('h.page_id');
+
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
