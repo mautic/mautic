@@ -57,7 +57,7 @@ class PageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'raw')));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $variantParent = $options['data']->getVariantParent();
