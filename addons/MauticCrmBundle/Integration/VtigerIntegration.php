@@ -87,6 +87,10 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function isAuthorized()
     {
+        if (!isset($this->keys['url'])) {
+            return false;
+        }
+
         $url         = $this->getApiUrl();
         $parameters  = array(
             'operation' => 'getchallenge',
