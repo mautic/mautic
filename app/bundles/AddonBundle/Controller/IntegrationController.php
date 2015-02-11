@@ -218,7 +218,7 @@ class IntegrationController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_addon_integration_index',
                 'mauticContent' => 'integration',
-                'route'         => $this->generateUrl('mautic_addon_integration_edit', array('name' => $name))
+                'route'         => false
             )
         ));
     }
