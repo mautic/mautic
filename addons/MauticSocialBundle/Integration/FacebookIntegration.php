@@ -114,8 +114,7 @@ class FacebookIntegration extends SocialIntegration
                 //getUserId has already obtained the data
                 $data = $id;
             } else {
-                $fields = array_merge(array_keys($this->getAvailableLeadFields()), array('id', 'link'));
-                $url    = $this->getApiUrl("$id") . "?fields=" . implode(',',$fields);
+                $url    = $this->getApiUrl("$id");
                 //@todo - can't use access token to do a global search; may not work after April
                 $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
             }
@@ -152,8 +151,7 @@ class FacebookIntegration extends SocialIntegration
         $identifiers = $this->cleanIdentifier($identifier);
 
         if (isset($identifiers['facebook'])) {
-            $fields = array_merge(array_keys($this->getAvailableLeadFields()), array('id', 'link'));
-            $url    = $this->getApiUrl($identifiers["facebook"]) . "?fields=" . implode(',',$fields);
+            $url    = $this->getApiUrl($identifiers["facebook"]);
             //@todo - can't use access token to do a global search; may not work after April
             $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
 
