@@ -55,7 +55,6 @@ class DetailsType extends AbstractType
             ));
         }
 
-        //@todo - add event so that other bundles can plug in custom features
         $features = $options['integration_object']->getSupportedFeatures();
         if (!empty($features)) {
             $labels = array();

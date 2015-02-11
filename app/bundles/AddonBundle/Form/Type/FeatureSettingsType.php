@@ -47,7 +47,7 @@ class FeatureSettingsType extends AbstractType
         $integration_object->appendToForm($builder, $options['data'], 'features');
         $leadFields = $options['lead_fields'];
 
-        $formModifier = function (FormInterface $form, $data) use ($integration_object, $leadFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields) {
 
             $settings = array(
                 'silence_exceptions' => false,
@@ -76,13 +76,14 @@ class FeatureSettingsType extends AbstractType
                 'alert_type'           => $alertType
             ));
 
-            if ($error) {
+            if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
             }
         };
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
+
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
@@ -91,7 +92,7 @@ class FeatureSettingsType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
-                $formModifier($event->getForm(), $data);
+                $formModifier($event->getForm(), $data, 'post');
             }
         );
     }
