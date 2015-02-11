@@ -150,15 +150,16 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $dataArray['success'] = 1;
-
-                $socialProfiles = IntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
+                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $helper */
+                $helper         = $this->factory->getHelper('integration');
+                $socialProfiles = $helper->clearIntegrationCache($lead, $network);
                 $socialCount    = count($socialProfiles);
 
                 if (empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
                         'socialProfiles'    => $socialProfiles,
                         'lead'              => $lead,
-                        'socialProfileUrls' => IntegrationHelper::getSocialProfileUrlRegex(false)
+                        'socialProfileUrls' => $helper->getSocialProfileUrlRegex(false)
                     ));
                 }
 
