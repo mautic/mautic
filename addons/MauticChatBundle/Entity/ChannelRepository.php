@@ -41,14 +41,17 @@ class ChannelRepository extends CommonRepository
         $q->andWhere(
             $q->expr()->andX(
                 $q->expr()->orX(
-                    $q->expr()->eq('c.isPrivate', 0),
+                    $q->expr()->eq('c.isPrivate', ':false'),
                     $q->expr()->andX(
-                        $q->expr()->eq('c.isPrivate', 1),
+                        $q->expr()->eq('c.isPrivate', ':true'),
                         $q->expr()->eq('u.id', ':userId')
                     )
                 )
             )
-        )->setParameter('userId', $args['userId']);
+        )
+            ->setParameter('userId', $args['userId'])
+            ->setParameter('false', false, 'boolean')
+            ->setPararmeter('true', true, 'boolean');
 
         $query = $q->getQuery();
 
@@ -139,7 +142,7 @@ class ChannelRepository extends CommonRepository
                 )
             )
         )
-        ->setParameter('userId', $userId);
+            ->setParameter('userId', $userId);
 
         $q->andWhere('c.isPublished = :true')
             ->setParameter(':true', true, 'boolean')
@@ -430,8 +433,8 @@ class ChannelRepository extends CommonRepository
 
         if (!$includeNotified) {
             $qb->andwhere(
-                $qb->expr()->eq('c.isNotified', 0)
-            );
+                $qb->expr()->eq('c.isNotified', ':false')
+            )->setParameter('false', false, 'boolean');
         }
 
         $results = $qb->getQuery()->getArrayResult();

@@ -167,7 +167,8 @@ class ChatRepository extends CommonRepository
         $now = new DateTimeHelper();
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX . 'chats')
-            ->set('is_read', 1)
+            ->set('is_read', ':true')
+            ->setParameter('true', true, 'boolean')
             ->set('date_read', ':readDate')
             ->where(
                 $q->expr()->andX(
@@ -209,8 +210,9 @@ class ChatRepository extends CommonRepository
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('IDENTITY(c.toUser)', ':toUser'),
-            $q->expr()->eq('c.isRead', 0)
+            $q->expr()->eq('c.isRead', ':false')
         );
+        $q->setParameter('false', false, 'boolean');
 
         if (!empty($fromUsers)) {
             $expr->add(
@@ -224,7 +226,7 @@ class ChatRepository extends CommonRepository
             ->leftJoin('c.fromUser', 'u')
             ->where($expr)
             ->setParameter('toUser', $toUser)
-            ->groupBy('c.fromUser');
+            ->groupBy('c.fromUser, u.id');
         $results = $q->getQuery()->getArrayResult();
 
         $return = array();
@@ -252,7 +254,7 @@ class ChatRepository extends CommonRepository
             ->join('c.toUser', 'tu')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->eq('c.isRead', 0),
+                    $q->expr()->eq('c.isRead', ':false'),
                     $q->expr()->eq('tu.id', ':userId')
                 )
             )
@@ -261,9 +263,11 @@ class ChatRepository extends CommonRepository
 
         if (!$includeNotified) {
             $q->andwhere(
-                $q->expr()->eq('c.isNotified', 0)
+                $q->expr()->eq('c.isNotified', ':false')
             );
         }
+
+        $q->setParameter('false', false, 'boolean');
 
         $results = $q->getQuery()->getArrayResult();
 
