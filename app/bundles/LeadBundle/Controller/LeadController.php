@@ -13,6 +13,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -275,6 +276,29 @@ class LeadController extends FormController
         $events     = $event->getEvents();
         $eventTypes = $event->getEventTypes();
 
+        // Get an engagement count
+        $translator = $this->factory->getTranslator();
+        $graphData = GraphHelper::prepareDatetimeLineGraphData(6, 'M', array($translator->trans('mautic.lead.graph.line.all_engagements'), $translator->trans('mautic.lead.graph.line.points')));
+        $fromDate = $graphData['fromDate'];
+        $allEngagements = array();
+        $total          = 0;
+        foreach ($events as $e) {
+            if ($e['timestamp'] < $fromDate) {
+                $total++;
+                $allEngagements[] = array(
+                    'date'  => $e['timestamp'],
+                    'data'  => 1
+                );
+            }
+        }
+
+        $graphData = GraphHelper::mergeLineGraphData($graphData, $allEngagements, 'M', 0, 'date', 'data', false, false);
+
+        /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
+        $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        $pointStats          = $pointsLogRepository->getLeadPoints($fromDate, array('lead_id' => $lead->getId()));
+        $engagementGraphData = GraphHelper::mergeLineGraphData($graphData, $pointStats, 'M', 1, 'date', 'data', false, false);
+
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
@@ -294,10 +318,6 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
 
-        /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-        $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-        $pointStats          = $pointsLogRepository->getLeadPoints(6, 'M', array('lead_id' => $lead->getId()));
-
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'lead'              => $lead,
@@ -311,7 +331,7 @@ class LeadController extends FormController
                 'eventFilters'      => $filters,
                 'upcomingEvents'    => $upcomingEvents,
                 'icons'             => $icons,
-                'pointStats'        => $pointStats,
+                'engagementData'    => $engagementGraphData,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                 'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                 'leadNotes'         => $this->forward('MauticLeadBundle:Note:index', array(

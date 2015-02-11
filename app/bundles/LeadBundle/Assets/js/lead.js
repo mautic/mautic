@@ -149,10 +149,10 @@ Mautic.leadlistOnLoad = function(container) {
     }
 
     /*
-    mQuery('#leadlist_filters_right').sortable({
-        items: "div.panel"
-    });
-    */
+     mQuery('#leadlist_filters_right').sortable({
+     items: "div.panel"
+     });
+     */
 
     if (mQuery('#leadlist_filters_right').length) {
         mQuery('#leadlist_filters_right .remove-selected').each( function (index, el) {
@@ -546,6 +546,11 @@ Mautic.renderEngagementChart = function() {
     var canvas = document.getElementById("chart-engagement");
     var chartData = mQuery.parseJSON(mQuery('#chart-engagement-data').text());
     Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
+
+    var legendHolder = document.createElement('div');
+    legendHolder.innerHTML = Mautic.leadEngagementChart.generateLegend();
+    mQuery('#engagement-legend').html(legendHolder.firstChild);
+    Mautic.leadEngagementChart.update();
 };
 
 Mautic.showSocialMediaImageModal = function(imgSrc) {
