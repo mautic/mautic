@@ -104,7 +104,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                         <?php $img = $view['gravatar']->getImage($fields['core']['email']['value']); ?>
                                     <?php else : ?>
                                         <?php $socialData = $lead->getSocialCache(); ?>
-                                        <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
+                                        <?php $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']); ?>
                                     <?php endif; ?>
                                     <img src="<?php echo $img; ?>" alt="" />
                             </span>
