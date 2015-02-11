@@ -13,39 +13,6 @@ $label = $view['translator']->trans($variants['criteria'][$results['basedOn']]['
 $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['labels'], $support['data']);
 
 ?>
-<style scoped>
-    .bar-legend {
-        list-style: none;
-        position: absolute;
-        top: 0;
-    }
-    .bar-legend li {
-        display: block;
-        position: relative;
-        margin-bottom: 4px;
-        border-radius: 5px;
-        padding: 2px 8px 2px 28px;
-        font-size: 14px;
-        cursor: default;
-        -webkit-transition: background-color 200ms ease-in-out;
-        -moz-transition: background-color 200ms ease-in-out;
-        -o-transition: background-color 200ms ease-in-out;
-        transition: background-color 200ms ease-in-out;
-    }
-    .bar-legend li:hover {
-        background-color: #fafafa;
-    }
-    .bar-legend li span {
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 20px;
-        height: 100%;
-        border-radius: 5px;
-    }
-</style>
-
 <div class="panel ovf-h bg-auto bg-light-xs abtest-bar-chart">
     <div class="panel-body box-layout">
         <div class="col-xs-8 va-m">
@@ -62,7 +29,7 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
             <canvas id="abtest-bar-chart" height="300"></canvas>
         </div>
         <div class="col-sm-5">
-            <div class="abtest-bar-legend"></div>
+            <div class="abtest-bar-legend legend-container"></div>
         </div>
     </div>
 </div>
