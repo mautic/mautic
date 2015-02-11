@@ -105,7 +105,7 @@ class GraphHelper
      *
      * @return string
      */
-    public static function getDateLabelFromat($unit = 'D')
+    public static function getDateLabelFormat($unit = 'D')
     {
         $format = '';
         if ($unit == 'H') {
@@ -115,7 +115,7 @@ class GraphHelper
         } elseif ($unit == 'W') {
             $format = 'W';
         } elseif ($unit == 'M') {
-            $format = 'F y';
+            $format = 'F';
         } elseif ($unit == 'Y') {
             $format = 'Y';
         }
@@ -140,7 +140,7 @@ class GraphHelper
             $isTime = 'T';
         }
 
-        $format = self::getDateLabelFromat($unit);
+        $format = self::getDateLabelFormat($unit);
 
         $date    = new \DateTime();
         $oneUnit = new \DateInterval('P' . $isTime . '1' . $unit);
@@ -273,7 +273,7 @@ class GraphHelper
                     $item[$dateName] = new \DateTime($item[$dateName]);
                 }
 
-                $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
+                $oneItem = $item[$dateName]->format(self::getDateLabelFormat($unit));
                 if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
                     if ($deltaName) {
                         if ($average) {
@@ -300,12 +300,13 @@ class GraphHelper
         }
 
         if ($incremental) {
+            $incrementalCount = 0;
             foreach ($graphData['datasets'][$datasetKey]['data'] as $key => $value) {
                 if ($graphData['datasets'][$datasetKey]['data'][$key]) {
-                    $incremental += $graphData['datasets'][$datasetKey]['data'][$key];
+                    $incrementalCount += $graphData['datasets'][$datasetKey]['data'][$key];
                 }
 
-                $graphData['datasets'][$datasetKey]['data'][$key] = $incremental;
+                $graphData['datasets'][$datasetKey]['data'][$key] = $incrementalCount;
             }
         }
 
