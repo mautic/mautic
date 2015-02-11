@@ -38,6 +38,7 @@ class UpdateHelper
         $options = array('transport.curl' => array(
             CURLOPT_SSLVERSION      => 1,
             CURLOPT_SSL_CIPHER_LIST => 'TLSv1',
+            CURLOPT_SSL_VERIFYPEER  => false
         ));
 
         $this->connector = HttpFactory::getHttp($options);
@@ -56,6 +57,11 @@ class UpdateHelper
         try {
             $data = $this->connector->get($package);
         } catch (\Exception $exception) {
+            // Log the error
+            $logger = $this->factory->getLogger();
+            $logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
+
+
             return array(
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.package'
