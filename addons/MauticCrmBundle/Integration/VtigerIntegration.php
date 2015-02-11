@@ -9,13 +9,13 @@
 
 namespace MauticAddon\MauticCrmBundle\Integration;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-
 /**
  * Class VtigerIntegration
  */
 class VtigerIntegration extends CrmAbstractIntegration
 {
+    private $authorzationError = '';
+
     /**
      * Returns the name of the social integration that must match the name of the file
      *
@@ -112,11 +112,48 @@ class VtigerIntegration extends CrmAbstractIntegration
         $response = $this->makeRequest($url, $loginParameters, 'POST');
 
         if (empty($response['success'])) {
+            if (is_array($response) && array_key_exists('error', $response)) {
+                $this->authorzationError = $response['error']['message'];
+            }
+
             return false;
         } else {
             $error = $this->extractAuthKeys($response['result']);
 
-            return (empty($error));
+            if (empty($error)) {
+                return true;
+            } else {
+                $this->authorzationError = $error;
+                return false;
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getAuthLoginUrl ()
+    {
+        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+    }
+
+    /**
+     * Retrieves and stores tokens returned from oAuthLogin
+     *
+     * @param array $settings
+     * @param array $parameters
+     *
+     * @return array
+     */
+    public function authCallback ($settings = array(), $parameters = array())
+    {
+        $success = $this->isAuthorized();
+        if (!$success) {
+            return $this->authorzationError;
+        } else {
+            return false;
         }
     }
 
@@ -187,5 +224,16 @@ class VtigerIntegration extends CrmAbstractIntegration
             //vtiger requires assigned_user_id so default to authenticated user
             $mappedData['assigned_user_id'] = $this->keys['userId'];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        return array(
+            'requires_callback'      => false,
+            'requires_authorization' => true
+        );
     }
 }

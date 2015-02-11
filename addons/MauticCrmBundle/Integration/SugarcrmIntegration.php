@@ -8,7 +8,8 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
+
+use Mautic\AddonBundle\Exception\ApiErrorException;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -18,6 +19,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
+
+    private $authorzationError;
+
     /**
      * Returns the name of the social integration that must match the name of the file
      *
@@ -115,17 +119,26 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function authCallback ($settings = array(), $parameters = array())
     {
-        $settings = array(
-            'grant_type'         => 'password',
-            'ignore_redirecturi' => true
-        );
-        $parameters = array(
-            'username' => $this->keys['username'],
-            'password' => $this->keys['password'],
-            'platform' => 'base'
-        );
+        if (isset($this->keys['version']) && $this->keys['version'] == '6') {
+            $success = $this->isAuthorized();
+            if (!$success) {
+                return $this->authorzationError;
+            } else {
+                return false;
+            }
+        } else {
+            $settings   = array(
+                'grant_type'         => 'password',
+                'ignore_redirecturi' => true
+            );
+            $parameters = array(
+                'username' => $this->keys['username'],
+                'password' => $this->keys['password'],
+                'platform' => 'base'
+            );
 
-        return parent::authCallback($settings, $parameters);
+            return parent::authCallback($settings, $parameters);
+        }
     }
 
     /**
@@ -179,6 +192,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
+            } else {
+                throw new ApiErrorException($this->authorzationError);
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -200,7 +215,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     {
         if ($this->keys['version'] == '6') {
             if (!empty($response['name'])) {
-                return $response['name'];
+                return $response['description'];
             } else {
                 return $this->factory->getTranslator()->trans("mautic.integration.error.genericerror", array(), "flashes");
             }
@@ -256,6 +271,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             unset($response['module'], $response['name_value_list']);
             $error = $this->extractAuthKeys($response, 'id');
 
+            $this->authorzationError = $error;
+
             return (empty($error));
         } else {
             return parent::isAuthorized();
@@ -297,5 +314,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'required' => true
             ));
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        return array(
+            'requires_callback'      => true,
+            'requires_authorization' => true
+        );
     }
 }

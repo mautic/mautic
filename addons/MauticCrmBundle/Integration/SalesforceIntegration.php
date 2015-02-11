@@ -9,8 +9,6 @@
 
 namespace MauticAddon\MauticCrmBundle\Integration;
 
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-
 /**
  * Class SalesforceIntegration
  */

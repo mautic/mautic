@@ -8,9 +8,8 @@
  */
 
 namespace MauticAddon\MauticCrmBundle\Integration;
+
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticAddon\MauticCrmBundle\Api\CrmApi;
-use Mautic\AddonBundle\Exception\ApiErrorException;
 
 /**
  * Class ZohoIntegration
