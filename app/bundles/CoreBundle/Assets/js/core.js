@@ -2766,7 +2766,13 @@ var Mautic = {
         mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
     },
 
-
+    /**
+     * Show builder feedback modal (accept input and insert into editor)
+     *
+     * @param event
+     * @param ui
+     * @param editorId
+     */
     showBuilderFeedbackModal: function (event, ui, editorId) {
         // Reset in case the modal wasn't closed via cancel
         mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
@@ -2841,8 +2847,7 @@ var Mautic = {
     /**
      * Tests an email server connection
      */
-    testEmailServerConnection: function() {
-        mQuery('#mailerTestButtonContainer')
+    testEmailServerConnection: function(sendEmail) {
         var data = {
             transport:  mQuery('#config_coreconfig_mailer_transport').val(),
             host:       mQuery('#config_coreconfig_mailer_host').val(),
@@ -2850,14 +2855,20 @@ var Mautic = {
             encryption: mQuery('#config_coreconfig_mailer_encryption').val(),
             authMode:   mQuery('#config_coreconfig_mailer_auth_mode').val(),
             user:       mQuery('#config_coreconfig_mailer_user').val(),
-            password:   mQuery('#config_coreconfig_mailer_password').val()
+            password:   mQuery('#config_coreconfig_mailer_password').val(),
+            from_name:  mQuery('#config_coreconfig_mailer_from_name').val(),
+            from_email: mQuery('#config_coreconfig_mailer_from_email').val(),
+            send_test:  (typeof sendEmail !== 'undefined') ? sendEmail : false
         };
+
+        mQuery('.button_container .fa-spinner').removeClass('hide');
 
         Mautic.ajaxActionRequest('testEmailServerConnection', data, function(response) {
             var theClass = (response.success) ? 'has-success' : 'has-error';
             var theMessage = response.message;
             mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);
             mQuery('#mailerTestButtonContainer .help-block').html(theMessage);
+            mQuery('.button_container .fa-spinner').addClass('hide');
         });
     }
 };

@@ -576,15 +576,36 @@ class AjaxController extends CommonController
             }
 
             if (!empty($mailer)) {
+                if (empty($settings['password'])) {
+                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                }
                 $mailer->setUsername($settings['user']);
                 $mailer->setPassword($settings['password']);
 
+                $logger = new \Swift_Plugins_Loggers_ArrayLogger();
+                $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
+
                 try {
                     $mailer->start();
+                    $translator = $this->factory->getTranslator();
+
+                    if (!empty($settings['send_test'])) {
+                        $message = new \Swift_Message(
+                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.subject'),
+                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
+                        );
+
+                        $message->setFrom(array($settings['from_email'] => $settings['from_name']));
+                        $message->setTo(array($settings['from_email'] => $settings['from_name']));
+
+                        $mailer->send($message);
+                    }
+
                     $dataArray['success'] = 1;
-                    $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+                    $dataArray['message'] = $translator->trans('mautic.core.success') . '<br />' . $logger->dump();
+
                 } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage();
+                    $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
                 }
             }
         }
