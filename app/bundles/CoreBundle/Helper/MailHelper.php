@@ -30,6 +30,11 @@ class MailHelper
     private $mailer;
 
     /**
+     * @var \Swift_Plugins_Loggers_ArrayLogger
+     */
+    private $logger;
+
+    /**
      * @var bool|\Swift_Message
      */
     public $message;
@@ -74,11 +79,19 @@ class MailHelper
      * @param               $mailer
      * @param null          $from
      */
-    public function __construct(MauticFactory $factory, $mailer, $from = null)
+    public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
         $this->factory = $factory;
         $this->mailer  = $mailer;
-        $this->from    = $from;
+
+        try {
+            $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
+            $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+
+        $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email'), $factory->getParameter('mailer_from_name'));
         $this->message = $this->getMessageInstance();
     }
 
@@ -133,9 +146,11 @@ class MailHelper
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
+                    $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $this->logger->dump());
                 }
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
+                $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $this->logger->dump());
             }
 
             $this->mailer->send($this->message, $this->failures);
