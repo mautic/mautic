@@ -282,21 +282,6 @@ var Mautic = {
             return Mautic.showConfirmation(this);
         });
 
-        //little hack to move modal windows outside of positioned divs
-        mQuery(container + " *[data-toggle='modal']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-
-            //move the modal to the body tag to get around positioned div issues
-            mQuery(target).off('show.bs.modal');
-            mQuery(target).on('show.bs.modal', function () {
-                if (!mQuery(target).hasClass('modal-moved')) {
-                    mQuery(target).appendTo("body");
-                    mQuery(target).addClass('modal-moved');
-                }
-            });
-        });
-
-
         //initialize date/time
         mQuery(container + " *[data-toggle='datetime']").each(function() {
             Mautic.activateDateTimeInputs(this, 'datetime');
@@ -717,23 +702,6 @@ var Mautic = {
             if (typeof MauticVars.modalsReset == 'undefined') {
                 MauticVars.modalsReset = {};
             }
-
-            mQuery(container + " *[data-toggle='modal']").each(function (index) {
-                var target = mQuery(this).attr('data-target');
-                mQuery(target).remove();
-            });
-
-            mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-                var target = mQuery(this).attr('data-target');
-                if (typeof MauticVars.modalsReset[target] == 'undefined') {
-                    if (mQuery(this).attr('data-ignore-removemodal') != 'true' && mQuery(target).attr('id') != 'MauticSharedModal') {
-                        mQuery(target).remove();
-                    } else {
-                        Mautic.resetModal(target, true);
-                    }
-                    MauticVars.modalsReset[target] = target;
-                }
-            });
 
             mQuery.each(['editor', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
@@ -1219,11 +1187,6 @@ var Mautic = {
 
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
-            if (!mQuery(target).hasClass('modal-moved')) {
-                mQuery(target).appendTo('body');
-                mQuery(target).addClass('modal-moved');
-            }
-
             if (header) {
                 mQuery(target + " .modal-title").html(header);
             }
@@ -1314,7 +1277,7 @@ var Mautic = {
 
             //mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app
-             Mautic.processPageContent(response);
+            Mautic.processPageContent(response);
         } else {
             if (response.flashes) {
                 Mautic.setFlashes(response.flashes);

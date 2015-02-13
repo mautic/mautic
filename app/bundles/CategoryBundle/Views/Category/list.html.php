@@ -57,9 +57,8 @@ if ($tmpl == 'index')
                             ),
                             'editMode'        => 'ajaxmodal',
                             'editAttr'        => array(
-                                'data-target'             => '#MauticSharedModal',
-                                'data-ignore-removemodal' => 'true',
-                                'data-header'             => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
+                                'data-target' => '#MauticSharedModal',
+                                'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
                             ),
                             'routeBase'       => 'category',
                             'query'           => array(
