@@ -17,7 +17,7 @@ $required = array();
 </div>
 
 <?php if ($description = $form->getDescription()): ?>
-	<p class="mauticform-description"><?php echo $description; ?></p>
+	<div class="mauticform-description"><?php echo $description; ?></div>
 <?php endif; ?>
 
 <form autocomplete="off" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" onsubmit="return MauticForm_<?php echo $formName; ?>.validateForm();">

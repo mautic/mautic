@@ -32,7 +32,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10 va-m">
-                        <p class="text-white dark-sm mb-0"><?php echo $activeAsset->getDescription(); ?></p>
+                        <div class="text-white dark-sm mb-0"><?php echo $activeAsset->getDescription(); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset)); ?>
