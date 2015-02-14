@@ -13,9 +13,9 @@ use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadPointLogRepository
+ * Class LeadTriggerLogRepository
  */
-class LeadPointLogRepository extends CommonRepository
+class LeadTriggerLogRepository extends CommonRepository
 {
 
     /**
@@ -27,7 +27,7 @@ class LeadPointLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'point_lead_action_log')
+        $q->update(MAUTIC_TABLE_PREFIX . 'point_lead_event_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();

@@ -10,6 +10,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
+use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
@@ -26,7 +27,8 @@ class LeadSubscriber extends CommonSubscriber
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0)
+            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
+            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
         );
     }
 
@@ -95,6 +97,21 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadChange(LeadChangeEvent $event)
     {
-        $this->factory->getModel('page')->getHitRepository()->updateLead($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
+        $this->factory->getModel('page')->getHitRepository()->updateLeadByTrackingId(
+            $event->getNewLead()->getId(),
+            $event->getNewTrackingId(),
+            $event->getOldTrackingId()
+        );
+    }
+
+    /**
+     * @param LeadChangeEvent $event
+     */
+    public function onLeadMerge(LeadMergeEvent $event)
+    {
+        $this->factory->getModel('page')->getHitRepository()->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
     }
 }

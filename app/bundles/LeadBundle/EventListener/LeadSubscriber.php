@@ -33,10 +33,11 @@ class LeadSubscriber extends CommonSubscriber
         return array(
             LeadEvents::LEAD_POST_SAVE       => array('onLeadPostSave', 0),
             LeadEvents::LEAD_POST_DELETE     => array('onLeadDelete', 0),
+            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0),
             LeadEvents::FIELD_POST_SAVE      => array('onFieldPostSave', 0),
             LeadEvents::FIELD_POST_DELETE    => array('onFieldDelete', 0),
-            LeadEvents::NOTE_POST_SAVE      => array('onNotePostSave', 0),
-            LeadEvents::NOTE_POST_DELETE    => array('onNoteDelete', 0),
+            LeadEvents::NOTE_POST_SAVE       => array('onNotePostSave', 0),
+            LeadEvents::NOTE_POST_DELETE     => array('onNoteDelete', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
             UserEvents::USER_PRE_DELETE      => array('onUserDelete', 0)
         );
@@ -241,6 +242,27 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"   => $note->deletedId,
             "action"     => "delete",
             "details"    => array('text', $note->getText()),
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+        );
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * @param LeadChangeEvent $event
+     */
+    public function onLeadMerge(LeadMergeEvent $event)
+    {
+        $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog')->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+
+        $log = array(
+            "bundle"     => "lead",
+            "object"     => "lead",
+            "objectId"   => $event->getLoser()->getId(),
+            "action"     => "merge",
+            "details"    => array('merged_into' => $event->getVictor()->getId()),
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);

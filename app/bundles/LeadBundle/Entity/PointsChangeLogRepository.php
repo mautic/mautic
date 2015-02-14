@@ -90,7 +90,7 @@ class PointsChangeLogRepository extends CommonRepository
     public function getMostPoints($query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
-            ->setFirstResult($offset);
+                ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
         return $results;
@@ -108,7 +108,7 @@ class PointsChangeLogRepository extends CommonRepository
     public function getMostLeads($query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
-            ->setFirstResult($offset);
+                ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
         return $results;
@@ -134,5 +134,20 @@ class PointsChangeLogRepository extends CommonRepository
         $result = $query->execute()->fetch();
 
         return $result['quantity'];
+    }
+
+    /**
+     * Updates lead ID (e.g. after a lead merge)
+     *
+     * @param $fromLeadId
+     * @param $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'lead_points_change_log')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = ' . (int) $fromLeadId)
+            ->execute();
     }
 }

@@ -42,7 +42,7 @@ class HitRepository extends CommonRepository
         }
 
         $q->andWhere('h.trackingId = :id')
-            ->setParameter('id', $trackingId);
+        ->setParameter('id', $trackingId);
 
         $count = $q->getQuery()->getSingleResult();
 
@@ -370,7 +370,7 @@ class HitRepository extends CommonRepository
     {
         if (!$q) {
             $q = $this->_em->getConnection()->createQueryBuilder()
-                ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
                 ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id');
         }
 
@@ -628,7 +628,7 @@ class HitRepository extends CommonRepository
      * @param $newTrackingId
      * @param $oldTrackingId
      */
-    public function updateLead($leadId, $newTrackingId, $oldTrackingId)
+    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX . 'page_hits')
@@ -641,6 +641,21 @@ class HitRepository extends CommonRepository
                 'newTrackingId' => $newTrackingId,
                 'oldTrackingId' => $oldTrackingId
             ))
+            ->execute();
+    }
+
+    /**
+     * Updates lead ID (e.g. after a lead merge)
+     *
+     * @param $fromLeadId
+     * @param $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'page_hits')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
     }
 }

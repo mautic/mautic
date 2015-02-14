@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -729,42 +730,58 @@ class LeadModel extends FormModel
         }
 
         //which lead is the oldest?
-        $oldLead  = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
-        $newLead  = ($oldLead->getId() === $leadId) ? $lead2 : $lead;
+        $mergeWith  = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
+        $mergeFrom  = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+
+        //dispatch pre merge event
+        $event = new LeadMergeEvent($mergeWith, $mergeFrom);
+        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRE_MERGE)) {
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
+        }
 
         //merge IP addresses
-        $ipAddresses = $newLead->getIpAddresses();
+        $ipAddresses = $mergeFrom->getIpAddresses();
         foreach ($ipAddresses as $ip) {
-            $oldLead->addIpAddress($ip);
+            $mergeWith->addIpAddress($ip);
         }
 
         //merge fields
-        $newLeadFields = $newLead->getFields();
-        foreach ($newLeadFields as $group => $groupFields) {
+        $mergeFromFields = $mergeFrom->getFields();
+        foreach ($mergeFromFields as $group => $groupFields) {
             foreach ($groupFields as $alias => $details) {
                 //overwrite old lead's data with new lead's if new lead's is not empty
                 if (!empty($details['value'])) {
-                    $oldLead->addUpdatedField($alias, $details['value']);
+                    $mergeWith->addUpdatedField($alias, $details['value']);
                 }
             }
         }
 
         //merge owner
-        $oldOwner = $oldLead->getOwner();
-        $newOwner = $newLead->getOwner();
+        $oldOwner = $mergeWith->getOwner();
+        $newOwner = $mergeFrom->getOwner();
 
         if ($oldOwner === null) {
-            $oldLead->setOwner($newOwner);
+            $mergeWith->setOwner($newOwner);
         }
 
+        //sum points
+        $mergeWithPoints = $mergeWith->getPoints();
+        $mergeFromPoints = $mergeFrom->getPoints();
+        $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
+
         //save the updated lead
-        $this->saveEntity($oldLead, false);
+        $this->saveEntity($mergeWith, false);
+
+        //post merge events
+        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
+            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
+        }
 
         //delete the old
-        $this->deleteEntity($newLead);
+        $this->deleteEntity($mergeFrom);
 
         //return the merged lead
-        return $oldLead;
+        return $mergeWith;
     }
 
     /**

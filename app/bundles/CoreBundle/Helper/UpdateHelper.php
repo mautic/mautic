@@ -57,10 +57,8 @@ class UpdateHelper
         try {
             $data = $this->connector->get($package);
         } catch (\Exception $exception) {
-            // Log the error
             $logger = $this->factory->getLogger();
             $logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
-
 
             return array(
                 'error'   => true,

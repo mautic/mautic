@@ -9,6 +9,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
@@ -26,7 +27,8 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
+            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
         );
     }
 
@@ -93,5 +95,16 @@ class LeadSubscriber extends CommonSubscriber
                 ));
             }
         }
+    }
+
+    /**
+     * @param LeadMergeEvent $event
+     */
+    public function onLeadMerge(LeadMergeEvent $event)
+    {
+        $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
     }
 }
