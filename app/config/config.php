@@ -167,20 +167,26 @@ $container->loadFromExtension('doctrine_migrations', array(
     'name'       => 'Mautic Migrations'
 ));
 
-//Swiftmailer Configuration
-$container->loadFromExtension('swiftmailer', array(
-    'transport' => '%mautic.mailer_transport%',
-    'host'      => '%mautic.mailer_host%',
-    'port'      => '%mautic.mailer_port%',
-    'username'  => '%mautic.mailer_user%',
-    'password'  => '%mautic.mailer_password%',
-    'spool'     => array(
-        'type' => '%mautic.mailer_spool_type%',
-        'path' => '%mautic.mailer_spool_path%'
-    ),
+// Swiftmailer Configuration
+$mailerSettings = array(
+    'transport'  => '%mautic.mailer_transport%',
+    'host'       => '%mautic.mailer_host%',
+    'port'       => '%mautic.mailer_port%',
+    'username'   => '%mautic.mailer_user%',
+    'password'   => '%mautic.mailer_password%',
     'encryption' => '%mautic.mailer_encryption%',
     'auth_mode'  => '%mautic.mailer_auth_mode%'
-));
+);
+
+// Only spool if using file as otherwise emails are not sent on redirects
+$spoolType = $container->getParameter('mautic.mailer_spool_type');
+if ($spoolType == 'file') {
+    $mailerSettings['spool'] = array(
+        'type' => '%mautic.mailer_spool_type%',
+        'path' => '%mautic.mailer_spool_path%'
+    );
+}
+$container->loadFromExtension('swiftmailer', $mailerSettings);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', array(
