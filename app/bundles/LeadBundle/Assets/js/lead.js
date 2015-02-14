@@ -149,10 +149,10 @@ Mautic.leadlistOnLoad = function(container) {
     }
 
     /*
-     mQuery('#leadlist_filters_right').sortable({
-     items: "div.panel"
-     });
-     */
+    mQuery('#leadlist_filters_right').sortable({
+        items: "div.panel"
+    });
+    */
 
     if (mQuery('#leadlist_filters_right').length) {
         mQuery('#leadlist_filters_right .remove-selected').each( function (index, el) {

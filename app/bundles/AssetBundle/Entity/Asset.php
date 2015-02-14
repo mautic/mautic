@@ -780,19 +780,19 @@ class Asset extends FormEntity
                 'xltm',
                 'xls',
                 'xlt'
-                ),
+            ),
             'word' => array(
                 'doc',
                 'docx',
                 'docm',
                 'dotx'
-                ),
+            ),
             'pdf' => array(
                 'pdf'
-                ),
+            ),
             'audio' => array(
                 'mp3'
-                ),
+            ),
             'archive' => array(
                 'zip',
                 'rar',
@@ -800,7 +800,7 @@ class Asset extends FormEntity
                 'tar',
                 'gz',
                 '7z'
-                ),
+            ),
             'image' => array(
                 'jpg',
                 'jpeg',
@@ -809,11 +809,11 @@ class Asset extends FormEntity
                 'ico',
                 'bmp',
                 'psd'
-                ),
+            ),
             'text' => array(
                 'txt',
                 'pub'
-                ),
+            ),
             'code' => array(
                 'php',
                 'js',
@@ -823,7 +823,7 @@ class Asset extends FormEntity
                 'html',
                 'htm',
                 'sql'
-                ),
+            ),
             'powerpoint' => array(
                 'ppt',
                 'pptx',
@@ -834,15 +834,15 @@ class Asset extends FormEntity
                 'pot',
                 'pps',
                 'odp'
-                ),
+            ),
             'video' => array(
                 'wmv',
                 'avi',
                 'mp4',
                 'mkv',
                 'mpeg'
-                )
-            );
+            )
+        );
     }
 
     /**
