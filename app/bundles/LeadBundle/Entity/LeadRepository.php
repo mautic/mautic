@@ -83,10 +83,10 @@ class LeadRepository extends CommonRepository
     {
         $col = 'l.'.$field;
         $q = $this->_em->getConnection()->createQueryBuilder()
-        ->select('l.id')
-        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-        ->where("$col = :search")
-        ->setParameter("search", $value);
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where("$col = :search")
+            ->setParameter("search", $value);
 
         if ($ignoreId) {
             $q->andWhere('l.id != :ignoreId')
@@ -107,8 +107,8 @@ class LeadRepository extends CommonRepository
             $q->where(
                 $q->expr()->in('l.id', ':ids')
             )
-            ->setParameter('ids', $ids)
-            ->orderBy('l.dateAdded', 'DESC');
+                ->setParameter('ids', $ids)
+                ->orderBy('l.dateAdded', 'DESC');
             $results = $q->getQuery()->getResult();
         }
 
@@ -598,9 +598,9 @@ class LeadRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-       return array(
-           array('l.last_active', 'DESC')
-       );
+        return array(
+            array('l.last_active', 'DESC')
+        );
     }
 
     /**
@@ -614,5 +614,28 @@ class LeadRepository extends CommonRepository
         $fields = array('last_active' => $dt->toUtcString());
 
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $leadId));
+    }
+
+    /**
+     * Grabs a random lead
+     */
+    public function getRandomLead()
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('*')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->neq('l.firstname', $q->expr()->literal('')),
+                    $q->expr()->neq('l.lastname', $q->expr()->literal('')),
+                    $q->expr()->neq('l.email', $q->expr()->literal(''))
+                )
+            )
+            ->orderBy('l.last_active');
+        $q->setMaxResults(1);
+
+        $result = $q->execute()->fetchAll();
+
+        return (count($result)) ? $result[0] : null;
     }
 }

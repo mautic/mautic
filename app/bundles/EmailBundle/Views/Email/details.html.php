@@ -32,6 +32,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 'iconClass'     => 'fa fa-send-o',
                 'btnText'       => $view["translator"]->trans("mautic.email.send")
             )
+        ),
+        array(
+            'attr' => array(
+                'data-toggle' => 'ajax',
+                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'example', 'objectId' => $email->getId())),
+            ),
+            'iconClass' => 'fa fa-send',
+            'btnText'   => 'mautic.email.send.example'
         )
     )
 )));
@@ -58,11 +66,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $email)); ?>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></span></td>
-                                    <td><?php echo $email->getTemplate(); ?></td>
-                                </tr>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $email)); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></span></td>
+                                <td><?php echo $email->getTemplate(); ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -111,95 +119,32 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         </div>
 
         <?php if (count($variants['children'])): ?>
-        <!-- start: tab-content -->
-        <div class="tab-content pa-md">
-            <!-- #variants-container -->
-            <div class="tab-pane active bdr-w-0" id="variants-container">
-                <!-- header -->
-                <?php if ($variants['parent']->getVariantStartDate() != null): ?>
-                    <div class="box-layout mb-lg">
-                        <div class="col-xs-10 va-m">
-                            <h4><?php echo $view['translator']->trans('mautic.email.variantstartdate', array(
-                                    '%time%' => $view['date']->toTime($variants['parent']->getVariantStartDate()),
-                                    '%date%' => $view['date']->toShort($variants['parent']->getVariantStartDate()),
-                                    '%full%' => $view['date']->toTime($variants['parent']->getVariantStartDate())
-                                ));?></h4>
-                        </div>
-                        <!-- button -->
-                        <div class="col-xs-2 va-m text-right">
-                            <a href="#" data-toggle="modal" data-target="#abStatsModal" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.email.abtest.stats'); ?></a>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                <!--/ header -->
-
-                <!-- start: variants list -->
-                <ul class="list-group">
-                    <?php if ($variants['parent']) : ?>
-                        <?php $isWinner = (isset($abTestResults['winners']) && in_array($variants['parent']->getId(), $abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $variants['parent']->isPublished()); ?>
-                        <li class="list-group-item bg-auto bg-light-xs">
-                            <div class="box-layout">
-                                <div class="col-md-8 va-m">
-                                    <div class="row">
-                                        <div class="col-xs-1">
-                                            <h3>
-                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
-                                                    'item'  => $variants['parent'],
-                                                    'model' => 'page.page',
-                                                    'size'  => '',
-                                                    'disableToggle' => true
-                                                )); ?>
-                                            </h3>
-                                        </div>
-                                        <div class="col-xs-11">
-                                            <?php if ($isWinner): ?>
-                                                <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.parentwinning'); ?>">
-                                                    <a class="btn btn-default disabled" href="javascript:void(0);">
-                                                        <i class="fa fa-trophy"></i>
-                                                    </a>
-                                                </div>
-                                            <?php endif; ?>
-                                            <h5 class="fw-sb text-primary">
-                                                <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getSubject(); ?>
-                                                    <?php if ($variants['parent']->getId() == $email->getId()) : ?>
-                                                        <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
-                                                    <?php endif; ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.core.parent'); ?>]</span>
-                                                </a>
-                                            </h5>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 va-t text-right">
-                                    <em class="text-white dark-sm"><span class="label label-success"><?php echo (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>%</span></em>
-                                </div>
+            <!-- start: tab-content -->
+            <div class="tab-content pa-md">
+                <!-- #variants-container -->
+                <div class="tab-pane active bdr-w-0" id="variants-container">
+                    <!-- header -->
+                    <?php if ($variants['parent']->getVariantStartDate() != null): ?>
+                        <div class="box-layout mb-lg">
+                            <div class="col-xs-10 va-m">
+                                <h4><?php echo $view['translator']->trans('mautic.email.variantstartdate', array(
+                                        '%time%' => $view['date']->toTime($variants['parent']->getVariantStartDate()),
+                                        '%date%' => $view['date']->toShort($variants['parent']->getVariantStartDate()),
+                                        '%full%' => $view['date']->toTime($variants['parent']->getVariantStartDate())
+                                    ));?></h4>
                             </div>
-                        </li>
+                            <!-- button -->
+                            <div class="col-xs-2 va-m text-right">
+                                <a href="#" data-toggle="modal" data-target="#abStatsModal" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.email.abtest.stats'); ?></a>
+                            </div>
+                        </div>
                     <?php endif; ?>
-                    <?php $totalWeight = (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>
-                    <?php if (count($variants['children'])): ?>
-                        <?php /** @var \Mautic\PageBundle\Entity\Page $variant */ ?>
-                        <?php foreach ($variants['children'] as $id => $variant) :
-                            if (!isset($variants['properties'][$id])):
-                                $settings = $variant->getVariantSettings();
-                                $variants['properties'][$id] = $settings;
-                            endif;
+                    <!--/ header -->
 
-                            if (!empty($variants['properties'][$id])):
-                                $thisCriteria  = $variants['properties'][$id]['winnerCriteria'];
-                                $weight        = (int) $variants['properties'][$id]['weight'];
-                                $criteriaLabel = ($thisCriteria) ? $view['translator']->trans($variants['criteria'][$thisCriteria]['label']) : '';
-                            else:
-                                $thisCriteria = $criteriaLabel = '';
-                                $weight       = 0;
-                            endif;
-
-                            $isPublished    = $variant->isPublished();
-                            $totalWeight   += ($isPublished) ? $weight : 0;
-                            $firstCriteria  = (!isset($firstCriteria)) ? $thisCriteria : $firstCriteria;
-                            $isWinner       = (isset($abTestResults['winners']) && in_array($variant->getId(), $abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $isPublished);
-                            ?>
-
+                    <!-- start: variants list -->
+                    <ul class="list-group">
+                        <?php if ($variants['parent']) : ?>
+                            <?php $isWinner = (isset($abTestResults['winners']) && in_array($variants['parent']->getId(), $abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $variants['parent']->isPublished()); ?>
                             <li class="list-group-item bg-auto bg-light-xs">
                                 <div class="box-layout">
                                     <div class="col-md-8 va-m">
@@ -207,8 +152,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <div class="col-xs-1">
                                                 <h3>
                                                     <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
-                                                        'item'  => $variant,
-                                                        'model' => 'page',
+                                                        'item'  => $variants['parent'],
+                                                        'model' => 'page.page',
                                                         'size'  => '',
                                                         'disableToggle' => true
                                                     )); ?>
@@ -216,42 +161,105 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             </div>
                                             <div class="col-xs-11">
                                                 <?php if ($isWinner): ?>
-                                                    <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.makewinner'); ?>">
-                                                        <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getSubject() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                                    <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.parentwinning'); ?>">
+                                                        <a class="btn btn-default disabled" href="javascript:void(0);">
                                                             <i class="fa fa-trophy"></i>
                                                         </a>
                                                     </div>
                                                 <?php endif; ?>
                                                 <h5 class="fw-sb text-primary">
-                                                    <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getSubject(); ?>
-                                                        <?php if ($variant->getId() == $email->getId()) : ?>
+                                                    <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getSubject(); ?>
+                                                        <?php if ($variants['parent']->getId() == $email->getId()) : ?>
                                                             <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                         <?php endif; ?>
+                                                        <span>[<?php echo $view['translator']->trans('mautic.core.parent'); ?>]</span>
                                                     </a>
                                                 </h5>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4 va-t text-right">
-                                        <em class="text-white dark-sm">
-                                            <?php if ($isPublished && ($totalWeight > 100 || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
-                                                <div class="text-danger" data-toggle="label label-danger" title="<?php echo $view['translator']->trans('mautic.email.variant.misconfiguration'); ?>"><div><span class="badge"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-exclamation-triangle"></i><?php echo $criteriaLabel; ?></div></div>
-                                            <?php elseif ($isPublished && $criteriaLabel): ?>
-                                                <div class="text-success"><div><span class="label label-success"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?></div></div>
-                                            <?php elseif ($thisCriteria): ?>
-                                                <div class="text-muted"><div><span class="label label-default"><?php echo $weight; ?>%</span></div><div><?php echo $criteriaLabel; ?></div></div>
-                                            <?php endif; ?>
-                                        </em>
+                                        <em class="text-white dark-sm"><span class="label label-success"><?php echo (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>%</span></em>
                                     </div>
                                 </div>
                             </li>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </ul>
-                <!--/ end: variants list -->
+                        <?php endif; ?>
+                        <?php $totalWeight = (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>
+                        <?php if (count($variants['children'])): ?>
+                            <?php /** @var \Mautic\PageBundle\Entity\Page $variant */ ?>
+                            <?php foreach ($variants['children'] as $id => $variant) :
+                                if (!isset($variants['properties'][$id])):
+                                    $settings = $variant->getVariantSettings();
+                                    $variants['properties'][$id] = $settings;
+                                endif;
+
+                                if (!empty($variants['properties'][$id])):
+                                    $thisCriteria  = $variants['properties'][$id]['winnerCriteria'];
+                                    $weight        = (int) $variants['properties'][$id]['weight'];
+                                    $criteriaLabel = ($thisCriteria) ? $view['translator']->trans($variants['criteria'][$thisCriteria]['label']) : '';
+                                else:
+                                    $thisCriteria = $criteriaLabel = '';
+                                    $weight       = 0;
+                                endif;
+
+                                $isPublished    = $variant->isPublished();
+                                $totalWeight   += ($isPublished) ? $weight : 0;
+                                $firstCriteria  = (!isset($firstCriteria)) ? $thisCriteria : $firstCriteria;
+                                $isWinner       = (isset($abTestResults['winners']) && in_array($variant->getId(), $abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $isPublished);
+                                ?>
+
+                                <li class="list-group-item bg-auto bg-light-xs">
+                                    <div class="box-layout">
+                                        <div class="col-md-8 va-m">
+                                            <div class="row">
+                                                <div class="col-xs-1">
+                                                    <h3>
+                                                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
+                                                            'item'  => $variant,
+                                                            'model' => 'page',
+                                                            'size'  => '',
+                                                            'disableToggle' => true
+                                                        )); ?>
+                                                    </h3>
+                                                </div>
+                                                <div class="col-xs-11">
+                                                    <?php if ($isWinner): ?>
+                                                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.makewinner'); ?>">
+                                                            <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getSubject() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                                                <i class="fa fa-trophy"></i>
+                                                            </a>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <h5 class="fw-sb text-primary">
+                                                        <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getSubject(); ?>
+                                                            <?php if ($variant->getId() == $email->getId()) : ?>
+                                                                <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
+                                                            <?php endif; ?>
+                                                        </a>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 va-t text-right">
+                                            <em class="text-white dark-sm">
+                                                <?php if ($isPublished && ($totalWeight > 100 || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
+                                                    <div class="text-danger" data-toggle="label label-danger" title="<?php echo $view['translator']->trans('mautic.email.variant.misconfiguration'); ?>"><div><span class="badge"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-exclamation-triangle"></i><?php echo $criteriaLabel; ?></div></div>
+                                                <?php elseif ($isPublished && $criteriaLabel): ?>
+                                                    <div class="text-success"><div><span class="label label-success"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?></div></div>
+                                                <?php elseif ($thisCriteria): ?>
+                                                    <div class="text-muted"><div><span class="label label-default"><?php echo $weight; ?>%</span></div><div><?php echo $criteriaLabel; ?></div></div>
+                                                <?php endif; ?>
+                                            </em>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </ul>
+                    <!--/ end: variants list -->
+                </div>
+                <!--/ #variants-container -->
             </div>
-        <!--/ #variants-container -->
-        </div>
         <?php endif; ?>
     </div>
     <!--/ left section -->
@@ -280,16 +288,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
-                echo $stats['datasets'][0]['data'][0] . '/' . $stats['datasets'][0]['data'][3]; ?>)</div>
+                    echo $stats['datasets'][0]['data'][0] . '/' . $stats['datasets'][0]['data'][3]; ?>)</div>
             </div>
             <div class="panel-body pt-xs">
                 <ul class="fa-ul">
                     <?php
                     $lists = $email->getLists();
                     foreach ($lists as $l):
-                    ?>
-                    <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
-                            $stats['datasets'][$l->getId()]['data'][0] . '/' . $stats['datasets'][$l->getId()]['data'][3] : '0/0/0'); ?>)</li>
+                        ?>
+                        <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
+                                $stats['datasets'][$l->getId()]['data'][0] . '/' . $stats['datasets'][$l->getId()]['data'][3] : '0/0/0'); ?>)</li>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -310,4 +318,3 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'body'   => (isset($abTestResults['supportTemplate'])) ? $view->render($abTestResults['supportTemplate'], array('results' => $abTestResults, 'variants' => $variants)) : $view['translator']->trans('mautic.email.abtest.noresults'),
     'size'   => 'lg'
 )); ?>
-

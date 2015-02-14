@@ -856,10 +856,7 @@ class EmailController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()
-        )
-        ) {
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         }
 
@@ -889,6 +886,36 @@ class EmailController extends FormController
                 'flashes' => $flashes
             ))
         );
+    }
+
+
+    /**
+     * Send example email to current user
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function exampleAction ($objectId)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model   = $this->factory->getModel('email');
+        $entity  = $model->getEntity($objectId);
+
+        //not found or not allowed
+        if ($entity === null || (!$this->factory->getSecurity()->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()))) {
+            return $this->viewAction($objectId);
+        }
+
+        // Grab a random lead
+        $lead = $this->factory->getModel('lead')->getRepository()->getRandomLead();
+
+        // Send to current user
+        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $lead);
+
+        $this->addFlash('mautic.email.notice.test_sent.success');
+
+        return $this->viewAction($objectId);
     }
 
     /**
