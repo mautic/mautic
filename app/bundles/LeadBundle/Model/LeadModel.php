@@ -447,6 +447,9 @@ class LeadModel extends FormModel
                     $this->saveEntity($lead);
                     $leadId = $lead->getId();
                 }
+
+                $fields = $this->getLeadDetails($lead);
+                $lead->setFields($fields);
             } else {
                 $lead = $this->getEntity($leadId);
                 if ($lead === null) {
@@ -456,6 +459,9 @@ class LeadModel extends FormModel
                     $lead->setNewlyCreated(true);
                     $this->saveEntity($lead);
                     $leadId = $lead->getId();
+
+                    $fields = $this->getLeadDetails($lead);
+                    $lead->setFields($fields);
                 }
             }
             $this->currentLead = $lead;
