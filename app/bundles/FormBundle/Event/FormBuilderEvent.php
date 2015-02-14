@@ -53,6 +53,20 @@ class FormBuilderEvent extends Event
      *  'formType'        => (required) name of the form type SERVICE for the action
      *  'formTypeOptions' => (optional) array of options to pass to formType
      *  'formTheme'       => (optional  theme for custom form views
+     *  'validator'       => (optional) callback function to validate form results (or do whatever is necessary prior to
+     *                      calling the callback function and also before the results are saved to the DB).
+     *
+     *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *          array $properties - values saved from the formType as defined here
+     *          array $post - values from submitted form
+     *          array $server - values from Request $request->server->all()
+     *          Mautic\CoreBundle\Factory\MauticFactory $factory
+     *          array $feedback whatever is returned from other function subscribed to this event will be stored stored
+     *                in this variable with the $key as its index; can be used to store new entities, etc that can
+     *                be used by other subscribers
+     *          Mautic\FormBundle\Entity\Action $action
+     *          Mautic\FormBundle\Entity\Form $form
+     *          Mautic\FormBundle\Entity\Submission $submission
      *  'callback'        => (required) callback function that will be passed the results upon a form submit.
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          array $fields - form fields with keys id, type and alias
@@ -65,6 +79,7 @@ class FormBuilderEvent extends Event
      *                be used by other subscribers
      *          Mautic\FormBundle\Entity\Action $action
      *          Mautic\FormBundle\Entity\Form $form
+     *          Mautic\FormBundle\Entity\Submission $submission
      *
      * @return void
      * @throws InvalidArgumentException
@@ -78,7 +93,7 @@ class FormBuilderEvent extends Event
         //check for required keys and that given functions are callable
         $this->verifyComponent(
             array('group', 'label', 'formType', 'callback'),
-            array('callback'),
+            array('callback', 'validator'),
             $action
         );
 

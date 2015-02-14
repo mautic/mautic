@@ -163,6 +163,58 @@ class SubmissionModel extends CommonFormModel
 
         $submission->setResults($results);
 
+        //execute submit actions
+        $actions          = $form->getActions();
+
+        //get post submit actions to make sure it still exists
+        $components       = $this->factory->getModel('form')->getCustomComponents();
+        $availableActions = $components['actions'];
+
+        $args = array(
+            'post'       => $post,
+            'server'     => $server,
+            'factory'    => $this->factory,
+            'submission' => $submission,
+            'fields'     => $fieldArray,
+            'form'       => $form,
+            'tokens'     => $tokens
+        );
+
+        foreach ($actions as $action) {
+            $key = $action->getType();
+            if (!isset($availableActions[$key])) {
+                continue;
+            }
+
+            $settings       = $availableActions[$key];
+            $args['action'] = $action;
+            $args['config'] = $action->getProperties();
+            $callback       = $settings['validator'];
+            if (is_callable($callback)) {
+                if (is_array($callback)) {
+                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                } elseif (strpos($callback, '::') !== false) {
+                    $parts      = explode('::', $callback);
+                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                } else {
+                    new \ReflectionMethod(null, $callback);
+                }
+
+                $pass = array();
+                foreach ($reflection->getParameters() as $param) {
+                    if (isset($args[$param->getName()])) {
+                        $pass[] = $args[$param->getName()];
+                    } else {
+                        $pass[] = null;
+                    }
+                }
+                list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
+                if (!$validated) {
+                    $errors[] = $validatedMessage;
+                }
+            }
+        }
+
         //return errors
         if (!empty($errors)) {
             return array('errors' => $errors);
@@ -176,23 +228,10 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        //execute submit actions
-        $actions = $form->getActions();
+        // Add a feedback parameter
+        $args['feedback'] = array();
 
-        //get post submit actions to make sure it still exists
-        $components       = $this->factory->getModel('form')->getCustomComponents();
-        $availableActions = $components['actions'];
-
-        $args = array(
-            'post'     => $post,
-            'server'   => $server,
-            'factory'  => $this->factory,
-            'feedback' => array(),
-            'fields'   => $fieldArray,
-            'form'     => $form,
-            'tokens'   => $tokens
-        );
-
+        // Now handle post submission actions
         foreach ($actions as $action) {
             $key = $action->getType();
             if (!isset($availableActions[$key])) {
