@@ -241,16 +241,36 @@ return array(
 
             // Mailers
             'mautic.transport.amazon'            => array(
-                'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport'
+                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => array(
+                    'setUsername' => array('%mautic.mailer_user%'),
+                    'setPassword' => array('%mautic.mailer_password%')
+                )
             ),
             'mautic.transport.mandrill'          => array(
-                'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport'
+                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => array(
+                    'setUsername' => array('%mautic.mailer_user%'),
+                    'setPassword' => array('%mautic.mailer_password%')
+                )
             ),
             'mautic.transport.sendgrid'          => array(
-                'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport'
+                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => array(
+                    'setUsername' => array('%mautic.mailer_user%'),
+                    'setPassword' => array('%mautic.mailer_password%')
+                )
             ),
             'mautic.transport.postmark'          => array(
-                'class' => 'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport'
+                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => array(
+                    'setUsername' => array('%mautic.mailer_user%'),
+                    'setPassword' => array('%mautic.mailer_password%')
+                )
             ),
 
             // Menu

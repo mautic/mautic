@@ -20,5 +20,7 @@ class MandrillTransport extends \Swift_SmtpTransport
     public function __construct($host = 'localhost', $port = 25, $security = null)
     {
         parent::__construct('smtp.mandrillapp.com', 587, 'tls');
+
+        $this->setAuthMode('login');
     }
 }

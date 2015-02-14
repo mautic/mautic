@@ -20,5 +20,7 @@ class AmazonTransport extends \Swift_SmtpTransport
     public function __construct($host = 'localhost', $port = 25, $security = null)
     {
         parent::__construct('email-smtp.us-east-1.amazonaws.com', 587, 'tls');
+
+        $this->setAuthMode('login');
     }
 }

@@ -63,6 +63,11 @@ class MauticCoreExtension extends Extension
                             continue;
                         }
 
+                        // Set service alias
+                        if (isset($details['serviceAlias'])) {
+                            $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
+                        }
+
                         // Generate definition arguments
                         $definitionArguments = array();
                         if (!isset($details['arguments'])) {
@@ -129,19 +134,28 @@ class MauticCoreExtension extends Extension
                             }
                         }
 
+                        // Set scope
                         if (!empty($details['scope'])) {
                             $definition->setScope($details['scope']);
                         } elseif ($type == 'templating') {
                             $definition->setScope('request');
                         }
 
-
+                        // Set factory service
                         if (!empty($details['factoryService'])) {
                             $definition->setFactoryService($details['factoryService']);
                         }
 
+                        // Set factory method
                         if (!empty($details['factoryMethod'])) {
                             $definition->setFactoryMethod($details['factoryMethod']);
+                        }
+
+                        // Set method calls
+                        if (!empty($details['methodCalls'])) {
+                            foreach ($details['methodCalls'] as $method => $methodArguments) {
+                                $definition->addMethodCall($method, $methodArguments);
+                            }
                         }
 
                         unset($definition);
