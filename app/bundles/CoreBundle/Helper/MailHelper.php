@@ -148,12 +148,10 @@ class MailHelper
                     $this->errors['failures'] = $failures;
                     $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $this->logger->dump());
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->errors[] = $e->getMessage();
                 $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $this->logger->dump());
             }
-
-            $this->mailer->send($this->message, $this->failures);
         }
 
         return empty($this->errors);
