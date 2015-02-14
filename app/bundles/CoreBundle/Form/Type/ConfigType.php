@@ -258,12 +258,21 @@ class ConfigType extends AbstractType
             'empty_value' => false
         ));
 
-        $builder->add('mailer_test_button', 'standalone_button', array(
+        $builder->add('mailer_test_connection_button', 'standalone_button', array(
             'label'       => 'mautic.core.config.form.mailer.transport.test_connection',
             'required'    => false,
             'attr'        => array(
                 'class'        => 'btn btn-success',
                 'onclick'      => 'Mautic.testEmailServerConnection()'
+            )
+        ));
+
+        $builder->add('mailer_test_send_button', 'standalone_button', array(
+            'label'       => 'mautic.core.config.form.mailer.transport.test_send',
+            'required'    => false,
+            'attr'        => array(
+                'class'        => 'btn btn-info',
+                'onclick'      => 'Mautic.testEmailServerConnection(true)'
             )
         ));
 
