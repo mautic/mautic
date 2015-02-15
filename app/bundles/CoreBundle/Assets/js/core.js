@@ -445,6 +445,13 @@ var Mautic = {
                         grid.shuffle("update");
                     });
 
+                // Update shuffle if in a tab
+                if (grid.parents('.tab-pane').length) {
+                    var tabId = grid.parents('.tab-pane').first().attr('id');
+                    var tab   = mQuery('a[href="#' + tabId + '"]').on('shown.bs.tab', function() {
+                        grid.shuffle("update");
+                    });
+                }
             }, 1000);
         }
 
