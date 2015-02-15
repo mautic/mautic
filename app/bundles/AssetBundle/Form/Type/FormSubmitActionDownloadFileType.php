@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -44,7 +45,7 @@ class FormSubmitActionDownloadFileType extends AbstractType
             'label'         => 'mautic.asset.form.submit.message',
             'label_attr'    => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
+                'class'   => 'form-control editor-basic',
                 'tooltip' => 'mautic.asset.form.submit.message_descr'
             )
         ));

@@ -40,11 +40,12 @@ class FormSubscriber extends CommonSubscriber
     {
         //add form submit actions
         $action = array(
-            'group'        => 'mautic.asset.actions',
-            'label'        => 'mautic.asset.asset.submitaction.downloadfile',
-            'description'  => 'mautic.asset.asset.submitaction.downloadfile_descr',
-            'formType'     => 'asset_submitaction_downloadfile',
-            'callback'     => '\Mautic\AssetBundle\Helper\FormSubmitHelper::onFormSubmit'
+            'group'              => 'mautic.asset.actions',
+            'label'              => 'mautic.asset.asset.submitaction.downloadfile',
+            'description'        => 'mautic.asset.asset.submitaction.downloadfile_descr',
+            'formType'           => 'asset_submitaction_downloadfile',
+            'formTypeCleanMasks' => array('message' => 'html'),
+            'callback'           => '\Mautic\AssetBundle\Helper\FormSubmitHelper::onFormSubmit'
         );
 
         $event->addSubmitAction('asset.download', $action);
