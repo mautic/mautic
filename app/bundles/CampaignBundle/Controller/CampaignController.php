@@ -238,6 +238,10 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setListFilters();
+        }
+
         //set limits
         $limit = $this->factory->getSession()->get('mautic.campaign.lead.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
@@ -290,6 +294,10 @@ class CampaignController extends FormController
             ));
         }
 
+        $triggerModel = $this->factory->getModel('point.trigger');
+        foreach ($leads['results'] as &$l) {
+            $l['color'] = $triggerModel->getColorForLeadPoints($l['points']);
+        }
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'page'          => $page,
@@ -301,9 +309,7 @@ class CampaignController extends FormController
                 'sessionVar'    => 'campaign.lead',
                 'limit'         => $limit,
                 'objectId'      => $objectId,
-                'noContactList' => $emailRepo->getDoNotEmailList(),
-                'hideCheckbox'  => true,
-                'target'        => '#leads-container'
+                'noContactList' => $emailRepo->getDoNotEmailList()
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:leads.html.php',
             'passthroughVars' => array(
