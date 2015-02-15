@@ -42,10 +42,16 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $trigger = array(
-            'label'       => 'mautic.email.campaign.event.open',
-            'description' => 'mautic.email.campaign.event.open_descr',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger'),
-            //'formType'    => 'emailopen_list'
+            'label'           => 'mautic.email.campaign.event.open',
+            'description'     => 'mautic.email.campaign.event.open_descr',
+            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger'),
+            'formType'        => 'emailopen_list',
+            'formTypeOptions' => array('list_options' => array(
+                'attr' => array(
+                    'data-placeholder' => $this->translator->trans('mautic.email.campaign.event.open.default'),
+                    'tooltip'          => 'mautic.email.campaign.event.open.default_tooltip'
+                )
+            )),
         );
         $event->addLeadDecision('email.open', $trigger);
 

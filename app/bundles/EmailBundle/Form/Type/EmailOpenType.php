@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class EmailOpenType
@@ -26,7 +27,7 @@ class EmailOpenType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('emails', 'email_list', array(
+        $defaultOptions = array(
             'label'      => 'mautic.email.open.limittoemails',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
@@ -34,7 +35,26 @@ class EmailOpenType extends AbstractType
                 'tooltip' => 'mautic.email.open.limittoemails_descr'
             ),
             'required'   => false
-        ));
+        );
+
+        if (isset($options['list_options'])) {
+            if (isset($options['list_options']['attr'])) {
+                $defaultOptions['attr'] = array_merge($defaultOptions['attr'], $options['list_options']['attr']);
+                unset($options['list_options']['attr']);
+            }
+
+            $defaultOptions = array_merge($defaultOptions, $options['list_options']);
+        }
+
+        $builder->add('emails', 'email_list', $defaultOptions);
+    }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(array('list_options'));
     }
 
     /**
