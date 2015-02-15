@@ -18,7 +18,7 @@ if (empty($route))
 <div id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event <?php echo $class; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name"><?php echo $event['name']; ?></span></div>
+        <div><span class="campaign-event-name ellipsis" data-toggle="tooltip" title="<?php echo $event['name']; ?>"><?php echo $event['name']; ?></span></div>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">
