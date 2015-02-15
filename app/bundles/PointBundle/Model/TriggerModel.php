@@ -120,7 +120,7 @@ class TriggerModel extends CommonFormModel
                 ));
 
                 foreach ($leads as $l) {
-                    if ($this->triggerEvent($event, $l, true)) {
+                    if ($this->triggerEvent($event->convertToArray(), $l, true)) {
                         $log = new LeadTriggerLog();
                         $log->setIpAddress($ipAddress);
                         $log->setEvent($event);
@@ -261,13 +261,13 @@ class TriggerModel extends CommonFormModel
     /**
      * Triggers a specific event
      *
-     * @param TriggerEvent $event
-     * @param Lead         $lead
-     * @param bool         $force
+     * @param array   $event
+     * @param Lead    $lead
+     * @param bool    $force
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent(TriggerEvent $event, Lead $lead = null,  $force = false)
+    public function triggerEvent($event, Lead $lead = null,  $force = false)
     {
         //only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -284,13 +284,13 @@ class TriggerModel extends CommonFormModel
             $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
 
             //if it's already been done, then skip it
-            if (isset($appliedEvents[$event->getId()])) {
+            if (isset($appliedEvents[$event['id']])) {
                 return false;
             }
         }
 
         $availableEvents = $this->getEvents();
-        $eventType       = $event->getType();
+        $eventType       = $event['type'];
 
         //make sure the event still exists
         if (!isset($availableEvents[$eventType])) {
@@ -302,7 +302,7 @@ class TriggerModel extends CommonFormModel
             'event'    => $event,
             'lead'     => $lead,
             'factory'  => $this->factory,
-            'config'   => $event->getProperties()
+            'config'   => $event['properties']
         );
 
         if (is_callable($settings['callback'])) {
@@ -350,7 +350,7 @@ class TriggerModel extends CommonFormModel
             $ipAddress     = $this->factory->getIpAddress();
             $persist       = array();
             foreach ($events as $event) {
-                if (isset($appliedEvents[$event->getId()])) {
+                if (isset($appliedEvents[$event['id']])) {
                     //don't apply the event to the lead if it's already been done
                     continue;
                 }
@@ -358,7 +358,7 @@ class TriggerModel extends CommonFormModel
                 if ($this->triggerEvent($event, $lead, true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
-                    $log->setEvent($event);
+                    $log->setEvent($this->em->getReference('MauticPointBundle:TriggerEvent', $event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
                     $event->addLog($log);

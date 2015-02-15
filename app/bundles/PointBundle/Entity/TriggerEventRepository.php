@@ -38,7 +38,7 @@ class TriggerEventRepository extends CommonRepository
         );
         $q->where($expr);
 
-        return $q->getQuery()->getResult();
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

@@ -57,8 +57,9 @@ class CampaignEventHelper
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel       = $factory->getModel('campaign');
-        $addToCampaigns      = $event['properties']['addTo'];
-        $removeFromCampaigns = $event['properties']['removeFrom'];
+        $properties          = $event['properties'];
+        $addToCampaigns      = $properties['addTo'];
+        $removeFromCampaigns = $properties['removeFrom'];
         $em                  = $factory->getEntityManager();
         $leadsModified       = false;
 

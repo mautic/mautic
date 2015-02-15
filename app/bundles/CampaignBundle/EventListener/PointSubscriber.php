@@ -37,11 +37,10 @@ class PointSubscriber extends CommonSubscriber
         $changeLists = array(
             'group'       => 'mautic.campaign.point.trigger',
             'label'       => 'mautic.campaign.point.trigger.changecampaigns',
-            'callback'    => array('\\Mautic\\CampaignBundle\\Helper\\PointEventHelper', 'changeCampaigns'),
+            'callback'    => array('\\Mautic\\CampaignBundle\\Helper\\CampaignEventHelper', 'addRemoveLead'),
             'formType'    => 'campaignevent_addremovelead'
         );
 
         $event->addEvent('campaign.changecampaign', $changeLists);
     }
-
 }
