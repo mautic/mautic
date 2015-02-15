@@ -22,6 +22,15 @@ CKEDITOR.editorConfig = function( config ) {
             { name: 'tools', items : [ 'Sourcedialog' ] }
         ];
 
+    config.toolbar_basic =
+        [
+            { name: 'basicstyles', items : [ 'Bold','Italic' ] },
+            { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+            { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+            { name: 'tools', items : [ 'Sourcedialog' ] },
+            { name: 'links', items : [ 'Link','Unlink','Anchor' ] }
+        ];
+
 	config.toolbar_advanced_2rows =
 	[
         { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },

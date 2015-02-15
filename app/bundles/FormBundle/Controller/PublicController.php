@@ -23,6 +23,10 @@ class PublicController extends CommonFormController
      */
     public function submitAction()
     {
+        if ($this->request->getMethod() !== 'POST') {
+            return $this->accessDenied();
+        }
+
         $post   = $this->request->request->get('mauticform');
         $server = $this->request->server->all();
         $return = (isset($post['return'])) ? $post['return'] : false;
@@ -96,6 +100,7 @@ class PublicController extends CommonFormController
                                     $pass[] = null;
                                 }
                             }
+
                             return $reflection->invokeArgs($this, $pass);
                         }
                     }

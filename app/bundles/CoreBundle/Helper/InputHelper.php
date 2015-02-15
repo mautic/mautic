@@ -29,7 +29,9 @@ class InputHelper
     {
         if (is_array($value) && is_array($mask)) {
             foreach ($value as $k => &$v) {
-                if (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
+                if (is_array($v) && is_array($mask) && isset($mask[$k])) {
+                    $v = self::_($v, $mask[$k]);
+                } elseif (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
                     $v = self::$mask[$k]($v, $urldecode);
                 } else {
                     $v = self::clean($v, $urldecode);

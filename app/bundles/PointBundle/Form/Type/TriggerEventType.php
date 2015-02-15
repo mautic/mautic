@@ -25,7 +25,7 @@ class TriggerEventType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $masks = array('description' => 'html');
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.core.name',
@@ -51,6 +51,11 @@ class TriggerEventType extends AbstractType
             if (!empty($options['settings']['formTypeOptions'])) {
                 $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
             }
+
+            if (isset($options['settings']['formTypeCleanMasks'])) {
+                $masks['properties'] = $options['settings']['formTypeCleanMasks'];
+            }
+
             $builder->add('properties', $options['settings']['formType'], $formTypeOptions);
         }
 
@@ -75,6 +80,8 @@ class TriggerEventType extends AbstractType
         $builder->add('triggerId', 'hidden', array(
             'mapped' => false
         ));
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

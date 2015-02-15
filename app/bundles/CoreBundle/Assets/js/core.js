@@ -404,7 +404,7 @@ var Mautic = {
         }
 
         //activate editors
-        mQuery.each(['editor', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+        mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
                     var settings = {};
@@ -703,7 +703,7 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            mQuery.each(['editor', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
                     for (var name in CKEDITOR.instances) {
                         var instance = CKEDITOR.instances[name];

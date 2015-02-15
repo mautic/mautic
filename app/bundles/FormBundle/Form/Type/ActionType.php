@@ -25,7 +25,7 @@ class ActionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $masks = array('description' => 'html');
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.core.name',
@@ -49,6 +49,9 @@ class ActionType extends AbstractType
             'attr'   => array(
                 'data-formid' => $options['formId'] //sneaky way of feeding the formId without requiring the option
             ));
+        if (isset($options['settings']['formTypeCleanMasks'])) {
+            $masks['properties'] = $options['settings']['formTypeCleanMasks'];
+        }
         if (!empty($options['settings']['formTypeOptions'])) {
             // Ensure that attr is not overwritten
             if (isset($options['settings']['formTypeOptions']['attr'])) {
@@ -79,6 +82,8 @@ class ActionType extends AbstractType
         $builder->add('formId', 'hidden', array(
             'mapped' => false
         ));
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

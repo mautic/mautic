@@ -25,6 +25,7 @@ class PointActionType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $masks           = array();
         $formTypeOptions = array(
             'label' => false
         );
@@ -32,6 +33,12 @@ class PointActionType extends AbstractType
             $formTypeOptions = array_merge($formTypeOptions, $options['formTypeOptions']);
         }
         $builder->add('properties', $options['formType'], $formTypeOptions);
+
+        if (isset($options['settings']['formTypeCleanMasks'])) {
+            $masks['properties'] = $options['settings']['formTypeCleanMasks'];
+        }
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($masks));
     }
 
     /**

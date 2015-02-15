@@ -28,7 +28,7 @@ class EventType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $masks = array();
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.core.name',
@@ -106,7 +106,9 @@ class EventType extends AbstractType
                 'label' => false,
                 'data'  => $properties
             );
-
+            if (isset($options['settings']['formTypeCleanMasks'])) {
+                $masks['properties'] = $options['settings']['formTypeCleanMasks'];
+            }
             if (!empty($options['settings']['formTypeOptions'])) {
                 $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
             }
@@ -140,6 +142,8 @@ class EventType extends AbstractType
         $builder->add('campaignId', 'hidden', array(
             'mapped' => false
         ));
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
