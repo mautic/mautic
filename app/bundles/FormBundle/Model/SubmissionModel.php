@@ -189,28 +189,30 @@ class SubmissionModel extends CommonFormModel
             $settings       = $availableActions[$key];
             $args['action'] = $action;
             $args['config'] = $action->getProperties();
-            $callback       = $settings['validator'];
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
-                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                } else {
-                    new \ReflectionMethod(null, $callback);
-                }
-
-                $pass = array();
-                foreach ($reflection->getParameters() as $param) {
-                    if (isset($args[$param->getName()])) {
-                        $pass[] = $args[$param->getName()];
+            if (array_key_exists('validator', $settings)) {
+                $callback = $settings['validator'];
+                if (is_callable($callback)) {
+                    if (is_array($callback)) {
+                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    } elseif (strpos($callback, '::') !== false) {
+                        $parts      = explode('::', $callback);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
-                        $pass[] = null;
+                        new \ReflectionMethod(null, $callback);
                     }
-                }
-                list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
-                if (!$validated) {
-                    $errors[] = $validatedMessage;
+
+                    $pass = array();
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
+                    if (!$validated) {
+                        $errors[] = $validatedMessage;
+                    }
                 }
             }
         }
