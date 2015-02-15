@@ -59,22 +59,9 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadsWithFields($args)
     {
-        //Get the list of custom fields
-        $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where('f.is_published = :true')
-            ->setParameter('true', true, 'boolean');
-        $results = $fq->execute()->fetchAll();
-
-        $fields = array();
-        foreach ($results as $r) {
-            $fields[$r['alias']] = $r;
-        }
-
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(l.id) as count')
+        $dq->select('count(cl.lead_id) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = cl.lead_id');
 
@@ -95,36 +82,24 @@ class LeadRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('l.*');
+
+        $ipQuery = $this->_em->getConnection()->createQueryBuilder();
+        $ipQuery->select('i.ip_address')
+            ->from(MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i')
+            ->leftJoin('i', MAUTIC_TABLE_PREFIX . 'lead_ips_xref', 'ix', 'i.id = ix.ip_id')
+            ->where('l.id = ix.lead_id')
+            ->orderBy('i.id', 'DESC');
+        $ipQuery->setMaxResults(1);
+
+        $dq->select('l.*, ' . sprintf('(%s)', $ipQuery->getSQL()) . ' as ip_address'); //single IP address
+
         $leads = $dq->execute()->fetchAll();
-
-        //loop over results to put fields in something that can be assigned to the entities
-        $fieldValues = array();
-        $leadEntities = array();
-        foreach ($leads as $key => $lead) {
-            $entity = $this->createFromArray('\Mautic\LeadBundle\Entity\Lead', $lead);
-
-            $leadEntities[$entity->getId()] = $entity;
-
-            $leadId = $entity->getId();
-
-            //whatever is left over is a custom field
-            foreach ($lead as $k => $r) {
-                if (isset($fields[$k])) {
-                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
-                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
-                    unset($lead[$k]);
-                }
-            }
-
-            $entity->setFields($fieldValues[$leadId]);
-        }
 
         return (!empty($args['withTotalCount'])) ?
             array(
                 'count' => $total,
-                'results' => $leadEntities
-            ) : $leadEntities;
+                'results' => $leads
+            ) : $leads;
     }
 
     /**
