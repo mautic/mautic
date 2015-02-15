@@ -879,8 +879,10 @@ class LeadController extends FormController
                             $file->seek($lineNumber);
                         }
 
+                        $config = $session->get('mautic.lead.import.config');
+
                         while ($batchSize && !$file->eof()) {
-                            $data = $file->fgetcsv();
+                            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
                             if ($lineNumber === 0) {
                                 $lineNumber++;
                                 continue;
@@ -892,7 +894,8 @@ class LeadController extends FormController
                             // Decrease batch count
                             $batchSize--;
 
-                            if (is_array($data)) {
+                            if (is_array($data) && count($headers) === count($data)) {
+
                                 $data = array_combine($headers, $data);
 
                                 if (empty($data)) {
@@ -949,9 +952,19 @@ class LeadController extends FormController
 
                                     $file = new \SplFileObject($fullPath);
 
+                                    $config = $form->getData();
+                                    unset($config['file']);
+                                    unset($config['start']);
+
+                                    foreach ($config as &$c) {
+                                        $c = htmlspecialchars_decode($c);
+                                    }
+
+                                    $session->set('mautic.lead.import.config', $config);
+
                                     if ($file !== false) {
                                         // Get the headers for matching
-                                        $headers = $file->fgetcsv();
+                                        $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
                                         // Get the number of lines so we can track progress
                                         $file->seek(PHP_INT_MAX);

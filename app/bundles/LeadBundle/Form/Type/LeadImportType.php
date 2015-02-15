@@ -28,9 +28,45 @@ class LeadImportType extends AbstractType
     {
         $builder->add('file', 'file', array(
             'label' => 'mautic.lead.import.file',
-            'attr' => array(
+            'attr'  => array(
                 'class' => 'form-control'
             )
+        ));
+
+        $constraints = array(
+            new \Symfony\Component\Validator\Constraints\NotBlank(
+                array('message' => 'mautic.core.value.required')
+            )
+        );
+
+        $default = (empty($options['data']['delimiter'])) ? "," : htmlspecialchars($options['data']['delimiter']);
+        $builder->add('delimiter', 'text', array(
+            'label'       => 'mautic.lead.import.delimiter',
+            'attr'        => array(
+                'class' => 'form-control'
+            ),
+            'data'        => $default,
+            'constraints' => $constraints
+        ));
+
+        $default = (empty($options['data']['enclosure'])) ? '&quot;' : htmlspecialchars($options['data']['enclosure']);
+        $builder->add('enclosure', 'text', array(
+            'label'       => 'mautic.lead.import.enclosure',
+            'attr'        => array(
+                'class' => 'form-control'
+            ),
+            'data'        => $default,
+            'constraints' => $constraints
+        ));
+
+        $default = (empty($options['data']['escape'])) ? '\\' : $options['data']['escape'];
+        $builder->add('escape', 'text', array(
+            'label'       => 'mautic.lead.import.escape',
+            'attr'        => array(
+                'class' => 'form-control'
+            ),
+            'data'        => $default,
+            'constraints' => $constraints
         ));
 
         $builder->add('start', 'submit', array(
@@ -50,7 +86,8 @@ class LeadImportType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
+    public function getName ()
+    {
         return "lead_import";
     }
 }
