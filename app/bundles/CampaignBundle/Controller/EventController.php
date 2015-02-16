@@ -135,6 +135,22 @@ class EventController extends CommonFormController
                 'campaignId' => $campaignId
             ));
             $passthroughVars['eventType'] = $eventType;
+
+            $translator = $this->factory->getTranslator();
+            if ($event['triggerMode'] == 'interval') {
+                $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
+                    '%number%' => $event['triggerInterval'],
+                    '%unit%'   => $translator->transChoice('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'], $event['triggerInterval'])
+                ));
+            } elseif ($event['triggerMode'] == 'date') {
+                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                $dh                       = $this->factory->getHelper('template.date');
+                $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
+                    '%full%' => $dh->toFull($event['triggerDate']),
+                    '%time%' => $dh->toTime($event['triggerDate']),
+                    '%date%' => $dh->toShort($event['triggerDate'])
+                ));
+            }
         }
 
         if ($closeModal) {
@@ -260,7 +276,6 @@ class EventController extends CommonFormController
                     $passthroughVars['eventType']  = $eventType;
 
                     $translator = $this->factory->getTranslator();
-
                     if ($event['triggerMode'] == 'interval') {
                         $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
                             '%number%' => $event['triggerInterval'],
@@ -268,7 +283,7 @@ class EventController extends CommonFormController
                         ));
                     } elseif ($event['triggerMode'] == 'date') {
                         /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                        $dh                       = $this->container->get('mautic.helper.template.date');
+                        $dh                       = $this->factory->getHelper('template.date');
                         $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
                             '%full%' => $dh->toFull($event['triggerDate']),
                             '%time%' => $dh->toTime($event['triggerDate']),

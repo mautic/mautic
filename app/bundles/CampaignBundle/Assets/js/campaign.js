@@ -56,6 +56,8 @@ Mautic.campaignOnLoad = function (container) {
  */
 Mautic.campaignOnUnload = function(container) {
     delete Mautic.campaignBuilderInstance;
+    delete Mautic.campaignBuilderLabels;
+
     if (container === '#app-content') {
         delete Mautic.campaignViewsBarChart;
         delete Mautic.campaignEmailSentPie;
@@ -89,9 +91,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
         var eventId    = '#' + domEventId;
 
         if (response.label) {
-            Mautic.campaignBuilderUpdateLabel(domEventId, response.label);
-        } else {
-            Mautic.campaignBuilderUpdateLabel(domEventId, false);
+            Mautic.campaignBuilderLabels[domEventId] = response.label;
         }
 
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
@@ -99,6 +99,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
         var newHtml = response.eventHtml;
         var domEventId = 'CampaignEvent_' + response.eventId;
         var eventId    = '#' + domEventId;
+        
+        if (response.label) {
+            Mautic.campaignBuilderLabels[domEventId] = response.label;
+        }
 
         //append content
         var x = mQuery('#droppedX').val();
@@ -161,7 +165,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
     Mautic.campaignBuilderInstance.repaintEverything();
 };
 
-Mautic.campaignBuilderUpdateLabel = function (domEventId, theLabel) {
+Mautic.campaignBuilderUpdateLabel = function (domEventId) {
+    var theLabel = typeof Mautic.campaignBuilderLabels[domEventId] == 'undefined' ? '' : Mautic.campaignBuilderLabels[domEventId];
     var currentConnections = Mautic.campaignBuilderInstance.select({
         target: domEventId
     });
@@ -220,8 +225,20 @@ Mautic.launchCampaignEditor = function() {
     mQuery('.builder').removeClass('hide');
 
     if (typeof Mautic.campaignBuilderInstance == 'undefined') {
+        // Store labels
+        Mautic.campaignBuilderLabels = {};
+
         Mautic.campaignBuilderInstance = jsPlumb.getInstance({
             Container: document.querySelector("#CampaignCanvas")
+        });
+
+        // Update the labels on connection/disconnection
+        Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
+            Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
+        });
+
+        Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
+            Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
         });
 
         var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];

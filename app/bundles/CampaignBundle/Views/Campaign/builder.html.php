@@ -107,31 +107,39 @@
         });
         <?php endforeach; ?>
 
-        // Recreate jsPlumb connections
+        // Recreate jsPlumb connections and labels
+        <?php
+        $labels = array();
+        foreach ($canvasSettings['connections'] as $connection):
+            if (isset($labels[$connection['targetId']])) continue;
+
+            $targetEvent = $campaignEvents[$connection['targetId']];
+            $labelText   = '';
+            if (isset($targetEvent['triggerMode'])):
+                if ($targetEvent['triggerMode'] == 'interval'):
+                    $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
+                        '%number%' => $targetEvent['triggerInterval'],
+                        '%unit%'   => $view['translator']->transChoice('mautic.campaign.event.intervalunit.' . $targetEvent['triggerIntervalUnit'], $targetEvent['triggerInterval'])
+                    ));
+                elseif ($targetEvent['triggerMode'] == 'date'):
+                    $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
+                        '%full%' => $view['date']->toFull($event['triggerDate']),
+                        '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
+                        '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
+                    ));
+                endif;
+            endif;
+            $labels[$connection['targetId']] = $labelText;
+        ?>
+
+        Mautic.campaignBuilderLabels["CampaignEvent_<?php echo $connection['targetId']; ?>"] = "<?php echo $labelText; ?>";
+        <?php endforeach; ?>
+
         <?php foreach ($canvasSettings['connections'] as $connection): ?>
 
         var ep = Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
-        <?php
-        $targetEvent = $campaignEvents[$connection['targetId']];
-        $labelText   = '';
-        if (isset($targetEvent['triggerMode'])):
-            if ($targetEvent['triggerMode'] == 'interval'):
-                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
-                    '%number%' => $targetEvent['triggerInterval'],
-                    '%unit%'   => $view['translator']->transChoice('mautic.campaign.event.intervalunit.' . $targetEvent['triggerIntervalUnit'], $targetEvent['triggerInterval'])
-                ));
-            elseif ($targetEvent['triggerMode'] == 'date'):
-                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
-                    '%full%' => $view['date']->toFull($event['triggerDate']),
-                    '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
-                    '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
-                ));
-            endif;
-        endif;
-        ?>
-        <?php if (!empty($labelText)): ?>
-
-        ep.addOverlay(["Label", {label: "<?php echo $labelText; ?>", location: 0.65, id: "<?php echo "{$connection['sourceId']}_{$connection['targetId']}"; ?>_connectionLabel", cssClass: "_jsPlumb_label"}]);
+        <?php if (!empty($labels[$connection['targetId']])): ?>
+        ep.addOverlay(["Label", {label: "<?php echo $labels[$connection['targetId']]; ?>", location: 0.65, id: "<?php echo "{$connection['sourceId']}_{$connection['targetId']}"; ?>_connectionLabel", cssClass: "_jsPlumb_label"}]);
         <?php endif; ?>
         <?php endforeach; ?>
         <?php endif; ?>
