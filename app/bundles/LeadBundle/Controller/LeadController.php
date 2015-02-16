@@ -803,6 +803,9 @@ class LeadController extends FormController
      */
     public function importAction ($objectId = 0, $ignorePost = false)
     {
+        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
+        ini_set('auto_detect_line_endings', true);
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model   = $this->factory->getModel('lead');
         $session = $this->factory->getSession();
@@ -862,8 +865,10 @@ class LeadController extends FormController
 
             case 4:
                 $inProgress = $session->get('mautic.lead.import.inprogress', false);
-                if (!$inProgress) {
+                $checks     = $session->get('mautic.lead.import.progresschecks', 1);
+                if (!$inProgress || $checks > 5) {
                     $session->set('mautic.lead.import.inprogress', true);
+                    $session->set('mautic.lead.import.progresschecks', 1);
 
                     // Batch process
                     $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
@@ -931,6 +936,9 @@ class LeadController extends FormController
                     }
 
                     break;
+                } else {
+                    $checks++;
+                    $session->set('mautic.lead.import.progresschecks', $checks);
                 }
         }
 
