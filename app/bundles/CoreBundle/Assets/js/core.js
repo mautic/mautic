@@ -2505,10 +2505,14 @@ var Mautic = {
                 source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
             }
         ).on('keypress', function (event) {
-                if ((event.keyCode || event.which) == 13) {
-                    mQuery(el).typeahead('close');
-                }
-            });
+            if ((event.keyCode || event.which) == 13) {
+                mQuery(el).typeahead('close');
+            }
+        }).on('focus', function() {
+            if(mQuery(el).typeahead('val') === '' && !options.minLength) {
+                mQuery(el).data('ttTypeahead').input.trigger('queryChanged', '');
+            }
+        });
 
         return theTypeahead;
     },

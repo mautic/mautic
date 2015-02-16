@@ -113,8 +113,8 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
         //check to see if there is a key/value split
         options = options.split('||');
         if (options.length == 2) {
-            keys = options[0].split('|');
-            values = options[1].split('|');
+            keys = options[1].split('|');
+            values = options[0].split('|');
         } else {
             values = options[0].split('|');
         }
