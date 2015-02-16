@@ -370,7 +370,7 @@ class LeadListRepository extends CommonRepository
     {
         $group       = false;
         $options     = $this->getFilterExpressionFunctions();
-        $expr        = $q->expr()->orX();
+        $expr        = $q->expr()->andX();
         $useExpr     =& $expr;
 
         foreach ($filters as $k => $details) {
