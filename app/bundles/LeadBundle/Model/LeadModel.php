@@ -810,7 +810,8 @@ class LeadModel extends FormModel
         }
 
         foreach ($fields as $leadField => $importField) {
-            if (!empty($data[$importField])) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
                 $lead->addUpdatedField($leadField, $data[$importField]);
             }
         }
