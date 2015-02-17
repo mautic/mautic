@@ -93,6 +93,8 @@ class AssetModel extends FormModel
                     $leadModel->setLeadCookie($clickthrough['lead']);
                     list($trackingId, $generated) = $leadModel->getTrackingCookie();
                     $leadClickthrough = true;
+
+                    $leadModel->setCurrentLead($lead);
                 }
             }
 
