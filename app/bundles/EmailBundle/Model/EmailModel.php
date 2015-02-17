@@ -331,13 +331,16 @@ class EmailModel extends FormModel
         $lead = $stat->getLead();
 
         if ($lead !== null) {
-
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
 
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
                 $leadModel->saveEntity($lead, true);
             }
+
+            // Set the lead as current lead
+            $leadModel->setCurrentLead($lead);
         }
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
@@ -777,7 +780,10 @@ class EmailModel extends FormModel
                     'idHash'   => $idHash
                 ));
             } else {
-                $mailer->setBody($useEmail['entity']->getCustomHtml());
+                // Tak on the tracking URL
+                $customHtml  = $useEmail['entity']->getCustomHtml();
+                $customHtml .= '<img height="1" width="1" src="' . $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true) . '" />';
+                $mailer->setBody($customHtml);
             }
 
             $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
