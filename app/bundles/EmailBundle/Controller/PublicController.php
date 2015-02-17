@@ -34,11 +34,6 @@ class PublicController extends CommonFormController
             //the lead needs to have fields populated
             $lead = $this->factory->getModel('lead')->getLead($statLead->getId());
 
-            // Set the lead as current lead
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $leadModel->setCurrentLead($lead);
-
             $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
