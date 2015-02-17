@@ -48,7 +48,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'point',
                 'orderBy'    => 'p.id',
-                'text'       => 'mmautic.core.id',
+                'text'       => 'mautic.core.id',
                 'class'      => 'visible-md visible-lg col-point-id'
             ));
             ?>
