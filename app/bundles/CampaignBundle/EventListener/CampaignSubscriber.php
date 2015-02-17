@@ -88,19 +88,22 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add trigger
         $leadChangeTrigger = array(
-            'label'        => 'mautic.campaign.event.leadchange',
-            'description'  => 'mautic.campaign.event.leadchange_descr',
-            'formType'     => 'campaignevent_leadchange',
-            'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
+            'label'       => 'mautic.campaign.event.leadchange',
+            'description' => 'mautic.campaign.event.leadchange_descr',
+            'formType'    => 'campaignevent_leadchange',
+            'callback'    => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
         );
         $event->addSystemChange('campaign.leadchange', $leadChangeTrigger);
 
         //Add action to actually add/remove lead to a specific lists
         $addRemoveLeadAction = array(
-            'label'        => 'mautic.campaign.event.addremovelead',
-            'description'  => 'mautic.campaign.event.addremovelead_descr',
-            'formType'     => 'campaignevent_addremovelead',
-            'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead'
+            'label'           => 'mautic.campaign.event.addremovelead',
+            'description'     => 'mautic.campaign.event.addremovelead_descr',
+            'formType'        => 'campaignevent_addremovelead',
+            'formTypeOptions' => array(
+                'include_this' => true
+            ),
+            'callback'        => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead'
         );
         $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
     }

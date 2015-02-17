@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class CampaignEventAddRemoveLeadType
@@ -42,7 +43,7 @@ class CampaignEventAddRemoveLeadType extends AbstractType
                 'class' => 'form-control'
             ),
             'required'   => false,
-            'include_this' => true
+            'include_this' => $options['include_this']
         ));
     }
 
@@ -52,4 +53,15 @@ class CampaignEventAddRemoveLeadType extends AbstractType
     public function getName() {
         return "campaignevent_addremovelead";
     }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'include_this' => false
+        ));
+    }
+
 }
