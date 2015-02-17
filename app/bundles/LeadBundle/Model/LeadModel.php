@@ -465,6 +465,7 @@ class LeadModel extends FormModel
                     $lead->setFields($fields);
                 }
             }
+
             $this->currentLead = $lead;
             $this->setLeadCookie($leadId);
         }
@@ -485,7 +486,8 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
-        $oldLead = $this->currentLead;
+        $oldLead = (is_null($this->currentLead)) ? $this->getCurrentLead() : $this->currentLead;
+
         $this->currentLead = $lead;
 
         if ($oldLead->getId() != $lead->getId()) {
