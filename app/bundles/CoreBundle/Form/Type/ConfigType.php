@@ -627,7 +627,7 @@ class ConfigType extends AbstractType
         $builder->add('cookie_secure', 'yesno_button_group', array(
             'label'       => 'mautic.core.config.form.cookie.secure',
             'empty_value' => 'mautic.core.form.default',
-            'data'        => ($options['data']['cookie_secure'] === '' || $options['data']['cookie_secure'] === null) ? '' : (bool)$$options['data']['cookie_secure'],
+            'data'        => (array_key_exists('cookie_secure', $options['data']) && !empty($options['data']['cookie_secure'])) ? true : false,
             'attr'        => array(
                 'tooltip' => 'mautic.core.config.form.cookie.secure.tooltip'
             )
@@ -635,7 +635,7 @@ class ConfigType extends AbstractType
 
         $builder->add('cookie_httponly', 'yesno_button_group', array(
             'label'       => 'mautic.core.config.form.cookie.httponly',
-            'data'        => (bool)$options['data']['cookie_httponly'],
+            'data'        => (array_key_exists('cookie_httponly', $options['data']) && !empty($options['data']['cookie_httponly'])) ? true : false,
             'attr'        => array(
                 'tooltip' => 'mautic.core.config.form.cookie.httponly.tooltip'
             )
