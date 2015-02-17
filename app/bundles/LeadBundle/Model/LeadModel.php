@@ -488,6 +488,11 @@ class LeadModel extends FormModel
     {
         $oldLead = (is_null($this->currentLead)) ? $this->getCurrentLead() : $this->currentLead;
 
+        $fields = $lead->getFields();
+        if (empty($fields)) {
+            $lead->setFields($this->getLeadDetails($lead));
+        }
+
         $this->currentLead = $lead;
 
         if ($oldLead->getId() != $lead->getId()) {
