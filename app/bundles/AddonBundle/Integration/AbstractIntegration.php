@@ -12,6 +12,7 @@ namespace Mautic\AddonBundle\Integration;
 use Mautic\AddonBundle\Entity\Integration;
 use Mautic\AddonBundle\Helper\oAuthHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -967,7 +968,12 @@ abstract class AbstractIntegration
             }
         }
 
-        $fields          = $lead->getFields(true);
+        if ($lead instanceof Lead) {
+            $fields = $lead->getFields(true);
+        } else {
+            $fields = $lead;
+        }
+
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
         $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
