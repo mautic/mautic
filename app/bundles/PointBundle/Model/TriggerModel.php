@@ -361,8 +361,7 @@ class TriggerModel extends CommonFormModel
                     $log->setEvent($this->em->getReference('MauticPointBundle:TriggerEvent', $event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
-                    $event->addLog($log);
-                    $persist[] = $event;
+                    $persist[] = $log;
                 }
             }
 
