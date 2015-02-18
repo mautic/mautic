@@ -36,6 +36,33 @@ class AssetsHelper extends CoreAssetsHelper
     protected $assets;
 
     /**
+     * Gets asset prefix
+     *
+     * @return string
+     */
+    public function getAssetPrefix()
+    {
+        return $this->factory->getSystemPath('asset_prefix');
+    }
+
+    /**
+     * Set asset url path
+     *
+     * @param string $path
+     * @param null   $packageName
+     * @param null   $version
+     *
+     * @return string
+     */
+    public function getUrl($path, $packageName = null, $version = null)
+    {
+        $assetPrefix = $this->getAssetPrefix();
+        $path        = $assetPrefix . $path;
+
+        return parent::getUrl($path, $packageName, $version);
+    }
+
+    /**
      * Adds a JS script to the template
      *
      * @param string $script

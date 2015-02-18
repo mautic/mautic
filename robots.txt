@@ -3,4 +3,5 @@ Disallow: /addons/
 Disallow: /app/
 Disallow: /media/
 Disallow: /themes/
+Disallow: /translations/
 Disallow: /vendor/
