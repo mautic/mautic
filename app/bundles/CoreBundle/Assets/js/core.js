@@ -410,14 +410,20 @@ var Mautic = {
                     var settings = {};
 
                     if (editorClass != 'editor') {
+                        // Set the custom editor toolbar
                         var toolbar = editorClass.replace('editor-', '').replace('-', '_');
                         settings.toolbar = toolbar;
                     }
 
-                    if (editorClass == 'editor-fullpage') {
-                        settings.fullPage = true;
+                    if (editorClass != 'editor' && editorClass != 'editor-basic') {
+                        // Do not strip classes and the like
                         settings.allowedContent = true;
-                        settings.extraPlugins = "docprops";
+                    }
+
+                    if (editorClass == 'editor-fullpage') {
+                        // Allow full page editing and add tools to update html document
+                        settings.fullPage     = true;
+                        settings.extraPlugins = "sourcedialog,docprops";
                     }
 
                     mQuery(this).ckeditor(settings);
