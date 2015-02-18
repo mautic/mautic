@@ -9,11 +9,47 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Joomla\Filter\InputFilter;
+
+
 /**
  * Class InputHelper
  */
 class InputHelper
 {
+    /**
+     * @var InputFilter
+     */
+    private static $filter;
+
+    private static function getFilter()
+    {
+        if (empty(self::$filter)) {
+            self::$filter = new InputFilter(array(), array(), 1, 1);
+            self::$filter->tagBlacklist = array(
+                'applet',
+                'bgsound',
+                'base',
+                'basefont',
+                'embed',
+                'frame',
+                'frameset',
+                'iframe',
+                'ilayer',
+                'layer',
+                'object',
+                'xml'
+            );
+
+            self::$filter->attrBlacklist = array(
+                'codebase',
+                'dynsrc',
+                'lowsrc'
+            );
+        }
+
+        return self::$filter;
+    }
 
     /**
      * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
@@ -27,14 +63,27 @@ class InputHelper
      */
     public static function _($value, $mask = 'clean', $urldecode = false)
     {
-        if (is_array($value) && is_array($mask)) {
+        if (is_array($value)) {
             foreach ($value as $k => &$v) {
-                if (is_array($v) && is_array($mask) && isset($mask[$k])) {
-                    $v = self::_($v, $mask[$k]);
-                } elseif (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
-                    $v = self::$mask[$k]($v, $urldecode);
+                $useMask = 'filter';
+                if (is_array($mask)) {
+                    if (array_key_exists($k, $mask)) {
+                        if (is_array($mask[$k])) {
+                            $useMask = $mask[$k];
+                        } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
+                            $useMask = $mask[$k];
+                        }
+                    }
+                } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+                    $useMask = $mask;
+                }
+
+                if (is_array($v) && is_array($useMask)) {
+                    $v = self::_($v, $useMask);
+                } elseif ($useMask == 'filter') {
+                    $v = self::getFilter()->clean($v, $useMask);
                 } else {
-                    $v = self::clean($v, $urldecode);
+                    $v = self::$useMask($v, $mask);
                 }
             }
 
@@ -49,7 +98,7 @@ class InputHelper
                 return self::$mask($value, $urldecode);
             }
         } else {
-            return self::clean($value, $urldecode);
+            return self::getFilter()->clean($value, $mask);
         }
     }
 
@@ -268,42 +317,6 @@ class InputHelper
 
         if (!is_array($value)) {
             $value = array($value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Clean HTML using htmLawed
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public static function html($value, $urldecode = false)
-    {
-        require_once __DIR__ . '/../Libraries/htmLawed/htmLawed.php';
-
-        $config = array('tidy' => 4, 'safe' => 1);
-
-        if (is_array($value)) {
-            foreach ($value as $k => &$v) {
-                if (is_array($v)) {
-                    $v = self::html($v, $urldecode);
-                } else {
-                    if ($urldecode) {
-                        $v = urldecode($v);
-                    }
-
-                    $v = htmLawed($v, $config);
-                }
-            }
-        } else {
-            if ($urldecode) {
-                $value = urldecode($value);
-            }
-
-            $value = htmLawed($value, $config);
         }
 
         return $value;
