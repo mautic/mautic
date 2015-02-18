@@ -19,6 +19,10 @@ mQuery(document).ready(function () {
         var that = this;
         CKEDITOR.inline(content_id, {
             toolbar: 'advanced',
+            // Inline mode seems to ignore this but leaving anyway
+            allowedContent: true,
+            // Allow any attributes and prevent conversion of height/width attributes to styles
+            extraAllowedContent: '*{*}; img[height,width]; table[height,width]',
             on: {
                 // Remove inserted <p /> tag if empty to allow the CSS3 placeholder to display
                 blur: function( event ) {
