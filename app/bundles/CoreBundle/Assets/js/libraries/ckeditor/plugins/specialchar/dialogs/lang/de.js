@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("specialchar","de",{euro:"Euro Zeichen",lsquo:"Hochkomma links",rsquo:"Hochkomma rechts",ldquo:"Anführungszeichen links",rdquo:"Anführungszeichen rechts",ndash:"kleiner Strich",mdash:"mittlerer Strich",iexcl:"invertiertes Ausrufezeichen",cent:"Cent",pound:"Pfund",curren:"Währung",yen:"Yen",brvbar:"gestrichelte Linie",sect:"§ Zeichen",uml:"Diäresis",copy:"Copyright",ordf:"Feminine ordinal Anzeige",laquo:"Nach links zeigenden Doppel-Winkel Anführungszeichen",not:"Not-Zeichen",

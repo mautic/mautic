@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("a11yhelp","si",{title:"ළඟා වියහැකි ",contents:"උදව් සඳහා අන්තර්ගතය.නික්මයෙමට ESC බොත්තම ඔබන්න",legend:[{name:"පොදු කරුණු",items:[{name:"සංස්කරණ මෙවලම් ",legend:"ඔබන්න ${මෙවලම් තීරු අවධානය} මෙවලම් තීරුවේ එහා මෙහා යෑමට.ඉදිරියට යෑමට හා ආපසු යෑමට මෙවලම් තීරුකාණ්ඩය හා TAB හා SHIFT-TAB .ඉදිරියට යෑමට හා ආපසු යෑමට මෙවලම් තීරු බොත්තම සමග RIGHT ARROW හෝ LEFT ARROW.මෙවලම් තීරු බොත්තම සක්‍රිය කර ගැනීමට  SPACE හෝ  ENTER බොත්තම ඔබන්න."},{name:"සංස්කරණ ",legend:"දෙබසක් තුළ, ඊළඟ දෙබස් පෙදෙසට යෑමට TAB බොත්තම ඔබන්න, කලින් පෙදෙසට යෑමට SHIFT + TAB බොත්තම ද, දෙබස් ඉදිරිපත් කිරීමට ENTER බොත්තම ද, දෙබස් නැවතීමට  ESCබොත්තම ද, දෙබස් සහිත ගොනු, පිටු වැඩි සංක්‍යයාවක් ලබා ගෙනිමට,ගොනු තුළ එහාමෙහා යෑමට ALT + F10 බොත්තම් ද, ඊළඟ ගොනුවට යෑමට TAB හෝ RIGTH ARROW බොත්තම ඔබන්න. පෙර ගොනුවට යෑමට SHIFT + TAB හෝ LEFT ARROW බොත්තම් ද ,ගොනු පිටු තේරීමට  SPACE හෝ ENTER බොත්තම් ද ඔබන්න."},

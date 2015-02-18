@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.dialog.add("a11yHelp",function(j){var a=j.lang.a11yhelp,l=CKEDITOR.tools.getNextId(),e={8:a.backspace,9:a.tab,13:a.enter,16:a.shift,17:a.ctrl,18:a.alt,19:a.pause,20:a.capslock,27:a.escape,33:a.pageUp,34:a.pageDown,35:a.end,36:a.home,37:a.leftArrow,38:a.upArrow,39:a.rightArrow,40:a.downArrow,45:a.insert,46:a["delete"],91:a.leftWindowKey,92:a.rightWindowKey,93:a.selectKey,96:a.numpad0,97:a.numpad1,98:a.numpad2,99:a.numpad3,100:a.numpad4,101:a.numpad5,102:a.numpad6,103:a.numpad7,104:a.numpad8,

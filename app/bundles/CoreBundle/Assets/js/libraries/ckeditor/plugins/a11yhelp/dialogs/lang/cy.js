@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("a11yhelp","cy",{title:"Canllawiau Hygyrchedd",contents:"Cynnwys Cymorth. I gau y deialog hwn, pwyswch ESC.",legend:[{name:"Cyffredinol",items:[{name:"Bar Offer y Golygydd",legend:"Pwyswch $ {toolbarFocus} i fynd at y bar offer. Symudwch i'r grŵp bar offer nesaf a blaenorol gyda TAB a SHIFT-TAB. Symudwch i'r botwm bar offer nesaf a blaenorol gyda SAETH DDE neu SAETH CHWITH. Pwyswch SPACE neu ENTER i wneud botwm y bar offer yn weithredol."},{name:"Deialog y Golygydd",legend:"Tu mewn i'r deialog, pwyswch TAB i fynd i'r maes nesaf ar y deialog, pwyswch SHIFT + TAB i symud i faes blaenorol, pwyswch ENTER i gyflwyno'r deialog, pwyswch ESC i ddiddymu'r deialog. Ar gyfer deialogau sydd â thudalennau aml-tab, pwyswch ALT + F10 i lywio'r tab-restr. Yna symudwch i'r tab nesaf gyda TAB neu SAETH DDE. Symudwch i dab blaenorol gyda SHIFT + TAB neu'r SAETH CHWITH. Pwyswch SPACE neu ENTER i ddewis y dudalen tab."},

@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("a11yhelp","ja",{title:"ユーザー補助の説明",contents:"ヘルプ　このダイアログを閉じるには ESCを押してください。",legend:[{name:"全般",items:[{name:"エディターツールバー",legend:"${toolbarFocus} を押すとツールバーのオン/オフ操作ができます。カーソルをツールバーのグループで移動させるにはTabかSHIFT+Tabを押します。グループ内でカーソルを移動させるには、右カーソルか左カーソルを押します。スペースキーやエンターを押すとボタンを有効/無効にすることができます。"},{name:"編集ダイアログ",legend:"ダイヤログ内では、ダイアログの次の選択肢に移動するにはTabを押します。前の選択肢に移動するには、SHIFT+Tabを押します。ダイアログを決定するには、ENTERを押します。ESCでダイアログをキャンセルできます。複数のタブがあるダイアログではタブリストを操作するにはALT+F10を押します。次のタブに移動するにはTabか右カーソル、前のタブに戻るにはSHIFT+Tabか左カーソルです。タブページを決定するにはスペースもしくは、ENTERキーを押してください。"},

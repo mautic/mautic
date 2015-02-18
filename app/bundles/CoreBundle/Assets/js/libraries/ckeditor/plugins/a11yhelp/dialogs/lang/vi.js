@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("a11yhelp","vi",{title:"Hướng dẫn trợ năng",contents:"Nội dung Hỗ trợ. Nhấn ESC để đóng hộp thoại.",legend:[{name:"Chung",items:[{name:"Thanh công cụ soạn thảo",legend:"Nhấn ${toolbarFocus} để điều hướng đến thanh công cụ. Nhấn TAB và SHIFT-TAB để chuyển đến nhóm thanh công cụ khác. Nhấn MŨI TÊN PHẢI hoặc MŨI TÊN TRÁI để chuyển sang nút khác trên thanh công cụ. Nhấn PHÍM CÁCH hoặc ENTER để kích hoạt nút trên thanh công cụ."},{name:"Hộp thoại Biên t",legend:"Bên trong một hộp thoại, nhấn TAB để chuyển sang trường tiếp theo, nhấn SHIFT + TAB để quay lại trường phía trước, nhấn ENTER để chấp nhận, nhấn ESC để đóng hộp thoại. Đối với các hộp thoại có nhiều tab, nhấn ALT + F10 để chuyển đến danh sách các tab. Sau đó nhấn TAB hoặc MŨI TÊN SANG PHẢI để chuyển sang tab tiếp theo. Nhấn SHIFT + TAB hoặc MŨI TÊN SANG TRÁI để chuyển sang tab trước đó. Nhấn DẤU CÁCH hoặc ENTER để chọn tab."},

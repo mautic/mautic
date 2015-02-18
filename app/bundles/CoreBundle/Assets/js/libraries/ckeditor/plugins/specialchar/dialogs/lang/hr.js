@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("specialchar","hr",{euro:"Euro znak",lsquo:"Lijevi jednostruki navodnik",rsquo:"Desni jednostruki navodnik",ldquo:"Lijevi dvostruki navodnik",rdquo:"Desni dvostruki navodnik",ndash:"En crtica",mdash:"Em crtica",iexcl:"Naopaki uskličnik",cent:"Cent znak",pound:"Funta znak",curren:"Znak valute",yen:"Yen znak",brvbar:"Potrgana prečka",sect:"Znak odjeljka",uml:"Prijeglasi",copy:"Copyright znak",ordf:"Feminine ordinal indicator",laquo:"Lijevi dvostruki uglati navodnik",not:"Not znak",

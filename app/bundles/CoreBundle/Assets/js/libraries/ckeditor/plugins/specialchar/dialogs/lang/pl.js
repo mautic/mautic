@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang("specialchar","pl",{euro:"Znak euro",lsquo:"Cudzysłów pojedynczy otwierający",rsquo:"Cudzysłów pojedynczy zamykający",ldquo:"Cudzysłów apostrofowy otwierający",rdquo:"Cudzysłów apostrofowy zamykający",ndash:"Półpauza",mdash:"Pauza",iexcl:"Odwrócony wykrzyknik",cent:"Znak centa",pound:"Znak funta",curren:"Znak waluty",yen:"Znak jena",brvbar:"Przerwana pionowa kreska",sect:"Paragraf",uml:"Diereza",copy:"Znak praw autorskich",ordf:"Wskaźnik rodzaju żeńskiego liczebnika porządkowego",
