@@ -602,6 +602,7 @@ class CampaignController extends FormController
             //load existing events into session
             $campaignEvents = array();
             $existingEvents = $entity->getEvents()->toArray();
+
             foreach ($existingEvents as $e) {
                 $id    = $e->getId();
                 $event = $e->convertToArray();
@@ -646,7 +647,8 @@ class CampaignController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $model  = $this->factory->getModel('campaign');
+        $model      = $this->factory->getModel('campaign');
+        $eventModel = $this->factory->getModel('campaign.event');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -654,13 +656,54 @@ class CampaignController extends FormController
                 return $this->accessDenied();
             }
 
-            $clone = clone $entity;
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+            // Get the events that need to be duplicated as well
+            $events = $entity->getEvents();
+
+            // Clone the campaign
+            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
+            $campaign = clone $entity;
+            $campaign->setIsPublished(false);
+
+            // Clone the campaign's events
+            $newEvents = array();
+            foreach ($events as $event) {
+                $campaign->removeEvent($event);
+
+                $clone = clone $event;
+                $clone->setCampaign($campaign);
+                $clone->setTempId($event->getId());
+                $campaign->addEvent($event->getId(), $clone);
+            }
+
+            $model->saveEntity($campaign);
+            $objectId = $campaign->getId();
+
+            $newEvents = $campaign->getEvents();
+            $eventIds  = array();
+            foreach ($newEvents as $n) {
+                $eventIds[$n->getTempId()] = $n->getId();
+            }
+
+            // Update canvas settings with new event ids
+            $canvasSettings = $campaign->getCanvasSettings();
+            if (isset($canvasSettings['nodes'])) {
+                foreach ($canvasSettings['nodes'] as &$node) {
+                    $node['id'] = $eventIds[$node['id']];
+                }
+            }
+
+            if (isset($canvasSettings['connections'])) {
+                foreach ($canvasSettings['connections'] as &$c) {
+                    $c['sourceId'] = $eventIds[$c['sourceId']];
+                    $c['targetId'] = $eventIds[$c['targetId']];
+                }
+            }
+
+            $campaign->setCanvasSettings($canvasSettings);
+            $model->saveEntity($campaign);
         }
 
-        return $this->editAction($objectId);
+        return $this->editAction($objectId, true);
     }
 
     /**
