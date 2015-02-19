@@ -71,6 +71,9 @@ if ($tmpl == 'index')
                     <?php if ($item->isListable()): ?>
                         <i class="fa fa-list "data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.listable'); ?>"></i>
                     <?php endif; ?>
+                    <?php if ($item->isPubliclyUpdatable()): ?>
+                        <i class="fa fa-globe text-danger "data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.public'); ?>"></i>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

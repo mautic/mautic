@@ -31,28 +31,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     public function getSubscribedEvents()
     {
         return array(
-            //ToolEvents::postGenerateSchemaTable,
             ToolEvents::postGenerateSchema
         );
-    }
-
-    public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $args)
-    {
-        $class = $args->getClassTable();
-
-        if ($class->getName() != MAUTIC_TABLE_PREFIX . 'leads') {
-            return;
-        }
-
-        $table  = $args->getClassTable();
-        //get a list of fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        ));
-
-        foreach ($fields as $f) {
-            $table->addColumn($f['alias'], 'text', array('notnull' => false));
-        }
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
@@ -71,13 +51,12 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ));
 
-
             foreach ($fields as $f) {
                 $table->addColumn($f['alias'], 'text', array('notnull' => false));
             }
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
+            error_log($e->getMessage());
         }
-
     }
 }

@@ -103,6 +103,11 @@ class LeadField extends FormEntity
     private $isListable = true;
 
     /**
+     * @ORM\Column(name="is_publicly_updatable", type="boolean")
+     */
+    private $isPubliclyUpdatable = false;
+
+    /**
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -497,5 +502,21 @@ class LeadField extends FormEntity
     public function setGroup ($group)
     {
         $this->group = $group;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsPubliclyUpdatable ()
+    {
+        return $this->isPubliclyUpdatable;
+    }
+
+    /**
+     * @param mixed $isPubliclyUpdatable
+     */
+    public function setIsPubliclyUpdatable ($isPubliclyUpdatable)
+    {
+        $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;
     }
 }

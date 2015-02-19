@@ -158,6 +158,13 @@ class FieldType extends AbstractType
             'label' => 'mautic.lead.field.form.islistable'
         ));
 
+        $builder->add('isPubliclyUpdatable', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.ispubliclyupdatable',
+            'attr'  => array(
+                'tooltip' => 'mautic.lead.field.form.ispubliclyupdatable.tooltip'
+            )
+        ));
+
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {

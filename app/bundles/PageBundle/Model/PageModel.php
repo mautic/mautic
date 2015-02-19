@@ -454,18 +454,22 @@ class PageModel extends FormModel
                     }
 
                     // Update lead fields if some data were sent in the URL query
-                    $leadFields = array();
-                    if (isset($query['email']) && $query['email']) {
-                        $leadFields['email'] = $query['email'];
+                    /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+                    $leadFieldModel      = $this->factory->getModel('lead.field');
+                    $availableLeadFields = $leadFieldModel->getFieldList(false, false, array(
+                        'isPublished'         => true,
+                        'isPubliclyUpdatable' => true
+                    ));
+
+                    $inQuery = array_intersect_key($query, $availableLeadFields);
+                    foreach ($inQuery as $k => $v) {
+                        if (empty($query[$k])) {
+                            unset($inQuery[$k]);
+                        }
                     }
-                    if (isset($query['firstname']) && $query['firstname']) {
-                        $leadFields['firstname'] = $query['firstname'];
-                    }
-                    if (isset($query['lastname']) && $query['lastname']) {
-                        $leadFields['lastname'] = $query['lastname'];
-                    }
-                    if (count($leadFields)) {
-                        $leadModel->setFieldValues($lead, $leadFields);
+
+                    if (count($inQuery)) {
+                        $leadModel->setFieldValues($lead, $inQuery);
                         $leadModel->saveEntity($lead);
                     }
                 }

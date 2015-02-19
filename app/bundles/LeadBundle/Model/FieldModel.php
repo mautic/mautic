@@ -346,11 +346,21 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true)
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = array('isPublished' => true))
     {
+        $forceFilters = array();
+        foreach ($filters as $col => $val) {
+            $forceFilters[] = array(
+                'column' => "f.{$col}",
+                'expr'   => 'eq',
+                'value'  => $val
+            );
+        }
         // Get a list of custom form fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter'     => array('isPublished' => true),
+        $fields = $this->getEntities(array(
+            'filter'     => array(
+                'force' => $forceFilters
+            ),
             'orderBy'    => 'f.order',
             'orderByDir' => 'asc'
         ));
@@ -359,7 +369,7 @@ class FieldModel extends FormModel
 
         foreach ($fields as $f) {
             if ($byGroup) {
-                $fieldName = $this->factory->getTranslator()->trans('mautic.lead.field.group.' . $f->getGroup());
+                $fieldName = $this->translator->trans('mautic.lead.field.group.' . $f->getGroup());
                 $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
             } else {
                 $leadFields[$f->getAlias()] = $f->getLabel();
