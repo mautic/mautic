@@ -225,6 +225,11 @@ return array(
                 'class' => 'Mautic\LeadBundle\Form\Type\ListActionType',
                 'alias' => 'leadlist_action'
             ),
+            'mautic.form.type.updatelead_action'              => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\UpdateLeadActionType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'updatelead_action'
+            ),
             'mautic.form.type.leadnote'                       => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\NoteType',
                 'arguments' => 'mautic.factory',

@@ -81,6 +81,25 @@ class CampaignEventHelper
     }
 
     /**
+     * Method let update some lead fields if event occurs
+     * 
+     * @param $event
+     * @param $factory
+     * @param Lead $lead
+     */
+    public static function updateLead ($event, $factory, $lead)
+    {
+        $properties = $event['properties'];
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel  = $factory->getModel('lead');
+        $leadModel->setFieldValues($lead, $properties, false);
+        $leadModel->saveEntity($lead);
+
+        return true;
+    }
+
+    /**
      * @param      $event
      * @param Lead $lead
      *

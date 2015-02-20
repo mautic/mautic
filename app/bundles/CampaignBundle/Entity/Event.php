@@ -176,7 +176,7 @@ class Event
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ($prop == 'category' || $prop == 'parent') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
