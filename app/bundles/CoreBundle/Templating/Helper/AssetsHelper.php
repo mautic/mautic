@@ -38,11 +38,22 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Gets asset prefix
      *
+     * @param bool $forceEndingSlash
+     *
      * @return string
      */
-    public function getAssetPrefix()
+    public function getAssetPrefix($includeEndingSlash = false)
     {
-        return $this->factory->getSystemPath('asset_prefix');
+        $prefix = $this->factory->getSystemPath('asset_prefix');
+        if (!empty($prefix)) {
+            if ($includeEndingSlash && substr($prefix, -1) != '/') {
+                $prefix .= '/';
+            } elseif (!$includeEndingSlash && substr($prefix, -1) == '/') {
+                $prefix = substr($prefix, 0, -1);
+            }
+        }
+
+        return $prefix;
     }
 
     /**
@@ -56,7 +67,7 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function getUrl($path, $packageName = null, $version = null)
     {
-        $assetPrefix = $this->getAssetPrefix();
+        $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
         $path        = $assetPrefix . $path;
 
         return parent::getUrl($path, $packageName, $version);

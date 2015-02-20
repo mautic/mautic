@@ -12,7 +12,7 @@ $view->extend(":$template:page.html.php");
 
 $view['assets']->addScriptDeclaration("var mauticBasePath    = '$basePath';");
 $view['assets']->addScriptDeclaration("var mauticAjaxUrl     = '" . $view['router']->generate("mautic_core_ajax") . "';");
-$view['assets']->addScriptDeclaration("var mauticAssetPrefix = '" . $view['assets']->getAssetPrefix() . "';");
+$view['assets']->addScriptDeclaration("var mauticAssetPrefix = '" . $view['assets']->getAssetPrefix(true) . "';");
 $view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true, true));
 $view['assets']->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
 $view['assets']->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
