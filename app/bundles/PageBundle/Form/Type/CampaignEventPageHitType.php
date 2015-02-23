@@ -30,6 +30,16 @@ class CampaignEventPageHitType extends AbstractType
                 'tooltip' => 'mautic.page.campaign.event.form.pages.descr'
             )
         ));
+
+        $builder->add('url', 'text', array(
+            'label'      => 'mautic.page.campaign.event.form.url',
+            'label_attr' => array('class' => 'control-label'),
+            'required'   => false,
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.campaign.event.form.url.descr'
+            )
+        ));
     }
 
     /**
