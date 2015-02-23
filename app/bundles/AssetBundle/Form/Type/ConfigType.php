@@ -39,6 +39,20 @@ class ConfigType extends AbstractType
                 ))
             )
         ));
+
+        $builder->add('max_size', 'text', array(
+            'label'       => 'mautic.asset.config.form.max.size',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.asset.config.form.max.size.tooltip'
+                ),
+            'constraints' => array(
+                new NotBlank(array(
+                    'message' => 'mautic.core.value.required'
+                ))
+            )
+        ));
     }
 
     /**

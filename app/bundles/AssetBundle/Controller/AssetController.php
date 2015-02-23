@@ -258,6 +258,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
+        $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
         if (!$this->factory->getSecurity()->isGranted('asset:assets:create')) {
@@ -367,6 +368,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity($objectId);
+        $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
         $request = $this->request;

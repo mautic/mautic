@@ -137,6 +137,7 @@ return array(
     ),
 
     'parameters' => array(
-        'upload_dir'  => '%kernel.root_dir%/../media/files'
+        'upload_dir'  => '%kernel.root_dir%/../media/files',
+        'max_size'    => '6'
     )
 );
