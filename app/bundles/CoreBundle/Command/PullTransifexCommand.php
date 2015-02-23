@@ -31,10 +31,15 @@ class PullTransifexCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:transifex:pull')
             ->setDescription('Fetches translations for Mautic from Transifex')
+            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
 
 <info>php %command.full_name%</info>
+
+The command can optionally only pull files for a specific language with the --language option
+
+<info php %command.full_name% --language=<language_code>"
 EOT
         );
     }
@@ -57,6 +62,7 @@ EOT
         }
 
         $options        = $input->getOptions();
+        $languageFilter = $options['language'];
         $files          = $this->getLanguageFiles();
         $translationDir = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/translations/';
 
@@ -74,6 +80,11 @@ EOT
 
                     foreach ($languageStats as $language => $stats) {
                         if ($language == 'en') {
+                            continue;
+                        }
+
+                        // If we are filtering on a specific language, skip anything that doesn't match
+                        if ($languageFilter && $languageFilter != $language) {
                             continue;
                         }
 

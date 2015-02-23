@@ -200,7 +200,7 @@ SlideshowManager.newSlide = function () {
 }
 
 SlideshowManager.preloadFileManager = function () {
-    filebrowserImageBrowseUrl = mauticBasePath + '/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
+    filebrowserImageBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
     var iframe = mQuery("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
     mQuery("#fileManager").hide().append(iframe);
     iframe.load(function () {

@@ -52,6 +52,17 @@ class InputHelper
     }
 
     /**
+     * Wrapper to InputHelper
+     *
+     * @param $name
+     * @param $arguments
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        return self::getFilter()->clean($arguments[0], $name);
+    }
+
+    /**
      * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
      * function to be used for the specific field.
      *
