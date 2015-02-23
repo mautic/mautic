@@ -42,7 +42,7 @@ class AssetType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html', 'file' => 'raw')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
         $builder->add('storageLocation', 'button_group', array(
