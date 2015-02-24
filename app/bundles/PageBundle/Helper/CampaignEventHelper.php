@@ -32,6 +32,7 @@ class CampaignEventHelper
 
         $pageHit = $eventDetails->getPage();
 
+        // Check Landing Pages
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel = $factory->getModel('page');
@@ -44,7 +45,20 @@ class CampaignEventHelper
 
         $limitToPages = $event['properties']['pages'];
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
+        $urlMatches   = array();
+
+        // Check Landing Pages URL or Tracing Pixel URL
+        if (isset($event['properties']['url']) && $event['properties']['url']) {
+            $pageUrl        = $eventDetails->getUrl();
+            $limitToUrls    = explode(',', $event['properties']['url']);
+
+            foreach ($limitToUrls as $url) {
+                $url = trim($url);
+                $urlMatches[$url] = fnmatch($url, $pageUrl);
+            }
+        }
+
+        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages) && !in_array(true, $urlMatches)) {
             return false;
         }
 

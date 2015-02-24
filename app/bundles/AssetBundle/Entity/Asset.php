@@ -75,7 +75,7 @@ class Asset extends FormEntity
     private $originalFileName;
 
     /**
-     * @Assert\File(maxSize="6000000")
+     * @Assert\File
      */
     private $file;
 
@@ -83,6 +83,11 @@ class Asset extends FormEntity
      * Holds upload directory
      */
     private $uploadDir;
+
+    /**
+     * Holds max size of uploaded file
+     */
+    private $maxSize;
 
     /**
      * Holds file type (file extension)
@@ -650,6 +655,35 @@ class Asset extends FormEntity
     }
 
     /**
+     * Returns maximal uploadable size in bytes.
+     * If not set, 6000000 is default
+     *
+     * @return string
+     */
+    protected function getMaxSize()
+    {
+        if ($this->maxSize) {
+            return $this->maxSize;
+        }
+
+        return 6000000;
+    }
+
+    /**
+     * Set max size
+     *
+     * @param string $maxSize
+     *
+     * @return Asset
+     */
+    public function setMaxSize($maxSize)
+    {
+        $this->maxSize = $maxSize;
+
+        return $this;
+    }
+
+    /**
      * Returns file extension
      *
      * @return string
@@ -914,6 +948,16 @@ class Asset extends FormEntity
             // If the object is stored locally, we should have file data
             if ($object->isNew() && $object->getFile() === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
+                    ->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
+
+            if ($object->getFile()->getSize() > $object->getMaxSize()) {
+                $context->buildViolation('mautic.asset.asset.error.file.size', array(
+                        '%fileSize%' => round($object->getFile()->getSize() / 1000000, 2), 
+                        '%maxSize%' => round($object->getMaxSize()) / 1000000, 2)
+                    )
                     ->atPath('file')
                     ->setTranslationDomain('validators')
                     ->addViolation();

@@ -80,7 +80,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['accumulative_time']) {
-            if (!isset($hitStats)){
+            if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
             if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
@@ -91,7 +91,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['page_hits']) {
-            if (!isset($hitStats)){
+            if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
             if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
@@ -114,7 +114,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_after']) {
-            if (!isset($latestHit)){
+            if (!isset($latestHit)) {
                 $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
             $latestPlus = clone $latestHit;
