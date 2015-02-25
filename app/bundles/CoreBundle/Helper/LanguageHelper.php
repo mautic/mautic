@@ -122,12 +122,14 @@ class LanguageHelper
     /**
      * Fetches the list of available languages
      *
+     * @param bool $overrideCache
+     *
      * @return array
      */
-    public function fetchLanguages()
+    public function fetchLanguages($overrideCache = false)
     {
         // Check if we have a cache file and try to return cached data if so
-        if (is_readable($this->cacheFile)) {
+        if (!$overrideCache && is_readable($this->cacheFile)) {
             $cacheData = json_decode(file_get_contents($this->cacheFile), true);
 
             // If we're within the cache time, return the cached data

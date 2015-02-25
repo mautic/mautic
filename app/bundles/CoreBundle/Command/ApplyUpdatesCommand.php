@@ -189,6 +189,35 @@ EOT
             }
         }
 
+        // Update languages
+        $supportedLanguages = $this->getContainer()->get('mautic.factory')->getParameter('supported_languages');
+
+        // If there is only one language, assume it is 'en_US' and skip this
+        if (count($supportedLanguages) > 1) {
+            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+            $languageHelper = $this->getContainer()->get('mautic.factory')->getHelper('language');
+
+            // First, update the cached language data
+            $result = $languageHelper->fetchLanguages(true);
+
+            // Only continue if not in error
+            if (!isset($result['error'])) {
+                foreach ($supportedLanguages as $locale => $name) {
+                    // We don't need to update en_US, that comes with the main package
+                    if ($locale == 'en_US') {
+                        continue;
+                    }
+
+                    // Update time
+                    $extractResult = $languageHelper->extractLanguagePackage($locale);
+
+                    if ($extractResult['error']) {
+                        $output->writeln('<error>' . $translator->trans('mautic.core.update.error_updating_language', array('%language%' => $name)) . '</error>');
+                    }
+                }
+            }
+        }
+
         // Migrate the database to the current version if migrations exist
         $output->writeln('<info>Migrate database schema...</info>');
         $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);

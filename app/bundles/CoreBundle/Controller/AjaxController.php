@@ -449,6 +449,7 @@ class AjaxController extends CommonController
         }
 
         $cacheDir = $this->factory->getSystemPath('cache');
+
         // Cleanup the update cache data now too
         if (file_exists($cacheDir . '/lastUpdateCheck.txt')) {
             @unlink($cacheDir . '/lastUpdateCheck.txt');
@@ -456,6 +457,35 @@ class AjaxController extends CommonController
 
         if (file_exists($cacheDir . '/' . $this->factory->getVersion() . '.zip')) {
             @unlink($cacheDir . '/' . $this->factory->getVersion() . '.zip');
+        }
+
+        // Update languages
+        $supportedLanguages = $this->factory->getParameter('supported_languages');
+
+        // If there is only one language, assume it is 'en_US' and skip this
+        if (count($supportedLanguages) > 1) {
+            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+            $languageHelper = $this->factory->getHelper('language');
+
+            // First, update the cached language data
+            $result = $languageHelper->fetchLanguages(true);
+
+            // Only continue if not in error
+            if (!isset($result['error'])) {
+                foreach ($supportedLanguages as $locale => $name) {
+                    // We don't need to update en_US, that comes with the main package
+                    if ($locale == 'en_US') {
+                        continue;
+                    }
+
+                    // Update time
+                    $extractResult = $languageHelper->extractLanguagePackage($locale);
+
+                    if ($extractResult['error']) {
+                        // TODO - Need to look at adding messages during update...
+                    }
+                }
+            }
         }
 
         $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
