@@ -49,10 +49,26 @@ class UserType extends AbstractType
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->translator         = $factory->getTranslator();
-        $this->supportedLanguages = $factory->getParameter('supported_languages');
-        $this->em                 = $factory->getEntityManager();
-        $this->model              = $factory->getModel('user');
+        $this->translator = $factory->getTranslator();
+        $this->em         = $factory->getEntityManager();
+        $this->model      = $factory->getModel('user');
+
+        // Get the list of available languages
+        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+        $languageHelper = $factory->getHelper('language');
+        $languages = $languageHelper->fetchLanguages();
+        $langChoices = array();
+
+        foreach ($languages as $code => $langData) {
+            $langChoices[$code] = $langData['name'];
+        }
+
+        $langChoices = array_merge($langChoices, $factory->getParameter('supported_languages'));
+
+        // Alpha sort the languages by name
+        asort($langChoices);
+
+        $this->supportedLanguages = $langChoices;
     }
 
     /**

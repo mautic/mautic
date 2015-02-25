@@ -124,6 +124,8 @@ class UserController extends FormController
         if (!$this->factory->getSecurity()->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
+
+        /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->factory->getModel('user.user');
 
         //retrieve the user entity
@@ -152,6 +154,23 @@ class UserController extends FormController
                     //form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user);
+
+                    //check if the user's locale has been downloaded already, fetch it if not
+                    $installedLanguages = $this->factory->getParameter('supported_languages');
+
+                    if (!array_key_exists($user->getLocale(), $installedLanguages)) {
+                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+                        $languageHelper = $this->factory->getHelper('language');
+
+                        $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
+
+                        // If there is an error, we need to reset the user's locale to the default
+                        if ($fetchLanguage['error']) {
+                            $user->setLocale(null);
+                            $model->saveEntity($user);
+                            $this->addFlash('mautic.core.could.not.set.language');
+                        }
+                    }
 
                     $this->addFlash('mautic.core.notice.created',  array(
                         '%name%'      => $user->getName(),
@@ -256,6 +275,23 @@ class UserController extends FormController
                     //form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
+
+                    //check if the user's locale has been downloaded already, fetch it if not
+                    $installedLanguages = $this->factory->getParameter('supported_languages');
+
+                    if (!array_key_exists($user->getLocale(), $installedLanguages)) {
+                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+                        $languageHelper = $this->factory->getHelper('language');
+
+                        $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
+
+                        // If there is an error, we need to reset the user's locale to the default
+                        if ($fetchLanguage['error']) {
+                            $user->setLocale(null);
+                            $model->saveEntity($user);
+                            $this->addFlash('mautic.core.could.not.set.language');
+                        }
+                    }
 
                     $this->addFlash('mautic.core.notice.updated',  array(
                         '%name%'      => $user->getName(),

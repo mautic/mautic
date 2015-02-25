@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+
 /**
  * Class ConfigSubscriber
  *
@@ -54,6 +55,24 @@ class ConfigSubscriber extends CommonSubscriber
             // Check to ensure we don't save a blank password to the config which may remove the user's old password
             if (array_key_exists($key, $values['coreconfig']) && empty($values['coreconfig'][$key])) {
                 unset($values['coreconfig'][$key]);
+            }
+        }
+
+        // Check if the selected locale has been downloaded already, fetch it if not
+        $installedLanguages = $this->factory->getParameter('supported_languages');
+
+        if (!array_key_exists($values['coreconfig']['locale'], $installedLanguages)) {
+            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+            $languageHelper = $this->factory->getHelper('language');
+
+            $fetchLanguage = $languageHelper->extractLanguagePackage($values['coreconfig']['locale']);
+
+            // If there is an error, fall back to 'en_US' as it is our system default
+            if ($fetchLanguage['error']) {
+                $values['coreconfig']['locale'] = 'en_US';
+
+                // TODO - Raise a flash message
+                $this->factory->getSession()->getFlashBag()->add('notice', 'mautic.core.could.not.set.language');
             }
         }
 
