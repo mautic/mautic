@@ -274,47 +274,33 @@ class PageModel extends FormModel
      */
     public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
-        $slug = $this->generateSlug($entity);
-
-        return $this->buildUrl('mautic_page_public', array('slug' => $slug), $absolute, $clickthrough);
-    }
-
-    /**
-     * Generates slug string
-     *
-     * @param $entity
-     *
-     * @return string
-     */
-    public function generateSlug ($entity)
-    {
-        $pageSlug =  $entity->getAlias();
+        $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
         //should the url include the category
         $catInUrl = $this->factory->getParameter('cat_in_page_url');
         if ($catInUrl) {
             $category = $entity->getCategory();
-            $catSlug  = (!empty($category)) ? $category->getAlias() :
+            $catSlug  = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
         $parent = $entity->getTranslationParent();
-        $slugs  = array();
         if ($parent) {
             //multiple languages so tack on the language
-            $slugs[] = $entity->getLanguage();
-        }
-
-        if (!empty($catSlug)) {
-            // Insert category slug
-            $slugs[] = $catSlug;
-            $slugs[] = $pageSlug;
+            $slugs = array(
+                'slug1' => $entity->getLanguage(),
+                'slug2' => (!empty($catSlug)) ? $catSlug : $pageSlug,
+                'slug3' => (!empty($catSlug)) ? $pageSlug : ''
+            );
         } else {
-            // Insert just the page slug
-            $slugs[] = $pageSlug;
+            $slugs = array(
+                'slug1' => (!empty($catSlug)) ? $catSlug : $pageSlug,
+                'slug2' => (!empty($catSlug)) ? $pageSlug : '',
+                'slug3' => ''
+            );
         }
 
-        return implode('/', $slugs);
+        return $this->buildUrl('mautic_page_public', $slugs, $absolute, $clickthrough);
     }
 
     /**
@@ -447,7 +433,7 @@ class PageModel extends FormModel
             //use current URL
 
             // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif')) {
+            if (strpos($request->server->get('REQUEST_URI'), '/p/mtracking.gif')) {
                 $pageURL = $request->server->get('HTTP_REFERER');
 
                 // if additional data were sent with the tracking pixel
@@ -667,5 +653,34 @@ class PageModel extends FormModel
 
         //save the entities
         $this->saveEntities($save, false);
+    }
+
+
+    /**
+     * Delete an entity
+     *
+     * @param object $entity
+     *
+     * @return void
+     */
+    public function deleteEntity($entity)
+    {
+        $this->getRepository()->nullParents($entity->getId());
+
+        return parent::deleteEntity($entity);
+    }
+
+    /**
+     * Delete an array of entities
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function deleteEntities($ids)
+    {
+        $this->getRepository()->nullParents($ids);
+
+        return parent::deleteEntities($ids);
     }
 }
