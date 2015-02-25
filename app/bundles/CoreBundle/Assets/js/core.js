@@ -1287,8 +1287,8 @@ var Mautic = {
 
         if (response.sessionExpired || (response.closeModal && response.newContent)) {
             mQuery(target).modal('hide');
-
-            //mQuery('.modal-backdrop').remove();
+            mQuery('body').removeClass('modal-open');
+            mQuery('.modal-backdrop').remove();
             //assume the content is to refresh main app
             Mautic.processPageContent(response);
         } else {
