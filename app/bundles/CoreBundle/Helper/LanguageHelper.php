@@ -113,6 +113,9 @@ class LanguageHelper
         $zipper->extractTo($this->factory->getSystemPath('root') . '/translations');
         $zipper->close();
 
+        // We can remove the package now
+        @unlink($packagePath);
+
         return array(
             'error'   => false,
             'message' => 'mautic.core.language.helper.language.saved.successfully'
