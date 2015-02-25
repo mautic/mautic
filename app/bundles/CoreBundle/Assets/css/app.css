@@ -4,11 +4,7 @@ body {
   width: 100%;
   height: 100%;
 }
-body {
-  background-color: #ffffff;
-}
 body > #app-wrapper {
-  background-color: #ffffff;
   overflow: hidden;
   position: relative;
   height: auto;
@@ -2530,7 +2526,7 @@ ul.line-legend li {
   content: "";
   position: absolute;
   width: inherit;
-  top: 0;
+  top: 60px;
   bottom: 0;
   z-index: -1;
   background-color: inherit;
