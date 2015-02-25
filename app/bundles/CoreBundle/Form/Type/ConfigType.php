@@ -55,6 +55,19 @@ class ConfigType extends AbstractType
             )
         ));
 
+        $builder->add('webroot', 'page_list', array(
+            'label'       => 'mautic.core.config.form.webroot',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.webroot.tooltip',
+                'data-placeholder' => $this->factory->getTranslator()->trans('mautic.core.config.form.webroot.dashboard')
+            ),
+            'multiple'    => false,
+            'empty_value' => '',
+            'required'    => false
+        ));
+
         $builder->add('cache_path', 'text', array(
             'label'       => 'mautic.core.config.form.cache.path',
             'label_attr'  => array('class' => 'control-label'),

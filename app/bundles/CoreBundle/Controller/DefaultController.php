@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class DefaultController
@@ -20,15 +21,32 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class DefaultController extends CommonController
 {
-
     /**
      * Generates default index.php
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        return $this->delegateView('MauticDashboardBundle:Default:index.html.php');
+        $root = $this->factory->getParameter('webroot');
+
+        if (empty($root)) {
+            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+        } else {
+            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+            $pageModel = $this->factory->getModel('page');
+            $page      = $pageModel->getEntity($root);
+
+            if (empty($page)) {
+                throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+            }
+
+            $slug = $pageModel->generateSlug($page);
+
+            $request->attributes->set('ignore_mismatch', true);
+
+            return $this->forward('MauticPageBundle:Public:index', array('slug' => $slug));
+        }
     }
 
     /**
@@ -73,5 +91,17 @@ class DefaultController extends CommonController
                 'updateMessage'    => $updateMessage
             )
         ));
+    }
+
+    /**
+     * @param $url
+     */
+    public function publicBcRedirectAction(Request $request)
+    {
+        $requestUri = $request->getRequestUri();
+
+        $url = str_replace('/p/', '/', $requestUri);
+
+        return $this->redirect($url, 301);
     }
 }

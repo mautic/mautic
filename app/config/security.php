@@ -38,13 +38,8 @@ $container->loadFromExtension('security', array(
             'security'  => true,
             'anonymous' => true
         ),
-        'public'               => array(
-            'pattern'   => '^/p/',
-            'anonymous' => true,
-            'context'   => 'mautic'
-        ),
         'login'                => array(
-            'pattern'   => '^/login$',
+            'pattern'   => '^/s/login$',
             'anonymous' => true,
             'context'   => 'mautic'
         ),
@@ -85,16 +80,20 @@ $container->loadFromExtension('security', array(
             'stateless'       => true
         ),
         'main'                 => array(
-            'pattern'     => "^/",
+            'pattern'     => "^/s/",
             'form_login'  => array(
                 'csrf_provider' => 'form.csrf_provider',
                 'success_handler' => 'mautic.security.authentication_handler',
-                'failure_handler' => 'mautic.security.authentication_handler'
+                'failure_handler' => 'mautic.security.authentication_handler',
+                'login_path' => '/s/login',
+                'check_path' => '/s/login_check'
             ),
             'logout'      => array(
                 'handlers' => array(
                     'mautic.security.logout_handler'
-                )
+                ),
+                'path'   => '/s/logout',
+                'target' => '/s/login'
             ),
             'remember_me' => array(
                 'key'      => '%mautic.rememberme_key%',
@@ -103,6 +102,11 @@ $container->loadFromExtension('security', array(
                 'domain'   => '%mautic.rememberme_domain%'
             ),
             'context'     => 'mautic'
+        ),
+        'public'               => array(
+            'pattern'   => '^/',
+            'anonymous' => true,
+            'context'   => 'mautic'
         ),
     ),
     'access_control' => array(

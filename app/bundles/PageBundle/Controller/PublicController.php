@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -23,22 +24,20 @@ class PublicController extends CommonFormController
 {
 
     /**
-     * @param string $slug1
-     * @param string $slug2
-     * @param string $slug3
+     * @param string $slug
      *
      * @return Response|\Symfony\Component\HttpFoundation\RedirectResponse
      * @throws AccessDeniedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function indexAction($slug1, $slug2 = '', $slug3 = '')
+    public function indexAction($slug, Request $request)
     {
         //find the page
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->factory->getModel('page.page');
         $security   = $this->factory->getSecurity();
         $translator = $this->get('translator');
-        $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
+        $entity     = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
             $published = $entity->isPublished();
@@ -49,20 +48,23 @@ class PublicController extends CommonFormController
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
 
-            //make sure URLs match up
-            $url        = $model->generateUrl($entity, false);
-            $requestUri = $this->request->getRequestUri();
+            if ($request->attributes->has('ignore_mismatch')) {
+                //make sure URLs match up
+                $url        = $model->generateUrl($entity, false);
+                $requestUri = $this->request->getRequestUri();
 
-            //remove query
-            $query      = $this->request->getQueryString();
-            if (!empty($query)) {
-                $requestUri = str_replace("?{$query}", '', $url);
-            }
+                //remove query
+                $query      = $this->request->getQueryString();
+                if (!empty($query)) {
+                    $requestUri = str_replace("?{$query}", '', $url);
+                }
 
-            //redirect if they don't match
-            if ($requestUri != $url) {
-                $model->hitPage($entity, $this->request, 301);
-                return $this->redirect($url, 301);
+                //redirect if they don't match
+                if ($requestUri != $url) {
+                    $model->hitPage($entity, $this->request, 301);
+
+                    return $this->redirect($url, 301);
+                }
             }
 
             //check for variants

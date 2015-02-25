@@ -126,6 +126,14 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
+     * Redirects /s and /s/ to /s/dashboard
+     */
+    public function redirectSecureRootAction()
+    {
+        return $this->redirect($this->generateUrl('mautic_dashboard_index'), 301);
+    }
+
+    /**
      * Redirects controller if not ajax or retrieves html output for ajax request
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
