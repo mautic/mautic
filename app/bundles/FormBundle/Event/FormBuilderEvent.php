@@ -54,7 +54,8 @@ class FormBuilderEvent extends Event
      *  'formTypeOptions' => (optional) array of options to pass to formType
      *  'formTheme'       => (optional  theme for custom form views
      *  'validator'       => (optional) callback function to validate form results (or do whatever is necessary prior to
-     *                      calling the callback function and also before the results are saved to the DB).
+     *                      calling the callback function and also before the results are saved to the DB). The function
+     *                      return an array of array(bool $valid, string $errorMessage)
      *
      *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          array $properties - values saved from the formType as defined here

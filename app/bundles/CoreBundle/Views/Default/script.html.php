@@ -10,7 +10,7 @@
 
 <script>
     var mauticBasePath    = '<?php echo $app->getRequest()->getBasePath(); ?>';
-    var mauticBaseUrl     = '<?php echo $view['router']->generate("mautic_dashboard_index"); ?>';
+    var mauticBaseUrl     = '<?php echo $view['router']->generate("mautic_base_index"); ?>';
     var mauticAjaxUrl     = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
     var mauticAssetPrefix = '<?php echo $view['assets']->getAssetPrefix(true); ?>';
     var mauticContent     = '<?php $view['slots']->output('mauticContent',''); ?>';

@@ -368,35 +368,4 @@ class FormModel extends CommonModel
     {
         return "getName";
     }
-
-    /**
-     * Retrieve entity based on id/alias slugs
-     *
-     * @param string $slug1
-     * @param string $slug2
-     * @param string $slug3
-     *
-     * @return object|bool
-     */
-    public function getEntityBySlugs($slug1, $slug2 = '', $slug3 = '')
-    {
-        if (!empty($slug3)) {
-            $idSlug = $slug3;
-        } elseif (!empty($slug2)) {
-            $idSlug = $slug2;
-        } else {
-            $idSlug = $slug1;
-        }
-
-        $parts  = explode(':', $idSlug);
-        if (count($parts) == 2) {
-            $entity = $this->getEntity($parts[0]);
-
-            if (!empty($entity)) {
-                return $entity;
-            }
-        }
-
-        return false;
-    }
 }

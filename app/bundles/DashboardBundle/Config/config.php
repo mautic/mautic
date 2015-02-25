@@ -11,7 +11,7 @@ return array(
     'routes' => array(
         'main' => array(
             'mautic_dashboard_index' => array(
-                'path' => '/',
+                'path' => '/dashboard',
                 'controller' => 'MauticDashboardBundle:Default:index'
             )
         )
