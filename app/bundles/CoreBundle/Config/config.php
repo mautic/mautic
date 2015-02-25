@@ -259,6 +259,10 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
                 'arguments' => 'mautic.factory'
             ),
+            'mautic.helper.language'             => array(
+                'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
+                'arguments' => 'mautic.factory'
+            ),
 
             // Mailers
             'mautic.transport.amazon'            => array(
