@@ -39,7 +39,7 @@ The <info>%command.name%</info> command is used to retrieve updated Mautic trans
 
 The command can optionally only pull files for a specific language with the --language option
 
-<info php %command.full_name% --language=<language_code>"
+<info>php %command.full_name% --language=<language_code></info>
 EOT
         );
     }

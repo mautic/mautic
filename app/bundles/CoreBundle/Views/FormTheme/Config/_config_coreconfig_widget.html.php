@@ -20,6 +20,7 @@ $template = '<div class="col-md-6">{content}</div>';
     <div class="panel-body">
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'site_url', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'webroot', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'update_stability', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'cache_path', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>

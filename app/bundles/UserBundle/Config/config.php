@@ -55,10 +55,6 @@ return array(
                 'path'       => '/account',
                 'controller' => 'MauticUserBundle:Profile:index'
             ),
-            'mautic_user_passwordreset' => array(
-                'path'       => '/p/passwordreset',
-                'controller' => 'MauticUserBundle:Public:passwordReset'
-            )
         ),
         'api'  => array(
             'mautic_api_getusers'        => array(
@@ -89,6 +85,12 @@ return array(
             'mautic_api_getrole'         => array(
                 'path'         => '/roles/{id}',
                 'controller'   => 'MauticUserBundle:Api\RoleApi:getEntity'
+            )
+        ),
+        'public' => array(
+            'mautic_user_passwordreset' => array(
+                'path'       => '/passwordreset',
+                'controller' => 'MauticUserBundle:Public:passwordReset'
             )
         )
     ),

@@ -169,4 +169,50 @@ class CommonModel
         return $url;
     }
 
+    /**
+     * Retrieve entity based on id/alias slugs
+     *
+     * @param string $slug
+     *
+     * @return object|bool
+     */
+    public function getEntityBySlugs($slug)
+    {
+        $slugs = explode('/', $slug);
+        if (!empty($slugs[0])) {
+            $idSlug = $slugs[0];
+        } elseif (!empty($slugs[1])) {
+            $idSlug = $slugs[1];
+        } else {
+            $idSlug = $slugs[0];
+        }
+
+        if (strpos($idSlug, ':') !== false) {
+            $parts = explode(':', $idSlug);
+            if (count($parts) == 2) {
+                $entity = $this->getEntity($parts[0]);
+
+                if (!empty($entity)) {
+                    return $entity;
+                }
+            }
+        } else {
+            $entity = $this->getEntityByAlias($idSlug);
+
+            if (!empty($entity)) {
+                return $entity;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $alias
+     */
+    public function getEntityByAlias($alias)
+    {
+        return $this->getRepository()->findOneBy(array('alias' => $alias));
+    }
+
 }

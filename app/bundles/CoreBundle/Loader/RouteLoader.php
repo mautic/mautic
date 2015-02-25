@@ -56,17 +56,17 @@ class RouteLoader extends Loader
 
         $dispatcher = $this->factory->getDispatcher();
 
-        //Main
-        $event = new RouteEvent($this);
-        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
-        $collection = $event->getCollection();
-
         //Public
         $event = new RouteEvent($this, 'public');
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
-        $publicCollection = $event->getCollection();
-        $publicCollection->addPrefix('/p');
-        $collection->addCollection($publicCollection);
+        $collection = $event->getCollection();
+
+        //Secured area - Default
+        $event = new RouteEvent($this);
+        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $secureCollection = $event->getCollection();
+        $secureCollection->addPrefix('/s');
+        $collection->addCollection($secureCollection);
 
         if ($this->factory->getParameter('api_enabled')) {
             //API
@@ -83,6 +83,12 @@ class RouteLoader extends Loader
                 $collection->addCollection($apiDoc);
             }
         }
+
+        //Catch all
+        $event = new RouteEvent($this, 'catchall');
+        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $lastCollection = $event->getCollection();
+        $collection->addCollection($lastCollection);
 
         $this->loaded = true;
 

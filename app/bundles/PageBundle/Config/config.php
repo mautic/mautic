@@ -28,14 +28,6 @@ return array(
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage'
             ),
-            'mautic_page_public'   => array(
-                'path'       => '/page/{slug1}/{slug2}/{slug3}',
-                'controller' => 'MauticPageBundle:Public:index',
-                'defaults'   => array(
-                    "slug2" => '',
-                    "slug3" => ''
-                )
-            ),
             'mautic_page_redirect' => array(
                 'path'       => '/redirect/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'
@@ -50,6 +42,15 @@ return array(
                 'path'       => '/pages/{id}',
                 'controller' => 'MauticPageBundle:Api\PageApi:getEntity',
             )
+        ),
+        'catchall'  => array(
+            'mautic_page_public'   => array(
+                'path'       => '/{slug}',
+                'controller' => 'MauticPageBundle:Public:index',
+                'requirements' => array(
+                    'slug' => '^(?!(_(profiler|wdt)|css|images|js)).+'
+                )
+            ),
         )
     ),
 

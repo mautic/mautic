@@ -31,7 +31,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     {
         $content = (isset($form[$key])) ? $this->widget($form[$key]) : '';
 
-        if (!empty($template)) {
+        if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);
         }
 
@@ -50,7 +50,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     {
         $content = (isset($form[$key])) ? $this->row($form[$key]) : '';
 
-        if (!empty($template)) {
+        if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);
         }
 
@@ -69,7 +69,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     {
         $content = (isset($form[$key])) ? $this->label($form[$key]) : '';
 
-        if (!empty($template)) {
+        if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);
         }
 

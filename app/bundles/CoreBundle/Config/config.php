@@ -14,14 +14,6 @@ return array(
                 'path'       => '/ajax',
                 'controller' => 'MauticCoreBundle:Ajax:delegateAjax'
             ),
-            'mautic_remove_trailing_slash' => array(
-                'path'         => '/{url}',
-                'controller'   => 'MauticCoreBundle:Common:removeTrailingSlash',
-                'method'       => 'GET',
-                'requirements' => array(
-                    'url' => '.*/$'
-                )
-            ),
             'mautic_core_update'           => array(
                 'path'       => '/update',
                 'controller' => 'MauticCoreBundle:Update:index'
@@ -33,6 +25,35 @@ return array(
                     'objectModel' => ''
                 )
             )
+        ),
+        'public' => array(
+            'mautic_base_index' => array(
+                'path' => '/',
+                'controller'   => 'MauticCoreBundle:Default:index'
+            ),
+            'mautic_secure_root' => array(
+                'path'         => '/s',
+                'controller'   => 'MauticCoreBundle:Default:redirectSecureRoot'
+            ),
+            'mautic_secure_root_slash' => array(
+                'path'         => '/s/',
+                'controller'   => 'MauticCoreBundle:Default:redirectSecureRoot'
+            ),
+            'mautic_remove_trailing_slash' => array(
+                'path'         => '/{url}',
+                'controller'   => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'method'       => 'GET',
+                'requirements' => array(
+                    'url' => '.*/$'
+                )
+            ),
+            'mautic_public_bc_redirect' => array(
+                'path'         => '/p/{url}',
+                'controller'   => 'MauticCoreBundle:Default:publicBcRedirect',
+                'requirements' => array(
+                    'url' => '.+'
+                )
+            ),
         )
     ),
 
@@ -313,6 +334,7 @@ return array(
 
     'parameters' => array(
         'site_url'                     => '',
+        'webroot'                      => '',
         'cache_path'                   => '%kernel.root_dir%/cache',
         'log_path'                     => '%kernel.root_dir%/logs',
         'image_path'                   => 'media/images',
