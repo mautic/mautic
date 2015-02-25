@@ -532,7 +532,7 @@ class FormController extends CommonFormController
                 }
             }
             if (!empty($reorder)) {
-                usort($modifiedFields, function ($a, $b) {
+                uasort($modifiedFields, function ($a, $b) {
                     return $a['order'] > $b['order'];
                 });
             }
@@ -552,10 +552,11 @@ class FormController extends CommonFormController
             }
 
             if (!empty($reorder)) {
-                usort($modifiedActions, function ($a, $b) {
+                uasort($modifiedActions, function ($a, $b) {
                     return $a['order'] > $b['order'];
                 });
             }
+
             $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
             $deletedActions = array();
         }
