@@ -137,7 +137,11 @@ class CommonSubscriber implements EventSubscriberInterface
             }
 
             $allItems[$name] = $event->getMenuItems();
-            $session->set('mautic.menu.items', $allItems);
+
+            // Only store in session for prod
+            if ($this->factory->getEnvironment() == 'prod') {
+                $session->set('mautic.menu.items', $allItems);
+            }
 
             unset($bundles, $menuItems);
         } else {
