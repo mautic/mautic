@@ -41,7 +41,7 @@ class Version20150225000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'reports CHANGE description description LONGTEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'roles CHANGE description description LONGTEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'chat_channels CHANGE description description LONGTEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'notifications CHANGE message message LONGTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'notifications CHANGE message message LONGTEXT NOT NULL');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_publicly_updatable TINYINT(1) NOT NULL');
 
