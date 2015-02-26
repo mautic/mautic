@@ -55,7 +55,7 @@ class Version20150225000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_submissions ADD CONSTRAINT ' . $this->generatePropertyName('form_submissions', 'fk', array('page_id')) . ' FOREIGN KEY (page_id) REFERENCES ' . $this->prefix . 'pages (id) ON DELETE SET NULL');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads DROP FOREIGN KEY ' . $this->findPropertyName('asset_downloads', 'fk', '6155458D'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads ADD CONSTRAINT ' . $this->generatePropertyName('asset_downloads', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES mautic_leads (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads ADD CONSTRAINT ' . $this->generatePropertyName('asset_downloads', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE SET NULL');
     }
 
     public function postgresUp(Schema $schema)
@@ -88,7 +88,7 @@ class Version20150225000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_submissions ADD CONSTRAINT ' . $this->generatePropertyName('form_submissions', 'fk', array('page_id')) . ' FOREIGN KEY (page_id) REFERENCES ' . $this->prefix . 'pages (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads DROP CONSTRAINT '  . $this->findPropertyName('asset_downloads', 'fk', '6155458D'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads ADD CONSTRAINT ' . $this->generatePropertyName('asset_downloads', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES mautic_leads (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads ADD CONSTRAINT ' . $this->generatePropertyName('asset_downloads', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
     public function mssqlUp(Schema $schema)
