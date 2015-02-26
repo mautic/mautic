@@ -274,33 +274,47 @@ class PageModel extends FormModel
      */
     public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
-        $pageSlug = $entity->getId() . ':' . $entity->getAlias();
+        $slug = $this->generateSlug($entity);
+
+        return $this->buildUrl('mautic_page_public', array('slug' => $slug), $absolute, $clickthrough);
+    }
+
+    /**
+     * Generates slug string
+     *
+     * @param $entity
+     *
+     * @return string
+     */
+    public function generateSlug ($entity)
+    {
+        $pageSlug =  $entity->getAlias();
 
         //should the url include the category
         $catInUrl = $this->factory->getParameter('cat_in_page_url');
         if ($catInUrl) {
             $category = $entity->getCategory();
-            $catSlug  = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
+            $catSlug  = (!empty($category)) ? $category->getAlias() :
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
         $parent = $entity->getTranslationParent();
+        $slugs  = array();
         if ($parent) {
             //multiple languages so tack on the language
-            $slugs = array(
-                'slug1' => $entity->getLanguage(),
-                'slug2' => (!empty($catSlug)) ? $catSlug : $pageSlug,
-                'slug3' => (!empty($catSlug)) ? $pageSlug : ''
-            );
-        } else {
-            $slugs = array(
-                'slug1' => (!empty($catSlug)) ? $catSlug : $pageSlug,
-                'slug2' => (!empty($catSlug)) ? $pageSlug : '',
-                'slug3' => ''
-            );
+            $slugs[] = $entity->getLanguage();
         }
 
-        return $this->buildUrl('mautic_page_public', $slugs, $absolute, $clickthrough);
+        if (!empty($catSlug)) {
+            // Insert category slug
+            $slugs[] = $catSlug;
+            $slugs[] = $pageSlug;
+        } else {
+            // Insert just the page slug
+            $slugs[] = $pageSlug;
+        }
+
+        return implode('/', $slugs);
     }
 
     /**
@@ -433,23 +447,44 @@ class PageModel extends FormModel
             //use current URL
 
             // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/p/mtracking.gif')) {
+            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif')) {
                 $pageURL = $request->server->get('HTTP_REFERER');
 
                 // if additional data were sent with the tracking pixel
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
                     // URL attr 'd' is decoded. Encode it first.
+                    $decoded = false;
                     if (isset($query['d'])) {
-                        $query = unserialize(base64_decode(urldecode($query['d'])));
+                        $query   = unserialize(base64_decode(urldecode($query['d'])));
+                        $decoded = true;
                     }
+
+                    if (isset($query['url'])) {
+                        $pageURL = $query['url'];
+                        if (!$decoded) {
+                            $pageURL = urldecode($pageURL);
+                        }
+                    }
+
                     if (isset($query['referrer'])) {
+                        if (!$decoded) {
+                            $query['referrer'] = urldecode($query['referrer']);
+                        }
                         $hit->setReferer($query['referrer']);
                     }
+
                     if (isset($query['language'])) {
+                        if (!$decoded) {
+                            $query['language'] = urldecode($query['language']);
+                        }
                         $hit->setPageLanguage($query['language']);
                     }
+
                     if (isset($query['title'])) {
+                        if (!$decoded) {
+                            $query['title'] = urldecode($query['title']);
+                        }
                         $hit->setUrlTitle($query['title']);
                     }
 
