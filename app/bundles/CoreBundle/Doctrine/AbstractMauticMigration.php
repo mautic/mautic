@@ -27,7 +27,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      *
      * @var array
      */
-    protected $supported = array('mysql', 'postgresql', 'mssql', 'sqlite');
+    protected $supported = array('mysql', 'postgresql', 'mssql');
 
     /**
      * Database prefix
@@ -73,13 +73,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function down(Schema $schema)
     {
-        $platform = $this->connection->getDatabasePlatform()->getName();
-
-        // Abort the migration if the platform is unsupported
-        $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
-
-        $function = $this->platform . "Down";
-        $this->$function($schema);
+        // Not supported
     }
 
     /**
@@ -94,14 +88,104 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     abstract public function mysqlUp(Schema $schema);
-    abstract public function mysqlDown(Schema $schema);
 
     abstract public function postgresUp(Schema $schema);
-    abstract public function postgresDown(Schema $schema);
 
     abstract public function mssqlUp(Schema $schema);
-    abstract public function mssqlDown(Schema $schema);
 
-    abstract public function sqliteUp(Schema $schema);
-    abstract public function sqliteDown(Schema $schema);
+    /**
+     * Finds/creates the local name for constraints and indexes
+     *
+     * @param $table
+     * @param $type
+     * @param $suffix
+     */
+    protected function findPropertyName($table, $type, $suffix)
+    {
+        static $schemaManager;
+        static $tables  = array();
+
+        if (empty($schemaManager)) {
+            $schemaManager = $this->factory->getDatabase()->getSchemaManager();
+        }
+
+        // Prepend prefix
+        $table = $this->prefix . $table;
+
+        if (!array_key_exists($table, $tables)) {
+            $tables[$table] = array();
+        }
+
+        $type   = strtolower($type);
+        $suffix = strtolower(substr($suffix, -4));
+
+        switch ($type) {
+            case 'fk':
+                if (!array_key_exists('fk', $tables[$table])) {
+                    $keys = $schemaManager->listTableForeignKeys($table);
+                    /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
+                    foreach ($keys as $k) {
+                        $name = strtolower($k->getName());
+                        $key  = substr($name, -4);
+                        $tables[$table]['fk'][$key] = $name;
+                    }
+                }
+
+                $localName = $tables[$table]['fk'][$suffix];
+
+                break;
+            case 'idx':
+            case 'uniq':
+                if (!array_key_exists('idx', $tables[$table])) {
+                    $tables[$table]['idx'] = array(
+                        'idx'  => array(),
+                        'uniq' => array()
+                    );
+
+                    $indexes = $schemaManager->listTableIndexes($table);
+
+                    /** @var \Doctrine\DBAL\Schema\Index $i */
+                    foreach ($indexes as $i) {
+                        $name        = strtolower($i->getName());
+                        $isIdx  = stripos($name, 'idx');
+                        $isUniq = stripos($name, 'uniq');
+
+                        if ($isIdx !== false || $isUniq !== false) {
+                            $key     = substr($name, -4);
+                            $keyType = ($isIdx !== false) ? 'idx' : 'uniq';
+
+                            $tables[$table]['idx'][$keyType][$key] = $name;
+                        }
+                    }
+                }
+
+                $localName = $tables[$table]['idx'][$type][$suffix];
+
+                break;
+        }
+
+        $localName = strtoupper($localName);
+
+        return $localName;
+    }
+
+    /**
+     * Generate the  name for the property
+     *
+     * @param        $table
+     * @param        $type
+     * @param array  $columns
+     * @param string $foreignTable
+     *
+     * @return mixed
+     */
+    protected function generatePropertyName($table, $type, array $columnNames)
+    {
+        $columnNames = array_merge(array($this->prefix . $table), $columnNames);
+        $hash        = implode("", array_map(function($column) {
+            return dechex(crc32($column));
+        }, $columnNames));
+
+        return substr(strtoupper($type . "_" . $hash), 0, 63);
+    }
 }
