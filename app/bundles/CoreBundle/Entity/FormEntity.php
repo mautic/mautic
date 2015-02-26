@@ -245,11 +245,15 @@ class FormEntity extends CommonEntity
      *
      * @return $this
      */
-    public function setCreatedBy(User $createdBy = null)
+    public function setCreatedBy($createdBy = null)
     {
-        $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
-        if ($createdBy != null) {
-            $this->createdByUser = $createdBy->getName();
+        if ($createdBy != null && !$createdBy instanceof User ) {
+            $this->createdBy = $createdBy;
+        } else {
+            $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
+            if ($createdBy != null) {
+                $this->createdByUser = $createdBy->getName();
+            }
         }
 
         return $this;
@@ -272,12 +276,16 @@ class FormEntity extends CommonEntity
      *
      * @return mixed
      */
-    public function setModifiedBy(User $modifiedBy = null)
+    public function setModifiedBy($modifiedBy = null)
     {
-        $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
+        if ($modifiedBy != null && !$modifiedBy instanceof User ) {
+            $this->modifiedBy = $modifiedBy;
+        } else {
+            $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
 
-        if ($modifiedBy != null) {
-            $this->modifiedByUser = $modifiedBy->getName();
+            if ($modifiedBy != null) {
+                $this->modifiedByUser = $modifiedBy->getName();
+            }
         }
 
         return $this;
@@ -300,12 +308,16 @@ class FormEntity extends CommonEntity
      *
      * @return mixed
      */
-    public function setCheckedOutBy(User $checkedOutBy = null)
+    public function setCheckedOutBy($checkedOutBy = null)
     {
-        $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
+        if ($checkedOutBy != null && !$checkedOutBy instanceof User ) {
+            $this->checkedOutBy = $checkedOutBy;
+        } else {
+            $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
 
-        if ($checkedOutBy != null) {
-            $this->checkedOutByUser = $checkedOutBy->getName();
+            if ($checkedOutBy != null) {
+                $this->checkedOutByUser = $checkedOutBy->getName();
+            }
         }
 
         return $this;

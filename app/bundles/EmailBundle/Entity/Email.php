@@ -151,7 +151,7 @@ class Email extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"emailDetails"})

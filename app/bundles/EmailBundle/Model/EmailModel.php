@@ -164,6 +164,34 @@ class EmailModel extends FormModel
         }
         $this->em->flush();
     }
+    
+    /**
+     * Delete an entity
+     *
+     * @param object $entity
+     *
+     * @return void
+     */
+    public function deleteEntity($entity)
+    {
+        $this->getRepository()->nullVariantParent($entity->getId());
+
+        return parent::deleteEntity($entity);
+    }
+
+    /**
+     * Delete an array of entities
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function deleteEntities($ids)
+    {
+        $this->getRepository()->nullVariantParent($ids);
+
+        return parent::deleteEntities($ids);
+    }
 
     /**
      * {@inheritdoc}

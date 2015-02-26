@@ -64,7 +64,7 @@ class Submission
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\PageBundle\Entity\Page", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $page;
 

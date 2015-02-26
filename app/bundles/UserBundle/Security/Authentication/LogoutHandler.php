@@ -47,5 +47,8 @@ class LogoutHandler implements LogoutHandlerInterface
             $event = new LogoutEvent($this->factory);
             $dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
         }
+
+        // Clear session
+        $this->factory->getSession()->clear();
     }
 }

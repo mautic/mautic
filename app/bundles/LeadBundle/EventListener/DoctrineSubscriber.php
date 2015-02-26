@@ -47,9 +47,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
         try {
             //get a list of fields
-            $fields = $this->factory->getModel('lead.field')->getEntities(array(
-                'hydration_mode' => 'HYDRATE_ARRAY'
-            ));
+            $fields = $this->factory->getModel('lead.field')->getRepository()->getFieldAliases();
 
             foreach ($fields as $f) {
                 $table->addColumn($f['alias'], 'text', array('notnull' => false));

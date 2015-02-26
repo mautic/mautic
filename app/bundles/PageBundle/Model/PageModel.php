@@ -454,16 +454,37 @@ class PageModel extends FormModel
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
                     // URL attr 'd' is decoded. Encode it first.
+                    $decoded = false;
                     if (isset($query['d'])) {
-                        $query = unserialize(base64_decode(urldecode($query['d'])));
+                        $query   = unserialize(base64_decode(urldecode($query['d'])));
+                        $decoded = true;
                     }
+
+                    if (isset($query['url'])) {
+                        $pageURL = $query['url'];
+                        if (!$decoded) {
+                            $pageURL = urldecode($pageURL);
+                        }
+                    }
+
                     if (isset($query['referrer'])) {
+                        if (!$decoded) {
+                            $query['referrer'] = urldecode($query['referrer']);
+                        }
                         $hit->setReferer($query['referrer']);
                     }
+
                     if (isset($query['language'])) {
+                        if (!$decoded) {
+                            $query['language'] = urldecode($query['language']);
+                        }
                         $hit->setPageLanguage($query['language']);
                     }
+
                     if (isset($query['title'])) {
+                        if (!$decoded) {
+                            $query['title'] = urldecode($query['title']);
+                        }
                         $hit->setUrlTitle($query['title']);
                     }
 
@@ -667,5 +688,34 @@ class PageModel extends FormModel
 
         //save the entities
         $this->saveEntities($save, false);
+    }
+
+
+    /**
+     * Delete an entity
+     *
+     * @param object $entity
+     *
+     * @return void
+     */
+    public function deleteEntity($entity)
+    {
+        $this->getRepository()->nullParents($entity->getId());
+
+        return parent::deleteEntity($entity);
+    }
+
+    /**
+     * Delete an array of entities
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function deleteEntities($ids)
+    {
+        $this->getRepository()->nullParents($ids);
+
+        return parent::deleteEntities($ids);
     }
 }

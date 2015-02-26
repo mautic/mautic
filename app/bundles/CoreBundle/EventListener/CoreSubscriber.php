@@ -107,6 +107,11 @@ class CoreSubscriber extends CommonSubscriber
             //set a session var for filemanager to know someone is logged in
             $session->set('mautic.user', $user->getId());
 
+            //set a cookie with session name for filemanager; if there are symfony clashes, set cookie_path in local.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->setCookie('mautic_session_name', session_name());
+
             //mark the user as last logged in
             $user = $this->factory->getUser();
             if ($user instanceof User) {

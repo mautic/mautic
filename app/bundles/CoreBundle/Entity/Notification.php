@@ -45,7 +45,7 @@ class Notification
     protected $header;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     protected $message;
 
