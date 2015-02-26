@@ -110,4 +110,15 @@ class LeadFieldRepository extends CommonRepository
             array('f.order', 'ASC')
         );
     }
+
+    /**
+     * Get field aliases for lead table columns
+     */
+    public function getFieldAliases()
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        return $qb->select('f.alias')->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')->execute()->fetchAll();
+    }
+
 }
