@@ -120,7 +120,8 @@ $container->loadFromExtension('framework', array(
     'trusted_hosts'        => '%mautic.trusted_hosts%',
     'trusted_proxies'      => '%mautic.trusted_proxies%',
     'session'              => array( //handler_id set to null will use default session handler from php.ini
-        'handler_id' => null
+        'handler_id' => null,
+        'name'       => md5(dirname($_SERVER['SCRIPT_NAME'])),
     ),
     'fragments'            => null,
     'http_method_override' => true,

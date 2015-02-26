@@ -16,9 +16,12 @@
  *	@copyright	Authors
  */
 
-
-
+if (!isset($_COOKIE['mautic_session_name'])) {
+    die();
+}
+session_name($_COOKIE['mautic_session_name']);
 session_start();
+
 /**
  *	Check if user is authorized
  *
