@@ -340,6 +340,6 @@ class Version20150201000000 extends AbstractMauticMigration
     /**
      * Due to SQL errors, these could not be intalled with beta3
      */
-    public function postgresUp(Schema $schema) {}
+    public function postgresqlUp(Schema $schema) {}
     public function mssqlUp(Schema $schema) {}
 }

@@ -58,7 +58,7 @@ class Version20150225000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'asset_downloads ADD CONSTRAINT ' . $this->generatePropertyName('asset_downloads', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE SET NULL');
     }
 
-    public function postgresUp(Schema $schema)
+    public function postgresqlUp(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addons ALTER description TYPE TEXT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'assets ALTER description TYPE TEXT');
@@ -76,7 +76,9 @@ class Version20150225000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'roles ALTER description TYPE TEXT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'notifications ALTER message TYPE TEXT');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_publicly_updatable BOOLEAN NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_publicly_updatable BOOLEAN');
+        $this->addSql('UPDATE ' . $this->prefix . 'lead_fields SET is_publicly_updatable = FALSE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ALTER COLUMN is_publicly_updatable SET NOT NULL');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'emails DROP CONSTRAINT ' . $this->findPropertyName('emails', 'fk', '91861123'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD CONSTRAINT ' . $this->generatePropertyName('emails', 'fk', array('variant_parent_id')) . ' FOREIGN KEY (variant_parent_id) REFERENCES ' . $this->prefix . 'emails (id)');

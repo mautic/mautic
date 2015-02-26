@@ -89,7 +89,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     abstract public function mysqlUp(Schema $schema);
 
-    abstract public function postgresUp(Schema $schema);
+    abstract public function postgresqlUp(Schema $schema);
 
     abstract public function mssqlUp(Schema $schema);
 
