@@ -25,8 +25,11 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
  * InstallController.
@@ -338,6 +341,15 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         }
 
+        // Add database migrations up to this point since this is a fresh install (must be done at this point
+        // after the cache has been rebuilt
+        $input  = new ArgvInput(array('console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction'));
+        $output = new BufferedOutput();
+
+        $application = new Application($this->factory->getKernel());
+        $application->setAutoExit(false);
+        $application->run($input, $output);
+
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
@@ -524,7 +536,8 @@ class InstallController extends CommonController
         $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool    = new SchemaTool($entityManager);
         $installSchema = $schemaTool->getSchemaFromMetadata($metadatas);
-        $mauticTables  = array();
+        $mauticTables  = $applicableSequences = array();
+
         foreach ($installSchema->getTables() as $m) {
             $tableName                = $m->getName();
             $mauticTables[$tableName] = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $tableName);;
@@ -613,7 +626,11 @@ class InstallController extends CommonController
 
                 //drop old indexes
                 /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
-                foreach ($backupIndexes[$t] as $oldIndex) {
+                foreach ($backupIndexes[$t] as $indexName => $oldIndex) {
+                    if ($indexName == 'primary') {
+                        continue;
+                    }
+
                     $oldName = $oldIndex->getName();
                     $newName = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $oldName);
 
@@ -631,7 +648,7 @@ class InstallController extends CommonController
                         $sql[] = $platform->getDropConstraintSQL($oldName, $t);
                     } else {
                         $newIndexes[] = $newIndex;
-                        $sql[]        = $platform->getDropIndexSQL($oldIndex);
+                        $sql[]        = $platform->getDropIndexSQL($oldIndex, $t);
                     }
                 }
 
