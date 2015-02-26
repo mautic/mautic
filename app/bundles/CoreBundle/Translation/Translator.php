@@ -45,6 +45,16 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function loadCatalogue($locale)
+    {
+        $this->addResource('mautic', null, $locale, 'messages');
+
+        parent::loadCatalogue($locale);
+    }
+
+    /**
      * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
      * $alternative
      *
