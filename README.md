@@ -36,8 +36,8 @@ Mautic Introduction
 <br />
 <h2>Disclaimer</h2>
 <p>Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates.</p>
-<p>Also note that the source outside [a tagged release](https://github.com/mautic/mautic/releases) should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.</p>
-<p>If you prefer, there are packaged downloads ready for install at https://www.mautic.org/download.</p>
+<p><em>Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.</em></p>
+<p>If you prefer, there are packaged downloads ready for install at <a href="https://www.mautic.org/download">https://www.mautic.org/download</a>.</p>
 
 <h2>Keeping Up-To-Date</h2>
 
@@ -48,13 +48,13 @@ Mautic Introduction
     $ cd /your/mautic/directory
     $ php app/console cache:clear --env=prod
     
-<p>(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to drop the `--env=prod` from the command).</p>
+<p>(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to drop the <code>--env=prod</code> from the command).</p>
   
 <h3>Database Schema</h3>
 
 <p>Before running these commands, please make a backup of your database.</p>
   
-<p>If updating from [a tagged release](https://github.com/mautic/mautic/releases) to [a tagged release](https://github.com/mautic/mautic/releases), schema changes will be included in a migrations file. To apply the changes, run</p>
+<p>If updating from <a href="https://github.com/mautic/mautic/releases">a tagged release</a> to <a href="https://github.com/mautic/mautic/releases">a tagged release</a>, schema changes will be included in a migrations file. To apply the changes, run</p>
   
     $ php app/console doctrine:migrations:migrate --env=prod
     
