@@ -34,6 +34,41 @@ Mautic Introduction
 	<strong>Get stuck?</strong> No problem. Check out the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.
 </em>
 <br />
+<h2>Disclaimer</h2>
+<p>Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates.</p>
+<p>Also note that the source outside [a tagged release](https://github.com/mautic/mautic/releases) should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.</p>
+<p>If you prefer, there are packaged downloads ready for install at https://www.mautic.org/download.</p>
+
+<h2>Keeping Up-To-Date</h2>
+
+<h3>Source Files</h3>
+
+<p>Each time you update Mautic's source after the initial setup/installation via a new checkout, download, git pull, etc; you will need to clear the cache. To do so, run the following command:</p>
+    
+    $ cd /your/mautic/directory
+    $ php app/console cache:clear --env=prod
+    
+<p>(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to drop the `--env=prod` from the command).</p>
+  
+<h3>Database Schema</h3>
+
+<p>Before running these commands, please make a backup of your database.</p>
+  
+<p>If updating from [a tagged release](https://github.com/mautic/mautic/releases) to [a tagged release](https://github.com/mautic/mautic/releases), schema changes will be included in a migrations file. To apply the changes, run</p>
+  
+    $ php app/console doctrine:migrations:migrate --env=prod
+    
+<p>If you are updating to the latest source (remember this is alpha), first run</p>
+  
+    $ php app/console doctrine:schema:update --env=prod --dump-sql
+  
+<p>This will list out the queries Doctrine wants to execute in order to get the schema up-to-date (no queries are actually executed). Review the queries to ensure there is nothing detrimental to your data. If you have doubts about a query, submit an issue here and we'll verify it.</p>
+  
+<p>If you're satisfied with the queries, execute them with</p>
+  
+    $ php app/console doctrine:schema:update --env=prod --force
+  
+<p>Your schema should now be up-to-date with the source.</p>
 <h2>Usage</h2>
 <p>
 	Learning how to use marketing automation can be challenging. The first step is to understand what marketing automation is and how it can help your business be more successful. This quick usage outline is not meant to be comprehensive but will outline a few key areas of Mautic and how to use each of them.
