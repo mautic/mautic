@@ -602,7 +602,7 @@ class AjaxController extends CommonController
                     }
 
                     $dataArray['success'] = 1;
-                    $dataArray['message'] = $translator->trans('mautic.core.success') . '<br />' . $logger->dump();
+                    $dataArray['message'] = $translator->trans('mautic.core.success');
 
                 } catch (\Exception $e) {
                     $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
