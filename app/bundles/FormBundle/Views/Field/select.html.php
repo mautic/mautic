@@ -29,6 +29,9 @@ $inputAttr .= ' name="'.$name.'"';;
 if (!isset($list))
     $list = $properties['list'];
 
+if (isset($list['list']))
+    $list = $list['list'];
+
 $containerClass  = ($field['isRequired']) ? ' mauticform-required' : '';
 $containerClass .= (!empty($deleted)) ? ' bg-danger' : '';
 $helpMessage     = $field['helpMessage'];
