@@ -74,6 +74,10 @@ return array(
                     'url' => ''
                 )
             ),
+            'mautic_ajax_bc_redirect' => array(
+                'path'         => '/update',
+                'controller'   => 'MauticCoreBundle:Default:updateBcRedirect'
+            ),
         )
     ),
 

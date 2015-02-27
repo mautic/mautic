@@ -136,4 +136,20 @@ class DefaultController extends CommonController
 
         return $this->redirect($url, 301);
     }
+
+    /**
+     * @param Request $request
+     *
+     * @deprecated Temp fix for pre 1.0.0-rc2
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function updateBcRedirectAction(Request $request)
+    {
+        $requestUri = $request->getRequestUri();
+
+        $url = str_replace('/update', '/s/update', $requestUri);
+
+        return $this->redirect($url, 301);
+    }
 }
