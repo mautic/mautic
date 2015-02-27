@@ -323,13 +323,14 @@ function move_mautic_core(array $status)
     );
 
     foreach ($fileOnlyDirectories as $dir) {
-        copy_files($dir, $errorLog);
+        if (copy_files($dir, $errorLog)) {
 
-        // At this point, we can remove the config directory
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . $dir);
+            // At this point, we can remove the config directory
+            $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . $dir);
 
-        if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', $dir);
+            if (!$deleteDir) {
+                $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', $dir);
+            }
         }
     }
 
@@ -593,6 +594,11 @@ function copy_files($dir, &$errorLog) {
                 }
             }
         }
+
+        return true;
+    } else {
+
+        return false;
     }
 }
 
