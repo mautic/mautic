@@ -58,10 +58,20 @@ class CampaignEventHelper
             }
         }
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages) && !in_array(true, $urlMatches)) {
-            return false;
+        // **Page hit is true if:**
+        // 1. no landing page is set and no URL rule is set
+        $applyToAny = (empty($event['properties']['url']) && empty($limitToPages));
+
+        // 2. some landing pages are set and page ID match
+        $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));
+
+        // 3. URL rule is set and match with URL hit
+        $urlIsHit = (!empty($event['properties']['url']) && in_array(true, $urlMatches));
+
+        if ($applyToAny || $langingPageIsHit || $urlIsHit) { 
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
