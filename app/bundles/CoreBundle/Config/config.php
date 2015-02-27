@@ -54,6 +54,26 @@ return array(
                     'url' => '.+'
                 )
             ),
+            'mautic_ajax_bc_redirect' => array(
+                'path'         => '/ajax{url}',
+                'controller'   => 'MauticCoreBundle:Default:ajaxBcRedirect',
+                'requirements' => array(
+                    'url' => '.+'
+                ),
+                'defaults' =>  array(
+                    'url' => ''
+                )
+            ),
+            'mautic_ajax_bc_redirect' => array(
+                'path'         => '/ajax{url}',
+                'controller'   => 'MauticCoreBundle:Default:ajaxBcRedirect',
+                'requirements' => array(
+                    'url' => '.+'
+                ),
+                'defaults' =>  array(
+                    'url' => ''
+                )
+            ),
         )
     ),
 
