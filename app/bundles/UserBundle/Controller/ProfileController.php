@@ -152,6 +152,23 @@ class ProfileController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($me);
 
+                    //check if the user's locale has been downloaded already, fetch it if not
+                    $installedLanguages = $this->factory->getParameter('supported_languages');
+
+                    if (!array_key_exists($me->getLocale(), $installedLanguages)) {
+                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+                        $languageHelper = $this->factory->getHelper('language');
+
+                        $fetchLanguage = $languageHelper->extractLanguagePackage($me->getLocale());
+
+                        // If there is an error, we need to reset the user's locale to the default
+                        if ($fetchLanguage['error']) {
+                            $me->setLocale(null);
+                            $model->saveEntity($me);
+                            $this->addFlash('mautic.core.could.not.set.language');
+                        }
+                    }
+
                     $returnUrl = $this->generateUrl('mautic_user_account');
 
                     return $this->postActionRedirect(array(

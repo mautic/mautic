@@ -361,8 +361,23 @@ class ConfigType extends AbstractType
             'required'   => false
         ));
 
+        // Get the list of available languages
+        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+        $languageHelper = $this->factory->getHelper('language');
+        $languages = $languageHelper->fetchLanguages();
+        $langChoices = array();
+
+        foreach ($languages as $code => $langData) {
+            $langChoices[$code] = $langData['name'];
+        }
+
+        $langChoices = array_merge($langChoices, $this->factory->getParameter('supported_languages'));
+
+        // Alpha sort the languages by name
+        asort($langChoices);
+
         $builder->add('locale', 'choice', array(
-            'choices'     => $this->factory->getParameter('supported_languages'),
+            'choices'     => $langChoices,
             'label'       => 'mautic.core.config.form.locale',
             'required'    => false,
             'attr'        => array(
