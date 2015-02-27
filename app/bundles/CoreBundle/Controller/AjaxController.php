@@ -594,8 +594,9 @@ class AjaxController extends CommonController
                             $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
                         );
 
+                        $user = $this->factory->getUser();
                         $message->setFrom(array($settings['from_email'] => $settings['from_name']));
-                        $message->setTo(array($settings['from_email'] => $settings['from_name']));
+                        $message->setTo(array($user->getEmail() => $user->getFirstName() . ' ' . $user->getLastName()));
 
                         $mailer->send($message);
                     }
