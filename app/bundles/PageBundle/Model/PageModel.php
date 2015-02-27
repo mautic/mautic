@@ -447,7 +447,7 @@ class PageModel extends FormModel
             //use current URL
 
             // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif')) {
+            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif') !== false) {
                 $pageURL = $request->server->get('HTTP_REFERER');
 
                 // if additional data were sent with the tracking pixel
