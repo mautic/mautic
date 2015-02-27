@@ -526,29 +526,33 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections     = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
-                        $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
+                        $connections = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
+                        if ($connections != null) {
+                            $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
-                        //form is valid so process the data
-                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                            //form is valid so process the data
+                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                        //update canvas settings with new event IDs then save
-                        $model->setCanvasSettings($entity, $connections);
+                            //update canvas settings with new event IDs then save
+                            $model->setCanvasSettings($entity, $connections);
 
-                        //trigger the first action in dripflow if published and first event is an action
-                        if ($entity->isPublished()) {
-                            //check for top level action events
-                            foreach ($processedEvents as $id => $e) {
-                                $parent = $e->getParent();
-                                if ($e->getEventType() == 'action' && $parent === null) {
-                                    //check the callback function for the event to make sure it even applies based on its settings
-                                    $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
+                            //trigger the first action in dripflow if published and first event is an action
+                            if ($entity->isPublished()) {
+                                //check for top level action events
+                                foreach ($processedEvents as $id => $e) {
+                                    $parent = $e->getParent();
+                                    if ($e->getEventType() == 'action' && $parent === null) {
+                                        //check the callback function for the event to make sure it even applies based on its settings
+                                        $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
+                                    }
                                 }
                             }
-                        }
 
-                        if (!empty($deletedEvents)) {
-                            $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                            if (!empty($deletedEvents)) {
+                                $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                            }
+                        } else {
+                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                         }
 
                         $this->addFlash('mautic.core.notice.updated', array(
@@ -614,6 +618,7 @@ class CampaignController extends FormController
             }
 
             $this->setSessionEvents($objectId, $campaignEvents);
+
             $deletedEvents = array();
         }
 

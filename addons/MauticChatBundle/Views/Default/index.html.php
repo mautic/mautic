@@ -16,7 +16,6 @@ if (empty($contentOnly)) {
     $view['assets']->addScriptDeclaration('Mautic.activateChatListUpdate();', 'bodyClose');
 }
 ?>
-
 <?php if ($tmpl == 'index'): ?>
 <div class="row ml-5 mr-5">
     <div class="col-xs-12">
@@ -29,6 +28,42 @@ if (empty($contentOnly)) {
     </div>
 </div>
 <div id="ChatCanvasContent">
+    <style type="text/css" scoped>
+        .chat-new-divider {
+            text-align: center;
+            color: #00b6ad;
+        }
+
+        .chat-channel {
+            font-size: 14px;
+        }
+
+        li.chat-list:after {
+            border-bottom: 0 !important;
+        }
+
+        .chat-list .bullet {
+            height: 8px;
+            width: 8px;
+        }
+
+        /** Need to update this CSS */
+        #ChatConversation .chat-group {
+            padding-top: 0 !important;
+        }
+
+        #ChatUsers li.chat-list img.media-object {
+            width: 40px;
+        }
+
+        .col-chat-settings {
+            width: 25px;
+        }
+
+        .col-chat-count {
+            width: 25px;
+        }
+    </style>
 <?php endif; ?>
 
 <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array(

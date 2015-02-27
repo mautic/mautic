@@ -501,6 +501,7 @@ class FormController extends CommonFormController
             } elseif ($form->get('buttons')->get('apply')->isClicked()) {
                 //rebuild everything to include new ids
                 $cleanSlate = true;
+                $reorder    = true;
             }
         } else {
             $cleanSlate = true;
@@ -530,12 +531,18 @@ class FormController extends CommonFormController
                     }
                 }
             }
+            if (!empty($reorder)) {
+                uasort($modifiedFields, function ($a, $b) {
+                    return $a['order'] > $b['order'];
+                });
+            }
+
             $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
             $session->set('mautic.form.'.$objectId.'.fields.submits', $submits);
             $deletedFields = array();
 
             //load existing actions into session
-            $modifiedActions     = array();
+            $modifiedActions = array();
             $existingActions = $entity->getActions()->toArray();
             foreach ($existingActions as $a) {
                 $id     = $a->getId();
@@ -543,6 +550,13 @@ class FormController extends CommonFormController
                 unset($action['form']);
                 $modifiedActions[$id] = $action;
             }
+
+            if (!empty($reorder)) {
+                uasort($modifiedActions, function ($a, $b) {
+                    return $a['order'] > $b['order'];
+                });
+            }
+
             $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
             $deletedActions = array();
         }

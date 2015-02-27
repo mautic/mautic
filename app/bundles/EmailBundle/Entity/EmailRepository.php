@@ -329,4 +329,25 @@ class EmailRepository extends CommonRepository
     {
         return 'e';
     }
+
+    /**
+     * Null variant parent
+     *
+     * @param $ids
+     */
+    public function nullVariantParent($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = array($ids);
+        }
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
+            ->set('variant_parent', ':null')
+            ->setParameter('null', null)
+            ->where(
+                $qb->expr()->in('variant_parent', $ids)
+            )
+            ->execute();
+    }
 }

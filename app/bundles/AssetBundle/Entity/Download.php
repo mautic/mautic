@@ -48,7 +48,7 @@ class Download
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true))
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL"))
      */
     private $lead;
 

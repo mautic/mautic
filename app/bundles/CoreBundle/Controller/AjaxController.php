@@ -296,8 +296,7 @@ class AjaxController extends CommonController
         if (method_exists($entity, 'getCheckedOutBy')) {
 
             $checkedOut = $entity->getCheckedOutBy();
-
-            if ($entity !== null && !empty($checkedOut) && $checkedOut->getId() === $currentUser->getId()) {
+            if ($entity !== null && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;

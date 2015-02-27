@@ -39,7 +39,7 @@ class LeadListAccessValidator extends ConstraintValidator
         if (!count($value)) {
             $this->context->addViolation(
                 $constraint->message,
-                array('%string%' => $value)
+                array('%string%' => '')
             );
         }
 
@@ -47,7 +47,7 @@ class LeadListAccessValidator extends ConstraintValidator
             if (!isset($lists[$l->getId()])) {
                 $this->context->addViolation(
                     $constraint->message,
-                    array('%string%' => $value)
+                    array('%string%' => $l->getName())
                 );
                 break;
             }

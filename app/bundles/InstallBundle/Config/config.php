@@ -9,7 +9,7 @@
 
 return array(
     'routes'   => array(
-        'main' => array(
+        'public' => array(
             'mautic_installer_home'  => array(
                 'path'       => '/installer',
                 'controller' => 'MauticInstallBundle:Install:step'

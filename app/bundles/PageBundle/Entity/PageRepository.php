@@ -287,4 +287,34 @@ class PageRepository extends CommonRepository
     {
         return 'p';
     }
+
+    /**
+     * Null variant and translation parent
+     *
+     * @param $ids
+     */
+    public function nullParents($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = array($ids);
+        }
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
+            ->set('variant_parent_id', ':null')
+            ->setParameter('null', null)
+            ->where(
+                $qb->expr()->in('variant_parent_id', $ids)
+            )
+            ->execute();
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
+            ->set('translation_parent_id', ':null')
+            ->setParameter('null', null)
+            ->where(
+                $qb->expr()->in('translation_parent_id', $ids)
+            )
+            ->execute();
+    }
 }

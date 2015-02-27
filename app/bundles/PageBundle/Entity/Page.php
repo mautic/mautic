@@ -156,7 +156,7 @@ class Page extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Page", inversedBy="translationChildren")
-     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"pageDetails"})
