@@ -367,13 +367,11 @@ class GooglePlusIntegration extends SocialIntegration
             return false;
         }
 
-        $cleaned = $this->cleanIdentifier($identifier);
-
-        if (!is_array($cleaned)) {
-            $cleaned = array($cleaned);
+        if (!is_array($identifier)) {
+            $identifier = array($identifier);
         }
 
-        foreach ($cleaned as $type => $id) {
+        foreach ($identifier as $type => $id) {
             if (empty($id)) {
                 continue;
             }
