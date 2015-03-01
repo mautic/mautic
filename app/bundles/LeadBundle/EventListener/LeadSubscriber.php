@@ -250,7 +250,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @param LeadChangeEvent $event
      */
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(Events\LeadMergeEvent $event)
     {
         $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog')->updateLead(
             $event->getLoser()->getId(),
