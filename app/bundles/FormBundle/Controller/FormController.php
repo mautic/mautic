@@ -648,10 +648,10 @@ class FormController extends CommonFormController
         $template = $form->getTemplate();
         if (!empty($template)) {
             $theme = $this->factory->getTheme($template);
-            if ($theme->getName() != $template) {
+            if ($theme->getTheme() != $template) {
                 $config = $theme->getConfig();
                 if (in_array('form', $config['features'])) {
-                    $template = $theme->getName();
+                    $template = $theme->getTheme();
                 } else {
                     $templateNotFound = true;
                 }
