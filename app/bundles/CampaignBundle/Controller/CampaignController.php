@@ -404,6 +404,9 @@ class CampaignController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
                     }
+                } else {
+                    $connections = $session->get('mautic.campaign.' . $sessionId . '.events.canvassettings');
+                    $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
                 }
             } else {
                 $viewParameters = array('page' => $page);
@@ -564,6 +567,12 @@ class CampaignController extends FormController
                             ))
                         ));
                     }
+                } else {
+                    $connections    = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
+                    $campaignEvents = $modifiedEvents;
+                    if ($connections != null) {
+                        $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
+                    }
                 }
             } else {
                 //unlock the entity
@@ -586,9 +595,9 @@ class CampaignController extends FormController
                         'contentTemplate' => 'MauticCampaignBundle:Campaign:view'
                     ))
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
-                //rebuild everything to include new ids
-                $cleanSlate = true;
+            } else {
+                //rebuild everything to include new ids if valid
+                $cleanSlate = $valid;
             }
         } else {
             $cleanSlate = true;
