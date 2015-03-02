@@ -945,17 +945,19 @@ class Asset extends FormEntity
     public static function validateFile($object, ExecutionContextInterface $context)
     {
         if ($object->getStorageLocation() == 'local') {
+            $file = $object->getFile();
+
             // If the object is stored locally, we should have file data
-            if ($object->isNew() && $object->getFile() === null) {
+            if ($object->isNew() && $file === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
                     ->atPath('file')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
 
-            if ($object->getFile()->getSize() > $object->getMaxSize()) {
+            if ($file !== null && $file->getSize() > $object->getMaxSize()) {
                 $context->buildViolation('mautic.asset.asset.error.file.size', array(
-                        '%fileSize%' => round($object->getFile()->getSize() / 1000000, 2), 
+                        '%fileSize%' => round($object->getFile()->getSize() / 1000000, 2),
                         '%maxSize%' => round($object->getMaxSize()) / 1000000, 2)
                     )
                     ->atPath('file')
