@@ -113,7 +113,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"userDetails"})
      */
-    private $timezone = 'UTC';
+    private $timezone = '';
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -121,7 +121,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"userDetails"})
      */
-    private $locale   = 'en_US';
+    private $locale   = '';
 
     /**
      * @ORM\Column(type="datetime", name="last_login", nullable=true)
