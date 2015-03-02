@@ -432,6 +432,7 @@ class LeadModel extends FormModel
         if (empty($this->currentLead)) {
             $leadId = $cookies->get($trackingId);
             $ip     = $this->factory->getIpAddress();
+
             if (empty($leadId)) {
                 //this lead is not tracked yet so get leads by IP and track that lead or create a new one
                 $leads = $this->getLeadsByIp($ip->getIpAddress());
@@ -445,7 +446,11 @@ class LeadModel extends FormModel
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $lead->setNewlyCreated(true);
-                    $this->saveEntity($lead);
+
+                    // Set to prevent loops
+                    $this->currentLead = $lead;
+
+                    $this->saveEntity($lead, false);
                     $leadId = $lead->getId();
                 }
 
@@ -453,12 +458,17 @@ class LeadModel extends FormModel
                 $lead->setFields($fields);
             } else {
                 $lead = $this->getEntity($leadId);
+
                 if ($lead === null) {
                     //let's create a lead
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $lead->setNewlyCreated(true);
-                    $this->saveEntity($lead);
+
+                    // Set to prevent loops
+                    $this->currentLead = $lead;
+
+                    $this->saveEntity($lead, false);
                     $leadId = $lead->getId();
 
                     $fields = $this->getLeadDetails($lead);
