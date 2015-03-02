@@ -179,6 +179,6 @@ Mautic Introduction
 <ul>
 	<li><a href="https://www.mautic.org">https://www.mautic.org</a></li>
 	<li><a href="https://twitter.com/trymautic">@trymautic</a> [Twitter]</li>
-	<li><a href="https://facebook/trymautic">@trymautic</a> [Facebook]</li>
+	<li><a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]</li>
 	<li><a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]</li>
 </ul>
