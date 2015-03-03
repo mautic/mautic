@@ -41,41 +41,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param array      $args
-     * @param Translator $translator
-     * @return Paginator
-     */
-    public function getEntities($args = array())
-    {
-        $q = $this
-            ->createQueryBuilder('l');
-
-        $this->buildClauses($q, $args);
-
-        $query = $q->getQuery();
-        $result = new Paginator($query);
-
-        if (!empty($args['includeLeadIds'])) {
-            $return = array(
-                'total' => count($result)
-            );
-
-            $iterator = $result->getIterator();
-            foreach ($iterator as &$i) {
-                $leadLists = $this->getLeadsByList($i, true);
-                $i->setLeads($leadLists[$i['id']]);
-            }
-
-            $return['lists'] = $iterator;
-            return $return;
-        }
-
-        return $result;
-    }
-
-    /**
      * Get a list of lists
      *
      * @param bool $user
@@ -102,17 +67,13 @@ class LeadListRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder()
             ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
-        if ($withLeads) {
-            $q->select('partial l.{id, name, alias, filters}, partial il.{id}, partial el.{id}')
-                ->leftJoin('l.includedLeads', 'il')
-                ->leftJoin('l.excludedLeads', 'el');
-        } elseif ($withFilters) {
+        if ($withLeads || $withFilters) {
             $q->select('partial l.{id, name, alias, filters}');
         } else {
             $q->select('partial l.{id, name, alias}');
         }
 
-        $q->where($q->expr()->eq('l.isPublished', ':true'))
+        $q->andWhere($q->expr()->eq('l.isPublished', ':true'))
             ->setParameter('true', true, 'boolean');
 
         if (!empty($user)) {
@@ -164,23 +125,24 @@ class LeadListRepository extends CommonRepository
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
             if ($forList) {
-                $q->select('partial l.{id, alias, name}, partial il.{id}');
+                $q->select('partial l.{id, alias, name}, partial lead.{id}');
             } else {
-                $q->select('l, partial il.{id}');
+                $q->select('l, partial lead.{id}');
             }
 
-            $q->leftJoin('l.includedLeads', 'il');
+            $q->leftJoin('l.leads', 'il')
+                ->leftJoin('il.lead', 'lead');
 
             $q->where(
-                $q->expr()->in('il.id', ':leads')
+                $q->expr()->in('lead.id', ':leads')
             )->setParameter('leads', $lead);
 
             $result = $q->getQuery()->getArrayResult();
 
             $return = array();
             foreach ($result as $r) {
-                foreach($r['includedLeads'] as $l) {
-                    $return[$l['id']][$r['id']] = $r;
+                foreach($r['leads'] as $l) {
+                    $return[$l['lead']['id']][$r['id']] = $r;
                 }
             }
 
@@ -196,10 +158,10 @@ class LeadListRepository extends CommonRepository
                     $q->select('l');
                 }
 
-                $q->leftJoin('l.includedLeads', 'il');
+                $q->leftJoin('l.leads', 'il');
 
                 $q->where(
-                    $q->expr()->eq('il.id', (int)$lead)
+                    $q->expr()->eq('IDENTITY(il.lead)', (int) $lead)
                 );
 
                 $return[$lead] = $q->getQuery()->getResult();
@@ -223,9 +185,12 @@ class LeadListRepository extends CommonRepository
             ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
         if ($withLeads) {
-            $q->select('partial l.{id, name, alias, filters}, partial il.{id}, partial el.{id}')
-                ->leftJoin('l.includedLeads', 'il')
-                ->leftJoin('l.excludedLeads', 'el');
+            $q->select('partial l.{id, name, alias, filters}, partial il.{lead_id}')
+                ->leftJoin('l.leads', 'il')
+                ->andWhere(
+                    $q->expr()->eq('il.manuallyRemoved', ':false')
+                )
+                ->setParameter('false', false, 'boolean');
         } elseif ($withFilters) {
             $q->select('partial l.{id, name, alias, filters}');
         } else {
@@ -253,17 +218,41 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the list
      */
-    public function getLeadCount($listId)
+    public function getLeadCount($listIds)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(l.lead_id) as recipient_count')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'l')
-            ->where($q->expr()->eq('l.leadlist_id', (int) $listId));
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'l');
+
+        $returnArray = (is_array($listIds));
+
+        if (!$returnArray) {
+            $listIds = array($listIds);
+        }
+
+        $q->where(
+            $q->expr()->in('l.leadlist_id', $listIds),
+            $q->expr()->eq('l.manually_removed', ':false')
+        )
+        ->setParameter('false', false, 'boolean')
+        ->groupBy('l.leadlist_id');
 
         $result = $q->execute()->fetchAll();
 
-        return (!empty($result[0])) ? $result[0]['recipient_count'] : 0;
+        $return = array();
+        foreach ($result as $r) {
+            $return[$r['leadlist_id']] = $r['thecount'];
+        }
+
+        // Ensure lists without leads have a value
+        foreach ($listIds as $l) {
+            if (!isset($return[$l])) {
+                $return[$l] = 0;
+            }
+        }
+
+        return ($returnArray) ? $return : $return[$listIds[0]];
     }
 
     /**
@@ -273,7 +262,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false)
+    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $includeManualInDynamic = true)
     {
         static $leads = array(), $currentOnlyLeads = array();
 
@@ -300,15 +289,22 @@ class LeadListRepository extends CommonRepository
                     $q = $this->_em->getConnection()->createQueryBuilder();
                     if ($idOnly) {
                         $q->select('ll.lead_id')
-                            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll');
+                            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
                     } else {
                         $q->select('l.*')
                             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
+                            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
                     }
 
-                    $q ->where($q->expr()->eq('ll.leadlist_id', ':list'))
-                        ->setParameter('list', $id);
+                    $q ->where(
+                        $q->expr()->andX(
+                            $q->expr()->eq('ll.manually_removed', ':false'),
+                            $q->expr()->eq('ll.leadlist_id', ':list')
+                        )
+                    )
+                        ->setParameter('list', $id)
+                        ->setParameter('false', false, 'boolean');
+
                     $results    = $q->execute()->fetchAll();
                     $currentOnlyLeads[$id] = array();
                     foreach ($results as $r) {
@@ -337,17 +333,56 @@ class LeadListRepository extends CommonRepository
                         $q->setParameter($k, $v);
                     }
 
-                    $results    = $q->execute()->fetchAll();
+                    $results = $q->execute()->fetchAll();
 
-                    $leads[$id] = array();
+                    $leads[$id]   = array();
+                    $dynamicLeads = array();
                     foreach ($results as $r) {
                         if ($idOnly) {
                             $leads[$id][] = $r['id'];
                         } else {
                             $leads[$id][$r['id']] = $r;
                         }
-
+                        $dynamicLeads[] = $r['id'];
                     }
+
+                    // Get a list of manually added leads and merge them with dynamic
+                    if ($includeManualInDynamic) {
+                        $q = $this->_em->getConnection()->createQueryBuilder();
+                        if ($idOnly) {
+                            $q->select('ll.lead_id as id')
+                                ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
+                        } else {
+                            $q->select('l.*')
+                                ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                                ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+                        }
+
+                        $dynamicExpr = $q->expr()->andX(
+                            $q->expr()->eq('ll.manually_added', ':true'),
+                            $q->expr()->eq('ll.leadlist_id', ':list')
+                        );
+                        if (!empty($dynamicLeads)) {
+                            $dynamicExpr->add(
+                                $q->expr()->notIn('ll.lead_id', $dynamicLeads)
+                            );
+                        }
+
+                        $q->where($dynamicExpr)
+                            ->setParameter('list', $id)
+                            ->setParameter('true', true, 'boolean');
+
+                        $results = $q->execute()->fetchAll();
+
+                        foreach ($results as $r) {
+                            if ($idOnly) {
+                                $leads[$id][] = $r['id'];
+                            } else {
+                                $leads[$id][$r['id']] = $r;
+                            }
+                        }
+                    }
+
                     unset($filters, $parameters, $q, $expr);
                 } else {
                     $leads[$id] = array();
@@ -355,6 +390,64 @@ class LeadListRepository extends CommonRepository
                 $return[$id] = $leads[$id];
             }
         }
+        return $return;
+    }
+
+    /**
+     * Get manually added leads for a list
+     *
+     * @param $lists
+     * @param $idOnly
+     *
+     * @return array
+     */
+    public function getManuallyAddedLeads($lists, $idOnly)
+    {
+        if (!$lists instanceof PersistentCollection && !is_array($lists) || isset($lists['id'])) {
+            $lists = array($lists);
+        }
+
+        $return = array();
+        foreach ($lists as $l) {
+
+            if ($l instanceof LeadList) {
+                $id = $l->getId();
+            } elseif (is_array($l)) {
+                $id = $l['id'];
+            } else {
+                $id = $l;
+            }
+
+            $q = $this->_em->getConnection()->createQueryBuilder();
+            if ($idOnly) {
+                $q->select('ll.lead_id as id')
+                    ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
+            } else {
+                $q->select('l.*')
+                    ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                    ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+            }
+
+            $q->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('ll.manually_added', ':true'),
+                    $q->expr()->eq('ll.leadlist_id', ':list')
+                )
+            )
+                ->setParameter('list', $id)
+                ->setParameter('true', true, 'boolean');
+
+            $results = $q->execute()->fetchAll();
+
+            foreach ($results as $r) {
+                if ($idOnly) {
+                    $return[$id][] = $r['id'];
+                } else {
+                    $return[$id][$r['id']] = $r;
+                }
+            }
+        }
+
         return $return;
     }
 
@@ -429,49 +522,6 @@ class LeadListRepository extends CommonRepository
             //add the group if not added yet
             $expr->add($group);
         }
-
-        /*
-        //add manually added leads
-        if ($list !== null) {
-            if ($list instanceof LeadList) {
-                $includedLeads = $list->getIncludedLeads();
-                $excludedLeads = $list->getExcludedLeads();
-            } else {
-                $includedLeads = $list['includedLeads'];
-                $excludedLeads = $list['excludedLeads'];
-            }
-
-            $includeIds  = array();
-            foreach ($includedLeads as $lead) {
-                $includeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
-            }
-
-            $excludeIds    = array();
-            foreach ($excludedLeads as $lead) {
-                $excludeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
-            }
-
-            $manualExpr = $q->expr()->andX();
-            if (!empty($includeIds)) {
-                $manualExpr->add(
-                    $q->expr()->in('l.id', $includeIds)
-                );
-            }
-
-            if (!empty($excludeIds)) {
-                $manualExpr->add(
-                    $q->expr()->notIn('l.id', $excludeIds)
-                );
-            }
-
-            if ($manualExpr->count()) {
-                $returnExpr = $q->expr()->orX();
-                $returnExpr->add($expr);
-                $returnExpr->add($manualExpr);
-                return $returnExpr;
-            }
-        }
-        */
 
         return $expr;
     }

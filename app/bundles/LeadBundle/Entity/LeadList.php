@@ -76,26 +76,15 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id", cascade={"remove"})
-     * @ORM\JoinTable(name="lead_lists_included_leads")
-     */
-    private $includedLeads;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id", cascade={"remove"})
-     * @ORM\JoinTable(name="lead_lists_excluded_leads")
-     */
-    private $excludedLeads;
-
-    /**
-     * @var array Used to populate the IDs of included Leads
+     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     *
+     * @var ArrayCollection
      */
     private $leads;
 
     public function __construct()
     {
-        $this->includedLeads = new ArrayCollection();
-        $this->excludedLeads = new ArrayCollection();
+        $this->leads = new ArrayCollection();
     }
 
     /**
@@ -256,20 +245,18 @@ class LeadList extends FormEntity
     /**
      * Add lead
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-
+     * @param $key
+     * @param ListLead $lead
+     *
+     * @return Campaign
      */
-    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead, $checkAgainstExcluded = false)
+    public function addLead($key, ListLead $lead)
     {
-        if ($checkAgainstExcluded) {
-            if (!$this->excludedLeads->contains($lead)) {
-                $this->includedLeads[] = $lead;
-                return true;
-            }
-            return false;
-        } else {
-            $this->includeLead($lead);
-        }
+        $action = ($this->leads->contains($lead)) ? 'updated' : 'added';
+
+        $leadEntity = $lead->getLead();
+        $this->changes['leads'][$action][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
+        $this->leads[$key] = $lead;
 
         return $this;
     }
@@ -277,97 +264,22 @@ class LeadList extends FormEntity
     /**
      * Remove lead
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $users
+     * @param ListLead $lead
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead, $checkAgainstExcluded = false)
+    public function removeLead(ListLead $lead)
     {
-        if ($checkAgainstExcluded) {
-            //if the lead is in the excluded list, it was manually added there so don't remove it
-            if (!$this->excludedLeads->contains($lead) && $this->includedLeads->contains($lead)) {
-                $this->includedLeads->removeElement($lead);
-                return true;
-            }
-            return false;
-        } else {
-            $this->excludeLead($lead);
-        }
-
-        return $this;
+        $leadEntity = $lead->getLead();
+        $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
+        $this->leads->removeElement($lead);
     }
 
     /**
-     * Get manual leads
+     * Get leads
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getIncludedLeads()
-    {
-        return $this->includedLeads;
-    }
-
-    /**
-     * Add lead
-     *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     */
-    public function excludeLead(\Mautic\LeadBundle\Entity\Lead $lead)
-    {
-        if (!$this->excludedLeads->contains($lead)) {
-            $this->excludedLeads[] = $lead;
-        }
-
-        if ($this->includedLeads->contains($lead)) {
-            $this->includedLeads->removeElement($lead);
-        }
-    }
-
-    /**
-     * @param Lead $lead
-     */
-    public function includeLead(\Mautic\LeadBundle\Entity\Lead $lead)
-    {
-        if (!$this->includedLeads->contains($lead)) {
-            $this->includedLeads[] = $lead;
-        }
-
-        if ($this->excludedLeads->contains($lead)) {
-            $this->excludedLeads->removeElement($lead);
-        }
-    }
-
-    /**
-     * Get manual leads
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getExcludedLeads()
-    {
-        return $this->excludedLeads;
-    }
-
-    /**
-     * @return array
-     */
-    public function getLeads ()
+    public function getLeads()
     {
         return $this->leads;
-    }
-
-    /**
-     * @param array $leads
-     */
-    public function setLeads (array $leads)
-    {
-        $this->leads = $leads;
-    }
-
-    public function setIncludedLeads($leads)
-    {
-        $this->includedLeads = $leads;
-    }
-
-    public function setExcludedLeads($leads)
-    {
-        $this->excludedLeads = $leads;
     }
 }
