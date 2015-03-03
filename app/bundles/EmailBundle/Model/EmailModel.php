@@ -164,7 +164,7 @@ class EmailModel extends FormModel
         }
         $this->em->flush();
     }
-    
+
     /**
      * Delete an entity
      *
@@ -810,7 +810,13 @@ class EmailModel extends FormModel
             } else {
                 // Tak on the tracking URL
                 $customHtml  = $useEmail['entity']->getCustomHtml();
-                $customHtml .= '<img height="1" width="1" src="' . $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true) . '" />';
+                $trackingImg = '<img height="1" width="1" src="' . $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true) . '" />';
+                if (strpos($customHtml, '</body>')) {
+                    $customHtml = str_replace('</body>', $trackingImg . '</body>', $customHtml);
+                } else {
+                    $customHtml .= $trackingImg;
+                }
+
                 $mailer->setBody($customHtml);
             }
 
