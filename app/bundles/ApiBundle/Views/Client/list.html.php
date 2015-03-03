@@ -31,6 +31,7 @@ endif;
             ));
             ?>
             <th class="visible-md visible-lg col-client-publicid"><?php echo $view['translator']->trans('mautic.api.client.thead.publicid'); ?></th>
+            <th class="visible-md visible-lg col-client-secret"><?php echo $view['translator']->trans('mautic.api.client.thead.secret'); ?></th>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
@@ -62,7 +63,10 @@ endif;
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <?php echo $item->getPublicId(); ?>
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getPublicId(); ?>" />
+                </td>
+                <td class="visible-md visible-lg">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getSecret(); ?>" />
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>

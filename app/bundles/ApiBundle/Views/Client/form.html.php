@@ -18,10 +18,10 @@ if (!empty($id)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
-<div class="box-layout">
-    <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="pa-md">
+<div class="row">
+    <div class="pa-md">
+        <div class="col-md-6">
             <?php echo $view['form']->form($form); ?>
         </div>
     </div>
-</div>
+</div
