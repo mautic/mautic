@@ -449,7 +449,7 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
             //return the icon back
             if (action == 'remove') {
                 //switch it on
-                mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+                mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
             } else {
                 mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
             }
@@ -491,7 +491,7 @@ Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
             //return the icon back
             if (action == 'remove') {
                 //switch it on
-                mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+                mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
             } else {
                 mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
             }
