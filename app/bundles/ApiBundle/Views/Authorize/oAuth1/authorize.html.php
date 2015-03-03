@@ -13,8 +13,8 @@ $name = $consumer->getName();
 $msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
     $view['translator']->trans('mautic.api.oauth.clientnoname');
 ?>
-<h4><?php echo $msg; ?></h4>
-<form class="form-login" role="form" name="bazinga_oauth_server_authorize" action="<?php echo $view['router']->generate('bazinga_oauth_server_authorize') ?>" method="post">
+<h4 class="mb-lg"><?php echo $msg; ?></h4>
+<form class="form-login text-center" role="form" name="bazinga_oauth_server_authorize" action="<?php echo $view['router']->generate('bazinga_oauth_server_authorize') ?>" method="post">
     <input type="hidden" name="oauth_token" value="<?php echo  $oauth_token; ?>" />
     <input type="hidden" name="oauth_callback" value="<?php echo $oauth_callback; ?>" />
 
