@@ -811,7 +811,7 @@ class EmailModel extends FormModel
                 // Tak on the tracking URL
                 $customHtml  = $useEmail['entity']->getCustomHtml();
                 $trackingImg = '<img height="1" width="1" src="' . $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true) . '" />';
-                if (strpos($customHtml, '</body>')) {
+                if (strpos($customHtml, '</body>') !== false) {
                     $customHtml = str_replace('</body>', $trackingImg . '</body>', $customHtml);
                 } else {
                     $customHtml .= $trackingImg;
