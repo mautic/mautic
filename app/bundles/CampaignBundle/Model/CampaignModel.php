@@ -265,13 +265,20 @@ class CampaignModel extends CommonFormModel
      * @param $entity
      * @param $settings
      */
-    public function setCanvasSettings($entity, $settings, $persist = true)
+    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
     {
-        $events  = $entity->getEvents();
+        if ($events === null) {
+            $events = $entity->getEvents();
+        }
+
         $tempIds = array();
 
         foreach ($events as $e) {
-            $tempIds[$e->getTempId()] = $e->getId();
+            if ($e instanceof Event) {
+                $tempIds[$e->getTempId()] = $e->getId();
+            } else {
+                $tempIds[$e['tempId']] = $e['id'];
+            }
         }
 
         if (!isset($settings['nodes'])) {
