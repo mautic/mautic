@@ -145,8 +145,6 @@ class InstagramIntegration extends SocialIntegration
             return false;
         }
 
-        $identifier = $this->cleanIdentifier($identifier);
-
         $data = $this->makeRequest($this->getApiUrl('users/search'), array('q' => $identifier));
 
         if (!empty($data->data)) {
