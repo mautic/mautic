@@ -9,7 +9,7 @@
 
 return array(
     'routes'     => array(
-        'main' => array(
+        'public' => array(
             // OAuth1.0a
             'bazinga_oauth_server_requesttoken'     => array(
                 'path'       => '/oauth/v1/request_token',
@@ -63,7 +63,8 @@ return array(
                 'controller' => 'MauticApiBundle:OAuth2/Security:loginCheck',
                 'method'     => 'GET|POST'
             ),
-
+        ),
+        'main' => array(
             // Clients
             'mautic_client_index'                   => array(
                 'path'       => '/credentials/{page}',
