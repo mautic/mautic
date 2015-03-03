@@ -20,11 +20,11 @@ class TriggerEventRepository extends CommonRepository
     /**
      * Get array of published triggers based on point total
      *
-     * @param int $points
+     * @param int      $points
      *
      * @return array
      */
-    public function getPublishedByPointTotal($points = 0)
+    public function getPublishedByPointTotal($points)
     {
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
@@ -33,9 +33,11 @@ class TriggerEventRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
+
         $expr->add(
-            $q->expr()->gte('r.points', $points)
+            $q->expr()->lte('r.points', (int) $points)
         );
+
         $q->where($expr);
 
         return $q->getQuery()->getArrayResult();
