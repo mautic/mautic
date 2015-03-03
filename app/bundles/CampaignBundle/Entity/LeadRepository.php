@@ -63,7 +63,11 @@ class LeadRepository extends CommonRepository
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(cl.lead_id) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-            ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = cl.lead_id');
+            ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = cl.lead_id')
+            ->where(
+                $dq->expr()->eq('cl.manually_removed', ':false')
+            )
+            ->setParameter('false', false, 'boolean');
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
@@ -116,8 +120,13 @@ class LeadRepository extends CommonRepository
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
         $q->where(
-            $q->expr()->eq('c.id', ':campaign')
-        )->setParameter('campaign', $campaignId);
+            $q->expr()->andX(
+                $q->expr()->eq('lc.manuallyRemoved', ':false'),
+                $q->expr()->eq('c.id', ':campaign')
+            )
+        )
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('campaign', $campaignId);
 
         if ($eventId != null) {
             $dq = $this->_em->createQueryBuilder();
@@ -139,7 +148,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * COunt leads for a specific campaign
+     * Count leads for a specific campaign
      *
      * @param      $campaignId
      * @return int
@@ -149,8 +158,13 @@ class LeadRepository extends CommonRepository
         $q = $this->createQueryBuilder('cl')
             ->select('count(cl.lead) as thecount');
         $q->where(
-            $q->expr()->eq('cl.campaign', ':campaign')
-        )->setParameter('campaign', $campaignId);
+            $q->expr()->andX(
+                $q->expr()->eq('cl.campaign', ':campaign'),
+                $q->expr()->eq('cl.manuallyRemoved', ':false')
+            )
+        )
+            ->setParameter('campaign', $campaignId)
+            ->setParameter('false', false, 'boolean');
 
         $result = $q->getQuery()->getSingleResult();
 
@@ -176,8 +190,14 @@ class LeadRepository extends CommonRepository
         $q = $this->createQueryBuilder('cl');
         $q->select('cl.dateAdded');
 
-        $q->andwhere($q->expr()->gte('cl.dateAdded', ':date'))
+        $q->andwhere(
+            $q->expr()->andX(
+                $q->expr()->gte('cl.dateAdded', ':date'),
+                $q->expr()->eq('cl.manuallyRemoved', ':false')
+            )
+        )
             ->setParameter('date', $graphData['fromDate'])
+            ->setParameter('false', false, 'boolean')
             ->orderBy('cl.dateAdded', 'ASC');
 
         if (isset($options['campaign_id'])) {
@@ -194,7 +214,12 @@ class LeadRepository extends CommonRepository
             $q2 = $this->createQueryBuilder('cl');
             $q2->select('count(cl.lead) as total');
 
-            $q2->andwhere($q->expr()->lt('cl.dateAdded', ':date'))
+            $q2->andwhere(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.manuallyRemoved', ':false'),
+                    $q->expr()->lt('cl.dateAdded', ':date'))
+                )
+                ->setParameter('false', false, 'boolean')
                 ->setParameter('date', $graphData['fromDate']);
 
             $total = $q2->getQuery()->getSingleResult();

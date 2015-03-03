@@ -65,7 +65,7 @@ class LeadSubscriber extends CommonSubscriber
                     $campaignListIds = array_keys($lists->toArray());
 
                     if (array_intersect($leadListIds, $campaignListIds)) {
-                        break;
+                        continue;
                     }
 
                     $model->removeLead($c, $lead);
