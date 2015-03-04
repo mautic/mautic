@@ -34,15 +34,18 @@ class ConfigType extends AbstractType
             )
         ));
 
-        $builder->add('google_analytics', 'text', array(
+        $builder->add('google_analytics', 'textarea', array(
             'label'      => 'mautic.page.config.form.google.analytics',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.page.config.form.google.analytics.tooltip'
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.config.form.google.analytics.tooltip',
+                'rows'    => 10
             ),
             'required' => false
         ));
+
+
     }
 
     /**
