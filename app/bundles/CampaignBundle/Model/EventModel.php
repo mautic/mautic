@@ -138,7 +138,7 @@ class EventModel extends CommonFormModel
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Campaign triggered for event type ' . $type);
         //only trigger events for anonymous users (to prevent populating full of user/company data)
-        if (!$this->security->isAnonymous()) {
+        if (!defined('MAUTIC_SKIP_CAMPAIGN_ANONYMOUS_CHECK') && !$this->security->isAnonymous()) {
             $logger->debug('CAMPAIGN: lead not anonymous; abort');
             return false;
         }
@@ -207,7 +207,7 @@ class EventModel extends CommonFormModel
                         $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet; abort');
                         break;
                     }
-                    $parentLog = $leadsEvents[$event['parent']['id']];
+                    $parentLog = $leadsEvents[$event['parent']['id']]['log'][0];
 
                     if ($parentLog['isScheduled']) {
                         //this event has a parent that is scheduled and thus not triggered
@@ -219,7 +219,14 @@ class EventModel extends CommonFormModel
                     $parentTriggeredDate = new \DateTime();
                 }
 
-                $settings = $availableEvents[$event['eventType']][$type];
+                if (isset($availableEvents[$event['eventType']][$type])) {
+                    $settings = $availableEvents[$event['eventType']][$type];
+                } else {
+                    // Not found maybe it's no longer available?
+                    $logger->debug('CAMPAIGN: ' . $type . ' does not exist. (#' . $event['id'] . '); abort');
+
+                    break;
+                }
 
                 //has this event already been examined via a parent's children?
                 //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
@@ -248,7 +255,15 @@ class EventModel extends CommonFormModel
                             continue;
                         }
 
-                        $settings = $availableEvents[$child['eventType']][$child['type']];
+                        if (isset($availableEvents[$child['eventType']][$child['type']])) {
+                            $settings = $availableEvents[$child['eventType']][$child['type']];
+                        } else {
+                            // Not found maybe it's no longer available?
+                            $logger->debug('CAMPAIGN: ' . $child['type'] . ' does not exist. (#' . $child['id'] . '); continue');
+
+                            continue;
+                        }
+
 
                         //store in case a child was pulled with events
                         $examinedEvents[] = $child['id'];
@@ -300,6 +315,49 @@ class EventModel extends CommonFormModel
     }
 
     /**
+     * Triggers starting actions for a specific lead, i.e. when a lead is first added to the campaign
+     *
+     * @param $campaign
+     * @param $lead
+     */
+    public function triggerCampaignStartingActionsForLead($campaign, $lead)
+    {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+        $model = $this->factory->getModel('campaign');
+
+        $actionEvents = $this->getRepository()->getRootLevelActions($campaign->getId(), $lead->getId());
+        $eventSettings = $model->getEvents();
+
+        if (!empty($actionEvents)) {
+            $persist = array();
+            foreach ($actionEvents as $e) {
+                if (!isset($eventSettings['action'][$e['type']])) {
+                    continue;
+                }
+
+                $timing = $this->checkEventTiming($e, new \DateTime(), true);
+                if ($timing instanceof \DateTime) {
+                    $log = $this->getLogEntity($e['id'], $campaign, $lead, null, true);
+                    $log->setLead($lead);
+                    $log->setIsScheduled(true);
+                    $log->setTriggerDate($timing);
+
+                    $persist[] = $log;
+                } elseif ($timing && $this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $lead, true)) {
+                    $log = $this->getLogEntity($e['id'], $campaign, $lead, null, true);
+                    $log->setDateTriggered(new \DateTime());
+
+                    $persist[] = $log;
+                } //else do nothing
+            }
+
+            if (!empty($persist)) {
+                $this->getRepository()->saveEntities($persist);
+            }
+        }
+    }
+
+    /**
      * Trigger the first action in a campaign if a decision is not involved
      *
      * @param $campaign
@@ -310,18 +368,25 @@ class EventModel extends CommonFormModel
      */
     public function triggerCampaignStartingAction($campaign, $eventEntity, $settings)
     {
-        //convert to array to match triggerEvent
-        $event = $eventEntity->convertToArray();
-        $event['campaign'] = $campaign->convertToArray();
+        // Skip the anonymous check to force actions to fire
+        defined('MAUTIC_SKIP_CAMPAIGN_ANONYMOUS_CHECK') or define('MAUTIC_SKIP_CAMPAIGN_ANONYMOUS_CHECK', 1);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->factory->getModel('campaign');
-        $eventId       = $event['id'];
 
-        $leads = $campaignModel->getCampaignLeads($campaign, $eventId);
+        $persist = array();
+
+        $event             = $eventEntity->convertToArray();
+        $event['campaign'] = $campaign->convertToArray();
+
+        $leads = $campaignModel->getCampaignLeads($campaign, $event['id']);
 
         foreach ($leads as $campaignLead) {
-            $lead = $campaignLead->getLead();
+            if ($campaignLead instanceof \Mautic\CampaignBundle\Entity\Lead) {
+                $lead = $campaignLead->getLead();
+            } else {
+                $lead = $campaignLead;
+            }
 
             $timing = $this->checkEventTiming($event, new \DateTime(), true);
             if ($timing instanceof \DateTime) {
@@ -627,6 +692,7 @@ class EventModel extends CommonFormModel
         $log = new LeadEventLog();
 
         if ($ipAddress == null) {
+            // Lead triggered from system IP
             $ipAddress = $this->factory->getIpAddress();
         }
         $log->setIpAddress($ipAddress);

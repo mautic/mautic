@@ -59,6 +59,7 @@ class EventRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'c');
+
         $expr->add(
             $q->expr()->eq('e.type', ':type')
         );
@@ -107,6 +108,48 @@ class EventRepository extends CommonRepository
         }
 
         return $events;
+    }
+
+    /**
+     * Get the top level actions for a campaign and lead
+     *
+     * @param $campaignId
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getRootLevelActions($campaignId, $leadId)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('c, e')
+            ->join('e.campaign', 'c');
+
+        //make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr->addMultiple(array(
+            $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
+            $q->expr()->isNull('e.parent'),
+            $q->expr()->eq('c.id', ':campaign')
+        ));
+        $q->where($expr)
+            ->setParameter('campaign', (int) $campaignId);
+
+        $dq = $this->_em->createQueryBuilder();
+        $dq->select('ellev.id')
+            ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+            ->leftJoin('ell.event', 'ellev')
+            ->leftJoin('ell.lead', 'el')
+            ->where('ellev.id = e.id')
+            ->andWhere(
+                $dq->expr()->eq('el.id', ':leadId')
+            );
+
+        $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
+            ->setParameter('leadId', (int) $leadId);
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
     }
 
     /**
