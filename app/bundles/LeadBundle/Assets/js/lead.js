@@ -416,59 +416,29 @@ Mautic.refreshLeadNotes = function(form) {
 };
 
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
-    var toggleOn  = 'fa-toggle-on text-success';
-    var toggleOff = 'fa-toggle-off text-danger';
-
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
 
-    if (action == 'remove') {
-        //switch it on
-        mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
-    } else {
-        mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
-    }
-
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (!response.success) {
-                //return the icon back
-                if (action == 'remove') {
-                    //switch it on
-                    mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
-                } else {
-                    mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
-                }
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            //return the icon back
-            if (action == 'remove') {
-                //switch it on
-                mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
-            } else {
-                mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
-            }
-        }
-    });
+    Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
 Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
+    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query  = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;
+
+    Mautic.toggleLeadSwitch(toggleId, query, action);
+};
+
+Mautic.toggleLeadSwitch = function(toggleId, query, action) {
     var toggleOn  = 'fa-toggle-on text-success';
     var toggleOff = 'fa-toggle-off text-danger';
-
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
-    var query = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;
+    var spinClass = 'fa-spin fa-spinner ';
 
     if (action == 'remove') {
         //switch it on
-        mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+        mQuery('#' + toggleId).removeClass(toggleOn).addClass(spinClass + 'text-danger');
     } else {
-        mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
+        mQuery('#' + toggleId).removeClass(toggleOff).addClass(spinClass + 'text-success');
     }
 
     mQuery.ajax({
@@ -477,18 +447,28 @@ Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
         data: query,
         dataType: "json",
         success: function (response) {
+            mQuery('#' + toggleId).removeClass(spinClass);
             if (!response.success) {
                 //return the icon back
                 if (action == 'remove') {
                     //switch it on
-                    mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+                    mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
                 } else {
                     mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+                }
+            } else {
+                if (action == 'remove') {
+                    //switch it on
+                    mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+                } else {
+                    mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
                 }
             }
         },
         error: function (request, textStatus, errorThrown) {
             //return the icon back
+            mQuery('#' + toggleId).removeClass(spinClass);
+
             if (action == 'remove') {
                 //switch it on
                 mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
