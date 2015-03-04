@@ -117,6 +117,7 @@ class AppKernel extends Kernel
             new Bazinga\OAuthServerBundle\BazingaOAuthServerBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
+            new Oneup\UploaderBundle\OneupUploaderBundle(),
         );
 
         //dynamically register Mautic Bundles

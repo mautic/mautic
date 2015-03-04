@@ -261,6 +261,7 @@ class AssetController extends FormController
         $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
+
         if (!$this->factory->getSecurity()->isGranted('asset:assets:create')) {
             return $this->accessDenied();
         }
@@ -268,6 +269,9 @@ class AssetController extends FormController
         //set the page we came from
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+
+        $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
+        $uploadEndpoint = $uploaderHelper->endpoint('gallery');
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -340,7 +344,8 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local'
+                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'uploadEndpoint'   => $uploadEndpoint
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

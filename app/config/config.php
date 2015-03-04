@@ -196,6 +196,15 @@ $container->loadFromExtension('knp_menu', array(
     'default_renderer' => 'mautic'
 ));
 
+// OneupUploader Configuration
+$container->loadFromExtension('oneup_uploader', array(
+    'mappings' => array(
+        'gallery' => array(
+            'frontend' => 'dropzone'
+        )
+    )
+));
+
 if ($container->getParameter('mautic.api_enabled')) {
     //FOS Rest
     $container->loadFromExtension('fos_rest', array(

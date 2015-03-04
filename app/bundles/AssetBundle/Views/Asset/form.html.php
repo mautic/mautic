@@ -14,6 +14,7 @@ $header = ($activeAsset->getId()) ?
 $view['slots']->set("headerTitle", $header);
 $view['slots']->set('mauticContent', 'asset');
 ?>
+<script><?php echo 'var uploadEndpoint = "' . $uploadEndpoint . '";'; ?></script>
 <?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">
@@ -33,7 +34,16 @@ $view['slots']->set('mauticContent', 'asset');
 						<?php endif; ?>
 					</div>
 			        <div id="storage-local"<?php if (!$startOnLocal) echo ' class="hide"'; ?>>
-				        <?php echo $view['form']->row($form['file']); ?>
+				        <div class="row">
+					        <div class="form-group col-xs-12 ">
+						        <?php echo $view['form']->label($form['file']); ?>
+					        	<noscript>
+							        <?php echo $view['form']->row($form['file']); ?>
+						        </noscript>
+						        <?php echo $view['form']->errors($form['file']); ?>
+						        <div class="mdropzone text-center" id="dropzone"></div>
+					        </div>
+				        </div>
 			        </div>
 			        <div id="storage-remote"<?php if ($startOnLocal) echo ' class="hide"'; ?>>
 				        <?php echo $view['form']->row($form['remotePath']); ?>

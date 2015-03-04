@@ -7,6 +7,7 @@ Mautic.assetOnLoad = function (container) {
     mQuery("#asset_file").change(function() {
         Mautic.previewBeforeUpload(this);
     });
+    Mautic.initializeDropzone();
 };
 
 Mautic.assetOnUnload = function(id) {
@@ -131,3 +132,19 @@ Mautic.changeAssetStorageLocation = function() {
         mQuery('#remote-button').removeClass('hide');
     }
 };
+
+Mautic.initializeDropzone = function() {
+    var options = {
+        url: uploadEndpoint,
+        uploadMultiple: false,
+        dictDefaultMessage: 'test',
+        init: function() {
+            this.on("addedfile", function() {
+                if (this.files[1] != null) {
+                    this.removeFile(this.files[0]);
+                }
+            });
+        }
+    };
+    var dropzone = new Dropzone("div#dropzone", options);
+}
