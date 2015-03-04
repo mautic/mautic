@@ -13,9 +13,4 @@ use Symfony\Component\Routing\RouteCollection;
 $collection = new RouteCollection();
 $collection->addCollection($loader->import('.', 'mautic'));
 
-// OneupUploader
-$collection->addCollection($loader->import('.', 'uploader'));
-// $wdt = $loader->import("@OneupUploaderBundle/Routing/RouteLoader.php", 'uloader');
-// $collection->addCollection($wdt);
-
 return $collection;
