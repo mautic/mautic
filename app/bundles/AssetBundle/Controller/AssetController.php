@@ -266,12 +266,13 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // Set the page we came from
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
 
+        // Get upload folder
         $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
-        $uploadEndpoint = $uploaderHelper->endpoint('gallery');
+        $uploadEndpoint = $uploaderHelper->endpoint('asset');
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action);

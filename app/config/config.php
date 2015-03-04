@@ -197,10 +197,16 @@ $container->loadFromExtension('knp_menu', array(
 ));
 
 // OneupUploader Configuration
+$uploadDir = $container->getParameter('mautic.upload_dir');
+$maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', array(
     'mappings' => array(
-        'gallery' => array(
-            'frontend' => 'dropzone'
+        'asset' => array(
+            'frontend' => 'dropzone',
+            'max_size' => $maxSize,
+            'storage'  => array(
+                'directory' => $uploadDir
+            )
         )
     )
 ));
