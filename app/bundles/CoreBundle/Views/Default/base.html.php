@@ -41,6 +41,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xs-6 text-muted"><?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => date('Y'))); ?></div>
+                        <div class="col-xs-6 text-muted text-right small">v<?php echo $view['formatter']->getVersion(); ?></div>
                     </div>
                 </div>
             </footer>
