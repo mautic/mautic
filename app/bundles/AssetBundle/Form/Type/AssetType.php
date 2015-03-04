@@ -134,6 +134,10 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
+        $builder->add('tempId', 'hidden', array(
+            'required'   => false
+        ));
+
         $builder->add('buttons', 'form_buttons', array());
 
         if (!empty($options["action"])) {

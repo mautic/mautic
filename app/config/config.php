@@ -203,7 +203,7 @@ $container->loadFromExtension('oneup_uploader', array(
     'mappings' => array(
         'asset' => array(
             'frontend' => 'dropzone',
-            'max_size' => $maxSize,
+            // 'max_size' => $maxSize, // TODO fix this
             'storage'  => array(
                 'directory' => $uploadDir
             )

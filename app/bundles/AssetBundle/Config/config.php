@@ -103,6 +103,9 @@ return array(
             ),
             'mautic.asset.search.subscriber' => array(
                 'class' => 'Mautic\AssetBundle\EventListener\SearchSubscriber'
+            ),
+            'oneup_uploader.pre_upload' => array(
+                'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber'
             )
         ),
         'forms' => array(

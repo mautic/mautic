@@ -102,6 +102,12 @@ class Asset extends FormEntity
     private $temp;
 
     /**
+     * Temporary ID used for file upload and validations
+     * before the actual ID is known.
+     */
+    private $tempId;
+
+    /**
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -979,5 +985,29 @@ class Asset extends FormEntity
             // Unset any local file data
             $object->setPath(null);
         }
+    }
+
+    /**
+     * Set temporary ID
+     *
+     * @param string $tempId
+     *
+     * @return Asset
+     */
+    public function setTempId($tempId)
+    {
+        $this->tempId = $tempId;
+
+        return $this;
+    }
+
+    /**
+     * Get temporary ID
+     *
+     * @return string
+     */
+    public function getTempId()
+    {
+        return $this->tempId;
     }
 }

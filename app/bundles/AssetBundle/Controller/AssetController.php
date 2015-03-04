@@ -266,6 +266,10 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
+        // Create temporary asset ID
+        $tempId = uniqid('tmp_');
+        $entity->setTempId($tempId);
+
         // Set the page we came from
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
