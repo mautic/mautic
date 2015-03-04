@@ -37,6 +37,31 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param object $entity
+     * @param bool   $flush
+     */
+    public function deleteEntity($entity, $flush = true)
+    {
+        // Null parents of associated events first
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_events', 'e')
+            ->set('e.parent_id', ':null')
+            ->setParameter('null', null)
+            ->where('e.campaign_id = ' . $entity->getId())
+            ->execute();
+
+        // Delete events
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->delete(MAUTIC_TABLE_PREFIX . 'campaign_events')
+            ->where('campaign_id = ' . $entity->getId())
+            ->execute();
+
+        parent::deleteEntity($entity, $flush);
+    }
+
+    /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead)
      *
      * @param null $specificId
