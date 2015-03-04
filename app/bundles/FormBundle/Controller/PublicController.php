@@ -201,8 +201,9 @@ class PublicController extends CommonFormController
 
             if (empty($templateNotFound)) {
                 $viewParams = array(
-                    'template' => $template,
-                    'content'  => $html,
+                    'template'        => $template,
+                    'content'         => $html,
+                    'googleAnalytics' => $this->factory->getParameter('google_analytics')
                 );
 
                 return $this->render('MauticFormBundle::form.html.php', $viewParams);
