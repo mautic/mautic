@@ -200,18 +200,27 @@ class EventModel extends CommonFormModel
 
         foreach ($events as $campaignId => $campaignEvents) {
             foreach ($campaignEvents as $k => $event) {
+                //has this event already been examined via a parent's children?
+                //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
+                if (in_array($event['id'], $examinedEvents)) {
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' already processed this round');
+                    continue;
+                }
+                $examinedEvents[] = $event['id'];
+
                 //check to see if this has been fired sequentially
                 if (!empty($event['parent'])) {
                     if (!isset($leadsEvents[$event['parent']['id']])) {
                         //this event has a parent that has not been triggered for this lead so break out
-                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet; abort');
-                        break;
+                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet or was triggered with this batch');
+                        continue;
                     }
                     $parentLog = $leadsEvents[$event['parent']['id']]['log'][0];
 
                     if ($parentLog['isScheduled']) {
                         //this event has a parent that is scheduled and thus not triggered
-                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet because it\'s scheduled; abort');
+                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet because it\'s scheduled');
+                        continue;
                     } else {
                         $parentTriggeredDate = $parentLog['dateTriggered'];
                     }
@@ -223,47 +232,42 @@ class EventModel extends CommonFormModel
                     $settings = $availableEvents[$event['eventType']][$type];
                 } else {
                     // Not found maybe it's no longer available?
-                    $logger->debug('CAMPAIGN: ' . $type . ' does not exist. (#' . $event['id'] . '); abort');
+                    $logger->debug('CAMPAIGN: ' . $type . ' does not exist. (#' . $event['id'] . ')');
 
-                    break;
-                }
-
-                //has this event already been examined via a parent's children?
-                //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
-                if (in_array($event['id'], $examinedEvents)) {
-                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' already processed this round; continue');
                     continue;
                 }
-                $examinedEvents[] = $event['id'];
 
                 //check the callback function for the event to make sure it even applies based on its settings
                 if (!$this->invokeEventCallback($event, $settings, $lead, $eventDetails)) {
-                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' callback check failed; continue');
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' callback check failed');
                     continue;
                 }
 
                 if (!empty($event['children'])) {
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' has children');
+
                     $childrenTriggered = false;
                     foreach ($event['children'] as $child) {
                         if (isset($leadsEvents[$child['id']])) {
                             //this child event has already been fired for this lead so move on to the next event
-                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' already triggered; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' already triggered');
                             continue;
                         } elseif ($child['eventType'] != 'action') {
                             //hit a triggering type event so move on
-                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' is an action; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' is a decision');
                             continue;
+                        } else {
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' is being processed');
                         }
 
                         if (isset($availableEvents[$child['eventType']][$child['type']])) {
                             $settings = $availableEvents[$child['eventType']][$child['type']];
                         } else {
                             // Not found maybe it's no longer available?
-                            $logger->debug('CAMPAIGN: ' . $child['type'] . ' does not exist. (#' . $child['id'] . '); continue');
+                            $logger->debug('CAMPAIGN: ' . $child['type'] . ' does not exist. (#' . $child['id'] . ')');
 
                             continue;
                         }
-
 
                         //store in case a child was pulled with events
                         $examinedEvents[] = $child['id'];
@@ -271,7 +275,7 @@ class EventModel extends CommonFormModel
                         $timing = $this->checkEventTiming($child, $parentTriggeredDate);
                         if ($timing instanceof \DateTime) {
                             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' timing is not appropriate and thus scheduled for ' . $timing . '; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' timing is not appropriate and thus scheduled for ' . $timing . '');
 
                             $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
                             $log->setIsScheduled(true);
