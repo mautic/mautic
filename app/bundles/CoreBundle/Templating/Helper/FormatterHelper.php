@@ -18,8 +18,8 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class FormatterHelper extends Helper
 {
-
     private $dateHelper;
+    private $version;
 
     /**
      * @param MauticFactory $factory
@@ -27,6 +27,7 @@ class FormatterHelper extends Helper
     public function __construct(MauticFactory $factory)
     {
         $this->dateHelper = $factory->getHelper('template.date');
+        $this->version    = $factory->getVersion();
     }
 
     /**
@@ -97,5 +98,13 @@ class FormatterHelper extends Helper
     public function getName()
     {
         return 'formatter';
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
     }
 }
