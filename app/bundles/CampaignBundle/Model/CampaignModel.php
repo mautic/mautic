@@ -192,7 +192,8 @@ class CampaignModel extends CommonFormModel
                 // Remove child from parent
                 $parent = $existingEvents[$deleteMe]->getParent();
                 if ($parent) {
-                    $parent->removeChild($events[$id]);
+                    $parent->removeChild($existingEvents[$deleteMe]);
+                    $existingEvents[$deleteMe]->removeParent();
                 }
 
                 $entity->removeEvent($existingEvents[$deleteMe]);
