@@ -172,6 +172,54 @@ class Asset extends FormEntity
      **/
     private $category;
 
+    /**
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $extension;
+
+    /**
+     * @return mixed
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param mixed $extension
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
+
+    /**
+     * @param mixed $mime
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
+    }
+
+    /**
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $mime;
+
     public function __clone()
     {
         $this->id = null;
