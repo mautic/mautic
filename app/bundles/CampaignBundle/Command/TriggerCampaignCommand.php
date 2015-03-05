@@ -25,7 +25,12 @@ class TriggerCampaignCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaign:trigger')
+            ->setName('mautic:campaigns:trigger')
+            ->setAliases(array(
+                'mautic:campaign:trigger',
+                'mautic:trigger:campaigns',
+                'mautic:trigger:campaign'
+            ))
             ->setDescription('Trigger timed events for published campaigns.')
             ->addOption('--campaign-id', null, InputOption::VALUE_OPTIONAL, 'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.', null)
             ->addOption('--scheduled-only', null, InputOption::VALUE_NONE, 'Trigger only scheduled events')
