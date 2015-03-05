@@ -27,7 +27,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class LeadModel extends FormModel
 {
-    private $currentLead = null;
+    private $currentLead       = null;
+    private $systemCurrentLead = null;
 
     /**
      * {@inheritdoc}
@@ -424,6 +425,11 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
+        if ($this->systemCurrentLead) {
+            // Just return the system set lead
+            return $this->systemCurrentLead;
+        }
+
         $request = $this->factory->getRequest();
         $cookies = $request->cookies;
 
@@ -493,9 +499,17 @@ class LeadModel extends FormModel
      * Sets current lead
      *
      * @param Lead $lead
+     * @param bool $systemForced Set by the system when executing actions that manipulate multiple leads
      */
     public function setCurrentLead(Lead $lead)
     {
+        if ($this->systemCurrentLead) {
+            // Overwrite system current lead
+            $this->systemCurrentLead = $lead;
+
+            return;
+        }
+
         $oldLead = (is_null($this->currentLead)) ? $this->getCurrentLead() : $this->currentLead;
 
         $fields = $lead->getFields();
@@ -517,6 +531,16 @@ class LeadModel extends FormModel
                 $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
             }
         }
+    }
+
+    /**
+     * Used by system processes that hook into events that use getCurrentLead()
+     *
+     * @param Lead $lead
+     */
+    function setSystemCurrentLead(Lead $lead = null)
+    {
+        $this->systemCurrentLead = $lead;
     }
 
     /**
