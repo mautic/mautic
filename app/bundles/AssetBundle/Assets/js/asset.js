@@ -4,15 +4,21 @@ Mautic.assetOnLoad = function (container) {
 	    Mautic.renderDownloadChart();
 	}
 
+    // todo fix this
     mQuery("#asset_file").change(function() {
         Mautic.previewBeforeUpload(this);
     });
-    Mautic.initializeDropzone();
+
+    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length)
+    {
+        Mautic.initializeDropzone();
+    }
 };
 
 Mautic.assetOnUnload = function(id) {
 	if (id === '#app-content') {
 		delete Mautic.renderDownloadChartObject;
+        delete Mautic.assetDropzone;
 	}
 };
 
@@ -135,9 +141,9 @@ Mautic.changeAssetStorageLocation = function() {
 
 Mautic.initializeDropzone = function() {
     var options = {
-        url: uploadEndpoint,
+        url: mauticAssetUploadEndpoint,
         uploadMultiple: false,
-        dictDefaultMessage: 'test',
+        // dictDefaultMessage: 'test',
         init: function() {
             this.on("addedfile", function() {
                 if (this.files[1] != null) {
@@ -146,5 +152,46 @@ Mautic.initializeDropzone = function() {
             });
         }
     };
-    var dropzone = new Dropzone("div#dropzone", options);
+
+    Mautic.assetDropzone = new Dropzone("div#dropzone", options);
+
+    Mautic.assetDropzone.on("sending", function(file, request, formData) {
+        formData.append('tempId', mQuery('#asset_tempId').val());
+    });
+
+    Mautic.assetDropzone.on("success", function(file, response, progress) {
+        if (response.tmpFileName) {
+            mQuery('#asset_tempName').val(response.tmpFileName);
+        }
+
+        var messageArea = mQuery('.mdropzone-error');
+        if (response.error) {
+            messageArea.text(response.error);
+            messageArea.closest('.form-group').addClass('has-error').removeClass('is-success');
+
+            // invoke the error
+            var node, _i, _len, _ref, _results;
+            var message = response.msg // modify it to your error message
+            file.previewElement.classList.add("dz-error");
+            _ref = file.previewElement.querySelectorAll("[data-dz-errormessage]");
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              node = _ref[_i];
+              _results.push(node.textContent = message);
+            }
+            return _results;
+        } else {
+            messageArea.text('');
+            messageArea.closest('.form-group').removeClass('has-error').addClass('is-success');
+        }
+
+        var titleInput = mQuery('#asset_title');
+        if (file.name && !titleInput.val()) {
+            titleInput.val(file.name);
+        }
+
+        if (file.name) {
+            mQuery('#asset_originalFileName').val(file.name);
+        }
+    });
 }

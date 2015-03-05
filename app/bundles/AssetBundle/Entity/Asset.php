@@ -15,6 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -106,6 +107,12 @@ class Asset extends FormEntity
      * before the actual ID is known.
      */
     private $tempId;
+
+    /**
+     * Temporary file name used for file upload and validations
+     * before the actual ID is known.
+     */
+    private $tempName;
 
     /**
      * @ORM\Column(name="alias", type="string")
@@ -206,9 +213,9 @@ class Asset extends FormEntity
     /**
      * Sets file.
      *
-     * @param UploadedFile $file
+     * @param File $file
      */
-    public function setFile(UploadedFile $file = null)
+    public function setFile(File $file = null)
     {
         $this->file = $file;
 
@@ -227,6 +234,15 @@ class Asset extends FormEntity
      */
     public function getFile()
     {
+        // if file is not set, try to find it at temp folder
+        if ($this->getStorageLocation() == 'local' && !$this->file) {
+            $tempFile = $this->loadFile(true);
+            
+            if ($tempFile) {
+                $this->setFile($tempFile);
+            }
+        }
+
         return $this->file;
     }
 
@@ -609,7 +625,6 @@ class Asset extends FormEntity
     public function preUpload()
     {
         if (null !== $this->getFile()) {
-            $this->setOriginalFileName($this->file->getClientOriginalName());
 
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
@@ -679,13 +694,28 @@ class Asset extends FormEntity
             $this->temp = null;
         }
 
+        // Remove temporary folder and files
+        $fs = new Filesystem();
+        $fs->remove($this->getAbsoluteTempDir());
+
         // clean up the file property as you won't need it anymore
         $this->file = null;
     }
 
-    public function removeUpload()
+    /**
+     * Remove a file
+     * 
+     * @param   boolean     $temp >> regular uploaded file or temporary
+     * @return  void
+     */
+    public function removeUpload($temp = false)
     {
-        $file = $this->getAbsolutePath();
+        if ($temp) {
+            $file = $this->getAbsoluteTempPath();
+        } else {
+            $file = $this->getAbsolutePath();
+        }
+        
         if ($file && file_exists($file)) {
             unlink($file);
         }
@@ -701,6 +731,30 @@ class Asset extends FormEntity
         return null === $this->path
             ? null
             : $this->getUploadDir() . '/' . $this->path;
+    }
+
+    /**
+     * Returns absolute path to temporary file.
+     *
+     * @return string
+     */
+    public function getAbsoluteTempPath()
+    {
+        return null === $this->tempId || null === $this->tempName
+            ? null
+            : $this->getAbsoluteTempDir() . '/' . $this->tempName;
+    }
+
+    /**
+     * Returns absolute path to temporary file.
+     *
+     * @return string
+     */
+    public function getAbsoluteTempDir()
+    {
+        return null === $this->tempId
+            ? null
+            : $this->getUploadDir() . '/tmp/' . $this->tempId;
     }
 
     /**
@@ -998,14 +1052,20 @@ class Asset extends FormEntity
      *
      * @return null|\Symfony\Component\HttpFoundation\File\File
      */
-    public function loadFile()
+    public function loadFile($temp = false)
     {
-        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath())) {
+        if ($temp) {
+            $path = $this->getAbsoluteTempPath();
+        } else {
+            $path = $this->getAbsolutePath();
+        }
+
+        if (!$path || !file_exists($path)) {
             return null;
         }
 
         try {
-            $file = new File($this->getAbsolutePath());
+            $file = new File($path);
         } catch (FileNotFoundException $e) {
             $file = null;
         }
@@ -1059,22 +1119,19 @@ class Asset extends FormEntity
     public static function validateFile($object, ExecutionContextInterface $context)
     {
         if ($object->getStorageLocation() == 'local') {
-            $file = $object->getFile();
+            $tempName = $object->getTempName();
 
             // If the object is stored locally, we should have file data
-            if ($object->isNew() && $file === null) {
+            if ($object->isNew() && $tempName === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
-                    ->atPath('file')
+                    ->atPath('tempName')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
 
-            if ($file !== null && $file->getSize() > $object->getMaxSize()) {
-                $context->buildViolation('mautic.asset.asset.error.file.size', array(
-                        '%fileSize%' => round($object->getFile()->getSize() / 1000000, 2),
-                        '%maxSize%' => round($object->getMaxSize()) / 1000000, 2)
-                    )
-                    ->atPath('file')
+            if ($object->getTitle() === null) {
+                $context->buildViolation('mautic.asset.asset.error.missing.title')
+                    ->atPath('title')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
@@ -1117,5 +1174,29 @@ class Asset extends FormEntity
     public function getTempId()
     {
         return $this->tempId;
+    }
+
+    /**
+     * Set temporary file name
+     *
+     * @param string $tempName
+     *
+     * @return Asset
+     */
+    public function setTempName($tempName)
+    {
+        $this->tempName = $tempName;
+
+        return $this;
+    }
+
+    /**
+     * Get temporary file name
+     *
+     * @return string
+     */
+    public function getTempName()
+    {
+        return $this->tempName;
     }
 }

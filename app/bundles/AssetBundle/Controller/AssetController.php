@@ -386,6 +386,14 @@ class AssetController extends FormController
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
 
+        // Create temporary asset ID
+        $tempId = uniqid('tmp_');
+        $entity->setTempId($tempId);
+
+        // Get upload folder
+        $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
+        $uploadEndpoint = $uploaderHelper->endpoint('asset');
+
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
@@ -491,7 +499,8 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local'
+                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'uploadEndpoint'   => $uploadEndpoint
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

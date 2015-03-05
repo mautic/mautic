@@ -12,6 +12,7 @@ namespace Mautic\AssetBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 
 /**
  * Class ConfigType
@@ -53,6 +54,19 @@ class ConfigType extends AbstractType
                 ))
             )
         ));
+
+        $arrayStringTransformer = new ArrayStringTransformer();
+        $builder->add(
+            $builder->create('allowed_extensions', 'text', array(
+                'label'      => 'mautic.asset.config.form.allowed.extensions',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.asset.config.form.allowed.extensions.tooltip'
+                ),
+                'required'   => false
+            ))->addViewTransformer($arrayStringTransformer)
+        );
     }
 
     /**

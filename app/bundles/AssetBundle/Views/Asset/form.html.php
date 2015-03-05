@@ -14,7 +14,7 @@ $header = ($activeAsset->getId()) ?
 $view['slots']->set("headerTitle", $header);
 $view['slots']->set('mauticContent', 'asset');
 ?>
-<script><?php echo 'var uploadEndpoint = "' . $uploadEndpoint . '";'; ?></script>
+<script><?php echo 'mauticAssetUploadEndpoint = "' . $uploadEndpoint . '";'; ?></script>
 <?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">
@@ -36,12 +36,15 @@ $view['slots']->set('mauticContent', 'asset');
 			        <div id="storage-local"<?php if (!$startOnLocal) echo ' class="hide"'; ?>>
 				        <div class="row">
 					        <div class="form-group col-xs-12 ">
-						        <?php echo $view['form']->label($form['file']); ?>
-					        	<noscript>
-							        <?php echo $view['form']->row($form['file']); ?>
-						        </noscript>
-						        <?php echo $view['form']->errors($form['file']); ?>
-						        <div class="mdropzone text-center" id="dropzone"></div>
+						        <?php echo $view['form']->label($form['tempName']); ?>
+						        <?php echo $view['form']->widget($form['tempName']); ?>
+						        <?php echo $view['form']->errors($form['tempName']); ?>
+						        <div class="help-block mdropzone-error"></div>
+						        <div class="mdropzone text-center" id="dropzone">
+						        	<div class="dz-message">
+						        		<?php echo $view['translator']->trans('mautic.asset.drop.file.here'); ?>
+									</div>
+						        </div>
 					        </div>
 				        </div>
 			        </div>
@@ -51,7 +54,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	</div>
 		    	<div class="col-md-6">
 		    		<div class="row">
-				    	<div class="form-group col-xs-12">
+				    	<div class="form-group col-xs-12 preview">
 				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl)); ?>
 			    		</div>
 		    		</div>

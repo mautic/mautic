@@ -136,11 +136,18 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias' => 'assetconfig'
             )
+        ),
+        'others' => array(
+            'mautic.asset.upload.error.handler' => array(
+                'class' => 'Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler',
+                'arguments' => 'mautic.factory'
+            )
         )
     ),
 
     'parameters' => array(
-        'upload_dir'  => '%kernel.root_dir%/../media/files',
-        'max_size'    => '6'
+        'upload_dir'            => '%kernel.root_dir%/../media/files',
+        'max_size'              => '6',
+        'allowed_extensions'    => array('csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav')
     )
 );

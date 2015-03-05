@@ -200,10 +200,16 @@ $container->loadFromExtension('knp_menu', array(
 $uploadDir = $container->getParameter('mautic.upload_dir');
 $maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', array(
+    // 'orphanage' => array(
+    //     'maxage' => 86400,
+    //     'directory' => $uploadDir . '/orphanage'
+    // ),
     'mappings' => array(
         'asset' => array(
+            'error_handler' => 'mautic.asset.upload.error.handler',
             'frontend' => 'dropzone',
-            // 'max_size' => $maxSize, // TODO fix this
+            // 'max_size' => ($maxSize * 1000000),
+            // 'use_orphanage' => true,
             'storage'  => array(
                 'directory' => $uploadDir
             )
