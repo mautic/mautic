@@ -123,7 +123,7 @@ class CampaignSubscriber extends CommonSubscriber
 
             if (!$this->security->isAnonymous()) {
                 // Force actions
-                defined('MAUTIC_SKIP_CAMPAIGN_ANONYMOUS_CHECK') or define('MAUTIC_SKIP_CAMPAIGN_ANONYMOUS_CHECK', 1);
+                defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
             }
 
             /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
