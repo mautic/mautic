@@ -152,15 +152,29 @@ class LeadEventLogRepository extends EntityRepository
             $q->setParameter('event', $eventId);
         }
 
-        if (!empty($leadIds)) {
-            if (!is_array($leadIds)) {
-                $leadIds = array($leadIds);
+        if (empty($leadIds)) {
+            $sq = $this->_em->getConnection()->createQueryBuilder()
+                ->select('lead_id')
+                ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
+                ->where('campaign_id = ' . (int) $campaignId);
+            $leads = $sq->execute()->fetchAll();
+
+            $limitByLeads = array();
+            foreach ($leads as $l) {
+                $limitByLeads[] = $l['lead_id'];
             }
-            $expr->add(
-                $q->expr()->in('l.id', ':leads')
-            );
-            $q->setParameter('leads', $leadIds);
+        } else {
+            if (!is_array($leadIds)) {
+                $limitByLeads = array($leadIds);
+            } else {
+                $limitByLeads = $leadIds;
+            }
         }
+
+        $expr->add(
+            $q->expr()->in('l.id', ':leads')
+        );
+        $q->setParameter('leads', $limitByLeads);
 
         $q->where($expr)
             ->setParameter('campaign', $campaignId);
