@@ -173,7 +173,7 @@ class Asset extends FormEntity
     private $category;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"assetDetails"})
@@ -181,39 +181,7 @@ class Asset extends FormEntity
     private $extension;
 
     /**
-     * @return mixed
-     */
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    /**
-     * @param mixed $extension
-     */
-    public function setExtension($extension)
-    {
-        $this->extension = $extension;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMime()
-    {
-        return $this->mime;
-    }
-
-    /**
-     * @param mixed $mime
-     */
-    public function setMime($mime)
-    {
-        $this->mime = $mime;
-    }
-
-    /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"assetDetails"})
@@ -285,6 +253,38 @@ class Asset extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param mixed $extension
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
+
+    /**
+     * @param mixed $mime
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
     }
 
     /**
@@ -640,6 +640,19 @@ class Asset extends FormEntity
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
+
+            // check for the remote and set type data
+            if ($this->getStorageLocation() == 'remote') {
+                // get some basic information about the file type
+                $fileInfo   = $this->getFileInfo();
+
+                $extension  = $fileInfo['extension'];
+                $mime       = $fileInfo['mime'];
+
+                // set the mime and extension column values
+                $this->setExtension($extension);
+                $this->setMime($mime);
+            }
             return;
         }
 
@@ -647,6 +660,16 @@ class Asset extends FormEntity
         // target filename to move to
         $this->getFile()->move($this->getUploadDir(), $this->path);
         $filePath = $this->getUploadDir() . '/' . $this->temp;
+
+        // get some basic information about the file type
+        $fileInfo   = $this->getFileInfo();
+
+        $extension  = $fileInfo['extension'];
+        $mime       = $fileInfo['mime'];
+
+        // set the mime and extension column values
+        $this->setExtension($extension);
+        $this->setMime($mime);
 
         // check if we have an old asset
         if (isset($this->temp) && file_exists($filePath)) {
@@ -756,6 +779,41 @@ class Asset extends FormEntity
     }
 
     /**
+     * Returns some file info
+     *
+     * @return array
+     */
+    public function getFileInfo()
+    {
+        $fileInfo = array();
+
+        if ($this->getStorageLocation() == 'remote') {
+            $ch = curl_init($this->getRemotePath());
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_exec($ch);
+
+            // build an array of handy info
+            $fileInfo['mime']       = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $fileInfo['extension']  = $this->getFileType();
+
+            return $fileInfo;
+        }
+
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        // return an array of file type info
+        $fileInfo['mime']       = $this->loadFile()->getMimeType();
+        $fileInfo['extension']  = $this->getFileType();
+
+        return $fileInfo;
+    }
+
+    /**
      * Returns file mime type
      *
      * @return string
@@ -776,7 +834,9 @@ class Asset extends FormEntity
             return '';
         }
 
-        return $this->loadFile()->getMimeType();
+        $type = $this->loadFile()->getMimeType();
+
+        return $type;
     }
 
     /**
