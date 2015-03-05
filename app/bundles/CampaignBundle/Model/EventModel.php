@@ -275,7 +275,7 @@ class EventModel extends CommonFormModel
                         $timing = $this->checkEventTiming($child, $parentTriggeredDate);
                         if ($timing instanceof \DateTime) {
                             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' timing is not appropriate and thus scheduled for ' . $timing . '');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' timing is not appropriate and thus scheduled for ' . $timing->format('Y-m-d H:m:i T') . '');
 
                             $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
                             $log->setIsScheduled(true);
@@ -296,6 +296,7 @@ class EventModel extends CommonFormModel
                             $persist[] = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
 
                             $childrenTriggered = true;
+
                         } else {
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' execution failed.');
                         }
