@@ -89,9 +89,10 @@ class PointType extends AbstractType
         if ($type) {
             $formType   =  (!empty($options['pointActions']['actions'][$type]['formType'])) ?
                 $options['pointActions']['actions'][$type]['formType'] : 'genericpoint_settings';
-
+            $properties = ($options['data']) ? $options['data']->getProperties() : array();
             $builder->add('properties', $formType, array(
-                'label' => false
+                'label' => false,
+                'data'  => $properties
             ));
         }
 
