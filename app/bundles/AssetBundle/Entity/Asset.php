@@ -235,9 +235,9 @@ class Asset extends FormEntity
     public function getFile()
     {
         // if file is not set, try to find it at temp folder
-        if ($this->getStorageLocation() == 'local' && !$this->file) {
+        if ($this->getStorageLocation() == 'local' && empty($this->file)) {
             $tempFile = $this->loadFile(true);
-            
+
             if ($tempFile) {
                 $this->setFile($tempFile);
             }
@@ -704,7 +704,7 @@ class Asset extends FormEntity
 
     /**
      * Remove a file
-     * 
+     *
      * @param   boolean     $temp >> regular uploaded file or temporary
      * @return  void
      */
@@ -715,7 +715,7 @@ class Asset extends FormEntity
         } else {
             $file = $this->getAbsolutePath();
         }
-        
+
         if ($file && file_exists($file)) {
             unlink($file);
         }

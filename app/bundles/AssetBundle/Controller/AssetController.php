@@ -267,7 +267,7 @@ class AssetController extends FormController
         }
 
         // Create temporary asset ID
-        $tempId = uniqid('tmp_');
+        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
         $entity->setTempId($tempId);
 
         // Set the page we came from
@@ -381,14 +381,10 @@ class AssetController extends FormController
         $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
-        $request = $this->request;
+        $method  = $this->request->getMethod();
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
-
-        // Create temporary asset ID
-        $tempId = uniqid('tmp_');
-        $entity->setTempId($tempId);
 
         // Get upload folder
         $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
@@ -427,12 +423,16 @@ class AssetController extends FormController
             return $this->isLocked($postActionVars, $entity, 'asset.asset');
         }
 
+        // Create temporary asset ID
+        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $entity->setTempId($tempId);
+
         //Create the form
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

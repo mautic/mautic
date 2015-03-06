@@ -305,4 +305,51 @@ class AssetModel extends FormModel
 
         return $this->buildUrl('mautic_asset_download', $slugs, $absolute, $clickthrough);
     }
+
+    /**
+     * Determine the max upload size based on PHP restrictions and config
+     */
+    public function getMaxUploadSize()
+    {
+        $maxAssetSize  = $this->convertSizeToBytes($this->factory->getParameter('max_size') . 'M');
+        $maxPostSize   = $this->convertSizeToBytes(ini_get('post_max_size'));
+        $maxUploadSize = $this->convertSizeToBytes(ini_get('upload_max_filesize'));
+        $memoryLimit   = $this->convertSizeToBytes(ini_get('memory_limit'));
+
+        $maxAllowed    =  min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
+
+        return round($maxAllowed / 1048576, 2);
+    }
+
+    /**
+     * Borrowed from Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize
+     *
+     * @param $size
+     *
+     * @return int|string
+     */
+    public function convertSizeToBytes($size)
+    {
+        if ('' === $size) {
+            return PHP_INT_MAX;
+        }
+
+        $max = ltrim($size, '+');
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = intval($max);
+        }
+
+        switch (strtolower(substr($size, -1))) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
+    }
 }

@@ -8,7 +8,6 @@
   max-height: 260px;
 }
 
-// mdropzone
 @-webkit-keyframes passing-through { 0% { opacity: 0; -webkit-transform: translateY(40px); -moz-transform: translateY(40px); -ms-transform: translateY(40px); -o-transform: translateY(40px); transform: translateY(40px); }
   30%, 70% { opacity: 1; -webkit-transform: translateY(0px); -moz-transform: translateY(0px); -ms-transform: translateY(0px); -o-transform: translateY(0px); transform: translateY(0px); }
   100% { opacity: 0; -webkit-transform: translateY(-40px); -moz-transform: translateY(-40px); -ms-transform: translateY(-40px); -o-transform: translateY(-40px); transform: translateY(-40px); } }
@@ -35,7 +34,7 @@
   20% { -webkit-transform: scale(1); -moz-transform: scale(1); -ms-transform: scale(1); -o-transform: scale(1); transform: scale(1); } }
 .mdropzone, .mdropzone * { box-sizing: border-box; }
 
-.mdropzone { min-height: 150px; border: 2px solid rgba(0, 0, 0, 0.3); background: white; padding: 54px 54px; }
+.mdropzone { min-height: 150px; border: 2px solid rgba(0, 0, 0, 0.3); background: white; padding: 30px 30px; }
 .has-error .mdropzone {border: 2px solid #a94442;}
 .is-success .mdropzone {border: 2px solid #00a08a;}
 .mdropzone.dz-clickable { cursor: pointer; }
@@ -77,7 +76,7 @@
 .mdropzone .dz-preview.dz-error .dz-error-message { display: block; }
 .mdropzone .dz-preview.dz-error:hover .dz-error-message { opacity: 1; pointer-events: auto; }
 .mdropzone .dz-preview .dz-error-message { pointer-events: none; z-index: 1000; position: absolute; display: block; display: none; opacity: 0; -webkit-transition: opacity 0.3s ease; -moz-transition: opacity 0.3s ease; -ms-transition: opacity 0.3s ease; -o-transition: opacity 0.3s ease; transition: opacity 0.3s ease; border-radius: 8px; font-size: 13px; top: 130px; left: -10px; width: 140px; background: #be2626; background: linear-gradient(to bottom, #be2626, #a92222); padding: 0.5em 1.2em; color: white; }
-.mdropzone .dz-preview .dz-error-message:after { content: ''; position: absolute; top: -6px; left: 64px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #be2626; }
+.mdropzone .dz-preview .dz-error-message:after { content: ''; position: absolute; top: -6px; left: 64px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #a94442; }
 
 /*
  * The MIT License
@@ -87,13 +86,13 @@
   box-sizing: border-box; }
 
 .mdropzone {
-  position: relative; 
+  position: relative;
 }
 .mdropzone .dz-preview {
   position: relative;
   display: inline-block;
   width: 120px;
-  margin: 0.5em; 
+  margin: 0.5em;
 }
 .mdropzone .dz-preview .dz-progress {
   display: block;
@@ -107,7 +106,7 @@
   background: green;
 }
 .mdropzone .dz-preview .dz-error-message {
-  color: red;
+  color: #fff;
   display: none;
 }
 .mdropzone .dz-preview.dz-error .dz-error-message, .mdropzone .dz-preview.dz-error .dz-error-mark {
