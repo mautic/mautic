@@ -404,6 +404,9 @@ class CampaignController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
                     }
+                } else {
+                    $connections = $session->get('mautic.campaign.' . $sessionId . '.events.canvassettings');
+                    $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
                 }
             } else {
                 $viewParameters = array('page' => $page);
@@ -469,7 +472,7 @@ class CampaignController extends FormController
 
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
-        $cleanSlate = true;
+
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
@@ -536,23 +539,24 @@ class CampaignController extends FormController
                             //update canvas settings with new event IDs then save
                             $model->setCanvasSettings($entity, $connections);
 
-                            //trigger the first action in dripflow if published and first event is an action
-                            if ($entity->isPublished()) {
-                                //check for top level action events
-                                foreach ($processedEvents as $id => $e) {
-                                    $parent = $e->getParent();
-                                    if ($e->getEventType() == 'action' && $parent === null) {
-                                        //check the callback function for the event to make sure it even applies based on its settings
-                                        $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
-                                    }
-                                }
-                            }
-
                             if (!empty($deletedEvents)) {
                                 $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
                             }
                         } else {
                             $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                            $processedEvents = $entity->getEvents();
+                        }
+
+                        //trigger the first action in dripflow if published and first event is an action
+                        if ($entity->isPublished()) {
+                            //check for top level action events
+                            foreach ($processedEvents as $id => $e) {
+                                $parent = $e->getParent();
+                                if ($e->getEventType() == 'action' && $parent === null) {
+                                    //check the callback function for the event to make sure it even applies based on its settings
+                                    $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
+                                }
+                            }
                         }
 
                         $this->addFlash('mautic.core.notice.updated', array(
@@ -563,6 +567,12 @@ class CampaignController extends FormController
                                 'objectId'     => $entity->getId()
                             ))
                         ));
+                    }
+                } else {
+                    $connections    = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
+                    $campaignEvents = $modifiedEvents;
+                    if ($connections != null) {
+                        $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
                     }
                 }
             } else {
@@ -586,9 +596,9 @@ class CampaignController extends FormController
                         'contentTemplate' => 'MauticCampaignBundle:Campaign:view'
                     ))
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
-                //rebuild everything to include new ids
-                $cleanSlate = true;
+            } else {
+                //rebuild everything to include new ids if valid
+                $cleanSlate = $valid;
             }
         } else {
             $cleanSlate = true;
@@ -761,6 +771,71 @@ class CampaignController extends FormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.campaign.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_campaign_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_campaign_index',
+                'mauticContent' => 'campaign'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('campaign');
+            $ids       = json_decode($this->request->query->get('ids', ''));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.campaign.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->isGranted('campaign:campaigns:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'campaign', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.campaign.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(

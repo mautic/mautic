@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
@@ -27,7 +28,8 @@ class ConfigSubscriber extends CommonSubscriber
     static public function getSubscribedEvents ()
     {
         return array(
-            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0)
+            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0),
+            ConfigEvents::CONFIG_PRE_SAVE    => array('onConfigSave', 0)
         );
     }
 
@@ -39,5 +41,15 @@ class ConfigSubscriber extends CommonSubscriber
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticPageBundle')
         ));
+    }
+
+    public function onConfigSave(ConfigEvent $event)
+    {
+        $values = $event->getConfig();
+
+        if (!empty($values['pageconfig']['google_analytics'])) {
+            $values['pageconfig']['google_analytics'] = htmlspecialchars($values['pageconfig']['google_analytics']);
+            $event->setConfig($values);
+        }
     }
 }

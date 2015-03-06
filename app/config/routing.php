@@ -12,4 +12,5 @@ use Symfony\Component\Routing\RouteCollection;
 //loads all of the Mautic bundles' routing.php files
 $collection = new RouteCollection();
 $collection->addCollection($loader->import('.', 'mautic'));
+
 return $collection;

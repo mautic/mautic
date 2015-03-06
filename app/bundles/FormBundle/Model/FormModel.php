@@ -123,8 +123,7 @@ class FormModel extends CommonFormModel
      */
     public function setFields(Form &$entity, $sessionFields)
     {
-        $order   = 1;
-        $aliases = array();
+        $order          = 1;
         $existingFields = $entity->getFields();
 
         foreach ($sessionFields as $key => $properties) {
@@ -144,26 +143,7 @@ class FormModel extends CommonFormModel
                 if (in_array($f, array('id', 'order')))
                     continue;
 
-                if ($f == 'alias') {
-                    $alias = strtolower(InputHelper::alphanum($properties['label']));
-
-                    //make sure alias is not already taken
-                    $testAlias = $alias;
-
-                    $count     = (int) in_array($alias, $aliases);
-                    $aliasTag  = $count;
-
-                    while ($count) {
-                        $testAlias = $alias . $aliasTag;
-                        $count     = (int) in_array($testAlias, $aliases);
-                        $aliasTag++;
-                    }
-
-                    $v = $testAlias;
-                    $aliases[] = $v;
-                }
-
-                $func = "set" .  ucfirst($f);
+                $func = "set" . ucfirst($f);
                 if (method_exists($field, $func)) {
                     $field->$func($v);
                 }

@@ -546,25 +546,25 @@ class LeadListRepository extends CommonRepository
                     'func'  => 'neq',
                     'oFunc' => 'eq'
                 ),
-            '&#62;'   =>
+            'gt'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthan',
                     'func'  => 'gt',
                     'oFunc' => 'lt'
                 ),
-            '&#62;='   =>
+            'gte'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthanequals',
                     'func'  => 'gte',
                     'oFunc' => 'lt'
                 ),
-            '&#60;'    =>
+            'lt'    =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthan',
                     'func'  => 'lt',
                     'oFunc' => 'gt'
                 ),
-            '&#60;='   =>
+            'lte'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthanequals',
                     'func'  => 'lte',

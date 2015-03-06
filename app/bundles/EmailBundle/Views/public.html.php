@@ -13,6 +13,10 @@ $view->extend(":$template:email.html.php");
 //add no index header for when viewing via web
 if (!empty($inBrowser)) {
     $view['assets']->addCustomDeclaration('<meta name="robots" content="noindex">');
+
+    if (!empty($googleAnalytics)) {
+        $view['assets']->addCustomDeclaration(htmlspecialchars_decode($googleAnalytics));
+    }
 }
 
 //Set the slots

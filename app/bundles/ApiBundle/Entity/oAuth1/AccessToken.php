@@ -10,7 +10,7 @@
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
 use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
-use Bazinga\OAuthServerBundle\Model\TokenInterface;
+use Bazinga\OAuthServerBundle\Model\AccessTokenInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity
  * @ORM\Table(name="oauth1_access_tokens")
  */
-class AccessToken implements TokenInterface
+class AccessToken implements AccessTokenInterface
 {
 
     /**

@@ -28,7 +28,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class LeadModel extends FormModel
 {
-    private $currentLead     = null;
+    private $currentLead       = null;
+    private $systemCurrentLead = null;
 
     /**
      * {@inheritdoc}
@@ -425,6 +426,11 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
+        if ($this->systemCurrentLead) {
+            // Just return the system set lead
+            return $this->systemCurrentLead;
+        }
+
         $request = $this->factory->getRequest();
         $cookies = $request->cookies;
 
@@ -433,6 +439,7 @@ class LeadModel extends FormModel
         if (empty($this->currentLead)) {
             $leadId = $cookies->get($trackingId);
             $ip     = $this->factory->getIpAddress();
+
             if (empty($leadId)) {
                 //this lead is not tracked yet so get leads by IP and track that lead or create a new one
                 $leads = $this->getLeadsByIp($ip->getIpAddress());
@@ -446,7 +453,11 @@ class LeadModel extends FormModel
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $lead->setNewlyCreated(true);
-                    $this->saveEntity($lead);
+
+                    // Set to prevent loops
+                    $this->currentLead = $lead;
+
+                    $this->saveEntity($lead, false);
                     $leadId = $lead->getId();
                 }
 
@@ -454,12 +465,17 @@ class LeadModel extends FormModel
                 $lead->setFields($fields);
             } else {
                 $lead = $this->getEntity($leadId);
+
                 if ($lead === null) {
                     //let's create a lead
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $lead->setNewlyCreated(true);
-                    $this->saveEntity($lead);
+
+                    // Set to prevent loops
+                    $this->currentLead = $lead;
+
+                    $this->saveEntity($lead, false);
                     $leadId = $lead->getId();
 
                     $fields = $this->getLeadDetails($lead);
@@ -487,6 +503,13 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
+        if ($this->systemCurrentLead) {
+            // Overwrite system current lead
+            $this->systemCurrentLead = $lead;
+
+            return;
+        }
+
         $oldLead = (is_null($this->currentLead)) ? $this->getCurrentLead() : $this->currentLead;
 
         $fields = $lead->getFields();
@@ -508,6 +531,16 @@ class LeadModel extends FormModel
                 $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
             }
         }
+    }
+
+    /**
+     * Used by system processes that hook into events that use getCurrentLead()
+     *
+     * @param Lead $lead
+     */
+    function setSystemCurrentLead(Lead $lead = null)
+    {
+        $this->systemCurrentLead = $lead;
     }
 
     /**

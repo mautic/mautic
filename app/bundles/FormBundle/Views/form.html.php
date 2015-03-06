@@ -8,4 +8,9 @@
  */
 
 //extend the template chosen
+
+if (!empty($googleAnalytics)) {
+    $view['assets']->addCustomDeclaration(htmlspecialchars_decode($googleAnalytics));
+}
+
 $view->extend(":$template:form.html.php");

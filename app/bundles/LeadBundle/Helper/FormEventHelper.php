@@ -42,6 +42,7 @@ class FormEventHelper
             array('filter' => array('isPublished' => true))
         );
         $data = array();
+
         $lead = $model->getCurrentLead();
         $currentFields = $lead->getFields();
 
@@ -87,6 +88,7 @@ class FormEventHelper
         //no lead was found by a mapped email field so create a new one
         if ($lead->isNewlyCreated()) {
             $lead->setPoints($properties['points']);
+            $lead->addIpAddress($ipAddress);
 
             //create a new points change event
             $lead->addPointsChangeLogEntry(
@@ -96,6 +98,11 @@ class FormEventHelper
                 $properties['points'],
                 $ipAddress
             );
+        } else {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
         }
 
         //set the mapped fields

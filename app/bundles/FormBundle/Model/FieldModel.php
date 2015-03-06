@@ -9,6 +9,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
 
@@ -59,5 +60,30 @@ class FieldModel extends CommonFormModel
         $fields = $session->get('mautic.form.'.$formId.'.fields.modified', array());
         $remove = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
         return array_diff_key($fields, array_flip($remove));
+    }
+
+    /**
+     * @param $formId
+     * @param $label
+     */
+    public function generateAlias($label, &$aliases)
+    {
+        $alias = strtolower(InputHelper::alphanum($label));
+
+        //make sure alias is not already taken
+        $testAlias = $alias;
+
+        $count     = (int) in_array($alias, $aliases);
+        $aliasTag  = $count;
+
+        while ($count) {
+            $testAlias = $alias . $aliasTag;
+            $count     = (int) in_array($testAlias, $aliases);
+            $aliasTag++;
+        }
+
+        $aliases[] = $testAlias;
+
+        return $testAlias;
     }
 }

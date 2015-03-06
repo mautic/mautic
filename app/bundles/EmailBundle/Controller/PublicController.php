@@ -21,7 +21,7 @@ class PublicController extends CommonFormController
     public function indexAction($idHash)
     {
         //find the email
-        $security   = $this->factory->getSecurity();
+        $security = $this->factory->getSecurity();
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');
@@ -47,17 +47,18 @@ class PublicController extends CommonFormController
             $model->hitEmail($idHash, $this->request, true);
 
             if ($entity->getContentMode() == 'builder') {
-                $template   = $entity->getTemplate();
-                $slots      = $this->factory->getTheme($template)->getSlots('email');
+                $template = $entity->getTemplate();
+                $slots    = $this->factory->getTheme($template)->getSlots('email');
 
                 $response = $this->render('MauticEmailBundle::public.html.php', array(
-                    'inBrowser' => true,
-                    'slots'     => $slots,
-                    'content'   => $entity->getContent(),
-                    'email'     => $entity,
-                    'lead'      => $lead,
-                    'template'  => $template,
-                    'idHash'    => $idHash
+                    'inBrowser'       => true,
+                    'googleAnalytics' => $this->factory->getParameter('google_analytics'),
+                    'slots'           => $slots,
+                    'content'         => $entity->getContent(),
+                    'email'           => $entity,
+                    'lead'            => $lead,
+                    'template'        => $template,
+                    'idHash'          => $idHash
                 ));
 
                 //replace tokens

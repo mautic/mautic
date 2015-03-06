@@ -233,6 +233,9 @@ class SubmissionModel extends CommonFormModel
         // Add a feedback parameter
         $args['feedback'] = array();
 
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         // Now handle post submission actions
         foreach ($actions as $action) {
             $key = $action->getType();
@@ -243,6 +246,10 @@ class SubmissionModel extends CommonFormModel
             $settings       = $availableActions[$key];
             $args['action'] = $action;
             $args['config'] = $action->getProperties();
+
+            // Set the lead each time in case an action updates it
+            $args['lead']   = $leadModel->getCurrentLead();
+
             $callback       = $settings['callback'];
             if (is_callable($callback)) {
                 if (is_array($callback)) {
@@ -267,8 +274,7 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
+        // Get updated lead with tracking ID
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
         $submission->setLead($lead);
 

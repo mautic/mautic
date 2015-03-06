@@ -190,10 +190,10 @@ class PublicController extends CommonFormController
         $template = $form->getTemplate();
         if (!empty($template)) {
             $theme = $this->factory->getTheme($template);
-            if ($theme->getName() != $template) {
+            if ($theme->getTheme() != $template) {
                 $config = $theme->getConfig();
                 if (in_array('form', $config['features'])) {
-                    $template = $theme->getName();
+                    $template = $theme->getTheme();
                 } else {
                     $templateNotFound = true;
                 }
@@ -201,8 +201,9 @@ class PublicController extends CommonFormController
 
             if (empty($templateNotFound)) {
                 $viewParams = array(
-                    'template' => $template,
-                    'content'  => $html,
+                    'template'        => $template,
+                    'content'         => $html,
+                    'googleAnalytics' => $this->factory->getParameter('google_analytics')
                 );
 
                 return $this->render('MauticFormBundle::form.html.php', $viewParams);

@@ -31,13 +31,12 @@ class CampaignEventHelper
         }
 
         //check against selected emails
-        $limitToEmails = $event['properties']['email'];
-        if (!empty($limitToEmails) && !in_array($eventDetails->getId(), $limitToEmails)) {
-            return false;
-        }
+        $limitToEmails = $event['properties']['emails'];
 
         //check to see if the parent event is a "send email" event and that it matches the current email opened
-        if (empty($event['parent']) || $event['parent']['type'] != 'email.send' || $eventDetails->getId() != $event['parent']['type']['properties']['email']) {
+        if (empty($limitToEmails) && !empty($event['parent']) && $event['parent']['type'] == 'email.send') {
+            return ($eventDetails->getId() === (int) $event['parent']['properties']['email']);
+        } elseif (!empty($limitToEmails) && !in_array($eventDetails->getId(), $limitToEmails)) {
             return false;
         }
 

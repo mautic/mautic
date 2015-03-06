@@ -89,6 +89,16 @@ class ThemeHelper
     }
 
     /**
+     * Returns the theme folder name
+     *
+     * @return string
+     */
+    public function getTheme()
+    {
+        return $this->theme;
+    }
+
+    /**
      * Get the theme's config
      *
      * @return mixed

@@ -185,6 +185,8 @@ class ClientController extends FormController
         $form->remove('randomId');
         $form->remove('secret');
         $form->remove('publicId');
+        $form->remove('consumerKey');
+        $form->remove('consumerSecret');
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
