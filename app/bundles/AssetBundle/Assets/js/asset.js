@@ -143,7 +143,6 @@ Mautic.initializeDropzone = function() {
     var options = {
         url: mauticAssetUploadEndpoint,
         uploadMultiple: false,
-        // dictDefaultMessage: 'test',
         init: function() {
             this.on("addedfile", function() {
                 if (this.files[1] != null) {
@@ -152,6 +151,22 @@ Mautic.initializeDropzone = function() {
             });
         }
     };
+
+    if (typeof mauticAssetUploadMaxSize !== 'undefined') {
+        options.maxFilesize = mauticAssetUploadMaxSize;
+    }
+
+    if (typeof mauticAssetUploadMaxSizeError !== 'undefined') {
+        options.dictFileTooBig = mauticAssetUploadMaxSizeError;
+    }
+
+    if (typeof mauticAssetUploadExtensions !== 'undefined') {
+        options.acceptedFiles = mauticAssetUploadExtensions;
+    }
+
+    if (typeof mauticAssetUploadExtensionError !== 'undefined') {
+        options.dictInvalidFileType = mauticAssetUploadExtensionError;
+    }
 
     Mautic.assetDropzone = new Dropzone("div#dropzone", options);
 

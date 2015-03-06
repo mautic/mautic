@@ -14,7 +14,13 @@ $header = ($activeAsset->getId()) ?
 $view['slots']->set("headerTitle", $header);
 $view['slots']->set('mauticContent', 'asset');
 ?>
-<script><?php echo 'mauticAssetUploadEndpoint = "' . $uploadEndpoint . '";'; ?></script>
+<script>
+	<?php echo 'mauticAssetUploadEndpoint = "' . $uploadEndpoint . '";'; ?>
+	<?php echo 'mauticAssetUploadMaxSize = ' . $maxSize . ';'; ?>
+	<?php echo 'mauticAssetUploadMaxSizeError = "' . $maxSizeError . '";'; ?>
+	<?php echo 'mauticAssetUploadExtensions = "' . $extensions . '";'; ?>
+	<?php echo 'mauticAssetUploadExtensionError = "' . $extensionError . '";'; ?>
+</script>
 <?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">

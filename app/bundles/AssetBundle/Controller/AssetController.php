@@ -377,11 +377,22 @@ class AssetController extends FormController
         $model = $this->factory->getModel('asset.asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
-        $entity  = $model->getEntity($objectId);
+        $entity     = $model->getEntity($objectId);
         $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
-        $session = $this->factory->getSession();
-        $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
-        $method  = $this->request->getMethod();
+        $session    = $this->factory->getSession();
+        $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
+        $method     = $this->request->getMethod();
+        $maxSize    = $this->factory->getParameter('max_size');
+        $extensions = '.' . implode(', .', $this->factory->getParameter('allowed_extensions'));
+
+        $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', array(
+            '%fileSize%' => '{{filesize}}',
+            '%maxSize%'  => '{{maxFilesize}}'
+        ), 'validators');
+
+        $extensionError = $this->get('translator')->trans('mautic.asset.asset.error.file.extension.js', array(
+            '%extensions%' => $extensions
+        ), 'validators');
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
@@ -500,7 +511,11 @@ class AssetController extends FormController
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
                 'startOnLocal'     => $entity->getStorageLocation() == 'local',
-                'uploadEndpoint'   => $uploadEndpoint
+                'uploadEndpoint'   => $uploadEndpoint,
+                'maxSize'          => $maxSize,
+                'maxSizeError'     => $maxSizeError,
+                'extensions'   => $extensions,
+                'extensionError'   => $extensionError
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
