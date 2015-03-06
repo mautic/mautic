@@ -33,7 +33,6 @@ class FieldController extends CommonFormController
 
         if ($method == 'POST') {
             $formField          = $this->request->request->get('formfield');
-            $formField['alias'] = 'new';
             $fieldType          = $formField['type'];
             $formId             = $formField['formId'];
         } else {
@@ -41,7 +40,6 @@ class FieldController extends CommonFormController
             $formId    = $this->request->query->get('formId');
             $formField = array(
                 'type'   => $fieldType,
-                'alias'  => 'new',
                 'formId' => $formId
             );
         }
@@ -84,7 +82,16 @@ class FieldController extends CommonFormController
                     $formData        = $form->getData();
                     $formField       = array_merge($formField, $formData);
                     $formField['id'] = $keyId;
+
+                    // Get aliases in order to generate a new one for the new field
+                    $aliases = array();
+                    foreach ($fields as $f) {
+                        $aliases[] = $f['alias'];
+                    }
+                    $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
+
                     $fields[$keyId]  = $formField;
+
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     //take note if this is a submit button or not
@@ -197,7 +204,20 @@ class FieldController extends CommonFormController
                         $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
                         $formData = $form->getData();
                         //overwrite with updated data
-                        $formField = $fields[$objectId] = array_merge($fields[$objectId], $formData);
+                        $formField = array_merge($fields[$objectId], $formData);
+
+                        if (strpos($objectId, 'new') !== false) {
+                            // Get aliases in order to generate update for this one
+                            $aliases = array();
+                            foreach ($fields as $k => $f) {
+                                if ($k != $objectId) {
+                                    $aliases[] = $f['alias'];
+                                }
+                            }
+                            $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                        }
+
+                        $fields[$objectId] = $formField;
                         $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                         //take note if this is a submit button or not

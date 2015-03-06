@@ -32,7 +32,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a lead generation action to available form submit actions
+     * Add a send email actions to available form submit actions
      *
      * @param FormBuilderEvent $event
      */

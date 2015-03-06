@@ -169,6 +169,11 @@ return array(
             'mautic.form.type.campaignevent_formsubmit'  => array(
                 'class' => 'Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType',
                 'alias' => 'campaignevent_formsubmit'
+            ),
+            'mautic.form.type.form_submitaction_sendemail'  => array(
+                'class'     => 'Mautic\FormBundle\Form\Type\SubmitActionEmailType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'form_submitaction_sendemail'
             )
         )
     )
