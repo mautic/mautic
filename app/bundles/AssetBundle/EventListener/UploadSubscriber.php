@@ -101,7 +101,7 @@ class UploadSubscriber extends CommonSubscriber
                 throw new ValidationException($message);
             }
 
-            if (!in_array($file->getExtension(), $extensions)) {
+            if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions))) {
                 $message = $this->translator->trans('mautic.asset.asset.error.file.extension', array(
                     '%fileExtension%' => $file->getExtension(),
                     '%extensions%'    => implode(', ', $extensions)
