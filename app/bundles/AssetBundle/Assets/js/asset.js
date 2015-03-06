@@ -114,6 +114,7 @@ Mautic.initializeDropzone = function() {
     var options = {
         url: mauticAssetUploadEndpoint,
         uploadMultiple: false,
+        filesizeBase: 1024,
         init: function() {
             this.on("addedfile", function() {
                 if (this.files[1] != null) {
