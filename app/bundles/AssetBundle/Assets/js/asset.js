@@ -4,11 +4,6 @@ Mautic.assetOnLoad = function (container) {
 	    Mautic.renderDownloadChart();
 	}
 
-    // todo fix this
-    mQuery("#asset_file").change(function() {
-        Mautic.previewBeforeUpload(this);
-    });
-
     if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length)
     {
         Mautic.initializeDropzone();
@@ -69,30 +64,6 @@ Mautic.updateDownloadChart = function(element, amount, unit) {
     });
 };
 
-Mautic.previewBeforeUpload = function(input) {
-    if (input.files && input.files[0]) {
-        var filename = input.files[0].name.toLowerCase();
-        var extension = filename.substr((filename.lastIndexOf('.') +1));
-        var reader = new FileReader();
-        var element = mQuery('<i />').addClass('fa fa-upload fa-5x');
-
-        if (mQuery.inArray(extension, ['jpg', 'jpeg', 'gif', 'png']) !== -1) {
-            reader.onload = function (e) {
-                element = mQuery('<img />').addClass('img-thumbnail').attr('src', e.target.result);
-                mQuery('.thumbnail-preview').empty().append(element);
-            }
-        } else if (extension === 'pdf') {
-            reader.onload = function (e) {
-                element = mQuery('<iframe />').attr('src', e.target.result);
-                mQuery('.thumbnail-preview').empty().append(element);
-            }
-        }
-
-        mQuery('.thumbnail-preview').empty().append(element);
-        reader.readAsDataURL(input.files[0]);
-    }
-};
-
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
@@ -143,7 +114,7 @@ Mautic.initializeDropzone = function() {
     var options = {
         url: mauticAssetUploadEndpoint,
         uploadMultiple: false,
-        // dictDefaultMessage: 'test',
+        filesizeBase: 1024,
         init: function() {
             this.on("addedfile", function() {
                 if (this.files[1] != null) {
@@ -153,11 +124,30 @@ Mautic.initializeDropzone = function() {
         }
     };
 
-    Mautic.assetDropzone = new Dropzone("div#dropzone", options);
+    if (typeof mauticAssetUploadMaxSize !== 'undefined') {
+        options.maxFilesize = mauticAssetUploadMaxSize;
+    }
 
-    Mautic.assetDropzone.on("sending", function(file, request, formData) {
+    if (typeof mauticAssetUploadMaxSizeError !== 'undefined') {
+        options.dictFileTooBig = mauticAssetUploadMaxSizeError;
+    }
+
+    if (typeof mauticAssetUploadExtensions !== 'undefined') {
+        options.acceptedFiles = mauticAssetUploadExtensions;
+    }
+
+    if (typeof mauticAssetUploadExtensionError !== 'undefined') {
+        options.dictInvalidFileType = mauticAssetUploadExtensionError;
+    }
+
+    Mautic.assetDropzone = new Dropzone("div#dropzone", options);
+    var preview = mQuery('.preview div.text-center');
+
+    Mautic.assetDropzone.on("sending", function (file, request, formData) {
         formData.append('tempId', mQuery('#asset_tempId').val());
-    }).on("success", function(file, response, progress) {
+    }).on("addedfile", function (file) {
+        preview.fadeOut('fast');
+    }).on("success", function (file, response, progress) {
         if (response.tmpFileName) {
             mQuery('#asset_tempName').val(response.tmpFileName);
         }
@@ -197,7 +187,14 @@ Mautic.initializeDropzone = function() {
             mQuery('#asset_originalFileName').val(file.name);
         }
     }).on("error", function (file, response) {
+        preview.fadeIn('fast');
         var messageArea = mQuery('.mdropzone-error');
+
+        // Dropzone error is just a text in the response var
+        if (typeof response == "string") {
+            response = {'error': response};
+        }
+
         if (response.error) {
             if (!response.error) {
                 var errorText = '';
@@ -219,5 +216,20 @@ Mautic.initializeDropzone = function() {
             }
             return _results;
         }
+    }).on("thumbnail", function (file, url) {
+        if (file.accepted === true) {
+            var extension = file.name.substr((file.name.lastIndexOf('.') +1)).toLowerCase();
+            var previewContent = '';
+
+            if (mQuery.inArray(extension, ['jpg', 'jpeg', 'gif', 'png']) !== -1) {
+                previewContent = mQuery('<img />').addClass('img-thumbnail').attr('src', url);
+            } else if (extension === 'pdf') {
+                previewContent = mQuery('<iframe />').attr('src', url);
+            }
+
+            preview.empty().html(previewContent);
+            preview.fadeIn('fast');
+        }
+        
     });
 }
