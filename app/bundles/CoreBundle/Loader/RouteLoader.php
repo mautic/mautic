@@ -56,15 +56,19 @@ class RouteLoader extends Loader
 
         $dispatcher = $this->factory->getDispatcher();
 
-        //Public
+        // Public
         $event = new RouteEvent($this, 'public');
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $collection = $event->getCollection();
 
-        //Secured area - Default
+        // Secured area - Default
         $event = new RouteEvent($this);
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $secureCollection = $event->getCollection();
+
+        // OneupUploader (added behind our secure /s)
+        $secureCollection->addCollection($this->import('.', 'uploader'));
+
         $secureCollection->addPrefix('/s');
         $collection->addCollection($secureCollection);
 
@@ -84,7 +88,7 @@ class RouteLoader extends Loader
             }
         }
 
-        //Catch all
+        // Catch all
         $event = new RouteEvent($this, 'catchall');
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $lastCollection = $event->getCollection();

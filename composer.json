@@ -60,6 +60,7 @@
         "willdurand/oauth-server-bundle": "dev-master",
         "jms/serializer-bundle": "@dev",
         "friendsofsymfony/rest-bundle": "1.3.*",
+        "oneup/uploader-bundle": "~1.3",
 
         "ircmaxell/password-compat": "~1.0",
         "phpoffice/phpexcel": "1.8.0",

@@ -261,13 +261,22 @@ class AssetController extends FormController
         $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
+
         if (!$this->factory->getSecurity()->isGranted('asset:assets:create')) {
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // Create temporary asset ID
+        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $entity->setTempId($tempId);
+
+        // Set the page we came from
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+
+        // Get upload folder
+        $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
+        $uploadEndpoint = $uploaderHelper->endpoint('asset');
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -340,7 +349,8 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local'
+                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'uploadEndpoint'   => $uploadEndpoint
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
@@ -371,10 +381,14 @@ class AssetController extends FormController
         $entity->setMaxSize($this->factory->getParameter('max_size') * 1000000); // convert from MB to B
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.asset.page', 1);
-        $request = $this->request;
+        $method  = $this->request->getMethod();
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
+
+        // Get upload folder
+        $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
+        $uploadEndpoint = $uploaderHelper->endpoint('asset');
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -409,12 +423,16 @@ class AssetController extends FormController
             return $this->isLocked($postActionVars, $entity, 'asset.asset');
         }
 
+        // Create temporary asset ID
+        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $entity->setTempId($tempId);
+
         //Create the form
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -481,7 +499,8 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local'
+                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'uploadEndpoint'   => $uploadEndpoint
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

@@ -15,6 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -102,6 +103,18 @@ class Asset extends FormEntity
     private $temp;
 
     /**
+     * Temporary ID used for file upload and validations
+     * before the actual ID is known.
+     */
+    private $tempId;
+
+    /**
+     * Temporary file name used for file upload and validations
+     * before the actual ID is known.
+     */
+    private $tempName;
+
+    /**
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -166,6 +179,22 @@ class Asset extends FormEntity
      **/
     private $category;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $extension;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $mime;
+
     public function __clone()
     {
         $this->id = null;
@@ -184,9 +213,9 @@ class Asset extends FormEntity
     /**
      * Sets file.
      *
-     * @param UploadedFile $file
+     * @param File $file
      */
-    public function setFile(UploadedFile $file = null)
+    public function setFile(File $file = null)
     {
         $this->file = $file;
 
@@ -205,6 +234,15 @@ class Asset extends FormEntity
      */
     public function getFile()
     {
+        // if file is not set, try to find it at temp folder
+        if ($this->getStorageLocation() == 'local' && empty($this->file)) {
+            $tempFile = $this->loadFile(true);
+
+            if ($tempFile) {
+                $this->setFile($tempFile);
+            }
+        }
+
         return $this->file;
     }
 
@@ -231,6 +269,38 @@ class Asset extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param mixed $extension
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
+
+    /**
+     * @param mixed $mime
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
     }
 
     /**
@@ -555,7 +625,6 @@ class Asset extends FormEntity
     public function preUpload()
     {
         if (null !== $this->getFile()) {
-            $this->setOriginalFileName($this->file->getClientOriginalName());
 
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
@@ -586,6 +655,19 @@ class Asset extends FormEntity
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
+
+            // check for the remote and set type data
+            if ($this->getStorageLocation() == 'remote') {
+                // get some basic information about the file type
+                $fileInfo   = $this->getFileInfo();
+
+                $extension  = $fileInfo['extension'];
+                $mime       = $fileInfo['mime'];
+
+                // set the mime and extension column values
+                $this->setExtension($extension);
+                $this->setMime($mime);
+            }
             return;
         }
 
@@ -593,6 +675,16 @@ class Asset extends FormEntity
         // target filename to move to
         $this->getFile()->move($this->getUploadDir(), $this->path);
         $filePath = $this->getUploadDir() . '/' . $this->temp;
+
+        // get some basic information about the file type
+        $fileInfo   = $this->getFileInfo();
+
+        $extension  = $fileInfo['extension'];
+        $mime       = $fileInfo['mime'];
+
+        // set the mime and extension column values
+        $this->setExtension($extension);
+        $this->setMime($mime);
 
         // check if we have an old asset
         if (isset($this->temp) && file_exists($filePath)) {
@@ -602,13 +694,28 @@ class Asset extends FormEntity
             $this->temp = null;
         }
 
+        // Remove temporary folder and files
+        $fs = new Filesystem();
+        $fs->remove($this->getAbsoluteTempDir());
+
         // clean up the file property as you won't need it anymore
         $this->file = null;
     }
 
-    public function removeUpload()
+    /**
+     * Remove a file
+     *
+     * @param   boolean     $temp >> regular uploaded file or temporary
+     * @return  void
+     */
+    public function removeUpload($temp = false)
     {
-        $file = $this->getAbsolutePath();
+        if ($temp) {
+            $file = $this->getAbsoluteTempPath();
+        } else {
+            $file = $this->getAbsolutePath();
+        }
+
         if ($file && file_exists($file)) {
             unlink($file);
         }
@@ -624,6 +731,30 @@ class Asset extends FormEntity
         return null === $this->path
             ? null
             : $this->getUploadDir() . '/' . $this->path;
+    }
+
+    /**
+     * Returns absolute path to temporary file.
+     *
+     * @return string
+     */
+    public function getAbsoluteTempPath()
+    {
+        return null === $this->tempId || null === $this->tempName
+            ? null
+            : $this->getAbsoluteTempDir() . '/' . $this->tempName;
+    }
+
+    /**
+     * Returns absolute path to temporary file.
+     *
+     * @return string
+     */
+    public function getAbsoluteTempDir()
+    {
+        return null === $this->tempId
+            ? null
+            : $this->getUploadDir() . '/tmp/' . $this->tempId;
     }
 
     /**
@@ -702,6 +833,41 @@ class Asset extends FormEntity
     }
 
     /**
+     * Returns some file info
+     *
+     * @return array
+     */
+    public function getFileInfo()
+    {
+        $fileInfo = array();
+
+        if ($this->getStorageLocation() == 'remote') {
+            $ch = curl_init($this->getRemotePath());
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_exec($ch);
+
+            // build an array of handy info
+            $fileInfo['mime']       = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $fileInfo['extension']  = $this->getFileType();
+
+            return $fileInfo;
+        }
+
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        // return an array of file type info
+        $fileInfo['mime']       = $this->loadFile()->getMimeType();
+        $fileInfo['extension']  = $this->getFileType();
+
+        return $fileInfo;
+    }
+
+    /**
      * Returns file mime type
      *
      * @return string
@@ -722,7 +888,9 @@ class Asset extends FormEntity
             return '';
         }
 
-        return $this->loadFile()->getMimeType();
+        $type = $this->loadFile()->getMimeType();
+
+        return $type;
     }
 
     /**
@@ -884,14 +1052,20 @@ class Asset extends FormEntity
      *
      * @return null|\Symfony\Component\HttpFoundation\File\File
      */
-    public function loadFile()
+    public function loadFile($temp = false)
     {
-        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath())) {
+        if ($temp) {
+            $path = $this->getAbsoluteTempPath();
+        } else {
+            $path = $this->getAbsolutePath();
+        }
+
+        if (!$path || !file_exists($path)) {
             return null;
         }
 
         try {
-            $file = new File($this->getAbsolutePath());
+            $file = new File($path);
         } catch (FileNotFoundException $e) {
             $file = null;
         }
@@ -945,22 +1119,19 @@ class Asset extends FormEntity
     public static function validateFile($object, ExecutionContextInterface $context)
     {
         if ($object->getStorageLocation() == 'local') {
-            $file = $object->getFile();
+            $tempName = $object->getTempName();
 
             // If the object is stored locally, we should have file data
-            if ($object->isNew() && $file === null) {
+            if ($object->isNew() && $tempName === null) {
                 $context->buildViolation('mautic.asset.asset.error.missing.file')
-                    ->atPath('file')
+                    ->atPath('tempName')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
 
-            if ($file !== null && $file->getSize() > $object->getMaxSize()) {
-                $context->buildViolation('mautic.asset.asset.error.file.size', array(
-                        '%fileSize%' => round($object->getFile()->getSize() / 1000000, 2),
-                        '%maxSize%' => round($object->getMaxSize()) / 1000000, 2)
-                    )
-                    ->atPath('file')
+            if ($object->getTitle() === null) {
+                $context->buildViolation('mautic.asset.asset.error.missing.title')
+                    ->atPath('title')
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
@@ -979,5 +1150,53 @@ class Asset extends FormEntity
             // Unset any local file data
             $object->setPath(null);
         }
+    }
+
+    /**
+     * Set temporary ID
+     *
+     * @param string $tempId
+     *
+     * @return Asset
+     */
+    public function setTempId($tempId)
+    {
+        $this->tempId = $tempId;
+
+        return $this;
+    }
+
+    /**
+     * Get temporary ID
+     *
+     * @return string
+     */
+    public function getTempId()
+    {
+        return $this->tempId;
+    }
+
+    /**
+     * Set temporary file name
+     *
+     * @param string $tempName
+     *
+     * @return Asset
+     */
+    public function setTempName($tempName)
+    {
+        $this->tempName = $tempName;
+
+        return $this;
+    }
+
+    /**
+     * Get temporary file name
+     *
+     * @return string
+     */
+    public function getTempName()
+    {
+        return $this->tempName;
     }
 }

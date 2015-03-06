@@ -196,6 +196,31 @@ $container->loadFromExtension('knp_menu', array(
     'default_renderer' => 'mautic'
 ));
 
+// OneupUploader Configuration
+$uploadDir = $container->getParameter('mautic.upload_dir');
+$maxSize   = $container->getParameter('mautic.max_size');
+$container->loadFromExtension('oneup_uploader', array(
+    // 'orphanage' => array(
+    //     'maxage' => 86400,
+    //     'directory' => $uploadDir . '/orphanage'
+    // ),
+    'mappings' => array(
+        'asset' => array(
+            'error_handler' => 'mautic.asset.upload.error.handler',
+            'frontend' => 'custom',
+            'custom_frontend' => array(
+                'class' => 'Mautic\AssetBundle\Controller\UploadController',
+                'name'  => 'mautic'
+            ),
+            // 'max_size' => ($maxSize * 1000000),
+            // 'use_orphanage' => true,
+            'storage'  => array(
+                'directory' => $uploadDir
+            )
+        )
+    )
+));
+
 if ($container->getParameter('mautic.api_enabled')) {
     //FOS Rest
     $container->loadFromExtension('fos_rest', array(

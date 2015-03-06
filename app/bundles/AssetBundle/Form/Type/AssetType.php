@@ -27,6 +27,7 @@ class AssetType extends AbstractType
 
     private $translator;
     private $themes;
+    private $assetModel;
 
     /**
      * @param MauticFactory $factory
@@ -34,6 +35,7 @@ class AssetType extends AbstractType
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
         $this->themes     = $factory->getInstalledThemes('asset');
+        $this->assetModel = $factory->getModel('asset');
     }
 
     /**
@@ -56,10 +58,14 @@ class AssetType extends AbstractType
             )
         ));
 
-        $builder->add('file', 'file', array(
-            'label'      => 'mautic.asset.asset.form.file.upload',
+        $maxUploadSize = $this->assetModel->getMaxUploadSize();
+        $builder->add('tempName', 'hidden', array(
+            'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', array('%max%' => $maxUploadSize)),
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'required'   => false
+        ));
+
+        $builder->add('originalFileName', 'hidden', array(
             'required'   => false
         ));
 
@@ -131,6 +137,10 @@ class AssetType extends AbstractType
                 'data-toggle' => 'datetime'
             ),
             'format'     => 'yyyy-MM-dd HH:mm',
+            'required'   => false
+        ));
+
+        $builder->add('tempId', 'hidden', array(
             'required'   => false
         ));
 
