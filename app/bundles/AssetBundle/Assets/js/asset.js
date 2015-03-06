@@ -157,27 +157,30 @@ Mautic.initializeDropzone = function() {
 
     Mautic.assetDropzone.on("sending", function(file, request, formData) {
         formData.append('tempId', mQuery('#asset_tempId').val());
-    });
-
-    Mautic.assetDropzone.on("success", function(file, response, progress) {
+    }).on("success", function(file, response, progress) {
         if (response.tmpFileName) {
             mQuery('#asset_tempName').val(response.tmpFileName);
         }
 
         var messageArea = mQuery('.mdropzone-error');
-        if (response.error) {
-            messageArea.text(response.error);
+        if (response.error || !response.tmpFileName) {
+            if (!response.error) {
+                var errorText = '';
+            } else {
+                var errorText = (typeof response.error == 'object') ? response.error.text : response.error;
+            }
+
+            messageArea.text(errorText);
             messageArea.closest('.form-group').addClass('has-error').removeClass('is-success');
 
             // invoke the error
             var node, _i, _len, _ref, _results;
-            var message = response.msg // modify it to your error message
-            file.previewElement.classList.add("dz-error");
-            _ref = file.previewElement.querySelectorAll("[data-dz-errormessage]");
+            file.previewElement.classList.add('dz-error');
+            _ref = file.previewElement.querySelectorAll('data-dz-errormessage');
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               node = _ref[_i];
-              _results.push(node.textContent = message);
+              _results.push(node.textContent = errorText);
             }
             return _results;
         } else {
@@ -192,6 +195,29 @@ Mautic.initializeDropzone = function() {
 
         if (file.name) {
             mQuery('#asset_originalFileName').val(file.name);
+        }
+    }).on("error", function (file, response) {
+        var messageArea = mQuery('.mdropzone-error');
+        if (response.error) {
+            if (!response.error) {
+                var errorText = '';
+            } else {
+                var errorText = (typeof response.error == 'object') ? response.error.text : response.error;
+            }
+
+            messageArea.text(errorText);
+            messageArea.closest('.form-group').addClass('has-error').removeClass('is-success');
+
+            // invoke the error
+            var node, _i, _len, _ref, _results;
+            file.previewElement.classList.add('dz-error');
+            _ref = file.previewElement.querySelectorAll('[data-dz-errormessage]');
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                node = _ref[_i];
+                _results.push(node.textContent = errorText);
+            }
+            return _results;
         }
     });
 }
