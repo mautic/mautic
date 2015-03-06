@@ -25,7 +25,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <!--/ filters -->
 
     <div class="col-md-9 bg-auto height-auto bdr-l">
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div class="panel panel-default bdr-t-wdh-0 bdr-l-wdh-0 mb-0">
             <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
                 'searchValue' => $searchValue,
                 'searchHelp'  => 'mautic.email.help.searchcommands',
