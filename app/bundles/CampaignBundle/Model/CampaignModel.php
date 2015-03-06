@@ -192,7 +192,8 @@ class CampaignModel extends CommonFormModel
                 // Remove child from parent
                 $parent = $existingEvents[$deleteMe]->getParent();
                 if ($parent) {
-                    $parent->removeChild($events[$id]);
+                    $parent->removeChild($existingEvents[$deleteMe]);
+                    $existingEvents[$deleteMe]->removeParent();
                 }
 
                 $entity->removeEvent($existingEvents[$deleteMe]);
@@ -228,8 +229,8 @@ class CampaignModel extends CommonFormModel
 
                 $parentId = $relationships[$id]['parent'];
                 $events[$id]->setParent($events[$parentId]);
-                $hierarchy[$id]  = $parentId;
-                $parentUpdated[] = $id;
+
+                $hierarchy[$id] = $parentId;
             } elseif ($events[$id]->getParent()) {
                 // No longer has a parent so null it out
 
@@ -240,9 +241,10 @@ class CampaignModel extends CommonFormModel
                 // Remove parent from child
                 $events[$id]->removeParent();
                 $hierarchy[$id] = 'null';
+            } else {
+                // Is a parent
+                $hierarchy[$id] = 'null';
             }
-
-            $entity->addEvent($id, $e);
         }
 
         //set event order used when querying the events

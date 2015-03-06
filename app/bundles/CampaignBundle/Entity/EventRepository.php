@@ -59,6 +59,7 @@ class EventRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'c');
+
         $expr->add(
             $q->expr()->eq('e.type', ':type')
         );
@@ -107,6 +108,48 @@ class EventRepository extends CommonRepository
         }
 
         return $events;
+    }
+
+    /**
+     * Get the top level actions for a campaign and lead
+     *
+     * @param $campaignId
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getRootLevelActions($campaignId, $leadId)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('c, e')
+            ->join('e.campaign', 'c');
+
+        //make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr->addMultiple(array(
+            $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
+            $q->expr()->isNull('e.parent'),
+            $q->expr()->eq('c.id', ':campaign')
+        ));
+        $q->where($expr)
+            ->setParameter('campaign', (int) $campaignId);
+
+        $dq = $this->_em->createQueryBuilder();
+        $dq->select('ellev.id')
+            ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+            ->leftJoin('ell.event', 'ellev')
+            ->leftJoin('ell.lead', 'el')
+            ->where('ellev.id = e.id')
+            ->andWhere(
+                $dq->expr()->eq('el.id', ':leadId')
+            );
+
+        $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
+            ->setParameter('leadId', (int) $leadId);
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
     }
 
     /**
@@ -284,11 +327,12 @@ class EventRepository extends CommonRepository
     public function getNegativePendingEvents($campaignId = null)
     {
         $q = $this->createQueryBuilder('e')
-            ->select('c, e, ep, epp, l')
+            ->select('c, e, event_parent, event_grandparent, l')
             ->join('e.campaign', 'c')
             ->leftJoin('c.leads', 'l')
-            ->leftJoin('e.parent', 'ep')
-            ->leftJoin('ep.parent', 'epp')
+            ->leftJoin('l.lead', 'cl')
+            ->leftJoin('e.parent', 'event_parent')
+            ->leftJoin('event_parent.parent', 'event_grandparent')
             ->orderBy('e.order');
 
         //make sure the published up and down dates are good
@@ -306,15 +350,37 @@ class EventRepository extends CommonRepository
             $q->expr()->eq('e.decisionPath', $q->expr()->literal('no'))
         );
 
-        //only events that have not been fired yet
+        //only events that have not been fired yet for the lead
         $dq = $this->_em->createQueryBuilder();
-        $dq->select('ellev.id')
-            ->from('MauticCampaignBundle:LeadEventLog', 'ell')
-            ->leftJoin('ell.event', 'ellev')
-            ->where('ellev.id = e.id');
+        $dq->select('log_event.id')
+            ->from('MauticCampaignBundle:LeadEventLog', 'log')
+            ->leftJoin('log.event', 'log_event')
+            ->where('log_event.id = e.id')
+            ->andWhere('IDENTITY(log.lead) = cl.id');
 
         $q->andWhere('e.id NOT IN('.$dq->getDQL().')');
 
+        //only events that have do not have a yes that's been fired
+        $dq2 = $this->_em->createQueryBuilder();
+        $dq2->select('count(log_event_yes.id)')
+            ->from('MauticCampaignBundle:LeadEventLog', 'log_yes')
+            ->join('log_yes.event', 'log_event_yes')
+            ->where(
+                $dq2->expr()->andX(
+                    //yes path
+                    $dq2->expr()->eq('log_event_yes.decisionPath', $dq2->expr()->literal('yes')),
+
+                    //on the same level as the no path
+                    $dq2->expr()->eq('log_event_yes.order', 'e.order'),
+                    $dq2->expr()->isNotNull('log_event_yes.parent'),
+                    $dq2->expr()->eq('IDENTITY(log_event_yes.parent)', 'e.parent'),
+
+                    //for the same lead
+                    $dq2->expr()->eq('IDENTITY(log_yes.lead)', 'cl.id')
+                )
+            );
+
+        $q->having(sprintf('(%s) = 0', $dq2->getDQL()));
         $results = $q->getQuery()->getArrayResult();
 
         return $results;

@@ -73,10 +73,15 @@ Mautic.campaignOnUnload = function(container) {
  */
 Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
-    if (response.deleted) {
-        var domEventId = 'CampaignEvent_' + response.eventId;
-        var eventId = '#' + domEventId;
+    var domEventId = 'CampaignEvent_' + response.eventId;
+    var eventId = '#' + domEventId;
 
+    if (response.label) {
+        Mautic.campaignBuilderLabels[domEventId] = response.label;
+        Mautic.campaignBuilderUpdateLabel(domEventId);
+    }
+
+    if (response.deleted) {
         //remove the connections
         Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
 
@@ -87,22 +92,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
         //remove the div
         mQuery(eventId).remove();
     } else if (response.updateHtml) {
-        var domEventId = 'CampaignEvent_' + response.eventId;
-        var eventId    = '#' + domEventId;
-
-        if (response.label) {
-            Mautic.campaignBuilderLabels[domEventId] = response.label;
-        }
 
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
     } else if (response.eventHtml) {
         var newHtml = response.eventHtml;
-        var domEventId = 'CampaignEvent_' + response.eventId;
-        var eventId    = '#' + domEventId;
-        
-        if (response.label) {
-            Mautic.campaignBuilderLabels[domEventId] = response.label;
-        }
 
         //append content
         var x = mQuery('#droppedX').val();

@@ -86,7 +86,7 @@ class ExceptionController extends CommonController
                     'error' => array(
                         'code'      => $code,
                         'text'      => $statusText,
-                        'exception' => ($env == 'dev') ? $statusText : '',
+                        'exception' => ($env == 'dev') ? $exception->getMessage() : '',
                         'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
                     ),
                     'route' => $urlParts['path']
