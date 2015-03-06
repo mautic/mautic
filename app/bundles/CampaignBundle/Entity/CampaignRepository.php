@@ -46,10 +46,10 @@ class CampaignRepository extends CommonRepository
     {
         // Null parents of associated events first
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_events', 'e')
-            ->set('e.parent_id', ':null')
+        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_events')
+            ->set('parent_id', ':null')
             ->setParameter('null', null)
-            ->where('e.campaign_id = ' . $entity->getId())
+            ->where('campaign_id = ' . $entity->getId())
             ->execute();
 
         // Delete events
