@@ -235,7 +235,7 @@ class Asset extends FormEntity
     public function getFile()
     {
         // if file is not set, try to find it at temp folder
-        if ($this->getStorageLocation() == 'local' && !empty($this->file)) {
+        if ($this->getStorageLocation() == 'local' && empty($this->file)) {
             $tempFile = $this->loadFile(true);
 
             if ($tempFile) {
