@@ -25,7 +25,7 @@ class EmailSubscriber extends CommonSubscriber
     static public function getSubscribedEvents ()
     {
         return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0)
+            EmailEvents::EMAIL_ON_BUILD => array('onEmailBuild', 0)
         );
     }
 
@@ -42,9 +42,5 @@ class EmailSubscriber extends CommonSubscriber
             'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner'
         );
         $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
-
-        //add email token
-        $content = $this->templating->render('MauticFormBundle:SubscribedEvents\EmailToken:token.html.php');
-        $event->addTokenSection('form.submissions', 'mautic.form.forms', $content);
     }
 }

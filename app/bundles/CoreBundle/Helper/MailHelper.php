@@ -290,4 +290,36 @@ class MailHelper
     {
         $this->tokens = array_merge($this->tokens, $tokens);
     }
+
+    /**
+     * Parses html into basic plaintext
+     */
+    public function parsePlainText($content = null)
+    {
+        if ($content == null) {
+            $content = $this->message->getBody();
+        }
+
+        // Remove line breaks (to prevent unwanted white space) then convert p and br to line breaks
+        $search = array(
+            "\n",
+            "</p>",
+            "<br />",
+            "<br>"
+        );
+
+        $replace = array(
+            '',
+            "\n\n",
+            "\n",
+            "\n"
+        );
+
+        $content = str_ireplace($search, $replace, $content);
+
+        // Strip tags
+        $content = strip_tags($content);
+
+        $this->message->addPart($content, 'text/plain');
+    }
 }
