@@ -42,7 +42,7 @@ $view['slots']->set('mauticContent', 'asset');
 						        <div class="help-block mdropzone-error"></div>
 						        <div class="mdropzone text-center" id="dropzone">
 						        	<div class="dz-message">
-						        		<?php echo $view['translator']->trans('mautic.asset.drop.file.here'); ?>
+						        		<h4><?php echo $view['translator']->trans('mautic.asset.drop.file.here'); ?></h4>
 									</div>
 						        </div>
 					        </div>
