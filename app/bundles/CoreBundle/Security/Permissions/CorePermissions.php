@@ -236,7 +236,7 @@ class CorePermissions
         static $grantedPermissions = array();
 
         if ($userEntity === null) {
-           $userEntity = $this->getUser();
+            $userEntity = $this->getUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -274,7 +274,7 @@ class CorePermissions
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
                 throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.notfound',
-                        array("%permission%" => $permission))
+                    array("%permission%" => $permission))
                 );
             }
 
@@ -450,6 +450,6 @@ class CorePermissions
     public function isAnonymous()
     {
         $userEntity = $this->getUser();
-        return ($userEntity instanceof User) ? false : true;
+        return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
     }
 }
