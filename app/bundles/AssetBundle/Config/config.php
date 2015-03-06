@@ -141,7 +141,9 @@ return array(
             'mautic.asset.upload.error.handler' => array(
                 'class' => 'Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler',
                 'arguments' => 'mautic.factory'
-            )
+            ),
+            // Override the DropzoneController
+            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController'
         )
     ),
 
