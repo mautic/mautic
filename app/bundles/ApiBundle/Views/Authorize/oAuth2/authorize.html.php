@@ -13,11 +13,11 @@ $name = $client->getName();
 $msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
     $view['translator']->trans('mautic.api.oauth.clientnoname');
 ?>
-<h4><?php echo $msg; ?></h4>
-<form class="form-login" role="form" name="fos_oauth_server_authorize_form" action="<?php echo $view['router']->generate('fos_oauth_server_authorize') ?>" method="post">
+<h4 class="mb-lg"><?php echo $msg; ?></h4>
+<form class="form-login text-center" role="form" name="fos_oauth_server_authorize_form" action="<?php echo $view['router']->generate('fos_oauth_server_authorize') ?>" method="post">
 
 <input type="submit" class="btn btn-primary btn-accept" name="accepted" value="<?php echo $view['translator']->trans('mautic.api.oauth.accept'); ?>" />
-<input type="submit" class="btn btn-danger" btn-deny" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
+<input type="submit" class="btn btn-danger btn-deny" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
 
 <?php
 echo $view['form']->row($form['client_id']);

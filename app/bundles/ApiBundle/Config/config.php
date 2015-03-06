@@ -9,7 +9,7 @@
 
 return array(
     'routes'     => array(
-        'main' => array(
+        'public' => array(
             // OAuth1.0a
             'bazinga_oauth_server_requesttoken'     => array(
                 'path'       => '/oauth/v1/request_token',
@@ -18,7 +18,7 @@ return array(
             ),
             'bazinga_oauth_login_allow'             => array(
                 'path'       => '/oauth/v1/authorize',
-                'controller' => 'MauticApiBundle:OAuth1/Authorize:allow',
+                'controller' => 'MauticApiBundle:oAuth1/Authorize:allow',
                 'method'     => 'GET'
             ),
             'bazinga_oauth_server_authorize'        => array(
@@ -28,12 +28,12 @@ return array(
             ),
             'mautic_oauth1_server_auth_login'       => array(
                 'path'       => '/oauth/v1/authorize_login',
-                'controller' => 'MauticApiBundle:OAuth1/Security:login',
+                'controller' => 'MauticApiBundle:oAuth1/Security:login',
                 'method'     => 'GET|POST'
             ),
             'mautic_oauth1_server_auth_login_check' => array(
                 'path'       => '/oauth/v1/authorize_login_check',
-                'controller' => 'MauticApiBundle:OAuth1/Security:loginCheck',
+                'controller' => 'MauticApiBundle:oAuth1/Security:loginCheck',
                 'method'     => 'GET|POST'
             ),
             'bazinga_oauth_server_accesstoken'      => array(
@@ -50,20 +50,21 @@ return array(
             ),
             'fos_oauth_server_authorize'            => array(
                 'path'       => '/oauth/v2/authorize',
-                'controller' => 'MauticApiBundle:OAuth2/Authorize:authorize',
+                'controller' => 'MauticApiBundle:oAuth2/Authorize:authorize',
                 'method'     => 'GET|POST'
             ),
             'mautic_oauth2_server_auth_login'       => array(
                 'path'       => '/oauth/v2/authorize_login',
-                'controller' => 'MauticApiBundle:OAuth2/Security:login',
+                'controller' => 'MauticApiBundle:oAuth2/Security:login',
                 'method'     => 'GET|POST'
             ),
             'mautic_oauth2_server_auth_login_check' => array(
                 'path'       => '/oauth/v2/authorize_login_check',
-                'controller' => 'MauticApiBundle:OAuth2/Security:loginCheck',
+                'controller' => 'MauticApiBundle:oAuth2/Security:loginCheck',
                 'method'     => 'GET|POST'
             ),
-
+        ),
+        'main' => array(
             // Clients
             'mautic_client_index'                   => array(
                 'path'       => '/credentials/{page}',

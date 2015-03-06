@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -35,6 +36,16 @@ class ExceptionController extends CommonController
             if ($code === 0) {
                 //thrown exception that didn't set a code
                 $code = 500;
+            }
+
+            // Special handling for oauth and api urls
+            if (strpos($request->getUri(), '/oauth') !== false || strpos($request->getUri(), '/api') !== false) {
+                $dataArray = array('error' => $exception->getMessage());
+                if ($env == 'dev') {
+                    $dataArray['trace'] = $exception->getTrace();
+                }
+
+                return new JsonResponse($dataArray, 200);
             }
 
             if ($request->get('prod')) {
