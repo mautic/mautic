@@ -189,6 +189,12 @@ Mautic.initializeDropzone = function() {
     }).on("error", function (file, response) {
         preview.fadeIn('fast');
         var messageArea = mQuery('.mdropzone-error');
+
+        // Dropzone error is just a text in the response var
+        if (typeof response == "string") {
+            response = {'error': response};
+        }
+
         if (response.error) {
             if (!response.error) {
                 var errorText = '';
