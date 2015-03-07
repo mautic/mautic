@@ -19,6 +19,7 @@ system('rm app/tests.bootstrap*');
 system('rm -rf app/bundles/*/Tests');
 system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache');
+system('rm -rf media/files/*');
 system('rm app/config/config_dev.php');
 system('rm app/config/config_test.php');
 system('rm app/config/local*.php');
