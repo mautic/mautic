@@ -70,19 +70,24 @@ $vendorsChanged = false;
 
 foreach ($fileDiff as $file) {
     $filename = substr($file, 2);
-    $folderPath = explode('/', $file);
-    $folderName = $folderPath[0];
+    $folderPath = explode('/', $filename);
+    $baseFolderName = $folderPath[0];
 
     if (!$vendorsChanged && $filename == 'composer.lock') {
         $vendorsChanged = true;
     }
 
-    if (!in_array($filename, $doNotPackage) && !in_array($folderName, $doNotPackage)) {
-        if (substr($file, 0, 1) == 'D') {
-            $deletedFiles[] = $filename;
-        } else {
-            $modifiedFiles[$filename] = true;
-        }
+    $doNotPackageFile = in_array($filename, $doNotPackage);
+    $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
+
+    if ($doNotPackageFile || $doNotPackageFolder) {
+        continue;
+    }
+
+    if (substr($file, 0, 1) == 'D') {
+        $deletedFiles[] = $filename;
+    } else {
+        $modifiedFiles[$filename] = true;
     }
 }
 
