@@ -90,11 +90,11 @@ class InputHelper
                 }
 
                 if (is_array($v) && is_array($useMask)) {
-                    $v = self::_($v, $useMask);
+                    $v = self::_($v, $useMask, $urldecode);
                 } elseif ($useMask == 'filter') {
                     $v = self::getFilter()->clean($v, $useMask);
                 } else {
-                    $v = self::$useMask($v, $mask);
+                    $v = self::$useMask($v, $urldecode);
                 }
             }
 
