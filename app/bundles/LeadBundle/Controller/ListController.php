@@ -96,7 +96,7 @@ class ListController extends FormController
         $this->factory->getSession()->set('mautic.leadlist.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = $model->getRepository()->getLeadCount($listIds);
+        $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : array();
 
         $parameters = array(
             'items'       => $items,
