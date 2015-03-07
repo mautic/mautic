@@ -519,11 +519,12 @@ class ListModel extends FormModel
      * @param      $lists
      * @param bool $idOnly
      * @param bool $dynamic
+     * @param bool $ignoreCache
      *
      * @return mixed
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false)
+    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $ignoreCache = false)
     {
-        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic);
+        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic, true, $ignoreCache);
     }
 }

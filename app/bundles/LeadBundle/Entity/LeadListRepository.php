@@ -259,10 +259,11 @@ class LeadListRepository extends CommonRepository
      * @param      $lists
      * @param bool $idOnly
      * @param bool $dynamic
+     * @param bool $ignoreCache
      *
      * @return array
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $includeManualInDynamic = true)
+    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $includeManualInDynamic = true, $ignoreCache = false)
     {
         static $leads = array(), $currentOnlyLeads = array();
 
@@ -285,7 +286,7 @@ class LeadListRepository extends CommonRepository
             }
 
             if (!$dynamic) {
-                if (!isset($currentOnlyLeads[$id])) {
+                if ($ignoreCache || !isset($currentOnlyLeads[$id])) {
                     $q = $this->_em->getConnection()->createQueryBuilder();
                     if ($idOnly) {
                         $q->select('ll.lead_id')
@@ -320,7 +321,7 @@ class LeadListRepository extends CommonRepository
                 $return[$id] = $currentOnlyLeads[$id];
 
             } else {
-                if (!isset($leads[$id]) && $filters) {
+                if ($ignoreCache || !isset($leads[$id]) && $filters) {
                     $q          = $this->_em->getConnection()->createQueryBuilder();
                     $parameters = array();
                     $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
@@ -390,6 +391,7 @@ class LeadListRepository extends CommonRepository
                 $return[$id] = $leads[$id];
             }
         }
+
         return $return;
     }
 
