@@ -155,7 +155,7 @@ class ProfileController extends FormController
                     //check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $this->factory->getParameter('supported_languages');
 
-                    if (!array_key_exists($me->getLocale(), $installedLanguages)) {
+                    if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
                         $languageHelper = $this->factory->getHelper('language');
 
