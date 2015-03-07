@@ -17,7 +17,7 @@
         <ul class="media-list media-list-feed">
             <?php foreach ($logs as $log) : ?>
             <li class="media">
-                <div class="media-object pull-left mt-xs">
+                <div class="media-object pull-left">
                     <span class="figure featured <?php echo ($log['action'] == 'create') ? 'bg-success' : ''; ?>">
                         <span class="fa <?php echo isset($icons[$log['bundle']]) ? $icons[$log['bundle']] : '' ?>"></span>
                     </span>

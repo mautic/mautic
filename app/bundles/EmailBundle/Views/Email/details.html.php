@@ -153,9 +153,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <h3>
                                                 <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                     'item'  => $variants['parent'],
-                                                    'model' => 'page.page',
+                                                    'model' => 'email',
                                                     'size'  => '',
-                                                    'disableToggle' => true
+                                                    'query' => 'size='
                                                 )); ?>
                                             </h3>
                                         </div>
@@ -216,9 +216,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                                 <h3>
                                                     <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
                                                         'item'  => $variant,
-                                                        'model' => 'page',
+                                                        'model' => 'email',
                                                         'size'  => '',
-                                                        'disableToggle' => true
+                                                        'query' => 'size='
                                                     )); ?>
                                                 </h3>
                                             </div>

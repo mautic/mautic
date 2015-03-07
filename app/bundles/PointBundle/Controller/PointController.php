@@ -178,11 +178,16 @@ class PointController extends FormController
             }
         }
 
+        $themes = array('MauticPointBundle:FormTheme\Action');
+        if ($actionType && !empty($actions['actions'][$actionType]['formTheme'])) {
+            $themes[] = $actions['actions'][$actionType]['formTheme'];
+        }
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
-                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:FormTheme\Action'),
+                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', $themes),
                 'actions'        => $actions['actions']
             ),
             'contentTemplate' => 'MauticPointBundle:Point:form.html.php',
@@ -249,7 +254,7 @@ class PointController extends FormController
             return $this->isLocked($postActionVars, $entity, 'point');
         }
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
+        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $actions = $model->getPointActions();
@@ -302,11 +307,15 @@ class PointController extends FormController
             $model->lockEntity($entity);
         }
 
+        $themes = array('MauticPointBundle:FormTheme\Action');
+        if (!empty($actions['actions'][$actionType]['formTheme'])) {
+            $themes[] = $actions['actions'][$actionType]['formTheme'];
+        }
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
-                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:FormTheme\Action'),
+                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', $themes),
                 'actions'        => $actions['actions']
             ),
             'contentTemplate' => 'MauticPointBundle:Point:form.html.php',

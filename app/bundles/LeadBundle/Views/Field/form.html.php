@@ -22,7 +22,7 @@ $view['slots']->set("headerTitle", $header);
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-r">
+    <div class="col-md-8 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-6">
@@ -91,8 +91,32 @@ $view['slots']->set("headerTitle", $header);
             <?php $form['properties']->setRendered(); ?>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-4 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isPublished']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isRequired']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isVisible']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isShortVisible']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isListable']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isPubliclyUpdatable']); ?>
+                </div>
+            </div>
             <?php echo $view['form']->rest($form); ?>
         </div>
     </div>
