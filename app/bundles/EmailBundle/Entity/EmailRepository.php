@@ -143,7 +143,7 @@ class EmailRepository extends CommonRepository
             $q->select('l.*');
         }
         $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id')
+            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
             ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
 
         $q->where('el.email_id = ' . (int) $emailId);
@@ -343,10 +343,10 @@ class EmailRepository extends CommonRepository
 
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
-            ->set('variant_parent', ':null')
+            ->set('variant_parent_id', ':null')
             ->setParameter('null', null)
             ->where(
-                $qb->expr()->in('variant_parent', $ids)
+                $qb->expr()->in('variant_parent_id', $ids)
             )
             ->execute();
     }

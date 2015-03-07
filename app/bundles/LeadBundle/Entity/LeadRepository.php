@@ -345,8 +345,15 @@ class LeadRepository extends CommonRepository
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(l.id) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
         $this->buildWhereClause($dq, $args);
+        $dq->andWhere(
+            $dq->expr()->orX(
+                $dq->expr()->isNull('ll.manually_removed'),
+                $dq->expr()->eq('ll.manually_removed', ':false')
+            )
+        )
+            ->setParameter('false', false, 'boolean');
 
         //get a total count
         $result = $dq->execute()->fetchAll();

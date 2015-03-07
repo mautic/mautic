@@ -459,7 +459,7 @@ class CampaignModel extends CommonFormModel
             if ($manuallyAdded && $campaignLead->wasManuallyRemoved()) {
                 $campaignLead->setManuallyRemoved(false);
                 $campaignLead->setManuallyAdded(true);
-                $this->saveEntity($campaignLead, false);
+                $this->getRepository()->saveEntity($campaignLead, false);
             } else {
                 //campaign lead already exists
                 return;
@@ -491,8 +491,10 @@ class CampaignModel extends CommonFormModel
      */
     public function addLeads (Campaign $campaign, array $leads, $manuallyAdded = false, $persist = true)
     {
-        foreach ($leads as $lead) {
+        $persistCampaign = false;
+        $persistEntities = array();
 
+        foreach ($leads as $lead) {
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
@@ -507,19 +509,20 @@ class CampaignModel extends CommonFormModel
                 if ($manuallyAdded && $campaignLead->wasManuallyRemoved()) {
                     $campaignLead->setManuallyRemoved(false);
                     $campaignLead->setManuallyAdded(true);
-                    $this->saveEntity($campaignLead, false);
+
+                    $persistEntities[] = $campaignLead;
                 } else {
-                    return;
+
+                    continue;
                 }
             } else {
+                $persistCampaign = true;
+
                 $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
                 $campaignLead->setCampaign($campaign);
                 $campaignLead->setDateAdded(new \DateTime());
                 $campaignLead->setLead($lead);
                 $campaign->addLead($lead->getId(), $campaignLead);
-                if ($persist) {
-                    $this->saveEntity($campaign, false);
-                }
             }
 
             if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
@@ -530,7 +533,11 @@ class CampaignModel extends CommonFormModel
             unset($campaignLead);
         }
 
-        if ($persist) {
+        if (!empty($persistEntities)) {
+            $this->getRepository()->saveEntities($persistEntities);
+        }
+
+        if ($persist && $persistCampaign) {
             $this->saveEntity($campaign, false);
         }
     }
@@ -544,44 +551,7 @@ class CampaignModel extends CommonFormModel
      */
     public function removeLead (Campaign $campaign, $lead, $manuallyRemoved = false, $persist = true)
     {
-        if (!$lead instanceof Lead) {
-            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
-
-        }
-
-        $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
-            'lead'     => $lead,
-            'campaign' => $campaign
-        ));
-
-        if (!$campaignLead) {
-            return;
-        }
-
-        if ($manuallyRemoved && $campaignLead->wasManuallyAdded()) {
-            //lead was manually added and now manually removed so get rid of it
-            $campaign->removeLead($campaignLead);
-            if ($persist) {
-                $this->saveEntity($campaign, false);
-            }
-        } elseif ($campaignLead->wasManuallyAdded()) {
-            //don't do anything because this lead was manually added
-            return;
-        } else {
-            $campaign->removeLead($campaignLead);
-            if ($persist) {
-                $this->saveEntity($campaign, false);
-            }
-        }
-
-        //remove scheduled events if the lead was removed
-        $this->removeScheduledEvents($campaign, $lead);
-
-        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-            $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
-            $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
-        }
+        $this->removeLeads($campaign, array($lead), $manuallyRemoved, $persist);
     }
 
     /**
@@ -593,11 +563,15 @@ class CampaignModel extends CommonFormModel
      */
     public function removeLeads (Campaign $campaign, array $leads, $manuallyRemoved = false, $persist = true)
     {
+        $persistCampaign = false;
+        $persistEntities = array();
+
         foreach ($leads as $lead) {
+            $dispatchEvent = false;
 
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
 
             $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
@@ -606,34 +580,38 @@ class CampaignModel extends CommonFormModel
             ));
 
             if ($campaignLead == null) {
-                //doesn't exist
-                unset($campaignLead);
                 continue;
             }
 
-            if ($manuallyRemoved && $campaignLead->wasManuallyAdded()) {
-                //lead was manually added and now manually removed so get rid of it
+            if (($manuallyRemoved && $campaignLead->wasManuallyAdded()) || (!$manuallyRemoved && !$campaignLead->wasManuallyAdded())) {
+                //lead was manually added and now manually removed or was not manually added and now being removed
+                $dispatchEvent   = true;
+                $persistCampaign = true;
+
                 $campaign->removeLead($campaignLead);
-                if ($persist) {
-                    $this->saveEntity($campaign, false);
+            } elseif ($manuallyRemoved && !$campaignLead->wasManuallyAdded()) {
+                $dispatchEvent = true;
+
+                $campaignLead->setManuallyRemoved(true);
+                $persistEntities[] = $campaignLead;
+            }
+
+            if ($dispatchEvent) {
+                //remove scheduled events if the lead was removed
+                $this->removeScheduledEvents($campaign, $lead);
+
+                if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+                    $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
+                    $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
                 }
-            } elseif ($campaignLead->wasManuallyAdded()) {
-                //don't do anything because this lead was manually added
-                return;
-            } else {
-                $campaign->removeLead($campaignLead);
             }
-
-            if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-                $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
-                $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
-            }
-
-            //remove scheduled events if the lead was removed
-            $this->removeScheduledEvents($campaign, $lead);
         }
 
-        if ($persist) {
+        if ($persistEntities) {
+            $this->getRepository()->saveEntities($persistEntities);
+        }
+
+        if ($persist && $persistCampaign) {
             $this->saveEntity($campaign, false);
         }
     }
@@ -712,8 +690,8 @@ class CampaignModel extends CommonFormModel
         $listModel = $this->factory->getModel('lead.list');
         $leads     = $listModel->getLeadsByList($lists, true);
 
-        foreach ($leads as $list => $listLeads) {
-            $this->addLeads($campaign, $listLeads, false, false);
+        foreach ($leads as $list => $campaignLeads) {
+            $this->addLeads($campaign, $campaignLeads, false, false);
         }
 
         if ($removedLists != null) {
@@ -721,11 +699,11 @@ class CampaignModel extends CommonFormModel
             $leads           = $listModel->getLeadsByList($removedLists, true);
             $listRepo        = $this->em->getRepository('MauticLeadBundle:LeadList');
 
-            foreach ($leads as $list => $listLeads) {
+            foreach ($leads as $list => $campaignLeads) {
                 //keyed by lead id then list id
-                $listsByLeads = $listRepo->getLeadLists($listLeads, true);
+                $listsByLeads = $listRepo->getLeadLists($campaignLeads, true);
 
-                foreach ($listLeads as $l) {
+                foreach ($campaignLeads as $l) {
                     //does this lead belong to another list still in the campaign?
                     $leadsLists = array_keys($listsByLeads[$l]);
 
@@ -757,7 +735,7 @@ class CampaignModel extends CommonFormModel
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
-        $leads = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
+        $leads      = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
 
         return $leads;
     }

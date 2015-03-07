@@ -4,16 +4,14 @@ Mautic.assetOnLoad = function (container) {
 	    Mautic.renderDownloadChart();
 	}
 
-    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length)
-    {
-        Mautic.initializeDropzone();
-    }
+    mQuery("#asset_file").change(function() {
+        Mautic.previewBeforeUpload(this);
+    });
 };
 
 Mautic.assetOnUnload = function(id) {
 	if (id === '#app-content') {
 		delete Mautic.renderDownloadChartObject;
-        delete Mautic.assetDropzone;
 	}
 };
 
@@ -64,6 +62,30 @@ Mautic.updateDownloadChart = function(element, amount, unit) {
     });
 };
 
+Mautic.previewBeforeUpload = function(input) {
+    if (input.files && input.files[0]) {
+        var filename = input.files[0].name.toLowerCase();
+        var extension = filename.substr((filename.lastIndexOf('.') +1));
+        var reader = new FileReader();
+        var element = mQuery('<i />').addClass('fa fa-upload fa-5x');
+
+        if (mQuery.inArray(extension, ['jpg', 'jpeg', 'gif', 'png']) !== -1) {
+            reader.onload = function (e) {
+                element = mQuery('<img />').addClass('img-thumbnail').attr('src', e.target.result);
+                mQuery('.thumbnail-preview').empty().append(element);
+            }
+        } else if (extension === 'pdf') {
+            reader.onload = function (e) {
+                element = mQuery('<iframe />').attr('src', e.target.result);
+                mQuery('.thumbnail-preview').empty().append(element);
+            }
+        }
+
+        mQuery('.thumbnail-preview').empty().append(element);
+        reader.readAsDataURL(input.files[0]);
+    }
+};
+
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
@@ -109,127 +131,3 @@ Mautic.changeAssetStorageLocation = function() {
         mQuery('#remote-button').removeClass('hide');
     }
 };
-
-Mautic.initializeDropzone = function() {
-    var options = {
-        url: mauticAssetUploadEndpoint,
-        uploadMultiple: false,
-        filesizeBase: 1024,
-        init: function() {
-            this.on("addedfile", function() {
-                if (this.files[1] != null) {
-                    this.removeFile(this.files[0]);
-                }
-            });
-        }
-    };
-
-    if (typeof mauticAssetUploadMaxSize !== 'undefined') {
-        options.maxFilesize = mauticAssetUploadMaxSize;
-    }
-
-    if (typeof mauticAssetUploadMaxSizeError !== 'undefined') {
-        options.dictFileTooBig = mauticAssetUploadMaxSizeError;
-    }
-
-    if (typeof mauticAssetUploadExtensions !== 'undefined') {
-        options.acceptedFiles = mauticAssetUploadExtensions;
-    }
-
-    if (typeof mauticAssetUploadExtensionError !== 'undefined') {
-        options.dictInvalidFileType = mauticAssetUploadExtensionError;
-    }
-
-    Mautic.assetDropzone = new Dropzone("div#dropzone", options);
-    var preview = mQuery('.preview div.text-center');
-
-    Mautic.assetDropzone.on("sending", function (file, request, formData) {
-        formData.append('tempId', mQuery('#asset_tempId').val());
-    }).on("addedfile", function (file) {
-        preview.fadeOut('fast');
-    }).on("success", function (file, response, progress) {
-        if (response.tmpFileName) {
-            mQuery('#asset_tempName').val(response.tmpFileName);
-        }
-
-        var messageArea = mQuery('.mdropzone-error');
-        if (response.error || !response.tmpFileName) {
-            if (!response.error) {
-                var errorText = '';
-            } else {
-                var errorText = (typeof response.error == 'object') ? response.error.text : response.error;
-            }
-
-            messageArea.text(errorText);
-            messageArea.closest('.form-group').addClass('has-error').removeClass('is-success');
-
-            // invoke the error
-            var node, _i, _len, _ref, _results;
-            file.previewElement.classList.add('dz-error');
-            _ref = file.previewElement.querySelectorAll('data-dz-errormessage');
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              node = _ref[_i];
-              _results.push(node.textContent = errorText);
-            }
-            return _results;
-        } else {
-            messageArea.text('');
-            messageArea.closest('.form-group').removeClass('has-error').addClass('is-success');
-        }
-
-        var titleInput = mQuery('#asset_title');
-        if (file.name && !titleInput.val()) {
-            titleInput.val(file.name);
-        }
-
-        if (file.name) {
-            mQuery('#asset_originalFileName').val(file.name);
-        }
-    }).on("error", function (file, response) {
-        preview.fadeIn('fast');
-        var messageArea = mQuery('.mdropzone-error');
-
-        // Dropzone error is just a text in the response var
-        if (typeof response == "string") {
-            response = {'error': response};
-        }
-
-        if (response.error) {
-            if (!response.error) {
-                var errorText = '';
-            } else {
-                var errorText = (typeof response.error == 'object') ? response.error.text : response.error;
-            }
-
-            messageArea.text(errorText);
-            messageArea.closest('.form-group').addClass('has-error').removeClass('is-success');
-
-            // invoke the error
-            var node, _i, _len, _ref, _results;
-            file.previewElement.classList.add('dz-error');
-            _ref = file.previewElement.querySelectorAll('[data-dz-errormessage]');
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                node = _ref[_i];
-                _results.push(node.textContent = errorText);
-            }
-            return _results;
-        }
-    }).on("thumbnail", function (file, url) {
-        if (file.accepted === true) {
-            var extension = file.name.substr((file.name.lastIndexOf('.') +1)).toLowerCase();
-            var previewContent = '';
-
-            if (mQuery.inArray(extension, ['jpg', 'jpeg', 'gif', 'png']) !== -1) {
-                previewContent = mQuery('<img />').addClass('img-thumbnail').attr('src', url);
-            } else if (extension === 'pdf') {
-                previewContent = mQuery('<iframe />').attr('src', url);
-            }
-
-            preview.empty().html(previewContent);
-            preview.fadeIn('fast');
-        }
-        
-    });
-}

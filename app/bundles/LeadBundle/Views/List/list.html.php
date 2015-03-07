@@ -77,7 +77,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo count($item->getIncludedLeads()); ?></td>
+                    <td class="visible-md visible-lg"><a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':' . $item->getAlias())); ?>" data-toggle="ajax"><?php echo $leadCounts[$item->getId()]; ?></a></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

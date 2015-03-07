@@ -9,19 +9,14 @@
 $leadId   = $lead->getId();
 $leadName = $lead->getPrimaryIdentifier();
 ?>
-<table class="table table-condensed table-border">
+<ul class="list-group">
     <?php foreach ($campaigns as $c):
         $switch  = $c['inCampaign'] ? 'fa-toggle-on' : 'fa-toggle-off';
         $bgClass = $c['inCampaign'] ? 'text-success' : 'text-danger';
     ?>
-    <tr>
-        <td class="fa-fw">
-            <i class="fa fa-2x fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadCampaignToggle<?php echo $c['id']; ?>"
-               onclick="Mautic.toggleLeadCampaign('leadCampaignToggle<?php echo $c['id']; ?>', <?php echo $leadId; ?>, <?php echo $c['id']; ?>);"></i>
-        </td>
-        <td>
-            <?php echo $c['name']; ?>
-        </td>
-    </tr>
+    <li class="list-group-item">
+        <i class="fa fa-lg fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadCampaignToggle<?php echo $c['id']; ?>" onclick="Mautic.toggleLeadCampaign('leadCampaignToggle<?php echo $c['id']; ?>', <?php echo $leadId; ?>, <?php echo $c['id']; ?>);"></i>
+        <span><?php echo $c['name']; ?></span>
+    </li>
     <?php endforeach; ?>
-</table>
+</ul>

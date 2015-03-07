@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -499,7 +500,6 @@ class LeadModel extends FormModel
      * Sets current lead
      *
      * @param Lead $lead
-     * @param bool $systemForced Set by the system when executing actions that manipulate multiple leads
      */
     public function setCurrentLead(Lead $lead)
     {
@@ -623,135 +623,27 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param $lead
-     * @param $lists
+     * Add lead to lists
+     *
+     * @param      $lead
+     * @param      $lists
+     * @param bool $manuallyAdded
      */
-    public function addToLists($lead, $lists)
+    public function addToLists($lead, $lists, $manuallyAdded = false)
     {
-        static $foundLists = array();
-
-        $leadListModel = $this->factory->getModel('lead.list');
-        $leadListRepo  = $leadListModel->getRepository();
-
-        if (!$lists instanceof LeadList) {
-            if (!is_array($lists)) {
-                $lists = array($lists);
-            }
-
-            //make sure they are ints
-            $searchForLists = array();
-            foreach ($lists as $k => &$l) {
-                $l = (int) $l;
-                if (!isset($foundLists[$l])) {
-                    $searchForLists[] = $l;
-                }
-            }
-
-            if (!empty($searchForLists)) {
-                $listEntities = $leadListModel->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
-                                'column' => 'l.id',
-                                'expr'   => 'in',
-                                'value'  => $searchForLists
-                            )
-                        )
-                    )
-                ));
-
-                foreach ($listEntities as $list) {
-                    $foundLists[$list->getId()] = $list;
-                }
-            }
-
-            $persist = array();
-            foreach ($lists as $l) {
-                $foundLists[$l]->addLead($lead);
-                $persist[] = $foundLists[$l];
-
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                    $event = new ListChangeEvent($lead, $foundLists[$l], true);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-                }
-            }
-
-            $leadListRepo->saveEntities($persist);
-        } else {
-            $lists->addLead($lead);
-            $leadListRepo->saveEntity($lists);
-
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $lists, true);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-            }
-        }
+        $this->factory->getModel('lead.list')->addLead($lead, $lists, $manuallyAdded);
     }
 
     /**
-     * @param $lead
-     * @param $lists
+     * Remove lead from lists
+     *
+     * @param      $lead
+     * @param      $lists
+     * @param bool $manuallyRemoved
      */
-    public function removeFromLists($lead, $lists)
+    public function removeFromLists($lead, $lists, $manuallyRemoved = false)
     {
-        static $foundLists = array();
-
-        $leadListModel = $this->factory->getModel('lead.list');
-        $leadListRepo  = $leadListModel->getRepository();
-
-        if (!$lists instanceof LeadList) {
-            if (!is_array($lists)) {
-                $lists = array($lists);
-            }
-
-            //make sure they are ints
-            $searchForLists = array();
-            foreach ($lists as $k => &$l) {
-                $l = (int) $l;
-                if (!isset($foundLists[$l])) {
-                    $searchForLists[] = $l;
-                }
-            }
-
-            if (!empty($searchForLists)) {
-                $listEntities = $leadListModel->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
-                                'column' => 'l.id',
-                                'expr'   => 'in',
-                                'value'  => $searchForLists
-                            )
-                        )
-                    )
-                ));
-
-                foreach ($listEntities as $list) {
-                    $foundLists[$list->getId()] = $list;
-                }
-            }
-
-            $persist = array();
-            foreach ($lists as $l) {
-                $foundLists[$l]->removeLead($lead);
-                $persist[] = $foundLists[$l];
-
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                    $event = new ListChangeEvent($lead, $foundLists[$l], false);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-                }
-            }
-
-            $leadListRepo->saveEntities($persist);
-        } else {
-            $lists->removeLead($lead);
-            $leadListRepo->saveEntity($lists);
-
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $lists, false);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-            }
-        }
+        $this->factory->getModel('lead.list')->removeLead($lead, $lists, $manuallyRemoved);
     }
 
     /**

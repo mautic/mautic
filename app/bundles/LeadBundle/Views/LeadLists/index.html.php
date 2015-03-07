@@ -9,21 +9,16 @@
 $leadId   = $lead->getId();
 $leadName = $lead->getPrimaryIdentifier();
 ?>
-<table class="table table-condensed table-border">
+<ul class="list-group">
     <?php foreach ($lists as $l): ?>
     <?php
         $inList  = in_array($leadId, $l['leads']);
         $switch  = $inList ? 'fa-toggle-on' : 'fa-toggle-off';
         $bgClass = $inList ? 'text-success' : 'text-danger';
     ?>
-    <tr>
-        <td class="fa-fw">
-            <i class="fa fa-2x fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadListToggle<?php echo $l['id']; ?>"
-               onclick="Mautic.toggleLeadList('leadListToggle<?php echo $l['id']; ?>', <?php echo $leadId; ?>, <?php echo $l['id']; ?>);"></i>
-        </td>
-        <td>
-            <?php echo $l['name'] . ' (' . $l['alias'] . ')'; ?>
-        </td>
-    </tr>
+    <li class="list-group-item">
+        <i class="fa fa-lg fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadListToggle<?php echo $l['id']; ?>" onclick="Mautic.toggleLeadList('leadListToggle<?php echo $l['id']; ?>', <?php echo $leadId; ?>, <?php echo $l['id']; ?>);"></i>
+        <span><?php echo $l['name'] . ' (' . $l['alias'] . ')'; ?></span>
+    </li>
     <?php endforeach; ?>
-</table>
+</ul>
