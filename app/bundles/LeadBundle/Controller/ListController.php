@@ -23,6 +23,9 @@ class ListController extends FormController
      */
     public function indexAction($page = 1)
     {
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        $model = $this->factory->getModel('lead.list');
+
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'lead:leads:viewown',
@@ -56,7 +59,7 @@ class ListController extends FormController
             $filter["force"] = " ($mine or $global)";
         }
 
-        $items =$this->factory->getModel('lead.list')->getEntities(
+        $items = $model->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -64,6 +67,7 @@ class ListController extends FormController
             ));
 
         $count = count($items);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -91,8 +95,12 @@ class ListController extends FormController
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.leadlist.page', $page);
 
+        $listIds    = array_keys($items->getIterator()->getArrayCopy());
+        $leadCounts = $model->getRepository()->getLeadCount($listIds);
+
         $parameters = array(
             'items'       => $items,
+            'leadCounts'  => $leadCounts,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,

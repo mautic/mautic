@@ -252,7 +252,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $list !== null) {
                 $class = "{$action}Lead";
-                $listModel->$class($lead, $list);
+                $listModel->$class($lead, $list, true);
                 $dataArray['success'] = 1;
             }
         }
@@ -281,7 +281,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $campaign !== null) {
                 $class = "{$action}Lead";
-                $campaignModel->$class($campaign, $lead);
+                $campaignModel->$class($campaign, $lead, true);
                 $dataArray['success'] = 1;
             }
         }

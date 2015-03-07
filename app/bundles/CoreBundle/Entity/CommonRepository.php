@@ -105,9 +105,10 @@ class CommonRepository extends EntityRepository
         if (isset($args['qb'])) {
             $q = $args['qb'];
         } else {
-            $q = $this
-                ->createQueryBuilder($alias)
-                ->select($alias);
+            $q = $this->_em
+                ->createQueryBuilder()
+                ->select($alias)
+                ->from($this->_entityName, $alias, "{$alias}.id");
         }
 
         $this->buildClauses($q, $args);

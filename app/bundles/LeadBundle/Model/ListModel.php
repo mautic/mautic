@@ -11,7 +11,9 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -25,6 +27,13 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ListModel extends FormModel
 {
     /**
+     * Used by addLead and removeLead functions
+     *
+     * @var array
+     */
+    private $leadChangeLists = array();
+
+    /**
      * {@inheritdoc}
      *
      * @return \Mautic\LeadBundle\Entity\LeadListRepository
@@ -32,6 +41,16 @@ class ListModel extends FormModel
     public function getRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadList');
+    }
+
+    /**
+     * Returns the repository for the table that houses the leads associated with a list
+     *
+     * @return \Mautic\LeadBundle\Entity\ListLeadRepository
+     */
+    public function getListLeadRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:ListLead');
     }
 
     /**
@@ -84,10 +103,9 @@ class ListModel extends FormModel
         }
         $entity->setAlias($alias);
 
-        $this->regenerateListLeads($entity, $isNew, false);
-
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $repo->saveEntity($entity);
+        $this->regenerateListLeads($entity, $isNew, false);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
     }
 
@@ -108,8 +126,8 @@ class ListModel extends FormModel
             $oldLeadList = $this->getLeadsByList(array('id' => $id), true);
             $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
 
-            $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
-            $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
+            $addLeads     = array_diff($newLeadList[$id], $oldLeadList[$id]);
+            $removeLeads  = array_diff($oldLeadList[$id], $newLeadList[$id]);
         } else {
             $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true, true);
             $addLeads    = $newLeadList['new'];
@@ -117,23 +135,17 @@ class ListModel extends FormModel
         }
 
         foreach ($addLeads as $l) {
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $l);
-            if ($entity->addLead($lead, true)) {
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                    $event = new ListChangeEvent($lead, $entity, true);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-                }
+           $this->addLead($l, $entity);
+        }
+
+        if (isset($manuallyAdded)) {
+            foreach ($manuallyAdded as $l) {
+                $this->addLead($l, $entity, true);
             }
         }
 
         foreach ($removeLeads as $l) {
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $l);
-            if ($entity->removeLead($lead, true)) {
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                    $event = new ListChangeEvent($lead, $entity, false);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-                }
-            }
+           $this->removeLead($l, $entity);
         }
 
         if ($persist) {
@@ -315,33 +327,204 @@ class ListModel extends FormModel
         return $lists;
     }
 
+
     /**
-     * @param $lead
-     * @param $lists
+     * Add lead to lists
+     *
+     * @param      $lead
+     * @param      $lists
+     * @param bool $manuallyAdded
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function addLead($lead, $lists)
+    public function addLead($lead, $lists, $manuallyAdded = false)
     {
-        $this->factory->getModel('lead')->addToLists($lead, $lists);
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        }
+
+        if (!$lists instanceof LeadList) {
+            //make sure they are ints
+            $searchForLists = array();
+            foreach ($lists as $k => &$l) {
+                $l = (int) $l;
+                if (!isset($this->leadChangeLists[$l])) {
+                    $searchForLists[] = $l;
+                }
+            }
+
+            if (!empty($searchForLists)) {
+                $listEntities = $this->getEntities(array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => $searchForLists
+                            )
+                        )
+                    )
+                ));
+
+                foreach ($listEntities as $list) {
+                    $this->leadChangeLists[$list->getId()] = $list;
+                }
+            }
+        } else {
+            $this->leadChangeLists[$lists->getId()] = $lists;
+
+            $lists = array($lists->getId());
+        }
+
+        if (!is_array($lists)) {
+            $lists = array($lists);
+        }
+
+        $persistLists = array();
+
+        foreach ($lists as $l) {
+            $listLead = $this->getListLeadRepository()->findOneBy(array(
+                'lead' => $lead,
+                'list' => $this->leadChangeLists[$l]
+            ));
+            if ($listLead != null) {
+                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                    $listLead->setManuallyRemoved(false);
+                    $listLead->setManuallyAdded(true);
+
+                    $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
+                    $persistLists[] = $this->leadChangeLists[$l];
+                } else {
+                    continue;
+                }
+            } else {
+                $listLead = new ListLead();
+                $listLead->setList($this->leadChangeLists[$l]);
+                $listLead->setLead($lead);
+                $listLead->setManuallyAdded($manuallyAdded);
+                $listLead->setDateAdded(new \DateTime());
+
+                $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
+                $persistLists[] = $this->leadChangeLists[$l];
+            }
+
+            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], true);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+            }
+        }
+
+        if (!empty($persistLists)) {
+            $this->saveEntities($persistLists, false);
+        }
     }
 
     /**
-     * @param $lead
-     * @param $lists
+     * Remove a lead from lists
+     *
+     * @param      $lead
+     * @param      $lists
+     * @param bool $manuallyRemoved
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function removeLead($lead, $lists)
+    public function removeLead($lead, $lists, $manuallyRemoved = false)
     {
-        $this->factory->getModel('lead')->removeFromLists($lead, $lists);
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        }
+
+        if (!$lists instanceof LeadList) {
+            //make sure they are ints
+            $searchForLists = array();
+            foreach ($lists as $k => &$l) {
+                $l = (int)$l;
+                if (!isset($this->leadChangeLists[$l])) {
+                    $searchForLists[] = $l;
+                }
+            }
+
+            if (!empty($searchForLists)) {
+                $listEntities = $this->getEntities(array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => $searchForLists
+                            )
+                        )
+                    )
+                ));
+
+                foreach ($listEntities as $list) {
+                    $this->leadChangeLists[$list->getId()] = $list;
+                }
+            }
+        } else {
+            $this->leadChangeLists[$lists->getId()] = $lists;
+
+            $lists = array($lists->getId());
+        }
+
+
+        if (!is_array($lists)) {
+            $lists = array($lists);
+        }
+
+        $persistLists = array();
+        foreach ($lists as $l) {
+            $dispatchEvent = false;
+
+            $listLead = $this->getListLeadRepository()->findOneBy(array(
+                'lead' => $lead,
+                'list' => $this->leadChangeLists[$l]
+            ));
+
+            if ($listLead == null) {
+                // Lead is not part of this list
+                continue;
+            }
+
+            if (($manuallyRemoved && $listLead->wasManuallyAdded()) || (!$manuallyRemoved && !$listLead->wasManuallyAdded())) {
+                //lead was manually added and now manually removed or was not manually added and now being removed
+                $dispatchEvent = true;
+
+                $this->leadChangeLists[$l]->removeLead($listLead);
+                $persistLists[] = $this->leadChangeLists[$l];
+            } elseif ($manuallyRemoved && !$listLead->wasManuallyAdded()) {
+                $dispatchEvent = true;
+
+                $listLead->setManuallyRemoved(true);
+
+                $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
+                $persistLists[] = $this->leadChangeLists[$l];
+            }
+
+            if ($dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], false);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+            }
+        }
+
+        if (!empty($persistLists)) {
+            $this->saveEntities($persistLists, false);
+        }
     }
+
 
     /**
      * @param      $lists
      * @param bool $idOnly
      * @param bool $dynamic
+     * @param bool $ignoreCache
      *
      * @return mixed
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false)
+    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $ignoreCache = false)
     {
-        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic);
+        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic, true, $ignoreCache);
     }
 }

@@ -331,11 +331,11 @@ class Campaign extends FormEntity
      */
     public function addLead($key, Lead $lead)
     {
-        if (!$this->leads->contains($lead)) {
-            $leadEntity = $lead->getLead();
-            $this->changes['leads']['added'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-            $this->leads[$key] = $lead;
-        }
+        $action     = ($this->leads->contains($lead)) ? 'updated' : 'added';
+        $leadEntity = $lead->getLead();
+
+        $this->changes['leads'][$action][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
+        $this->leads[$key] = $lead;
 
         return $this;
     }

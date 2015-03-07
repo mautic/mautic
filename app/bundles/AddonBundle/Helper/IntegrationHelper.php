@@ -91,7 +91,7 @@ class IntegrationHelper
                     continue;
                 }
                 if (!isset($integrations[$a['integration']])) {
-                    $class           = "\\MauticAddon\\{$a['namespace']}\\Integration\\{$a['integration']}Integration";
+                    $class           = "\\MauticAddon\\" . $a['namespace'] . "\\Integration\\" . $a['integration'] . "Integration";
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInstantiable()) {
                         $integrations[$a['integration']] = new $class($this->factory);
