@@ -46,7 +46,8 @@ class LanguageHelper
             CURLOPT_SSL_VERIFYPEER  => false
         ));
 
-        $this->cacheFile = $this->factory->getSystemPath('cache') . '/languageList.txt';
+        // Moved to outside environment folder so that it doesn't get wiped on each config update
+        $this->cacheFile = $this->factory->getSystemPath('cache') . '/../languageList.txt';
         $this->connector = HttpFactory::getHttp($options);
     }
 
@@ -129,7 +130,7 @@ class LanguageHelper
      *
      * @return array
      */
-    public function fetchLanguages($overrideCache = false)
+    public function fetchLanguages($overrideCache = false, $returnError = true)
     {
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($this->cacheFile)) {
@@ -151,7 +152,7 @@ class LanguageHelper
             $logger = $this->factory->getLogger();
             $logger->addError('An error occurred while attempting to fetch the language list: ' . $exception->getMessage());
 
-            return array(
+            return (!$returnError) ? array() : array(
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.fetching.languages'
             );
@@ -166,7 +167,7 @@ class LanguageHelper
                 is_string($data->body) ? $data->body : implode('; ', $data->body)
             ));
 
-            return array(
+            return (!$returnError) ? array() : array(
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.fetching.languages'
             );

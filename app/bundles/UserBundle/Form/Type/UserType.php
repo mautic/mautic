@@ -56,7 +56,7 @@ class UserType extends AbstractType
         // Get the list of available languages
         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
         $languageHelper = $factory->getHelper('language');
-        $languages = $languageHelper->fetchLanguages();
+        $languages = $languageHelper->fetchLanguages(false, false);
         $langChoices = array();
 
         foreach ($languages as $code => $langData) {
