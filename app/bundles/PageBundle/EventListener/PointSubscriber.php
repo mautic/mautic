@@ -52,7 +52,8 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
             'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'validateUrlHit'),
-            'formType'    => 'pointaction_urlhit'
+            'formType'    => 'pointaction_urlhit',
+            'formTheme'   => 'MauticPageBundle:FormTheme\Point'
         );
 
         $event->addAction('url.hit', $action);

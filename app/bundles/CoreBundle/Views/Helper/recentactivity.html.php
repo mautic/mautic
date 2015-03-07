@@ -17,7 +17,7 @@
         <ul class="media-list media-list-feed">
             <?php foreach ($logs as $log) : ?>
             <li class="media">
-                <div class="media-object pull-left mt-xs">
+                <div class="media-object pull-left">
                 <?php if ($log['action'] == 'create') : ?>
                     <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
                 <?php else: ?>
