@@ -30,6 +30,12 @@ mQuery(document).ready(function () {
                     if (!data) {
                         mQuery(that).html('');
                     }
+                },
+                instanceReady: function( event ) {
+                    var data = event.editor.getData();
+                    if (!data) {
+                        mQuery(that).html('');
+                    }
                 }
             }
         });
