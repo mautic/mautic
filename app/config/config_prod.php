@@ -23,6 +23,7 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
+$debugMode = $container->getParameter('kernel.debug');
 $container->loadFromExtension("monolog", array(
     "channels" => array(
         "mautic",
@@ -31,7 +32,7 @@ $container->loadFromExtension("monolog", array(
         "main"    => array(
             "type"         => "fingers_crossed",
             "buffer_size"  => "200",
-            "action_level" => "error",
+            "action_level" => ($debugMode) ? "debug" : "error",
             "handler"      => "nested",
             "channels" => array(
                 "!mautic"
@@ -40,7 +41,7 @@ $container->loadFromExtension("monolog", array(
         "nested"  => array(
             "type"  => "stream",
             "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
-            "level" => "error"
+            "level" => ($debugMode) ? "debug" : "error"
         ),
         "console" => array(
             "type" => "console"
@@ -48,7 +49,7 @@ $container->loadFromExtension("monolog", array(
         "mautic"    => array(
             "type"  => "stream",
             "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
-            "level" => "error",
+            "level" => ($debugMode) ? "debug" : "error",
             'channels' => array(
                 'mautic',
             ),
