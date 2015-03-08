@@ -136,6 +136,12 @@ class CampaignSubscriber extends CommonSubscriber
         $list   = $event->getList();
         $action = $event->wasAdded() ? 'added' : 'removed';
         $name   = 'lead.listchange.' . $lead->getId() . '.' . $list->getId() . '.' . $action;
+
+        if (!$this->security->isAnonymous()) {
+            // Force actions
+            defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        }
+
         $model->triggerEvent('lead.listchange', $event, $name);
     }
 }
