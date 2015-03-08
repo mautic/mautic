@@ -241,7 +241,9 @@ class LeadRepository extends CommonRepository
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-            ->where('cl.lead_id = ' . $toLeadId);
+            ->where('cl.lead_id = ' . $toLeadId)
+            ->execute()
+            ->fetchAll();
         $campaigns = array();
         foreach ($results as $r) {
             $campaigns[] = $r['campaign_id'];
