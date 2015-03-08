@@ -219,12 +219,12 @@ class EventModel extends CommonFormModel
 
                 //check to see if this has been fired sequentially
                 if (!empty($event['parent'])) {
-                    if (!isset($leadsEvents[$event['parent']['id']])) {
+                    if (!isset($leadsEvents[$leadId][$event['parent']['id']])) {
                         //this event has a parent that has not been triggered for this lead so break out
                         $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet or was triggered with this batch');
                         continue;
                     }
-                    $parentLog = $leadsEvents[$event['parent']['id']]['log'][0];
+                    $parentLog = $leadsEvents[$leadId][$event['parent']['id']]['log'][0];
 
                     if ($parentLog['isScheduled']) {
                         //this event has a parent that is scheduled and thus not triggered
@@ -257,7 +257,7 @@ class EventModel extends CommonFormModel
 
                     $childrenTriggered = false;
                     foreach ($event['children'] as $child) {
-                        if (isset($leadsEvents[$child['id']])) {
+                        if (isset($leadsEvents[$leadId][$child['id']])) {
                             //this child event has already been fired for this lead so move on to the next event
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' already triggered');
                             continue;
