@@ -95,6 +95,19 @@ class AppKernel extends Kernel
             return new RedirectResponse($base . '/installer');
         }
 
+        // Check for an an active db connection and die with error if unable to connect
+        if (!defined('MAUTIC_INSTALLER')) {
+            $db = $this->getContainer()->get('database_connection');
+            try {
+                $db->connect();
+            } catch (\Exception $e) {
+                error_log($e);
+                die($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
+                    '%code%' => $e->getCode()
+                )));
+            }
+        }
+
         return parent::handle($request, $type, $catch);
     }
 
