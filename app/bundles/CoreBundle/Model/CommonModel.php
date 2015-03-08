@@ -156,14 +156,7 @@ class CommonModel
      */
     public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
     {
-        if ($absolute && php_sapi_name() == 'cli') {
-            $siteUrl = $this->factory->getParameter('site_url');
-            $baseUrl = $this->factory->getRouter()->generate($route, $routeParams);
-            $url     = $siteUrl . $baseUrl;
-        } else {
-            $url = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
-        }
-
+        $url  = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
 
         return $url;
