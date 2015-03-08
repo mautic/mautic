@@ -335,6 +335,10 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
+        //check for existing IP
+        $ipAddress = $this->factory->getIpAddress();
+        $hit->setIpAddress($ipAddress);
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
@@ -347,7 +351,6 @@ class PageModel extends FormModel
                 $lead = $leadModel->getEntity($clickthrough['lead']);
                 if ($lead !== null) {
                     $leadModel->setLeadCookie($clickthrough['lead']);
-                    list($trackingId, $generated) = $leadModel->getTrackingCookie();
                     $leadClickthrough = true;
 
                     $leadModel->setCurrentLead($lead);
@@ -365,79 +368,7 @@ class PageModel extends FormModel
         }
 
         if (empty($leadClickthrough)) {
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
-        }
-
-        $hit->setTrackingId($trackingId);
-        $hit->setLead($lead);
-
-        if (!$generated) {
-            $lastHit = $request->cookies->get('mautic_referer_id');
-            if (!empty($lastHit)) {
-                //this is not a new session so update the last hit if applicable with the date/time the user left
-                $this->getHitRepository()->updateHitDateLeft($lastHit);
-            }
-        }
-
-        if (!empty($page)) {
-            $hitCount = $page->getHits();
-            $hitCount++;
-            $page->setHits($hitCount);
-
-            //check for a hit from tracking id
-            $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
-            if (empty($countById)) {
-                $uniqueHitCount = $page->getUniqueHits();
-                $uniqueHitCount++;
-                $page->setUniqueHits($uniqueHitCount);
-            }
-
-            if ($page instanceof Page) {
-                $hit->setPage($page);
-                $hit->setPageLanguage($page->getLanguage());
-
-                if ($countById) {
-                    $variantHitCount = $page->getVariantHits();
-                    $variantHitCount++;
-                    $page->setVariantHits($variantHitCount);
-                }
-            } elseif ($page instanceof Redirect) {
-                $hit->setRedirect($page);
-            }
-
-            $this->em->persist($page);
-        }
-
-        //check for existing IP
-        $ipAddress = $this->factory->getIpAddress();
-
-        $hit->setIpAddress($ipAddress);
-
-        //glean info from the IP address
-        if ($details = $ipAddress->getIpDetails()) {
-            $hit->setCountry($details['country']);
-            $hit->setRegion($details['region']);
-            $hit->setCity($details['city']);
-            $hit->setIsp($details['isp']);
-            $hit->setOrganization($details['organization']);
-        }
-
-        $hit->setCode($code);
-        $hit->setReferer($request->server->get('HTTP_REFERER'));
-        $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
-
-        //get a list of the languages the user prefers
-        $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
-        if (!empty($browserLanguages)) {
-            $languages = explode(',', $browserLanguages);
-            foreach ($languages as $k => $l) {
-                if ($pos = strpos(';q=', $l) !== false) {
-                    //remove weights
-                    $languages[$k] = substr($l, 0, $pos);
-                }
-            }
-            $hit->setBrowserLanguages($languages);
+            $lead = $leadModel->getCurrentLead();
         }
 
         if ($page instanceof Redirect) {
@@ -504,6 +435,25 @@ class PageModel extends FormModel
                     }
 
                     if (count($inQuery)) {
+                        if (isset($inQuery['email'])) {
+                            // Make sure a lead does not currently exist if the current lead doesn't match
+                            $fields = $lead->getFields();
+                            if (strtolower($inQuery['email']) != $fields['core']['email']['value']) {
+                                $exists = $leadModel->getRepository()->getLeadsByFieldValue('email', $inQuery['email'], $lead->getId());
+                                if (!empty($exists)) {
+                                    //merge with current lead
+                                    $lead = $leadModel->mergeLeads($lead, $exists[0]);
+                                    $leadIpAddresses = $lead->getIpAddresses();
+
+                                    if (!$leadIpAddresses->contains($ipAddress)) {
+                                        $lead->addIpAddress($ipAddress);
+                                    }
+
+                                    $leadModel->setCurrentLead($lead);
+                                }
+                            }
+
+                        }
                         $leadModel->setFieldValues($lead, $inQuery);
                         $leadModel->saveEntity($lead);
                     }
@@ -524,6 +474,75 @@ class PageModel extends FormModel
         }
 
         $hit->setUrl($pageURL);
+
+        list($trackingId, $generated) = $leadModel->getTrackingCookie();
+
+        $hit->setTrackingId($trackingId);
+        $hit->setLead($lead);
+
+        if (!$generated) {
+            $lastHit = $request->cookies->get('mautic_referer_id');
+            if (!empty($lastHit)) {
+                //this is not a new session so update the last hit if applicable with the date/time the user left
+                $this->getHitRepository()->updateHitDateLeft($lastHit);
+            }
+        }
+
+        if (!empty($page)) {
+            $hitCount = $page->getHits();
+            $hitCount++;
+            $page->setHits($hitCount);
+
+            //check for a hit from tracking id
+            $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
+            if (empty($countById)) {
+                $uniqueHitCount = $page->getUniqueHits();
+                $uniqueHitCount++;
+                $page->setUniqueHits($uniqueHitCount);
+            }
+
+            if ($page instanceof Page) {
+                $hit->setPage($page);
+                $hit->setPageLanguage($page->getLanguage());
+
+                if ($countById) {
+                    $variantHitCount = $page->getVariantHits();
+                    $variantHitCount++;
+                    $page->setVariantHits($variantHitCount);
+                }
+            } elseif ($page instanceof Redirect) {
+                $hit->setRedirect($page);
+            }
+
+            $this->em->persist($page);
+        }
+
+        //glean info from the IP address
+        if ($details = $ipAddress->getIpDetails()) {
+            $hit->setCountry($details['country']);
+            $hit->setRegion($details['region']);
+            $hit->setCity($details['city']);
+            $hit->setIsp($details['isp']);
+            $hit->setOrganization($details['organization']);
+        }
+
+        $hit->setCode($code);
+        $hit->setReferer($request->server->get('HTTP_REFERER'));
+        $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
+        $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+
+        //get a list of the languages the user prefers
+        $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
+        if (!empty($browserLanguages)) {
+            $languages = explode(',', $browserLanguages);
+            foreach ($languages as $k => $l) {
+                if ($pos = strpos(';q=', $l) !== false) {
+                    //remove weights
+                    $languages[$k] = substr($l, 0, $pos);
+                }
+            }
+            $hit->setBrowserLanguages($languages);
+        }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($hit, $request, $code);
