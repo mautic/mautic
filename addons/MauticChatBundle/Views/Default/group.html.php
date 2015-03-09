@@ -17,7 +17,7 @@ if (!empty($insertUnreadDivider) && ((isset($lastReadId) && $firstMsg['id'] > $l
 ?>
 <li class="media<?php echo $direction; ?> chat-group nm pb-0" id="ChatGroup<?php echo $firstMsg['id']; ?>">
     <div class="media-object">
-        <img src="<?php echo $view['gravatar']->getImage($user['email'], 40); ?>" class="img-circle" alt="">
+        <img style="max-width: 40px;" src="<?php echo $view['gravatar']->getImage($user['email'], 40); ?>" class="img-circle" alt="">
         <div class="small"><?php echo $user['firstName'] . ' ' . substr($user['lastName'], 0, 1) . '.'; ?></div>
     </div>
 
