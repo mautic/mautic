@@ -78,7 +78,7 @@ class FieldController extends CommonFormController
                     $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
-                    $fields          = $session->get('mautic.form.'.$formId.'.fields.modified');
+                    $fields          = $session->get('mautic.form.'.$formId.'.fields.modified', array());
                     $formData        = $form->getData();
                     $formField       = array_merge($formField, $formData);
                     $formField['id'] = $keyId;
