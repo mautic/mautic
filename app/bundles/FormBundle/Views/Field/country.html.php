@@ -13,5 +13,5 @@ echo $view->render('MauticFormBundle:Field:select.html.php', array(
     'list'    => \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames(),
     'id'      => $id,
     'deleted' => (!empty($deleted)) ? true : false,
-    'formId'  => $formId
+    'formId'  => (isset($formId)) ? $formId : 0
 ));
