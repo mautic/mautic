@@ -11,8 +11,11 @@ if (strpos($labelAttr, 'class') === false)
     $labelAttr .= ' class="mauticform-label"';
 
 $inputAttr = 'id="mauticform_input_' . $field['alias'] . '" '. $field['inputAttributes'];
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform-selectbox"';
+if (strpos($inputAttr, 'class') === false) {
+    $inputAttr .= ' class="mauticform-selectbox' . (!empty($inForm) ? ' not-chosen' : '') . '"';
+} elseif ((!empty($inForm))) {
+    $inputAttr = str_replace('class="', 'class="not-chosen ', $labelAttr);
+}
 
 if (!empty($inForm))
     $inputAttr .= ' disabled="disabled"';
@@ -43,7 +46,7 @@ if ($field['isRequired']) {
 }
 ?>
 
-<div class="mauticform-row mauticform-select<?php echo $containerClass; ?> mauticform-row-<?php echo $field['alias']; ?>" id="mauticform_<?php echo $id; ?>">
+<div class="mauticform-row mauticform-select<?php echo $containerClass . ($inForm ? ' not-chosen' : ''); ?> mauticform-row-<?php echo $field['alias']; ?>" id="mauticform_<?php echo $id; ?>">
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
