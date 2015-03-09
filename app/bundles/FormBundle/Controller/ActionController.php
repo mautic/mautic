@@ -72,7 +72,7 @@ class ActionController extends CommonFormController
                     $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
-                    $actions          = $session->get('mautic.form.'.$formId.'.actions.modified');
+                    $actions          = $session->get('mautic.form.'.$formId.'.actions.modified', array());
                     $formData         = $form->getData();
                     $formAction       = array_merge($formAction, $formData);
                     $formAction['id'] = $keyId;
