@@ -160,8 +160,8 @@ $form['filters']->setRendered();
                                                                 <select class="form-control" name="leadlist[filters][filter][]" data-placeholder="<?php echo $choices[$filter['field']]['label']; ?>">
                                                                     <?php foreach ($regions as $country => $countryRegions): ?>
                                                                         <optgroup><?php echo $country; ?></optgroup>
-                                                                        <?php $selected = ($filter['filter'] == $v) ? ' selected="selected"' : ''; ?>
                                                                         <?php foreach ($countryRegions as $v => $l): ?>
+                                                                            <?php $selected = ($filter['filter'] == $l) ? ' selected="selected"' : ''; ?>
                                                                             <option value="<?php echo $v; ?>"<?php echo $selected; ?>><?php echo $l; ?></option>
                                                                         <?php endforeach; ?>
                                                                     <?php endforeach; ?>
