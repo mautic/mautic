@@ -18,8 +18,7 @@
     .mauticform-row.mauticform-required .mauticform-label:after { color: #e32; content: " *"; display: inline; }
     .mauticform-helpmessage { display: block; font-size: 0.9em; margin-bottom: 3px; }
     .mauticform-errormsg { display: block; color: red;}
-    .mauticform-selectbox, .mauticform-input, .mauticform-textarea { width: 50%; padding: 0.5em 0.6em; border: 1px solid #CCC; box-shadow: 0px 1px 3px #DDD inset; border-radius: 4px; box-sizing: border-box; }
-    .mauticform-input { height: 30px !important; }
+    .mauticform-selectbox, .mauticform-input, .mauticform-textarea { width: 50%; padding: 0.2em 0.2em; border: 1px solid #CCC; box-shadow: 0px 1px 3px #DDD inset; border-radius: 4px; box-sizing: border-box; }
     .mauticform-checkboxgrp-row {}
     .mauticform-checkboxgrp-label { font-weight: normal; }
     .mauticform-checkboxgrp-checkbox {}
