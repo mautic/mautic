@@ -36,8 +36,6 @@ class UpdateHelper
         $this->factory = $factory;
 
         $options = array('transport.curl' => array(
-            CURLOPT_SSLVERSION      => 1,
-            CURLOPT_SSL_CIPHER_LIST => 'TLSv1',
             CURLOPT_SSL_VERIFYPEER  => false
         ));
 
