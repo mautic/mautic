@@ -38,15 +38,14 @@ class PointEventHelper
     }
 
     /**
-     * @param       $action
-     *
-     * @return array
+     * @param               $event
+     * @param Lead          $lead
+     * @param MauticFactory $factory
      */
-    public static function sendEmail(TriggerEvent $event, Lead $lead, MauticFactory $factory)
+    public static function sendEmail($event, Lead $lead, MauticFactory $factory)
     {
-        $properties = $event->getProperties();
+        $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
-        $trigger    = $event->getTrigger();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $factory->getModel('email');
@@ -62,7 +61,7 @@ class PointEventHelper
                     'firstname' => $leadFields['core']['firstname']['value'],
                     'lastname'  => $leadFields['core']['lastname']['value']
                 );
-                $options = array('source' => array('trigger', $trigger->getId()));
+                $options = array('source' => array('trigger', $event['id']));
                 $model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
             }
         }
