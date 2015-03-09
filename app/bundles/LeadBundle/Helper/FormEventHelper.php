@@ -140,8 +140,8 @@ class FormEventHelper
                 $model = $factory->getModel('lead.lead');
                 $em    = $factory->getEntityManager();
                 $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue(
-                    $properties['leadField'],
-                    $fieldName
+                    $fieldName,
+                    $post[$fieldName]
                 );
 
                 //check for existing IP address or add one if not exist
