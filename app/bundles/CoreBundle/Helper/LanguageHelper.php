@@ -132,6 +132,11 @@ class LanguageHelper
      */
     public function fetchLanguages($overrideCache = false, $returnError = true)
     {
+        $overrideFile = $this->factory->getParameter('language_list_file');
+        if (!empty($overrideFile) && is_readable($overrideFile)) {
+            return json_decode(file_get_contents($overrideFile), true);
+        }
+
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($this->cacheFile)) {
             $cacheData = json_decode(file_get_contents($this->cacheFile), true);
