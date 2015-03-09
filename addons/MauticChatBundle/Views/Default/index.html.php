@@ -28,12 +28,9 @@ if (empty($contentOnly)) {
     </div>
 </div>
 <div id="ChatCanvasContent">
-    <style type="text/css" scoped>
-        .chat-new-divider {
-            text-align: center;
-            color: #00b6ad;
-        }
+<?php endif; ?>
 
+    <style type="text/css" scoped>
         .chat-channel {
             font-size: 14px;
         }
@@ -52,10 +49,6 @@ if (empty($contentOnly)) {
             padding-top: 0 !important;
         }
 
-        #ChatUsers li.chat-list img.media-object {
-            width: 40px;
-        }
-
         .col-chat-settings {
             width: 25px;
         }
@@ -64,8 +57,6 @@ if (empty($contentOnly)) {
             width: 25px;
         }
     </style>
-<?php endif; ?>
-
 <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array(
     'channels'    => $channels,
     'permissions' => $permissions
