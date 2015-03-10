@@ -125,7 +125,7 @@ class LeadListRepository extends CommonRepository
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
             if ($forList) {
-                $q->select('partial l.{id, alias, name}, partial lead.{id}');
+                $q->select('partial l.{id, alias, name}, partial il.{lead, list}');
             } else {
                 $q->select('l, partial lead.{id}');
             }
@@ -142,7 +142,7 @@ class LeadListRepository extends CommonRepository
             $return = array();
             foreach ($result as $r) {
                 foreach($r['leads'] as $l) {
-                    $return[$l['lead']['id']][$r['id']] = $r;
+                    $return[$l['lead_id']][$r['id']] = $r;
                 }
             }
 

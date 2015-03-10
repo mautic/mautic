@@ -704,12 +704,14 @@ class CampaignModel extends CommonFormModel
                 $listsByLeads = $listRepo->getLeadLists($campaignLeads, true);
 
                 foreach ($campaignLeads as $l) {
-                    //does this lead belong to another list still in the campaign?
-                    $leadsLists = array_keys($listsByLeads[$l]);
+                    if (!empty($listsByLeads[$l])) {
+                        //does this lead belong to another list still in the campaign?
+                        $leadsLists = array_keys($listsByLeads[$l]);
 
-                    $inBothLists = array_intersect($leadsLists, $campaignListIds);
-                    if (!empty($inBothLists)) {
-                        continue;
+                        $inBothLists = array_intersect($leadsLists, $campaignListIds);
+                        if (!empty($inBothLists)) {
+                            continue;
+                        }
                     }
 
                     $this->removeLead($campaign, $l, false, false);
