@@ -161,7 +161,7 @@ $form['filters']->setRendered();
                                                                     <?php foreach ($regions as $country => $countryRegions): ?>
                                                                         <optgroup><?php echo $country; ?></optgroup>
                                                                         <?php foreach ($countryRegions as $v => $l): ?>
-                                                                            <?php $selected = ($filter['filter'] == $l) ? ' selected="selected"' : ''; ?>
+                                                                            <?php $selected = ($filter['filter'] == $v) ? ' selected="selected"' : ''; ?>
                                                                             <option value="<?php echo $v; ?>"<?php echo $selected; ?>><?php echo $l; ?></option>
                                                                         <?php endforeach; ?>
                                                                     <?php endforeach; ?>
