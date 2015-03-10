@@ -95,6 +95,19 @@ class AppKernel extends Kernel
             return new RedirectResponse($base . '/installer');
         }
 
+        // Check for an an active db connection and die with error if unable to connect
+        if (!defined('MAUTIC_INSTALLER')) {
+            $db = $this->getContainer()->get('database_connection');
+            try {
+                $db->connect();
+            } catch (\Exception $e) {
+                error_log($e);
+                die($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
+                    '%code%' => $e->getCode()
+                )));
+            }
+        }
+
         return parent::handle($request, $type, $catch);
     }
 
@@ -302,22 +315,11 @@ class AppKernel extends Kernel
      */
     private function isInstalled()
     {
-        static $isInstalled;
+        static $isInstalled = null;
 
-        if (empty($isInstalled)) {
-            $isInstalled = false;
+        if ($isInstalled === null) {
             $params      = $this->getLocalParams();
-            if (!empty($params)) {
-                try {
-                    $db          = $this->getDatabaseConnection($params);
-                    $prefix      = (isset($params['db_table_prefix'])) ? $params['db_table_prefix'] : '';
-                    $users       = $db->createQueryBuilder()->select('count(u.id) as count')->from($prefix.'users', 'u')->execute()->fetchAll();
-                    $isInstalled = (!empty($users[0]['count']));
-
-                    $db->close();
-                } catch (\Exception $exception) {
-                }
-            }
+            $isInstalled = (is_array($params) && !empty($params['db_driver']) && !empty($params['mailer_from_name']));
         }
 
         return $isInstalled;
@@ -404,7 +406,7 @@ class AppKernel extends Kernel
             if ($configFile = $this->getLocalConfigFile()) {
                 /** @var $parameters */
                 include $configFile;
-                $localParameters = $parameters;
+                $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : array();
             } else {
                 $localParameters = array();
             }

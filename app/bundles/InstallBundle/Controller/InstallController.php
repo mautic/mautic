@@ -264,9 +264,6 @@ class InstallController extends CommonController
                     // Clear the cache one final time with the updated config
                     $this->clearCacheFile();
 
-                    $session->remove('mautic.installer.completedsteps');
-                    $session->remove('mautic.installer.user');
-
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
                             'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
@@ -336,10 +333,23 @@ class InstallController extends CommonController
      */
     public function finalAction ()
     {
+        $session = $this->factory->getSession();
+
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
         if ($this->checkIfInstalled()) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            if (!$session->has('mautic.installer.completedsteps')) {
+                // Arrived here by directly browsing to URL so redirect to the dashboard
+
+                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            }
+        } else {
+            // Shouldn't have made it to this step without having a successful install
+            return $this->redirect($this->generateUrl('mautic_installer_home'));
         }
+
+        // Remove installer session variables
+        $session->remove('mautic.installer.completedsteps');
+        $session->remove('mautic.installer.user');
 
         // Add database migrations up to this point since this is a fresh install (must be done at this point
         // after the cache has been rebuilt
@@ -384,56 +394,22 @@ class InstallController extends CommonController
     {
         // If the config file doesn't even exist, no point in checking further
         $localConfigFile = $this->factory->getLocalConfigFile();
-        if (file_exists($localConfigFile)) {
-            /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-            $configurator = $this->container->get('mautic.configurator');
-            $params       = $configurator->getParameters();
-
-            if (empty($params['db_driver'])) {
-                return false;
-            }
-
-            $testParams = array('driver', 'host', 'port', 'name', 'user', 'password', 'path');
-            $dbParams   = array();
-            foreach ($testParams as &$p) {
-                $param           = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
-                if ($p == 'port') {
-                    $param = (int) $param;
-                }
-                $name            = ($p == 'name') ? 'dbname' : $p;
-                $dbParams[$name] = $param;
-            }
-
-            // Test a database connection and a user
-            try {
-                $db = DriverManager::getConnection($dbParams);
-                $db->connect();
-
-                $prefix = (isset($params['db_table_prefix'])) ? $params['db_table_prefix'] : '';
-                $users  = $db->createQueryBuilder()->select('count(u.id) as count')->from($prefix.'users', 'u')->execute()->fetchAll();
-
-                $db->close();
-
-                if (empty($users[0]['count'])) {
-                    return false;
-                }
-            } catch (\Exception $exception) {
-                return false;
-            }
-
-            // Check for mailer settings
-            if (empty($params['mailer_from_name']) && empty($params['mailer_from_email'])) {
-
-                return false;
-            }
-
-            // We need to allow users to the final step, so one last check here
-            if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
-                return true;
-            }
+        if (!file_exists($localConfigFile)) {
+            return false;
         }
 
-        return false;
+        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        $configurator = $this->container->get('mautic.configurator');
+        $params       = $configurator->getParameters();
+
+        // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
+        // performed; manually deleting these values or deleting the config file will be required to re-enter
+        // installation.
+        if (empty($params['db_driver']) || empty($params['mailer_from_name'])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
