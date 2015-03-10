@@ -12,4 +12,8 @@ $view['slots']->set('mauticContent', 'user');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.user.header.contact', array('%name%' => $user->getName())));
 ?>
 
-<?php echo $view['form']->form($form); ?>
+<div class="panel">
+    <div class="panel-body pa-md">
+        <?php echo $view['form']->form($form); ?>
+    </div>
+</div>

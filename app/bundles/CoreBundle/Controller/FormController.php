@@ -76,8 +76,8 @@ class FormController extends CommonController
             urlencode($this->generateUrl('mautic_dashboard_index'));
         $override  = '';
 
-        $model        = $this->factory->getModel($model);
-        $nameFunction = $model->getNameGetter();
+        $modelClass   = $this->factory->getModel($model);
+        $nameFunction = $modelClass->getNameGetter();
 
         if ($this->factory->getUser()->isAdmin()) {
             $override = $this->get('translator')->trans('mautic.core.override.lock', array(
