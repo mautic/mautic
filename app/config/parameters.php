@@ -104,4 +104,15 @@ foreach ($mauticParams as $k => &$v) {
 // Used for passing params into factory/services
 $container->setParameter('mautic.parameters', $mauticParams);
 
+// Set the router URI for CLI
+if (isset($mauticParams['site_url'])) {
+    $parts = parse_url($mauticParams['site_url']);
+
+    if (!empty($parts['host'])) {
+        $container->setParameter('router.request_context.host', $parts['host']);
+        $container->setParameter('router.request_context.scheme', (!empty($parts['scheme']) ? $parts['scheme'] : 'http'));
+        $container->setParameter('router.request_context.base_url', (!empty($parts['path']) ? $parts['path'] : '/'));
+    }
+}
+
 unset($mauticParams, $replaceRootPlaceholder, $bundles);
