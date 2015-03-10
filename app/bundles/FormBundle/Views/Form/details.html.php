@@ -289,7 +289,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                   </div>
                   <div class="panel-body">
                       <p><?php echo $view['translator']->trans('mautic.form.form.help.manualcopy'); ?></p>
-                      <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);"><?php echo htmlentities($activeForm->getCachedHtml()); ?></textarea>
+                      <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);"><?php echo htmlspecialchars($activeForm->getCachedHtml(), ENT_QUOTES, "UTF-8"); ?></textarea>
                   </div>
                   <div class="panel-footer text-right">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
