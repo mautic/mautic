@@ -135,7 +135,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <?php foreach ($fields[$group] as $field): ?>
                                                 <tr>
                                                     <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
-                                                    <td><?php echo $field['value']; ?></td>
+                                                    <td>
+                                                        <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                            <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;" />
+                                                            <?php echo $field['value']; ?>
+                                                        <?php else: ?>
+                                                            <?php echo $field['value']; ?>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
