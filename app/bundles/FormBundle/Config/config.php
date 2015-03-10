@@ -57,13 +57,6 @@ return array(
                 'path'       => '/form/submit',
                 'controller' => 'MauticFormBundle:Public:submit'
             ),
-            'mautic_form_preview'      => array(
-                'path'       => '/form/{id}',
-                'controller' => 'MauticFormBundle:Public:preview',
-                'defaults'   => array(
-                    'id' => '0'
-                )
-            ),
             'mautic_form_generateform' => array(
                 'path'       => '/form/generate.js',
                 'controller' => 'MauticFormBundle:Public:generate'
@@ -71,6 +64,13 @@ return array(
             'mautic_form_postmessage'  => array(
                 'path'       => '/form/message',
                 'controller' => 'MauticFormBundle:Public:message'
+            ),
+            'mautic_form_preview'      => array(
+                'path'       => '/form/{id}',
+                'controller' => 'MauticFormBundle:Public:preview',
+                'defaults'   => array(
+                    'id' => '0'
+                )
             )
         )
     ),
