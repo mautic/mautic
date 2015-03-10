@@ -63,11 +63,11 @@ function clear_mautic_cache(array $status)
 
     //Remove the cached update
 
-    $status['complete']                      = true;
-    $status['stepStatus']                    = 'Success';
-    $status['nextStep']                      = 'Processing Database Updates';
-    $status['nextStepStatus']                = 'In Progress';
-    $status['updateState']['vendorComplete'] = true;
+    $status['complete']                     = true;
+    $status['stepStatus']                   = 'Success';
+    $status['nextStep']                     = 'Processing Database Updates';
+    $status['nextStepStatus']               = 'In Progress';
+    $status['updateState']['cacheComplete'] = true;
 
     return $status;
 }
