@@ -251,8 +251,8 @@ class AjaxController extends CommonAjaxController
             $list = $listModel->getEntity($listId);
 
             if ($lead !== null && $list !== null) {
-                $class = "{$action}Lead";
-                $listModel->$class($lead, $list, true);
+                $class = $action == 'add' ? 'addToLists' : 'removeFromLists';
+                $leadModel->$class($lead, $list);
                 $dataArray['success'] = 1;
             }
         }

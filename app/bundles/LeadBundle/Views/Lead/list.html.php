@@ -79,7 +79,7 @@ if ($tmpl == 'index')
                         $custom[] = array(
                             'attr' => array(
                                 'href' => $view['router']->generate('mautic_leadlist_action', array(
-                                    "objectAction" => "removelead",
+                                    "objectAction" => "removeLead",
                                     "objectId" => $currentList['id'],
                                     "leadId"   => $item->getId()
                                 )),
