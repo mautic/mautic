@@ -109,7 +109,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
-                <ul class="nav nav-tabs pr-md pl-md" role="tablist">
+                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
                 <?php $step = 0; ?>
                 <?php foreach ($groups as $g): ?>
                     <?php if (!empty($fields[$g])): ?>
@@ -138,7 +138,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                                     <td>
                                                         <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
                                                             <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;" />
-                                                            <?php echo $field['value']; ?>
+                                                            <span class="mt-1"><?php echo $field['value']; ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>
