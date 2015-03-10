@@ -158,7 +158,7 @@ class UserController extends FormController
                     //check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $this->factory->getParameter('supported_languages');
 
-                    if (!array_key_exists($user->getLocale(), $installedLanguages)) {
+                    if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
                         $languageHelper = $this->factory->getHelper('language');
 
@@ -279,7 +279,7 @@ class UserController extends FormController
                     //check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $this->factory->getParameter('supported_languages');
 
-                    if (!array_key_exists($user->getLocale(), $installedLanguages)) {
+                    if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
                         $languageHelper = $this->factory->getHelper('language');
 
