@@ -30,7 +30,14 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:email:process')
+            ->setName('mautic:send:emails')
+            ->setAliases(array(
+                'mautic:process:email',
+                'mautic:process:emails',
+                'mautic:email:process',
+                'mautic:emails:process',
+                'mautic:send:email',
+            ))
             ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
@@ -72,45 +79,47 @@ EOT
             }
 
             $spoolPath = $container->getParameter('mautic.mailer_spool_path');
-            $finder    = Finder::create()->in($spoolPath)->name('*.{finalretry,sending,tryagain}');
+            if (file_exists($spoolPath)) {
+                $finder = Finder::create()->in($spoolPath)->name('*.{finalretry,sending,tryagain}');
 
-            foreach ($finder as $failedFile) {
-                $file = $failedFile->getRealPath();
+                foreach ($finder as $failedFile) {
+                    $file = $failedFile->getRealPath();
 
-                $lockedtime = filectime($file);
-                if (!(time() - $lockedtime) > $timeout) {
-                    //the file is not old enough to be resent yet
-                    continue;
-                }
-
-                //rename the file so no other process tries to find it
-                $tmpFilename = $failedFile . '.finalretry';
-                rename($failedFile, $tmpFilename);
-
-                $message = unserialize(file_get_contents($tmpFilename));
-
-                $tryAgain = false;
-                if ($dispatcher->hasListeners(CoreEvents::EMAIL_RESEND)) {
-                    $event = new EmailEvent($message);
-                    $dispatcher->dispatch(CoreEvents::EMAIL_RESEND, $event);
-                    $tryAgain = $event->shouldTryAgain();
-                }
-
-                try {
-                    $transport->send($message);
-                } catch (\Swift_TransportException $e) {
-                    if ($dispatcher->hasListeners(CoreEvents::EMAIL_FAILED)) {
-                        $event = new EmailEvent($message);
-                        $dispatcher->dispatch(CoreEvents::EMAIL_FAILED, $event);
+                    $lockedtime = filectime($file);
+                    if (!(time() - $lockedtime) > $timeout) {
+                        //the file is not old enough to be resent yet
+                        continue;
                     }
-                }
 
-                if ($tryAgain) {
-                    $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
-                    rename($tmpFilename, $retryFilename);
-                } else {
-                    //delete the file, either because it sent or because it failed
-                    unlink($tmpFilename);
+                    //rename the file so no other process tries to find it
+                    $tmpFilename = $failedFile . '.finalretry';
+                    rename($failedFile, $tmpFilename);
+
+                    $message = unserialize(file_get_contents($tmpFilename));
+
+                    $tryAgain = false;
+                    if ($dispatcher->hasListeners(CoreEvents::EMAIL_RESEND)) {
+                        $event = new EmailEvent($message);
+                        $dispatcher->dispatch(CoreEvents::EMAIL_RESEND, $event);
+                        $tryAgain = $event->shouldTryAgain();
+                    }
+
+                    try {
+                        $transport->send($message);
+                    } catch (\Swift_TransportException $e) {
+                        if ($dispatcher->hasListeners(CoreEvents::EMAIL_FAILED)) {
+                            $event = new EmailEvent($message);
+                            $dispatcher->dispatch(CoreEvents::EMAIL_FAILED, $event);
+                        }
+                    }
+
+                    if ($tryAgain) {
+                        $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
+                        rename($tmpFilename, $retryFilename);
+                    } else {
+                        //delete the file, either because it sent or because it failed
+                        unlink($tmpFilename);
+                    }
                 }
             }
         }
