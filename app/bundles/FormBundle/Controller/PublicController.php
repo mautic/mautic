@@ -164,9 +164,9 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction()
+    public function previewAction($id = 0)
     {
-        $objectId     = InputHelper::int($this->request->get('id'));
+        $objectId     = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
         $css          = InputHelper::raw($this->request->get('css'));
         $model        = $this->factory->getModel('form.form');
         $form         = $model->getEntity($objectId);
@@ -177,41 +177,40 @@ class PublicController extends CommonFormController
         }
 
         if ($form === null || !$form->isPublished()) {
-            $html =
-                '<h1>' .
-                $this->get('translator')->trans('mautic.form.error.notfound', array('%id%' => $objectId), 'flashes') .
-                '</h1>';
+            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+
         } else {
             $html = $form->getCachedHtml();
-        }
+            $name = $form->getName();
 
-        $model->populateValuesWithGetParameters($form, $html);
+            $model->populateValuesWithGetParameters($form, $html);
 
-        $template = $form->getTemplate();
-        if (!empty($template)) {
-            $theme = $this->factory->getTheme($template);
-            if ($theme->getTheme() != $template) {
-                $config = $theme->getConfig();
-                if (in_array('form', $config['features'])) {
-                    $template = $theme->getTheme();
-                } else {
-                    $templateNotFound = true;
+            $template = $form->getTemplate();
+            if (!empty($template)) {
+                $theme = $this->factory->getTheme($template);
+                if ($theme->getTheme() != $template) {
+                    $config = $theme->getConfig();
+                    if (in_array('form', $config['features'])) {
+                        $template = $theme->getTheme();
+                    } else {
+                        $templateNotFound = true;
+                    }
                 }
-            }
 
-            if (empty($templateNotFound)) {
-                $viewParams = array(
-                    'template'        => $template,
-                    'content'         => $html,
-                    'googleAnalytics' => $this->factory->getParameter('google_analytics')
-                );
+                if (empty($templateNotFound)) {
+                    $viewParams = array(
+                        'template'        => $template,
+                        'content'         => $html,
+                        'googleAnalytics' => $this->factory->getParameter('google_analytics')
+                    );
 
-                return $this->render('MauticFormBundle::form.html.php', $viewParams);
+                    return $this->render('MauticFormBundle::form.html.php', $viewParams);
+                }
             }
         }
 
         $response = new Response();
-        $response->setContent('<html><head><title>' . $form->getName() . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
+        $response->setContent('<html><head><title>' . $name . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
         $response->setStatusCode(Response::HTTP_OK);
         $response->headers->set('Content-Type', 'text/html');
 

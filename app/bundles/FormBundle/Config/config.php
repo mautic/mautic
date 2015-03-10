@@ -58,8 +58,11 @@ return array(
                 'controller' => 'MauticFormBundle:Public:submit'
             ),
             'mautic_form_preview'      => array(
-                'path'       => '/form',
-                'controller' => 'MauticFormBundle:Public:preview'
+                'path'       => '/form/{id}',
+                'controller' => 'MauticFormBundle:Public:preview',
+                'defaults'   => array(
+                    'id' => '0'
+                )
             ),
             'mautic_form_generateform' => array(
                 'path'       => '/form/generate.js',
