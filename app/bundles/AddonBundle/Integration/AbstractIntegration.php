@@ -937,7 +937,8 @@ abstract class AbstractIntegration
      */
     protected function getRefererUrl ()
     {
-        return 'http' . (($_SERVER['SERVER_PORT'] == 443) ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $request = $this->factory->getRequest();
+        return $request->getRequestUri();
     }
 
     /**
