@@ -90,7 +90,25 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $entity->setProperties(array("list" =>"|Mr|Mrs|Miss"));
             }
             $entity->setType($type);
-            $entity->setIsFixed(true);
+
+            $fixed = in_array($name, array(
+                'title',
+                'firstname',
+                'lastname',
+                'position',
+                'company',
+                'email',
+                'phone',
+                'mobile',
+                'address1',
+                'address2',
+                'country',
+                'city',
+                'state',
+                'zipcode'
+            )) ? true : false;
+            $entity->setIsFixed($fixed);
+
             $entity->setOrder(($key+1));
             $entity->setAlias($name);
             $listable    = in_array($name, array(

@@ -23,6 +23,38 @@ class Version20150310000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $this->connection->delete(MAUTIC_TABLE_PREFIX . 'addons', array('bundle' => 'MauticChatBundle'));
+
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'lead_fields')
+            ->set('is_fixed', ':false')
+            ->where(
+                $qb->expr()->notIn('alias',
+                    array_map(
+                        function($v) use ($qb) {
+                            return $qb->expr()->literal($v);
+                        },
+                        array(
+                            'title',
+                            'firstname',
+                            'lastname',
+                            'position',
+                            'company',
+                            'email',
+                            'phone',
+                            'mobile',
+                            'address1',
+                            'address2',
+                            'country',
+                            'city',
+                            'state',
+                            'zipcode'
+                        )
+                    )
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->execute();
     }
 
     /**
