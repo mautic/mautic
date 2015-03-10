@@ -257,16 +257,6 @@ class LeadSubscriber extends CommonSubscriber
             $event->getVictor()->getId()
         );
 
-        $this->factory->getEntityManager()->getRepository('MauticLeadBundle:ListLead')->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
-
-        $this->factory->getEntityManager()->getRepository('MauticLeadBundle:LeadNote')->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
-
         $log = array(
             "bundle"     => "lead",
             "object"     => "lead",
