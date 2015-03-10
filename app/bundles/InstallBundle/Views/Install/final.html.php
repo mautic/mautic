@@ -19,7 +19,7 @@ if ($tmpl == 'index') {
 <div class="panel-body text-center">
     <div><i class="fa fa-check fa-5x mb-20 text-success"></i></div>
     <h4><?php echo $view['translator']->trans('mautic.install.heading.finished'); ?></h4>
-    <?php if (false && $is_writable) : ?>
+    <?php if ($is_writable) : ?>
         <h5><?php echo $view['translator']->trans('mautic.install.heading.configured'); ?></h5>
     <?php else : ?>
         <h5><?php echo $view['translator']->trans('mautic.install.heading.almost.configured'); ?></h5>
