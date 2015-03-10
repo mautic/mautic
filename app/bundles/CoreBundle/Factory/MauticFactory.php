@@ -673,7 +673,7 @@ class MauticFactory
      *
      * @return mixed array | string
      */
-    public function getBundleConfig($bundleName, $keyName = '', $includeAddons = false)
+    public function getBundleConfig($bundleName, $configKey = '', $includeAddons = false)
     {
         // get the configs
         $configFiles = $this->getMauticBundles($includeAddons);
@@ -690,23 +690,23 @@ class MauticFactory
             throw new \Exception('Bundle ' . $bundleName . ' does not exist');
         }
 
+        // get the specific bundle's configurations
+        $bundleConfig = $configFiles[$bundleName]['config'];
+
         // no config key supplied so just return the bundle's config
-        if (! $keyName)
+        if (! $configKey)
         {
-            return $configFiles[$bundleName];
+            return $bundleConfig;
         }
 
-        // get the specific bundle's config
-        $bundleConfig = $configFiles[$bundleName];
-
         // check that the key exists
-        if (!array_key_exists($keyName, $bundleConfig))
+        if (!array_key_exists($configKey, $bundleConfig))
         {
-            throw new \Exception('Key ' . $keyName . 'does not exist in bundle ' . $bundleName);
+            throw new \Exception('Key ' . $configKey . 'does not exist in bundle ' . $bundleName);
         }
 
         // we didn't throw so we can send the key value
-        return $bundleConfig[$keyName];
+        return $bundleConfig[$configKey];
     }
 
     /**
