@@ -108,9 +108,11 @@ $container->setParameter('mautic.parameters', $mauticParams);
 if (isset($mauticParams['site_url'])) {
     $parts = parse_url($mauticParams['site_url']);
 
-    $container->setParameter('router.request_context.host', $parts['host']);
-    $container->setParameter('router.request_context.scheme', $parts['scheme']);
-    $container->setParameter('router.request_context.base_url', $parts['path']);
+    if (!empty($parts['host'])) {
+        $container->setParameter('router.request_context.host', $parts['host']);
+        $container->setParameter('router.request_context.scheme', (!empty($parts['scheme']) ? $parts['scheme'] : 'http'));
+        $container->setParameter('router.request_context.base_url', (!empty($parts['path']) ? $parts['path'] : '/'));
+    }
 }
 
 unset($mauticParams, $replaceRootPlaceholder, $bundles);
