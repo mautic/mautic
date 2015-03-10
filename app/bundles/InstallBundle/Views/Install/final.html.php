@@ -16,21 +16,20 @@ if ($tmpl == 'index') {
         <?php echo $view['translator']->trans('mautic.install.heading.final'); ?>
     </h2>
 </div>
-<div class="panel-body">
+<div class="panel-body text-center">
+    <div><i class="fa fa-check fa-5x mb-20 text-success"></i></div>
     <h4><?php echo $view['translator']->trans('mautic.install.heading.finished'); ?></h4>
-    <?php if ($is_writable) : ?>
+    <?php if (false && $is_writable) : ?>
         <h5><?php echo $view['translator']->trans('mautic.install.heading.configured'); ?></h5>
     <?php else : ?>
         <h5><?php echo $view['translator']->trans('mautic.install.heading.almost.configured'); ?></h5>
-        <?php if ($is_writable) : ?>
-            <p><?php echo $view['translator']->trans('mautic.install.sentence.config.written', array('%path%' => $config_path)); ?></p>
-        <?php else : ?>
+        <div class="text-left mt-20">
             <p><?php echo $view['translator']->trans('mautic.install.sentence.config.not.written', array('%path%' => $config_path)); ?></p>
-        <?php endif; ?>
-        <textarea class="form-control" rows="15"><?php echo $parameters; ?></textarea>
+            <textarea class="form-control" rows="15"><?php echo $parameters; ?></textarea>
+        </div>
     <?php endif; ?>
     <?php if ($welcome_url) : ?>
-        <a href="<?php echo $welcome_url; ?>" role="button" class="btn btn-primary pull-right mt-20">
+        <a href="<?php echo $welcome_url; ?>" role="button" class="btn btn-primary mt-20">
             <?php echo $view['translator']->trans('mautic.install.sentence.proceed.to.mautic'); ?>
         </a>
     <?php endif; ?>
