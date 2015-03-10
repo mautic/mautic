@@ -389,9 +389,9 @@ class ListModel extends FormModel
                 'list' => $this->leadChangeLists[$l]
             ));
             if ($listLead != null) {
-                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                if ($listLead->wasManuallyRemoved()) {
                     $listLead->setManuallyRemoved(false);
-                    $listLead->setManuallyAdded(true);
+                    $listLead->setManuallyAdded($manuallyAdded);
 
                     $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
                     $persistLists[] = $this->leadChangeLists[$l];

@@ -424,7 +424,7 @@ class ListController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function removeleadAction($objectId)
+    public function removeLeadAction($objectId)
     {
         return $this->changeList($objectId, 'remove');
     }
@@ -434,7 +434,7 @@ class ListController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function addLeadDecision($objectId)
+    public function addLeadAction($objectId)
     {
         return $this->changeList($objectId, 'add');
     }
@@ -494,7 +494,7 @@ class ListController extends FormController
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ($action == 'remove') ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list);
+                $model->$function($lead, $list, true);
 
                 $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = array(

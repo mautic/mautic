@@ -629,7 +629,7 @@ class LeadModel extends FormModel
      * @param      $lists
      * @param bool $manuallyAdded
      */
-    public function addToLists($lead, $lists, $manuallyAdded = false)
+    public function addToLists($lead, $lists, $manuallyAdded = true)
     {
         $this->factory->getModel('lead.list')->addLead($lead, $lists, $manuallyAdded);
     }
@@ -641,7 +641,7 @@ class LeadModel extends FormModel
      * @param      $lists
      * @param bool $manuallyRemoved
      */
-    public function removeFromLists($lead, $lists, $manuallyRemoved = false)
+    public function removeFromLists($lead, $lists, $manuallyRemoved = true)
     {
         $this->factory->getModel('lead.list')->removeLead($lead, $lists, $manuallyRemoved);
     }
