@@ -152,6 +152,7 @@ class EventModel extends CommonFormModel
             $session         = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.campaign.events', array());
             if (in_array($typeId, $triggeredEvents)) {
+                $logger->debug('CAMPAIGN: ' . $typeId . ' has already been processed.');
                 return false;
             }
             $triggeredEvents[] = $typeId;
@@ -250,6 +251,8 @@ class EventModel extends CommonFormModel
                 if (!$this->invokeEventCallback($event, $settings, $lead, $eventDetails, $systemTriggered)) {
                     $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' callback check failed');
                     continue;
+                } else {
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' successfully executed and logged.');
                 }
 
                 if (!empty($event['children'])) {
@@ -350,8 +353,9 @@ class EventModel extends CommonFormModel
         // Set lead in case this is triggered by the system
         $leadModel->setSystemCurrentLead($lead);
 
+        $repo = $this->getRepository();
+
         if (!empty($actionEvents)) {
-            $persist = array();
             foreach ($actionEvents as $e) {
                 if (!isset($eventSettings['action'][$e['type']])) {
                     continue;
@@ -364,17 +368,18 @@ class EventModel extends CommonFormModel
                     $log->setIsScheduled(true);
                     $log->setTriggerDate($timing);
 
-                    $persist[] = $log;
-                } elseif ($timing && $this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $lead, null, $systemTriggered)) {
+                    $repo->saveEntity($log);
+                } elseif ($timing) {
+                    // Log the executing event to prevent subsequent triggers from duplicating
                     $log = $this->getLogEntity($e['id'], $campaign, $lead, null, $systemTriggered);
                     $log->setDateTriggered(new \DateTime());
+                    $repo->saveEntity($log);
 
-                    $persist[] = $log;
+                    if (!$this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $lead, null, $systemTriggered)) {
+                        // Something failed so remove the log
+                        $repo->deleteEntity($log);
+                    }
                 } //else do nothing
-            }
-
-            if (!empty($persist)) {
-                $this->getRepository()->saveEntities($persist);
             }
         }
 
@@ -402,12 +407,12 @@ class EventModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
-        $persist = array();
-
         $event             = $eventEntity->convertToArray();
         $event['campaign'] = $campaign->convertToArray();
 
         $leads = $campaignModel->getCampaignLeads($campaign, $event['id']);
+
+        $repo = $this->getRepository();
 
         foreach ($leads as $campaignLead) {
             if ($campaignLead instanceof \Mautic\CampaignBundle\Entity\Lead) {
@@ -426,20 +431,22 @@ class EventModel extends CommonFormModel
                 $log->setIsScheduled(true);
                 $log->setTriggerDate($timing);
 
-                $persist[] = $log;
-            } elseif ($timing && $this->invokeEventCallback($event, $settings, $lead, null, true)) {
+                $repo->saveEntity($log);
+            } elseif ($timing) {
+                // Save log first to prevent subsequent triggers from duplicating
                 $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
                 $log->setDateTriggered(new \DateTime());
+                $repo->saveEntity($log);
 
-                $persist[] = $log;
+                if (!$this->invokeEventCallback($event, $settings, $lead, null, true)) {
+                    // Something failed so remove the log
+                    $repo->deleteEntity($log);
+                }
+
             } //else do nothing
         }
 
         $leadModel->setSystemCurrentLead();
-
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-        }
     }
 
     /**
