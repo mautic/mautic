@@ -702,7 +702,7 @@ class MauticFactory
         // check that the key exists
         if (!array_key_exists($configKey, $bundleConfig))
         {
-            throw new \Exception('Key ' . $configKey . 'does not exist in bundle ' . $bundleName);
+            throw new \Exception('Key ' . $configKey . ' does not exist in bundle ' . $bundleName);
         }
 
         // we didn't throw so we can send the key value
