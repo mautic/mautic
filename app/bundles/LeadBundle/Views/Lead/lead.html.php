@@ -18,9 +18,27 @@ $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($
 $leadName = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
 
 $view['slots']->set('mauticContent', 'lead');
+
+    if (!$isAnonymous) {
+        $preferred = $lead->getPreferredProfileImage();
+
+        if ($preferred == 'gravatar' || empty($preferred))  {
+            $img = $view['gravatar']->getImage($fields['core']['email']['value']);
+        }
+        else {
+            $socialData = $lead->getSocialCache();
+            $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
+        }
+    }
+?>
+<?php
+
 $view['slots']->set("headerTitle",
-    '<span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
-    $lead->getSecondaryIdentifier() . '</span>');
+        '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px">'
+      .    '<img src=" ' . $img . '" alt="" />'
+      .  '</span>'
+      .  '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
+    $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
@@ -87,48 +105,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
-            <!-- lead detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <div class="media">
-                            <?php if (!empty($flag)): ?>
-                            <span class="pull-left img-wrapper img-rounded" style="width:38px">
-                                <img src="<?php echo $flag; ?>" alt="" />
-                            </span>
-                            <?php endif; ?>
-                            <?php if (!$isAnonymous): ?>
-                            <span class="pull-left img-wrapper img-rounded" style="width:38px">
-                                <?php $preferred = $lead->getPreferredProfileImage(); ?>
-                                <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
-                                    <?php $img = $view['gravatar']->getImage($fields['core']['email']['value']); ?>
-                                <?php else : ?>
-                                    <?php $socialData = $lead->getSocialCache(); ?>
-                                    <?php $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']); ?>
-                                <?php endif; ?>
-                                <img src="<?php echo $img; ?>" alt="" />
-                            </span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <div class="col-xs-4 va-m text-right">
-                        <?php if ($doNotContact) : ?>
-                            <h4 class="fw-sb"><span class="label label-danger"><?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?></span></h4>
-                        <?php endif; ?>
-                        <?php
-                        $color = $lead->getColor();
-                        $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
-                        ?>
-                            <h1 class="fw-sb text-white dark-md"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></h1>
-                    </div>
-                </div>
-            </div>
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
-
-                <ul class="nav nav-tabs pr-md pl-md" role="tablist">
+                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
                 <?php $step = 0; ?>
                 <?php foreach ($groups as $g): ?>
                     <?php if (!empty($fields[$g])): ?>
@@ -154,7 +135,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <?php foreach ($fields[$group] as $field): ?>
                                                 <tr>
                                                     <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
-                                                    <td><?php echo $field['value']; ?></td>
+                                                    <td>
+                                                        <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                            <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;" />
+                                                            <span class="mt-1"><?php echo $field['value']; ?>
+                                                        <?php else: ?>
+                                                            <?php echo $field['value']; ?>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -272,6 +260,26 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="points-panel text-center">
+                <?php
+                $color = $lead->getColor();
+                $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
+                ?>
+                <h1 <?php echo $style; ?>>
+                    <?php echo $view['translator']->transChoice('mautic.lead.points.count', $lead->getPoints(), array('%points%' => $lead->getPoints())); ?>
+                </h1>
+                <hr />
+            </div>
+            <?php if ($doNotContact) : ?>
+                <div class="panel-heading text-center">
+                    <h4 class="fw-sb">
+                        <span class="label label-danger">
+                            <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                        </span>
+                    </h4>
+                </div>
+                <hr />
+            <?php endif; ?>
             <div class="panel-heading">
                 <div class="panel-title">
                     <?php echo $view['translator']->trans('mautic.lead.field.header.contact'); ?>
