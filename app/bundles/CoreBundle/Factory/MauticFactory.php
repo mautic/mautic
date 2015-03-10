@@ -671,7 +671,7 @@ class MauticFactory
     /**
      * Gets an array of a specific bundle's config settings
      *
-     * @return array
+     * @return mixed array | string
      */
     public function getBundleConfig($bundleName, $keyName = '', $includeAddons = false)
     {
