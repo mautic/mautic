@@ -34,11 +34,11 @@ $view['slots']->set('mauticContent', 'lead');
 <?php
 
 $view['slots']->set("headerTitle",
-        '<span class="pull-left img-wrapper img-rounded mr-10" style="width:38px">'
+        '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px">'
       .    '<img src=" ' . $img . '" alt="" />'
       .  '</span>'
-      .  '<span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
-    $lead->getSecondaryIdentifier() . '</span>');
+      .  '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
+    $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
