@@ -160,4 +160,18 @@ class LeadNoteRepository extends CommonRepository
         );
     }
 
+    /**
+     * Updates lead ID (e.g. after a lead merge)
+     *
+     * @param $fromLeadId
+     * @param $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX . 'lead_notes')
+            ->set('lead_id', (int)$toLeadId)
+            ->where('lead_id = ' . (int)$fromLeadId)
+            ->execute();
+    }
 }
