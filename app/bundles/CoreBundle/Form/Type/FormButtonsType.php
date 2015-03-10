@@ -34,13 +34,13 @@ class FormButtonsType extends AbstractType
             ));
         }
 
-        if (!empty($options['apply_text'])) {
-            $builder->add('apply', 'submit', array(
-                'label' => $options['apply_text'],
+        if (!empty($options['cancel_text'])) {
+            $builder->add('cancel', 'submit', array(
+                'label' => $options['cancel_text'],
                 'attr'  => array(
-                    'class'   => $options['apply_class'],
-                    'icon'    => $options['apply_icon'],
-                    'onclick' => $options['apply_onclick']
+                    'class'   => $options['cancel_class'],
+                    'icon'    => $options['cancel_icon'],
+                    'onclick' => $options['cancel_onclick']
                 )
             ));
         }
@@ -56,13 +56,13 @@ class FormButtonsType extends AbstractType
             ));
         }
 
-        if (!empty($options['cancel_text'])) {
-            $builder->add('cancel', 'submit', array(
-                'label' => $options['cancel_text'],
+        if (!empty($options['apply_text'])) {
+            $builder->add('apply', 'submit', array(
+                'label' => $options['apply_text'],
                 'attr'  => array(
-                    'class'   => $options['cancel_class'],
-                    'icon'    => $options['cancel_icon'],
-                    'onclick' => $options['cancel_onclick']
+                    'class'   => $options['apply_class'],
+                    'icon'    => $options['apply_icon'],
+                    'onclick' => $options['apply_onclick']
                 )
             ));
         }

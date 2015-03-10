@@ -360,6 +360,7 @@ var Mautic = {
                     mQuery(container + ' .toolbar-form-buttons .hidden-xs').html('');
                     mQuery(container + ' .toolbar-form-buttons .hidden-md .drop-menu').html('');
 
+                    var lastIndex = mQuery(buttons).filter("button").length - 1;
                     mQuery(buttons).filter("button").each(function (i, v) {
                         //get the ID
                         var id = mQuery(this).attr('id');
@@ -383,7 +384,7 @@ var Mautic = {
                             .on('click.ajaxform', buttonClick)
                             .appendTo('.toolbar-form-buttons .hidden-sm');
 
-                        if (i === 0) {
+                        if (i === lastIndex) {
                             mQuery(".toolbar-form-buttons .hidden-md .btn-main")
                                 .off('.ajaxform')
                                 .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
@@ -394,7 +395,7 @@ var Mautic = {
                                 .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
                                 .html(mQuery(this).html())
                                 .on('click.ajaxform', buttonClick)
-                                .appendTo(mQuery('<li />').appendTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
+                                .appendTo(mQuery('<li />').prependTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
                         }
 
                     });
