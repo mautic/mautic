@@ -3,6 +3,7 @@
     "options": {
         "culture": "en",
         "lang": "php",
+        "theme": "mautic",
         "defaultViewMode": "grid",
         "autoload": true,
         "showFullPath": false,
@@ -20,11 +21,13 @@
         "fileRoot": "/",
         "relPath": false,
         "logger": false,
-        "capabilities": ["select", "download", "rename", "delete", "replace"],
+        "capabilities": ["select", "rename", "delete", "replace"],
         "plugins": []
     },
-        "security": {
+    "security": {
+        "allowFolderDownload": false,
         "allowChangeExtensions": false,
+        "allowNoExtension": false,
             "uploadPolicy": "DISALLOW_ALL",
             "uploadRestrictions": [
             "jpg",
@@ -51,15 +54,19 @@
             "m4v",
             "ogg",
             "mp3",
-            "wav"
+            "wav",
+            "zip",
+            "rar"
         ]
     },
-        "upload": {
-        "overwrite": false,
+    "upload": {
+            "multiple": true,
+            "number": 10,
+            "overwrite": false,
             "imagesOnly": true,
             "fileSizeLimit": 16
     },
-        "exclude": {
+    "exclude": {
         "unallowed_files": [
             ".htaccess",
             "web.config"
@@ -72,7 +79,7 @@
             "unallowed_files_REGEXP": "/^\\./",
             "unallowed_dirs_REGEXP": "/^\\./"
     },
-        "images": {
+    "images": {
         "imagesExt": [
             "jpg",
             "jpeg",
@@ -86,7 +93,7 @@
                 "maxHeight": 1024
         }
     },
-        "videos": {
+    "videos": {
         "showVideoPlayer": true,
             "videosExt": [
             "ogv",
@@ -97,7 +104,7 @@
             "videosPlayerWidth": 400,
             "videosPlayerHeight": 222
     },
-        "audios": {
+    "audios": {
         "showAudioPlayer": true,
             "audiosExt": [
             "ogg",
@@ -105,8 +112,8 @@
             "wav"
         ]
     },
-        "edit": {
-        "enabled": true,
+    "edit": {
+        "enabled": false,
             "lineNumbers": true,
             "lineWrapping": true,
             "codeHighlight": false,
@@ -116,13 +123,19 @@
             "csv"
         ]
     },
-        "extras": {
+    "customScrollbar": {
+    	"enabled": false,
+    	"theme": "inset-2-dark",
+    	"button": true
+    },
+    "extras": {
         "extra_js": [],
             "extra_js_async": true
     },
-        "icons": {
+    "icons": {
         "path": "images/fileicons/",
             "directory": "_Open.png",
             "default": "default.png"
-    }
+    },
+    "url": "https://github.com/simogeo/Filemanager"
 }
