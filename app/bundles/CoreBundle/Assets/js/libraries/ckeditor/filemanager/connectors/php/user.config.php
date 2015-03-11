@@ -20,6 +20,7 @@ if (!isset($_COOKIE['mautic_session_name'])) {
     die();
 }
 session_name($_COOKIE['mautic_session_name']);
+
 session_start();
 
 /**
@@ -32,7 +33,7 @@ function auth() {
     // You can insert your own code over here to check if the user is authorized.
     // If you use a session variable, you've got to start the session first (session_start())
 
-    return (!empty($_SESSION['_sf2_attributes']['mautic.user'])) ? true : false;
+    return (!empty($_SESSION['_sf2_attributes']['mautic.user']));
 }
 
 
@@ -54,12 +55,22 @@ if (substr($userDir, -1) !== '/') {
     $userDir .= '/';
 }
 
-if (substr($userDir, 0, 1) !== '/') {
-    $userDir = '/' . $userDir;
-}
+if ($baseDir && $baseDir != '/') {
+    if (substr($baseDir, 0, 1) == '/') {
+        $baseDir = substr($baseDir, 1);
+    }
 
-if ($baseDir) {
-    $userDir = $baseDir . $userDir;
+    if (substr($baseDir, -1) == '/') {
+        $baseDir = substr($baseDir, 0, -1);
+    }
+
+    if (substr($userDir, 0, 1) == '/') {
+        $userDir = substr($userDir, 1);
+    }
+
+    $userDir = $baseDir . '/' . $userDir;
+} elseif (substr($userDir, 0, 1) == '/') {
+    $userDir = substr($userDir, 1);
 }
 
 $fm = new Filemanager();

@@ -100,8 +100,8 @@ class CoreSubscriber extends CommonSubscriber
 
         $session = $event->getRequest()->getSession();
         $securityContext = $this->factory->getSecurityContext();
-        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
@@ -110,7 +110,7 @@ class CoreSubscriber extends CommonSubscriber
             //set a cookie with session name for filemanager; if there are symfony clashes, set cookie_path in local.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->setCookie('mautic_session_name', session_name());
+            $cookieHelper->setCookie('mautic_session_name', session_name(), null);
 
             //mark the user as last logged in
             $user = $this->factory->getUser();
