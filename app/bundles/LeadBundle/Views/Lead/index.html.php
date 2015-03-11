@@ -16,8 +16,9 @@ if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
             'class'       => 'btn btn-default btn-nospin',
-            'data-toggle' => 'modal',
+            'data-toggle' => 'ajaxmodal',
             'data-target' => '#lead-quick-add',
+            'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
         ),
         'iconClass' => 'fa fa-bolt',
         'btnText'   => 'mautic.lead.lead.menu.quickadd'
@@ -42,11 +43,9 @@ button;
 $extraHtml .= "<div class=\"text-left\">\n" . $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'lead-quick-add',
     'header' => $view['translator']->trans('mautic.lead.lead.header.quick.add'),
-    'body'   => $view->render('MauticLeadBundle:Lead:quickadd.html.php', array('form' => $quickForm)),
+    'body'   => '',
     'size'   => 'sm',
-    'footer' =>
-        '<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times text-danger "></i> ' . $view["translator"]->trans("mautic.core.form.cancel") . '</button>' .
-        '<button id="save-quick-add" type="button" class="btn btn-default" onclick="Mautic.startModalLoadingBar(\'#lead-quick-add\'); mQuery(\'form[name=lead]\').submit();"><i class="fa fa-save"></i> ' . $view["translator"]->trans("mautic.core.form.save") . '</button>'
+    'footerButtons' => true
 )) . "\n</div>\n";
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
