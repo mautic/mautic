@@ -180,6 +180,10 @@ class LeadController extends FormController
         ));
     }
 
+    /*
+     * Quick form controller route and view
+     */
+
     public function quickAddAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
