@@ -1,6 +1,11 @@
 <?php
 $loader->import("config.php");
-$loader->import("security.php");
+
+if (file_exists(__DIR__ . '/security_local.php')) {
+    $loader->import("security_local.php");
+} else {
+    $loader->import("security.php");
+}
 
 //Twig Configuration
 $container->loadFromExtension('twig', array(
@@ -106,8 +111,12 @@ $container->setDefinition(
     $definitionConsoleExceptionListener
 );
 
+// Allow overriding config without a requiring a full bundle or hacks
+if (file_exists(__DIR__ . '/config_override.php')) {
+    $loader->import("config_override.php");
+}
 
+// Allow local settings without committing to git such as swift mailer delivery address overrides
 if (file_exists(__DIR__ . '/config_local.php')) {
-    //to allow local settings without committing to git such as swift mailer delivery address overrides
     $loader->import("config_local.php");
 }
