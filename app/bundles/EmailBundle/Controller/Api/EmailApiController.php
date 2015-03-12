@@ -9,7 +9,9 @@
 
 namespace Mautic\EmailBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -100,5 +102,101 @@ class EmailApiController extends CommonApiController
     public function getEntityAction($id)
     {
         return parent::getEntityAction($id);
+    }
+
+    /**
+     * Sends the email to it's assigned lists
+     *
+     * @ApiDoc(
+     *   section = "Emails",
+     *   description = "Sends the email to it's assigned lists",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned if the email was not found"
+     *   }
+     * )
+     *
+     * @param int $id     Email ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if (null !== $entity) {
+            if (!$this->checkEntityAccess($entity, 'view')) {
+                return $this->accessDenied();
+            }
+
+            $this->model->sendEmailToLists($entity);
+
+            $view = $this->view(array('success' => 1), Codes::HTTP_OK);
+
+            return $this->handleView($view);
+
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Sends the email to a specific lead
+     *
+     * @ApiDoc(
+     *   section = "Emails",
+     *   description = "Sends the email to a specific lead",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned if the email was not found"
+     *   },
+     *   parameters={
+     *       {"name"="tokens", "dataType"="array", "required"=false, "description"="Array of tokens to search and replace with the assigned values"}
+     *   }
+     * )
+     *
+     * @param int $id     Email ID
+     * @param int $leadId Lead ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendLeadAction($id, $leadId)
+    {
+        $entity = $this->model->getEntity($id);
+        if (null !== $entity) {
+            if (!$this->checkEntityAccess($entity, 'view')) {
+                return $this->accessDenied();
+            }
+
+            $leadModel = $this->factory->getModel('lead');
+            $lead      = $leadModel->getEntity($leadId);
+
+            if ($lead == null) {
+                return $this->notFound();
+            } elseif (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $lead->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $post   = $this->request->request->all();
+            $tokens = (!empty($post['tokens'])) ? $post['tokens'] : array();
+
+            $cleantokens = array_map(function($v) {
+                return InputHelper::clean($v);
+            }, $tokens);
+
+            $leadFields = array_merge(array('id' => $leadId), $leadModel->flattenFields($lead->getFields()));
+
+            $this->model->sendEmail ($entity, $leadFields, array(
+                'source' => array('api', 0),
+                'tokens' => $cleantokens
+            ));
+
+            $view = $this->view(array('success' => 1), Codes::HTTP_OK);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
     }
 }
