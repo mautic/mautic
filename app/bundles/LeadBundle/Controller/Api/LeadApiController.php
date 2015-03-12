@@ -227,33 +227,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of smart lists for the user
-     *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a list of of lead lists available to the user",
-     *   statusCodes = {
-     *     200 = "Returned when successful"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\LeadList",
-     *      "groups"={"leadListList"}
-     *   }
-     * )
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getListsAction()
-    {
-        $lists = $this->factory->getModel('lead.list')->getUserLists();
-        $view = $this->view($lists, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('leadListList'));
-        $view->setSerializationContext($context);
-
-        return $this->handleView($view);
-    }
-
-    /**
      * Obtains a list of custom fields
      *
      * @ApiDoc(

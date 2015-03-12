@@ -93,14 +93,29 @@ return array(
                 'path'       => '/leads/list/owners',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getOwners'
             ),
+            'mautic_api_getleadfields' => array(
+                'path'       => '/leads/list/fields',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
+            ),
             'mautic_api_getleadlists'  => array(
                 'path'       => '/leads/list/lists',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
             ),
-            'mautic_api_getleadfields' => array(
-                'path'       => '/leads/list/fields',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
+            'mautic_api_getlists'  => array(
+                'path'       => '/lists',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
+            ),
+            'mautic_api_listaddlead' => array(
+                'path'       => '/lists/{id}/lead/add/{leadId}',
+                'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_listremovelead' => array(
+                'path'       => '/lists/{id}/lead/remove/{leadId}',
+                'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
+                'method'     => 'POST'
             )
+
         )
     ),
 
