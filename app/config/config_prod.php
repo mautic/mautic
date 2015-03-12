@@ -56,3 +56,13 @@ $container->loadFromExtension("monolog", array(
         )
     )
 ));
+
+// Allow overriding config without a requiring a full bundle or hacks
+if (file_exists(__DIR__ . '/config_override.php')) {
+    $loader->import("config_override.php");
+}
+
+// Allow local settings without committing to git such as swift mailer delivery address overrides
+if (file_exists(__DIR__ . '/config_local.php')) {
+    $loader->import("config_local.php");
+}
