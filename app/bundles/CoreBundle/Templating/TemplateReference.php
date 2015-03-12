@@ -47,11 +47,19 @@ class TemplateReference extends BaseTemplateReference
             preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
 
             if (!empty($match[1])) {
-                $theme = $this->factory->getTheme();
-                //check for an override and load it if there is
-                $themeDir = $theme->getThemePath();
-                if (!file_exists($template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path)) {
-                    $template = '@' . $this->get('bundle') . '/Views/' . $path;
+                // Check for a system-wide override
+                $themePath      = $this->factory->getSystemPath('themes', true);
+                $systemTemplate = $themePath . '/system/' . $this->parameters['bundle'] . '/' . $path;
+                if (file_exists($systemTemplate)) {
+                    $template = $systemTemplate;
+                } else {
+                    $theme = $this->factory->getTheme();
+                    //check for an override and load it if there is
+                    $themeDir = $theme->getThemePath();
+                    $template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path;
+                    if (!file_exists($template)) {
+                        $template = '@' . $this->get('bundle') . '/Views/' . $path;
+                    }
                 }
             }
         } else {
