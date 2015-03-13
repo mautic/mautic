@@ -14,6 +14,13 @@ if (!empty($assetPrefix)) {
     }
 }
 $assetBase = $assetPrefix . $base . $paths['assets'];
+
+// Allow a custom error page
+if (file_exists(__DIR__ . '/custom_offline.php')) {
+    include __DIR__ . '/custom_offline.php';
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +30,7 @@ $assetBase = $assetPrefix . $base . $paths['assets'];
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title><?php echo $_SERVER['HTTP_HOST']; ?></title>
+    <title>Site is offline</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="<?php echo $assetBase . '/images/favicon.ico'; ?>" />
