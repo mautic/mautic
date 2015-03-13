@@ -99,11 +99,11 @@ return array(
             ),
             'mautic_api_getleadlists'  => array(
                 'path'       => '/leads/list/lists',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
+                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
             ),
             'mautic_api_getlists'  => array(
                 'path'       => '/lists',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
+                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
             ),
             'mautic_api_listaddlead' => array(
                 'path'       => '/lists/{id}/lead/add/{leadId}',
