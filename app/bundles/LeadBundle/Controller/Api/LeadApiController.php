@@ -277,7 +277,7 @@ class LeadApiController extends CommonApiController
      *
      * @ApiDoc(
      *   section = "Leads",
-     *   description = "Obtains a list of of notes on a specific lead"
+     *   description = "Obtains a list of of notes on a specific lead",
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Lead not found"

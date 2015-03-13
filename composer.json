@@ -72,7 +72,7 @@
         "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
         "liip/functional-test-bundle": "dev-master",
-        "nelmio/api-doc-bundle": "2.7.*@dev",
+        "nelmio/api-doc-bundle": "2.8.*@dev",
         "sensio/generator-bundle": "~2.3",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "@stable"
