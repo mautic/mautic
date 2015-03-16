@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "aa36a309e7c3ee21046271dde70a5975",
+    "hash": "774a242162b811cae6e09258f3a1024f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "2.7.20",
+            "version": "2.7.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "2c9d93fbe680f64a84f5877209904f414d5cf92f"
+                "reference": "7c97f11ca46c47209e597ebab6e74e164cdf6216"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2c9d93fbe680f64a84f5877209904f414d5cf92f",
-                "reference": "2c9d93fbe680f64a84f5877209904f414d5cf92f",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/7c97f11ca46c47209e597ebab6e74e164cdf6216",
+                "reference": "7c97f11ca46c47209e597ebab6e74e164cdf6216",
                 "shasum": ""
             },
             "require": {
@@ -71,7 +71,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2015-02-24 00:04:06"
+            "time": "2015-03-12 19:51:58"
         },
         {
             "name": "doctrine/annotations",
@@ -881,12 +881,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "312fb5939d5b9dbd66e515374533933e7c5cc8a6"
+                "reference": "7fc9125b7b2e329c55040feb53c443fbf974dd54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/312fb5939d5b9dbd66e515374533933e7c5cc8a6",
-                "reference": "312fb5939d5b9dbd66e515374533933e7c5cc8a6",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/7fc9125b7b2e329c55040feb53c443fbf974dd54",
+                "reference": "7fc9125b7b2e329c55040feb53c443fbf974dd54",
                 "shasum": ""
             },
             "require": {
@@ -931,7 +931,7 @@
                 "database",
                 "migrations"
             ],
-            "time": "2015-03-02 18:28:52"
+            "time": "2015-03-12 22:57:04"
         },
         {
             "name": "doctrine/orm",
@@ -1670,16 +1670,16 @@
         },
         {
             "name": "joomla/http",
-            "version": "1.1.5",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/http.git",
-                "reference": "71bc4adf7592f11ac684d163eb3cb530375d6d41"
+                "reference": "63e98b274943143e96276c7dbd2ff66ec47f3031"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/71bc4adf7592f11ac684d163eb3cb530375d6d41",
-                "reference": "71bc4adf7592f11ac684d163eb3cb530375d6d41",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/63e98b274943143e96276c7dbd2ff66ec47f3031",
+                "reference": "63e98b274943143e96276c7dbd2ff66ec47f3031",
                 "shasum": ""
             },
             "require": {
@@ -1687,7 +1687,9 @@
                 "php": ">=5.3.10"
             },
             "require-dev": {
-                "joomla/test": "~1.0"
+                "joomla/test": "~1.0",
+                "phpunit/phpunit": "4.*",
+                "squizlabs/php_codesniffer": "1.*"
             },
             "suggest": {
                 "joomla/registry": "Registry can be used as an alternative to using an array for the package options."
@@ -1715,7 +1717,7 @@
                 "http",
                 "joomla"
             ],
-            "time": "2014-12-16 17:34:09"
+            "time": "2015-03-05 11:45:34"
         },
         {
             "name": "joomla/uri",
@@ -1760,12 +1762,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/Gaufrette.git",
-                "reference": "fcc3c3fbf1dd1899ad670b1412050fc57d821081"
+                "reference": "4c73bb66ff41d7c9beb57372a82047cf5dcc6d1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/fcc3c3fbf1dd1899ad670b1412050fc57d821081",
-                "reference": "fcc3c3fbf1dd1899ad670b1412050fc57d821081",
+                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/4c73bb66ff41d7c9beb57372a82047cf5dcc6d1c",
+                "reference": "4c73bb66ff41d7c9beb57372a82047cf5dcc6d1c",
                 "shasum": ""
             },
             "require": {
@@ -1776,6 +1778,7 @@
                 "aws/aws-sdk-php": "~2",
                 "doctrine/dbal": ">=2.3",
                 "dropbox-php/dropbox-php": "*",
+                "google/apiclient": "~1.1",
                 "herzult/php-ssh": "*",
                 "microsoft/windowsazure": "dev-master",
                 "mikey179/vfsstream": "~1.2.0",
@@ -1791,10 +1794,11 @@
                 "dropbox-php/dropbox-php": "to use the Dropbox adapter",
                 "ext-apc": "to use the APC adapter",
                 "ext-curl": "*",
-                "ext-fileinfo": "This extension is used to automatically detect the content-type of a file in the AwsS3, OpenCloud, and AzureBlogStorage adapters",
+                "ext-fileinfo": "This extension is used to automatically detect the content-type of a file in the AwsS3, OpenCloud, AzureBlogStorage and GoogleCloudStorage adapters",
                 "ext-mbstring": "*",
                 "ext-mongo": "*",
                 "ext-zip": "to use the Zip adapter",
+                "google/apiclient": "to use GoogleCloudStorage adapter",
                 "herzult/php-ssh": "to use SFtp adapter",
                 "knplabs/knp-gaufrette-bundle": "to use with Symfony2",
                 "microsoft/windowsazure": "to use Microsoft Azure Blob Storage adapter",
@@ -1834,7 +1838,7 @@
                 "filesystem",
                 "media"
             ],
-            "time": "2015-03-03 11:30:54"
+            "time": "2015-03-09 08:06:57"
         },
         {
             "name": "knplabs/knp-menu",
@@ -1906,12 +1910,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/KnpMenuBundle.git",
-                "reference": "dc2c5b9702369f952fd7268a9a8a24473705b3a7"
+                "reference": "f9b9fe1995d2aecaaab408420664d4b9235deaeb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/dc2c5b9702369f952fd7268a9a8a24473705b3a7",
-                "reference": "dc2c5b9702369f952fd7268a9a8a24473705b3a7",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/f9b9fe1995d2aecaaab408420664d4b9235deaeb",
+                "reference": "f9b9fe1995d2aecaaab408420664d4b9235deaeb",
                 "shasum": ""
             },
             "require": {
@@ -1942,7 +1946,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "Knplabs",
+                    "name": "KnpLabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -1954,20 +1958,20 @@
             "keywords": [
                 "menu"
             ],
-            "time": "2015-01-28 10:37:00"
+            "time": "2015-03-04 10:53:50"
         },
         {
             "name": "monolog/monolog",
-            "version": "1.12.0",
+            "version": "1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "1fbe8c2641f2b163addf49cc5e18f144bec6b19f"
+                "reference": "c31a2c4e8db5da8b46c74cf275d7f109c0f249ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1fbe8c2641f2b163addf49cc5e18f144bec6b19f",
-                "reference": "1fbe8c2641f2b163addf49cc5e18f144bec6b19f",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c31a2c4e8db5da8b46c74cf275d7f109c0f249ac",
+                "reference": "c31a2c4e8db5da8b46c74cf275d7f109c0f249ac",
                 "shasum": ""
             },
             "require": {
@@ -1984,6 +1988,7 @@
                 "phpunit/phpunit": "~4.0",
                 "raven/raven": "~0.5",
                 "ruflin/elastica": "0.90.*",
+                "swiftmailer/swiftmailer": "~5.3",
                 "videlalvaro/php-amqplib": "~2.4"
             },
             "suggest": {
@@ -2000,7 +2005,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.12.x-dev"
+                    "dev-master": "1.13.x-dev"
                 }
             },
             "autoload": {
@@ -2026,7 +2031,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-12-29 21:29:35"
+            "time": "2015-03-09 09:58:04"
         },
         {
             "name": "mrclay/minify",
@@ -4554,12 +4559,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioApiDocBundle.git",
-                "reference": "e23a7d7d66d78bcbd28afd218133659a6694f16d"
+                "reference": "d8c05dbf57b11b4602ed9c5fa3b7ba43653d0257"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/e23a7d7d66d78bcbd28afd218133659a6694f16d",
-                "reference": "e23a7d7d66d78bcbd28afd218133659a6694f16d",
+                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/d8c05dbf57b11b4602ed9c5fa3b7ba43653d0257",
+                "reference": "d8c05dbf57b11b4602ed9c5fa3b7ba43653d0257",
                 "shasum": ""
             },
             "require": {
@@ -4591,7 +4596,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7.x-dev"
+                    "dev-master": "2.8.x-dev"
                 }
             },
             "autoload": {
@@ -4620,7 +4625,7 @@
                 "documentation",
                 "rest"
             ],
-            "time": "2015-02-06 15:04:01"
+            "time": "2015-03-13 16:22:24"
         },
         {
             "name": "sensio/generator-bundle",
