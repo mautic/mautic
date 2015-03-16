@@ -775,7 +775,7 @@ var Mautic = {
             success: function (response) {
                 if (response) {
                     if (response.callback) {
-                        window["Mautic"][callback].apply('window', [response]);
+                        window["Mautic"][response.callback].apply('window', [response]);
                         return;
                     }
                     if (response.redirect) {
@@ -1299,6 +1299,11 @@ var Mautic = {
         } else {
             if (response.flashes) {
                 Mautic.setFlashes(response.flashes);
+            }
+
+            if (response.callback) {
+                window["Mautic"][response.callback].apply('window', [response]);
+                return;
             }
 
             if (response.closeModal) {
