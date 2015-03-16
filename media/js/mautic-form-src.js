@@ -33,7 +33,7 @@
         Profiler.runTime = function() {
             this._endTime = performance.now();
             this._runtime = this._endTime - this._startTime;
-            console.log('Execution time: ' + this._runtime + ' ms.');
+            if (Core.debug()) console.log('Execution time: ' + this._runtime + ' ms.');
         }
 
         Form.initialize = function(){
@@ -112,7 +112,7 @@
         }
 
         Modal.loadStyle = function() {
-            if (typeof(config.modal_css) != 'undefined') {
+            if (typeof(config.modal_css) != 'undefined' && parseInt(config.modal_css) != 'Nan' && config.modal_css == 0) {
                 if (Core.debug()) console.log('custom modal css style');
                 return;
             }
@@ -122,6 +122,7 @@
             s.type = "text/css"
             s.href = Core.debug() ? Core.getMauticBaseUrl() + 'media/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
             document.head.appendChild(s);
+            if (Core.debug()) console.log(s);
         }
 
         Modal.open = function() {
@@ -217,11 +218,11 @@
         }
 
         Core.debug = function() {
-            return typeof(config.debug) != 'undefined' ? true : false ;
+            return (typeof(config.debug) != 'undefined' && parseInt(config.debug) != 'Nan' && config.debug == 1) ? true : false ;
         }
 
         Core.devMode = function() {
-            return typeof(config.devmode) != 'undefined' ? true : false ;
+            return (typeof(config.devmode) != 'undefined' && parseInt(config.devmode) != 'Nan' && config.devmode == 1) ? true : false ;
         }
 
         Core.setMauticBaseUrl = function(base_url) {
