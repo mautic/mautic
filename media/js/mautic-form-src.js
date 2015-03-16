@@ -94,7 +94,7 @@
 
         Form.getFormLink = function(options) {
             var index = (Core.debug()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/p/form/?' + options.params;
+            return Core.getMauticBaseUrl() + index + '/form/?' + options.params;
         }
 
         Form.createIframe = function(options, embed) {
