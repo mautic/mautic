@@ -774,6 +774,10 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 if (response) {
+                    if (response.callback) {
+                        window["Mautic"][callback].apply('window', [response]);
+                        return;
+                    }
                     if (response.redirect) {
                         mQuery('<div />', {
                             'class': "modal-backdrop fade in"
