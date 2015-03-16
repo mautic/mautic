@@ -24,7 +24,7 @@
         //Mautic Profiler
         var Profiler = {};
         //global configuration
-        var config = {};
+        var config = {devmode: false, debug: false};
 
         Profiler.startTime = function() {
             this._startTime = performance.now();
@@ -45,7 +45,8 @@
                 text[1].trim().split(/\s+/).forEach(function (strAttribute){
                     var tmpAtr = strAttribute.split('=');
                     replaceArgs.data[tmpAtr[0]] = tmpAtr[1];
-                    tmpParams.push(tmpAtr[0]+'='+encodeURIComponent(tmpAtr[1]));
+                    if (tmpAtr[0] != 'id')
+                        tmpParams.push(tmpAtr[0]+'='+encodeURIComponent(tmpAtr[1]));
                 });
                 tmpParams.push('html=1');
                 replaceArgs.params = tmpParams.join('&');
@@ -93,8 +94,8 @@
         }
 
         Form.getFormLink = function(options) {
-            var index = (Core.debug()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/form/?' + options.params;
+            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
+            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
         }
 
         Form.createIframe = function(options, embed) {
@@ -217,6 +218,10 @@
 
         Core.debug = function() {
             return typeof(config.debug) != 'undefined' ? true : false ;
+        }
+
+        Core.devMode = function() {
+            return typeof(config.devmode) != 'undefined' ? true : false ;
         }
 
         Core.setMauticBaseUrl = function(base_url) {
