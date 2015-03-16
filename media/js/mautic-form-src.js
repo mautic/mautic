@@ -203,6 +203,11 @@
             this.overlay.addEventListener(this.transitionSelect(), function() {
                 if(_.overlay.parentNode) _.overlay.parentNode.removeChild(_.overlay);
             });
+
+            //remove modal and overlay
+            this.overlay.parentNode.removeChild(this.overlay);
+            this.modal.parentNode.removeChild(this.modal);
+
         }
 
         Core.parseToObject = function(params) {
