@@ -229,6 +229,7 @@ class LeadRepository extends CommonRepository
         return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'dateAdded', null, false, $total);
     }
 
+
     /**
      * Updates lead ID (e.g. after a lead merge)
      *
@@ -237,10 +238,35 @@ class LeadRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
+        // First check to ensure the $toLead doesn't already exist
+        $results = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cl.campaign_id')
+            ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
+            ->where('cl.lead_id = ' . $toLeadId)
+            ->execute()
+            ->fetchAll();
+        $campaigns = array();
+        foreach ($results as $r) {
+            $campaigns[] = $r['campaign_id'];
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX . 'campaign_leads')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
-            ->execute();
+            ->set('lead_id', (int)$toLeadId)
+            ->where('lead_id = ' . (int)$fromLeadId);
+
+        if (!empty($campaigns)) {
+            $q->andWhere(
+                $q->expr()->notIn('campaign_id', $campaigns)
+            )->execute();
+
+            // Delete remaining leads as the new lead already belongs
+            $this->_em->getConnection()->createQueryBuilder()
+                ->delete(MAUTIC_TABLE_PREFIX . 'campaign_leads')
+                ->where('lead_id = ' . (int)$fromLeadId)
+                ->execute();
+        } else {
+            $q->execute();
+        }
     }
 }
