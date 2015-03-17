@@ -17,8 +17,9 @@ if ($permissions['lead:leads:create']) {
         'attr'      => array(
             'class'       => 'btn btn-default btn-nospin',
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#lead-quick-add',
+            'data-target' => '#MauticSharedModal',
             'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
+            'data-header' => $view['translator']->trans('mautic.lead.lead.menu.quickadd'),
         ),
         'iconClass' => 'fa fa-bolt',
         'btnText'   => 'mautic.lead.lead.menu.quickadd'
@@ -39,14 +40,6 @@ $extraHtml = <<<button
     <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
 </div>
 button;
-
-$extraHtml .= "<div class=\"text-left\">\n" . $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'lead-quick-add',
-    'header' => $view['translator']->trans('mautic.lead.lead.header.quick.add'),
-    'body'   => '',
-    'size'   => 'sm',
-    'footerButtons' => true
-)) . "\n</div>\n";
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(
