@@ -24,7 +24,7 @@
         //Mautic Profiler
         var Profiler = {};
         //global configuration
-        var config = {};
+        var config = {devmode: false, debug: false};
 
         Profiler.startTime = function() {
             this._startTime = performance.now();
@@ -33,7 +33,7 @@
         Profiler.runTime = function() {
             this._endTime = performance.now();
             this._runtime = this._endTime - this._startTime;
-            console.log('Execution time: ' + this._runtime + ' ms.');
+            if (Core.debug()) console.log('Execution time: ' + this._runtime + ' ms.');
         }
 
         Form.initialize = function(){
@@ -45,7 +45,8 @@
                 text[1].trim().split(/\s+/).forEach(function (strAttribute){
                     var tmpAtr = strAttribute.split('=');
                     replaceArgs.data[tmpAtr[0]] = tmpAtr[1];
-                    tmpParams.push(tmpAtr[0]+'='+encodeURIComponent(tmpAtr[1]));
+                    if (tmpAtr[0] != 'id')
+                        tmpParams.push(tmpAtr[0]+'='+encodeURIComponent(tmpAtr[1]));
                 });
                 tmpParams.push('html=1');
                 replaceArgs.params = tmpParams.join('&');
@@ -93,8 +94,8 @@
         }
 
         Form.getFormLink = function(options) {
-            var index = (Core.debug()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/p/form/?' + options.params;
+            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
+            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
         }
 
         Form.createIframe = function(options, embed) {
@@ -111,7 +112,7 @@
         }
 
         Modal.loadStyle = function() {
-            if (typeof(config.modal_css) != 'undefined') {
+            if (typeof(config.modal_css) != 'undefined' && parseInt(config.modal_css) != 'Nan' && config.modal_css == 0) {
                 if (Core.debug()) console.log('custom modal css style');
                 return;
             }
@@ -121,6 +122,7 @@
             s.type = "text/css"
             s.href = Core.debug() ? Core.getMauticBaseUrl() + 'media/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
             document.head.appendChild(s);
+            if (Core.debug()) console.log(s);
         }
 
         Modal.open = function() {
@@ -201,6 +203,11 @@
             this.overlay.addEventListener(this.transitionSelect(), function() {
                 if(_.overlay.parentNode) _.overlay.parentNode.removeChild(_.overlay);
             });
+
+            //remove modal and overlay
+            this.overlay.parentNode.removeChild(this.overlay);
+            this.modal.parentNode.removeChild(this.modal);
+
         }
 
         Core.parseToObject = function(params) {
@@ -216,7 +223,11 @@
         }
 
         Core.debug = function() {
-            return typeof(config.debug) != 'undefined' ? true : false ;
+            return (typeof(config.debug) != 'undefined' && parseInt(config.debug) != 'Nan' && config.debug == 1) ? true : false ;
+        }
+
+        Core.devMode = function() {
+            return (typeof(config.devmode) != 'undefined' && parseInt(config.devmode) != 'Nan' && config.devmode == 1) ? true : false ;
         }
 
         Core.setMauticBaseUrl = function(base_url) {
