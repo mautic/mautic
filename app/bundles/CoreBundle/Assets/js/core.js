@@ -774,6 +774,10 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 if (response) {
+                    if (response.callback) {
+                        window["Mautic"][response.callback].apply('window', [response]);
+                        return;
+                    }
                     if (response.redirect) {
                         mQuery('<div />', {
                             'class': "modal-backdrop fade in"
@@ -1295,6 +1299,11 @@ var Mautic = {
         } else {
             if (response.flashes) {
                 Mautic.setFlashes(response.flashes);
+            }
+
+            if (response.callback) {
+                window["Mautic"][response.callback].apply('window', [response]);
+                return;
             }
 
             if (response.closeModal) {
