@@ -12,6 +12,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -19,17 +20,17 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Campaign
- * @ORM\Table(name="campaigns")
- * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\CampaignRepository")
+ *
+ * @package Mautic\CampaignBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Campaign extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails", "campaignList"})
@@ -37,7 +38,8 @@ class Campaign extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails", "campaignList"})
@@ -45,7 +47,8 @@ class Campaign extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -53,7 +56,8 @@ class Campaign extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
+     * @var null|\DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -61,7 +65,8 @@ class Campaign extends FormEntity
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
+     * @var null|\DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -69,8 +74,8 @@ class Campaign extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
+     * @var \Mautic\CategoryBundle\Entity\Category
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails", "campaignList"})
@@ -78,8 +83,8 @@ class Campaign extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Event", mappedBy="campaign", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"order" = "ASC"})
+     * @var ArrayCollection
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -87,26 +92,24 @@ class Campaign extends FormEntity
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $leads;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\LeadList", fetch="EXTRA_LAZY", indexBy="id")
-     * @ORM\JoinTable(name="campaign_leadlist_xref")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
-     **/
+     * @var ArrayCollection
+     */
     private $lists;
 
     /**
-     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
+     * @var array
      */
     private $canvasSettings = array();
 
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct ()
     {
         $this->events = new ArrayCollection();
         $this->leads  = new ArrayCollection();
@@ -114,17 +117,52 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return array
+     * @param ORM\ClassMetadata $metadata
      */
-    public function convertToArray()
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
     {
-        return get_object_vars($this);
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('campaigns')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\CampaignRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addPublishDates();
+
+        $builder->addCategory();
+
+        $builder->createOneToMany('events', 'Event')
+            ->setIndexBy('id')
+            ->setOrderBy(array('order' => 'ASC'))
+            ->mappedBy('campaign')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('leads', 'Lead')
+            ->setIndexBy('id')
+            ->mappedBy('campaign')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+            ->setJoinTable('campaign_leadlist_xref')
+            ->setIndexBy('id')
+            ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->createField('canvasSettings', 'array')
+            ->columnName('canvas_settings')
+            ->nullable()
+            ->build();
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
@@ -140,12 +178,20 @@ class Campaign extends FormEntity
     }
 
     /**
+     * @return array
+     */
+    public function convertToArray ()
+    {
+        return get_object_vars($this);
+    }
+
+    /**
      * @param string $prop
      * @param mixed  $val
      *
      * @return void
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -165,7 +211,7 @@ class Campaign extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -174,9 +220,10 @@ class Campaign extends FormEntity
      * Set description
      *
      * @param string $description
+     *
      * @return Campaign
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -189,7 +236,7 @@ class Campaign extends FormEntity
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -198,9 +245,10 @@ class Campaign extends FormEntity
      * Set name
      *
      * @param string $name
+     *
      * @return Campaign
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -213,7 +261,7 @@ class Campaign extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -221,11 +269,12 @@ class Campaign extends FormEntity
     /**
      * Add events
      *
-     * @param $key
+     * @param                                     $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
+     *
      * @return Campaign
      */
-    public function addEvent($key, Event $event)
+    public function addEvent ($key, Event $event)
     {
         if ($changes = $event->getChanges()) {
             $this->changes['events']['added'][$key] = array($key, $changes);
@@ -240,7 +289,7 @@ class Campaign extends FormEntity
      *
      * @param \Mautic\CampaignBundle\Entity\Event $event
      */
-    public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
+    public function removeEvent (\Mautic\CampaignBundle\Entity\Event $event)
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
 
@@ -252,7 +301,7 @@ class Campaign extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getEvents()
+    public function getEvents ()
     {
         return $this->events;
     }
@@ -261,9 +310,10 @@ class Campaign extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Campaign
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -276,7 +326,7 @@ class Campaign extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishUp()
+    public function getPublishUp ()
     {
         return $this->publishUp;
     }
@@ -285,9 +335,10 @@ class Campaign extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Campaign
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -300,7 +351,7 @@ class Campaign extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishDown()
+    public function getPublishDown ()
     {
         return $this->publishDown;
     }
@@ -325,17 +376,18 @@ class Campaign extends FormEntity
     /**
      * Add lead
      *
-     * @param $key
+     * @param                                    $key
      * @param \Mautic\CampaignBundle\Entity\Lead $lead
+     *
      * @return Campaign
      */
-    public function addLead($key, Lead $lead)
+    public function addLead ($key, Lead $lead)
     {
         $action     = ($this->leads->contains($lead)) ? 'updated' : 'added';
         $leadEntity = $lead->getLead();
 
         $this->changes['leads'][$action][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-        $this->leads[$key] = $lead;
+        $this->leads[$key]                                     = $lead;
 
         return $this;
     }
@@ -345,9 +397,9 @@ class Campaign extends FormEntity
      *
      * @param Lead $lead
      */
-    public function removeLead(Lead $lead)
+    public function removeLead (Lead $lead)
     {
-        $leadEntity = $lead->getLead();
+        $leadEntity                                              = $lead->getLead();
         $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
         $this->leads->removeElement($lead);
     }
@@ -357,7 +409,7 @@ class Campaign extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLeads()
+    public function getLeads ()
     {
         return $this->leads;
     }
@@ -365,7 +417,7 @@ class Campaign extends FormEntity
     /**
      * @return ArrayCollection
      */
-    public function getLists()
+    public function getLists ()
     {
         return $this->lists;
     }
@@ -374,9 +426,10 @@ class Campaign extends FormEntity
      * Add list
      *
      * @param \Mautic\LeadBundle\Entity\LeadList $list
+     *
      * @return Campaign
      */
-    public function addList(\Mautic\LeadBundle\Entity\LeadList $list)
+    public function addList (\Mautic\LeadBundle\Entity\LeadList $list)
     {
         $this->lists[] = $list;
 
@@ -390,7 +443,7 @@ class Campaign extends FormEntity
      *
      * @param \Mautic\LeadBundle\Entity\LeadList $list
      */
-    public function removeList(\Mautic\LeadBundle\Entity\LeadList $list)
+    public function removeList (\Mautic\LeadBundle\Entity\LeadList $list)
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
         $this->lists->removeElement($list);

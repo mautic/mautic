@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,30 +20,30 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class LeadNote
- * @ORM\Table(name="lead_notes")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadNoteRepository")
+ *
+ * @package Mautic\LeadBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class LeadNote extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Groups({"leadNoteDetails"})
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="notes")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
@@ -50,7 +51,8 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
@@ -58,7 +60,8 @@ class LeadNote extends FormEntity
     private $type = 'general';
 
     /**
-     * @ORM\Column(type="datetime", name="date_time", nullable=true)
+     * @var \DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
@@ -66,11 +69,38 @@ class LeadNote extends FormEntity
     private $dateTime;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_notes')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadNoteRepository');
+
+        $builder->addId();
+
+        $builder->addLead(false, 'CASCADE', false, 'notes');
+
+        $builder->addField('text', 'text');
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->nullable()
+            ->build();
+
+        $builder->createField('dateTime', 'datetime')
+            ->columnName('date_time')
+            ->nullable()
+            ->build();
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -79,9 +109,10 @@ class LeadNote extends FormEntity
      * Set text
      *
      * @param string $text
+     *
      * @return LeadNote
      */
-    public function setText($text)
+    public function setText ($text)
     {
         $this->isChanged('text', $text);
         $this->text = $text;
@@ -94,7 +125,7 @@ class LeadNote extends FormEntity
      *
      * @return string
      */
-    public function getText()
+    public function getText ()
     {
         return $this->text;
     }
@@ -103,9 +134,10 @@ class LeadNote extends FormEntity
      * Set type
      *
      * @param string $type
+     *
      * @return LeadNote
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -118,7 +150,7 @@ class LeadNote extends FormEntity
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -126,9 +158,10 @@ class LeadNote extends FormEntity
 
     /**
      * Form validation rules
+     *
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
             array('message' => 'mautic.lead.note.text.notblank')
@@ -154,7 +187,7 @@ class LeadNote extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }

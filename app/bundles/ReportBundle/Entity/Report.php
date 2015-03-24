@@ -11,6 +11,7 @@ namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -18,16 +19,15 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Report
  *
- * @ORM\Table(name="reports")
- * @ORM\Entity(repositoryClass="Mautic\ReportBundle\Entity\ReportRepository")
+ * @package Mautic\ReportBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Report extends FormEntity
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportList", "reportDetails"})
@@ -35,7 +35,8 @@ class Report extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportList", "reportDetails"})
@@ -43,7 +44,8 @@ class Report extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -51,7 +53,8 @@ class Report extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @var bool
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -59,7 +62,8 @@ class Report extends FormEntity
     private $system = false;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -67,7 +71,8 @@ class Report extends FormEntity
     private $source;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -75,7 +80,8 @@ class Report extends FormEntity
     private $columns = array();
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -83,7 +89,8 @@ class Report extends FormEntity
     private $filters = array();
 
     /**
-     * @ORM\Column(type="array", name="table_order", nullable=true)
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -91,7 +98,8 @@ class Report extends FormEntity
     private $tableOrder = array();
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"reportDetails"})
@@ -99,9 +107,45 @@ class Report extends FormEntity
     private $graphs = array();
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('reports')
+            ->setCustomRepositoryClass('Mautic\ReportBundle\Entity\ReportRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addField('system', 'boolean');
+
+        $builder->addField('source', 'string');
+
+        $builder->createField('columns', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('filters', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('tableOrder', 'array')
+            ->columnName('table_order')
+            ->nullable()
+            ->build();
+
+        $builder->createField('graphs', 'array')
+            ->nullable()
+            ->build();
+
+
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank(array(
             'message' => 'mautic.core.name.required'
@@ -113,7 +157,7 @@ class Report extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -125,7 +169,7 @@ class Report extends FormEntity
      *
      * @return Report
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -138,7 +182,7 @@ class Report extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -150,7 +194,7 @@ class Report extends FormEntity
      *
      * @return Report
      */
-    public function setSystem($system)
+    public function setSystem ($system)
     {
         $this->isChanged('system', $system);
         $this->system = $system;
@@ -163,7 +207,7 @@ class Report extends FormEntity
      *
      * @return integer
      */
-    public function getSystem()
+    public function getSystem ()
     {
         return $this->system;
     }
@@ -175,7 +219,7 @@ class Report extends FormEntity
      *
      * @return Report
      */
-    public function setSource($source)
+    public function setSource ($source)
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -188,7 +232,7 @@ class Report extends FormEntity
      *
      * @return string
      */
-    public function getSource()
+    public function getSource ()
     {
         return $this->source;
     }
@@ -200,7 +244,7 @@ class Report extends FormEntity
      *
      * @return Report
      */
-    public function setColumns($columns)
+    public function setColumns ($columns)
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -213,7 +257,7 @@ class Report extends FormEntity
      *
      * @return string
      */
-    public function getColumns()
+    public function getColumns ()
     {
         return $this->columns;
     }
@@ -225,7 +269,7 @@ class Report extends FormEntity
      *
      * @return Report
      */
-    public function setFilters($filters)
+    public function setFilters ($filters)
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -238,7 +282,7 @@ class Report extends FormEntity
      *
      * @return string
      */
-    public function getFilters()
+    public function getFilters ()
     {
         return $this->filters;
     }

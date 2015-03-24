@@ -11,21 +11,21 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 
 /**
  * Class FormEntity
  *
- * @ORM\MappedSuperclass
- * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
  */
 class FormEntity extends CommonEntity
 {
 
     /**
-     * @ORM\Column(name="is_published", type="boolean")
+     * @var bool
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -33,7 +33,8 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime", nullable=true)
+     * @var null|\DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -41,7 +42,8 @@ class FormEntity extends CommonEntity
     private $dateAdded = null;
 
     /**
-     * @ORM\Column(name="created_by", type="integer", nullable=true)
+     * @var null|int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -49,7 +51,8 @@ class FormEntity extends CommonEntity
     private $createdBy;
 
     /**
-     * @ORM\Column(name="created_by_user", type="string", nullable=true)
+     * @var null|string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -57,7 +60,8 @@ class FormEntity extends CommonEntity
     private $createdByUser;
 
     /**
-     * @ORM\Column(name="date_modified", type="datetime", nullable=true)
+     * @var null|\DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -65,7 +69,8 @@ class FormEntity extends CommonEntity
     private $dateModified;
 
     /**
-     * @ORM\Column(name="modified_by", type="integer", nullable=true)
+     * var null|int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -73,7 +78,8 @@ class FormEntity extends CommonEntity
     private $modifiedBy;
 
     /**
-     * @ORM\Column(name="modified_by_user", type="string", nullable=true)
+     * @var null|string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -81,17 +87,18 @@ class FormEntity extends CommonEntity
     private $modifiedByUser;
 
     /**
-     * @ORM\Column(name="checked_out", type="datetime", nullable=true)
+     * @var null|\DateTime
      */
     private $checkedOut;
 
     /**
-     * @ORM\Column(name="checked_out_by", nullable=true, type="integer")
+     * @var null|int
      */
     private $checkedOutBy;
 
     /**
-     * @ORM\Column(name="checked_out_by_user", type="string", nullable=true)
+     * @var null|string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
@@ -102,6 +109,62 @@ class FormEntity extends CommonEntity
      * @var array
      */
     protected $changes = array();
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setMappedSuperClass();
+
+        $builder->createField('isPublished', 'boolean')
+            ->columnName('is_published')
+            ->build();
+
+        $builder->addDateAdded();
+
+        $builder->createField('createdBy', 'integer')
+            ->columnName('created_by')
+            ->nullable()
+            ->build();
+
+        $builder->createField('createdByUser', 'string')
+            ->columnName('created_by_user')
+            ->nullable()
+            ->build();
+
+        $builder->createField('dateModified', 'datetime')
+            ->columnName('date_modified')
+            ->nullable()
+            ->build();
+
+        $builder->createField('modifiedBy', 'integer')
+            ->columnName('modified_by')
+            ->nullable()
+            ->build();
+
+        $builder->createField('modifiedByUser', 'string')
+            ->columnName('modified_by_user')
+            ->nullable()
+            ->build();
+
+        $builder->createField('checkedOut', 'datetime')
+            ->columnName('checked_out')
+            ->nullable()
+            ->build();
+
+        $builder->createField('checkedOutBy', 'integer')
+            ->columnName('checked_out_by')
+            ->nullable()
+            ->build();
+
+        $builder->createField('checkedOutByUser', 'string')
+            ->columnName('checked_out_by_user')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * Check publish status with option to check against category, publish up and down dates

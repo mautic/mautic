@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -19,16 +20,16 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class LeadList
- * @ORM\Table(name="lead_lists")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadListRepository")
+ *
+ * @package Mautic\LeadBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class LeadList extends FormEntity
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails", "leadListList"})
@@ -36,7 +37,8 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails", "leadListList"})
@@ -44,15 +46,8 @@ class LeadList extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
-     */
-    private $alias;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails", "leadListList"})
@@ -60,15 +55,26 @@ class LeadList extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(type="array")
+     * @var string
+     *
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadListDetails", "leadListList"})
+     */
+    private $alias;
+
+    /**
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails"})
      */
-    private $filters;
+    private $filters = array();
 
     /**
-     * @ORM\Column(name="is_global", type="boolean")
+     * @var bool
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails"})
@@ -76,15 +82,44 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
-     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
-     *
      * @var ArrayCollection
      */
     private $leads;
 
+    /**
+     * Construct
+     */
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_lists')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadListRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addField('alias', 'string');
+
+        $builder->addField('filters', 'array');
+
+        $builder->createField('isGlobal', 'boolean')
+            ->columnName('is_global')
+            ->build();
+
+        $builder->createOneToMany('leads', 'ListLead')
+            ->setIndexBy('id')
+            ->mappedBy('list')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**

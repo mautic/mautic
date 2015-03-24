@@ -11,103 +11,173 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class Stats
- * @ORM\Table(name="email_stats")
- * @ORM\Entity(repositoryClass="Mautic\EmailBundle\Entity\StatRepository")
+ * Class Stat
+ *
+ * @package Mautic\EmailBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Stat
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     **/
+     * @var Email
+     */
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     **/
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     private $lead;
 
     /**
-     * @ORM\Column(name="email_address", type="string")
+     * @var string
      */
     private $emailAddress;
+
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\LeadList")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
-     **/
+     * @var \Mautic\LeadBundle\Entity\LeadList
+     */
     private $list;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
-     * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=true)
+     * @var \Mautic\CoreBundle\Entity\IpAddress
      */
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="date_sent", type="datetime")
+     * @var \DateTime
      */
     private $dateSent;
 
     /**
-     * @ORM\Column(name="is_read", type="boolean")
+     * @var bool
      */
     private $isRead = false;
 
     /**
-     * @ORM\Column(name="is_failed", type="boolean")
+     * @var bool
      */
     private $isFailed = false;
 
     /**
-     * @ORM\Column(name="viewed_in_browser", type="boolean")
+     * @var bool
      */
     private $viewedInBrowser = false;
 
     /**
-     * @ORM\Column(name="date_read", type="datetime", nullable=true)
+     * @var \DateTime
      */
     private $dateRead;
 
     /**
-     * @ORM\Column(name="tracking_hash", type="string", nullable=true)
+     * @var string
      */
     private $trackingHash;
 
     /**
-     * @ORM\Column(name="retry_count", type="string", nullable=true)
+     * @var int
      */
     private $retryCount = 0;
 
     /**
-     * @ORM\Column(name="source", type="string", nullable=true)
+     * @var string
      */
     private $source;
 
     /**
-     * @ORM\Column(name="source_id", type="integer", nullable=true)
+     * @var int
      */
     private $sourceId;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
      */
     private $tokens = array();
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('email_stats')
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository');
+
+        $builder->addId();
+
+        $builder->createManyToOne('email', 'Email')
+            ->inversedBy('stats')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addLead(true);
+
+        $builder->createField('emailAddress', 'string')
+            ->columnName('email_address')
+            ->build();
+
+        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+            ->addJoinColumn('list_id', 'id')
+            ->build();
+
+        $builder->addIpAddress();
+
+        $builder->createField('dateSent', 'datetime')
+            ->columnName('date_sent')
+            ->nullable()
+            ->build();
+
+        $builder->createField('isRead', 'boolean')
+            ->columnName('is_read')
+            ->build();
+
+        $builder->createField('isFailed', 'boolean')
+            ->columnName('is_failed')
+            ->build();
+
+        $builder->createField('viewedInBrowser', 'boolean')
+            ->columnName('viewed_in_browser')
+            ->build();
+
+        $builder->createField('dateRead', 'datetime')
+            ->columnName('date_read')
+            ->nullable()
+            ->build();
+
+        $builder->createField('trackingHash', 'string')
+            ->columnName('tracking_hash')
+            ->nullable()
+            ->build();
+
+        $builder->createField('retryCount', 'integer')
+            ->columnName('retry_count')
+            ->build();
+
+        $builder->createField('source', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('sourceId', 'integer')
+            ->columnName('source_id')
+            ->nullable()
+            ->build();
+
+        $builder->createField('tokens', 'array')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * @return mixed
@@ -192,7 +262,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function isRead()
+    public function isRead ()
     {
         return $this->getIsRead();
     }
@@ -272,7 +342,7 @@ class Stat
     /**
      *
      */
-    public function upRetryCount()
+    public function upRetryCount ()
     {
         $this->retryCount++;
     }
@@ -296,7 +366,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function isFailed()
+    public function isFailed ()
     {
         return $this->getIsFailed();
     }
@@ -362,7 +432,7 @@ class Stat
      */
     public function setSourceId ($sourceId)
     {
-        $this->sourceId = (int) $sourceId;
+        $this->sourceId = (int)$sourceId;
     }
 
     /**

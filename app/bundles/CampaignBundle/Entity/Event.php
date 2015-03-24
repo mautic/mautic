@@ -12,20 +12,21 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Event
- * @ORM\Table(name="campaign_events")
- * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\EventRepository")
+ *
+ * @package Mautic\CampaignBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Event
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -33,23 +34,8 @@ class Event
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(name="event_type", type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
-     */
-    private $eventType;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -57,7 +43,8 @@ class Event
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -65,7 +52,26 @@ class Event
     private $description;
 
     /**
-     * @ORM\Column(name="event_order", type="integer")
+     * @var string
+     *
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"campaignDetails"})
+     */
+    private $type;
+
+    /**
+     * @var string
+     *
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"campaignDetails"})
+     */
+    private $eventType;
+
+    /**
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -73,7 +79,8 @@ class Event
     private $order = 0;
 
     /**
-     * @ORM\Column(type="array")
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -81,7 +88,8 @@ class Event
     private $properties = array();
 
     /**
-     * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
+     * @var null|\DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -89,7 +97,8 @@ class Event
     private $triggerDate;
 
     /**
-     * @ORM\Column(name="trigger_interval", type="integer", nullable=true)
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -97,7 +106,8 @@ class Event
     private $triggerInterval = 0;
 
     /**
-     * @ORM\Column(name="trigger_interval_unit", type="string", length=1, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -105,7 +115,8 @@ class Event
     private $triggerIntervalUnit;
 
     /**
-     * @ORM\Column(name="trigger_mode", type="string", length=10, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -113,14 +124,13 @@ class Event
     private $triggerMode;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="events")
-     * @ORM\JoinColumn(name="campaign_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var Campaign
      */
     private $campaign;
 
     /**
-     * @ORM\OneToMany(targetEntity="Event", mappedBy="parent", indexBy="id")
-     * @ORM\OrderBy({"order" = "ASC"})
+     * @var ArrayCollection
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -128,8 +138,8 @@ class Event
     private $children;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Event", inversedBy="children", cascade={"persist"})
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
+     * @var Event
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -138,7 +148,8 @@ class Event
     private $parent = null;
 
     /**
-     * @ORM\Column(name="decision_path", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
@@ -146,12 +157,12 @@ class Event
     private $decisionPath;
 
     /**
-     * @ORM\Column(name="temp_id", nullable=true)
+     * @var string
      **/
     private $tempId;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @var ArrayCollection
      */
     private $log;
 
@@ -160,10 +171,95 @@ class Event
      */
     private $changes;
 
-    public function __construct()
+    public function __construct ()
     {
         $this->log      = new ArrayCollection();
         $this->children = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('campaign_events')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('eventType', 'string')
+            ->columnName('event_type')
+            ->length(50)
+            ->build();
+
+        $builder->createField('order', 'integer')
+            ->columnName('event_order')
+            ->build();
+
+        $builder->addField('properties', 'array');
+
+        $builder->createField('triggerDate', 'datetime')
+            ->columnName('trigger_date')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerInterval', 'integer')
+            ->columnName('trigger_interval')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerIntervalUnit', 'string')
+            ->columnName('trigger_interval_unit')
+            ->length(1)
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerMode', 'string')
+            ->columnName('trigger_mode')
+            ->length(10)
+            ->nullable()
+            ->build();
+
+        $builder->createManyToOne('campaign', 'Campaign')
+            ->inversedBy('events')
+            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createOneToMany('children', 'Event')
+            ->setIndexBy('id')
+            ->setOrderBy(array('order' => 'ASC'))
+            ->mappedBy('parent')
+            ->build();
+
+        $builder->createManyToOne('parent', 'Event')
+            ->inversedBy('children')
+            ->cascadePersist()
+            ->addJoinColumn('parent_id', 'id')
+            ->build();
+
+        $builder->createField('decisionPath', 'string')
+            ->columnName('decision_path')
+            ->nullable()
+            ->build();
+
+        $builder->createField('tempId', 'string')
+            ->columnName('temp_id')
+            ->nullable();
+
+        $builder->createOneToMany('log', 'LeadEventLog')
+            ->mappedBy('event')
+            ->cascadePersist()
+            ->cascadeRemove()
+            ->fetchExtraLazy()
+            ->build();
+
+
     }
 
     /**
@@ -172,7 +268,7 @@ class Event
      *
      * @return void
      */
-    private function isChanged($prop, $val)
+    private function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -190,7 +286,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getChanges()
+    public function getChanges ()
     {
         return $this->changes;
     }
@@ -200,7 +296,7 @@ class Event
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -209,9 +305,10 @@ class Event
      * Set order
      *
      * @param integer $order
+     *
      * @return Event
      */
-    public function setOrder($order)
+    public function setOrder ($order)
     {
         $this->isChanged('order', $order);
 
@@ -225,7 +322,7 @@ class Event
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrder ()
     {
         return $this->order;
     }
@@ -234,9 +331,10 @@ class Event
      * Set properties
      *
      * @param array $properties
+     *
      * @return Event
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -250,7 +348,7 @@ class Event
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -259,9 +357,10 @@ class Event
      * Set campaign
      *
      * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
+     *
      * @return Event
      */
-    public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
+    public function setCampaign (\Mautic\CampaignBundle\Entity\Campaign $campaign)
     {
         $this->campaign = $campaign;
 
@@ -273,7 +372,7 @@ class Event
      *
      * @return \Mautic\CampaignBundle\Entity\Campaign
      */
-    public function getCampaign()
+    public function getCampaign ()
     {
         return $this->campaign;
     }
@@ -282,9 +381,10 @@ class Event
      * Set type
      *
      * @param string $type
+     *
      * @return Event
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -297,7 +397,7 @@ class Event
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -305,7 +405,7 @@ class Event
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -314,9 +414,10 @@ class Event
      * Set description
      *
      * @param string $description
+     *
      * @return Event
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -329,7 +430,7 @@ class Event
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -338,9 +439,10 @@ class Event
      * Set name
      *
      * @param string $name
+     *
      * @return Event
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -353,7 +455,7 @@ class Event
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -362,9 +464,10 @@ class Event
      * Add log
      *
      * @param LeadEventLog $log
+     *
      * @return Event
      */
-    public function addLog(LeadEventLog $log)
+    public function addLog (LeadEventLog $log)
     {
         $this->log[] = $log;
 
@@ -376,7 +479,7 @@ class Event
      *
      * @param LeadEventLog $log
      */
-    public function removeLog(LeadEventLog $log)
+    public function removeLog (LeadEventLog $log)
     {
         $this->log->removeElement($log);
     }
@@ -386,7 +489,7 @@ class Event
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog()
+    public function getLog ()
     {
         return $this->log;
     }
@@ -395,9 +498,10 @@ class Event
      * Add children
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
+     *
      * @return Event
      */
-    public function addChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function addChild (\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children[] = $children;
 
@@ -409,7 +513,7 @@ class Event
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
      */
-    public function removeChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function removeChild (\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children->removeElement($children);
     }
@@ -419,7 +523,7 @@ class Event
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getChildren()
+    public function getChildren ()
     {
         return $this->children;
     }
@@ -428,9 +532,10 @@ class Event
      * Set parent
      *
      * @param \Mautic\CampaignBundle\Entity\Event $parent
+     *
      * @return Event
      */
-    public function setParent(\Mautic\CampaignBundle\Entity\Event $parent = null)
+    public function setParent (\Mautic\CampaignBundle\Entity\Event $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -441,7 +546,7 @@ class Event
     /**
      * Remove parent
      */
-    public function removeParent()
+    public function removeParent ()
     {
         $this->isChanged('parent', '');
         $this->parent = null;
@@ -452,7 +557,7 @@ class Event
      *
      * @return \Mautic\CampaignBundle\Entity\Event
      */
-    public function getParent()
+    public function getParent ()
     {
         return $this->parent;
     }

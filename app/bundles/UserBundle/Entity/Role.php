@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -18,17 +19,17 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Role
- * @ORM\Table(name="roles")
- * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\RoleRepository")
+ *
+ * @package Mautic\UserBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Role extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"roleDetails", "roleList"})
@@ -36,7 +37,8 @@ class Role extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"roleDetails", "roleList"})
@@ -44,7 +46,8 @@ class Role extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"roleDetails", "roleList"})
@@ -52,7 +55,8 @@ class Role extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(name="is_admin", type="boolean")
+     * @var bool
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"roleDetails"})
@@ -60,32 +64,69 @@ class Role extends FormEntity
     private $isAdmin = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist","remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $permissions;
 
     /**
-     * @ORM\Column(name="readable_permissions", type="array")
+     * @var array
      */
     private $rawPermissions;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="role", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $users;
 
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct ()
     {
         $this->permissions = new ArrayCollection();
+        $this->users       = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('roles')
+            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\RoleRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('isAdmin', 'boolean')
+            ->columnName('is_admin')
+            ->build();
+
+        $builder->createOneToMany('permissions', 'Permission')
+            ->orphanRemoval()
+            ->mappedBy('role')
+            ->cascadePersist()
+            ->cascadeRemove()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('rawPermissions', 'array')
+            ->columnName('readable_permissions')
+            ->build();
+
+        $builder->createOneToMany('users', 'User')
+            ->mappedBy('role')
+            ->fetchExtraLazy()
+            ->build();
+
+
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.core.name.required')
@@ -97,7 +138,7 @@ class Role extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -109,7 +150,7 @@ class Role extends FormEntity
      *
      * @return Role
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -122,7 +163,7 @@ class Role extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -134,7 +175,7 @@ class Role extends FormEntity
      *
      * @return Role
      */
-    public function addPermission(Permission $permissions)
+    public function addPermission (Permission $permissions)
     {
         $permissions->setRole($this);
 
@@ -148,7 +189,7 @@ class Role extends FormEntity
      *
      * @param Permission $permissions
      */
-    public function removePermission(Permission $permissions)
+    public function removePermission (Permission $permissions)
     {
         $this->permissions->removeElement($permissions);
     }
@@ -158,7 +199,7 @@ class Role extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPermissions()
+    public function getPermissions ()
     {
         return $this->permissions;
     }
@@ -170,7 +211,7 @@ class Role extends FormEntity
      *
      * @return Role
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -183,7 +224,7 @@ class Role extends FormEntity
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -195,7 +236,7 @@ class Role extends FormEntity
      *
      * @return Role
      */
-    public function setIsAdmin($isAdmin)
+    public function setIsAdmin ($isAdmin)
     {
         $this->isChanged('isAdmin', $isAdmin);
         $this->isAdmin = $isAdmin;
@@ -208,7 +249,7 @@ class Role extends FormEntity
      *
      * @return boolean
      */
-    public function getIsAdmin()
+    public function getIsAdmin ()
     {
         return $this->isAdmin;
     }
@@ -218,7 +259,7 @@ class Role extends FormEntity
      *
      * @return boolean
      */
-    public function isAdmin()
+    public function isAdmin ()
     {
         return $this->getIsAdmin();
     }
@@ -228,7 +269,7 @@ class Role extends FormEntity
      *
      * @param array $permissions
      */
-    public function setRawPermissions(array $permissions)
+    public function setRawPermissions (array $permissions)
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
@@ -239,7 +280,7 @@ class Role extends FormEntity
      *
      * @return array
      */
-    public function getRawPermissions()
+    public function getRawPermissions ()
     {
         return $this->rawPermissions;
     }
@@ -251,7 +292,7 @@ class Role extends FormEntity
      *
      * @return Role
      */
-    public function addUser(User $users)
+    public function addUser (User $users)
     {
         $this->users[] = $users;
 
@@ -263,7 +304,7 @@ class Role extends FormEntity
      *
      * @param User $users
      */
-    public function removeUser(User $users)
+    public function removeUser (User $users)
     {
         $this->users->removeElement($users);
     }
@@ -273,7 +314,7 @@ class Role extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUsers()
+    public function getUsers ()
     {
         return $this->users;
     }

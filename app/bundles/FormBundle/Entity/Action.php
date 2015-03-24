@@ -11,21 +11,22 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Action
- * @ORM\Table(name="form_actions")
- * @ORM\Entity(repositoryClass="Mautic\FormBundle\Entity\ActionRepository")
+ *
+ * @package Mautic\FormBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Action
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
@@ -33,15 +34,8 @@ class Action
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
@@ -49,7 +43,8 @@ class Action
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
@@ -57,7 +52,17 @@ class Action
     private $description;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @var string
+     *
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
+     */
+    private $type;
+
+    /**
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
@@ -65,7 +70,8 @@ class Action
     private $order = 0;
 
     /**
-     * @ORM\Column(type="array")
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"formDetails"})
@@ -73,8 +79,7 @@ class Action
     private $properties = array();
 
     /**
-     * @ORM\ManyToOne(targetEntity="Form", inversedBy="actions")
-     * @ORM\JoinColumn(name="form_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var Form
      */
     private $form;
 
@@ -84,12 +89,40 @@ class Action
     private $changes;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('form_actions')
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\ActionRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('order', 'integer')
+            ->columnName('action_order')
+            ->build();
+
+        $builder->addField('properties', 'array');
+
+        $builder->createManyToOne('form', 'Form')
+            ->inversedBy('actions')
+            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->build();
+    }
+
+    /**
      * @param $prop
      * @param $val
      *
      * @return void
      */
-    private function isChanged($prop, $val)
+    private function isChanged ($prop, $val)
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = array($this->$prop, $val);
@@ -99,7 +132,7 @@ class Action
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges ()
     {
         return $this->changes;
     }
@@ -109,7 +142,7 @@ class Action
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -121,7 +154,7 @@ class Action
      *
      * @return Action
      */
-    public function setOrder($order)
+    public function setOrder ($order)
     {
         $this->isChanged('order', $order);
 
@@ -135,7 +168,7 @@ class Action
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrder ()
     {
         return $this->order;
     }
@@ -147,7 +180,7 @@ class Action
      *
      * @return Action
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -161,7 +194,7 @@ class Action
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -173,7 +206,7 @@ class Action
      *
      * @return Action
      */
-    public function setForm(Form $form)
+    public function setForm (Form $form)
     {
         $this->form = $form;
 
@@ -185,7 +218,7 @@ class Action
      *
      * @return Form
      */
-    public function getForm()
+    public function getForm ()
     {
         return $this->form;
     }
@@ -197,7 +230,7 @@ class Action
      *
      * @return Action
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -210,7 +243,7 @@ class Action
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -218,7 +251,7 @@ class Action
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -230,7 +263,7 @@ class Action
      *
      * @return Action
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -243,7 +276,7 @@ class Action
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -255,7 +288,7 @@ class Action
      *
      * @return Action
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -268,7 +301,7 @@ class Action
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }

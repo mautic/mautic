@@ -12,21 +12,22 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class DoNotEmail
- * @ORM\Table(name="email_donotemail")
- * @ORM\Entity()
+ *
+ * @package Mautic\EmailBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class DoNotEmail
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -34,8 +35,8 @@ class DoNotEmail
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Email")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
+     * @var Email
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -43,7 +44,8 @@ class DoNotEmail
     private $email;
 
     /**
-     * @ORM\Column(name="address", type="string")
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -51,8 +53,8 @@ class DoNotEmail
     private $emailAddress;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(onDelete="CASCADE")
+     * @var \Mautic\CampaignBundle\Entity\LeadRepository
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -60,7 +62,8 @@ class DoNotEmail
     private $lead;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime", nullable=true)
+     * @var \DateTime
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -68,22 +71,56 @@ class DoNotEmail
     private $dateAdded;
 
     /**
-     * @ORM\Column(name="unsubscribed", type="boolean")
+     * @var bool
      */
     private $unsubscribed = false;
 
     /**
-     * @ORM\Column(name="bounced", type="boolean")
+     * @var bool
      */
     private $bounced = false;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
     private $comments;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('email_donotemail')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository');
+
+        $builder->addId();
+
+        $builder->createManyToOne('email', 'Email')
+            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createField('emailAddress', 'string')
+            ->columnName('address')
+            ->build();
+
+        $builder->addLead();
+
+        $builder->addDateAdded();
+
+        $builder->addField('unsubscribed', 'boolean');
+
+        $builder->addField('bounced', 'boolean');
+
+        $builder->createField('comments', 'text')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * @return mixed

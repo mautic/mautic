@@ -11,43 +11,69 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
 /**
  * Class Redirect
- * @ORM\Table(name="page_redirects")
- * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\RedirectRepository")
+ *
+ * @package Mautic\PageBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class Redirect extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="redirect_id", type="string", length=25)
+     * @var string
      */
     private $redirectId;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $url;
 
     /**
-     * @ORM\Column(name="hits", type="integer")
+     * @var int
      */
     private $hits = 0;
 
     /**
-     * @ORM\Column(name="unique_hits", type="integer")
+     * @var int
      */
     private $uniqueHits = 0;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('page_redirects')
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
+
+        $builder->addId();
+
+        $builder->createField('redirectId', 'string')
+            ->columnName('redirect_id')
+            ->length(25)
+            ->build();
+
+        $builder->addField('url', 'string');
+
+        $builder->addField('hits', 'integer');
+
+        $builder->createField('uniqueHits', 'integer')
+            ->columnName('unique_hits')
+            ->build();
+    }
 
     /**
      * @return integer

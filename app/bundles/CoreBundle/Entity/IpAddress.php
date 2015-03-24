@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Joomla\Http\HttpFactory;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class IpAddress
@@ -25,14 +26,13 @@ class IpAddress
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="ip_address", type="text", length=15)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"ipAddress"})
@@ -40,12 +40,36 @@ class IpAddress
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="ip_details", type="array", nullable=true)
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"ipAddress"})
      */
     private $ipDetails;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('ip_addresses')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository');
+
+        $builder->addId();
+
+        $builder->createField('ipAddress', 'string')
+            ->columnName('ip_address')
+            ->length(15)
+            ->build();
+
+        $builder->createField('ipDetails', 'array')
+            ->columnName('ip_details')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * Get id

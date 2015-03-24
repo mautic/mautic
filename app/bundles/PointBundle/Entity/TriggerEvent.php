@@ -12,21 +12,22 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class TriggerEvent
- * @ORM\Table(name="point_trigger_events")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\TriggerEventRepository")
+ *
+ * @package Mautic\PointBundle\Entity
+ *
  * @Serializer\ExclusionPolicy("all")
  */
 class TriggerEvent
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
@@ -34,15 +35,8 @@ class TriggerEvent
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
@@ -50,7 +44,8 @@ class TriggerEvent
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
@@ -58,7 +53,17 @@ class TriggerEvent
     private $description;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @var string
+     *
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"triggerDetails"})
+     */
+    private $type;
+
+    /**
+     * @var int
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
@@ -66,7 +71,8 @@ class TriggerEvent
     private $order = 0;
 
     /**
-     * @ORM\Column(type="array")
+     * @var array
+     *
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
@@ -74,31 +80,73 @@ class TriggerEvent
     private $properties = array();
 
     /**
-     * @ORM\ManyToOne(targetEntity="Trigger", inversedBy="events")
-     * @ORM\JoinColumn(name="trigger_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var Trigger
      */
     private $trigger;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadTriggerLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @var ArrayCollection
      */
     private $log;
 
+    /**
+     * @var array
+     */
     private $changes;
 
-    public function __construct()
+    /**
+     * Construct
+     */
+    public function __construct ()
     {
         $this->log = new ArrayCollection();
     }
 
-    private function isChanged($prop, $val)
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('point_trigger_events')
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerEventRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('order', 'integer')
+            ->columnName('action_order')
+            ->build();
+
+        $builder->addField('properties', 'array');
+
+        $builder->createManyToOne('trigger', 'Trigger')
+            ->inversedBy('events')
+            ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createOneToMany('log', 'LeadTriggerLog')
+            ->mappedBy('event')
+            ->cascadePersist()
+            ->cascadeRemove()
+            ->fetchExtraLazy()
+            ->build();
+
+
+    }
+
+    private function isChanged ($prop, $val)
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = array($this->$prop, $val);
         }
     }
 
-    public function getChanges()
+    public function getChanges ()
     {
         return $this->changes;
     }
@@ -108,7 +156,7 @@ class TriggerEvent
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -120,7 +168,7 @@ class TriggerEvent
      *
      * @return TriggerEvent
      */
-    public function setOrder($order)
+    public function setOrder ($order)
     {
         $this->isChanged('order', $order);
 
@@ -134,7 +182,7 @@ class TriggerEvent
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrder ()
     {
         return $this->order;
     }
@@ -146,7 +194,7 @@ class TriggerEvent
      *
      * @return TriggerEvent
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -160,7 +208,7 @@ class TriggerEvent
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -172,7 +220,7 @@ class TriggerEvent
      *
      * @return TriggerTriggerEvent
      */
-    public function setTrigger(Trigger $trigger)
+    public function setTrigger (Trigger $trigger)
     {
         $this->trigger = $trigger;
 
@@ -184,7 +232,7 @@ class TriggerEvent
      *
      * @return Trigger
      */
-    public function getTrigger()
+    public function getTrigger ()
     {
         return $this->trigger;
     }
@@ -196,7 +244,7 @@ class TriggerEvent
      *
      * @return TriggerEvent
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -209,7 +257,7 @@ class TriggerEvent
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -217,7 +265,7 @@ class TriggerEvent
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -229,7 +277,7 @@ class TriggerEvent
      *
      * @return TriggerEvent
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -242,7 +290,7 @@ class TriggerEvent
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -254,7 +302,7 @@ class TriggerEvent
      *
      * @return TriggerEvent
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -267,7 +315,7 @@ class TriggerEvent
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -279,7 +327,7 @@ class TriggerEvent
      *
      * @return Log
      */
-    public function addLog(LeadTriggerLog $log)
+    public function addLog (LeadTriggerLog $log)
     {
         $this->log[] = $log;
 
@@ -291,7 +339,7 @@ class TriggerEvent
      *
      * @param LeadTriggerLog $log
      */
-    public function removeLog(LeadTriggerLog $log)
+    public function removeLog (LeadTriggerLog $log)
     {
         $this->log->removeElement($log);
     }
@@ -301,7 +349,7 @@ class TriggerEvent
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog()
+    public function getLog ()
     {
         return $this->log;
     }
