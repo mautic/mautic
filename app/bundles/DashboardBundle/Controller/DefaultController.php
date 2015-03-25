@@ -74,6 +74,7 @@ class DefaultController extends CommonController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
 
         // Get names of log's items
+        $router = $this->factory->getRouter();
         foreach ($logs as &$log) {
             if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                 $model = $this->factory->getModel($log['bundle'] . '.' . $log['object']);
@@ -82,6 +83,13 @@ class DefaultController extends CommonController
                     $log['objectName'] = $item->{$model->getNameGetter()}();
                 } else {
                     $log['objectName'] = '';
+                }
+
+                $routeName = 'mautic_' . $log['bundle'] . '_action';
+                if ($router->getRouteCollection()->get($routeName) !== null) {
+                    $log['route'] = $router->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId']));
+                } else {
+                    $log['route'] = false;
                 }
             }
         }
