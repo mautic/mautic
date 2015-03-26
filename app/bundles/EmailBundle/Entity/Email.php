@@ -294,7 +294,8 @@ class Email extends FormEntity
         $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
             ->setJoinTable('email_list_xref')
             ->setIndexBy('id')
-            ->addJoinColumn('email_id', 'id')
+            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
 

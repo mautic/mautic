@@ -224,7 +224,7 @@ class Hit
             ->build();
 
         $builder->createField('remoteHost', 'string')
-            ->columnName('remoteHost')
+            ->columnName('remote_host')
             ->nullable()
             ->build();
 

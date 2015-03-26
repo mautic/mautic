@@ -90,7 +90,8 @@ class Client extends BaseClient
 
         $builder->createManyToMany('users', 'Mautic\UserBundle\Entity\User')
             ->setJoinTable('oauth2_user_client_xref')
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
 
@@ -107,7 +108,6 @@ class Client extends BaseClient
         $builder->createField('allowedGrantTypes', 'array')
             ->columnName('allowed_grant_types')
             ->build();
-
     }
 
     /**

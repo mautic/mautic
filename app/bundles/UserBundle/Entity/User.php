@@ -199,22 +199,21 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
 
         $builder->createField('firstName', 'string')
             ->columnName('first_name')
-            ->length(50)
+            ->length(255)
             ->build();
 
         $builder->createField('lastName', 'string')
             ->columnName('last_name')
-            ->length(50)
+            ->length(255)
             ->build();
 
         $builder->createField('email', 'string')
-            ->length(60)
+            ->length(255)
             ->unique()
             ->build();
 
         $builder->createField('position', 'string')
-            ->length(60)
-            ->unique()
+            ->length(255)
             ->build();
 
         $builder->createManyToOne('role', 'Role')

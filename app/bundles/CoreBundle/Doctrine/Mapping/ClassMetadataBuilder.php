@@ -166,12 +166,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     /**
      * Added dateAdded column
      */
-    public function addDateAdded()
+    public function addDateAdded($nullable = false)
     {
-        $this->createField('dateAdded', 'datetime')
-            ->columnName('date_added')
-            ->nullable()
-            ->build();
+        $dateAdded = $this->createField('dateAdded', 'datetime')
+            ->columnName('date_added');
+
+        if ($nullable) {
+            $dateAdded->nullable();
+        }
+
+        $dateAdded->build();
     }
 
     /**
@@ -201,12 +205,12 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     /**
      * Adds IP address
      */
-    public function addIpAddress()
+    public function addIpAddress($nullable = false)
     {
         $this->createManyToOne('ipAddress', 'Mautic\CoreBundle\Entity\IpAddress')
             ->cascadePersist()
             ->cascadeMerge()
-            ->addJoinColumn('ip_id', 'id', false)
+            ->addJoinColumn('ip_id', 'id', $nullable)
             ->build();
     }
 }

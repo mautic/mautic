@@ -282,7 +282,6 @@ class Page extends FormEntity
         $builder->createField('metaDescription', 'text')
             ->columnName('meta_description')
             ->nullable()
-            ->length('320')
             ->build();
 
         $builder->addCategory();

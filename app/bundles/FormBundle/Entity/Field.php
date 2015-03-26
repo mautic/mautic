@@ -218,9 +218,12 @@ class Field
 
         $builder->createField('order', 'integer')
             ->columnName('field_order')
+            ->nullable()
             ->build();
 
-        $builder->addField('properties', 'array');
+        $builder->createField('properties', 'array')
+            ->nullable()
+            ->build();
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
@@ -228,16 +231,14 @@ class Field
             ->build();
 
         $builder->createField('labelAttributes', 'string')
-            ->columnName('label_attributes')
+            ->columnName('label_attr')
             ->nullable()
             ->build();
 
         $builder->createField('inputAttributes', 'string')
-            ->columnName('input_attributes')
+            ->columnName('input_attr')
             ->nullable()
             ->build();
-
-
     }
 
     /**

@@ -83,7 +83,7 @@ class LeadEventLog
         $builder->addLead(false, 'CASCADE', true);
 
         $builder->createManyToOne('campaign', 'Campaign')
-            ->addJoinColumn('campaign_id', 'id', false)
+            ->addJoinColumn('campaign_id', 'id')
             ->build();
 
         $builder->addIpAddress();

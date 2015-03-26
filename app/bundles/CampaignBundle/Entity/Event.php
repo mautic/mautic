@@ -250,7 +250,8 @@ class Event
 
         $builder->createField('tempId', 'string')
             ->columnName('temp_id')
-            ->nullable();
+            ->nullable()
+            ->build();
 
         $builder->createOneToMany('log', 'LeadEventLog')
             ->mappedBy('event')

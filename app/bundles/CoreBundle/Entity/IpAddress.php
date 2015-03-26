@@ -62,7 +62,7 @@ class IpAddress
 
         $builder->createField('ipAddress', 'string')
             ->columnName('ip_address')
-            ->length(15)
+            ->length(45)
             ->build();
 
         $builder->createField('ipDetails', 'array')

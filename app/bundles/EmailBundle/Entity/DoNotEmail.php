@@ -109,7 +109,7 @@ class DoNotEmail
             ->columnName('address')
             ->build();
 
-        $builder->addLead();
+        $builder->addLead(true);
 
         $builder->addDateAdded();
 

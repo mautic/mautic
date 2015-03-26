@@ -122,7 +122,8 @@ class Download
 
         $builder->createField('sourceId', 'integer')
             ->columnName('source_id')
-            ->nullable();
+            ->nullable()
+            ->build();
 
         $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')

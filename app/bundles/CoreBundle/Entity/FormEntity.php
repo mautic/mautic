@@ -123,7 +123,7 @@ class FormEntity extends CommonEntity
             ->columnName('is_published')
             ->build();
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(true);
 
         $builder->createField('createdBy', 'integer')
             ->columnName('created_by')

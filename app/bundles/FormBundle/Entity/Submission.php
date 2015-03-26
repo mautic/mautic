@@ -91,7 +91,7 @@ class Submission
         $builder->addLead(true, 'SET NULL');
 
         $builder->createField('trackingId', 'string')
-            ->columnName('trackign_id')
+            ->columnName('tracking_id')
             ->nullable()
             ->build();
 

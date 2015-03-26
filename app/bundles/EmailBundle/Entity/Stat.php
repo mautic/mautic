@@ -122,7 +122,7 @@ class Stat
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(true);
+        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('emailAddress', 'string')
             ->columnName('email_address')
@@ -132,11 +132,10 @@ class Stat
             ->addJoinColumn('list_id', 'id')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
-            ->nullable()
             ->build();
 
         $builder->createField('isRead', 'boolean')
@@ -163,6 +162,7 @@ class Stat
 
         $builder->createField('retryCount', 'integer')
             ->columnName('retry_count')
+            ->nullable()
             ->build();
 
         $builder->createField('source', 'string')
