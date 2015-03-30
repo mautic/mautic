@@ -142,7 +142,8 @@ return array(
             ),
             'bazinga.oauth.security.authentication.provider.class'    => 'Mautic\ApiBundle\Security\OAuth1\Authentication\Provider\OAuthProvider',
             'bazinga.oauth.security.authentication.listener.class'    => 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener',
-            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener'
+            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
+            'jms_serializer.metadata.annotation_driver.class'         => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver'
         )
     ),
 
