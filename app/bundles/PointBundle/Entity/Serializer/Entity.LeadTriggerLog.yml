@@ -1,0 +1,2 @@
+Mautic\PointBundle\Entity\LeadTriggerLog:
+    exclusion_policy: ALL

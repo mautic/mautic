@@ -16,68 +16,41 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class LeadList
  *
  * @package Mautic\LeadBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadList extends FormEntity
 {
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $description;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $alias;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails"})
      */
     private $filters = array();
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails"})
      */
     private $isGlobal = true;
 

@@ -10,7 +10,6 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
@@ -18,8 +17,6 @@ use Mautic\EmailBundle\Entity\Email;
  * Class Download
  *
  * @package Mautic\AssetBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Download
 {

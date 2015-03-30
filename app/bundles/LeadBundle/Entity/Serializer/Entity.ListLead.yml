@@ -1,0 +1,2 @@
+Mautic\LeadBundle\Entity\Lead:
+    exclusion_policy: ALL

@@ -18,33 +18,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\Validator\Constraints as SecurityAssert;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class User
  *
  * @package Mautic\UserBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class User extends FormEntity implements AdvancedUserInterface, \Serializable
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails", "userList"})
      */
     protected $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails", "userList"})
      */
     protected $username;
 
@@ -69,91 +58,51 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails", "userList"})
      */
     private $firstName;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails", "userList"})
      */
     private $lastName;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $email;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $position;
 
     /**
      * @var Role
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $role;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $timezone = '';
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $locale = '';
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $lastLogin;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $lastActive;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"userDetails"})
      */
     private $onlineStatus = 'offline';
 
@@ -189,7 +138,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         $builder->addId();
 
         $builder->createField('username', 'string')
-            ->length(60)
+            ->length(255)
             ->unique()
             ->build();
 

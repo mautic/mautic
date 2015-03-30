@@ -1,0 +1,62 @@
+Mautic\FormBundle\Entity\Form:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails, formList]
+
+        name:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails, formList]
+
+        description:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        alias:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails, formList]
+
+        category:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails, formList]
+
+        cachedHtml:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        publishUp:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        publishDown:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        fields:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        actions:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        template:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        submissionCount:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]

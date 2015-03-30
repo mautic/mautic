@@ -1,0 +1,37 @@
+Mautic\CampaignBundle\Entity\Campaign:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails, campaignList]
+
+        name:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails, campaignList]
+
+        description:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails]
+
+        publishUp:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails]
+
+        publishDown:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails]
+
+        category:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails, campaignList]
+
+        events:
+            expose: true
+            since_version: 1.0
+            groups: [campaignDetails]

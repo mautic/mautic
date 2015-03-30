@@ -1,0 +1,67 @@
+Mautic\FormBundle\Entity\Field:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        label:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        showLabel:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        alias:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        type:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        defaultValue:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        isRequired:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        validationMessage:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        helpMessage:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        order:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        properties:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        labelAttributes:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]
+
+        inputAttributes:
+           expose: true
+           since_version: 1.0
+           groups: [formDetails]

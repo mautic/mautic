@@ -1,0 +1,22 @@
+Mautic\UserBundle\Entity\Role:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [roleDetails, roleList]
+
+        name:
+            expose: true
+            since_version: 1.0
+            groups: [roleDetails, roleList]
+
+        description:
+            expose: true
+            since_version: 1.0
+            groups: [roleDetails, roleList]
+
+        isAdmin:
+            expose: true
+            since_version: 1.0
+            groups: [roleDetails]

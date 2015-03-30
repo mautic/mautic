@@ -10,16 +10,12 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Mautic\CoreBundle\Doctrine\Mapping\AssociationBuilder;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Lead
  *
  * @package Mautic\CampaignBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Lead
 {

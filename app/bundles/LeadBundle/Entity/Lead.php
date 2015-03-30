@@ -13,44 +13,28 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\IpAddress;
 
 /**
  * Class Lead
  *
  * @package Mautic\LeadBundle\Entity
- *
- * @Serializer\XmlRoot("lead")
- * @Serializer\ExclusionPolicy("all")
  */
 class Lead extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $id;
 
     /**
      * @var \Mautic\UserBundle\Entity\User
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
      */
     private $owner;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $points = 0;
 
@@ -61,19 +45,11 @@ class Lead extends FormEntity
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
      */
     private $ipAddresses;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $lastActive;
 
@@ -98,10 +74,6 @@ class Lead extends FormEntity
      * Used to populate trigger color
      *
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $color;
 
@@ -114,10 +86,6 @@ class Lead extends FormEntity
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
      */
     private $dateIdentified;
 
@@ -130,19 +98,11 @@ class Lead extends FormEntity
      * Used by Mautic to populate the fields pulled from the DB
      *
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     protected $fields = array();
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $preferredProfileImage;
 
@@ -176,8 +136,8 @@ class Lead extends FormEntity
 
         $builder->setTable('leads')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
-            ->addLifecycleEvent('checkDateIdentified', 'PreUpdate')
-            ->addLifecycleEvent('checkDateIdentified', 'PrePersist');
+            ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
+            ->addLifecycleEvent('checkDateIdentified', 'prePersist');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -21,71 +20,42 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class LeadField
  *
  * @package Mautic\LeadBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadField extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $label;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $alias;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"}))
      */
     private $type;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $group;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $defaultValue;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $isRequired = false;
 
@@ -116,19 +86,11 @@ class LeadField extends FormEntity
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $order = 0;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $properties;
 

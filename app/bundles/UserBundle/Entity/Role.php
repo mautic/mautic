@@ -15,51 +15,32 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Role
  *
  * @package Mautic\UserBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Role extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $description;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"roleDetails"})
      */
     private $isAdmin = false;
 

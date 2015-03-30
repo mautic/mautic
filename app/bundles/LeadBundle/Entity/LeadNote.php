@@ -12,8 +12,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -22,17 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * Class LeadNote
  *
  * @package Mautic\LeadBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadNote extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $id;
 
@@ -43,28 +36,16 @@ class LeadNote extends FormEntity
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $text;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $type = 'general';
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $dateTime;
 

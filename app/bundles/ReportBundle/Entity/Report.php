@@ -10,7 +10,6 @@
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -20,89 +19,51 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Report
  *
  * @package Mautic\ReportBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Report extends FormEntity
 {
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $description;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $system = false;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $source;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $columns = array();
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $filters = array();
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $tableOrder = array();
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
      */
     private $graphs = array();
 

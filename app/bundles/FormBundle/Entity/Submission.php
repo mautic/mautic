@@ -10,7 +10,6 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -18,8 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
  * Class Submission
  *
  * @package Mautic\FormBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Submission
 {

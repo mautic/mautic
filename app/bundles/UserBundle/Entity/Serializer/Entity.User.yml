@@ -1,0 +1,62 @@
+Mautic\UserBundle\Entity\User:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails, userList]
+
+        username:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails, userList]
+
+        firstName:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails, userList]
+
+        lastName:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails, userList]
+
+        email:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        position:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        role:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        timezone:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        locale:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        lastLogin:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        lastActive:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]
+
+        onlineStatus:
+            expose: true
+            since_version: 1.0
+            groups: [userDetails]

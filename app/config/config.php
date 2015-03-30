@@ -1,8 +1,8 @@
 <?php
-$ormMappings = array();
+$ormMappings = $serializerMappings = array();
 
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container, &$ormMappings) {
+$buildBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
     if (strpos($namespace, 'Mautic\\') !== false) {
         $bundleBase    = str_replace('Mautic', '', $bundle);
         $directory     = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
@@ -26,6 +26,14 @@ $buildBundles = function($namespace, $bundle) use ($container, &$ormMappings) {
             );
         }
 
+        // Set serializer mapping
+        if (file_exists($directory.'/Entity/Serializer')) {
+            $serializerMappings[$bundle] = array(
+                'namespace_prefix' => $baseNamespace,
+                'path'             => "@$bundle/Entity/Serializer"
+            );
+        }
+
         return array(
             "isAddon"           => false,
             "base"              => str_replace('Bundle', '', $bundleBase),
@@ -42,7 +50,7 @@ $buildBundles = function($namespace, $bundle) use ($container, &$ormMappings) {
 };
 
 // Note MauticAddon bundles so they can be applied as needed
-$buildAddonBundles = function($namespace, $bundle) use ($container) {
+$buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
     if (strpos($namespace, 'MauticAddon\\') !== false) {
         $directory     = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
         $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
@@ -75,6 +83,14 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
                     break;
                 }
             }
+        }
+
+        // Set serializer mapping
+        if (file_exists($directory.'/Entity/Serializer')) {
+            $serializerMappings[$bundle] = array(
+                'namespace_prefix' => $baseNamespace,
+                'path'             => "@$bundle/Entity/Serializer"
+            );
         }
 
         return array(
@@ -284,13 +300,17 @@ if ($container->getParameter('mautic.api_enabled')) {
     $container->loadFromExtension('jms_serializer', array(
         'handlers' => array(
             'datetime' => array(
-                'default_format' => 'c',
+                'default_format'   => 'c',
                 'default_timezone' => 'UTC'
             )
         ),
         'property_naming' => array(
             'separator'  => '',
             'lower_case' => false
+        ),
+        'metadata'       => array(
+            'auto_detection' => false,
+            'directories'    => $serializerMappings
         )
     ));
 

@@ -10,15 +10,12 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class ListLead
  *
  * @package Mautic\LeadBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class ListLead
 {

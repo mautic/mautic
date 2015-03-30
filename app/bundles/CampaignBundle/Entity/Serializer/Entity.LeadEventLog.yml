@@ -1,0 +1,2 @@
+Mautic\CampaignBundle\Entity\LeadEventLog:
+    exclusion_policy: ALL

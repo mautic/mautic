@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -22,62 +21,37 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *
  * @package Mautic\FormBundle\Entity
  *
- * @Serializer\ExclusionPolicy("all")
  */
 class Form extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $description;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $alias;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
      **/
     private $category;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $cachedHtml;
 
@@ -93,46 +67,26 @@ class Form extends FormEntity
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $publishUp;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $publishDown;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $fields;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $actions;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $template;
 
@@ -142,9 +96,7 @@ class Form extends FormEntity
     private $submissions;
 
     /**
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var int
      */
     public $submissionCount;
 

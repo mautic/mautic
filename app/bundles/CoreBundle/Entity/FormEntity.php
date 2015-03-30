@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
@@ -18,71 +17,43 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class FormEntity
  *
- * @Serializer\ExclusionPolicy("all")
+ * @package Mautic\CoreBundle\Entity
  */
 class FormEntity extends CommonEntity
 {
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $isPublished = true;
 
     /**
      * @var null|\DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $dateAdded = null;
 
     /**
      * @var null|int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $createdBy;
 
     /**
      * @var null|string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $createdByUser;
 
     /**
      * @var null|\DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $dateModified;
 
     /**
      * var null|int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $modifiedBy;
 
     /**
      * @var null|string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $modifiedByUser;
 
@@ -98,10 +69,6 @@ class FormEntity extends CommonEntity
 
     /**
      * @var null|string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"publishDetails"})
      */
     private $checkedOutByUser;
 

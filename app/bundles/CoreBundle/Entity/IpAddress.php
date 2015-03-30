@@ -10,17 +10,13 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class IpAddress
  *
- * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\IpAddressRepository")
- * @ORM\Table(name="ip_addresses")
- * @ORM\HasLifecycleCallbacks
- * @Serializer\ExclusionPolicy("all")
+ * @package Mautic\CoreBundle\Entity
  */
 class IpAddress
 {
@@ -32,19 +28,11 @@ class IpAddress
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
      */
     private $ipAddress;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
      */
     private $ipDetails;
 

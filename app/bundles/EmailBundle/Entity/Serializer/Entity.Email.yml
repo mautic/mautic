@@ -1,0 +1,79 @@
+Mautic\EmailBundle\Entity\Email:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails, emailList]
+
+        subject:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails, emailList]
+
+        language:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails, emailList]
+
+        publishUp:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        publishDown:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        readCount:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        readInBrowser:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        sentCount:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        revision:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        category:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails, emailList]
+
+        variantParent:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+            max_depth: 1
+
+        variantChildren:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+            max_depth: 1
+
+        variantStartDate:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        variantSentCount:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        variantReadCount:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]

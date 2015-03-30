@@ -1,0 +1,2 @@
+Mautic\EmailBundle\Entity\DoNotEmail:
+    exclusion_policy: ALL

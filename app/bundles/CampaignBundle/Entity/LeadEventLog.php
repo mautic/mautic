@@ -10,16 +10,12 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Mautic\CoreBundle\Doctrine\Mapping\AssociationBuilder;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class LeadEventLog
  *
  * @package Mautic\CampaignBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadEventLog
 {
@@ -86,7 +82,7 @@ class LeadEventLog
             ->addJoinColumn('campaign_id', 'id')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')

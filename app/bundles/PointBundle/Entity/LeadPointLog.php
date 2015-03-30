@@ -17,8 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  * Class LeadPointLog
  *
  * @package Mautic\PointBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadPointLog
 {
@@ -55,13 +53,13 @@ class LeadPointLog
 
         $builder->createManyToOne('point', 'Point')
             ->isPrimaryKey()
-            ->addJoinColumn('point_id', 'id', true, false, 'SET NULL')
+            ->addJoinColumn('point_id', 'id', true, false, 'CASCADE')
             ->inversedBy('log')
             ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('dateFired', 'datetime')
             ->columnName('date_fired')

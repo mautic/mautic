@@ -1,0 +1,18 @@
+Mautic\CoreBundle\Entity\IpAddress:
+    exclusion_policy: ALL
+    properties:
+       id:
+           expose: true
+           since_version: 1.0
+           groups: [ipAddress]
+
+       ipAddress:
+           expose: true
+           since_version: 1.0
+           groups: [ipAddress]
+
+       ipDetails:
+           expose: true
+           since_version: 1.0
+           groups: [ipAddress]
+

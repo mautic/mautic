@@ -10,8 +10,6 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,8 +18,6 @@ use Mautic\LeadBundle\Entity\Lead;
  * Class Hit
  *
  * @package Mautic\PageBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Hit
 {

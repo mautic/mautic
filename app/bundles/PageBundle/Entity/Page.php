@@ -12,7 +12,6 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -22,36 +21,22 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Page
  *
  * @package Mautic\PageBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Page extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $title;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $alias;
 
@@ -62,10 +47,6 @@ class Page extends FormEntity
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $language = 'en';
 
@@ -86,131 +67,71 @@ class Page extends FormEntity
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $publishUp;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $publishDown;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $hits = 0;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $uniqueHits = 0;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $variantHits = 0;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $revision = 1;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $metaDescription;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $translationChildren;
 
     /**
      * @var Page
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $translationParent = null;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $variantChildren;
 
     /**
      * @var Page
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $variantParent = null;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $variantSettings = array();
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
      */
     private $variantStartDate;
 

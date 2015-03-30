@@ -11,7 +11,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,72 +20,42 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Trigger
  *
  * @package Mautic\PointBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Trigger extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $description;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $publishUp;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $publishDown;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $points = 0;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $color;
 
@@ -97,19 +66,11 @@ class Trigger extends FormEntity
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $events;
 
@@ -152,7 +113,8 @@ class Trigger extends FormEntity
             ->setOrderBy(array('order' => 'ASC'))
             ->mappedBy('trigger')
             ->cascadeAll()
-            ->fetchExtraLazy();
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**

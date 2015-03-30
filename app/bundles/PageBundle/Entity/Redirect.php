@@ -10,7 +10,6 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
@@ -18,8 +17,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
  * Class Redirect
  *
  * @package Mautic\PageBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Redirect extends FormEntity
 {

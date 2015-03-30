@@ -17,8 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  * Class LeadTriggerLog
  *
  * @package Mautic\PointBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class LeadTriggerLog
 {
@@ -61,7 +59,7 @@ class LeadTriggerLog
 
         $builder->addLead(false, 'CASCADE', true);
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('dateFired', 'datetime')
             ->columnName('date_fired')

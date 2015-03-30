@@ -1,0 +1,2 @@
+Mautic\AssetBundle\Entity\Download:
+    exclusion_policy: ALL

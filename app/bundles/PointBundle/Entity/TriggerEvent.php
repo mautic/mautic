@@ -11,7 +11,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -19,63 +18,37 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Class TriggerEvent
  *
  * @package Mautic\PointBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class TriggerEvent
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $description;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $type;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $order = 0;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
      */
     private $properties = array();
 
@@ -139,6 +112,10 @@ class TriggerEvent
 
     }
 
+    /**
+     * @param $prop
+     * @param $val
+     */
     private function isChanged ($prop, $val)
     {
         if ($this->$prop != $val) {
@@ -146,6 +123,9 @@ class TriggerEvent
         }
     }
 
+    /**
+     * @return array
+     */
     public function getChanges ()
     {
         return $this->changes;

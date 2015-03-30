@@ -77,7 +77,7 @@ class RequestToken implements RequestTokenInterface
             ->build();
 
         $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addField('token', 'string');
@@ -86,7 +86,7 @@ class RequestToken implements RequestTokenInterface
 
         $builder->createField('expiresAt', 'integer')
             ->columnName('expires_at')
-            ->nullable();
+            ->build();
 
         $builder->addField('verifier', 'string');
     }

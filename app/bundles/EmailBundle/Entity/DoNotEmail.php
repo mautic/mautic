@@ -11,7 +11,6 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -19,54 +18,32 @@ use Mautic\LeadBundle\Entity\Lead;
  * Class DoNotEmail
  *
  * @package Mautic\EmailBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class DoNotEmail
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $id;
 
     /**
      * @var Email
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $email;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $emailAddress;
 
     /**
      * @var \Mautic\CampaignBundle\Entity\LeadRepository
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $lead;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateAdded;
 
@@ -82,10 +59,6 @@ class DoNotEmail
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $comments;
 

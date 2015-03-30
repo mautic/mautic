@@ -10,61 +10,38 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Field
  *
  * @package Mautic\FormBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Field
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $label;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $showLabel = true;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $alias;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $type;
 
@@ -80,55 +57,31 @@ class Field
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $defaultValue;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $isRequired = false;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $validationMessage;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $helpMessage;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $order = 0;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $properties = array();
 
@@ -139,19 +92,11 @@ class Field
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $labelAttributes;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      */
     private $inputAttributes;
 
@@ -226,7 +171,7 @@ class Field
             ->build();
 
         $builder->createManyToOne('form', 'Form')
-            ->inversedBy('actions')
+            ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 

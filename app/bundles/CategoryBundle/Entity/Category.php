@@ -12,7 +12,6 @@ namespace Mautic\CategoryBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -20,54 +19,32 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Category
  *
  * @package Mautic\CategoryBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Category extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $title;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails"})
      */
     private $description;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $alias;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails"})
      */
     private $color;
 

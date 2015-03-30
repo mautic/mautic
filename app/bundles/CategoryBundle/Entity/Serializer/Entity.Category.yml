@@ -1,0 +1,23 @@
+Mautic\CategoryBundle\Entity\Category:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [categoryDetails, categoryList]
+        title:
+            expose: true
+            since_version: 1.0
+            groups: [categoryDetails, categoryList]
+        description:
+            expose: true
+            since_version: 1.0
+            groups: [categoryDetails]
+        alias:
+            expose: true
+            since_version: 1.0
+            groups: [categoryDetails, categoryList]
+        color:
+            expose: true
+            since_version: 1.0
+            groups: [categoryDetails]

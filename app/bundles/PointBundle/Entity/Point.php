@@ -11,7 +11,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,82 +20,48 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Point
  *
  * @package Mautic\PointBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Point extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $description;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $type;
 
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
      */
     private $publishUp;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
      */
     private $publishDown;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
      */
     private $delta = 0;
 
     /**
      * @var array
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
      */
     private $properties = array();
 
@@ -107,10 +72,6 @@ class Point extends FormEntity
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
      **/
     private $category;
 

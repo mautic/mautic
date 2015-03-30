@@ -11,14 +11,11 @@ namespace Mautic\AddonBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Addon
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Addon extends CommonEntity
 {

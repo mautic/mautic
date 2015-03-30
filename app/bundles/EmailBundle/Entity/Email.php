@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -22,27 +21,17 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Email
  *
  * @package Mautic\EmailBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Email extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $subject;
 
@@ -53,10 +42,6 @@ class Email extends FormEntity
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $language = 'en';
 
@@ -82,63 +67,36 @@ class Email extends FormEntity
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $publishUp;
 
     /**
      * @var \DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $publishDown;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $readCount = 0;
 
     /**
      * @var bool
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $readInBrowser = false;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $sentCount = 0;
 
     /**
      * @var int
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $revision = 1;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
      **/
     private $category;
 
@@ -149,30 +107,16 @@ class Email extends FormEntity
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $stats;
 
     /**
      * @var Email
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $variantParent = null;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
-     * @Serializer\MaxDepth(1)
      **/
     private $variantChildren;
 
@@ -182,38 +126,22 @@ class Email extends FormEntity
     private $variantSettings = array();
 
     /**
-     * @var \DateTiem
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var \DateTime
      */
     private $variantStartDate;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $variantSentCount = 0;
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $variantReadCount = 0;
 
     /**
      * @var \Mautic\FormBundle\Entity\Form
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      */
     private $unsubscribeForm;
 

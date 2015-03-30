@@ -10,14 +10,11 @@
 namespace Mautic\AddonBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Integration
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Integration extends CommonEntity
 {

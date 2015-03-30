@@ -1,0 +1,96 @@
+Mautic\PageBundle\Entity\Page:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails, pageList]
+
+        title:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails, pageList]
+
+        alias:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails, pageList]
+
+        language:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        publishUp:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        publishDown:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        hits:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        uniqueHits:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        variantHits:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        revision:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        metaDescription:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        category:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails, pageList]
+
+        translationChildren:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+            max_depth: 1
+
+        translationParent:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+            max_depth: 1
+
+        variantChildren:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+            max_depth: 1
+
+        variantParent:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+            max_depth: 1
+
+        variantSettings:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        variantStartDate:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]

@@ -1,0 +1,47 @@
+Mautic\PointBundle\Entity\Trigger:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails, triggerList]
+
+        name:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails, triggerList]
+
+        description:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails, triggerList]
+
+        publishUp:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails]
+
+        publishDown:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails]
+
+        points:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails]
+
+        color:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails]
+
+        category:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails, triggerList]
+
+        events:
+            expose: true
+            since_version: 1.0
+            groups: [triggerDetails]

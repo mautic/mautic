@@ -82,7 +82,8 @@ class AccessToken implements AccessTokenInterface
 
         $builder->createField('expiresAt', 'integer')
             ->columnName('expires_at')
-            ->nullable();
+            ->nullable()
+            ->build();
     }
 
     /**

@@ -11,7 +11,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -22,72 +21,42 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Campaign
  *
  * @package Mautic\CampaignBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Campaign extends FormEntity
 {
 
     /**
      * @var int
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails", "campaignList"})
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails", "campaignList"})
      */
     private $name;
 
     /**
      * @var string
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
      */
     private $description;
 
     /**
      * @var null|\DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
      */
     private $publishUp;
 
     /**
      * @var null|\DateTime
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
      */
     private $publishDown;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails", "campaignList"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
-     *
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"campaignDetails"})
      */
     private $events;
 

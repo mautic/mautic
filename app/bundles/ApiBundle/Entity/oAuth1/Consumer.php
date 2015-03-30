@@ -72,7 +72,7 @@ class Consumer implements ConsumerInterface
 
         $builder->setTable('oauth1_consumers')
             ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository')
-            ->addLifecycleEvent('createConsumerKeys', 'PrePersist');
+            ->addLifecycleEvent('createConsumerKeys', 'prePersist');
 
         $builder->addIdColumns('name', false);
 
@@ -88,8 +88,9 @@ class Consumer implements ConsumerInterface
 
         $builder->createOneToMany('accessTokens', 'AccessToken')
             ->setIndexBy('id')
-            ->mappedBy('Consumer')
-            ->fetchExtraLazy();
+            ->mappedBy('consumer')
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**

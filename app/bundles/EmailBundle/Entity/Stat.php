@@ -19,8 +19,6 @@ use Mautic\LeadBundle\Entity\Lead;
  * Class Stat
  *
  * @package Mautic\EmailBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Stat
 {

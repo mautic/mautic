@@ -1,0 +1,2 @@
+Mautic\FormBundle\Entity\Submission:
+    exclusion_policy: ALL

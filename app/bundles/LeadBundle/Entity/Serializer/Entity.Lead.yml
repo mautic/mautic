@@ -1,0 +1,48 @@
+Mautic\LeadBundle\Entity\Lead:
+    exclusion_policy: ALL
+    xml_root_name: lead
+    properties:
+        id:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails, leadList]
+
+        owner:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails]
+
+        points:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails, leadList]
+
+        ipAddresses:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails]
+
+        lastActive:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails, leadList]
+
+        color:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails, leadList]
+
+        dateIdentified:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails]
+
+        fields:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails, leadList]
+
+        preferredProfileImage:
+            expose: true
+            since_version: 1.0
+            groups: [leadDetails]

@@ -17,8 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  * Class Permission
  *
  * @package Mautic\UserBundle\Entity
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class Permission
 {
