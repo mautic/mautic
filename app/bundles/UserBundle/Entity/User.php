@@ -163,6 +163,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
 
         $builder->createField('position', 'string')
             ->length(255)
+            ->nullable()
             ->build();
 
         $builder->createManyToOne('role', 'Role')
