@@ -175,7 +175,7 @@ class DoctrineStep implements StepInterface
      */
     public static function getDrivers()
     {
-        $supported = array(
+        $mauticSupported = array(
             'pdo_mysql'  => 'MySQL PDO (Recommended)',
             'mysqli'     => 'MySQLi',
             'pdo_pgsql'  => 'PosgreSQL',
@@ -187,17 +187,22 @@ class DoctrineStep implements StepInterface
             //'ibm_db2'    => 'IBM DB2 (native)',
         );
 
-        // Add PDO drivers if they're supported
-        $pdoDrivers = \PDO::getAvailableDrivers();
-        foreach ($pdoDrivers as $driver) {
-            if (!array_key_exists('pdo_' . $driver, $supported)) {
-                unset($supported[$driver]);
+        $supported = array();
+
+        // Add PDO drivers if supported
+        if (class_exists('\PDO')) {
+            $pdoDrivers = \PDO::getAvailableDrivers();
+
+            foreach ($pdoDrivers as $driver) {
+                if (array_key_exists('pdo_' . $driver, $mauticSupported)) {
+                    $supported['pdo_' . $driver] = $mauticSupported['pdo_' . $driver];
+                }
             }
         }
 
         // Add MySQLi if available
-        if (!function_exists('mysqli_connect')) {
-            unset($supported['mysqli']);
+        if (function_exists('mysqli_connect')) {
+            $supported['mysqli'] = $mauticSupported['mysqli'];
         }
 
         return $supported;
