@@ -178,9 +178,9 @@ class DoctrineStep implements StepInterface
         $mauticSupported = array(
             'pdo_mysql'  => 'MySQL PDO (Recommended)',
             'mysqli'     => 'MySQLi',
-            'pdo_pgsql'  => 'PosgreSQL',
+            'pdo_pgsql'  => 'PostgreSQL',
             //'pdo_sqlite' => 'SQLite',
-            'pdo_sqlsrv' => 'SQLServer',
+            'pdo_sqlsrv' => 'SQL Server',
             //'pdo_oci'    => 'Oracle (PDO)',
             //'pdo_ibm'    => 'IBM DB2 (PDO)',
             //'oci8'       => 'Oracle (native)',
