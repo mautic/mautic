@@ -35,6 +35,16 @@ return array(
             'mautic_api_getcampaign'  => array(
                 'path'       => '/campaigns/{id}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntity'
+            ),
+            'mautic_api_campaignaddlead' => array(
+                'path'       => '/campaigns/{id}/lead/add/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_campaignremovelead' => array(
+                'path'       => '/campaigns/{id}/lead/remove/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
+                'method'     => 'POST'
             )
         )
     ),

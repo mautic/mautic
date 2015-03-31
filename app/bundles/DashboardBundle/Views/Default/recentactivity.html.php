@@ -31,9 +31,14 @@
                         <?php echo $log['userName']; ?>
                     <?php endif; ?>
                     <?php echo $view['translator']->trans('mautic.dashboard.' . $log['action'] . '.past.tense'); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId'])); ?>" data-toggle="ajax">
+
+                    <?php if (!empty($log['route'])): ?>
+                    <a href="<?php echo $log['route']; ?>" data-toggle="ajax">
                         <?php echo $log['objectName']; ?>
                     </a>
+                    <?php else: ?>
+                    <?php echo $log['objectName']; ?>
+                    <?php endif; ?>
                     <?php echo $log['object']; ?>
                     <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
                 </div>

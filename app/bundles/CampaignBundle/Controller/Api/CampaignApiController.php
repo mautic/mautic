@@ -9,6 +9,7 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -85,5 +86,87 @@ class CampaignApiController extends CommonApiController
     public function getEntityAction($id)
     {
         return parent::getEntityAction($id);
+    }
+
+    /**
+     * Adds a lead to a campaign
+     *
+     * @ApiDoc(
+     *   section = "Campaigns",
+     *   description = "Adds a lead to a campaign",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned if the campaign or lead was not found"
+     *   }
+     * )
+     *
+     * @param int $id     Campaign ID
+     * @param int $leadId Lead ID
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function addLeadAction($id, $leadId)
+    {
+        $entity = $this->model->getEntity($id);
+        if (null !== $entity) {
+            $leadModel = $this->factory->getModel('lead');
+            $lead      = $leadModel->getEntity($leadId);
+
+            if ($lead == null) {
+                return $this->notFound();
+            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $this->model->addLead($entity, $leadId);
+
+            $view = $this->view(array('success' => 1), Codes::HTTP_OK);
+
+            return $this->handleView($view);
+
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Removes given lead from a campaign
+     *
+     * @ApiDoc(
+     *   section = "Campaigns",
+     *   description = "Removes a lead from a campaign",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned if the campaign or lead was not found"
+     *   }
+     * )
+     *
+     * @param int $id     Campaign ID
+     * @param int $leadId Lead ID
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function removeLeadAction($id, $leadId)
+    {
+        $entity = $this->model->getEntity($id);
+        if (null !== $entity) {
+            $leadModel = $this->factory->getModel('lead');
+            $lead      = $leadModel->getEntity($leadId);
+
+            if ($lead == null) {
+                return $this->notFound();
+            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $this->model->removeLead($entity, $leadId);
+
+            $view = $this->view(array('success' => 1), Codes::HTTP_OK);
+
+            return $this->handleView($view);
+
+        }
+
+        return $this->notFound();
     }
 }

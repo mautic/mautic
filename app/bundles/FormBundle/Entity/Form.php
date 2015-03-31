@@ -230,11 +230,12 @@ class Form extends FormEntity
         $groups = array('form');
 
         $postAction = $data->getPostAction();
+
         if ($postAction == 'message') {
             $groups[] = 'messageRequired';
         } elseif ($postAction == 'redirect') {
-            $groups['urlRequired'];
-            $groups['urlRequiredPassTwo'];
+            $groups[] = 'urlRequired';
+            $groups[] = 'urlRequiredPassTwo';
         }
 
         return $groups;

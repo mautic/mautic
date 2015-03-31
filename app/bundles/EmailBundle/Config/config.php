@@ -27,6 +27,16 @@ return array(
             'mautic_api_getemail'  => array(
                 'path'       => '/emails/{id}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:getEntity'
+            ),
+            'mautic_api_sendleademail'  => array(
+                'path'       => '/emails/{id}/send/lead/{leadId}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_sendemail'  => array(
+                'path'       => '/emails/{id}/send',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:send',
+                'method'     => 'POST'
             )
         ),
         'public' => array(

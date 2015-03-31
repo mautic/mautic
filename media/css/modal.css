@@ -167,65 +167,6 @@
     transition: 500ms opacity 500ms ease;
 }
 
-/* Demo Styles */
-html
-{
-    box-sizing: border-box;
-}
-
-*
-{
-    box-sizing: inherit;
-}
-
-body
-{
-    font-family: Helvetica,Arial,san-serif;
-    font-size: 16px;
-
-    margin: 0;
-    padding: 0;
-}
-
-#content
-{
-    display: none;
-}
-
-.trigger-button
-{
-    font-size: 17px;
-
-    position: relative;
-    top: 100px;
-
-    display: block;
-
-    margin: auto;
-    padding: 10px 30px;
-
-    cursor: pointer;
-
-    color: #fff;
-    border: 0;
-    border-radius: 3px;
-    outline: none;
-    background: #2ecc71;
-    box-shadow: 0 5px 1px #27ae60;
-}
-
-.trigger-button:hover
-{
-    background: #27ae60;
-    box-shadow: 0 5px 1px #145b32;
-}
-
-.trigger-button:focus
-{
-    border-top: 5px solid white;
-    box-shadow: none;
-}
-
 .mauticForm-content {
     height: 100%;
 }
