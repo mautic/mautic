@@ -51,19 +51,6 @@ class FormApiController extends CommonApiController
     }
 
     /**
-     * Obtains a specific form
-     *
-     * @param int $id Form ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function preSerializeEntity (&$entity, $action = 'view')

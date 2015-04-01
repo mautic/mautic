@@ -59,19 +59,6 @@ class EmailApiController extends CommonApiController
     }
 
     /**
-     * Obtains a specific email
-     *
-     * @param int $id Email ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-    /**
      * Sends the email to it's assigned lists
      *
      * @param int $id Email ID

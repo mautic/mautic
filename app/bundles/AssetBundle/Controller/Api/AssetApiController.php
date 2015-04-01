@@ -48,17 +48,4 @@ class AssetApiController extends CommonApiController
 
         return parent::getEntitiesAction();
     }
-
-    /**
-     * Obtains a specific asset
-     *
-     * @param int $id Asset ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
 }

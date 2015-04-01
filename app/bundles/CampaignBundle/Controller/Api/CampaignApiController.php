@@ -33,29 +33,6 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of campaigns
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific campaign
-     *
-     * @param int $id Campaign ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-    /**
      * Adds a lead to a campaign
      *
      * @param int $id     Campaign ID

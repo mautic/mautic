@@ -62,19 +62,6 @@ class PageApiController extends CommonApiController
     }
 
     /**
-     * Obtains a specific page
-     *
-     * @param int $id Page ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function preSerializeEntity (&$entity, $action = 'view')
