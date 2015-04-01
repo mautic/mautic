@@ -369,6 +369,7 @@ class LeadRepository extends CommonRepository
 
         //loop over results to put fields in something that can be assigned to the entities
         $fieldValues = array();
+        $groups      = array('core', 'social', 'personal', 'professional');
         foreach ($results as $result) {
             $leadId = $result['id'];
             //unset all the columns that are not fields
@@ -378,6 +379,13 @@ class LeadRepository extends CommonRepository
                 if (isset($fields[$k])) {
                     $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
                     $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                }
+            }
+
+            //make sure each group key is present
+            foreach ($groups as $g) {
+                if (!isset($fieldValues[$leadId][$g])) {
+                    $fieldValues[$leadId][$g] = array();
                 }
             }
         }
