@@ -13,7 +13,6 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LeadApiController extends CommonApiController
 {
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->factory->getModel('lead.lead');
@@ -38,29 +37,9 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of leads
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a list of leads",
-     *   statusCodes = {
-     *     200 = "Returned when successful"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails"}
-     *   },
-     *   filters={
-     *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
-     *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
-     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
-     *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
-     *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|firstName|lastName|email|company|points|phone)", "description"="Table column in which to sort the results by."},
-     *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
-     *   }
-     * )
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction ()
     {
         return parent::getEntitiesAction();
     }
@@ -68,24 +47,12 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a specific lead
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a specific lead",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned if the lead was not found"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails"}
-     *   }
-     * )
-     *
      * @param int $id Lead ID
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function getEntityAction($id)
+    public function getEntityAction ($id)
     {
         return parent::getEntityAction($id);
     }
@@ -93,71 +60,47 @@ class LeadApiController extends CommonApiController
     /**
      * Deletes a lead
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Deletes a lead",
-     *   statusCodes = {
-     *     200 = "Returned if successful",
-     *   }
-     * )
-     *
      * @param int $id Lead ID
+     *
      * @return Response
      */
-    public function deleteEntityAction($id)
+    public function deleteEntityAction ($id)
     {
         return parent::deleteEntityAction($id);
     }
 
     /**
-     * Creates a new lead.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
-     *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Creates a new lead",
-     *   statusCodes = {
-     *     200 = "Returned if successful",
-     *     400 = "Returned if validation failed"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails", "ipAddress"}
-     *   }
-     * )
+     * Creates a new lead or edits if one is found with same email.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      */
-    public function newEntityAction()
+    public function newEntityAction ()
     {
+        // Check for an email to see if the lead already exists
+        $parameters = $this->request->request->all();
+
+        if (array_key_exists('email', $parameters)) {
+            $lead = $this->model->getRepository()->getLeadByEmail($parameters['email']);
+
+            if (!empty($lead)) {
+                // Lead found so edit rather than create a new one
+
+                return parent::editEntityAction($lead['id']);
+            }
+        }
+
         return parent::newEntityAction();
     }
 
     /**
      * Edits an existing lead or creates a new one on PUT if not found.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Edits an existing lead or creates a new one on PUT if not found",
-     *   statusCodes = {
-     *     200 = "Returned if successful edit",
-     *     201 = "Returned if a new lead was created",
-     *     400 = "Returned if validation failed"
-     *   },
-     *   parameters={
-     *       {"name"="owner", "dataType"="integer", "required"=false, "description"="ID of the user who is to be the owner of this lead."},
-     *       {"name"="ipAddress", "dataType"="string", "required"=false, "description"="Passthrough IP of where the lead originated."}
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails", "ipAddress"}
-     *   }
-     * )
-     *
      * @param int $id Lead ID
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws NotFoundHttpException
      */
-    public function editEntityAction($id)
+    public function editEntityAction ($id)
     {
-       return parent::editEntityAction($id);
+        return parent::editEntityAction($id);
     }
 
     /**
@@ -167,10 +110,10 @@ class LeadApiController extends CommonApiController
      *
      * @return mixed|void
      */
-    protected function createEntityForm($entity)
+    protected function createEntityForm ($entity)
     {
         $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'force' => array(
+            'force'          => array(
                 array(
                     'column' => 'f.isPublished',
                     'expr'   => 'eq',
@@ -186,32 +129,15 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of users for lead owner edits
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a list of available users(owners) for leads",
-     *   filters={
-     *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
-     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
-     *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
-     *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set start record; defaults to 0."},
-     *   },
-     *   statusCodes = {
-     *     200 = "Returned when successful"
-     *   },
-     *   output={
-     *      "class"="Mautic\UserBundle\Entity\User",
-     *      "groups"={"userList"}
-     *   }
-     * )
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getOwnersAction()
+    public function getOwnersAction ()
     {
         if (!$this->factory->getSecurity()->isGranted(
             array('lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'),
             'MATCH_ONE'
-        )) {
+        )
+        ) {
             return $this->accessDenied();
         }
 
@@ -229,26 +155,11 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of custom fields
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a list of of custom fields for editing leads",
-     *   statusCodes = {
-     *     200 = "Returned when successful"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadFieldList"}
-     *   }
-     * )
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getFieldsAction()
+    public function getFieldsAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted(
-            array('lead:leads:editown','lead:leads:editother'),
-            'MATCH_ONE'
-        )) {
+        if (!$this->factory->getSecurity()->isGranted(array('lead:leads:editown', 'lead:leads:editother'), 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -264,7 +175,7 @@ class LeadApiController extends CommonApiController
             )
         ));
 
-        $view = $this->view($fields, Codes::HTTP_OK);
+        $view    = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('leadFieldList'));
         $view->setSerializationContext($context);
 
@@ -275,22 +186,9 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead
      *
-     * @ApiDoc(
-     *   section = "Leads",
-     *   description = "Obtains a list of of notes on a specific lead",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Lead not found"
-     *   },
-     *   output={
-     *      "class"="Mautic\LeadBundle\Entity\LeadNote",
-     *      "groups"={"leadNoteList"}
-     *   }
-     * )
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getNotesAction($id)
+    public function getNotesAction ($id)
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
@@ -298,22 +196,33 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $notes = $this->factory->getModel('lead.note')->getEntities(array(
-                'filter' => array(
-                    'force' => array(
+            $results = $this->factory->getModel('lead.note')->getEntities(array(
+                'start'          => $this->request->query->get('start', 0),
+                'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+                'filter'         => array(
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => array(
                         array(
-                            'column' => 'e.lead',
+                            'column' => 'n.lead',
                             'expr'   => 'eq',
                             'value'  => $entity
                         )
                     )
                 ),
-                'orderBy' => 'e.dateAdded',
-                'orderByDir' => 'DESC'
+                'orderBy'        => $this->request->query->get('orderBy', 'n.dateAdded'),
+                'orderByDir'     => $this->request->query->get('orderByDir', 'DESC')
             ));
-            $view = $this->view($notes, Codes::HTTP_OK);
-            $context = SerializationContext::create()->setGroups(array('leadNoteList'));
+
+            list($count, $notes) = $this->prepareEntitiesForView($results);
+
+            $view = $this->view(array(
+                'total' => $count,
+                'notes' => $notes
+            ), Codes::HTTP_OK);
+
+            $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
             $view->setSerializationContext($context);
+
             return $this->handleView($view);
         }
 
@@ -328,7 +237,7 @@ class LeadApiController extends CommonApiController
      * @param                                 $form
      * @param string                          $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity (&$entity, $form, $parameters, $action = 'edit')
     {
         //Since the request can be from 3rd party, check for an IP address if included
         if (isset($parameters['ipAddress'])) {
@@ -359,7 +268,7 @@ class LeadApiController extends CommonApiController
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding ($parameters, $entity, $action)
     {
         unset($parameters['ipAddress']);
 

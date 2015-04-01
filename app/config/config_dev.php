@@ -68,11 +68,6 @@ $container->loadFromExtension("monolog", array(
     )
 ));
 
-if ($container->getParameter('mautic.api_enabled')) {
-    //Load API doc
-    $container->loadFromExtension('nelmio_api_doc', array());
-}
-
 //Register command line logging
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
