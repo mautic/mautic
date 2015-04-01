@@ -179,6 +179,25 @@ class AssetsHelper extends CoreAssetsHelper
         }
     }
 
+    /*
+     * Loads an addon script
+     *
+     * @param $assetFilepath the path to the file location from mautic's root
+     * @
+     */
+
+    public function buildAddonScript($assetFilePath, $isAddon = false)
+    {
+        /*
+        $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
+        $path        = $assetPrefix . $bundlePath . $assetPath;
+        */
+
+        $this->getAssetPrefix();
+
+        return '<script type="text/javascript">console.log(\'hello world2\');  Mautic.loadScript(\'' . $assetFilePath . '\');</script>';
+    }
+
     /**
      * Add style tag to the header
      *

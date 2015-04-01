@@ -840,6 +840,32 @@ var Mautic = {
     },
 
     /**
+     *
+     * @param url
+     */
+    loadScript: function (url) {
+        console.log('hello');
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = url;
+        var x = document.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+    },
+
+    /**
+     *
+     * @param url
+     */
+    loadStylesheet: function (url) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = url;
+        document.getElementsByTagName("head")[0].appendChild(link);
+    },
+
+    /**
      * Just a little visual that an action is taking place
      * @param event
      */
