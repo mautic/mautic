@@ -239,6 +239,70 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Obtains a list of lead lists the lead is in
+     *
+     * @param $id
+     */
+    public function getListsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $lists = $this->model->getLists($entity, true);
+
+            $view = $this->view(
+                array(
+                    'total' => count($lists),
+                    'lists' => $lists
+                ),
+                Codes::HTTP_OK
+            );
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Obtains a list of campaigns the lead is part of
+     *
+     * @param $id
+     */
+    public function getCampaignsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+            $campaignModel = $this->factory->getModel('campaign');
+            $campaigns = $campaignModel->getLeadCampaigns($entity, true);
+
+            foreach ($campaigns as &$c) {
+                unset($c['lists']);
+            }
+
+            $view = $this->view(
+                array(
+                    'total'     => count($campaigns),
+                    'campaigns' => $campaigns
+                ),
+                Codes::HTTP_OK
+            );
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead  &$entity
