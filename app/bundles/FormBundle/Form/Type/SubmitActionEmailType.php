@@ -34,7 +34,7 @@ class SubmitActionEmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $data = (isset($options['subject'])) ? $options['subject'] : $this->factory->getTranslator()->trans('mautic.form.action.sendemail.subject.default');
+        $data = (isset($options['data']['subject'])) ? $options['data']['subject'] : $this->factory->getTranslator()->trans('mautic.form.action.sendemail.subject.default');
         $builder->add('subject', 'text', array(
             'label'      => 'mautic.form.action.sendemail.subject',
             'label_attr' => array('class' => 'control-label'),
