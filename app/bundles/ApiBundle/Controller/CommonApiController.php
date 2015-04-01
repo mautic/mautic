@@ -258,6 +258,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
             $this->model->deleteEntity($entity);
 
+            $this->preSerializeEntity($entity);
             $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
             $this->setSerializationContext($view);
 
