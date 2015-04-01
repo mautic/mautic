@@ -528,4 +528,22 @@ class CommonApiController extends FOSRestController implements MauticController
 
         return $this->handleView($view);
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param null  $data
+     * @param null  $statusCode
+     * @param array $headers
+     */
+    protected function view($data = null, $statusCode = null, array $headers = array())
+    {
+
+        if ($data instanceof Paginator) {
+            // Get iterator out of Paginator class so that the entities are properly serialized by the serializer
+            $data = $data->getIterator()->getArrayCopy();
+        }
+
+        return parent::view($data, $statusCode, $headers);
+    }
 }

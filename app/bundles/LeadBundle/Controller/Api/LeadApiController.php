@@ -162,9 +162,6 @@ class LeadApiController extends CommonApiController
             )
         ));
 
-        // Get iterator out of Paginator class so that they are properly serialized by serializer
-        $fields = $fields->getIterator()->getArrayCopy();
-
         $view    = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('leadFieldList'));
         $view->setSerializationContext($context);
