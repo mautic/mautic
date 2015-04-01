@@ -70,10 +70,23 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Creates a new lead.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
+     * Creates a new lead or edits if one is found with same email.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      */
     public function newEntityAction ()
     {
+        // Check for an email to see if the lead already exists
+        $parameters = $this->request->request->all();
+
+        if (array_key_exists('email', $parameters)) {
+            $lead = $this->model->getRepository()->getLeadByEmail($parameters['email']);
+
+            if (!empty($lead)) {
+                // Lead found so edit rather than create a new one
+
+                return parent::editEntityAction($lead['id']);
+            }
+        }
+
         return parent::newEntityAction();
     }
 
