@@ -47,9 +47,10 @@ class Stat
      * @ORM\Column(name="email_address", type="string")
      */
     private $emailAddress;
+
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\LeadList")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      **/
     private $list;
 
