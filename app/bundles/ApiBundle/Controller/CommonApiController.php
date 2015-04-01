@@ -150,44 +150,8 @@ class CommonApiController extends FOSRestController implements MauticController
         );
         $results = $this->model->getEntities($args);
 
-        if ($results instanceof Paginator) {
-            $totalCount = count($results);
-        } elseif (isset($results['count'])) {
-            $totalCount = $results['count'];
-            $results    = $results['results'];
-        } else {
-            $totalCount = count($results);
-        }
+        list($entities, $totalCount) = $this->prepareEntitiesForView($results);
 
-        //we have to convert them from paginated proxy functions to entities in order for them to be
-        //returned by the serializer/rest bundle
-        $entities = array();
-        foreach ($results as $r) {
-            if (is_array($r) && isset($r[0])) {
-                //entity has some extra something something tacked onto the entities
-                if (is_object($r[0])) {
-                    foreach ($r as $k => $v) {
-                        if ($k === 0) {
-                            continue;
-                        }
-
-                        $r[0]->$k = $v;
-                    }
-                    $this->preSerializeEntity($r[0]);
-                    $entities[] = $r[0];
-                } elseif (is_array($r[0])) {
-                    foreach ($r[0] as $k => $v) {
-                        $r[$k] = $v;
-                    }
-                    unset($r[0]);
-                    $this->preSerializeEntity($r);
-                    $entities[] = $r;
-                }
-            } else {
-                $this->preSerializeEntity($r);
-                $entities[] = $r;
-            }
-        }
         $view = $this->view(array(
             'total'                => $totalCount,
             $this->entityNameMulti => $entities
@@ -545,5 +509,57 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         return parent::view($data, $statusCode, $headers);
+    }
+
+    /**
+     * Prepares entities returned from repository getEntities()
+     *
+     * @param $results
+     *
+     * @return array($totalCount, $entities)
+     */
+    protected function prepareEntitiesForView($results)
+    {
+
+        if ($results instanceof Paginator) {
+            $totalCount = count($results);
+        } elseif (isset($results['count'])) {
+            $totalCount = $results['count'];
+            $results    = $results['results'];
+        } else {
+            $totalCount = count($results);
+        }
+
+        //we have to convert them from paginated proxy functions to entities in order for them to be
+        //returned by the serializer/rest bundle
+        $entities = array();
+        foreach ($results as $r) {
+            if (is_array($r) && isset($r[0])) {
+                //entity has some extra something something tacked onto the entities
+                if (is_object($r[0])) {
+                    foreach ($r as $k => $v) {
+                        if ($k === 0) {
+                            continue;
+                        }
+
+                        $r[0]->$k = $v;
+                    }
+                    $this->preSerializeEntity($r[0]);
+                    $entities[] = $r[0];
+                } elseif (is_array($r[0])) {
+                    foreach ($r[0] as $k => $v) {
+                        $r[$k] = $v;
+                    }
+                    unset($r[0]);
+                    $this->preSerializeEntity($r);
+                    $entities[] = $r;
+                }
+            } else {
+                $this->preSerializeEntity($r);
+                $entities[] = $r;
+            }
+        }
+
+        return array($totalCount, $entities);
     }
 }

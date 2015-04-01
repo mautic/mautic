@@ -183,21 +183,31 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $notes   = $this->factory->getModel('lead.note')->getEntities(array(
-                'filter'     => array(
-                    'force' => array(
+            $results = $this->factory->getModel('lead.note')->getEntities(array(
+                'start'          => $this->request->query->get('start', 0),
+                'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+                'filter'         => array(
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => array(
                         array(
-                            'column' => 'e.lead',
+                            'column' => 'n.lead',
                             'expr'   => 'eq',
                             'value'  => $entity
                         )
                     )
                 ),
-                'orderBy'    => 'e.dateAdded',
-                'orderByDir' => 'DESC'
+                'orderBy'        => $this->request->query->get('orderBy', 'n.dateAdded'),
+                'orderByDir'     => $this->request->query->get('orderByDir', 'DESC')
             ));
-            $view    = $this->view($notes, Codes::HTTP_OK);
-            $context = SerializationContext::create()->setGroups(array('leadNoteList'));
+
+            list($count, $notes) = $this->prepareEntitiesForView($results);
+
+            $view = $this->view(array(
+                'total' => $count,
+                'notes' => $notes
+            ), Codes::HTTP_OK);
+
+            $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
             $view->setSerializationContext($context);
 
             return $this->handleView($view);
