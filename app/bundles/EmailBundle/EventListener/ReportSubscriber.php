@@ -61,10 +61,6 @@ class ReportSubscriber extends CommonSubscriber
                     'label' => 'mautic.email.report.read_count',
                     'type'  => 'int'
                 ),
-                $prefix . 'read_in_browser'    => array(
-                    'label' => 'mautic.email.report.read_in_browser',
-                    'type'  => 'int'
-                ),
                 $prefix . 'revision'           => array(
                     'label' => 'mautic.email.report.revision',
                     'type'  => 'int'
