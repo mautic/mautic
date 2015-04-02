@@ -53,6 +53,13 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
+     * Set the name of the source that installed Mautic
+     *
+     * @var string
+     */
+    public $install_source = 'Mautic';
+
+    /**
      * Constructor
      *
      * @param boolean $configIsWritable Flag if the configuration file is writable

@@ -115,7 +115,7 @@ class GraphHelper
         } elseif ($unit == 'W') {
             $format = 'W';
         } elseif ($unit == 'M') {
-            $format = 'F';
+            $format = 'F y';
         } elseif ($unit == 'Y') {
             $format = 'Y';
         }

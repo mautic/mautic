@@ -31,27 +31,4 @@ class PointApiController extends CommonApiController
         $this->permissionBase   = 'point:points';
         $this->serializerGroups = array('pointDetails', 'categoryList', 'publishDetails');
     }
-
-    /**
-     * Obtains a list of points
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific point
-     *
-     * @param int $id Point ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
 }

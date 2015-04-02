@@ -46,7 +46,7 @@ class Report extends FormEntity
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"reportDetails"})
+     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $description;
 

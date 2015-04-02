@@ -31,27 +31,4 @@ class TriggerApiController extends CommonApiController
         $this->permissionBase   = 'point:triggers';
         $this->serializerGroups = array('triggerDetails', 'categoryList', 'publishDetails');
     }
-
-    /**
-     * Obtains a list of triggers
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific trigger
-     *
-     * @param int $id Point ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
 }
