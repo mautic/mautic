@@ -45,7 +45,7 @@ class ReportApiController extends CommonApiController
             $this->listFilters = array(
                 'column' => 'r.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()
+                'value'  => $this->factory->getUser()->getId()
             );
         }
 
@@ -70,8 +70,6 @@ class ReportApiController extends CommonApiController
         $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), array('paginate' => false, 'ignoreGraphData' => true));
 
         $view = $this->view($reportData, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('reportDetails'));
-        $view->setSerializationContext($context);
 
         return $this->handleView($view);
     }
