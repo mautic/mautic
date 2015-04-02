@@ -392,7 +392,7 @@ class RoleController extends FormController
                 } elseif ($model->isLocked($entity)) {
                     return $this->isLocked($postActionVars, $entity, 'user.role');
                 } else {
-                    $model->deleteEntity($objectId);
+                    $model->deleteEntity($entity);
                     $name      = $entity->getName();
                     $flashes[] = array(
                         'type'    => 'notice',
