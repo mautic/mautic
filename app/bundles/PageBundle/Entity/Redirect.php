@@ -35,7 +35,7 @@ class Redirect extends FormEntity
     private $redirectId;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     private $url;
 

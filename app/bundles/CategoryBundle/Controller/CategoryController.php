@@ -248,6 +248,8 @@ class CategoryController extends FormController
         $entity    = $model->getEntity($objectId);
         $success   = $closeModal = 0;
         $cancelled = $valid = false;
+        $method    = $this->request->getMethod();
+        $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
 
         //not found
         if ($entity === null) {
@@ -265,9 +267,10 @@ class CategoryController extends FormController
             'bundle'       => $bundle
         ));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
+        $form['inForm']->setData($inForm);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -294,6 +297,16 @@ class CategoryController extends FormController
         $closeModal = ($closeModal || $cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
 
         if ($closeModal) {
+            if ($inForm) {
+                return new JsonResponse(array(
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1,
+                    'inForm'        => 1,
+                    'categoryName'  => $entity->getName(),
+                    'categoryId'    => $entity->getId()
+                ));
+            }
+
             $viewParameters = array(
                 'page'   => $session->get('mautic.category.page'),
                 'bundle' => $bundle

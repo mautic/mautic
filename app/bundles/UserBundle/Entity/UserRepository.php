@@ -184,7 +184,7 @@ class UserRepository extends CommonRepository
                 );
             }
             $expr = $q->expr()->orX(
-                $q->expr()->eq('r.isAdmin', true),
+                $q->expr()->eq('r.isAdmin', ':true'),
                 $expr
             );
             $q->andWhere($expr);

@@ -49,6 +49,11 @@ class Translator extends BaseTranslator
      */
     protected function loadCatalogue($locale)
     {
+        if ($locale != 'en_US') {
+            // Always force en_US so that it's available for fallback
+            $this->addResource('mautic', null, 'en_US', 'messages');
+        }
+
         $this->addResource('mautic', null, $locale, 'messages');
 
         parent::loadCatalogue($locale);
