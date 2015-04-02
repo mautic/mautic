@@ -82,6 +82,13 @@ class LeadRepository extends CommonRepository
     public function getLeadsByFieldValue($field, $value, $ignoreId = null)
     {
         $col = 'l.'.$field;
+
+        if ($field == 'email') {
+            // Prevent emails from being case sensitive
+            $col   = "LOWER($col)";
+            $value = strtolower($value);
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder()
         ->select('l.id')
         ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
