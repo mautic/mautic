@@ -99,6 +99,13 @@ class FormType extends AbstractType
             'data'      => $data
         ));
 
+        $builder->add('inKioskMode', 'yesno_button_group', array(
+            'label'       => 'mautic.form.form.kioskmode',
+            'attr'        => array(
+                'tooltip' => 'mautic.form.form.kioskmode.tooltip'
+            )
+        ));
+
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',

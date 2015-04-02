@@ -43,8 +43,18 @@ class FormEventHelper
         );
         $data = array();
 
-        $lead = $model->getCurrentLead();
-        $currentFields = $lead->getFields();
+        $inKioskMode = $form->isInKioskMode();
+
+        if (!$inKioskMode) {
+            $lead          = $model->getCurrentLead();
+            $leadId        = $lead->getId();
+            $currentFields = $lead->getFields();
+        } else {
+            $lead = new Lead();
+            $lead->setNewlyCreated(true);
+
+            $leadId = null;
+        }
 
         foreach ($leadFields as $f) {
             $id    = $f->getId();
@@ -63,14 +73,14 @@ class FormEventHelper
 
                         //update the lead rather than creating a new one if there is for sure identifier match
                         if ($type == 'email') {
-                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue($alias, $value, $lead->getId());
+                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue($alias, $value, $leadId);
                             if (count($leads)) {
-                                //merge with current lead
-                                $lead = $model->mergeLeads($lead, $leads[0]);
-                            } else {
+                                //merge with current lead if not in kiosk mode
+                                $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
+                            } elseif (!$inKioskMode) {
                                 //create a new lead if details differ
                                 $currentEmail = $currentFields['core']['email']['value'];
-                                if (!empty($currentEmail) && $currentEmail != $value) {
+                                if (!empty($currentEmail) && strtolower($currentEmail) != strtolower($value)) {
                                     //for sure a different lead so create a new one
                                     $lead = new Lead();
                                     $lead->setNewlyCreated(true);
@@ -88,7 +98,10 @@ class FormEventHelper
         //no lead was found by a mapped email field so create a new one
         if ($lead->isNewlyCreated()) {
             $lead->setPoints($properties['points']);
-            $lead->addIpAddress($ipAddress);
+
+            if (!$inKioskMode) {
+                $lead->addIpAddress($ipAddress);
+            }
 
             //create a new points change event
             $lead->addPointsChangeLogEntry(
@@ -98,7 +111,7 @@ class FormEventHelper
                 $properties['points'],
                 $ipAddress
             );
-        } else {
+        } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
@@ -116,7 +129,13 @@ class FormEventHelper
         //create a new lead
         $model->saveEntity($lead, false);
 
-        $model->setCurrentLead($lead);
+        if (!$inKioskMode) {
+            // Set the current lead which will generate tracking cookies
+            $model->setCurrentLead($lead);
+        } else {
+            // Set system current lead which will still allow execution of events without generating tracking cookies
+            $model->setSystemCurrentLead($lead);
+        }
 
         //return the lead so it can be used elsewhere
         return array('lead' => $lead);
