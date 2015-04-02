@@ -26,17 +26,19 @@ class OAuthRequestListener extends \Bazinga\OAuthServerBundle\EventListener\OAut
     {
         $authorization = false;
 
-        // Check to see if the header was added to $_SERVER by .htaccess
-        //     RewriteCond %{HTTP:Authorization} .+
-        //     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-        if ($request->server->has('REDIRECT_HTTP_AUTHORIZATION')) {
-            $authorization = $request->server->get('REDIRECT_HTTP_AUTHORIZATION');
-        } elseif ($request->server->has('HTTP_AUTHORIZATION')) {
-            $authorization = $request->server->get('HTTP_AUTHORIZATION');
-        }
+        if (!$request->headers->has('authorization')) {
+            // Check to see if the header was added to $_SERVER by .htaccess
+            //     RewriteCond %{HTTP:Authorization} .+
+            //     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+            if ($request->server->has('REDIRECT_HTTP_AUTHORIZATION')) {
+                $authorization = $request->server->get('REDIRECT_HTTP_AUTHORIZATION');
+            } elseif ($request->server->has('HTTP_AUTHORIZATION')) {
+                $authorization = $request->server->get('HTTP_AUTHORIZATION');
+            }
 
-        if ($authorization) {
-            $request->headers->set('authorization', $authorization);
+            if ($authorization) {
+                $request->headers->set('authorization', $authorization);
+            }
         }
 
         return parent::parseAuthorizationHeader($request);
