@@ -164,7 +164,7 @@ class LeadListRepository extends CommonRepository
                     $q->expr()->eq('IDENTITY(il.lead)', (int) $lead)
                 );
 
-                $return[$lead] = $q->getQuery()->getResult();
+                $return[$lead] = $q->getQuery()->getArrayResult();
             }
 
             return $return[$lead];

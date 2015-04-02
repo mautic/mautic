@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LeadApiController extends CommonApiController
 {
 
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->factory->getModel('lead.lead');
@@ -37,7 +37,7 @@ class LeadApiController extends CommonApiController
     /**
      * Creates a new lead or edits if one is found with same email.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      */
-    public function newEntityAction ()
+    public function newEntityAction()
     {
         // Check for an email to see if the lead already exists
         $parameters = $this->request->request->all();
@@ -62,18 +62,20 @@ class LeadApiController extends CommonApiController
      *
      * @return mixed|void
      */
-    protected function createEntityForm ($entity)
+    protected function createEntityForm($entity)
     {
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'force'          => array(
-                array(
-                    'column' => 'f.isPublished',
-                    'expr'   => 'eq',
-                    'value'  => true
-                )
-            ),
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        ));
+        $fields = $this->factory->getModel('lead.field')->getEntities(
+            array(
+                'force'          => array(
+                    array(
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    )
+                ),
+                'hydration_mode' => 'HYDRATE_ARRAY'
+            )
+        );
 
         return $this->model->createForm($entity, $this->get('form.factory'), null, array('fields' => $fields));
     }
@@ -83,7 +85,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getOwnersAction ()
+    public function getOwnersAction()
     {
         if (!$this->factory->getSecurity()->isGranted(
             array('lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'),
@@ -109,23 +111,25 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getFieldsAction ()
+    public function getFieldsAction()
     {
         if (!$this->factory->getSecurity()->isGranted(array('lead:leads:editown', 'lead:leads:editother'), 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
+        $fields = $this->factory->getModel('lead.field')->getEntities(
+            array(
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        )
                     )
                 )
             )
-        ));
+        );
 
         $view    = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('leadFieldList'));
@@ -140,7 +144,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getNotesAction ($id)
+    public function getNotesAction($id)
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
@@ -148,32 +152,101 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $results = $this->factory->getModel('lead.note')->getEntities(array(
-                'start'          => $this->request->query->get('start', 0),
-                'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
-                'filter'         => array(
-                    'string' => $this->request->query->get('search', ''),
-                    'force'  => array(
-                        array(
-                            'column' => 'n.lead',
-                            'expr'   => 'eq',
-                            'value'  => $entity
+            $results = $this->factory->getModel('lead.note')->getEntities(
+                array(
+                    'start'      => $this->request->query->get('start', 0),
+                    'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+                    'filter'     => array(
+                        'string' => $this->request->query->get('search', ''),
+                        'force'  => array(
+                            array(
+                                'column' => 'n.lead',
+                                'expr'   => 'eq',
+                                'value'  => $entity
+                            )
                         )
-                    )
+                    ),
+                    'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
+                    'orderByDir' => $this->request->query->get('orderByDir', 'DESC')
+                )
+            );
+
+            list($notes, $count) = $this->prepareEntitiesForView($results);
+
+            $view = $this->view(
+                array(
+                    'total' => $count,
+                    'notes' => $notes
                 ),
-                'orderBy'        => $this->request->query->get('orderBy', 'n.dateAdded'),
-                'orderByDir'     => $this->request->query->get('orderByDir', 'DESC')
-            ));
-
-            list($count, $notes) = $this->prepareEntitiesForView($results);
-
-            $view = $this->view(array(
-                'total' => $count,
-                'notes' => $notes
-            ), Codes::HTTP_OK);
+                Codes::HTTP_OK
+            );
 
             $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
             $view->setSerializationContext($context);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Obtains a list of lead lists the lead is in
+     *
+     * @param $id
+     */
+    public function getListsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $lists = $this->model->getLists($entity, true);
+
+            $view = $this->view(
+                array(
+                    'total' => count($lists),
+                    'lists' => $lists
+                ),
+                Codes::HTTP_OK
+            );
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Obtains a list of campaigns the lead is part of
+     *
+     * @param $id
+     */
+    public function getCampaignsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+            $campaignModel = $this->factory->getModel('campaign');
+            $campaigns = $campaignModel->getLeadCampaigns($entity, true);
+
+            foreach ($campaigns as &$c) {
+                unset($c['lists']);
+            }
+
+            $view = $this->view(
+                array(
+                    'total'     => count($campaigns),
+                    'campaigns' => $campaigns
+                ),
+                Codes::HTTP_OK
+            );
 
             return $this->handleView($view);
         }
@@ -189,7 +262,7 @@ class LeadApiController extends CommonApiController
      * @param                                 $form
      * @param string                          $action
      */
-    protected function preSaveEntity (&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         //Since the request can be from 3rd party, check for an IP address if included
         if (isset($parameters['ipAddress'])) {
@@ -220,10 +293,23 @@ class LeadApiController extends CommonApiController
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding ($parameters, $entity, $action)
+    protected function prepareParametersForBinding($parameters, $entity, $action)
     {
         unset($parameters['ipAddress']);
 
         return $parameters;
+    }
+
+    /**
+     * Flatten fields into an 'all' key for dev convenience
+     *
+     * @param $entity
+     */
+    protected function preSerializeEntity(&$entity, $action = 'view')
+    {
+        $fields        = $entity->getFields();
+        $all           = $this->model->flattenFields($fields);
+        $fields['all'] = $all;
+        $entity->setFields($fields);
     }
 }
