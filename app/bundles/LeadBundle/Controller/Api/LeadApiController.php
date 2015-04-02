@@ -35,41 +35,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of leads
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific lead
-     *
-     * @param int $id Lead ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-    /**
-     * Deletes a lead
-     *
-     * @param int $id Lead ID
-     *
-     * @return Response
-     */
-    public function deleteEntityAction ($id)
-    {
-        return parent::deleteEntityAction($id);
-    }
-
-    /**
      * Creates a new lead or edits if one is found with same email.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      */
     public function newEntityAction ()
@@ -88,19 +53,6 @@ class LeadApiController extends CommonApiController
         }
 
         return parent::newEntityAction();
-    }
-
-    /**
-     * Edits an existing lead or creates a new one on PUT if not found.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
-     *
-     * @param int $id Lead ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws NotFoundHttpException
-     */
-    public function editEntityAction ($id)
-    {
-        return parent::editEntityAction($id);
     }
 
     /**

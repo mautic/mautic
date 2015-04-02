@@ -43,7 +43,7 @@ class PageApiController extends CommonApiController
             $this->listFilters = array(
                 'column' => 'p.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()
+                'value'  => $this->factory->getUser()->getId()
             );
         }
 
@@ -59,19 +59,6 @@ class PageApiController extends CommonApiController
         );
 
         return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific page
-     *
-     * @param int $id Page ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
     }
 
     /**

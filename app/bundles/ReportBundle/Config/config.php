@@ -35,6 +35,16 @@ return array(
                 'path'         => '/reports/{objectAction}/{objectId}',
                 'controller'   => 'MauticReportBundle:Report:execute'
             )
+        ),
+        'api'  => array(
+            'mautic_api_getreports'   => array(
+                'path'       => '/reports',
+                'controller' => 'MauticReportBundle:Api\ReportApi:getEntities'
+            ),
+            'mautic_api_getreport'    => array(
+                'path'       => '/reports/{id}',
+                'controller' => 'MauticReportBundle:Api\ReportApi:getReport'
+            )
         )
     ),
 
