@@ -40,7 +40,12 @@ class ExceptionController extends CommonController
 
             // Special handling for oauth and api urls
             if (strpos($request->getUri(), '/oauth') !== false || strpos($request->getUri(), '/api') !== false) {
-                $dataArray = array('error' => $exception->getMessage());
+                $dataArray = array(
+                    'error' => array(
+                        'message' => $exception->getMessage(),
+                        'code'    => $exception->getCode()
+                    )
+                );
                 if ($env == 'dev') {
                     $dataArray['trace'] = $exception->getTrace();
                 }
@@ -68,30 +73,32 @@ class ExceptionController extends CommonController
 
             $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
 
-            $url = $request->getRequestUri();
+            $url      = $request->getRequestUri();
             $urlParts = parse_url($url);
 
-            return $this->delegateView(array(
-                'viewParameters'  => array(
-                    'baseTemplate'   => $baseTemplate,
-                    'status_code'    => $code,
-                    'status_text'    => $statusText,
-                    'exception'      => $exception,
-                    'logger'         => $logger,
-                    'currentContent' => $currentContent,
-                    'isPublicPage'   => $anonymous
-                ),
-                'contentTemplate' => $template,
-                'passthroughVars' => array(
-                    'error' => array(
-                        'code'      => $code,
-                        'text'      => $statusText,
-                        'exception' => ($env == 'dev') ? $exception->getMessage() : '',
-                        'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'baseTemplate'   => $baseTemplate,
+                        'status_code'    => $code,
+                        'status_text'    => $statusText,
+                        'exception'      => $exception,
+                        'logger'         => $logger,
+                        'currentContent' => $currentContent,
+                        'isPublicPage'   => $anonymous
                     ),
-                    'route' => $urlParts['path']
+                    'contentTemplate' => $template,
+                    'passthroughVars' => array(
+                        'error' => array(
+                            'code'      => $code,
+                            'text'      => $statusText,
+                            'exception' => ($env == 'dev') ? $exception->getMessage() : '',
+                            'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
+                        ),
+                        'route' => $urlParts['path']
+                    )
                 )
-            ));
+            );
         }
     }
 
