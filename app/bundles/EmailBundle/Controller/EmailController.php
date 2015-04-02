@@ -579,8 +579,10 @@ class EmailController extends FormController
                 return $this->accessDenied();
             }
 
+            /** @var \Mautic\EmailBundle\Entity\Email $clone */
             $clone = clone $entity;
             $clone->setSentCount(0);
+            $clone->setReadCount(0);
             $clone->setRevision(0);
             $clone->setVariantSentCount(0);
             $clone->setVariantStartDate(null);
