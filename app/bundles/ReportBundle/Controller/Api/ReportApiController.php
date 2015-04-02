@@ -69,6 +69,11 @@ class ReportApiController extends CommonApiController
 
         $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), array('paginate' => false, 'ignoreGraphData' => true));
 
+        // Unset keys that we don't need to send back
+        foreach (array('graphs', 'contentTemplate', 'columns', 'limit') as $key) {
+            unset($reportData[$key]);
+        }
+
         $view = $this->view($reportData, Codes::HTTP_OK);
 
         return $this->handleView($view);
