@@ -353,7 +353,7 @@ class LeadApiController extends CommonApiController
      *
      * @param $entity
      */
-    protected function preSerializeEntity($entity)
+    protected function preSerializeEntity(&$entity, $action = 'view')
     {
         $fields        = $entity->getFields();
         $all           = $this->model->flattenFields($fields);
