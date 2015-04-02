@@ -238,7 +238,7 @@ class ReportSubscriber extends CommonSubscriber
             $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
             $qb->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
-                ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.id = p.id')
+                ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id')
                 ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'tp', 'p.id = tp.id')
                 ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'pages', 'vp', 'p.id = vp.id')
                 ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = ph.email_id')
