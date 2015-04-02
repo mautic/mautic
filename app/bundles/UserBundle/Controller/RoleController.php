@@ -392,7 +392,7 @@ class RoleController extends FormController
                 } elseif ($model->isLocked($entity)) {
                     return $this->isLocked($postActionVars, $entity, 'user.role');
                 } else {
-                    $model->deleteEntity($objectId);
+                    $model->deleteEntity($entity);
                     $name      = $entity->getName();
                     $flashes[] = array(
                         'type'    => 'notice',
@@ -410,6 +410,79 @@ class RoleController extends FormController
                 );
             }
 
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.role.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_role_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_role_index',
+                'mauticContent' => 'role'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('user.role');
+            $ids       = json_decode($this->request->query->get('ids', ''));
+            $deleteIds = array();
+            $currentUser    = $this->factory->getUser();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+                $users  = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')->findByRole($entity);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.role.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (count($users)) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.role.error.deletenotallowed',
+                        'msgVars' => array('%name%' => $entity->getName())
+                    );
+                } elseif(!$this->factory->getSecurity()->isGranted('user:roles:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'user.role', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.user.role.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(
