@@ -845,7 +845,6 @@ var Mautic = {
      * @param url
      */
     loadScript: function (url) {
-        console.log('hello');
         var s = document.createElement('script');
         s.type = 'text/javascript';
         s.async = true;
