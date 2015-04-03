@@ -67,11 +67,12 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function getUrl($path, $packageName = null, $version = null)
     {
-        // if
+        // if we have http in the url it is absolute and we can just return it
         if (strpos($path, 'http') === 0) {
             return $path;
         }
 
+        // otherwise build the complete path
         $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
         $path        = $assetPrefix . $path;
 
@@ -187,14 +188,11 @@ class AssetsHelper extends CoreAssetsHelper
     /*
      * Loads an addon script
      *
-     * @param $assetFilepath the path to the file location from mautic's root
-     * @
+     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
      */
 
     public function includeScript($assetFilePath)
     {
-
-
         return  '<script type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
