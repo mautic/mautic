@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5744d74d6f6eb5b7ddd0c83e5f1ad083",
+    "hash": "389c7482b09daba81bcaae9375d0291c",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4370,12 +4370,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/willdurand/BazingaOAuthServerBundle.git",
-                "reference": "a621552fa9b7f334808d7009fd9ead9254b9c1d6"
+                "reference": "ed7afdb19c144fa18ad182907476d0b6af052eb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willdurand/BazingaOAuthServerBundle/zipball/a621552fa9b7f334808d7009fd9ead9254b9c1d6",
-                "reference": "a621552fa9b7f334808d7009fd9ead9254b9c1d6",
+                "url": "https://api.github.com/repos/willdurand/BazingaOAuthServerBundle/zipball/ed7afdb19c144fa18ad182907476d0b6af052eb6",
+                "reference": "ed7afdb19c144fa18ad182907476d0b6af052eb6",
                 "shasum": ""
             },
             "require": {
@@ -4413,7 +4413,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2015-03-03 22:26:57"
+            "time": "2015-04-01 09:28:15"
         }
     ],
     "packages-dev": [

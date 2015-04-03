@@ -19,26 +19,24 @@ $leadName = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentif
 
 $view['slots']->set('mauticContent', 'lead');
 
-    if (!$isAnonymous) {
-        $preferred = $lead->getPreferredProfileImage();
+$avatar = '';
+if (!$isAnonymous) {
+    $preferred = $lead->getPreferredProfileImage();
 
-        if ($preferred == 'gravatar' || empty($preferred))  {
-            $img = $view['gravatar']->getImage($fields['core']['email']['value']);
-        }
-        else {
-            $socialData = $lead->getSocialCache();
-            $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
-        }
+    if ($preferred == 'gravatar' || empty($preferred))  {
+        $img = $view['gravatar']->getImage($fields['core']['email']['value']);
+    } else {
+        $socialData = $lead->getSocialCache();
+        $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
     }
+
+    $avatar = '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="' . $img . '" alt="" /></span>';
+}
 ?>
 <?php
 
 $view['slots']->set("headerTitle",
-        '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px">'
-      .    '<img src=" ' . $img . '" alt="" />'
-      .  '</span>'
-      .  '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
-    $lead->getSecondaryIdentifier() . '</span></div>');
+       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'

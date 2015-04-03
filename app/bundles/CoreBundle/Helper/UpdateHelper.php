@@ -113,12 +113,13 @@ class UpdateHelper
             $instanceId = hash('sha1', $this->factory->getParameter('secret_key') . 'Mautic' . $this->factory->getParameter('db_driver'));
 
             $data = array(
-                'application' => 'Mautic',
-                'version'     => $this->factory->getVersion(),
-                'phpVersion'  => PHP_VERSION,
-                'dbDriver'    => $this->factory->getParameter('db_driver'),
-                'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
-                'instanceId'  => $instanceId
+                'application'   => 'Mautic',
+                'version'       => $this->factory->getVersion(),
+                'phpVersion'    => PHP_VERSION,
+                'dbDriver'      => $this->factory->getParameter('db_driver'),
+                'serverOs'      => php_uname('s') . ' ' . php_uname('r'),
+                'instanceId'    => $instanceId,
+                'installSource' => $this->factory->getParameter('install_source', 'Mautic')
             );
 
             $this->connector->post('https://updates.mautic.org/stats/send', $data);

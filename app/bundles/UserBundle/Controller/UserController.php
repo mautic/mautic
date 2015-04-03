@@ -338,7 +338,7 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        $currentUser    = $this->get('security.context')->getToken()->getUser();
+        $currentUser    = $this->factory->getUser();
         $page           = $this->factory->getSession()->get('mautic.user.page', 1);
         $returnUrl      = $this->generateUrl('mautic_user_index', array('page' => $page));
         $success        = 0;
@@ -425,7 +425,7 @@ class UserController extends FormController
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'contact', 'objectId' => $objectId));
         $form   = $this->createForm(new FormType\ContactType(), array(), array('action' => $action));
 
-        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $currentUser = $this->factory->getUser();
 
         if ($this->request->getMethod() == 'POST') {
             $formUrl   = $this->request->request->get('contact[returnUrl]', '', true);
@@ -510,5 +510,76 @@ class UserController extends FormController
                 'mauticContent' => 'user'
             )
         ));
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.user.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticUserBundle:User:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_user_index',
+                'mauticContent' => 'user'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('user');
+            $ids       = json_decode($this->request->query->get('ids', ''));
+            $deleteIds = array();
+            $currentUser    = $this->factory->getUser();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ((int)$currentUser->getId() === (int)$objectId) {
+                    $flashes[] = array(
+                        'type' => 'error',
+                        'msg'  => 'mautic.user.user.error.cannotdeleteself'
+                    );
+                } elseif ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.user.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'user', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.user.user.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
     }
 }

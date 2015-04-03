@@ -43,24 +43,11 @@ class FormApiController extends CommonApiController
             $this->listFilters = array(
                 'column' => 'f.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()
+                'value'  => $this->factory->getUser()->getId()
             );
         }
 
         return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific form
-     *
-     * @param int $id Form ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
     }
 
     /**
