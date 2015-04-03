@@ -14,7 +14,6 @@ CKEDITOR.editorConfig = function( config ) {
 
     config.enterMode = CKEDITOR.ENTER_P;
     config.filebrowserImageBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images';
-    config.filebrowserImageUploadUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/connectors/php/filemanager.php?command=QuickUpload&type;=Images';
 
     config.toolbar =
         [

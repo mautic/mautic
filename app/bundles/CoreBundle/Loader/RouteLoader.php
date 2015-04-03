@@ -76,13 +76,6 @@ class RouteLoader extends Loader
             $apiCollection = $event->getCollection();
             $apiCollection->addPrefix('/api');
             $collection->addCollection($apiCollection);
-
-            if ($this->factory->getEnvironment() == 'dev') {
-                //Load API doc routing
-                $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
-                $apiDoc->addPrefix('/api-docs');
-                $secureCollection->addCollection($apiDoc);
-            }
         }
 
         $secureCollection->addPrefix('/s');

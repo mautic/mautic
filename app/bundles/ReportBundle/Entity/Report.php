@@ -23,47 +23,77 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Report extends FormEntity
 {
     /**
-     * @var int
+     * @ORM\Column(type="integer")
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $id;
 
     /**
-     * @var string
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportList", "reportDetails"})
      */
     private $name;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportList", "reportDetails"})
      * @var string
      */
     private $description;
 
     /**
-     * @var bool
+     * @ORM\Column(type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $system = false;
 
     /**
-     * @var string
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $source;
 
     /**
-     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $columns = array();
 
     /**
-     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $filters = array();
 
     /**
-     * @var array
+     * @ORM\Column(type="array", name="table_order", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $tableOrder = array();
 
     /**
-     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"reportDetails"})
      */
     private $graphs = array();
 

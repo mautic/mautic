@@ -52,7 +52,9 @@ class SlotsHelper extends BaseSlotsHelper
 
         if (is_array($names)) {
             foreach ($names as $n) {
-                $hasContent = (boolean) strip_tags(trim($this->slots[$n]));
+                // strip tags used to ensure we don't have empty tags.
+                // Caused a bug with hasContent returning incorrectly. Whitelisted img to fix
+                $hasContent = (boolean) strip_tags(trim($this->slots[$n]), "<img>");
                 if ($hasContent) {
                     return true;
                 }

@@ -91,6 +91,11 @@ class Form extends FormEntity
     private $template;
 
     /**
+     * @ORM\Column(type="boolean", nullable=true, name="in_kiosk_mode")
+     */
+    private $inKioskMode = false;
+
+    /**
      * @var ArrayCollection
      */
     private $submissions;
@@ -604,5 +609,29 @@ class Form extends FormEntity
     public function setTemplate ($template)
     {
         $this->template = $template;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInKioskMode()
+    {
+        return $this->inKioskMode;
+    }
+
+    /**
+     * @param mixed $inKioskMode
+     */
+    public function setInKioskMode($inKioskMode)
+    {
+        $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isInKioskMode()
+    {
+        return $this->getInKioskMode();
     }
 }

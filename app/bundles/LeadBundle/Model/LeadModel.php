@@ -213,9 +213,10 @@ class LeadModel extends FormModel
         $lead->setSocialCache($socialCache);
 
         //save the field values
-        if (!$isNew && !$lead->isNewlyCreated()) {
-            $fieldValues = $lead->getFields();
-        } else {
+        $fieldValues = $lead->getFields();
+
+        if (empty($fieldValues)) {
+            // Lead is new or they haven't been populated so let's build the fields now
             static $fields;
             if (empty($fields)) {
                 $fields = $this->factory->getModel('lead.field')->getEntities(array(

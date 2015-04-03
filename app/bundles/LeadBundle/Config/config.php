@@ -85,9 +85,17 @@ return array(
                 'controller' => 'MauticLeadBundle:Api\LeadApi:deleteEntity',
                 'method'     => 'DELETE'
             ),
-            'mautic_api_getleadnotes'  => array(
+            'mautic_api_getleadsnotes'  => array(
                 'path'       => '/leads/{id}/notes',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes'
+            ),
+            'mautic_api_getleadscampaigns'  => array(
+                'path'       => '/leads/{id}/campaigns',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns'
+            ),
+            'mautic_api_getleadslists'  => array(
+                'path'       => '/leads/{id}/lists',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
             ),
             'mautic_api_getleadowners' => array(
                 'path'       => '/leads/list/owners',

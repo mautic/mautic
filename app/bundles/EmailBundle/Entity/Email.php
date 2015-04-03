@@ -81,11 +81,6 @@ class Email extends FormEntity
     private $readCount = 0;
 
     /**
-     * @var bool
-     */
-    private $readInBrowser = false;
-
-    /**
      * @var int
      */
     private $sentCount = 0;
@@ -205,10 +200,6 @@ class Email extends FormEntity
 
         $builder->createField('readCount', 'integer')
             ->columnName('read_count')
-            ->build();
-
-        $builder->createField('readInBrowser', 'boolean')
-            ->columnName('read_in_browser')
             ->build();
 
         $builder->createField('sentCount', 'integer')
@@ -679,22 +670,6 @@ class Email extends FormEntity
                 $this->variantSentCount--;
             }
         }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getReadInBrowser ()
-    {
-        return $this->readInBrowser;
-    }
-
-    /**
-     * @param mixed $readInBrowser
-     */
-    public function setReadInBrowser ($readInBrowser)
-    {
-        $this->readInBrowser = $readInBrowser;
     }
 
     /**

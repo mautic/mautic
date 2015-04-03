@@ -14,11 +14,11 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20150330000000
+ * Class Version20150403000000
  *
  * @package Mautic\Migrations
  */
-class Version20150330000000 extends AbstractMauticMigration
+class Version20150403000000 extends AbstractMauticMigration
 {
 
     public function preUp(Schema $schema)

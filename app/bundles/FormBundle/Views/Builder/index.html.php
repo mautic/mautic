@@ -152,6 +152,7 @@ $formId = $form['sessionId']->vars['data'];
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
+            echo $view['form']->row($form['inKioskMode']);
             echo $view['form']->row($form['template']);
             ?>
         </div>

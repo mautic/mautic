@@ -93,12 +93,12 @@ class Hit
     private $code;
 
     /**
-     * @var string
+     * @ORM\Column(type="text", nullable=true)
      */
     private $referer;
 
     /**
-     * @var string
+     * @ORM\Column(type="text", nullable=true)
      */
     private $url;
 

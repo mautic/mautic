@@ -32,7 +32,7 @@ class Redirect extends FormEntity
     private $redirectId;
 
     /**
-     * @var string
+     * @ORM\Column(type="text")
      */
     private $url;
 
