@@ -101,29 +101,6 @@ class LeadController extends FormController
         $leads = $results['results'];
         unset($results);
 
-        // Get the quick add form
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new', 'qf' => 1));
-
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter'         => array(
-                'force' => array(
-                    array(
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    ),
-                    array(
-                        'column' => 'f.isShortVisible',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    )
-                )
-            ),
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        ));
-
-        $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
-
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -192,7 +169,6 @@ class LeadController extends FormController
                 'currentList'   => $list,
                 'security'      => $this->factory->getSecurity(),
                 'inSingleList'  => $inSingleList,
-                'quickForm'     => $quickForm->createView(),
                 'noContactList' => $emailRepo->getDoNotEmailList()
             ),
             'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
@@ -202,6 +178,51 @@ class LeadController extends FormController
                 'route'         => $this->generateUrl('mautic_lead_index', array('page' => $page))
             )
         ));
+    }
+
+    /*
+     * Quick form controller route and view
+     */
+
+    public function quickAddAction()
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model   = $this->factory->getModel('lead.lead');
+
+        // Get the quick add form
+        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new', 'qf' => 1));
+
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+                'filter'         => array(
+                    'force' => array(
+                        array(
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ),
+                        array(
+                            'column' => 'f.isShortVisible',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        )
+                    )
+                ),
+                'hydration_mode' => 'HYDRATE_ARRAY'
+            ));
+
+        $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+
+        return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'quickForm'     => $quickForm->createView()
+                ),
+                'contentTemplate' => "MauticLeadBundle:Lead:quickadd.html.php",
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_lead_index',
+                    'mauticContent' => 'lead',
+                    'route'         => false
+                )
+            ));
     }
 
     /**

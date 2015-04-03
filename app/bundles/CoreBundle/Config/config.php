@@ -44,7 +44,7 @@ return array(
                 'controller'   => 'MauticCoreBundle:Common:removeTrailingSlash',
                 'method'       => 'GET',
                 'requirements' => array(
-                    'url' => '.*/$'
+                    'url' => '^(?!(/s/api-docs).*)/$'
                 )
             ),
             'mautic_public_bc_redirect' => array(

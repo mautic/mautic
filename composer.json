@@ -43,7 +43,7 @@
         "sensio/distribution-bundle": "~2.3",
         "sensio/framework-extra-bundle": "~3.0",
 
-        "doctrine/orm": "~2.3",
+        "doctrine/orm": "~2.3,<2.5",
         "doctrine/dbal": "2.4.*",
         "doctrine/doctrine-bundle": "~1.2",
         "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
@@ -72,7 +72,6 @@
         "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
         "liip/functional-test-bundle": "dev-master",
-        "nelmio/api-doc-bundle": "2.7.*@dev",
         "sensio/generator-bundle": "~2.3",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "@stable"

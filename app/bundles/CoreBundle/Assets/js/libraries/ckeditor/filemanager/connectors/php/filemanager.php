@@ -35,7 +35,7 @@ if(!isset($_GET)) {
   if(isset($_GET['mode']) && $_GET['mode']!='') {
 
     switch($_GET['mode']) {
-      	
+
       default:
 
         $fm->error($fm->lang('MODE_ERROR'));
@@ -49,7 +49,7 @@ if(!isset($_GET)) {
         break;
 
       case 'getfolder':
-        	
+
         if($fm->getvar('path')) {
           $response = $fm->getfolder();
         }
@@ -64,18 +64,18 @@ if(!isset($_GET)) {
 
       case 'move':
         // allow "../"
-        if($fm->getvar('old') && $fm->getvar('new', 'parent_dir') && $fm->getvar('root')) {
+        if($fm->getvar('old') && $fm->getvar('new') && $fm->getvar('root')) {
           $response = $fm->move();
         }
         break;
 
       case 'editfile':
-        	 
+
         if($fm->getvar('path')) {
         	$response = $fm->editfile();
         }
         break;
-        
+
       case 'delete':
 
         if($fm->getvar('path')) {
@@ -95,7 +95,7 @@ if(!isset($_GET)) {
           $fm->download();
         }
         break;
-        
+
       case 'preview':
         if($fm->getvar('path')) {
         	if(isset($_GET['thumbnail'])) {
@@ -106,7 +106,7 @@ if(!isset($_GET)) {
           $fm->preview($thumbnail);
         }
         break;
-			
+
       case 'maxuploadfilesize':
         $fm->getMaxUploadFileSize();
         break;
@@ -115,12 +115,12 @@ if(!isset($_GET)) {
   } else if(isset($_POST['mode']) && $_POST['mode']!='') {
 
     switch($_POST['mode']) {
-      	
+
       default:
 
         $fm->error($fm->lang('MODE_ERROR'));
         break;
-        	
+
       case 'add':
 
         if($fm->postvar('currentpath')) {
@@ -129,14 +129,14 @@ if(!isset($_GET)) {
         break;
 
     	case 'replace':
-    
+
 	    	if($fm->postvar('newfilepath')) {
 	    		$fm->replace();
 	    	}
 	    	break;
-    
+
 	    case 'savefile':
-	    	
+
 	    	if($fm->postvar('content', false) && $fm->postvar('path')) {
 	    		$response = $fm->savefile();
 	    	}

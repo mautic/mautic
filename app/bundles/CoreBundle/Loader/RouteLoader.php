@@ -69,9 +69,6 @@ class RouteLoader extends Loader
         // OneupUploader (added behind our secure /s)
         $secureCollection->addCollection($this->import('.', 'uploader'));
 
-        $secureCollection->addPrefix('/s');
-        $collection->addCollection($secureCollection);
-
         if ($this->factory->getParameter('api_enabled')) {
             //API
             $event = new RouteEvent($this, 'api');
@@ -79,14 +76,10 @@ class RouteLoader extends Loader
             $apiCollection = $event->getCollection();
             $apiCollection->addPrefix('/api');
             $collection->addCollection($apiCollection);
-
-            if ($this->factory->getEnvironment() == 'dev') {
-                //Load API doc routing
-                $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
-                $apiDoc->addPrefix('/docs/api');
-                $collection->addCollection($apiDoc);
-            }
         }
+
+        $secureCollection->addPrefix('/s');
+        $collection->addCollection($secureCollection);
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');

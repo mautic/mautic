@@ -39,7 +39,7 @@ UL.jqueryFileTree A:hover {
 }
 
 .jqueryFileTree LI.wait {
-	background: url(images/spinner.gif) left top no-repeat;
+	background: url(images/square-loading.gif) left top no-repeat;
 }
 
 /* File Extensions*/

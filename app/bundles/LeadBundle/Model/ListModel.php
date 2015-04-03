@@ -255,7 +255,7 @@ class ListModel extends FormModel
                 'label'       => $this->translator->trans('mautic.core.date.added'),
                 'properties'  => array('type' => 'date')
             ),
-            'owner'     => array(
+            'owner_id'     => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
                 'properties' => array(
                     'type'     => 'lookup_id',
@@ -311,6 +311,7 @@ class ListModel extends FormModel
         $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->factory->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias, '', $withLeads);
+
         return $lists;
     }
 

@@ -38,7 +38,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 1;
+    const PATCH_VERSION = 2;
 
     /**
      * Extra version identifier
@@ -60,6 +60,7 @@ class AppKernel extends Kernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
             define('MAUTIC_INSTALLER', 1);
         } else {
@@ -72,6 +73,7 @@ class AppKernel extends Kernel
         if (false === $this->booted) {
             $this->boot();
         }
+
         //the context is not populated at this point so have to do it manually
         $router = $this->getContainer()->get('router');
         $requestContext = new \Symfony\Component\Routing\RequestContext();
@@ -102,9 +104,11 @@ class AppKernel extends Kernel
                 $db->connect();
             } catch (\Exception $e) {
                 error_log($e);
-                die($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
-                    '%code%' => $e->getCode()
-                )));
+                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException(
+                    $this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
+                        '%code%' => $e->getCode()
+                    )
+                ));
             }
         }
 
@@ -183,7 +187,6 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
-            $bundles[] = new Nelmio\ApiDocBundle\NelmioApiDocBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
         }
 

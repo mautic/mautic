@@ -27,13 +27,27 @@ $apcLoader->register(true);
 require_once __DIR__ . '/app/AppKernel.php';
 //require_once __DIR__.'/mautic/app/AppCache.php';
 
-$kernel = new AppKernel('prod', false);
-$kernel->loadClassCache();
-//$kernel = new AppCache($kernel);
+try {
+    $kernel = new AppKernel('prod', false);
+    $kernel->loadClassCache();
+    //$kernel = new AppCache($kernel);
 
-// When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
-//Request::enableHttpMethodParameterOverride();
-$request  = Request::createFromGlobals();
-$response = $kernel->handle($request);
-$response->send();
-$kernel->terminate($request, $response);
+    // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
+    //Request::enableHttpMethodParameterOverride();
+    $request  = Request::createFromGlobals();
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+
+} catch (\Mautic\CoreBundle\Exception\DatabaseConnectionException $e) {
+    define('MAUTIC_OFFLINE', 1);
+    $message = $e->getMessage();
+    include __DIR__ . '/offline.php';
+} catch (\Exception $e) {
+    error_log($e);
+
+    define('MAUTIC_OFFLINE', 1);
+    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+    $submessage = 'System administrators, check server logs for errors.';
+    include __DIR__ . '/offline.php';
+}
