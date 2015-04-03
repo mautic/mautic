@@ -840,6 +840,32 @@ var Mautic = {
     },
 
     /**
+     * Inserts a new javascript file request into the document head
+     *
+     * @param url
+     */
+    loadScript: function (url) {
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = url;
+        mQuery('head').append(s);
+    },
+
+    /**
+     * Inserts a new stylesheet into the document head
+     *
+     * @param url
+     */
+    loadStylesheet: function (url) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = url;
+        mQuery('head').append(link);
+    },
+
+    /**
      * Just a little visual that an action is taking place
      * @param event
      */
