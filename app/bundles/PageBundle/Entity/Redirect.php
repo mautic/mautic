@@ -32,7 +32,7 @@ class Redirect extends FormEntity
     private $redirectId;
 
     /**
-     * @ORM\Column(type="text")
+     * @var
      */
     private $url;
 
@@ -63,7 +63,7 @@ class Redirect extends FormEntity
             ->length(25)
             ->build();
 
-        $builder->addField('url', 'string');
+        $builder->addField('url', 'text');
 
         $builder->addField('hits', 'integer');
 

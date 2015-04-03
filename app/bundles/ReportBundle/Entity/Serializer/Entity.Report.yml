@@ -1,47 +1,47 @@
-Mautic\PointBundle\Entity\Point:
+Mautic\ReportBundle\Entity\Report:
     exclusion_policy: ALL
     properties:
         id:
             expose: true
             since_version: 1.0
-            groups: [pointDetails, pointList]
+            groups: [reportDetails, reportList]
 
         name:
             expose: true
             since_version: 1.0
-            groups: [pointDetails, pointList]
+            groups: [reportDetails, reportList]
 
         description:
             expose: true
             since_version: 1.0
-            groups: [pointDetails, pointList]
+            groups: [reportDetails, reportList]
 
-        type:
+        system:
             expose: true
             since_version: 1.0
-            groups: [pointDetails, pointList]
+            groups: [reportDetails]
 
-        publishUp:
+        source:
             expose: true
             since_version: 1.0
-            groups: [pointDetails]
+            groups: [reportDetails]
 
-        publishDown:
+        columns:
             expose: true
             since_version: 1.0
-            groups: [pointDetails]
+            groups: [reportDetails]
 
-        delta:
+        filters:
             expose: true
             since_version: 1.0
-            groups: [pointDetails]
+            groups: [reportDetails]
 
-        properties:
+        tableOrder:
             expose: true
             since_version: 1.0
-            groups: [pointDetails]
+            groups: [reportDetails]
 
-        category:
+        graphs:
             expose: true
             since_version: 1.0
-            groups: [pointDetails, pointList]
+            groups: [reportDetails]

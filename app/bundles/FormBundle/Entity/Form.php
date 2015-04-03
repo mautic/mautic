@@ -91,7 +91,7 @@ class Form extends FormEntity
     private $template;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true, name="in_kiosk_mode")
+     * @var bool
      */
     private $inKioskMode = false;
 
@@ -113,6 +113,9 @@ class Form extends FormEntity
         $this->id = null;
     }
 
+    /**
+     * Construct
+     */
     public function __construct ()
     {
         $this->fields      = new ArrayCollection();
@@ -169,6 +172,11 @@ class Form extends FormEntity
             ->build();
 
         $builder->createField('template', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('inKioskMode', 'boolean')
+            ->columnName('in_kiosk_mode')
             ->nullable()
             ->build();
 

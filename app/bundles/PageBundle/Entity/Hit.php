@@ -93,12 +93,12 @@ class Hit
     private $code;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var
      */
     private $referer;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var
      */
     private $url;
 
@@ -201,11 +201,11 @@ class Hit
 
         $builder->addField('code', 'integer');
 
-        $builder->createField('referer', 'string')
+        $builder->createField('referer', 'text')
             ->nullable()
             ->build();
 
-        $builder->createField('url', 'string')
+        $builder->createField('url', 'text')
             ->nullable()
             ->build();
 
@@ -247,7 +247,6 @@ class Hit
             ->nullable()
             ->build();
     }
-
 
     /**
      * Get id

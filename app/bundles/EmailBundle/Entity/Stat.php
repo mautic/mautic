@@ -44,9 +44,6 @@ class Stat
     private $emailAddress;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\LeadList")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-
      * @var \Mautic\LeadBundle\Entity\LeadList
      */
     private $list;
@@ -130,7 +127,7 @@ class Stat
             ->build();
 
         $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
-            ->addJoinColumn('list_id', 'id')
+            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addIpAddress(true);
