@@ -840,6 +840,7 @@ var Mautic = {
     },
 
     /**
+     * Inserts a new javascript file request into the document head
      *
      * @param url
      */
@@ -849,11 +850,11 @@ var Mautic = {
         s.type = 'text/javascript';
         s.async = true;
         s.src = url;
-        var x = document.getElementsByTagName('script')[0];
-        x.parentNode.insertBefore(s, x);
+        mQuery('head').append(s);
     },
 
     /**
+     * Inserts a new stylesheet into the document head
      *
      * @param url
      */
@@ -862,7 +863,7 @@ var Mautic = {
         link.type = "text/css";
         link.rel = "stylesheet";
         link.href = url;
-        document.getElementsByTagName("head")[0].appendChild(link);
+        mQuery('head').append(link);
     },
 
     /**

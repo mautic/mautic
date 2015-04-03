@@ -67,6 +67,11 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function getUrl($path, $packageName = null, $version = null)
     {
+        // if
+        if (strpos($path, 'http') === 0) {
+            return $path;
+        }
+
         $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
         $path        = $assetPrefix . $path;
 
@@ -186,16 +191,11 @@ class AssetsHelper extends CoreAssetsHelper
      * @
      */
 
-    public function includeScript($assetFilePath, $isAddon = false)
+    public function includeScript($assetFilePath)
     {
-        $pathPrefix = $this->factory->getSystemPath('root');
 
-        if ($isAddon)
-        {
-            $pathPrefix = $this->factory->getSystemPath('addons');
-        }
 
-        return '<script type="text/javascript">Mautic.loadScript(\'' . $assetFilePath . '\');</script>';
+        return  '<script type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /**
