@@ -186,16 +186,16 @@ class AssetsHelper extends CoreAssetsHelper
      * @
      */
 
-    public function buildAddonScript($assetFilePath, $isAddon = false)
+    public function includeScript($assetFilePath, $isAddon = false)
     {
-        /*
-        $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
-        $path        = $assetPrefix . $bundlePath . $assetPath;
-        */
+        $pathPrefix = $this->factory->getSystemPath('root');
 
-        $this->getAssetPrefix();
+        if ($isAddon)
+        {
+            $pathPrefix = $this->factory->getSystemPath('addons');
+        }
 
-        return '<script type="text/javascript">console.log(\'hello world2\');  Mautic.loadScript(\'' . $assetFilePath . '\');</script>';
+        return '<script type="text/javascript">Mautic.loadScript(\'' . $assetFilePath . '\');</script>';
     }
 
     /**
