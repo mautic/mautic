@@ -539,12 +539,12 @@ class CampaignModel extends CommonFormModel
                 // Manually added and manually removed so chuck it
                 $dispatchEvent   = true;
 
-                $this->getRepository()->deleteEntity($campaignLead);
+                $this->getEventRepository()->deleteEntity($campaignLead);
             } elseif ($manuallyRemoved) {
                 $dispatchEvent = true;
 
                 $campaignLead->setManuallyRemoved(true);
-                $this->getRepository()->saveEntity($campaignLead);
+                $this->getEventRepository()->saveEntity($campaignLead);
             }
 
             if ($dispatchEvent) {
