@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead as RealLead;
 
 /**
  * EventRepository
@@ -73,6 +74,7 @@ class EventRepository extends CommonRepository
         }
 
         if ($leadId != null) {
+            // Events that aren't fired yet
             $dq = $this->_em->createQueryBuilder();
             $dq->select('ellev.id')
                 ->from('MauticCampaignBundle:LeadEventLog', 'ell')
@@ -113,39 +115,72 @@ class EventRepository extends CommonRepository
     /**
      * Get the top level actions for a campaign and lead
      *
-     * @param $campaignId
-     * @param $leadId
+     * @param $campaign
      *
      * @return array
      */
-    public function getRootLevelActions($campaignId, $leadId)
+    public function getRootLevelActions($campaign = null, $lead = null)
     {
-        $q = $this->createQueryBuilder('e')
-            ->select('c, e')
-            ->join('e.campaign', 'c');
+        $leadId = ($lead instanceof RealLead) ? $lead->getId() : (int) $lead;
+
+        $q = $this->createQueryBuilder('e');
+
+        if ($leadId) {
+            $q->select('c, e');
+        } else {
+            $q->select('c, e, l');
+        }
+
+        $q->join('e.campaign', 'c')
+            ->leftJoin('c.leads', 'l')
+            ->leftJoin('l.lead', 'cl');
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'c');
         $expr->addMultiple(array(
             $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
             $q->expr()->isNull('e.parent'),
-            $q->expr()->eq('c.id', ':campaign')
         ));
-        $q->where($expr)
-            ->setParameter('campaign', (int) $campaignId);
 
-        $dq = $this->_em->createQueryBuilder();
-        $dq->select('ellev.id')
-            ->from('MauticCampaignBundle:LeadEventLog', 'ell')
-            ->leftJoin('ell.event', 'ellev')
-            ->leftJoin('ell.lead', 'el')
-            ->where('ellev.id = e.id')
-            ->andWhere(
-                $dq->expr()->eq('el.id', ':leadId')
+        if ($campaign !== null) {
+            $expr->add(
+                $q->expr()->eq('c.id', ':campaign')
             );
 
-        $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
-            ->setParameter('leadId', (int) $leadId);
+            $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
+
+            $q->setParameter('campaign', (int) $campaignId);
+        }
+
+        if ($leadId) {
+            $expr->add(
+                $q->expr()->eq('cl.id', $leadId)
+            );
+        }
+
+        $q->where($expr);
+
+        // Only events that have not been fired yet
+        $dq2 = $this->_em->createQueryBuilder();
+        if ($leadId) {
+            $dq2->select('log_event.id');
+        } else {
+            $dq2->select('log_lead.id');
+        }
+
+        $dq2->from('MauticCampaignBundle:LeadEventLog', 'log')
+            ->leftJoin('log.event', 'log_event')
+            ->leftJoin('log.lead', 'log_lead')
+            ->where('log_event.id = e.id')
+            ->andWhere('IDENTITY(log.lead) = cl.id');
+
+        if ($leadId) {
+            // Only applicable ['campaign']['leads'] and thus applicable events
+            $q->andWhere('e.id NOT IN('.$dq2->getDQL().')');
+        } else {
+            // Only applicable ['campaign']['leads'] and thus applicable events
+            $q->andWhere('cl.id NOT IN('.$dq2->getDQL().')');
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -350,21 +385,24 @@ class EventRepository extends CommonRepository
             $q->expr()->eq('e.decisionPath', $q->expr()->literal('no'))
         );
 
-        //only events that have not been fired yet for the lead
+        // Only events that have not been fired yet
         $dq = $this->_em->createQueryBuilder();
-        $dq->select('log_event.id')
+        $dq->select('log_lead.id')
             ->from('MauticCampaignBundle:LeadEventLog', 'log')
             ->leftJoin('log.event', 'log_event')
+            ->leftJoin('log.lead', 'log_lead')
             ->where('log_event.id = e.id')
             ->andWhere('IDENTITY(log.lead) = cl.id');
 
-        $q->andWhere('e.id NOT IN('.$dq->getDQL().')');
+        // Only applicable ['campaign']['leads'] and thus applicable events
+        $q->andWhere('cl.id NOT IN('.$dq->getDQL().')');
 
-        //only events that have do not have a yes that's been fired
+        // Only events that have do not have a yes that's been fired
         $dq2 = $this->_em->createQueryBuilder();
-        $dq2->select('count(log_event_yes.id)')
+        $dq2->select('log_event_yes_lead.id')
             ->from('MauticCampaignBundle:LeadEventLog', 'log_yes')
             ->join('log_yes.event', 'log_event_yes')
+            ->leftJoin('log_yes.lead', 'log_event_yes_lead')
             ->where(
                 $dq2->expr()->andX(
                     //yes path
@@ -380,7 +418,9 @@ class EventRepository extends CommonRepository
                 )
             );
 
-        $q->having(sprintf('(%s) = 0', $dq2->getDQL()));
+        // Only applicable ['campaign']['leads'] and thus applicable events
+        $q->andWhere('cl.id NOT IN('.$dq2->getDQL().')');
+
         $results = $q->getQuery()->getArrayResult();
 
         return $results;

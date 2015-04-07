@@ -337,7 +337,7 @@ class EventModel extends CommonFormModel
      * @param $campaign
      * @param $lead
      */
-    public function triggerCampaignStartingActionsForLead($campaign, $lead)
+    public function triggerCampaignStartingActionsForLead(Campaign $campaign, $lead)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model     = $this->factory->getModel('campaign');
@@ -388,17 +388,14 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * Trigger the first action in a campaign if a decision is not involved
+     * Trigger the root level action(s) in campaign(s)
      *
      * @param $campaign
-     * @param $event
-     * @param $settings
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerCampaignStartingAction($campaign, $eventEntity, $settings)
+    public function triggerStartingEvents($campaign = null)
     {
-        // Skip the anonymous check to force actions to fire for subsequant triggers
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
@@ -407,43 +404,61 @@ class EventModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
-        $event             = $eventEntity->convertToArray();
-        $event['campaign'] = $campaign->convertToArray();
-
-        $leads = $campaignModel->getCampaignLeads($campaign, $event['id']);
-
         $repo = $this->getRepository();
 
-        foreach ($leads as $campaignLead) {
-            if ($campaignLead instanceof \Mautic\CampaignBundle\Entity\Lead) {
-                $lead = $campaignLead->getLead();
-            } else {
-                $lead = $campaignLead;
+        $events        = $repo->getRootLevelActions($campaign);
+        $eventSettings = $campaignModel->getEvents();
+
+        foreach ($events as $event) {
+            // Get lead entities for the event listeners
+            if (empty($event['campaign']['leads'])) {
+                continue;
             }
 
-            // Set lead in case this is triggered by the system
-            $leadModel->setSystemCurrentLead($lead);
+            $leadIds = array();
+            foreach ($event['campaign']['leads'] as $l) {
+                $leadIds[] = $l['lead_id'];
+            }
 
-            $timing = $this->checkEventTiming($event, new \DateTime());
-            if ($timing instanceof \DateTime) {
-                $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
-                $log->setLead($lead);
-                $log->setIsScheduled(true);
-                $log->setTriggerDate($timing);
+            $leads = $leadModel->getEntities(
+                array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => $leadIds
+                            )
+                        )
+                    )
+                )
+            );
 
-                $repo->saveEntity($log);
-            } elseif ($timing) {
-                // Save log first to prevent subsequent triggers from duplicating
-                $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
-                $log->setDateTriggered(new \DateTime());
-                $repo->saveEntity($log);
+            foreach ($leads as $lead) {
+                // Set lead in case this is triggered by the system
+                $leadModel->setSystemCurrentLead($lead);
 
-                if (!$this->invokeEventCallback($event, $settings, $lead, null, true)) {
-                    // Something failed so remove the log
-                    $repo->deleteEntity($log);
-                }
+                $timing = $this->checkEventTiming($event, new \DateTime());
+                if ($timing instanceof \DateTime) {
+                    $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, null, true);
+                    $log->setLead($lead);
+                    $log->setIsScheduled(true);
+                    $log->setTriggerDate($timing);
 
-            } //else do nothing
+                    $repo->saveEntity($log);
+                } elseif ($timing) {
+                    // Save log first to prevent subsequent triggers from duplicating
+                    $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, null, true);
+                    $log->setDateTriggered(new \DateTime());
+                    $repo->saveEntity($log);
+
+                    if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
+                        // Something failed so remove the log
+                        $repo->deleteEntity($log);
+                    }
+
+                } //else do nothing
+            }
         }
 
         $leadModel->setSystemCurrentLead();
