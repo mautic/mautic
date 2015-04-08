@@ -172,9 +172,8 @@ class CommonModel
     public function getEntityBySlugs($slug)
     {
         $slugs = explode('/', $slug);
-        if (!empty($slugs[0])) {
-            $idSlug = $slugs[0];
-        } elseif (!empty($slugs[1])) {
+
+        if (!empty($slugs[1])) {
             $idSlug = $slugs[1];
         } else {
             $idSlug = $slugs[0];
