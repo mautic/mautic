@@ -561,15 +561,16 @@ class LeadModel extends FormModel
     /**
      * Get a list of lists this lead belongs to
      *
-     * @param $lead
-     * @param bool $forLists
+     * @param Lead  $lead
+     * @param bool  $forLists
+     * @param boole $arrayHydration
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false)
     {
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
-        return $repo->getLeadLists($lead->getId(), $forLists);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration);
     }
 
     /**

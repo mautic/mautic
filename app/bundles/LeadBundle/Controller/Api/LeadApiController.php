@@ -203,7 +203,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $lists = $this->model->getLists($entity, true);
+            $lists = $this->model->getLists($entity, true, true);
 
             $view = $this->view(
                 array(
