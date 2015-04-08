@@ -31,6 +31,8 @@ Mautic Introduction
 	</tr>
 </table>
 <em>
+<strong> If you would like campaigns to trigger at certain times/delays setup the following cron job on your server.</strong>
+$ php 0,5,10,15,20,25,30,35,40,45,50,55 * * * * mautic_user php /path/to/mautic/app/console mautic:campaign:trigger --env=prod
 	<strong>Get stuck?</strong> No problem. Check out the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.
 </em>
 <br />
