@@ -118,13 +118,6 @@ class CampaignSubscriber extends CommonSubscriber
         $lead     = $event->getLead();
         $campaign = $event->getCampaign();
 
-        if ($event->getAction() == 'added' && !$this->security->isAnonymous()) {
-
-            /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-            $eventModel = $this->factory->getModel('campaign.event');
-            $eventModel->triggerCampaignStartingActionsForLead($campaign, $lead);
-        }
-
         // Trigger a lead change event
         $model->triggerEvent('campaign.leadchange', $event, 'campaign.leadchange.'.$lead->getId() . '.' . $campaign->getId());
     }

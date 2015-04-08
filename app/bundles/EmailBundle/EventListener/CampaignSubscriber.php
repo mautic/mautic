@@ -15,6 +15,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class CampaignSubscriber
@@ -73,8 +74,11 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        $email = $event->getEmail();
-        $this->factory->getModel('campaign')->triggerEvent('email.send', $email);
+        $email  = $event->getEmail();
+        $lead   = $event->getLead();
+        $leadId = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
+
+        $this->factory->getModel('campaign')->triggerEvent('email.send', $email, 'email.send.'.$leadId.'.'.$email->getId());
     }
 
     /**
