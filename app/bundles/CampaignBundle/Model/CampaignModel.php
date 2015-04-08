@@ -456,10 +456,13 @@ class CampaignModel extends CommonFormModel
      */
     public function addLeads (Campaign $campaign, array $leads, $manuallyAdded = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         foreach ($leads as $lead) {
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                $lead   = $leadModel->getEntity($leadId);
             }
 
             $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
@@ -487,6 +490,8 @@ class CampaignModel extends CommonFormModel
             }
 
             if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+                $leadModel->setSystemCurrentLead($lead);
+
                 $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
                 $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
             }
@@ -516,12 +521,15 @@ class CampaignModel extends CommonFormModel
      */
     public function removeLeads (Campaign $campaign, array $leads, $manuallyRemoved = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         foreach ($leads as $lead) {
             $dispatchEvent = false;
 
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                $lead   = $leadModel->getEntity($leadId);
             }
 
             $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
@@ -552,6 +560,8 @@ class CampaignModel extends CommonFormModel
                 $this->removeScheduledEvents($campaign, $lead);
 
                 if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+                    $leadModel->setSystemCurrentLead($lead);
+
                     $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
                     $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
                 }
