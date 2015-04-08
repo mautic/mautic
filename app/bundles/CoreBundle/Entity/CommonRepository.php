@@ -285,7 +285,7 @@ class CommonRepository extends EntityRepository
                 $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
 
                 if (!empty($filterCount)) {
-                    $q->where($expressions);
+                    $q->andWhere($expressions);
                     foreach ($parameters as $k => $v) {
                         if ($v === true || $v === false) {
                             $q->setParameter($k, $v, 'boolean');
