@@ -646,11 +646,11 @@ class CommonRepository extends EntityRepository
             $q->expr()->eq("$alias.isPublished", ':true'),
             $q->expr()->orX(
                 $q->expr()->isNull("$alias.publishUp"),
-                $q->expr()->gte("$alias.publishUp", ':now')
+                $q->expr()->lte("$alias.publishUp", ':now')
             ),
             $q->expr()->orX(
                 $q->expr()->isNull("$alias.publishDown"),
-                $q->expr()->lte("$alias.publishDown", ':now')
+                $q->expr()->gte("$alias.publishDown", ':now')
             )
         );
 
