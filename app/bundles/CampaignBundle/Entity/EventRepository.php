@@ -333,7 +333,7 @@ class EventRepository extends CommonRepository
 
         $expr = $this->getPublishedByDateExpression($q, 'c', false);
         $expr->add(
-            $q->expr()->eq('o.isScheduled', 1)
+            $q->expr()->eq('o.isScheduled', ':true')
         );
 
         $expr->add(
