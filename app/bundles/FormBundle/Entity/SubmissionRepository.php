@@ -55,7 +55,8 @@ class SubmissionRepository extends CommonRepository
             ->where('f.form_id = ' . $form->getId())
             ->andWhere(
                 $fq->expr()->notIn('f.type', array("'button'", "'freetext'"))
-            );
+            )
+            ->orderBy('f.field_order', 'ASC');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
