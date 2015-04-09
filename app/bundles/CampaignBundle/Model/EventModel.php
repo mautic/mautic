@@ -175,6 +175,12 @@ class EventModel extends CommonFormModel
             $leadCampaigns[$leadId] = $campaignModel->getLeadCampaigns($lead, true);
         }
 
+        if (empty($leadCampaigns[$leadId] )) {
+            $logger->debug('CAMPAIGN: no campaigns found so abort');
+
+            return false;
+        }
+
         //get the list of events that match the triggering event and is in the campaigns this lead belongs to
         /** @var \Mautic\CampaignBundle\Entity\EventRepository $eventRepo */
         $eventRepo = $this->getRepository();
@@ -642,12 +648,6 @@ class EventModel extends CommonFormModel
             'systemTriggered' => $systemTriggered,
             'config'          => $event['properties']
         );
-
-        if ($lead instanceof Lead) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $lead->setFields($leadModel->getLeadDetails($lead));
-        }
 
         if (is_callable($settings['callback'])) {
             if (is_array($settings['callback'])) {
