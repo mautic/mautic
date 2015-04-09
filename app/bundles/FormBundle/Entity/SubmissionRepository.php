@@ -122,9 +122,10 @@ class SubmissionRepository extends CommonRepository
             //ORM - generates lead entities
             $q = $this
                 ->createQueryBuilder('s');
-            $q->select('s, p, i,' . $order)
+            $q->select('s, partial l.{id}, p, i,' . $order)
                 ->leftJoin('s.ipAddress', 'i')
-                ->leftJoin('s.page', 'p');
+                ->leftJoin('s.page', 'p')
+                ->leftJoin('s.lead', 'l');
 
             //only pull the submissions as filtered via DBAL
             $q->where(
