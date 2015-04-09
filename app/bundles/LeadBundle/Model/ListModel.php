@@ -385,6 +385,11 @@ class ListModel extends FormModel
         $persistLists = array();
 
         foreach ($lists as $l) {
+            if (!isset($this->leadChangeLists[$l])) {
+                // List no longer exists in the DB so continue to the next
+                continue;
+            }
+
             $listLead = $this->getListLeadRepository()->findOneBy(array(
                 'lead' => $lead,
                 'list' => $this->leadChangeLists[$l]
@@ -477,6 +482,11 @@ class ListModel extends FormModel
 
         $persistLists = array();
         foreach ($lists as $l) {
+            if (!isset($this->leadChangeLists[$l])) {
+                // List no longer exists in the DB so continue to the next
+                continue;
+            }
+
             $dispatchEvent = false;
 
             $listLead = $this->getListLeadRepository()->findOneBy(array(
