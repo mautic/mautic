@@ -234,6 +234,9 @@ class CampaignModel extends CommonFormModel
             } elseif ($events[$id]->getParent()) {
                 // No longer has a parent so null it out
 
+                // Remove decision
+                $events[$id]->setDecisionPath(null);
+
                 // Remove child from parent
                 $parent = $events[$id]->getParent();
                 $parent->removeChild($events[$id]);
@@ -244,6 +247,8 @@ class CampaignModel extends CommonFormModel
             } else {
                 // Is a parent
                 $hierarchy[$id] = 'null';
+
+                $events[$id]->setDecisionPath(null);
             }
         }
 

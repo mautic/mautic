@@ -363,7 +363,8 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections     = $session->get('mautic.campaign.' . $sessionId . '.events.canvassettings');
+                        $connections = $session->get('mautic.campaign.' . $sessionId . '.events.canvassettings');
+                        $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
@@ -519,6 +520,7 @@ class CampaignController extends FormController
                     } else {
                         $connections = $session->get('mautic.campaign.' . $objectId . '.events.canvassettings');
                         if ($connections != null) {
+                            $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                             //form is valid so process the data
                             $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
