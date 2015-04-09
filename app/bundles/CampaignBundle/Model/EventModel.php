@@ -686,6 +686,9 @@ class EventModel extends CommonFormModel
      */
     public function checkEventTiming($action, $parentTriggeredDate = null, $allowNegate = false)
     {
+        $logger = $this->factory->getLogger();
+        $logger->debug('CAMPAIGN: Determining timing for event execution');
+
         $now = new \DateTime();
 
         if ($action instanceof Event) {
@@ -693,13 +696,13 @@ class EventModel extends CommonFormModel
         }
 
         if ($action['decisionPath'] == 'no' && !$allowNegate) {
+            $logger->debug('CAMPAIGN: Action is in a no path and negate is not allowed');
 
             return false;
         } else {
             $negate = ($action['decisionPath'] == 'no' && $allowNegate);
 
             if ($action['triggerMode'] == 'interval') {
-
                 $triggerOn = $negate ? $parentTriggeredDate : new \DateTime();
 
                 if ($triggerOn == null) {
@@ -708,6 +711,8 @@ class EventModel extends CommonFormModel
 
                 $interval = $action['triggerInterval'];
                 $unit     = strtoupper($action['triggerIntervalUnit']);
+
+                $logger->debug('CAMPAIGN: Interval delay of ' . $interval . $unit);
 
                 switch ($unit) {
                     case 'Y':
@@ -731,9 +736,13 @@ class EventModel extends CommonFormModel
                     //the event; otherwise false to do nothing
                     $now->sub($dv);
 
+                    $logger->debug('CAMPAIGN: Negate comparison of now >= triggerOn (' . $now->format('Y-m-d H:i:s') . ' >= ' . $triggerOn->format('Y-m-d H:i:s'));
+
                     return ($now >= $triggerOn) ? true : false;
                 } else {
                     $triggerOn->add($dv);
+
+                    $logger->debug('CAMPAIGN: Non-negate comparison of triggerOn >= now (' . $triggerOn->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
 
                     if ($triggerOn > $now) {
                         //the event is to be scheduled based on the time interval
@@ -741,17 +750,26 @@ class EventModel extends CommonFormModel
                     }
                 }
             } elseif ($action['triggerMode'] == 'date') {
+                $logger->debug('CAMPAIGN: Date execution on ' . $action['triggerDate']->format('Y-m-d H:i:s'));
+
                 $pastDue = $action['triggerDate'] >= $now;
                 if ($negate) {
+                    $logger->debug('CAMPAIGN: Negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
+
+
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
                     return ($pastDue) ? true : false;
                 } elseif (!$pastDue) {
+                    $logger->debug('CAMPAIGN: Non-negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
+
                     //schedule the event
                     return $action['triggerDate'];
                 }
             }
         }
+
+        $logger->debug('CAMPAIGN: Nothing stopped execution based on timing.');
 
         //default is to trigger the event
         return true;
