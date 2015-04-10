@@ -163,17 +163,18 @@ Mautic.campaignBuilderUpdateLabel = function (domEventId) {
     var currentConnections = Mautic.campaignBuilderInstance.select({
         target: domEventId
     });
+
     if (currentConnections.length > 0) {
         currentConnections.each(function(conn) {
 
             //remove current label
             var overlays = conn.getOverlays();
             if (overlays.length > 0) {
-                mQuery.each(overlays, function (index, overlay) {
-                    if (overlay.type == 'Label') {
-                        conn.removeOverlay(overlay.id);
+                for (var i = 0; i <= overlays.length; i++ ) {
+                    if ( typeof overlays[i] != 'undefined' && overlays[i].type == 'Label') {
+                        conn.removeOverlay(overlays[i].id);
                     }
-                });
+                }
             }
 
             if (theLabel) {
