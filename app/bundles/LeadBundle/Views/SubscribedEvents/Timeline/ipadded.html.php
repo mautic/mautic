@@ -6,7 +6,14 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$ip      = $event['extra']['ipDetails'];
+$ip = $event['extra']['ipDetails'];
+
+if (!is_object($ip)) {
+    // Somehow the IP entity wasn't found
+
+    return;
+}
+
 $details = $ip->getIpDetails();
 $ipAddress = $ip->getIpAddress();
 
@@ -40,6 +47,6 @@ $ipAddress = $ip->getIpAddress();
             if (!empty($location)): ?>
             <i class="fa fa-map-marker"></i> <?php echo $location; ?> </span>
             <?php endif; ?>
-	    </div>
-	</div>
+        </div>
+    </div>
 </li>
