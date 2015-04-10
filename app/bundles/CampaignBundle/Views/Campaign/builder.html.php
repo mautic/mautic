@@ -24,26 +24,6 @@
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>
         <div class="panel-group margin-sm-top" id="CampaignEventPanel">
-            <?php /*
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="#CampaignEventSystemActions">
-                                <?php echo $view['translator']->trans('mautic.campaign.event.systemchanges.header'); ?>
-                            </a>
-                        </h4>
-                    </div>
-                    <div class="panel-body">
-                        <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
-                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
-                                <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                    <span><?php echo $e['label']; ?></span>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                */ ?>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">

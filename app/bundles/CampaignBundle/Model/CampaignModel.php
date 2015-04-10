@@ -375,7 +375,6 @@ class CampaignModel extends CommonFormModel
             $event  = new Events\CampaignBuilderEvent($this->translator);
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
             $events['decision']     = $event->getLeadDecisions();
-            $events['systemaction'] = $event->getSystemChanges();
             $events['action']       = $event->getActions();
         }
 

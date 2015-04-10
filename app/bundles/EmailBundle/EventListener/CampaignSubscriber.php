@@ -32,7 +32,6 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            EmailEvents::EMAIL_ON_SEND        => array('onEmailSend', 0),
             EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0)
         );
     }
@@ -65,20 +64,6 @@ class CampaignSubscriber extends CommonSubscriber
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
         );
         $event->addAction('email.send', $action);
-    }
-
-    /**
-     * Trigger campaign event for sending of an email
-     *
-     * @param EmailSendEvent $event
-     */
-    public function onEmailSend(EmailSendEvent $event)
-    {
-        $email  = $event->getEmail();
-        $lead   = $event->getLead();
-        $leadId = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
-
-        $this->factory->getModel('campaign')->triggerEvent('email.send', $email, 'email.send.'.$leadId.'.'.$email->getId());
     }
 
     /**

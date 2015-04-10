@@ -335,6 +335,8 @@ class EventModel extends CommonFormModel
                         //a child of this event was triggered or scheduled so make not of the triggering event in the log
                         $persist[] = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
                     }
+                } else {
+                    $logger->debug('CAMPAIGN: No children for this event.');
                 }
             }
         }
