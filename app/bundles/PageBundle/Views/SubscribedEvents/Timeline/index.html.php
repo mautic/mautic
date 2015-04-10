@@ -27,7 +27,7 @@ if ($event['extra']['hit']['dateLeft']) {
 	<div class="figure"><span class="fa <?php echo isset($icons['page']) ? $icons['page'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
-	    	<h3>
+	    	<h3 class="ellipsis">
 		    	<?php if ($event['extra']['hit']['page_id']) : ?>
 		    		<a href="<?php echo $view['router']->generate('mautic_page_action',
 					    array("objectAction" => "view", "objectId" => $item->getId())); ?>"
@@ -48,14 +48,14 @@ if ($event['extra']['hit']['dateLeft']) {
 	        <div class="panel-footer">
 	            <dl class="dl-horizontal">
 					<dt><?php echo $view['translator']->trans('mautic.page.time.on.page'); ?>:</dt>
-					<dd><?php echo $timeOnPage; ?></dd>
+					<dd class="ellipsis"><?php echo $timeOnPage; ?></dd>
 					<dt><?php echo $view['translator']->trans('mautic.page.referrer'); ?>:</dt>
-					<dd><?php echo $event['extra']['hit']['referer'] ? $view['assets']->makeLinks($event['extra']['hit']['referer']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
+					<dd class="ellipsis"><?php echo $event['extra']['hit']['referer'] ? $view['assets']->makeLinks($event['extra']['hit']['referer']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
 					<dt><?php echo $view['translator']->trans('mautic.page.url'); ?>:</dt>
-					<dd><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
+					<dd class="ellipsis"><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
 					<?php if (isset($event['extra']['hit']['sourceName'])) : ?>
 					<dt><?php echo $view['translator']->trans('mautic.core.source'); ?>:</dt>
-					<dd>
+					<dd class="ellipsis">
 						<a href="<?php echo $view['router']->generate('mautic_' . $event['extra']['hit']['source'] . '_action',
 						    array("objectAction" => "view", "objectId" => $event['extra']['hit']['sourceId'])); ?>"
 						   data-toggle="ajax">
