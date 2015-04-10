@@ -137,10 +137,7 @@
 
         <?php foreach ($canvasSettings['connections'] as $connection): ?>
 
-        var ep = Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
-        <?php if (!empty($labels[$connection['targetId']])): ?>
-        ep.addOverlay(["Label", {label: "<?php echo $labels[$connection['targetId']]; ?>", location: 0.65, id: "<?php echo "{$connection['sourceId']}_{$connection['targetId']}"; ?>_connectionLabel", cssClass: "_jsPlumb_label"}]);
-        <?php endif; ?>
+        Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
         <?php endforeach; ?>
         <?php endif; ?>
 
