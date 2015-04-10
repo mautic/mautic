@@ -71,11 +71,14 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the submissions to the event array
         foreach ($rows as $row) {
+            // Convert to local from UTC
+            $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
+
             $submission = $submissionRepository->getEntity($row['id']);
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => new \DateTime($row['dateSubmitted']),
+                'eventLabel'=> $eventTypeName,
+                'timestamp' => $dtHelper->getLocalDateTime(),
                 'extra'     => array(
                     'submission' => $submission,
                     'form'  => $formModel->getEntity($row['form_id']),
