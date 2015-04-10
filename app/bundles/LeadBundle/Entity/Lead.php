@@ -60,7 +60,7 @@ class Lead extends FormEntity
     private $pointsChangeLog;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"}, fetch="EXTRA_LAZY", indexBy="ipAddress")
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"}, indexBy="ipAddress")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
@@ -402,6 +402,12 @@ class Lead extends FormEntity
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
+        if ($pointsDelta <= 0) {
+            // No need to record this
+
+            return;
+        }
+
         //create a new points change event
         $event = new PointsChangeLog();
         $event->setType($type);
