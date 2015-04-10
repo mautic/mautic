@@ -29,7 +29,6 @@ class LeadSubscriber extends CommonSubscriber
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
             LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
         );
     }
@@ -85,14 +84,6 @@ class LeadSubscriber extends CommonSubscriber
                 'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
-    }
-
-    /**
-     * @param LeadChangeEvent $event
-     */
-    public function onLeadChange(LeadChangeEvent $event)
-    {
-        $this->factory->getModel('form.submission')->getRepository()->updateLeadByTrackingId($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
     }
 
     /**
