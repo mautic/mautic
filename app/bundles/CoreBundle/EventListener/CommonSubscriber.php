@@ -241,6 +241,9 @@ class CommonSubscriber implements EventSubscriberInterface
                         $requirements['_method'] = 'GET';
                     }
 
+                    // Set condition
+                    $condition = (!empty($details['condition'])) ? $details['condition'] : '';
+
                     // Set some very commonly used defaults and requirements
                     if (strpos($details['path'], '{page}') !== false) {
                         if (!isset($defaults['page'])) {
@@ -256,13 +259,13 @@ class CommonSubscriber implements EventSubscriberInterface
                         }
                     }
                     if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
-                        if (!isset($requirements['page'])) {
+                        if (!isset($requirements['id'])) {
                             $requirements['id'] = '\d+';
                         }
                     }
 
                     // Add the route
-                    $collection->add($name, new Route($details['path'], $defaults, $requirements));
+                    $collection->add($name, new Route($details['path'], $defaults, $requirements, array(), '', array(), array(), $condition));
                 }
             }
         }
