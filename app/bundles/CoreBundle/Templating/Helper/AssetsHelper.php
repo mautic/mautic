@@ -196,6 +196,17 @@ class AssetsHelper extends CoreAssetsHelper
         return  '<script type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
+    /*
+     * Include stylesheet
+     *
+     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
+     */
+
+    public function includeStylesheet($assetFilePath)
+    {
+        return  '<script type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+    }
+
     /**
      * Add style tag to the header
      *
