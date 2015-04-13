@@ -13,7 +13,6 @@ $header = ($activeAsset->getId()) ?
     $view['translator']->trans('mautic.asset.asset.menu.new');
 $view['slots']->set("headerTitle", $header);
 $view['slots']->set('mauticContent', 'asset');
-
 ?>
 <script>
 	<?php echo 'mauticAssetUploadEndpoint = "' . $uploadEndpoint . '";'; ?>
