@@ -184,7 +184,9 @@ class IntegrationHelper
     {
         if (!is_array($addon)) {
             $addons = $this->factory->getParameter('addon.bundles');
-            $addon  = $addons[$addon];
+            if (array_key_exists($addon, $addons)) {
+                $addon = $addons[$addon];
+            }
         }
 
         if (is_dir($addon['directory'] . '/Integration')) {
