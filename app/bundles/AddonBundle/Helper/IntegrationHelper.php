@@ -186,6 +186,10 @@ class IntegrationHelper
             $addons = $this->factory->getParameter('addon.bundles');
             if (array_key_exists($addon, $addons)) {
                 $addon = $addons[$addon];
+            } else {
+                // It doesn't exist so return 0
+
+                return 0;
             }
         }
 
