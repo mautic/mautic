@@ -472,14 +472,18 @@ class LeadListRepository extends CommonRepository
         $useExpr     =& $expr;
 
         foreach ($filters as $k => $details) {
-            $uniqueFilter              = $this->generateRandomParameterName();
-            $parameters[$uniqueFilter] = $details['filter'];
-
-            $uniqueFilter              = ":$uniqueFilter";
             //DQL does not have a not() function so we have to use the opposite
             $func                      = (!$not) ? $options[$details['operator']]['func'] :
                 $options[$details['operator']]['oFunc'];
             $field                     = "l.{$details['field']}";
+            $uniqueFilter              = $this->generateRandomParameterName();
+            $parameters[$uniqueFilter] = $details['filter'];
+
+            if ($func == 'like' || $func == 'notLike') {
+                $parameters[$uniqueFilter] = '%' . $parameters[$uniqueFilter] . '%';
+            }
+
+            $uniqueFilter              = ":$uniqueFilter";
 
             //the next one will determine the group
             $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
