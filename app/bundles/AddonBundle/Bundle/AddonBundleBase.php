@@ -55,6 +55,8 @@ abstract class AddonBundleBase extends Bundle
     /**
      * Called by AddonController::reloadAction when an addon is uninstalled
      *
+     * @todo NOT IMPLEMENTED YET IN THE ADDON MANAGER
+     *
      * @param Addon         $addon
      * @param MauticFactory $factory
      */
