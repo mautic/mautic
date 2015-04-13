@@ -120,22 +120,21 @@ class ListModel extends FormModel
      */
     public function regenerateListLeads(LeadList $entity, $isNew = false, $persist = true)
     {
+        $id          = $entity->getId();
+        $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
+
         if (!$isNew) {
-            $id = $entity->getId();
-
             $oldLeadList = $this->getLeadsByList(array('id' => $id), true);
-            $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
 
-            $addLeads     = array_diff($newLeadList[$id], $oldLeadList[$id]);
-            $removeLeads  = array_diff($oldLeadList[$id], $newLeadList[$id]);
+            $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
+            $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
         } else {
-            $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true, true);
-            $addLeads    = $newLeadList['new'];
+            $addLeads    = $newLeadList[$id];
             $removeLeads = array();
         }
 
         foreach ($addLeads as $l) {
-           $this->addLead($l, $entity);
+            $this->addLead($l, $entity);
         }
 
         if (isset($manuallyAdded)) {
@@ -145,7 +144,7 @@ class ListModel extends FormModel
         }
 
         foreach ($removeLeads as $l) {
-           $this->removeLead($l, $entity);
+            $this->removeLead($l, $entity);
         }
 
         if ($persist) {
