@@ -345,7 +345,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $leadModel->getEntities($leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
@@ -443,7 +443,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $leadModel->getEntities($leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
