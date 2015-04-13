@@ -369,27 +369,6 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $newTrackingId
-     * @param $oldTrackingId
-     */
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'form_submissions')
-            ->set('lead_id', (int) $leadId)
-            ->set('tracking_id', ':newTrackingId')
-            ->where(
-                $q->expr()->eq('tracking_id', ':oldTrackingId')
-            )
-            ->setParameters(array(
-                'newTrackingId' => $newTrackingId,
-                'oldTrackingId' => $oldTrackingId
-            ))
-            ->execute();
-    }
-
-    /**
      * Updates lead ID (e.g. after a lead merge)
      *
      * @param $fromLeadId
