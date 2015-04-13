@@ -14,8 +14,6 @@ $header = ($activeAsset->getId()) ?
 $view['slots']->set("headerTitle", $header);
 $view['slots']->set('mauticContent', 'asset');
 
-echo $view['assets']->buildAddonScript('bundlename/assets/assets.js');
-
 ?>
 <script>
 	<?php echo 'mauticAssetUploadEndpoint = "' . $uploadEndpoint . '";'; ?>
