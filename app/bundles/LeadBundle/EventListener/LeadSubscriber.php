@@ -102,7 +102,7 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 //trigger the points change event
-                if (!$lead->imported && isset($details["points"]) || (int) $details["points"][1] > 0) {
+                if (!$lead->imported && isset($details["points"]) && (int) $details["points"][1] > 0) {
                     if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
                         $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
                         $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
