@@ -52,6 +52,11 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $scheduleOnly = $input->getOption('scheduled-only');
         $negativeOnly = $input->getOption('negative-only');
 
+        if (!$negativeOnly && !$scheduleOnly) {
+            //trigger starting action events for newly added leads
+            $model->triggerStartingEvents($campaignId);
+        }
+
         if (!$negativeOnly) {
             //trigger scheduled events
             $model->triggerScheduledEvents($campaignId);

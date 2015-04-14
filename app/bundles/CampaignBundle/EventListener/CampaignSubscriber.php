@@ -29,8 +29,7 @@ class CampaignSubscriber extends CommonSubscriber
         return array(
             CampaignEvents::CAMPAIGN_POST_SAVE     => array('onCampaignPostSave', 0),
             CampaignEvents::CAMPAIGN_POST_DELETE   => array('onCampaignDelete', 0),
-            CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
-            CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0)
+            CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0)
         );
     }
 
@@ -86,15 +85,6 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(Events\CampaignBuilderEvent $event)
     {
-        //Add trigger
-        $leadChangeTrigger = array(
-            'label'       => 'mautic.campaign.event.leadchange',
-            'description' => 'mautic.campaign.event.leadchange_descr',
-            'formType'    => 'campaignevent_leadchange',
-            'callback'    => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
-        );
-        $event->addSystemChange('campaign.leadchange', $leadChangeTrigger);
-
         //Add action to actually add/remove lead to a specific lists
         $addRemoveLeadAction = array(
             'label'           => 'mautic.campaign.event.addremovelead',
@@ -106,32 +96,5 @@ class CampaignSubscriber extends CommonSubscriber
             'callback'        => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead'
         );
         $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
-    }
-
-    /**
-     * @param Events\CampaignLeadChangeEvent $event
-     */
-    public function onCampaignLeadChange(Events\CampaignLeadChangeEvent $event)
-    {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model    = $this->factory->getModel('campaign');
-        $lead     = $event->getLead();
-        $campaign = $event->getCampaign();
-
-        if ($event->getAction() == 'added') {
-            // Trigger first action(s) if applicable
-
-            if (!$this->security->isAnonymous()) {
-                // Force actions
-                defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-            }
-
-            /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-            $eventModel = $this->factory->getModel('campaign.event');
-            $eventModel->triggerCampaignStartingActionsForLead($campaign, $lead);
-        }
-
-        // Trigger a lead change event
-        $model->triggerEvent('campaign.leadchange', $event, 'campaign.leadchange.'.$lead->getId() . '.' . $campaign->getId());
     }
 }

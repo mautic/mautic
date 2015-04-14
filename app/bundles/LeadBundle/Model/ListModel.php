@@ -339,9 +339,12 @@ class ListModel extends FormModel
      */
     public function addLead($lead, $lists, $manuallyAdded = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
@@ -415,6 +418,9 @@ class ListModel extends FormModel
             }
 
             if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                // Force system lead for actions that use getCurrentLead
+                $leadModel->setSystemCurrentLead($lead);
+
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], true);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
             }
@@ -436,9 +442,12 @@ class ListModel extends FormModel
      */
     public function removeLead($lead, $lists, $manuallyRemoved = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
@@ -514,6 +523,9 @@ class ListModel extends FormModel
             }
 
             if ($dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                // Force system lead for actions that use getCurrentLead
+                $leadModel->setSystemCurrentLead($lead);
+
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], false);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
             }
