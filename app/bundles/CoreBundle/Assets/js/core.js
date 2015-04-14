@@ -102,6 +102,10 @@ var Mautic = {
             mQuery('#mautic_dashboard_index').click();
         });
 
+        Mousetrap.bind('shift+l', function(e) {
+            mQuery('#menu_lead_parent_child > li:first > a').click();
+        });
+
         Mousetrap.bind('shift+right', function (e) {
             mQuery('.navbar-right > button.navbar-toggle').click();
         });
