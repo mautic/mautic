@@ -43,7 +43,13 @@ class AddonController extends FormController
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.addon.filter', ''));
         $this->factory->getSession()->set('mautic.addon.filter', $search);
 
-        $filter = array('string' => $search, 'force' => array());
+        $filter = array('string' => $search, 'force' => array(
+            array(
+                'column' => 'i.isMissing',
+                'expr'   => 'eq',
+                'value'  => false
+            )
+        ));
 
         $orderBy    = $this->factory->getSession()->get('mautic.addon.orderby', 'i.name');
         $orderByDir = $this->factory->getSession()->get('mautic.addon.orderbydir', 'DESC');
@@ -115,6 +121,7 @@ class AddonController extends FormController
 
         /** @var \Mautic\AddonBundle\Model\AddonModel $model */
         $model  = $this->factory->getModel('addon');
+        /** @var \Mautic\AddonBundle\Entity\AddonRepository $repo */
         $repo   = $model->getRepository();
         $addons = $this->factory->getParameter('addon.bundles');
         $added  = $disabled = $updated = 0;
@@ -125,10 +132,12 @@ class AddonController extends FormController
         foreach ($installedAddons as $bundle => $addon) {
             $persistUpdate = false;
             if (!isset($addons[$bundle])) {
-                //files are no longer found
-                $addon->setIsEnabled(false);
-                $addon->setIsMissing(true);
-                $disabled++;
+                if (!$addon->getIsMissing()) {
+                    //files are no longer found
+                    $addon->setIsEnabled(false);
+                    $addon->setIsMissing(true);
+                    $disabled++;
+                }
             } else {
                 if ($addon->getIsMissing()) {
                     //was lost but now is found
@@ -216,8 +225,8 @@ class AddonController extends FormController
             $model->saveEntities($persist);
         }
 
-        if ($updated) {
-            //clear the cache if addons were updated
+        if ($updated || $disabled) {
+            //clear the cache if addons were updated or disabled
             $this->clearCache();
         }
 

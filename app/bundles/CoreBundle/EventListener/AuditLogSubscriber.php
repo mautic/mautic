@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
@@ -94,7 +95,7 @@ class AuditLogSubscriber extends CommonSubscriber
             } elseif (isset($details[1])) {
                 $ipAddress = $details[1];
             } else {
-                continue;
+                $row->getIpAddress();
             }
 
             $event->addEvent(array(

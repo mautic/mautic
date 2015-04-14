@@ -1,9 +1,5 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    Mousetrap.bind('shift+l', function(e) {
-        mQuery('#menu_lead_parent_child > li:first > a').click();
-    });
-
     Mousetrap.bind('a', function(e) {
         if(mQuery('#lead-quick-add').length) {
             mQuery('#lead-quick-add').modal();

@@ -285,7 +285,7 @@ class CommonRepository extends EntityRepository
                 $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
 
                 if (!empty($filterCount)) {
-                    $q->where($expressions);
+                    $q->andWhere($expressions);
                     foreach ($parameters as $k => $v) {
                         if ($v === true || $v === false) {
                             $q->setParameter($k, $v, 'boolean');
@@ -646,11 +646,11 @@ class CommonRepository extends EntityRepository
             $q->expr()->eq("$alias.isPublished", ':true'),
             $q->expr()->orX(
                 $q->expr()->isNull("$alias.publishUp"),
-                $q->expr()->gte("$alias.publishUp", ':now')
+                $q->expr()->lte("$alias.publishUp", ':now')
             ),
             $q->expr()->orX(
                 $q->expr()->isNull("$alias.publishDown"),
-                $q->expr()->lte("$alias.publishDown", ':now')
+                $q->expr()->gte("$alias.publishDown", ':now')
             )
         );
 

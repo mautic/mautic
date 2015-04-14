@@ -102,6 +102,10 @@ var Mautic = {
             mQuery('#mautic_dashboard_index').click();
         });
 
+        Mousetrap.bind('shift+l', function(e) {
+            mQuery('#menu_lead_parent_child > li:first > a').click();
+        });
+
         Mousetrap.bind('shift+right', function (e) {
             mQuery('.navbar-right > button.navbar-toggle').click();
         });
@@ -837,6 +841,54 @@ var Mautic = {
         //prevent firing of href link
         //mQuery(link).attr("href", "javascript: void(0)");
         return false;
+    },
+
+    /**
+     * Inserts a new javascript file request into the document head
+     *
+     * @param url
+     */
+    loadScript: function (url) {
+        // check if the asset has been loaded
+        if (typeof Mautic.headLoadedAssets == 'undefined') {
+            Mautic.headLoadedAssets = {};
+        } else if (typeof Mautic.headLoadedAssets[url] != 'undefined') {
+            // URL has already been appended to head
+            return;
+        }
+
+        // Note that asset has been appended
+        Mautic.headLoadedAssets[url] = 1;
+
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = url;
+        mQuery('head').append(s);
+    },
+
+    /**
+     * Inserts a new stylesheet into the document head
+     *
+     * @param url
+     */
+    loadStylesheet: function (url) {
+        // check if the asset has been loaded
+        if (typeof Mautic.headLoadedAssets == 'undefined') {
+            Mautic.headLoadedAssets = {};
+        } else if (typeof Mautic.headLoadedAssets[url] != 'undefined') {
+            // URL has already been appended to head
+            return;
+        }
+
+        // Note that asset has been appended
+        Mautic.headLoadedAssets[url] = 1;
+
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = url;
+        mQuery('head').append(link);
     },
 
     /**

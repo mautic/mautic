@@ -83,19 +83,59 @@ class LeadTimelineEvent extends Event
      *
      * @return array Events sorted by timestamp with most recent event first
      */
-    public function getEvents()
+    public function getEvents($returnGrouped = false)
     {
         $events = $this->events;
 
-        usort($events, function($a, $b) {
-            if ($a['timestamp'] == $b['timestamp']) {
-                return 0;
+        $byDate = array();
+
+        // Group by date
+        foreach ($events as $e) {
+            $dateString = $e['timestamp']->format('Y-m-d H:i:s');
+            if (!isset($byDate[$dateString])) {
+                $byDate[$dateString] = array();
             }
 
-            return ($a['timestamp'] > $b['timestamp']) ? -1 : 1;
-        });
+            $byDate[$dateString][] = $e;
+        }
 
-        return $events;
+        // Sort by date
+        krsort($byDate);
+
+        // Sort by certain event actions
+        $order = array(
+            'page.hit',
+            'asset.download',
+            'form.submitted',
+            'lead.merge',
+            'lead.create',
+            'lead.ipadded',
+            'lead.identified'
+        );
+
+        $events = array();
+        foreach ($byDate as $date => $dateEvents) {
+            usort(
+                $dateEvents,
+                function ($a, $b) use ($order) {
+                    if (!in_array($a['event'], $order) || !in_array($b['event'], $order)) {
+                        // No specific order so push to the end
+
+                        return 1;
+                    }
+
+                    $pos_a = array_search($a['event'], $order);
+                    $pos_b = array_search($b['event'], $order);
+
+                    return $pos_a - $pos_b;
+                }
+            );
+
+            $byDate[$date] = $dateEvents;
+            $events = array_merge($events, array_reverse($dateEvents));
+        }
+
+        return ($returnGrouped) ? $byDate : $events;
     }
 
     /**

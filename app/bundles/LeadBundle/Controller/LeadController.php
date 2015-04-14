@@ -294,8 +294,8 @@ class LeadController extends FormController
         $event      = new LeadTimelineEvent($lead, $filters);
         $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
-        $events     = $event->getEvents();
-        $eventTypes = $event->getEventTypes();
+        $eventsByDate = $event->getEvents(true);
+        $eventTypes   = $event->getEventTypes();
 
         // Get an engagement count
         $translator = $this->factory->getTranslator();
@@ -303,14 +303,18 @@ class LeadController extends FormController
         $fromDate = $graphData['fromDate'];
         $allEngagements = array();
         $total          = 0;
-        foreach ($events as $e) {
-            if ($e['timestamp'] < $fromDate) {
+
+        $events = array();
+        foreach ($eventsByDate as $eventDate => $dateEvents) {
+            $datetime = \DateTime::createFromFormat('Y-m-d H:i:s', $eventDate);
+            if ($datetime > $fromDate) {
                 $total++;
                 $allEngagements[] = array(
-                    'date'  => $e['timestamp'],
-                    'data'  => 1
+                    'date' => $datetime,
+                    'data' => 1
                 );
             }
+            $events = array_merge($events, array_reverse($dateEvents));
         }
 
         $graphData = GraphHelper::mergeLineGraphData($graphData, $allEngagements, 'M', 0, 'date', 'data', false, false);

@@ -242,8 +242,6 @@ class FormModel extends CommonFormModel
             'form' => $entity
         ));
 
-        $html = InputHelper::html($html);
-
         $style  = $templating->render('MauticFormBundle:Builder:style.html.php', array(
             'form' => $entity
         ));

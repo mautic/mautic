@@ -24,26 +24,6 @@
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>
         <div class="panel-group margin-sm-top" id="CampaignEventPanel">
-            <?php /*
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="#CampaignEventSystemActions">
-                                <?php echo $view['translator']->trans('mautic.campaign.event.systemchanges.header'); ?>
-                            </a>
-                        </h4>
-                    </div>
-                    <div class="panel-body">
-                        <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
-                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
-                                <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                    <span><?php echo $e['label']; ?></span>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                */ ?>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -137,10 +117,7 @@
 
         <?php foreach ($canvasSettings['connections'] as $connection): ?>
 
-        var ep = Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
-        <?php if (!empty($labels[$connection['targetId']])): ?>
-        ep.addOverlay(["Label", {label: "<?php echo $labels[$connection['targetId']]; ?>", location: 0.65, id: "<?php echo "{$connection['sourceId']}_{$connection['targetId']}"; ?>_connectionLabel", cssClass: "_jsPlumb_label"}]);
-        <?php endif; ?>
+        Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
         <?php endforeach; ?>
         <?php endif; ?>
 

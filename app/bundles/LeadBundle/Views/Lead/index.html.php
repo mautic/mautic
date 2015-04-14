@@ -48,7 +48,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'routeBase' => 'lead',
     'langVar'   => 'lead.lead',
     'preCustomButtons' => $preButtons,
-    'customButtons'    => $buttons
+    'customButtons'    => $buttons,
+    'extraHtml'        => $extraHtml
 )));
 ?>
 

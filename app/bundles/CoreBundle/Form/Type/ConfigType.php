@@ -268,7 +268,7 @@ class ConfigType extends AbstractType
                 'data-show-on' => $smtpServiceShowConditions,
                 'tooltip'      => 'mautic.core.config.form.mailer.encryption.tooltip'
             ),
-            'empty_value' => false
+            'empty_value' => 'mautic.core.config.mailer_encryption.none'
         ));
 
         $builder->add('mailer_test_connection_button', 'standalone_button', array(
