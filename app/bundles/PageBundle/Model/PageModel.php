@@ -384,10 +384,13 @@ class PageModel extends FormModel
                 // if additional data were sent with the tracking pixel
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
-                    // URL attr 'd' is decoded. Encode it first.
+
+                    // URL attr 'd' is encoded so let's decode it first.
+
                     $decoded = false;
                     if (isset($query['d'])) {
-                        $query   = unserialize(base64_decode(urldecode($query['d'])));
+                        // parse_str auto urldecodes
+                        $query   = unserialize(base64_decode($query['d']));
                         $decoded = true;
                     }
 
