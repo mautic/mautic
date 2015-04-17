@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -292,7 +293,7 @@ class ListModel extends FormModel
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false)
+    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -325,6 +326,10 @@ class ListModel extends FormModel
         // Number of total leads to process
         $leadCount = (int) $newLeadsCount[$id]['count'];
 
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
+        }
+
         // Handle by batches
         $start          = 0;
         $leadsProcessed = 0;
@@ -345,7 +350,7 @@ class ListModel extends FormModel
                         'dynamic'       => true,
                         'newOnly'       => true,
                         'includeManual' => false,
-                        'start'         => $start,
+                        // No start set because of newOnly thus always at 0
                         'limit'         => $limit,
                         'batchLimiters' => $batchLimiters
                     )
@@ -366,7 +371,7 @@ class ListModel extends FormModel
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
 
-                        return;
+                        return $leadsProcessed;
                     }
                 }
 
@@ -405,16 +410,22 @@ class ListModel extends FormModel
             true,
             array(
                 'countOnly'     => true,
+                'includeManual' => false,
                 'filterOutIds'  => $fullList[$id],
                 'batchLimiters' => $batchLimiters
             )
         );
 
         // Restart batching
-        $start = 0;
+        $start     = 0;
+        $leadCount = $removeLeadCount[$id]['count'];
+
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
+        }
 
         // Remove leads
-        while ($start < $removeLeadCount[$id]['count']) {
+        while ($start < $leadCount) {
             // Keep CPU down
             sleep(2);
 
@@ -422,9 +433,9 @@ class ListModel extends FormModel
                 $list,
                 true,
                 array(
-                    'start'         => $start,
+                    // No start because the items are deleted so always 0
                     'limit'         => $limit,
-                    'filterOutIds'  => $fullList,
+                    'filterOutIds'  => $fullList[$id],
                     'batchLimiters' => $batchLimiters
                 )
             );
@@ -435,12 +446,12 @@ class ListModel extends FormModel
 
                 $this->removeLead($l, $entity, false, true, true);
 
-                $recordCount++;
+                $leadsProcessed++;
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
                     // done for this round, bye bye
 
-                    return;
+                    return $leadsProcessed;
                 }
             }
 
@@ -462,6 +473,8 @@ class ListModel extends FormModel
             // Free some memory
             gc_collect_cycles();
         }
+
+        return $leadsProcessed;
 
         unset($allLeadIds);
     }

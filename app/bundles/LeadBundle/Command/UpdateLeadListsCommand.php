@@ -31,34 +31,51 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
             ))
             ->setDescription('Update leads in smart lists based on new lead data.')
             ->addOption('--batch-limit', null, InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
-            ->addOption('--max-leads', null, InputOption::VALUE_OPTIONAL, 'Set max number of leads to process for this script execution. Defaults to all.', false);
-
+            ->addOption('--max-leads', null, InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per list for this script execution. Defaults to all.', false)
+            ->addOption('--list-id', null, InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container  = $this->getContainer();
-
-        $factory = $container->get('mautic.factory');
+        $factory    = $container->get('mautic.factory');
+        $translator = $factory->getTranslator();
 
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $factory->getModel('lead.list');
 
-        $lists     = $listModel->getEntities(array(
-            'iterator_mode' => true
-        ));
-
+        $id    = $input->getOption('list-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-leads');
 
-        while (($l = $lists->next()) !== false) {
-            $l = reset($l);
-            $listModel->rebuildListLeads($l, $batch, $max);
+        if ($id) {
+            $list = $listModel->getEntity($id);
+            if ($list !== null) {
+                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
+                $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>');
+            } else {
+                $output->writeln('<error>' . $translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)) . '</error>');
+            }
+        } else {
+            $lists = $listModel->getEntities(
+                array(
+                    'iterator_mode' => true
+                )
+            );
 
-            unset($l);
+            while (($l = $lists->next()) !== false) {
+                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
+
+                $l = reset($l);
+                $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>');
+
+                unset($l);
+            }
+
+            unset($lists);
         }
-
-        unset($lists);
 
         return 0;
     }
