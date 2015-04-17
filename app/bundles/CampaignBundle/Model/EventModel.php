@@ -658,7 +658,7 @@ class EventModel extends CommonFormModel
                 $parts      = explode('::', $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
-                new \ReflectionMethod(null, $settings['callback']);
+                $reflection = new \ReflectionMethod(null, $settings['callback']);
             }
 
             $pass = array();
