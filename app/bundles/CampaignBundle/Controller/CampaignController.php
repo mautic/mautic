@@ -329,9 +329,6 @@ class CampaignController extends FormController
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->factory->getModel('campaign');
 
-        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
-        $eventModel = $this->factory->getModel('campaign.event');
-
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
 
@@ -455,9 +452,6 @@ class CampaignController extends FormController
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->factory->getModel('campaign');
-
-        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-        $eventModel = $this->factory->getModel('campaign.event');
 
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
@@ -638,8 +632,7 @@ class CampaignController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $model      = $this->factory->getModel('campaign');
-        $eventModel = $this->factory->getModel('campaign.event');
+        $model  = $this->factory->getModel('campaign');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -656,7 +649,6 @@ class CampaignController extends FormController
             $campaign->setIsPublished(false);
 
             // Clone the campaign's events
-            $newEvents = array();
             foreach ($events as $event) {
                 $campaign->removeEvent($event);
 
