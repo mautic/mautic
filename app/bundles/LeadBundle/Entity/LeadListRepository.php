@@ -99,7 +99,7 @@ class LeadListRepository extends CommonRepository
 
         if ($withLeads) {
             foreach ($results as &$i) {
-                $leadLists = $this->getLeadsByList($i, true);
+                $leadLists = $this->getLeadsByList($i, array('idOnly' => true));
                 $i['leads'] = $leadLists[$i['id']];
             }
         }
@@ -119,8 +119,6 @@ class LeadListRepository extends CommonRepository
      */
     public function getLeadLists($lead, $forList = false, $singleArrayHydration = false)
     {
-        static $return = array();
-
         if (is_array($lead)) {
             $q = $this->_em->createQueryBuilder()
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
@@ -135,8 +133,13 @@ class LeadListRepository extends CommonRepository
                 ->leftJoin('il.lead', 'lead');
 
             $q->where(
-                $q->expr()->in('lead.id', ':leads')
-            )->setParameter('leads', $lead);
+                $q->expr()->andX(
+                    $q->expr()->in('lead.id', ':leads'),
+                    $q->expr()->in('il.manuallyRemoved', ':false')
+                )
+            )
+                ->setParameter('leads', $lead)
+                ->setParameter('false', false, 'boolean');
 
             $result = $q->getQuery()->getArrayResult();
 
@@ -149,28 +152,26 @@ class LeadListRepository extends CommonRepository
 
             return $return;
         } else {
-            $typeKey = $singleArrayHydration ? 'array' : 'object';
+            $q = $this->_em->createQueryBuilder()
+                ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
-            if (empty($return[$lead][$typeKey])) {
-                $q = $this->_em->createQueryBuilder()
-                    ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
-
-                if ($forList) {
-                    $q->select('partial l.{id, alias, name}');
-                } else {
-                    $q->select('l');
-                }
-
-                $q->leftJoin('l.leads', 'il');
-
-                $q->where(
-                    $q->expr()->eq('IDENTITY(il.lead)', (int) $lead)
-                );
-
-                $return[$lead][$typeKey] = ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
+            if ($forList) {
+                $q->select('partial l.{id, alias, name}');
+            } else {
+                $q->select('l');
             }
 
-            return $return[$lead][$typeKey];
+            $q->leftJoin('l.leads', 'il');
+
+            $q->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(il.lead)', (int) $lead),
+                    $q->expr()->in('il.manuallyRemoved', ':false')
+                )
+            )
+                ->setParameter('false', false, 'boolean');
+
+            return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
     }
 
@@ -210,7 +211,7 @@ class LeadListRepository extends CommonRepository
 
         if ($withLeads) {
             foreach ($results as &$i) {
-                $leadLists = $this->getLeadsByList($i, true);
+                $leadLists = $this->getLeadsByList($i, array('idOnly' => true));
                 $i['leads'] = $leadLists[$i['id']];
             }
         }
@@ -266,9 +267,17 @@ class LeadListRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $includeManualInDynamic = true, $ignoreCache = false)
+    public function getLeadsByList($lists, $args = array())
     {
-        static $leads = array(), $currentOnlyLeads = array();
+        $idOnly        = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly'];
+        $noteExists    = (!array_key_exists('noteExists', $args)) ? false : $args['noteExists'];
+        $dynamic       = (!array_key_exists('dynamic', $args)) ? false : $args['dynamic'];
+        $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
+        $includeManual = (!array_key_exists('includeManual', $args)) ? true : $args['includeManual'];
+        $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
+        $filterOutNew  = (!array_key_exists('filterOutNew', $args)) ? false : $args['filterOutNew'];
+        $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
+        $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
         if (!$lists instanceof PersistentCollection && !is_array($lists) || isset($lists['id'])) {
             $lists = array($lists);
@@ -276,6 +285,7 @@ class LeadListRepository extends CommonRepository
 
         $return = array();
         foreach ($lists as $l) {
+            $leads = ($countOnly) ? 0 : array();
 
             if ($l instanceof LeadList) {
                 $id      = $l->getId();
@@ -288,111 +298,178 @@ class LeadListRepository extends CommonRepository
                 $filters = array();
             }
 
-            if (!$dynamic) {
-                if ($ignoreCache || !isset($currentOnlyLeads[$id])) {
-                    $q = $this->_em->getConnection()->createQueryBuilder();
-                    if ($idOnly) {
-                        $q->select('ll.lead_id')
-                            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
-                    } else {
-                        $q->select('l.*')
-                            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
-                    }
+            if ($dynamic && $filters) {
+                $q          = $this->_em->getConnection()->createQueryBuilder();
+                $parameters = array();
+                $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
 
-                    $q ->where(
+                if ($countOnly) {
+                    $select = $includeManual ? 'l.id, count(l.id) as lead_count' : 'l.id, count(l.id) as lead_count, max(id) as max_id';;
+                } elseif ($noteExists) {
+                    $select = 'll.lead_id as assigned, l.id';
+                } elseif ($idOnly) {
+                    $select = 'l.id';
+                } else {
+                    $select = 'l.*';
+                }
+
+                $q->select($select)
+                    ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
+                    ->where($expr);
+
+                foreach ($parameters as $k => $v) {
+                    $q->setParameter($k, $v);
+                }
+
+                if ($filterOutNew) {
+                    $q->andWhere(
                         $q->expr()->andX(
-                            $q->expr()->eq('ll.manually_removed', ':false'),
-                            $q->expr()->eq('ll.leadlist_id', ':list')
+                            $q->expr()->notIn('ll.lead_id', $filterOutNew),
+                            $q->expr()->eq('ll.manually_added', ':false'),
+                            $q->expr()->eq('ll.manually_removed', ':false')
                         )
                     )
-                        ->setParameter('list', $id)
-                        ->setParameter('false', false, 'boolean');
-
-                    $results    = $q->execute()->fetchAll();
-                    $currentOnlyLeads[$id] = array();
-                    foreach ($results as $r) {
-                        if ($idOnly) {
-                            $currentOnlyLeads[$id][] = $r['lead_id'];
-                        } else {
-                            $currentOnlyLeads[$id][$r['id']] = $r;
-                        }
-                    }
-
-                    unset($filters, $parameters, $q, $expr);
+                    ->setParameter(':false', false, 'boolean');
                 }
-                $return[$id] = $currentOnlyLeads[$id];
 
-            } else {
-                if ($ignoreCache || !isset($leads[$id]) && $filters) {
-                    $q          = $this->_em->getConnection()->createQueryBuilder();
-                    $parameters = array();
-                    $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
+                // Set batch limiters to ensure the same group is used each batch
+                if ($batchLimiters) {
+                    $q->andWhere(
+                        $q->expr()->andX(
+                            // Only leads in the list at the time of count
+                            $q->expr()->orX(
+                                $q->expr()->isNull('ll.lead_id'),
+                                $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                            ),
+                            // Only leads that existed at teh time of count
+                            $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                        )
+                    );
+                }
 
-                    $select = ($idOnly) ? 'l.id' : 'l.*';
-                    $q->select($select)
-                        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                        ->where($expr);
-                    foreach ($parameters as $k => $v) {
-                        $q->setParameter($k, $v);
-                    }
+                // Set limits if applied
+                if (!empty($limit)) {
+                    $q->setFirstResult($start)
+                        ->setMaxResults($limit);
+                }
 
-                    $results = $q->execute()->fetchAll();
+                $q->orderBy('l.id', 'ASC');
 
-                    $leads[$id]   = array();
-                    $dynamicLeads = array();
-                    foreach ($results as $r) {
-                        if ($idOnly) {
-                            $leads[$id][] = $r['id'];
+                $results = $q->execute()->fetchAll();
+
+                $dynamicLeads = array();
+                foreach ($results as $r) {
+                    if ($countOnly) {
+                        if ($includeManual) {
+                            $leads = $r['lead_count'];
                         } else {
-                            $leads[$id][$r['id']] = $r;
-                        }
-                        $dynamicLeads[] = $r['id'];
-                    }
-
-                    // Get a list of manually added leads and merge them with dynamic
-                    if ($includeManualInDynamic) {
-                        $q = $this->_em->getConnection()->createQueryBuilder();
-                        if ($idOnly) {
-                            $q->select('ll.lead_id as id')
-                                ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
-                        } else {
-                            $q->select('l.*')
-                                ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                                ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
-                        }
-
-                        $dynamicExpr = $q->expr()->andX(
-                            $q->expr()->eq('ll.manually_added', ':true'),
-                            $q->expr()->eq('ll.leadlist_id', ':list')
-                        );
-                        if (!empty($dynamicLeads)) {
-                            $dynamicExpr->add(
-                                $q->expr()->notIn('ll.lead_id', $dynamicLeads)
+                            $leads = array(
+                                'count' => $r['lead_count'],
+                                'maxId' => $r['max_id']
                             );
                         }
+                    } elseif ($noteExists) {
+                        $leads[] = $r;
+                    } elseif ($idOnly) {
+                        $leads[] = $r['id'];
+                    } else {
+                        $leads[] = $r;
+                    }
+                    $dynamicLeads[] = $r['id'];
+                }
+            }
 
-                        $q->where($dynamicExpr)
-                            ->setParameter('list', $id)
-                            ->setParameter('true', true, 'boolean');
+            // Get a list of manually added leads and merge them with dynamic if $includeManual
+            if (!$dynamic || ($includeManual && !$limit)) {
+                $q = $this->_em->getConnection()->createQueryBuilder();
+                if ($countOnly) {
+                    $q->select('count(ll.lead_id) as lead_count')
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
+                } elseif ($idOnly) {
+                    $q->select('ll.lead_id as id')
+                        ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
+                } else {
+                    $q->select('l.*')
+                        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                        ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+                }
 
-                        $results = $q->execute()->fetchAll();
+                // Filter by list
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('ll.leadlist_id', ':list'),
+                    $q->expr()->eq('ll.manually_removed', ':false')
+                );
+                $q->setParameter('list', (int) $id)
+                    ->setParameter('false', false, 'boolean');
 
-                        foreach ($results as $r) {
-                            if ($idOnly) {
-                                $leads[$id][] = $r['id'];
-                            } else {
-                                $leads[$id][$r['id']] = $r;
-                            }
-                        }
+
+                // Set limits if applied
+                if (!empty($limit)) {
+                    $q->setFirstResult($start)
+                        ->setMaxResults($limit);
+
+                } elseif (!$includeManual) {
+                    // Exclude manually added
+                    $expr->add(
+                        $q->expr()->eq('ll.manually_added', ':false')
+                    );
+                }
+
+                if (!empty($dynamicLeads)) {
+                    $expr->add(
+                        $q->expr()->notIn('ll.lead_id', $dynamicLeads)
+                    );
+                }
+
+                $q->where($expr);
+
+                if (!$includeManual) {
+                    // Set batch limiters to ensure the same group is used each batch
+                    if ($batchLimiters) {
+                        $q->andWhere(
+                            $q->expr()->andX(
+                            // Only leads in the list at the time of count
+                                $q->expr()->orX(
+                                    $q->expr()->isNull('ll.lead_id'),
+                                    $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                                ),
+                                // Only leads that existed at teh time of count
+                                $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                            )
+                        );
                     }
 
-                    unset($filters, $parameters, $q, $expr);
-                } else {
-                    $leads[$id] = array();
+                    // Set limits if applied
+                    if (!empty($limit)) {
+                        $q->setFirstResult($start)
+                            ->setMaxResults($limit);
+                    }
                 }
-                $return[$id] = $leads[$id];
+
+                $q->orderBy('ll.lead_id', 'ASC');
+
+                $results = $q->execute()->fetchAll();
+
+                foreach ($results as $r) {
+                    if ($countOnly) {
+                        if ($includeManual) {
+                            $leads += $r['lead_count'];
+                        } else {
+                            $leads = $r['lead_count'];
+                        }
+
+                    } elseif ($idOnly) {
+                        $leads[] = $r['id'];
+                    } else {
+                        $leads[] = $r;
+                    }
+                }
             }
+
+            $return[$id] = $leads;
+
+            unset($filters, $parameters, $q, $expr, $results, $dynamicExpr, $dynamicLeads, $leads);
         }
 
         return $return;

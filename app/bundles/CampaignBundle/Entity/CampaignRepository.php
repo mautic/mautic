@@ -78,15 +78,17 @@ class CampaignRepository extends CommonRepository
         if ($forList) {
             $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
-            $q->select('c, l, partial ll.{id}');
+            $q->select('c, l, partial ll.{id}')
+                ->leftJoin('c.events', 'e')
+                ->leftJoin('e.log', 'o');
         }
 
-        $q->leftJoin('c.leads', 'l')
-            ->leftJoin('c.lists', 'll')
-            ->leftJoin('c.events', 'e')
-            ->leftJoin('e.log', 'o')
-            ->where($this->getPublishedByDateExpression($q));
+        if ($leadId || !$forList) {
+            $q->leftJoin('c.leads', 'l');
+        }
 
+        $q->leftJoin('c.lists', 'll')
+            ->where($this->getPublishedByDateExpression($q));
 
         if (!empty($specificId)) {
             $q->andWhere(
@@ -118,7 +120,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getPublishedCampaignsByLeadLists(array $leadLists, $forList = false, array $ignoreIds = array())
     {
-        $q   = $this->_em->createQueryBuilder()
+        $q = $this->_em->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
         if ($forList) {
@@ -143,6 +145,31 @@ class CampaignRepository extends CommonRepository
 
         $results = ($forList) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         return $results;
+    }
+
+    /**
+     * Get array of list IDs assigned to this campaign
+     *
+     * @param $id
+     */
+    public function getCampaignListIds($id)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cl.list_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
+
+        $q->where(
+            $q->expr()->eq('cl.campaign_id', $id)
+        );
+
+        $lists  = array();
+        $results = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $lists[] = $r['list_id'];
+        }
+
+        return $lists;
     }
 
     /**

@@ -57,7 +57,7 @@ class Version20150307000000 extends AbstractMauticMigration
             $listModel->regenerateListLeads($l);
         }
 
-        $leads = $listModel->getLeadsByList($lists, true, false, true);
+        $leads = $listModel->getLeadsByList($lists, true);
 
         $persist = array();
         $em = $this->factory->getEntityManager();

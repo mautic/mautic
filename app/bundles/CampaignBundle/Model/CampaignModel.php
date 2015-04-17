@@ -451,6 +451,8 @@ class CampaignModel extends CommonFormModel
     public function addLead (Campaign $campaign, $lead, $manuallyAdded = true)
     {
         $this->addLeads($campaign, array($lead), $manuallyAdded);
+
+        unset($campaign, $lead);
     }
 
     /**
@@ -459,7 +461,7 @@ class CampaignModel extends CommonFormModel
      * @param Campaign $campaign
      * @param array    $leads
      */
-    public function addLeads (Campaign $campaign, array $leads, $manuallyAdded = false)
+    public function addLeads (Campaign $campaign, array $leads, $manuallyAdded = false, $detachLead = false)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
@@ -467,7 +469,7 @@ class CampaignModel extends CommonFormModel
         foreach ($leads as $lead) {
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $leadModel->getEntity($leadId);
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
 
             $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
@@ -482,6 +484,12 @@ class CampaignModel extends CommonFormModel
 
                     $this->getRepository()->saveEntity($campaignLead);
                 } else {
+                    $this->em->detach($campaignLead);
+                    if ($detachLead) {
+                        $this->em->detach($lead);
+                    }
+
+                    unset($campaignLead, $lead);
 
                     continue;
                 }
@@ -495,14 +503,21 @@ class CampaignModel extends CommonFormModel
             }
 
             if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-                $leadModel->setSystemCurrentLead($lead);
-
                 $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
                 $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+
+                unset($event);
             }
 
-            unset($campaignLead);
+            // Detach CampaignLead to save memory
+            $this->em->detach($campaignLead);
+            if ($detachLead) {
+                $this->em->detach($lead);
+            }
+            unset($campaignLead, $lead);
         }
+
+        unset($leadModel, $campaign, $leads);
     }
 
     /**
@@ -515,6 +530,8 @@ class CampaignModel extends CommonFormModel
     public function removeLead (Campaign $campaign, $lead, $manuallyRemoved = true)
     {
         $this->removeLeads($campaign, array($lead), $manuallyRemoved);
+
+        unset($campaign, $lead);
     }
 
     /**
@@ -524,7 +541,7 @@ class CampaignModel extends CommonFormModel
      * @param array    $leads
      * @param bool     $manuallyRemoved
      */
-    public function removeLeads (Campaign $campaign, array $leads, $manuallyRemoved = false)
+    public function removeLeads (Campaign $campaign, array $leads, $manuallyRemoved = false, $detachLead = false)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
@@ -534,7 +551,7 @@ class CampaignModel extends CommonFormModel
 
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $leadModel->getEntity($leadId);
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
 
             $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
@@ -543,6 +560,11 @@ class CampaignModel extends CommonFormModel
             ));
 
             if ($campaignLead == null) {
+                if ($detachLead) {
+                    $this->em->detach($lead);
+                    unset($lead);
+                }
+
                 continue;
             }
 
@@ -565,12 +587,21 @@ class CampaignModel extends CommonFormModel
                 $this->removeScheduledEvents($campaign, $lead);
 
                 if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-                    $leadModel->setSystemCurrentLead($lead);
-
                     $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
                     $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+
+                    unset($event);
                 }
             }
+
+            // Detach CampaignLead to save memory
+            $this->em->detach($campaignLead);
+
+            if ($detachLead) {
+                $this->em->detach($lead);
+            }
+
+            unset($campaignLead, $lead);
         }
     }
 
@@ -707,5 +738,13 @@ class CampaignModel extends CommonFormModel
     public function removeScheduledEvents($campaign, $lead)
     {
         $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->removeScheduledEvents($campaign->getId(), $lead->getId());
+    }
+
+    /**
+     * @param $id
+     */
+    public function getCampaignListIds($id)
+    {
+        return $this->getRepository()->getCampaignListIds((int) $id);
     }
 }

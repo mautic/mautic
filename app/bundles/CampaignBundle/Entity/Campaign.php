@@ -87,7 +87,7 @@ class Campaign extends FormEntity
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", fetch="EXTRA_LAZY")
      */
     private $leads;
 

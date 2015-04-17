@@ -472,20 +472,25 @@ class LeadRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->orX(
-            $q->expr()->like('l.firstname', ":$unique"),
-            $q->expr()->like('l.lastname', ":$unique"),
-            $q->expr()->like('l.email', ":$unique"),
-            $q->expr()->like('l.company', ":$unique"),
-            $q->expr()->like('l.city', ":$unique"),
-            $q->expr()->like('l.state', ":$unique"),
-            $q->expr()->like('l.zipcode', ":$unique"),
-            $q->expr()->like('l.country', ":$unique")
-        );
-
         if ($filter->not) {
-            $q->expr()->not($expr);
+            $xFunc    = 'andX';
+            $exprFunc = 'notLike';
+        } else {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+
         }
+
+        $expr = $q->expr()->$xFunc(
+            $q->expr()->$exprFunc('l.firstname', ":$unique"),
+            $q->expr()->$exprFunc('l.lastname', ":$unique"),
+            $q->expr()->$exprFunc('l.email', ":$unique"),
+            $q->expr()->$exprFunc('l.company', ":$unique"),
+            $q->expr()->$exprFunc('l.city', ":$unique"),
+            $q->expr()->$exprFunc('l.state', ":$unique"),
+            $q->expr()->$exprFunc('l.zipcode', ":$unique"),
+            $q->expr()->$exprFunc('l.country', ":$unique")
+        );
 
         return array(
             $expr,
