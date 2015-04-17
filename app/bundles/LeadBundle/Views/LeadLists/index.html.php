@@ -12,7 +12,7 @@ $leadName = $lead->getPrimaryIdentifier();
 <ul class="list-group">
     <?php foreach ($lists as $l): ?>
     <?php
-        $inList  = in_array($leadId, $l['leads']);
+        $inList  = isset($leadsLists[$l['id']]);
         $switch  = $inList ? 'fa-toggle-on' : 'fa-toggle-off';
         $bgClass = $inList ? 'text-success' : 'text-danger';
     ?>

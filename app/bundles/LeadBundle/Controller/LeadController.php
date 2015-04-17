@@ -764,7 +764,8 @@ class LeadController extends FormController
      */
     public function listAction ($objectId)
     {
-        $model = $this->factory->getModel('lead.lead');
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->factory->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
         if ($lead != null && $this->factory->getSecurity()->hasEntityAccess(
@@ -773,15 +774,19 @@ class LeadController extends FormController
         ) {
             /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
             $listModel = $this->factory->getModel('lead.list');
-            $lists     = $listModel->getUserLists('', true);
+            $lists     = $listModel->getUserLists();
+
+            // Get a list of lists for the lead
+            $leadsLists = $model->getLists($lead, true, true);
         } else {
-            $lists = array();
+            $lists = $leadsLists = array();
         }
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'lists' => $lists,
-                'lead'  => $lead
+                'lists'      => $lists,
+                'leadsLists' => $leadsLists,
+                'lead'       => $lead
             ),
             'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
         ));
