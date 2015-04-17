@@ -20,8 +20,19 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
     {
         $this
             ->setName('mautic:leadlists:update')
+            ->setAliases(array(
+                'mautic:lists:update',
+                'mautic:update:leadlists',
+                'mautic:update:lists',
+                'mautic:rebuild:leadlists',
+                'mautic:leadlists:rebuild',
+                'mautic:lists:rebuild',
+                'mautic:rebuild:lists',
+            ))
             ->setDescription('Update leads in smart lists based on new lead data.')
-            ->addOption('--limit', null, InputOption::VALUE_OPTIONAL, 'Max number of leads to process per command. Defaults to 1000.', 1000);
+            ->addOption('--batch-limit', null, InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
+            ->addOption('--max-leads', null, InputOption::VALUE_OPTIONAL, 'Set max number of leads to process for this script execution. Defaults to all.', false);
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -37,11 +48,12 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
             'iterator_mode' => true
         ));
 
-        $limit = $input->getOption('limit');
+        $batch = $input->getOption('batch-limit');
+        $max   = $input->getOption('max-leads');
 
         while (($l = $lists->next()) !== false) {
             $l = reset($l);
-            $listModel->regenerateListLeads($l, $limit);
+            $listModel->rebuildListLeads($l, $batch, $max);
 
             unset($l);
         }

@@ -287,13 +287,14 @@ class ListModel extends FormModel
      * Rebuild lead lists
      *
      * @param LeadList $entity
-     * @param          $persist
+     * @param          $limit
+     * @param          $batchsize
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function regenerateListLeads(LeadList $entity, $limit = 1000)
+    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false)
     {
-        defined('MAUTIC_REGENERATING_LEAD_LISTS') or define('MAUTIC_REGENERATING_LEAD_LISTS', 1);
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
         // Set SQL logging to null or else will hit memory limits in dev for sure
         $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -311,71 +312,92 @@ class ListModel extends FormModel
             true,
             array(
                 'countOnly'     => true,
+                'newOnly'       => true,
                 'dynamic'       => true,
-                'includeManual' => false
+                'includeManual' => false,
+                'batchLimiters' => $batchLimiters
             )
         );
 
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = $newLeadsCount[$id]['maxId'];
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
 
-        // Store IDs for remove comparison
-        $allLeadIds = array();
+        // Number of total leads to process
+        $leadCount = (int) $newLeadsCount[$id]['count'];
 
         // Handle by batches
-        $start = 0;
+        $start          = 0;
+        $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
 
-        // Add leads
-        while ($start < $newLeadsCount[$id]['count']) {
-            // Keep CPU down
-            sleep(2);
-
-            $newLeadList = $this->getLeadsByList(
-                $list,
-                true,
-                array(
-                    'dynamic'       => true,
-                    'noteExists'    => true,
-                    'includeManual' => false,
-                    'start'         => $start,
-                    'limit'         => $limit,
-                    'batchLimiters' => $batchLimiters
-                )
-            );
-
-            $start += $limit;
-
-            foreach ($newLeadList[$id] as $l) {
-                // Keep RAM down
-                usleep(500);
-
-                $this->addLead($l['id'], $entity, false, true, $l['assigned']);
-
-                // To prevent remove from filtering the new ones
-                $allLeadIds[] = $l['id'];
-
-                unset($l);
-            }
-
-            // Dispatch batch event
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                // Keep RAM down
+        if ($leadCount) {
+            // Add leads
+            while ($start < $leadCount) {
+                // Keep CPU down
                 sleep(2);
 
-                $event = new ListChangeEvent($newLeadList[$id], $entity, true);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
+                $newLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    array(
+                        'dynamic'       => true,
+                        'newOnly'       => true,
+                        'includeManual' => false,
+                        'start'         => $start,
+                        'limit'         => $limit,
+                        'batchLimiters' => $batchLimiters
+                    )
+                );
 
-                unset($event);
+                $start += $limit;
+
+                foreach ($newLeadList[$id] as $l) {
+                    // Keep RAM down
+                    usleep(500);
+
+                    $this->addLead($l, $entity, false, true, -1);
+
+                    unset($l);
+
+                    $leadsProcessed++;
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        // done for this round, bye bye
+
+                        return;
+                    }
+                }
+
+                // Dispatch batch event
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    // Keep RAM down
+                    sleep(2);
+
+                    $event = new ListChangeEvent($newLeadList[$id], $entity, true);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
+
+                    unset($event);
+                }
+
+                unset($newLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
             }
-
-            unset($newLeadList);
-
-            // Free some memory
-            gc_collect_cycles();
         }
+
+        $fullList = $this->getLeadsByList(
+            $list,
+            true,
+            array(
+                'dynamic'       => true,
+                'existingOnly'  => true,
+                'includeManual' => false,
+                'batchLimiters' => $batchLimiters
+            )
+        );
 
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
@@ -383,7 +405,7 @@ class ListModel extends FormModel
             true,
             array(
                 'countOnly'     => true,
-                'filterOutNew'  => $allLeadIds,
+                'filterOutIds'  => $fullList[$id],
                 'batchLimiters' => $batchLimiters
             )
         );
@@ -402,7 +424,7 @@ class ListModel extends FormModel
                 array(
                     'start'         => $start,
                     'limit'         => $limit,
-                    'filterOutNew'  => $allLeadIds,
+                    'filterOutIds'  => $fullList,
                     'batchLimiters' => $batchLimiters
                 )
             );
@@ -412,6 +434,14 @@ class ListModel extends FormModel
                 usleep(500);
 
                 $this->removeLead($l, $entity, false, true, true);
+
+                $recordCount++;
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    // done for this round, bye bye
+
+                    return;
+                }
             }
 
             $start += $limit;
@@ -443,11 +473,11 @@ class ListModel extends FormModel
      * @param      $lists
      * @param bool $manuallyAdded
      * @param bool $batchProcess
-     * @param bool $skipFindOne
+     * @param int  $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $skipFindOne = false)
+    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
@@ -506,15 +536,23 @@ class ListModel extends FormModel
                 continue;
             }
 
-            $listLead = (empty($skipFindOne)) ?
-                $this->getListLeadRepository()->findOneBy(array(
-                    'lead' => $lead,
-                    'list' => $this->leadChangeLists[$l]
-                )) :
-                $this->em->getReference('MauticLeadBundle:ListLead', array(
-                    'lead' => $leadId,
-                    'list' => $l
-                ));
+            if ($searchListLead == -1) {
+                $listLead = null;
+            } elseif ($searchListLead) {
+                $listLead = $this->getListLeadRepository()->findOneBy(
+                    array(
+                        'lead' => $lead,
+                        'list' => $this->leadChangeLists[$l]
+                    )
+                );
+            } else {
+                $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
+                    array(
+                        'lead' => $leadId,
+                        'list' => $l
+                    )
+                );
+            }
 
             if ($listLead != null) {
                 if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
@@ -636,7 +674,7 @@ class ListModel extends FormModel
 
             $dispatchEvent = false;
 
-            $listLead = (empty($skipFindOne)) ?
+            $listLead = (!$skipFindOne) ?
                 $this->getListLeadRepository()->findOneBy(array(
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$l]

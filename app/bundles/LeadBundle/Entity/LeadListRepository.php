@@ -270,12 +270,13 @@ class LeadListRepository extends CommonRepository
     public function getLeadsByList($lists, $args = array())
     {
         $idOnly        = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly'];
-        $noteExists    = (!array_key_exists('noteExists', $args)) ? false : $args['noteExists'];
+        $newOnly       = (!array_key_exists('newOnly', $args)) ? false : $args['newOnly'];
+        $existingOnly  = (!array_key_exists('existingOnly', $args)) ? false : $args['existingOnly'];
         $dynamic       = (!array_key_exists('dynamic', $args)) ? false : $args['dynamic'];
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $includeManual = (!array_key_exists('includeManual', $args)) ? true : $args['includeManual'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
-        $filterOutNew  = (!array_key_exists('filterOutNew', $args)) ? false : $args['filterOutNew'];
+        $filterOutIds  = (!array_key_exists('filterOutIds', $args)) ? false : $args['filterOutIds'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
@@ -304,9 +305,7 @@ class LeadListRepository extends CommonRepository
                 $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
 
                 if ($countOnly) {
-                    $select = $includeManual ? 'l.id, count(l.id) as lead_count' : 'l.id, count(l.id) as lead_count, max(id) as max_id';;
-                } elseif ($noteExists) {
-                    $select = 'll.lead_id as assigned, l.id';
+                    $select = $includeManual ? 'l.id, count(l.id) as lead_count' : 'l.id, count(l.id) as lead_count, max(id) as max_id';
                 } elseif ($idOnly) {
                     $select = 'l.id';
                 } else {
@@ -322,10 +321,10 @@ class LeadListRepository extends CommonRepository
                     $q->setParameter($k, $v);
                 }
 
-                if ($filterOutNew) {
+                if ($filterOutIds) {
                     $q->andWhere(
                         $q->expr()->andX(
-                            $q->expr()->notIn('ll.lead_id', $filterOutNew),
+                            $q->expr()->notIn('ll.lead_id', $filterOutIds),
                             $q->expr()->eq('ll.manually_added', ':false'),
                             $q->expr()->eq('ll.manually_removed', ':false')
                         )
@@ -335,17 +334,37 @@ class LeadListRepository extends CommonRepository
 
                 // Set batch limiters to ensure the same group is used each batch
                 if ($batchLimiters) {
-                    $q->andWhere(
-                        $q->expr()->andX(
-                            // Only leads in the list at the time of count
-                            $q->expr()->orX(
-                                $q->expr()->isNull('ll.lead_id'),
-                                $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                            ),
-                            // Only leads that existed at teh time of count
-                            $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                    $batchExpr = $q->expr()->andX(
+                        // Only leads in the list at the time of count
+                        $q->expr()->orX(
+                            $q->expr()->isNull('ll.lead_id'),
+                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
                         )
                     );
+
+                    if (!empty($batchLimiters['maxId'])) {
+                        // Only leads that existed at teh time of count
+                        $batchExpr->add(
+                            $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                        );
+                    }
+
+                    $q->andWhere($batchExpr);
+                }
+
+                if ($newOnly) {
+                    $q->andWhere(
+                        $q->expr()->isNull('ll.lead_id')
+                    );
+                } elseif ($existingOnly) {
+                    $q->andWhere(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('ll.lead_id'),
+                            $q->expr()->eq('ll.manually_added', ':false'),
+                            $q->expr()->eq('ll.manually_removed', ':false')
+                        )
+                    )
+                    ->setParameter(':false', false, 'boolean');
                 }
 
                 // Set limits if applied
@@ -369,8 +388,6 @@ class LeadListRepository extends CommonRepository
                                 'maxId' => $r['max_id']
                             );
                         }
-                    } elseif ($noteExists) {
-                        $leads[] = $r;
                     } elseif ($idOnly) {
                         $leads[] = $r['id'];
                     } else {
@@ -425,19 +442,25 @@ class LeadListRepository extends CommonRepository
                 $q->where($expr);
 
                 if (!$includeManual) {
+
                     // Set batch limiters to ensure the same group is used each batch
                     if ($batchLimiters) {
-                        $q->andWhere(
-                            $q->expr()->andX(
-                            // Only leads in the list at the time of count
-                                $q->expr()->orX(
-                                    $q->expr()->isNull('ll.lead_id'),
-                                    $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                                ),
-                                // Only leads that existed at teh time of count
-                                $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                        $batchExpr = $q->expr()->andX(
+                        // Only leads in the list at the time of count
+                            $q->expr()->orX(
+                                $q->expr()->isNull('ll.lead_id'),
+                                $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
                             )
                         );
+
+                        if (!empty($batchLimiters['maxId'])) {
+                            // Only leads that existed at teh time of count
+                            $batchExpr->add(
+                                $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                            );
+                        }
+
+                        $q->andWhere($batchExpr);
                     }
 
                     // Set limits if applied
