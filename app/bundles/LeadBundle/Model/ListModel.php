@@ -475,8 +475,6 @@ class ListModel extends FormModel
         }
 
         return $leadsProcessed;
-
-        unset($allLeadIds);
     }
 
     /**
@@ -492,9 +490,6 @@ class ListModel extends FormModel
      */
     public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
@@ -612,7 +607,7 @@ class ListModel extends FormModel
             $this->em->detach($lead);
         }
 
-        unset($leadModel, $lead, $persistLists, $lists);
+        unset($lead, $persistLists, $lists);
     }
 
     /**
@@ -628,9 +623,6 @@ class ListModel extends FormModel
      */
     public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
@@ -744,7 +736,7 @@ class ListModel extends FormModel
             $this->em->detach($lead);
         }
 
-        unset($leadModel, $lead, $deleteLists, $persistLists, $lists);
+        unset($lead, $deleteLists, $persistLists, $lists);
     }
 
 

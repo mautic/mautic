@@ -335,7 +335,7 @@ class LeadListRepository extends CommonRepository
                     $q->setParameter(':false', false, 'boolean');
                 }
 
-                // Set batch limiters to ensure the same group is used each batch
+                // Set batch limiters to ensure the same group is used
                 if ($batchLimiters) {
                     $expr->add(
                         // Only leads in the list at the time of count
@@ -346,7 +346,7 @@ class LeadListRepository extends CommonRepository
                     );
 
                     if (!empty($batchLimiters['maxId'])) {
-                        // Only leads that existed at teh time of count
+                        // Only leads that existed at the time of count
                         $expr->add(
                             $q->expr()->lte('l.id', $batchLimiters['maxId'])
                         );
@@ -444,17 +444,8 @@ class LeadListRepository extends CommonRepository
                     $expr->add(
                         $q->expr()->eq('ll.manually_added', ':false')
                     );
-                }
 
-                if (!empty($dynamicLeads)) {
-                    $expr->add(
-                        $q->expr()->notIn('ll.lead_id', $dynamicLeads)
-                    );
-                }
-
-                if (!$includeManual) {
-
-                    // Set batch limiters to ensure the same group is used each batch
+                    // Set batch limiters to ensure the same group is used
                     if ($batchLimiters) {
                         $expr->add(
                         // Only leads in the list at the time of count
@@ -462,18 +453,18 @@ class LeadListRepository extends CommonRepository
                         );
 
                         if (!empty($batchLimiters['maxId'])) {
-                            // Only leads that existed at teh time of count
+                            // Only leads that existed at the time of count
                             $expr->add(
                                 $q->expr()->lte('ll.lead_id', $batchLimiters['maxId'])
                             );
                         }
                     }
+                }
 
-                    // Set limits if applied
-                    if (!empty($limit)) {
-                        $q->setFirstResult($start)
-                            ->setMaxResults($limit);
-                    }
+                if (!empty($dynamicLeads)) {
+                    $expr->add(
+                        $q->expr()->notIn('ll.lead_id', $dynamicLeads)
+                    );
                 }
 
                 if ($filterOutIds) {
