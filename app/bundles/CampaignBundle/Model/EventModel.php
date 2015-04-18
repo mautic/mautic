@@ -14,6 +14,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class EventModel
@@ -357,9 +358,11 @@ class EventModel extends CommonFormModel
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerStartingEvents($campaign = null)
+    public function triggerStartingEvents($campaign, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
+        $campaignId = $campaign->getId();
 
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering starting events');
@@ -372,86 +375,138 @@ class EventModel extends CommonFormModel
 
         $repo = $this->getRepository();
 
-        $events        = $repo->getRootLevelActions($campaign);
-        $eventSettings = $campaignModel->getEvents();
+        $events = $repo->getRootLevelActions($campaignId);
 
         if (empty($events)) {
             $logger->debug('CAMPAIGN: No events to trigger');
+
+            return 0;
         }
 
-        foreach ($events as $event) {
-            // Get lead entities for the event listeners
-            if (empty($event['campaign']['leads'])) {
-                continue;
-            }
+        // Event settings
+        $eventSettings = $campaignModel->getEvents();
 
-            $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
+        // Get a list of leads who have already had the events executed
+        // (going to assume if one event of this level has fired for the event, all were fired)
+        $ignoreLeads = $repo->getEventLogLeads(array_keys($events));
 
-            $leadIds = $leadDateAdded = array();
-            foreach ($event['campaign']['leads'] as $l) {
-                $leadIds[]                    = $l['lead_id'];
-                $leadDateAdded[$l['lead_id']] = $l['dateAdded'];
-            }
+        // Get list of all campaign leads
+        $campaignLeads = $this->em->getRepository('MauticCampaignBundle:Campaign')->getCampaignLeadIds($campaignId, $ignoreLeads);
+        if (empty($campaignLeads)) {
+            $logger->debug('CAMPAIGN: No leads to process');
 
+            unset($events);
+
+            return 0;
+        }
+
+        $leadCount = count($campaignLeads);
+
+        $output->writeln(
+            $this->translator->trans(
+                'mautic.campaign.trigger.lead_count',
+                array('%leads%' => $leadCount, '%batch%' => $limit)
+            )
+        );
+
+        $eventCount = 0;
+
+        while ($eventCount < $leadCount) {
             $leads = $leadModel->getEntities(
                 array(
-                    'filter' => array(
+                    'filter'     => array(
                         'force' => array(
                             array(
                                 'column' => 'l.id',
                                 'expr'   => 'in',
-                                'value'  => $leadIds
+                                'value'  => $campaignLeads
                             )
                         )
-                    )
+                    ),
+                    'orderBy'    => 'l.id',
+                    'orderByDir' => 'asc',
+                    'limit'      => $limit
                 )
             );
 
-            if (empty($leads)) {
-                $logger->debug('CAMPAIGN: No lead entities were found; ' . implode(', ', $leadIds));
-            }
+            // Remove retrieved ids from $campaignLeads for next batch
+            $campaignLeads = array_slice($campaignLeads, $limit);
 
-            foreach ($leads as $lead) {
-                $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
+            foreach ($events as $event) {
+                // Set campaign ID
+                $event['campaign'] = array('id' => $campaignId);
 
-                // Set lead in case this is triggered by the system
-                $leadModel->setSystemCurrentLead($lead);
+                // Keep CPU down
+                sleep(2);
 
-                $timing = $this->checkEventTiming($event, $leadDateAdded[$lead->getId()]);
-                if ($timing instanceof \DateTime) {
-                    //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-                    $logger->debug(
-                        'CAMPAIGN: ID# '.$event['id'].' timing is not appropriate and thus scheduled for '.$timing->format('Y-m-d H:m:i T').''
-                    );
+                $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
 
-                    $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, null, true);
-                    $log->setLead($lead);
-                    $log->setIsScheduled(true);
-                    $log->setTriggerDate($timing);
+                foreach ($leads as $lead) {
 
-                    $repo->saveEntity($log);
-                } elseif ($timing) {
-                    // Save log first to prevent subsequent triggers from duplicating
-                    $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, null, true);
-                    $log->setDateTriggered(new \DateTime());
-                    $repo->saveEntity($log);
+                    $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
 
-                    if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
-                        // Something failed so remove the log
-                        $repo->deleteEntity($log);
+                    // Set lead in case this is triggered by the system
+                    $leadModel->setSystemCurrentLead($lead);
 
-                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
+                    $timing = $this->checkEventTiming($event, new \DateTime());
+                    if ($timing instanceof \DateTime) {
+                        //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+                        $logger->debug(
+                            'CAMPAIGN: ID# '.$event['id'].' timing is not appropriate and thus scheduled for '.$timing->format('Y-m-d H:m:i T').''
+                        );
+
+                        $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
+                        $log->setLead($lead);
+                        $log->setIsScheduled(true);
+                        $log->setTriggerDate($timing);
+
+                        $repo->saveEntity($log);
+                    } elseif ($timing) {
+                        // Save log first to prevent subsequent triggers from duplicating
+                        $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
+                        $log->setDateTriggered(new \DateTime());
+                        $repo->saveEntity($log);
+
+                        if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
+                            // Something failed so remove the log
+                            $repo->deleteEntity($log);
+
+                            $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
+                        } else {
+                            $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+                        }
+
                     } else {
-                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+                        //else do nothing
+
+                        $logger->debug('CAMPAIGN: Timing failed ('.gettype($timing).')');
                     }
 
-                } else {
-                    //else do nothing
+                    if (!empty($log)) {
+                        // Detach log
+                        $this->em->detach($log);
 
-                    $logger->debug('CAMPAIGN: Timing failed ('.gettype($timing).')');
+                        $eventCount++;
+                    }
+
+                    if ($max && $eventCount >= $max) {
+                        // Hit the max, bye bye
+
+                        return $eventCount;
+                    }
                 }
             }
+
+            // Keep CPU down and give small amount of time for events to finish persisting
+            // before detaching all the entities
+            sleep(2);
+
+            $this->em->clear('MauticLeadBundle:Lead');
+
+            unset($leads);
         }
+
+        return $eventCount;
     }
 
     /**

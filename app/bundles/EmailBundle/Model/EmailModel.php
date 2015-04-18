@@ -788,6 +788,7 @@ class EmailModel extends FormModel
         //start at the beginning for this batch
         $useEmail     = reset($emailSettings);
         $saveEntities = array();
+
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
 
@@ -855,6 +856,8 @@ class EmailModel extends FormModel
             $stat->setTokens($tokens);
             $saveEntities[] = $stat;
 
+            unset($stat);
+
             //increase the sent counts
             $useEmail['entity']->upSentCounts();
 
@@ -866,12 +869,19 @@ class EmailModel extends FormModel
                 $useEmail   = next($emailSettings);
             }
         }
-        unset($sent, $sendTo);
 
         if ($returnEntities) {
+
             return $saveEntities;
         } else {
-            $this->saveEntities($saveEntities);
+            $this->getRepository()->saveEntities($saveEntities);
+
+            foreach ($saveEntities as $stat) {
+                // Save RAM
+                $this->em->detach($stat);
+            }
+
+            unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sent, $sendTo);
 
             return true;
         }

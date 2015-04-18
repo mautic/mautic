@@ -37,7 +37,7 @@ class Lead extends FormEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User", cascade={"detach"})
+     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -54,7 +54,7 @@ class Lead extends FormEntity
     private $points = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="PointsChangeLog", mappedBy="lead", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="PointsChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
     private $pointsChangeLog;

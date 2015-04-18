@@ -436,4 +436,41 @@ class CampaignRepository extends CommonRepository
         return $leads;
     }
 
+    /**
+     * Get lead IDs of a campaign
+     *
+     * @param $campaignId
+     */
+    public function getCampaignLeadIds($campaignId, $ignoreLeads = array())
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('cl.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if (!empty($ignoreLeads)) {
+            $q->andWhere(
+                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $leads = array();
+        foreach ($results as $r) {
+            $leads[] = $r['lead_id'];
+        }
+
+        unset($results);
+
+        return $leads;
+    }
 }

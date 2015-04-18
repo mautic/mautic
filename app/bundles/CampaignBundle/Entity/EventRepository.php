@@ -113,78 +113,58 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get the top level actions for a campaign and lead
+     * Get the top level actions for a campaign
      *
-     * @param $campaign
+     * @param $id
      *
      * @return array
      */
-    public function getRootLevelActions($campaign = null, $lead = null)
+    public function getRootLevelActions($id)
     {
-        $leadId = ($lead instanceof RealLead) ? $lead->getId() : (int) $lead;
+        $q = $this->_em->createQueryBuilder();
 
-        $q = $this->createQueryBuilder('e');
-
-        if ($leadId) {
-            $q->select('c, e');
-        } else {
-            $q->select('c, e, l');
-        }
-
-        $q->join('e.campaign', 'c')
-            ->leftJoin('c.leads', 'l')
-            ->leftJoin('l.lead', 'cl');
-
-        //make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q, 'c');
-        $expr->addMultiple(array(
-            $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
-            $q->expr()->isNull('e.parent'),
-        ));
-
-        if ($campaign !== null) {
-            $expr->add(
-                $q->expr()->eq('c.id', ':campaign')
+        $q->select('e')
+            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
+                    $q->expr()->isNull('e.parent')
+                )
             );
-
-            $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
-
-            $q->setParameter('campaign', (int) $campaignId);
-        }
-
-        if ($leadId) {
-            $expr->add(
-                $q->expr()->eq('cl.id', $leadId)
-            );
-        }
-
-        $q->where($expr);
-
-        // Only events that have not been fired yet
-        $dq2 = $this->_em->createQueryBuilder();
-        if ($leadId) {
-            $dq2->select('log_event.id');
-        } else {
-            $dq2->select('log_lead.id');
-        }
-
-        $dq2->from('MauticCampaignBundle:LeadEventLog', 'log')
-            ->leftJoin('log.event', 'log_event')
-            ->leftJoin('log.lead', 'log_lead')
-            ->where('log_event.id = e.id')
-            ->andWhere('IDENTITY(log.lead) = cl.id');
-
-        if ($leadId) {
-            // Only applicable ['campaign']['leads'] and thus applicable events
-            $q->andWhere('e.id NOT IN('.$dq2->getDQL().')');
-        } else {
-            // Only applicable ['campaign']['leads'] and thus applicable events
-            $q->andWhere('cl.id NOT IN('.$dq2->getDQL().')');
-        }
 
         $results = $q->getQuery()->getArrayResult();
 
         return $results;
+    }
+
+    /**
+     * Gets ids of leads who have already triggered the event
+     *
+     * @param $events
+     *
+     * @return array
+     */
+    public function getEventLogLeads($events)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('distinct(e.lead_id)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+            ->where(
+                $q->expr()->in('e.event_id', $events)
+            )
+            ->setParameter('false', false, 'boolean');
+
+        $results = $q->execute()->fetchAll();
+
+        $log = array();
+        foreach ($results as $r) {
+            $log[] = $r['lead_id'];
+        }
+
+        unset($results);
+
+        return $log;
     }
 
     /**
@@ -278,31 +258,6 @@ class EventRepository extends CommonRepository
         $return = array();
         foreach ($results as $r) {
             $return[$r['id']] = $r;
-        }
-
-        return $return;
-    }
-
-    /**
-     * Get a list of lead IDs for a specific event
-     *
-     * @param $type
-     * @param $eventId
-     *
-     * @return array
-     */
-    public function getLeadsForEvent($eventId)
-    {
-        $results = $this->_em->getConnection()->createQueryBuilder()
-            ->select('e.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-            ->where('e.event_id = ' . (int) $eventId)
-            ->execute()
-            ->fetchAll();
-
-        $return = array();
-        foreach ($results as $r) {
-            $return[] = $r['lead_id'];
         }
 
         return $return;
