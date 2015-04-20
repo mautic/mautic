@@ -42,7 +42,7 @@ class LeadController extends FormController
             'lead:leads:deleteother'
         ), "RETURN_ARRAY");
 
-        if (!$permissions['lead:leads:viewown'] || !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 
