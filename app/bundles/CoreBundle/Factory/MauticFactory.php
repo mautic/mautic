@@ -554,11 +554,19 @@ class MauticFactory
 
         foreach ($ipHolders as $key) {
             if ($request->server->get($key)) {
-                return $request->server->get($key);
+                $ip = $request->server->get($key);
+
+                if (strpos($ip, ',') !== false) {
+                    // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
+                    $ips = explode(',', $ip);
+                    $ip  = end($ips);
+                }
+
+                return trim($ip);
             }
         }
 
-        // if everything else failes
+        // if everything else fails
         return '127.0.0.1';
     }
 
