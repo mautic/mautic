@@ -454,13 +454,9 @@ abstract class AbstractIntegration
     public function makeRequest ($url, $parameters = array(), $method = 'GET', $settings = array())
     {
         $method          = strtoupper($method);
-        $headers         = array();
         $authType        = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
-        $clientIdKey     = $this->getClientIdKey();
-        $clientSecretKey = $this->getClientSecretKey();
-        $authTokenKey    = $this->getAuthTokenKey();
-        $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
-        $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
+
+        list($parameters, $headers) = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
 
         if (!isset($settings['query'])) {
             $settings['query'] = array();
@@ -468,80 +464,6 @@ abstract class AbstractIntegration
 
         if (!$this->isConfigured()) {
             return array('error' => array('message' => $this->factory->getTranslator()->trans('mautic.integration.missingkeys')));
-        }
-
-        if (!empty($settings['authorize_session'])) {
-            switch ($authType) {
-                case 'oauth1a':
-                    $requestTokenUrl = $this->getRequestTokenUrl();
-                    if (!array_key_exists('append_callback', $settings) && !empty($requestTokenUrl)) {
-                        $settings['append_callback'] = false;
-                    }
-                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
-                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
-                    break;
-                case 'oauth2':
-                    if ($bearerToken = $this->getBearerToken(true)) {
-                        $headers                  = array(
-                            "Authorization: Basic {$bearerToken}",
-                            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-                        );
-                        $parameters['grant_type'] = 'client_credentials';
-                    } else {
-                        $defaultGrantType   = (!empty($settings['refresh_token'])) ? 'refresh_token' : 'authorization_code';
-                        $grantType          = (!isset($settings['grant_type'])) ? $defaultGrantType : $settings['grant_type'];
-
-                        $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
-                        $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey : $settings[$clientSecretKey];
-                        $parameters         = array_merge($parameters, array(
-                            $useClientIdKey     => $this->keys[$clientIdKey],
-                            $useClientSecretKey => $this->keys[$clientSecretKey],
-                            'grant_type'        => $grantType
-                        ));
-
-                        if (!empty($settings['refresh_token']) && !empty($this->keys[$settings['refresh_token']])) {
-                            $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
-                        }
-
-                        if ($grantType == 'authorization_code') {
-                            $parameters['code'] = $this->factory->getRequest()->get('code');
-                        }
-                        if (empty($settings['ignore_redirecturi'])) {
-                            $callback                   = $this->getAuthCallbackUrl();
-                            $parameters['redirect_uri'] = $callback;
-                        }
-                    }
-                    break;
-            }
-        } else {
-            switch ($authType) {
-                case 'oauth1a':
-                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
-                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
-                    break;
-                case 'oauth2':
-                    if ($bearerToken = $this->getBearerToken()) {
-                        $headers = array(
-                            "Authorization: Bearer {$bearerToken}",
-                            //"Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-                        );
-                    } else {
-                        if (!empty($settings['append_auth_token'])) {
-                            $settings['query'][$authTokenKey] = $authToken;
-                        } else {
-                            $parameters[$authTokenKey] = $authToken;
-                        }
-
-                        $headers                   = array(
-                            "oauth-token: $authTokenKey",
-                            "Authorization: OAuth {$authToken}",
-                        );
-                    }
-                    break;
-                case 'key':
-                    $parameters[$authTokenKey] = $authToken;
-                    break;
-            }
         }
 
         if ($method == 'GET' && !empty($parameters)) {
@@ -631,6 +553,98 @@ abstract class AbstractIntegration
 
             return $response;
         }
+    }
+
+    /*
+     * Method to prepare the request parameters. Builds array of headers and parameters
+     *
+     * @return array
+     */
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    {
+        $clientIdKey     = $this->getClientIdKey();
+        $clientSecretKey = $this->getClientSecretKey();
+        $authTokenKey    = $this->getAuthTokenKey();
+        $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
+        $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
+
+        $headers = array();
+
+        if (!empty($settings['authorize_session'])) {
+            switch ($authType) {
+                case 'oauth1a':
+                    $requestTokenUrl = $this->getRequestTokenUrl();
+                    if (!array_key_exists('append_callback', $settings) && !empty($requestTokenUrl)) {
+                        $settings['append_callback'] = false;
+                    }
+                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
+                    break;
+                case 'oauth2':
+                    if ($bearerToken = $this->getBearerToken(true)) {
+                        $headers                  = array(
+                            "Authorization: Basic {$bearerToken}",
+                            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
+                        );
+                        $parameters['grant_type'] = 'client_credentials';
+                    } else {
+                        $defaultGrantType   = (!empty($settings['refresh_token'])) ? 'refresh_token' : 'authorization_code';
+                        $grantType          = (!isset($settings['grant_type'])) ? $defaultGrantType : $settings['grant_type'];
+
+                        $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
+                        $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey : $settings[$clientSecretKey];
+                        $parameters         = array_merge($parameters, array(
+                                $useClientIdKey     => $this->keys[$clientIdKey],
+                                $useClientSecretKey => $this->keys[$clientSecretKey],
+                                'grant_type'        => $grantType
+                            ));
+
+                        if (!empty($settings['refresh_token']) && !empty($this->keys[$settings['refresh_token']])) {
+                            $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
+                        }
+
+                        if ($grantType == 'authorization_code') {
+                            $parameters['code'] = $this->factory->getRequest()->get('code');
+                        }
+                        if (empty($settings['ignore_redirecturi'])) {
+                            $callback                   = $this->getAuthCallbackUrl();
+                            $parameters['redirect_uri'] = $callback;
+                        }
+                    }
+                    break;
+            }
+        } else {
+            switch ($authType) {
+                case 'oauth1a':
+                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
+                    break;
+                case 'oauth2':
+                    if ($bearerToken = $this->getBearerToken()) {
+                        $headers = array(
+                            "Authorization: Bearer {$bearerToken}",
+                            //"Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
+                        );
+                    } else {
+                        if (!empty($settings['append_auth_token'])) {
+                            $settings['query'][$authTokenKey] = $authToken;
+                        } else {
+                            $parameters[$authTokenKey] = $authToken;
+                        }
+
+                        $headers                   = array(
+                            "oauth-token: $authTokenKey",
+                            "Authorization: OAuth {$authToken}",
+                        );
+                    }
+                    break;
+                case 'key':
+                    $parameters[$authTokenKey] = $authToken;
+                    break;
+            }
+        }
+
+        return array($parameters, $headers);
     }
 
     /**
