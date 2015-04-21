@@ -437,11 +437,45 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Get a count of leads that belong to the campaign
+     *
+     * @param       $campaignId
+     * @param array $ignoreLeads
+     *
+     * @return mixed
+     */
+    public function getCampaignLeadCount($campaignId, $ignoreLeads = array())
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(cl.lead_id) as lead_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if (!empty($ignoreLeads)) {
+            $q->andWhere(
+                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results[0]['lead_count'];
+    }
+
+    /**
      * Get lead IDs of a campaign
      *
      * @param $campaignId
      */
-    public function getCampaignLeadIds($campaignId, $ignoreLeads = array())
+    public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $ignoreLeads = array())
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -460,6 +494,11 @@ class CampaignRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->notIn('cl.lead_id', $ignoreLeads)
             );
+        }
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();

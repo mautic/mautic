@@ -416,9 +416,9 @@ class LeadRepository extends CommonRepository
             $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
 
             //ORM - generates lead entities
-            $q = $this
-                ->createQueryBuilder('l');
+            $q = $this->_em->createQueryBuilder();
             $q->select('l, u, i,' . $order)
+                ->from('MauticLeadBundle:Lead', 'l', 'l.id')
                 ->leftJoin('l.ipAddresses', 'i')
                 ->leftJoin('l.owner', 'u');
 

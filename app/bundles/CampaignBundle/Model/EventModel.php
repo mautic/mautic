@@ -35,6 +35,16 @@ class EventModel extends CommonFormModel
     }
 
     /**
+     * Get CampaignRepository
+     *
+     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
+     */
+    public function getCampaignRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:Campaign');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -373,7 +383,8 @@ class EventModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
-        $repo = $this->getRepository();
+        $repo         = $this->getRepository();
+        $campaignRepo = $this->getCampaignRepository();
 
         $events = $repo->getRootLevelActions($campaignId);
 
@@ -390,17 +401,16 @@ class EventModel extends CommonFormModel
         // (going to assume if one event of this level has fired for the event, all were fired)
         $ignoreLeads = $repo->getEventLogLeads(array_keys($events));
 
-        // Get list of all campaign leads
-        $campaignLeads = $this->em->getRepository('MauticCampaignBundle:Campaign')->getCampaignLeadIds($campaignId, $ignoreLeads);
-        if (empty($campaignLeads)) {
+        // Get a lead count
+        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $ignoreLeads);
+
+        if (empty($leadCount)) {
             $logger->debug('CAMPAIGN: No leads to process');
 
             unset($events);
 
             return 0;
         }
-
-        $leadCount = count($campaignLeads);
 
         $output->writeln(
             $this->translator->trans(
@@ -411,7 +421,11 @@ class EventModel extends CommonFormModel
 
         $eventCount = 0;
 
+        $start = 0;
         while ($eventCount < $leadCount) {
+            // Get list of all campaign leads
+            $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
+
             $leads = $leadModel->getEntities(
                 array(
                     'filter'     => array(
@@ -424,13 +438,9 @@ class EventModel extends CommonFormModel
                         )
                     ),
                     'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc',
-                    'limit'      => $limit
+                    'orderByDir' => 'asc'
                 )
             );
-
-            // Remove retrieved ids from $campaignLeads for next batch
-            $campaignLeads = array_slice($campaignLeads, $limit);
 
             foreach ($events as $event) {
                 // Set campaign ID
@@ -467,6 +477,13 @@ class EventModel extends CommonFormModel
                         $log->setDateTriggered(new \DateTime());
                         $repo->saveEntity($log);
 
+                        if (!isset($eventSettings['action'][$event['type']])) {
+                            unset($event);
+                            $eventCount++;
+
+                            continue;
+                        }
+
                         if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
                             // Something failed so remove the log
                             $repo->deleteEntity($log);
@@ -497,13 +514,15 @@ class EventModel extends CommonFormModel
                 }
             }
 
+            $start += $limit;
+
             // Keep CPU down and give small amount of time for events to finish persisting
             // before detaching all the entities
             sleep(2);
 
             $this->em->clear('MauticLeadBundle:Lead');
 
-            unset($leads);
+            unset($leads, $campaignLeads);
         }
 
         return $eventCount;
@@ -512,64 +531,154 @@ class EventModel extends CommonFormModel
     /**
      * Trigger events that are scheduled
      *
-     * @param mixed $campaignId
+     * @param                 $campaign
+     * @param int             $limit
+     * @param bool            $max
+     * @param OutputInterface $output
+     *
+     * @return int
      */
-    public function triggerScheduledEvents($campaignId = null)
+    public function triggerScheduledEvents($campaign, $eventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
+        $campaignId = $campaign->getId();
 
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering scheduled events');
 
-        $repo            = $this->getRepository();
-        $events          = $repo->getPublishedScheduled($campaignId);
-        $campaignModel   = $this->factory->getModel('campaign');
-        $leadModel       = $this->factory->getModel('lead');
-        $availableEvents = $campaignModel->getEvents();
-        $persist         = array();
-        $leadEntityCache = array();
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel = $this->factory->getModel('campaign');
 
-        if (empty($events)) {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
+        $repo = $this->getRepository();
+
+        // Get a count
+        $leadCount = $repo->getScheduledEvents($campaignId, true);
+
+        $output->writeln(
+            $this->translator->trans(
+                'mautic.campaign.trigger.lead_count',
+                array('%leads%' => $leadCount, '%batch%' => $limit)
+            )
+        );
+
+        if (empty($leadCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
+
+            return 0;
         }
 
-        foreach ($events as $e) {
-            /** @var \Mautic\CampaignBundle\Entity\Event $event */
-            $event     = $e['event'];
-            $eventType = $event['eventType'];
-            $type      = $event['type'];
-            if (!isset($availableEvents[$eventType][$type])) {
-                continue;
+        // Get events to avoid joins
+        $campaignEvents = $repo->getCampaignActionEvents($campaignId);
+
+        // Event settings
+        $eventSettings = $campaignModel->getEvents();
+
+        while ($eventCount < $leadCount) {
+            // Get a count
+            $events = $repo->getScheduledEvents($campaignId, false, $limit);
+
+            if (empty($events)) {
+                unset($campaignEvents, $event, $leads, $eventSettings);
+
+                return $eventCount;
             }
 
-            $settings = $availableEvents[$eventType][$type];
+            $leads  = $leadModel->getEntities(
+                array(
+                    'filter'     => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => array_keys($events)
+                            )
+                        )
+                    ),
+                    'orderBy'    => 'l.id',
+                    'orderByDir' => 'asc'
+                )
+            );
 
-            if (empty($leadEntityCache[$e['lead']['id']])) {
-                $leadEntityCache[$e['lead']['id']] = $leadModel->getEntity($e['lead']['id']);
+            foreach ($events as $leadId => $leadEvents) {
+                if (!isset($leads[$leadId])) {
+                    continue;
+                }
+
+                $lead = $leads[$leadId];
+
+                $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
+
+                // Set lead in case this is triggered by the system
+                $leadModel->setSystemCurrentLead($lead);
+
+                $persist = array();
+
+                foreach ($leadEvents as $log) {
+                    // Keep CPU down
+                    sleep(1);
+
+                    $event = $campaignEvents[$log['event_id']];
+
+                    // Set campaign ID
+                    $event['campaign'] = array('id' => $campaignId);
+
+                    if (!isset($eventSettings['action'][$event['type']])) {
+                        unset($event);
+                        $eventCount++;
+
+                        continue;
+                    }
+
+                    //trigger the action
+                    if ($this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
+                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+
+                        $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
+                        $e->setTriggerDate(null);
+                        $e->setIsScheduled(false);
+                        $e->setDateTriggered(new \DateTime());
+                        $persist[] = $e;
+                    } else {
+                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
+                    }
+
+                    $eventCount++;
+
+                    if ($max && $eventCount >= $max) {
+                        // Persist then detach
+                        if (!empty($persist)) {
+                            $repo->saveEntities($persist);
+                        }
+
+                        unset($campaignEvents, $event, $leads, $eventSettings);
+
+                        // Hit the max, bye bye
+                        return $eventCount;
+                    }
+                }
+
+                // Persist then detach
+                if (!empty($persist)) {
+                    $repo->saveEntities($persist);
+
+                    // Free RAM
+                    $this->em->clear('MauticCampaignBundle:LeadEventLog');
+                }
+
+                unset($persist);
             }
 
-            $logger->debug('CAMPAIGN: Current Lead ID: '.$e['lead']['id']);
+            // Free RAM
+            $this->em->clear('MauticLeadBundle:Lead');
 
-            // Set the system lead for events that may fire as a result of firing this one
-            $leadModel->setSystemCurrentLead($leadEntityCache[$e['lead']['id']]);
-
-            //trigger the action
-            if ($this->invokeEventCallback($event, $settings, $leadEntityCache[$e['lead']['id']], null, true)) {
-                $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
-
-                $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $e['lead']['id'], 'event' => $event['id']));
-                $e->setTriggerDate(null);
-                $e->setIsScheduled(false);
-                $e->setDateTriggered(new \DateTime());
-                $persist[] = $e;
-            } else {
-                $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
-            }
+            unset($events, $leads);
         }
 
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-        }
+        return $eventCount;
     }
 
     /**
@@ -577,37 +686,94 @@ class EventModel extends CommonFormModel
      *
      * @param null $campaignId
      */
-    public function triggerNegativeEvents($campaignId = null)
+    public function triggerNegativeEvents($campaign, $eventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-
-        //get a list of pending events
-        $events = $this->getRepository()->getNegativePendingEvents($campaignId);
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $this->factory->getModel('campaign');
-        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-        $eventModel = $this->factory->getModel('campaign.event');
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-        $eventRepo = $eventModel->getRepository();
 
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering negative events');
 
-        if (empty($events)) {
-            $logger->debug('CAMPAIGN: No events to trigger');
+        $campaignId = $campaign->getId();
+
+        $repo         = $this->getRepository();
+        $campaignRepo = $this->getCampaignRepository();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
+        // Get events to avoid large number of joins
+        $campaignEvents = $repo->getCampaignEvents($campaignId);
+
+        // Get an array of events that are non-action based
+        $nonActionEvents = array();
+        foreach($campaignEvents as $id => $e) {
+            if ($e['decisionPath'] == 'no') {
+                $nonActionEvents[$id] = $e;
+            }
         }
 
-        //get settings for events
-        $availableEvents = $campaignModel->getEvents();
+        if (empty($nonActionEvents)) {
+            // No non-action events associated with this campaign
+            unset($campaignEvents);
 
-        //used to cache stuff to prevent duplicate db calls
-        $leadsEventCache = array();
-        $leadEntityCache = array();
+            return 0;
+        }
 
-        //persist all entities at once
-        $persist = array();
+        // Get a count
+        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId);
 
+        $output->writeln(
+            $this->translator->trans(
+                'mautic.campaign.trigger.lead_count',
+                array('%leads%' => $leadCount, '%batch%' => $limit)
+            )
+        );
+
+        $start = 0;
+        while ($start <= $leadCount) {
+            // Get batched campaign ids
+            $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit);
+
+            $leads = $leadModel->getEntities(
+                array(
+                    'filter'     => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => $campaignLeads
+                            )
+                        )
+                    ),
+                    'orderBy'    => 'l.id',
+                    'orderByDir' => 'asc'
+                )
+            );
+            // Get the lead log for this batch of leads
+            $leadLog = $repo->getEventLog($campaignLeads, $campaignEvents);
+
+            // Loop over the non-actions and determine if it has been processed for this lead
+            foreach ($leads as $l) {
+                // Keep CPU down
+                sleep(2);
+
+                foreach ($nonActionEvents as $e) {
+                    // Check to see if this lead has already gone down this path
+
+                }
+
+                $this->em->detach($l);
+                unset($l);
+            }
+
+            $start += $limit;
+
+            $this->em->clear('MauticLeadBundle:Lead');
+
+            unset($leads, $campaignLeads, $leadLog);
+        }
+
+        /*
         foreach ($events as $event) {
             $settings = $availableEvents[$event['eventType']][$event['type']];
 
@@ -683,6 +849,7 @@ class EventModel extends CommonFormModel
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
         }
+        */
     }
 
     /**

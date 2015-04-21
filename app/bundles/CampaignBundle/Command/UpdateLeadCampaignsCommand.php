@@ -26,9 +26,9 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
                 'mautic:campaigns:rebuild',
             ))
             ->setDescription('Rebuild campaigns based on lead lists.')
-            ->addOption('--batch-limit', null, InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
-            ->addOption('--max-leads', null, InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per campaign for this script execution. Defaults to all.', false)
-            ->addOption('--campaign-id', null, InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
+            ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per campaign for this script execution. Defaults to all.', false)
+            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -36,6 +36,7 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
         $container  = $this->getContainer();
         $factory    = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
+        $em         = $factory->getEntityManager();
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $factory->getModel('campaign');
@@ -61,11 +62,16 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
             );
 
             while (($c = $campaigns->next()) !== false) {
-                $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $c[0]->getId())) . '</info>');
+                if ($c[0]->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $c[0]->getId())).'</info>');
 
-                $processed = $campaignModel->rebuildCampaignLeads($c[0], $batch, $max, $output);
-                $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>' . "\n");
+                    $processed = $campaignModel->rebuildCampaignLeads($c[0], $batch, $max, $output);
+                    $output->writeln(
+                        '<info>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</info>'."\n"
+                    );
+                }
 
+                $em->detach($c[0]);
                 unset($c);
             }
 

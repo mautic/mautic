@@ -82,6 +82,8 @@ class CampaignEventHelper
             }
         }
 
+        unset($lead, $leadCredentials, $email, $emailModel, $factory);
+
         return $emailSent;
     }
 }
