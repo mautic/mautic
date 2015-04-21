@@ -66,6 +66,7 @@ class oAuthHelper
         //Add the parameters
         $headers                    = array_merge($headers, $parameters);
         $base_info                  = $this->buildBaseString($url, $method, $headers);
+
         $composite_key              = $this->getCompositeKey();
         $headers['oauth_signature'] = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
 
@@ -102,11 +103,15 @@ class oAuthHelper
             'oauth_timestamp'        => time(),
             'oauth_version'          => '1.0'
         );
-        if (isset($this->accessToken)) {
+
+        if (empty($this->settings['authorize_session']) && !empty($this->accessToken))  {
             $oauth['oauth_token'] = $this->accessToken;
+        } elseif (!empty($this->settings['request_token'])) {
+            // OAuth1.a access_token request that requires the retrieved request_token to be appended
+            $oauth['oauth_token'] = $this->settings['request_token'];
         }
 
-        if (!empty($this->callback)) {
+        if (!empty($this->settings['append_callback']) && !empty($this->callback)) {
             $oauth['oauth_callback'] = $this->callback;
         }
 
@@ -169,7 +174,7 @@ class oAuthHelper
                     $k = $key;
                 }
                 if ($encode) {
-                    $normalized[] = $this->encode($k) . '=' . $this->encode($v);
+                    $normalized[] = $this->encode($k) . '="' . $this->encode($v).'"';
                 } else {
                     $normalized[] = $k . '=' . $v;
                 }

@@ -336,6 +336,8 @@ abstract class AbstractIntegration
         switch ($this->getAuthenticationType()) {
             case 'oauth2':
                 return 'access_token';
+            case 'oauth1a':
+                return 'oauth_token';
             default:
                 return '';
         }
@@ -471,6 +473,10 @@ abstract class AbstractIntegration
         if (!empty($settings['authorize_session'])) {
             switch ($authType) {
                 case 'oauth1a':
+                    $requestTokenUrl = $this->getRequestTokenUrl();
+                    if (!array_key_exists('append_callback', $settings) && !empty($requestTokenUrl)) {
+                        $settings['append_callback'] = false;
+                    }
                     $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
                     break;
@@ -547,6 +553,12 @@ abstract class AbstractIntegration
             $url .= (strpos($url, '?') === false) ? '?' . $query : '&' . $query;
         }
 
+        // Check for custom content-type header
+        if (!empty($settings['content_type'])) {
+            $settings['encoding_headers_set'] = true;
+            $headers[] = "Content-type: {$settings['content_type']}";
+        }
+
         $ch = curl_init();
 
         if ($method == 'POST') {
@@ -597,7 +609,6 @@ abstract class AbstractIntegration
 
         $referer = $this->getRefererUrl();
         curl_setopt($ch, CURLOPT_REFERER, $referer);
-
         curl_setopt($ch, CURLOPT_URL, $url);
 
         $result    = curl_exec($ch);
@@ -697,24 +708,38 @@ abstract class AbstractIntegration
      */
     public function authCallback ($settings = array(), $parameters = array())
     {
-        $url    = $this->getAccessTokenUrl();
-        $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
+        $authType = $this->getAuthenticationType();
+
+        switch ($authType) {
+            case 'oauth2':
+                if (!empty($settings['use_refresh_token'])) {
+                    // Try refresh token
+                    $refreshTokenKeys = $this->getRefreshTokenKeys();
+                    if (!empty($refreshTokenKeys)) {
+                        list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
+
+                        $settings['refresh_token'] = $refreshTokenKey;
+                    }
+                }
+                break;
+
+            case 'oauth1a':
+                // After getting request_token and authorizing, post back to access_token
+                $settings['append_callback']  = true;
+                $settings['include_verifier'] = true;
+
+                // Get request token returned from Twitter and submit it to get access_token
+                $settings['request_token'] = $this->factory->getRequest()->get('oauth_token');
+                break;
+        }
 
         $settings['authorize_session'] = true;
 
-        if (!empty($settings['use_refresh_token'])) {
-            // Try refresh token
-            $refreshTokenKeys = $this->getRefreshTokenKeys();
-            if (!empty($refreshTokenKeys)) {
-                list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
-
-                $settings['refresh_token'] = $refreshTokenKey;
-            }
-        }
-
-        $data = $this->makeRequest($url, $parameters, $method, $settings);
+        $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
+        $data = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
 
         return $this->extractAuthKeys($data);
+
     }
 
     /**
@@ -851,6 +876,41 @@ abstract class AbstractIntegration
      * @return string
      */
     public function getAuthenticationUrl ()
+    {
+        return '';
+    }
+
+    /**
+     * Get request token for oauth1a authorization request
+     *
+     * @param array $settings
+     *
+     * @return mixed|string
+     */
+    public function getRequestToken($settings = array())
+    {
+        // Child classes can easily pass in custom settings this way
+        $settings = array_merge(array('authorize_session' => true, 'append_callback' => false, 'ssl_verifypeer' => false), $settings);
+
+        $url = $this->getRequestTokenUrl();
+        if (!empty($url)) {
+            $result = $this->makeRequest(
+                $url,
+                array(),
+                'POST',
+                $settings
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Url to post in order to get the request token if required; leave empty if not required
+     *
+     * @return string
+     */
+    public function getRequestTokenUrl()
     {
         return '';
     }

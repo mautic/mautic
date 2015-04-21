@@ -65,17 +65,27 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getAccessTokenUrl ()
     {
-        return 'https://api.twitter.com/oauth2/token';
+        return 'https://api.twitter.com/oauth/access_token';
+    }
+
+    public function getAuthLoginUrl()
+    {
+        $url = 'https://api.twitter.com/oauth/authorize';
+
+        // Get request token
+        $requestToken = $this->getRequestToken();
+
+        $url .= '?oauth_token=' . $requestToken['oauth_token'];
+
+        return $url;
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
-     *
      * @return string
      */
-    public function getAuthenticationUrl ()
+    public function getRequestTokenUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+        return 'https://api.twitter.com/oauth/request_token';
     }
 
     /**
@@ -83,7 +93,7 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getAuthenticationType ()
     {
-        return 'oauth2';
+        return 'oauth1a';
     }
 
     /**
@@ -284,6 +294,11 @@ class TwitterIntegration extends SocialIntegration
      */
     public function parseCallbackResponse ($data, $postAuthorization = false)
     {
+        if ($postAuthorization) {
+            parse_str($data, $parsed);
+
+            return $parsed;
+        }
         return json_decode($data, true);
     }
 }
