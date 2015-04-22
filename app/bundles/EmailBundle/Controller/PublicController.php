@@ -148,8 +148,8 @@ class PublicController extends CommonFormController
             $template = $formTemplate;
         }
         $theme  = $this->factory->getTheme($template);
-        if ($theme->getName() != $template) {
-            $template = $theme->getName();
+        if ($theme->getTheme() != $template) {
+            $template = $theme->getTheme();
         }
         $config = $theme->getConfig();
 
@@ -204,13 +204,13 @@ class PublicController extends CommonFormController
         }
 
         $theme  = $this->factory->getTheme($template);
-        if ($theme->getName() != $template) {
-            $template = $theme->getName();
+        if ($theme->getTheme() != $template) {
+            $template = $theme->getTheme();
         }
 
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
-        if (empty($theme) || $theme->getName() !== $template) {
+        if (empty($theme) || $theme->getTheme() !== $template) {
             $template = $this->factory->getParameter('theme');
         }
 
