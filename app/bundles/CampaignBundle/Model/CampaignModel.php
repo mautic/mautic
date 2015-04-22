@@ -624,33 +624,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Get event log for a campaign
-     *
-     * @param      $campaign
-     * @param null $event
-     * @param null $leads
-     *
-     * @return mixed
-     */
-    public function getEventLog ($campaign, $event = null, $leads = null)
-    {
-        $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
-        if (is_array($event)) {
-            $eventId = $event['id'];
-        } elseif ($event instanceof Event) {
-            $eventId = $event->getId();
-        } else {
-            $eventId = $event;
-        }
-
-        if ($leads instanceof PersistentCollection) {
-            $leads = array_keys($leads->toArray());
-        }
-
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->getCampaignLog($campaignId, $eventId, $leads);
-    }
-
-    /**
      * Get details of leads in a campaign
      *
      * @param      $campaign

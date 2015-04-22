@@ -698,6 +698,9 @@ class EventModel extends CommonFormModel
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
 
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel = $this->factory->getModel('campaign');
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
@@ -708,7 +711,7 @@ class EventModel extends CommonFormModel
         $nonActionEvents = array();
         foreach($campaignEvents as $id => $e) {
             if ($e['decisionPath'] == 'no') {
-                $nonActionEvents[$id] = $e;
+                $nonActionEvents[$e['parent_id']][$id] = $e;
             }
         }
 
@@ -730,126 +733,188 @@ class EventModel extends CommonFormModel
         );
 
         $start = 0;
+
+        $eventSettings = $campaignModel->getEvents();
+
         while ($start <= $leadCount) {
             // Get batched campaign ids
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit);
 
-            $leads = $leadModel->getEntities(
-                array(
-                    'filter'     => array(
-                        'force' => array(
-                            array(
-                                'column' => 'l.id',
-                                'expr'   => 'in',
-                                'value'  => $campaignLeads
-                            )
-                        )
-                    ),
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc'
-                )
-            );
-            // Get the lead log for this batch of leads
-            $leadLog = $repo->getEventLog($campaignLeads, $campaignEvents);
+            foreach ($nonActionEvents as $parentId => $events) {
+                // Just a check to ensure this is an appropriate action
+                if ($campaignEvents[$parentId]['eventType'] != 'decision') {
+                    $logger->debug('CAMPAIGN: Parent event ID #' . $parentId . ' is not a decision.');
 
-            // Loop over the non-actions and determine if it has been processed for this lead
-            foreach ($leads as $l) {
-                // Keep CPU down
-                sleep(2);
-
-                foreach ($nonActionEvents as $e) {
-                    // Check to see if this lead has already gone down this path
-
+                    continue;
                 }
 
+                // Get only leads who have had the action prior to the decision executed
+                $grandParentId = $campaignEvents[$parentId]['parent_id'];
+
+                // Get the lead log for this batch of leads limiting to those that have already triggered
+                // the decision's parent and haven't executed this level in the path yet
+                $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
+
+                $applicableLeads = array_keys($leadLog);
+                if (empty($applicableLeads)) {
+                    $logger->debug('CAMPAIGN: No events are applicable');
+
+                    continue;
+                }
+
+                // Get the leads
+                $leads = $leadModel->getEntities(
+                    array(
+                        'filter'     => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $applicableLeads
+                                )
+                            )
+                        ),
+                        'orderBy'    => 'l.id',
+                        'orderByDir' => 'asc'
+                    )
+                );
+
+                $pauseBatchCount = 0;
+                $pauseBatch      = 5;
+
+                // Loop over the non-actions and determine if it has been processed for this lead
+                foreach ($leads as $l) {
+
+                    // Set lead for listeners
+                    $leadModel->setSystemCurrentLead($l);
+
+                    $logger->debug('CAMPAIGN: Lead ID #' . $l->getId());
+
+                        // Prevent path if lead has already gone down this path
+                    if (!array_key_exists($parentId, $leadLog[$l->getId()])) {
+                        if ($pauseBatchCount == $pauseBatch) {
+                            // Keep CPU down
+                            sleep(2);
+                            $pauseBatchCount = 0;
+                        } else {
+                            $pauseBatchCount++;
+                        }
+
+                        // Get date to compare against
+                        $utcDateString   = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
+                        // Convert to local DateTime
+                        $grandParentDate = $this->factory->getDate($utcDateString, 'Y-m-d H:i:s', 'UTC')->getLocalDateTime();
+
+                        // Non-decision has not taken place yet, so cycle over each associated action to see if timing is right
+                        $eventTiming   = array();
+                        $executeAction = false;
+                        foreach ($events as $id => $e) {
+                            if (array_key_exists($id, $leadLog[$l->getId()])) {
+                                $logger->debug('CAMPAIGN: Event (ID #' . $id . ') has already been executed');
+                                unset($e);
+                                continue;
+                            }
+
+                            if (!isset($eventSettings['action'][$e['type']])) {
+                                $logger->debug('CAMPAIGN: Event (ID #' . $id . ') no longer exists');
+                                unset($e);
+                                continue;
+                            }
+
+                            // First get the timing for all the 'non-decision' actions
+                            $eventTiming[$id] = $this->checkEventTiming($e, $grandParentDate, true);
+                            if ($eventTiming[$id] === true) {
+                                // Includes events to be executed now then schedule the rest if applicable
+                                $executeAction = true;
+                            }
+
+                            unset($e);
+                        }
+
+                        if (!$executeAction) {
+                            // Timing is not appropriate so move on to next lead
+                            unset($eventTiming);
+
+                            continue;
+                        }
+
+                        // Execute or schedule events
+                        foreach ($eventTiming as $id => $timing) {
+                            // Set event
+                            $e = $events[$id];
+                            $e['campaign'] = array('id' => $campaignId);
+
+                            // Set lead in case this is triggered by the system
+                            $leadModel->setSystemCurrentLead($l);
+
+                            if ($timing instanceof \DateTime) {
+                                // Schedule the action
+                                $logger->debug(
+                                    'CAMPAIGN: ID# '.$e['id'].' timing is not appropriate and thus scheduled for '.$timing->format('Y-m-d H:m:i T').''
+                                );
+
+                                $log = $this->getLogEntity($e['id'], $campaign, $l, null, true);
+                                $log->setLead($l);
+                                $log->setIsScheduled(true);
+                                $log->setTriggerDate($timing);
+
+                                $repo->saveEntity($log);
+                            } else {
+                                // Save log first to prevent subsequent triggers from duplicating
+                                $log = $this->getLogEntity($e['id'], $campaign, $l, null, true);
+                                $log->setDateTriggered(new \DateTime());
+
+                                $repo->saveEntity($log);
+
+                                if (!$this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $l, null, true)) {
+                                    $repo->deleteEntity($log);
+                                    $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');
+                                } else {
+                                    $logger->debug('CAMPAIGN: ID# '.$e['id'].' successfully executed and logged.');
+                                }
+                            }
+
+                            if (!empty($log)) {
+                                $this->em->detach($log);
+                            }
+
+                            unset($e, $log);
+
+                            if ($max && $eventCount >= $max) {
+                                // Hit the max
+                                return $eventCount;
+                            }
+
+                            $eventCount++;
+
+                            unset($utcDateString, $grandParentDate);
+                        }
+                    } else {
+                        $logger->debug('CAMPAIGN: Decision has already been executed.');
+                        unset($events);
+
+                        $pauseBatchCount++;
+
+                        if ($pauseBatchCount == $pauseBatch) {
+                            // Keep CPU down
+                            sleep(2);
+                            $pauseBatchCount = 0;
+                        }
+                    }
+                }
+
+                // Save RAM
                 $this->em->detach($l);
                 unset($l);
             }
 
+            // Next batch
             $start += $limit;
 
+            // Save RAM
             $this->em->clear('MauticLeadBundle:Lead');
-
             unset($leads, $campaignLeads, $leadLog);
         }
-
-        /*
-        foreach ($events as $event) {
-            $settings = $availableEvents[$event['eventType']][$event['type']];
-
-            if (!empty($event['campaign']['leads'])) {
-                foreach ($event['campaign']['leads'] as $lead) {
-                    $logger->debug('CAMPAIGN: Current Lead ID: '.$lead['lead_id']);
-
-                    if (empty($leadsEventCache[$lead['lead_id']])) {
-                        $leadsEventCache[$lead['lead_id']] = $eventRepo->getLeadTriggeredEvents($lead['lead_id']);
-                    }
-
-                    $leadsEvents = $leadsEventCache[$lead['lead_id']];
-
-                    if (empty($event['parent'])) {
-                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' has no parent and thus not applicable.');
-                        continue;
-                    }
-
-                    //the grandparent (parent's parent) is what will be compared against to determine if the timeframe is appropriate
-                    $grandparent = $event['parent']['parent'];
-
-                    if (empty($grandparent)) {
-                        //there is no grandparent so compare using the date added to the campaign
-                        $fromDate = $lead['dateAdded'];
-                    } else {
-                        if (!isset($leadsEvents[$grandparent['id']])) {
-                            $logger->debug(
-                                'CAMPAIGN: grandparent ID# '.$grandparent['id'].' <- parent ID# '.$event['parent']['id'].' <- ID# '.$event['id']
-                                .' has not been triggered; continue'
-                            );
-                            continue;
-                        }
-
-                        $grandparentLog = $leadsEvents[$grandparent['id']]['log'][0];
-                        if ($grandparentLog['isScheduled']) {
-                            //this event has a parent that is scheduled and thus not triggered
-                            $logger->debug(
-                                'CAMPAIGN: grandparent ID# '.$grandparent['id'].' <- parent ID# '.$event['parent']['id'].' <- ID# '.$event['id']
-                                .' is scheduled; continue'
-                            );
-                            continue;
-                        } else {
-                            $fromDate = $grandparentLog['dateTriggered'];
-                        }
-                    }
-
-                    $timing = $this->checkEventTiming($event, $fromDate, true);
-                    if ($timing) {
-                        if (empty($leadEntityCache[$lead['lead_id']])) {
-                            $leadEntityCache[$lead['lead_id']] = $leadModel->getEntity($lead['lead_id']);
-                        }
-
-                        // Set the system lead for events that may fire as a result of firing this one
-                        $leadModel->setSystemCurrentLead($leadEntityCache[$lead['lead_id']]);
-
-                        if ($this->invokeEventCallback($event, $settings, $leadEntityCache[$lead['lead_id']], null, true)) {
-                            $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
-
-                            $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $leadEntityCache[$lead['lead_id']], null, true);
-                            $log->setDateTriggered(new \DateTime());
-
-                            $persist[] = $log;
-                        } else {
-                            $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
-                        }//else do nothing
-                    } else {
-                        $logger->debug('CAMPAIGN: Timing not appropriate for ID# '.$event['id']);
-                    }//else do nothing
-                }
-            }
-        }
-
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-        }
-        */
     }
 
     /**
@@ -954,36 +1019,25 @@ class EventModel extends CommonFormModel
                 }
 
                 $dv = new \DateInterval($dt);
+                $triggerOn->add($dv);
 
-                if ($negate) {
-                    //if the set interval has passed since the parent event was triggered, then return true to trigger
-                    //the event; otherwise false to do nothing
-                    $now->sub($dv);
+                $logger->debug('CAMPAIGN: Comparison of triggerOn >= now (' . $triggerOn->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
 
-                    $logger->debug('CAMPAIGN: Negate comparison of now >= triggerOn (' . $now->format('Y-m-d H:i:s') . ' >= ' . $triggerOn->format('Y-m-d H:i:s'));
-
-                    return ($now >= $triggerOn) ? true : false;
-                } else {
-                    $triggerOn->add($dv);
-
-                    $logger->debug('CAMPAIGN: Non-negate comparison of triggerOn >= now (' . $triggerOn->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
-
-                    if ($triggerOn > $now) {
-                        //the event is to be scheduled based on the time interval
-                        return $triggerOn;
-                    }
+                if ($triggerOn > $now) {
+                    //the event is to be scheduled based on the time interval
+                    return $triggerOn;
                 }
             } elseif ($action['triggerMode'] == 'date') {
                 $logger->debug('CAMPAIGN: Date execution on ' . $action['triggerDate']->format('Y-m-d H:i:s'));
 
-                $pastDue = $action['triggerDate'] >= $now;
+                $pastDue = $now >= $action['triggerDate'];
+
                 if ($negate) {
                     $logger->debug('CAMPAIGN: Negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
 
-
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
-                    return ($pastDue) ? true : false;
+                    return ($pastDue) ? true : $action['triggerDate'];
                 } elseif (!$pastDue) {
                     $logger->debug('CAMPAIGN: Non-negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
 

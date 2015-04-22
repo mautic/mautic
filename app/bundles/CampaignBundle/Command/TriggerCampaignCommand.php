@@ -50,7 +50,8 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of events to process per campaign for this script execution. Defaults to all.',
                 0
-            );
+            )
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
     }
 
     /**
@@ -62,6 +63,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
 
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
+
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
         $model = $factory->getModel('campaign.event');
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
@@ -69,18 +71,56 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $translator    = $factory->getTranslator();
         $em            = $factory->getEntityManager();
 
-        $id = $input->getOption('campaign-id');
+        $id           = $input->getOption('campaign-id');
         $scheduleOnly = $input->getOption('scheduled-only');
         $negativeOnly = $input->getOption('negative-only');
-        $batch = $input->getOption('batch-limit');
-        $max = $input->getOption('max-events');
-        $processed = 0;
+        $batch        = $input->getOption('batch-limit');
+        $max          = $input->getOption('max-events');
+        $force        = $input->getOption('force');
+
+        // Prevent script overlap
+        $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
+        $command        = 'mautic:campaign:trigger';
+        $key            = ($id) ? $id : 'all';
+        $executionTimes = array();
+
+        if (file_exists($checkFile)) {
+            // Get the time in the file
+            $executionTimes = json_decode(file_get_contents($checkFile), true);
+            if (!is_array($executionTimes)) {
+                $executionTimes = array();
+            }
+
+            if ($force || empty($executionTimes['in_progress'][$command][$key])) {
+                // Just started
+                $executionTimes['in_progress'][$command][$key] = time();
+            } else {
+                // In progress
+                $check = $executionTimes['in_progress'][$command][$key];
+
+                if ($check + 1800 <= time()) {
+                    // Has been 30 minutes so override
+                    $executionTimes['in_progress'][$command][$key] = time();
+                } else {
+                    $output->writeln('<error>Script in progress</error>');
+
+                    return 0;
+                }
+            }
+        } else {
+            // Just started
+            $executionTimes['in_progress'][$command][$key] = time();
+        }
+
+        file_put_contents($checkFile, json_encode($executionTimes));
 
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             $campaign = $campaignModel->getEntity($id);
 
             if ($campaign !== null && $campaign->isPublished()) {
+                $processed = 0;
+
                 if (!$negativeOnly && !$scheduleOnly) {
                     //trigger starting action events for newly added leads
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.starting').'</info>');
@@ -90,26 +130,16 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     );
                 }
 
-                if ($max && $processed >= $max) {
-
-                    return 0;
-                }
-
-                if (!$negativeOnly) {
+                if ((!$max || $processed < $max) && !$negativeOnly) {
                     //trigger scheduled events
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.scheduled').'</info>');
-                    $processed += $model->triggerScheduledEvents($campaign,$processed, $batch, $max, $output);
+                    $processed += $model->triggerScheduledEvents($campaign, $processed, $batch, $max, $output);
                     $output->writeln(
                         '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                     );
                 }
 
-                if ($max && $processed >= $max) {
-
-                    return 0;
-                }
-
-                if (!$scheduleOnly) {
+                if ((!$max || $processed < $max) && !$scheduleOnly) {
                     //find and trigger "no" path events
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.negative').'</info>');
                     $processed += $model->triggerNegativeEvents($campaign, $processed, $batch, $max, $output);
@@ -128,6 +158,8 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             );
 
             while (($c = $campaigns->next()) !== false) {
+                $processed = 0;
+
                 if ($c[0]->isPublished()) {
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added leads
@@ -140,7 +172,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
 
                     if ($max && $processed >= $max) {
 
-                        return 0;
+                        continue;
                     }
 
                     if (!$negativeOnly) {
@@ -152,9 +184,9 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                         );
                     }
 
-                    if ($max && $processed < $max) {
+                    if ($max && $processed >= $max) {
 
-                        return 0;
+                        continue;
                     }
 
                     if (!$scheduleOnly) {
@@ -168,7 +200,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
 
                     if ($max && $processed >= $max) {
 
-                        return 0;
+                        continue;
                     }
                 }
 
@@ -178,6 +210,9 @@ class TriggerCampaignCommand extends ContainerAwareCommand
 
             unset($campaigns);
         }
+
+        unset($executionTimes['in_progress'][$command][$key]);
+        file_put_contents($checkFile, json_encode($executionTimes));
 
         return 0;
     }

@@ -168,73 +168,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get array of published events based on type for a specific lead
-     *
-     * @param      $type
-     * @param int  $leadId
-     *
-     * @return array
-     */
-    public function getPublishedByTypeForLead($type, $leadId)
-    {
-        //get a list of campaigns
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('l.campaign_id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
-            ->where(
-                $q->expr()->eq('l.lead_id', $leadId)
-            );
-        $results   = $q->execute()->fetchAll();
-        $campaigns = array();
-        foreach ($results as $r) {
-            $campaigns[] = $r['campaign_id'];
-        }
-
-        if (empty($campaigns)) {
-            //lead not part of any campaign
-            return array();
-        }
-
-        $q = $this->createQueryBuilder('e')
-            ->select('c, e, ec, ep')
-            ->join('e.campaign', 'c')
-            ->leftJoin('e.parent', 'ep')
-            ->leftJoin('e.children', 'ec')
-            ->orderBy('c.id, e.order');
-
-        //make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q, 'c');
-        $expr->add(
-            $q->expr()->eq('e.type', ':type')
-        );
-
-        //limit to campaigns the lead is part of
-        $expr->add(
-            $q->expr()->in('c.id', $campaigns)
-        );
-
-        if (!empty($eventType)) {
-            $expr->add(
-                $q->expr()->eq('e.eventType', ':eventType')
-            );
-            $q->setParameter('eventType', ':eventType');
-        }
-
-        $q->where($expr)
-            ->setParameter('type', $type);
-
-        $results = $q->getQuery()->getArrayResult();
-
-        //group them by campaign
-        $events = array();
-        foreach ($results as $r) {
-            $events[$r['campaign']['id']][$r['id']] = $r;
-        }
-
-        return $events;
-    }
-
-    /**
      * Get an array of events that have been triggered by this lead
      *
      * @param $type
@@ -323,16 +256,24 @@ class EventRepository extends CommonRepository
     public function getCampaignEvents($campaignId)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('e')
+        $q->select('e, IDENTITY(e.parent)')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.event_order', 'ASC');
+            ->orderBy('e.order', 'ASC');
 
         $results = $q->getQuery()->getArrayResult();
 
-        return $results;
+        // Fix the parent ID
+        $events = array();
+        foreach ($results as $id => $r) {
+            $r[0]['parent_id'] = $r[1];
+            $events[$id] = $r[0];
+        }
+        unset($results);
+
+        return $events;
     }
 
     /**
@@ -391,17 +332,17 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get the non-action log and organize by yes/no and lead
+     * Get the non-action log
      *
      * @param $events
      *
      * @return mixed
      */
-    public function getEventLog($campaignId, $leads = array())
+    public function getEventLog($campaignId, $leads = array(), $havingEvents = array(), $excludeEvents = array())
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('e.lead_id, e.event_id')
+        $q->select('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
                 $q->expr()->eq('e.campaign_id', (int) $campaignId)
@@ -412,11 +353,48 @@ class EventRepository extends CommonRepository
                 $q->expr()->in('e.lead_id', $leads)
             );
         }
+
+        if (!empty($havingEvents)) {
+            $dq = $this->_em->getConnection()->createQueryBuilder();
+
+            $dq->select('count(eh.event_id)')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'eh')
+                ->where(
+                    $dq->expr()->eq('eh.lead_id', 'e.lead_id'),
+                    $dq->expr()->in('eh.event_id', $havingEvents)
+                );
+
+            $q->having(
+                sprintf('(%s) > 0', $dq->getSQL())
+            );
+        }
+
+        if (!empty($excludeEvents)) {
+            $dq = $this->_em->getConnection()->createQueryBuilder();
+
+            $dq->select('count(eh.event_id)')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'eh')
+                ->where(
+                    $dq->expr()->eq('eh.lead_id', 'e.lead_id'),
+                    $dq->expr()->in('eh.event_id', $excludeEvents)
+                );
+
+            $q->andHaving(
+                sprintf('(%s) = 0', $dq->getSQL())
+            );
+        }
+
         $results = $q->execute()->fetchAll();
 
         $log = array();
         foreach ($results as $r) {
-            $log[$r['lead_id']][] = $r['event_id'];
+            $leadId  = $r['lead_id'];
+            $eventId = $r['event_id'];
+
+            unset($r['lead_id']);
+            unset($r['event_id']);
+
+            $log[$leadId][$eventId] = $r;
         }
 
         unset($results);
