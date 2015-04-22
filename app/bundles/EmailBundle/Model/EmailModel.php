@@ -789,6 +789,8 @@ class EmailModel extends FormModel
         $useEmail     = reset($emailSettings);
         $saveEntities = array();
 
+        $error = false;
+
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
 
@@ -832,7 +834,14 @@ class EmailModel extends FormModel
             $mailer->message->leadIdHash = $idHash;
 
             //queue the message
-            $mailer->send(true);
+            if (!$mailer->send(true)) {
+                $error = true;
+
+                //save some memory
+                unset($mailer);
+
+                continue;
+            }
 
             //save some memory
             unset($mailer);
@@ -883,7 +892,7 @@ class EmailModel extends FormModel
 
             unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sent, $sendTo);
 
-            return true;
+            return (empty($error));
         }
     }
 
