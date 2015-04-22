@@ -153,7 +153,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                 $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)).'</error>');
             }
         } else {
-            $campaigns = $model->getEntities(
+            $campaigns = $campaignModel->getEntities(
                 array(
                     'iterator_mode' => true
                 )
@@ -162,11 +162,14 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             while (($c = $campaigns->next()) !== false) {
                 $totalProcessed = 0;
 
-                if ($c[0]->isPublished()) {
+                // Key is ID and not 0
+                $c = reset($c);
+
+                if ($c->isPublished()) {
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added leads
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.starting').'</info>');
-                        $processed = $model->triggerStartingEvents($c[0], $batch, $max, $output);
+                        $processed = $model->triggerStartingEvents($c, $batch, $max, $output);
                         $totalProcessed += $processed;
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
@@ -181,7 +184,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     if (!$negativeOnly) {
                         //trigger scheduled events
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.scheduled').'</info>');
-                        $processed = $model->triggerScheduledEvents($c[0], $totalProcessed, $batch, $max, $output);
+                        $processed = $model->triggerScheduledEvents($c, $totalProcessed, $batch, $max, $output);
                         $totalProcessed += $processed;
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
@@ -196,14 +199,14 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     if (!$scheduleOnly) {
                         //find and trigger "no" path events
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.negative').'</info>');
-                        $processed = $model->triggerNegativeEvents($c[0], $totalProcessed, $batch, $max, $output);
+                        $processed = $model->triggerNegativeEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                         );
                     }
                 }
 
-                $em->detach($c[0]);
+                $em->detach($c);
                 unset($c);
             }
 
