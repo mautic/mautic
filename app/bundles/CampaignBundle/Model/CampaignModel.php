@@ -693,6 +693,9 @@ class CampaignModel extends CommonFormModel
         gc_enable();
 
         if ($leadCount) {
+
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
             // Add leads
             while ($start < $leadCount) {
                 // Keep CPU down
@@ -721,8 +724,23 @@ class CampaignModel extends CommonFormModel
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
+                        if ($output) {
+                            $output->write("...100%\n");
+                        }
 
                         return $leadsProcessed;
+                    }
+                }
+
+                // Determine percentage of each round
+                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
+                if ($output) {
+                    if ($roundPercentage > 100) {
+                        $roundPercentage = 100;
+                    }
+                    $output->write('...'.$roundPercentage.'%');
+                    if ($roundPercentage == 100) {
+                        $output->write("\n");
                     }
                 }
 
@@ -750,39 +768,61 @@ class CampaignModel extends CommonFormModel
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
-        // Remove leads
-        while ($start < $leadCount) {
-            // Keep CPU down
-            sleep(2);
+        if ($leadCount) {
 
-            $removeLeadList = $repo->getCampaignOrphanLeads($campaign->getId(), $lists,
-                array(
-                    'limit'         => $limit,
-                    'batchLimiters' => $batchLimiters
-                )
-            );
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
-            foreach ($removeLeadList as $l) {
-                // Keep RAM down
-                usleep(500);
+            // Remove leads
+            while ($start < $leadCount) {
+                // Keep CPU down
+                sleep(2);
 
-                $this->removeLeads($campaign, array($l), false, true, true);
+                $removeLeadList = $repo->getCampaignOrphanLeads(
+                    $campaign->getId(),
+                    $lists,
+                    array(
+                        'limit'         => $limit,
+                        'batchLimiters' => $batchLimiters
+                    )
+                );
 
-                $leadsProcessed++;
+                foreach ($removeLeadList as $l) {
+                    // Keep RAM down
+                    usleep(500);
 
-                if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    // done for this round, bye bye
+                    $this->removeLeads($campaign, array($l), false, true, true);
 
-                    return $leadsProcessed;
+                    $leadsProcessed++;
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        // done for this round, bye bye
+                        if ($output) {
+                            $output->write("...100%\n");
+                        }
+
+                        return $leadsProcessed;
+                    }
                 }
+
+                $start += $limit;
+
+                // Determine percentage of each round
+                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
+                if ($output) {
+                    if ($roundPercentage > 100) {
+                        $roundPercentage = 100;
+                    }
+                    $output->write('...'.$roundPercentage.'%');
+                    if ($roundPercentage == 100) {
+                        $output->write("\n");
+                    }
+                }
+
+                unset($removeLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
             }
-
-            $start += $limit;
-
-            unset($removeLeadList);
-
-            // Free some memory
-            gc_collect_cycles();
         }
 
         return $leadsProcessed;

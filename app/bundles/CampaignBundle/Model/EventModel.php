@@ -419,9 +419,13 @@ class EventModel extends CommonFormModel
             return 0;
         }
 
-        $eventCount = 0;
+        $start = $eventCount = 0;
 
-        $start = 0;
+        // Try to save some memory
+        gc_enable();
+
+        $maxCount = ($max) ? $max : $leadCount;
+
         while ($eventCount < $leadCount) {
             // Get list of all campaign leads
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
@@ -513,6 +517,9 @@ class EventModel extends CommonFormModel
 
                     if ($max && $eventCount >= $max) {
                         // Hit the max, bye bye
+                        if ($output) {
+                            $output->write("...100%\n");
+                        }
 
                         return $eventCount;
                     }
@@ -528,6 +535,21 @@ class EventModel extends CommonFormModel
             $this->em->clear('MauticLeadBundle:Lead');
 
             unset($leads, $campaignLeads);
+
+            // Determine percentage of each round
+            $roundPercentage = ceil(($eventCount / $maxCount) * 100);
+            if ($output) {
+                if ($roundPercentage > 100) {
+                    $roundPercentage = 100;
+                }
+                $output->write('...' . $roundPercentage . '%');
+                if ($roundPercentage == 100) {
+                    $output->write("\n");
+                }
+            }
+
+            // Free some memory
+            gc_collect_cycles();
         }
 
         return $eventCount;
@@ -561,7 +583,7 @@ class EventModel extends CommonFormModel
         $repo = $this->getRepository();
 
         // Get a count
-        $totalEventCount = $repo->getScheduledEvents($campaignId, true);
+        $totalScheduledCount = $repo->getScheduledEvents($campaignId, true);
 
         $output->writeln(
             $this->translator->trans(
@@ -570,7 +592,7 @@ class EventModel extends CommonFormModel
             )
         );
 
-        if (empty($totalEventCount)) {
+        if (empty($totalScheduledCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
 
             return 0;
@@ -583,7 +605,12 @@ class EventModel extends CommonFormModel
         $eventSettings = $campaignModel->getEvents();
 
         $eventCount = 0;
-        while ($eventCount < $totalEventCount) {
+        $maxCount   = ($max) ? $max : $totalScheduledCount;
+
+        // Try to save some memory
+        gc_enable();
+
+        while ($eventCount < $totalScheduledCount) {
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
 
@@ -684,6 +711,21 @@ class EventModel extends CommonFormModel
             $this->em->clear('MauticLeadBundle:Lead');
 
             unset($events, $leads);
+
+            // Determine percentage of each round
+            if ($output) {
+                $roundPercentage = ($max) ? ceil(($totalEventCount / $maxCount) * 100) : ceil(($eventCount / $maxCount) * 100);
+                if ($roundPercentage > 100) {
+                    $roundPercentage = 100;
+                }
+                $output->write('...' . $roundPercentage . '%');
+                if ($roundPercentage == 100) {
+                    $output->write("\n");
+                }
+            }
+
+            // Free some memory
+            gc_collect_cycles();
         }
 
         return $eventCount;
@@ -740,9 +782,14 @@ class EventModel extends CommonFormModel
             )
         );
 
-        $start = $eventCount = 0;
+        $start = $eventCount = $leadProcessedCount = 0;
 
         $eventSettings = $campaignModel->getEvents();
+
+        $maxCount = ($max) ? $max : $leadCount;
+
+        // Try to save some memory
+        gc_enable();
 
         while ($start <= $leadCount) {
             // Get batched campaign ids
@@ -902,6 +949,10 @@ class EventModel extends CommonFormModel
 
                             if ($max && $totalEventCount >= $max) {
                                 // Hit the max
+                                if ($output) {
+                                    $output->write("...100%\n");
+                                }
+
                                 return $eventCount;
                             }
 
@@ -921,6 +972,8 @@ class EventModel extends CommonFormModel
                             $pauseBatchCount = 0;
                         }
                     }
+
+                    $leadProcessedCount++;
                 }
 
                 // Save RAM
@@ -934,6 +987,21 @@ class EventModel extends CommonFormModel
             // Save RAM
             $this->em->clear('MauticLeadBundle:Lead');
             unset($leads, $campaignLeads, $leadLog);
+
+            // Show percentage of progress
+            if ($output) {
+                $roundPercentage = ($max) ? ceil(($totalEventCount / $maxCount) * 100) : ceil(($leadProcessedCount / $maxCount) * 100);
+                if ($roundPercentage > 100) {
+                    $roundPercentage = 100;
+                }
+                $output->write('...' . $roundPercentage . '%');
+                if ($roundPercentage == 100) {
+                    $output->write("\n");
+                }
+            }
+
+            // Free some memory
+            gc_collect_cycles();
         }
 
         return $eventCount;

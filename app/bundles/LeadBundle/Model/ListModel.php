@@ -338,6 +338,12 @@ class ListModel extends FormModel
         gc_enable();
 
         if ($leadCount) {
+            if ($output) {
+                $output->write('0%');
+            }
+
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
             // Add leads
             while ($start < $leadCount) {
                 // Keep CPU down
@@ -361,8 +367,6 @@ class ListModel extends FormModel
                     break;
                 }
 
-                $start += $limit;
-
                 foreach ($newLeadList[$id] as $l) {
                     // Keep RAM down
                     usleep(500);
@@ -374,9 +378,21 @@ class ListModel extends FormModel
                     $leadsProcessed++;
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                        // done for this round, bye bye
+                        break;
+                    }
+                }
 
-                        return $leadsProcessed;
+                $start += $limit;
+
+                // Determine percentage of each round
+                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
+                if ($output) {
+                    if ($roundPercentage > 100) {
+                        $roundPercentage = 100;
+                    }
+                    $output->write('...' . $roundPercentage . '%');
+                    if ($roundPercentage == 100) {
+                        $output->write("\n");
                     }
                 }
 
@@ -395,6 +411,10 @@ class ListModel extends FormModel
 
                 // Free some memory
                 gc_collect_cycles();
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    return $leadsProcessed;
+                }
             }
         }
 
@@ -429,59 +449,82 @@ class ListModel extends FormModel
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
-        // Remove leads
-        while ($start < $leadCount) {
-            // Keep CPU down
-            sleep(2);
-
-            $removeLeadList = $this->getLeadsByList(
-                $list,
-                true,
-                array(
-                    // No start because the items are deleted so always 0
-                    'limit'         => $limit,
-                    'filterOutIds'  => $fullList[$id],
-                    'batchLimiters' => $batchLimiters
-                )
-            );
-
-            if (empty($removeLeadList[$id])) {
-                // Somehow ran out of leads so break out
-                break;
+        if ($leadCount) {
+            if ($output) {
+                $output->write('0%');
             }
 
-            foreach ($removeLeadList[$id] as $l) {
-                // Keep RAM down
-                usleep(500);
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
-                $this->removeLead($l, $entity, false, true, true);
+            // Remove leads
+            while ($start < $leadCount) {
+                // Keep CPU down
+                sleep(2);
 
-                $leadsProcessed++;
+                $removeLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    array(
+                        // No start because the items are deleted so always 0
+                        'limit'         => $limit,
+                        'filterOutIds'  => $fullList[$id],
+                        'batchLimiters' => $batchLimiters
+                    )
+                );
+
+                if (empty($removeLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
+                foreach ($removeLeadList[$id] as $l) {
+                    // Keep RAM down
+                    usleep(500);
+
+                    $this->removeLead($l, $entity, false, true, true);
+
+                    $leadsProcessed++;
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        break;
+                    }
+                }
+
+                // Dispatch batch event
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    // Keep RAM down
+                    sleep(2);
+
+                    $event = new ListChangeEvent($removeLeadList[$id], $entity, false);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
+
+                    unset($event);
+                }
+
+                $start += $limit;
+
+                // Determine percentage of each round
+                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
+                if ($output) {
+                    if ($roundPercentage > 100) {
+                        $roundPercentage = 100;
+                    }
+                    $output->write('...'.$roundPercentage.'%');
+                    if ($roundPercentage == 100) {
+                        $output->write("\n");
+                    }
+                }
+
+
+                unset($removeLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    // done for this round, bye bye
-
                     return $leadsProcessed;
                 }
             }
-
-            $start += $limit;
-
-            // Dispatch batch event
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                // Keep RAM down
-                sleep(2);
-
-                $event = new ListChangeEvent($removeLeadList[$id], $entity, false);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
-
-                unset($event);
-            }
-
-            unset($removeLeadList);
-
-            // Free some memory
-            gc_collect_cycles();
         }
 
         return $leadsProcessed;
