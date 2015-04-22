@@ -343,6 +343,15 @@ class CampaignRepository extends CommonRepository
         return $leads;
     }
 
+    /**
+     * Get leads that do not belong based on lead lists
+     *
+     * @param       $id
+     * @param array $lists
+     * @param array $args
+     *
+     * @return array|int\
+     */
     public function getCampaignOrphanLeads($id, array $lists, $args = array())
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];

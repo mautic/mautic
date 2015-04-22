@@ -308,9 +308,9 @@ class LeadListRepository extends CommonRepository
                 $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
 
                 if ($countOnly) {
-                    $select = $includeManual ? 'l.id, count(l.id) as lead_count' : 'count(l.id) as lead_count, max(id) as max_id';
+                    $select = $includeManual ? 'l.id, count(distinct(l.id)) as lead_count' : 'count(distinct(l.id)) as lead_count, max(id) as max_id';
                 } elseif ($idOnly) {
-                    $select = 'l.id';
+                    $select = 'distinct(l.id)';
                 } else {
                     $select = 'l.*';
                 }
@@ -414,10 +414,10 @@ class LeadListRepository extends CommonRepository
             if (!$dynamic || ($includeManual && !$limit)) {
                 $q = $this->_em->getConnection()->createQueryBuilder();
                 if ($countOnly) {
-                    $q->select('max(ll.lead_id) as max_id, count(ll.lead_id) as lead_count')
+                    $q->select('max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as lead_count')
                         ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
                 } elseif ($idOnly) {
-                    $q->select('ll.lead_id as id')
+                    $q->select('distinct(ll.lead_id) as id')
                         ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
                 } else {
                     $q->select('l.*')
