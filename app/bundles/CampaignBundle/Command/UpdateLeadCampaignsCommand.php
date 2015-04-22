@@ -28,7 +28,8 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
             ->setDescription('Rebuild campaigns based on lead lists.')
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
             ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per campaign for this script execution. Defaults to all.', false)
-            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -44,6 +45,41 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
         $id    = $input->getOption('campaign-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-leads');
+        $force = $input->getOption('force');
+
+        // Prevent script overlap
+        $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
+        $command        = 'mautic:campaign:update';
+        $key            = ($id) ? $id : 'all';
+        $executionTimes = array();
+
+        if (file_exists($checkFile)) {
+            // Get the time in the file
+            $executionTimes = json_decode(file_get_contents($checkFile), true);
+            if (!is_array($executionTimes)) {
+                $executionTimes = array();
+            }
+
+            if ($force || empty($executionTimes['in_progress'][$command][$key])) {
+                // Just started
+                $executionTimes['in_progress'][$command][$key] = time();
+            } else {
+                // In progress
+                $check = $executionTimes['in_progress'][$command][$key];
+
+                if ($check + 1800 <= time()) {
+                    // Has been 30 minutes so override
+                    $executionTimes['in_progress'][$command][$key] = time();
+                } else {
+                    $output->writeln('<error>Script in progress</error>');
+
+                    return 0;
+                }
+            }
+        } else {
+            // Just started
+            $executionTimes['in_progress'][$command][$key] = time();
+        }
 
         if ($id) {
             $campaign = $campaignModel->getEntity($id);
@@ -77,6 +113,9 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
 
             unset($campaigns);
         }
+
+        unset($executionTimes['in_progress'][$command][$key]);
+        file_put_contents($checkFile, json_encode($executionTimes));
 
         return 0;
     }
