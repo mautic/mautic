@@ -107,7 +107,7 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
                 $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $l->getId())) . '</info>');
 
                 $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>');
+                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>'."\n");
 
                 unset($l);
             }

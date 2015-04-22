@@ -442,6 +442,11 @@ class EventModel extends CommonFormModel
                 )
             );
 
+            if (!count($leads)) {
+                // Somehow ran out of leads so break out
+                break;
+            }
+
             foreach ($events as $event) {
                 // Set campaign ID
                 $event['campaign'] = array('id' => $campaignId);
@@ -781,6 +786,11 @@ class EventModel extends CommonFormModel
                         'orderByDir' => 'asc'
                     )
                 );
+
+                if (!count($leads)) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
 
                 $pauseBatchCount = 0;
                 $pauseBatch      = 5;

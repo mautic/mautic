@@ -356,6 +356,11 @@ class ListModel extends FormModel
                     )
                 );
 
+                if (empty($newLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
                 $start += $limit;
 
                 foreach ($newLeadList[$id] as $l) {
@@ -439,6 +444,11 @@ class ListModel extends FormModel
                     'batchLimiters' => $batchLimiters
                 )
             );
+
+            if (empty($removeLeadList[$id])) {
+                // Somehow ran out of leads so break out
+                break;
+            }
 
             foreach ($removeLeadList[$id] as $l) {
                 // Keep RAM down
