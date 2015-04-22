@@ -514,6 +514,7 @@ class CampaignModel extends CommonFormModel
                 $campaignLead->setCampaign($campaign);
                 $campaignLead->setDateAdded(new \DateTime());
                 $campaignLead->setLead($lead);
+                $campaignLead->setManuallyAdded($manuallyAdded);
 
                 $this->getRepository()->saveEntity($campaignLead);
             }
