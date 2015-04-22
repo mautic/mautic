@@ -537,8 +537,8 @@ class EventModel extends CommonFormModel
             unset($leads, $campaignLeads);
 
             // Determine percentage of each round
-            $roundPercentage = ceil(($eventCount / $maxCount) * 100);
             if ($output) {
+                $roundPercentage = ceil(($eventCount / $maxCount) * 100);
                 if ($roundPercentage > 100) {
                     $roundPercentage = 100;
                 }
