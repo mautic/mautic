@@ -36,7 +36,7 @@ class ListController extends FormController
         ), 'RETURN_ARRAY');
 
         //Lists can be managed by anyone who has access to leads
-        if (!$permissions['lead:leads:viewown'] || !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 

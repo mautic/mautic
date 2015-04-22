@@ -1000,15 +1000,6 @@ class EmailModel extends FormModel
             $em = $this->factory->getEntityManager();
             $em->persist($dnc);
 
-            //update stats
-            $stat->setIsFailed(true);
-            $em->persist($stat);
-
-            if ($email !== null) {
-                $email->downSentCounts();
-                $em->persist($email);
-            }
-
             $em->flush();
         }
     }
