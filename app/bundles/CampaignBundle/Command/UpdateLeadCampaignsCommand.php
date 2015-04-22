@@ -98,16 +98,19 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
             );
 
             while (($c = $campaigns->next()) !== false) {
-                if ($c[0]->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $c[0]->getId())).'</info>');
+                // Get first item; using reset as the key will be the ID and not 0
+                $c = reset($c);
 
-                    $processed = $campaignModel->rebuildCampaignLeads($c[0], $batch, $max, $output);
+                if ($c->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $c->getId())).'</info>');
+
+                    $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
                     $output->writeln(
                         '<info>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</info>'."\n"
                     );
                 }
 
-                $em->detach($c[0]);
+                $em->detach($c);
                 unset($c);
             }
 
