@@ -114,6 +114,15 @@ class Campaign extends FormEntity
     }
 
     /**
+     *
+     */
+    public function __clone()
+    {
+        $this->leads  = new ArrayCollection();
+        $this->id    = null;
+    }
+
+    /**
      * @return array
      */
     public function convertToArray()
