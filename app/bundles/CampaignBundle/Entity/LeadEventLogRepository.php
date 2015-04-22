@@ -131,68 +131,27 @@ class LeadEventLogRepository extends EntityRepository
      * @param null       $eventId
      * @param null|array $leadIds
      */
-    public function getCampaignLog($campaignId, $eventId = null, $leadIds = null)
+    public function getCampaignLogCounts($campaignId, $leadIds)
     {
-        $q = $this->_em->createQueryBuilder()
-            ->select('o, partial l.{id}, partial e.{id}')
-            ->from('MauticCampaignBundle:LeadEventLog', 'o');
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('o.event_id, count(o.lead_id) as lead_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
-        $q->leftJoin('o.lead', 'l')
-            ->leftJoin('o.event', 'e')
-            ->leftJoin('e.campaign', 'c');
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('o.campaign_id', (int) $campaignId),
+                $q->expr()->in('o.lead_id', $leadIds)
+            )
+        )
+            ->groupBy('o.event_id');
 
-        $expr = $q->expr()->andX(
-            $q->expr()->eq('c.id', ':campaign')
-        );
-
-        if (!empty($eventId)) {
-            $expr->add(
-                $q->expr()->eq('e.id', ':event')
-            );
-            $q->setParameter('event', $eventId);
-        }
-
-        if (empty($leadIds)) {
-            $sq = $this->_em->getConnection()->createQueryBuilder()
-                ->select('lead_id')
-                ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-                ->where('campaign_id = ' . (int) $campaignId);
-            $leads = $sq->execute()->fetchAll();
-
-            $limitByLeads = array();
-            foreach ($leads as $l) {
-                $limitByLeads[] = $l['lead_id'];
-            }
-        } else {
-            if (!is_array($leadIds)) {
-                $limitByLeads = array($leadIds);
-            } else {
-                $limitByLeads = $leadIds;
-            }
-        }
-
-        $expr->add(
-            $q->expr()->in('l.id', ':leads')
-        );
-        $q->setParameter('leads', $limitByLeads);
-
-        $q->where($expr)
-            ->setParameter('campaign', $campaignId);
-
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
         $return = array();
 
-        if (!empty($leadIds)) {
-            //group by lead id then event id
-            foreach ($results as $l) {
-                $return[$l['lead']['id']][$l['event']['id']][] = $l;
-            }
-        } else {
-            //group by event id
-            foreach ($results as $l) {
-                $return[$l['event']['id']][] = $l;
-            }
+        //group by event id
+        foreach ($results as $l) {
+            $return[$l['event_id']] = $l['lead_count'];
         }
 
         return $return;
