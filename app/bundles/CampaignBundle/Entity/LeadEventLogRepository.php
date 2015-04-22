@@ -137,6 +137,11 @@ class LeadEventLogRepository extends EntityRepository
             ->select('o.event_id, count(o.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
+        if (empty($leadIds)) {
+            // Just force nothing
+            $leadIds = array(0);
+        }
+
         $q->where(
             $q->expr()->andX(
                 $q->expr()->eq('o.campaign_id', (int) $campaignId),
