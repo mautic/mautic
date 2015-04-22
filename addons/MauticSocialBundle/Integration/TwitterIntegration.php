@@ -97,22 +97,28 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
-     * Generate a Twitter bearer token
+     * {@inheritdoc}
      *
-     * @param $inAuthorization
-     *
-     * @return string
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
      */
-    public function getBearerToken ($inAuthorization = false)
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
-        if ($inAuthorization) {
-            $consumer_key    = rawurlencode($this->keys[$this->getClientIdKey()]);
-            $consumer_secret = rawurlencode($this->keys[$this->getClientSecretKey()]);
+        // Prevent SSL issues
+        $settings['ssl_verifypeer'] = false;
 
-            return base64_encode($consumer_key . ':' . $consumer_secret);
-        } else {
-            return $this->keys[$this->getAuthTokenKey()];
+        if (empty($settings['authorize_session'])) {
+            // Twitter requires oauth_token_secret to be part of composite key
+            $settings['token_secret'] = $this->keys['oauth_token_secret'];
+
+            //Twitter also requires double encoding of parameters in building base string
+            $settings['double_encode_basestring_parameters'] = true;
         }
+
+        return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
     /**
