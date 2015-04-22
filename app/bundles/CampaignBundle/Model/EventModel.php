@@ -404,6 +404,13 @@ class EventModel extends CommonFormModel
         // Get a lead count
         $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $ignoreLeads);
 
+        $output->writeln(
+            $this->translator->trans(
+                'mautic.campaign.trigger.lead_count_processed',
+                array('%leads%' => $leadCount, '%batch%' => $limit)
+            )
+        );
+
         if (empty($leadCount)) {
             $logger->debug('CAMPAIGN: No leads to process');
 
@@ -411,13 +418,6 @@ class EventModel extends CommonFormModel
 
             return 0;
         }
-
-        $output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.lead_count',
-                array('%leads%' => $leadCount, '%batch%' => $limit)
-            )
-        );
 
         $eventCount = 0;
 
@@ -538,7 +538,7 @@ class EventModel extends CommonFormModel
      *
      * @return int
      */
-    public function triggerScheduledEvents($campaign, $eventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
+    public function triggerScheduledEvents($campaign, $totalEventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -556,16 +556,16 @@ class EventModel extends CommonFormModel
         $repo = $this->getRepository();
 
         // Get a count
-        $leadCount = $repo->getScheduledEvents($campaignId, true);
+        $totalEventCount = $repo->getScheduledEvents($campaignId, true);
 
         $output->writeln(
             $this->translator->trans(
-                'mautic.campaign.trigger.lead_count',
-                array('%leads%' => $leadCount, '%batch%' => $limit)
+                'mautic.campaign.trigger.event_count',
+                array('%events%' => $totalEventCount, '%batch%' => $limit)
             )
         );
 
-        if (empty($leadCount)) {
+        if (empty($totalEventCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
 
             return 0;
@@ -577,7 +577,8 @@ class EventModel extends CommonFormModel
         // Event settings
         $eventSettings = $campaignModel->getEvents();
 
-        while ($eventCount < $leadCount) {
+        $eventCount = 0;
+        while ($eventCount < $totalEventCount) {
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
 
@@ -629,6 +630,7 @@ class EventModel extends CommonFormModel
                     if (!isset($eventSettings['action'][$event['type']])) {
                         unset($event);
                         $eventCount++;
+                        $totalEventCount++;
 
                         continue;
                     }
@@ -647,8 +649,9 @@ class EventModel extends CommonFormModel
                     }
 
                     $eventCount++;
+                    $totalEventCount++;
 
-                    if ($max && $eventCount >= $max) {
+                    if ($max && $totalEventCount >= $max) {
                         // Persist then detach
                         if (!empty($persist)) {
                             $repo->saveEntities($persist);
@@ -686,7 +689,7 @@ class EventModel extends CommonFormModel
      *
      * @param null $campaignId
      */
-    public function triggerNegativeEvents($campaign, $eventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
+    public function triggerNegativeEvents($campaign, $totalEventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -727,12 +730,12 @@ class EventModel extends CommonFormModel
 
         $output->writeln(
             $this->translator->trans(
-                'mautic.campaign.trigger.lead_count',
+                'mautic.campaign.trigger.lead_count_analyzed',
                 array('%leads%' => $leadCount, '%batch%' => $limit)
             )
         );
 
-        $start = 0;
+        $start = $eventCount = 0;
 
         $eventSettings = $campaignModel->getEvents();
 
@@ -838,6 +841,13 @@ class EventModel extends CommonFormModel
                             continue;
                         }
 
+                        // Log the decision
+                        $log = $this->getLogEntity($parentId, $campaign, $l, null, true);
+                        $log->setDateTriggered(new \DateTime());
+                        $repo->saveEntity($log);
+                        $this->em->detach($log);
+                        unset($log);
+
                         // Execute or schedule events
                         foreach ($eventTiming as $id => $timing) {
                             // Set event
@@ -880,18 +890,18 @@ class EventModel extends CommonFormModel
 
                             unset($e, $log);
 
-                            if ($max && $eventCount >= $max) {
+                            if ($max && $totalEventCount >= $max) {
                                 // Hit the max
                                 return $eventCount;
                             }
 
                             $eventCount++;
+                            $totalEventCount++;
 
                             unset($utcDateString, $grandParentDate);
                         }
                     } else {
                         $logger->debug('CAMPAIGN: Decision has already been executed.');
-                        unset($events);
 
                         $pauseBatchCount++;
 
@@ -915,6 +925,8 @@ class EventModel extends CommonFormModel
             $this->em->clear('MauticLeadBundle:Lead');
             unset($leads, $campaignLeads, $leadLog);
         }
+
+        return $eventCount;
     }
 
     /**

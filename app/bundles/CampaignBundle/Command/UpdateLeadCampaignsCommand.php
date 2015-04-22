@@ -71,7 +71,7 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
                     // Has been 30 minutes so override
                     $executionTimes['in_progress'][$command][$key] = time();
                 } else {
-                    $output->writeln('<error>Script in progress</error>');
+                    $output->writeln('<error>Script in progress. Use -f or --force to force execution.</error>');
 
                     return 0;
                 }

@@ -102,7 +102,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     // Has been 30 minutes so override
                     $executionTimes['in_progress'][$command][$key] = time();
                 } else {
-                    $output->writeln('<error>Script in progress</error>');
+                    $output->writeln('<error>Script in progress. Use -f or --force to force execution.</error>');
 
                     return 0;
                 }
@@ -119,30 +119,32 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             $campaign = $campaignModel->getEntity($id);
 
             if ($campaign !== null && $campaign->isPublished()) {
-                $processed = 0;
+                $totalProcessed = 0;
 
                 if (!$negativeOnly && !$scheduleOnly) {
                     //trigger starting action events for newly added leads
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.starting').'</info>');
-                    $processed += $model->triggerStartingEvents($campaign, $batch, $max, $output);
+                    $processed = $model->triggerStartingEvents($campaign, $batch, $max, $output);
+                    $totalProcessed += $processed;
                     $output->writeln(
                         '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                     );
                 }
 
-                if ((!$max || $processed < $max) && !$negativeOnly) {
+                if ((!$max || $totalProcessed < $max) && !$negativeOnly) {
                     //trigger scheduled events
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.scheduled').'</info>');
-                    $processed += $model->triggerScheduledEvents($campaign, $processed, $batch, $max, $output);
+                    $processed = $model->triggerScheduledEvents($campaign, $totalProcessed, $batch, $max, $output);
+                    $totalProcessed += $processed;
                     $output->writeln(
                         '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                     );
                 }
 
-                if ((!$max || $processed < $max) && !$scheduleOnly) {
+                if ((!$max || $totalProcessed < $max) && !$scheduleOnly) {
                     //find and trigger "no" path events
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.negative').'</info>');
-                    $processed += $model->triggerNegativeEvents($campaign, $processed, $batch, $max, $output);
+                    $processed = $model->triggerNegativeEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
                         '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                     );
@@ -158,19 +160,20 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             );
 
             while (($c = $campaigns->next()) !== false) {
-                $processed = 0;
+                $totalProcessed = 0;
 
                 if ($c[0]->isPublished()) {
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added leads
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.starting').'</info>');
-                        $processed += $model->triggerStartingEvents($c[0], $batch, $max, $output);
+                        $processed = $model->triggerStartingEvents($c[0], $batch, $max, $output);
+                        $totalProcessed += $processed;
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                         );
                     }
 
-                    if ($max && $processed >= $max) {
+                    if ($max && $totalProcessed >= $max) {
 
                         continue;
                     }
@@ -178,13 +181,14 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     if (!$negativeOnly) {
                         //trigger scheduled events
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.scheduled').'</info>');
-                        $processed += $model->triggerScheduledEvents($c[0], $processed, $batch, $max, $output);
+                        $processed = $model->triggerScheduledEvents($c[0], $totalProcessed, $batch, $max, $output);
+                        $totalProcessed += $processed;
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                         );
                     }
 
-                    if ($max && $processed >= $max) {
+                    if ($max && $totalProcessed >= $max) {
 
                         continue;
                     }
@@ -192,15 +196,10 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     if (!$scheduleOnly) {
                         //find and trigger "no" path events
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.negative').'</info>');
-                        $processed += $model->triggerNegativeEvents($c[0], $processed, $batch, $max, $output);
+                        $processed = $model->triggerNegativeEvents($c[0], $totalProcessed, $batch, $max, $output);
                         $output->writeln(
                             '<info>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</info>'."\n"
                         );
-                    }
-
-                    if ($max && $processed >= $max) {
-
-                        continue;
                     }
                 }
 
