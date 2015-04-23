@@ -158,6 +158,13 @@ class FieldType extends AbstractType
             'label' => 'mautic.lead.field.form.islistable'
         ));
 
+        $builder->add('isUniqueIdentifer', 'yesno_button_group', array(
+            'label' => 'mautic.lead.field.form.isuniqueidentifer',
+            'attr'  => array(
+                'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip'
+            )
+        ));
+
         $builder->add('isPubliclyUpdatable', 'yesno_button_group', array(
             'label' => 'mautic.lead.field.form.ispubliclyupdatable',
             'attr'  => array(
