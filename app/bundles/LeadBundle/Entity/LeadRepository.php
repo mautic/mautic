@@ -123,6 +123,41 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Get a list of leads based on fields
+     *
+     * @param $fields
+     * @param $values
+     *
+     * @return array
+     */
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        // loop through the fields and
+        foreach($uniqueFieldsWithData as $col => $val) {
+            $q->orWhere("l.$col = :" . $col)
+              ->setParameter($col, $val);
+        }
+
+        // make sure that its not the id we already have
+        $q->andWhere("l.id != " . $leadId);
+
+        $results = $q->execute()->fetchAll();
+
+        // @todo find out if we need to return a list of IDs or an actual entity here
+        if (count($results)) {
+            $id = $results[0]; // first item
+            $entity = $this->getEntity($id);
+        }
+
+        return $entity;
+    }
+
+
+    /**
      * @param $email
      */
     public function getLeadByEmail($email)
