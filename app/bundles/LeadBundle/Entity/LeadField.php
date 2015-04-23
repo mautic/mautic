@@ -108,6 +108,11 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
+     * @ORM\Column(name="is_unique_identifer", type="boolean", nullable=true)
+     */
+    private $isUniqueIdentifer = false;
+
+    /**
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -133,13 +138,13 @@ class LeadField extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
-            array('message' => 'mautic.lead.field.label.notblank')
-        ));
+                array('message' => 'mautic.lead.field.label.notblank')
+            ));
 
         $metadata->addConstraint(new UniqueEntity(array(
-            'fields'  => array('alias'),
-            'message' => 'mautic.lead.field.alias.unique'
-        )));
+                    'fields'  => array('alias'),
+                    'message' => 'mautic.lead.field.alias.unique'
+                )));
     }
 
     /**
@@ -428,6 +433,30 @@ class LeadField extends FormEntity
     public function isShortVisible()
     {
         return $this->getIsShortVisible();
+    }
+
+    /**
+     * Get the unique identifer state of the field
+     *
+     * @return boolean
+     */
+    public function getIsUniqueIdentifer()
+    {
+        return $this->isUniqueIdentifer;
+    }
+
+    /**
+     * Set the unique identifer state of the field
+     *
+     * @param mixed $isUniqueIdentifer
+     *
+     * @return LeadField
+     */
+    public function setIsUniqueIdentifer($isUniqueIdentifer)
+    {
+        $this->isUniqueIdentifer = $isUniqueIdentifer;
+
+        return $this;
     }
 
     /**
