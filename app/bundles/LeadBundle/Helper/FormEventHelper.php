@@ -62,7 +62,6 @@ class FormEventHelper
         foreach ($leadFields as $f) {
             $id    = $f->getId();
             $alias = $f->getAlias();
-            $type  = $f->getType();
 
             $data[$alias] = '';
 
