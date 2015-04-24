@@ -30,7 +30,7 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
                 'mautic:rebuild:lists',
             ))
             ->setDescription('Update leads in smart lists based on new lead data.')
-            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 1000.', 1000)
+            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
             ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per list for this script execution. Defaults to all.', false)
             ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
