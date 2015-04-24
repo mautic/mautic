@@ -123,7 +123,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Get a list of leads based on fields
+     * Get a list of lead entities
      *
      * @param $fields
      * @param $values
@@ -132,6 +132,39 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId)
     {
+        // get the list of IDs
+        $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
+
+        if (count($idList)) {
+            $ids = array();
+            foreach ($idList as $r) {
+                $ids[] = $r['id'];
+            }
+
+            $q = $this->_em->createQueryBuilder()
+                ->select('l')
+                ->from('MauticLeadBundle:Lead', 'l');
+            $q->where(
+                $q->expr()->in('l.id', ':ids')
+            )
+                ->setParameter('ids', $ids)
+                ->orderBy('l.dateAdded', 'DESC');
+            $results = $q->getQuery()->getResult();
+        }
+
+        return $results;
+    }
+
+    /*
+     * Get list of lead Ids by unique field data.
+     *
+     * @param $uniqueFieldsWithData is an array of columns & values to filter by
+     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     *
+     * @return array
+     */
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId)
+    {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
@@ -139,7 +172,7 @@ class LeadRepository extends CommonRepository
         // loop through the fields and
         foreach($uniqueFieldsWithData as $col => $val) {
             $q->orWhere("l.$col = :" . $col)
-              ->setParameter($col, $val);
+                ->setParameter($col, $val);
         }
 
         // make sure that its not the id we already have
@@ -147,15 +180,8 @@ class LeadRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        // @todo find out if we need to return a list of IDs or an actual entity here
-        if (count($results)) {
-            $id = $results[0]; // first item
-            $entity = $this->getEntity($id);
-        }
-
-        return $entity;
+        return $results;
     }
-
 
     /**
      * @param $email
