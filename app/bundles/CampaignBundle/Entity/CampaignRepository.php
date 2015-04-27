@@ -267,9 +267,11 @@ class CampaignRepository extends CommonRepository
         $expr = $q->expr()->andX();
 
 
-        $expr->add(
-            $q->expr()->in('ll.leadlist_id', $lists),
-            $q->expr()->eq('ll.manually_removed', ':false')
+        $expr->addMultiple(
+            array(
+                $q->expr()->in('ll.leadlist_id', $lists),
+                $q->expr()->eq('ll.manually_removed', ':false')
+            )
         );
 
         $q->setParameter('false', false, 'boolean');
@@ -321,7 +323,7 @@ class CampaignRepository extends CommonRepository
 
         $dq->where($expr);
 
-        $q->andWhere('ll.lead_id NOT IN ' . sprintf('(%s)', $dq->getSQL()));
+        $q->andWhere('ll.lead_id NOT IN '.sprintf('(%s)', $dq->getSQL()));
 
         $q->orderBy('ll.lead_id', 'ASC');
 
