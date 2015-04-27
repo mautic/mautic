@@ -114,7 +114,7 @@ if ($tmpl == 'index') {
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getSentCount(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getReadCount(); ?></td>
-                <td class="visible-md visible-lg">~<?php echo $model->getPendingLeads($item, null, true); ?></td>
+                <td class="visible-md visible-lg"><?php echo $model->getPendingLeads($item, null, true); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
