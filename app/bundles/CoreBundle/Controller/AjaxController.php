@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -500,7 +501,8 @@ class AjaxController extends CommonController
             $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
-            $result = $application->run($input);
+            $output      = new NullOutput();
+            $result      = $application->run($input, $output);
         }
 
         if ($result !== 0) {
