@@ -208,11 +208,11 @@ class UserModel extends FormModel
         // Email the user
         $mailer = $this->factory->getMailer();
 
-        $mailer->message->setTo(array($user->getEmail() => $user->getName()));
-        $mailer->message->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
+        $mailer->setTo(array($user->getEmail() => $user->getName()));
+        $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
         $body = $this->translator->trans('mautic.user.user.passwordreset.body', array('%name%' => $user->getFirstName(), '%password%' => $newPassword));
         $body = str_replace('\\n', "\n", $body);
-        $mailer->message->setBody($body);
+        $mailer->setBody($body);
 
         //queue the message
         $mailer->send();

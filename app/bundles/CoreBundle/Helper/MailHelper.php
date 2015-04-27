@@ -210,6 +210,26 @@ class MailHelper
     }
 
     /**
+     * Set subject
+     *
+     * @param $subject
+     */
+    public function setSubject($subject)
+    {
+        $this->message->setSubject($subject);
+    }
+
+    /**
+     * Set a plain text part
+     *
+     * @param $content
+     */
+    public function setPlainText($content)
+    {
+        $this->message->addPart($content, 'text/plain');
+    }
+
+    /**
      * @param        $content
      * @param string $contentType
      * @param null   $charset
@@ -217,6 +237,25 @@ class MailHelper
     public function setBody($content, $contentType = 'text/html', $charset = null)
     {
         $this->message->setBody($content, $contentType, $charset);
+    }
+
+    /**
+     * Set the to address (includes exception catching)
+     *
+     * @param $addresses
+     */
+    public function setTo($addresses)
+    {
+        if (!is_array($addresses)) {
+            $addresses = array($addresses);
+        }
+
+        try {
+            $this->message->setTo($addresses);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
     }
 
     /**
@@ -233,6 +272,9 @@ class MailHelper
     public function setIdHash ($idHash)
     {
         $this->idHash = $idHash;
+
+        // Add the trackingID to the $message object in order to update the stats if the email failed to send
+        $this->message->leadIdHash = $idHash;
     }
 
     /**

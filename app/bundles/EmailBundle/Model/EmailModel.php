@@ -820,15 +820,12 @@ class EmailModel extends FormModel
                 $mailer->setBody($customHtml);
             }
 
-            $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
-            $mailer->message->setSubject($useEmail['entity']->getSubject());
+            $mailer->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
+            $mailer->setSubject($useEmail['entity']->getSubject());
 
             if ($plaintext = $useEmail['entity']->getPlainText()) {
-                $mailer->message->addPart($plaintext, 'text/plain');
+                $mailer->setPlainText($plaintext);
             }
-
-            //add the trackingID to the $message object in order to update the stats if the email failed to send
-            $mailer->message->leadIdHash = $idHash;
 
             //queue the message
             $mailer->send(true);
@@ -942,11 +939,11 @@ class EmailModel extends FormModel
                 $mailer->setBody($email->getCustomHtml());
             }
 
-            $mailer->message->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
-            $mailer->message->setSubject($email->getSubject());
+            $mailer->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
+            $mailer->setSubject($email->getSubject());
 
             if ($plaintext = $email->getPlainText()) {
-                $mailer->message->addPart($plaintext, 'text/plain');
+                $mailer->setPlainText($plaintext);
             }
 
             //queue the message
