@@ -287,6 +287,21 @@ class MailHelper
         }
     }
 
+    /**
+     * Set from address (defaults to system)
+     *
+     * @param $address
+     * @param $name
+     */
+    public function setFrom($address, $name = null)
+    {
+        try {
+            $this->message->setFrom($address, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
 
     /**
      * @return null
