@@ -693,6 +693,9 @@ class CampaignModel extends CommonFormModel
         gc_enable();
 
         if ($leadCount) {
+            if ($output) {
+                $output->write('0%');
+            }
 
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
@@ -769,6 +772,9 @@ class CampaignModel extends CommonFormModel
         }
 
         if ($leadCount) {
+            if ($output) {
+                $output->write('0%');
+            }
 
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 

@@ -120,6 +120,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
 
             if ($campaign !== null && $campaign->isPublished()) {
                 $totalProcessed = 0;
+                $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $id)).'</info>');
 
                 if (!$negativeOnly && !$scheduleOnly) {
                     //trigger starting action events for newly added leads
@@ -166,6 +167,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                 $c = reset($c);
 
                 if ($c->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $c->getId())).'</info>');
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added leads
                         $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.starting').'</info>');
