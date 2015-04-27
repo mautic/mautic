@@ -240,23 +240,53 @@ class MailHelper
     }
 
     /**
-     * Set the to address (includes exception catching)
+     * Set to address(es)
      *
      * @param $addresses
+     * @param $name
      */
-    public function setTo($addresses)
+    public function setTo($addresses, $name = null)
     {
-        if (!is_array($addresses)) {
-            $addresses = array($addresses);
-        }
-
         try {
-            $this->message->setTo($addresses);
+            $this->message->setTo($addresses, $name);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
         }
     }
+
+    /**
+     * Set CC address(es)
+     *
+     * @param $addresses
+     * @param $name
+     */
+    public function setCc($addresses, $name = null)
+    {
+        try {
+            $this->message->setCc($addresses, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set BCC address(es)
+     *
+     * @param $addresses
+     * @param $name
+     */
+    public function setBcc($addresses, $name = null)
+    {
+        try {
+            $this->message->setBcc($addresses, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
+
 
     /**
      * @return null
