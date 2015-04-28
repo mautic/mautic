@@ -130,7 +130,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
     {
         // get the list of IDs
         $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
@@ -153,9 +153,15 @@ class LeadRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder()
             ->select('l')
             ->from('MauticLeadBundle:Lead', 'l');
-        $q->where(
-            $q->expr()->in('l.id', ':ids')
-        )
+
+        // if we have a lead ID add it to our query
+        if (!empty($leadId)) {
+            $q->where(
+                $q->expr()->in('l.id', ':ids')
+            );
+        }
+
+        $q
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
 
@@ -172,7 +178,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId)
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -184,8 +190,11 @@ class LeadRepository extends CommonRepository
                 ->setParameter($col, $val);
         }
 
-        // make sure that its not the id we already have
-        $q->andWhere("l.id != " . $leadId);
+        // if we have a lead ID lets use it
+        if (!empty($leadId)) {
+            // make sure that its not the id we already have
+            $q->andWhere("l.id != " . $leadId);
+        }
 
         $results = $q->execute()->fetchAll();
 
