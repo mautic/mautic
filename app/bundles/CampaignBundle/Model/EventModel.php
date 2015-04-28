@@ -430,6 +430,12 @@ class EventModel extends CommonFormModel
             // Get list of all campaign leads
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
 
+            if (!count($campaignLeads)) {
+                // No leads found
+
+                break;
+            }
+
             $leads = $leadModel->getEntities(
                 array(
                     'filter'     => array(
@@ -447,7 +453,8 @@ class EventModel extends CommonFormModel
             );
 
             if (!count($leads)) {
-                // Somehow ran out of leads so break out
+                // Just a precaution in case non-existant leads are lingering in the campaign leads table
+
                 break;
             }
 
