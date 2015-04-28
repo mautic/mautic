@@ -154,14 +154,9 @@ class LeadRepository extends CommonRepository
             ->select('l')
             ->from('MauticLeadBundle:Lead', 'l');
 
-        // if we have a lead ID add it to our query
-        if (!empty($leadId)) {
-            $q->where(
-                $q->expr()->in('l.id', ':ids')
-            );
-        }
-
-        $q
+        $q->where(
+            $q->expr()->in('l.id', ':ids')
+        )
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
 
