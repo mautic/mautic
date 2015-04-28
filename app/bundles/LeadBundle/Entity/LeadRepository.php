@@ -83,6 +83,9 @@ class LeadRepository extends CommonRepository
     {
         $col = 'l.'.$field;
 
+        // init to empty array
+        $results = array();
+
         if ($field == 'email') {
             // Prevent emails from being case sensitive
             $col   = "LOWER($col)";
