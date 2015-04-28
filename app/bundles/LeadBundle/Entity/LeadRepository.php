@@ -83,9 +83,6 @@ class LeadRepository extends CommonRepository
     {
         $col = 'l.'.$field;
 
-        // init to empty array
-        $results = array();
-
         if ($field == 'email') {
             // Prevent emails from being case sensitive
             $col   = "LOWER($col)";
@@ -138,22 +135,32 @@ class LeadRepository extends CommonRepository
         // get the list of IDs
         $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
 
-        if (count($idList)) {
-            $ids = array();
-            foreach ($idList as $r) {
-                $ids[] = $r['id'];
-            }
+        // init to empty array
+        $results = array();
 
-            $q = $this->_em->createQueryBuilder()
-                ->select('l')
-                ->from('MauticLeadBundle:Lead', 'l');
-            $q->where(
-                $q->expr()->in('l.id', ':ids')
-            )
-                ->setParameter('ids', $ids)
-                ->orderBy('l.dateAdded', 'DESC');
-            $results = $q->getQuery()->getResult();
+        // if we didn't get anything return empty
+        if (!count(($idList)))
+        {
+            return $results;
         }
+
+        $ids = array();
+
+        // we know we have at least one
+        foreach ($idList as $r) {
+            $ids[] = $r['id'];
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->select('l')
+            ->from('MauticLeadBundle:Lead', 'l');
+        $q->where(
+            $q->expr()->in('l.id', ':ids')
+        )
+            ->setParameter('ids', $ids)
+            ->orderBy('l.dateAdded', 'DESC');
+
+        $results = $q->getQuery()->getResult();
 
         return $results;
     }
@@ -168,6 +175,8 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId)
     {
+        $results = array();
+
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
