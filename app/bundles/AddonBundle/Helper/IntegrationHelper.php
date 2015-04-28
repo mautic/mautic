@@ -283,6 +283,8 @@ class IntegrationHelper
 
             //check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, array('public_profile', 'public_activity'));
+
+            /* @var \MauticAddon\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -298,11 +300,11 @@ class IntegrationHelper
                     //clear the cache
                     unset($profile['profile'], $profile['activity']);
 
-                    if (in_array('public_profile', $features)) {
+                    if (in_array('public_profile', $features) && $sn->isAuthorized()) {
                         $sn->getUserData($identifierField, $profile);
                     }
 
-                    if (in_array('public_activity', $features)) {
+                    if (in_array('public_activity', $features) && $sn->isAuthorized()) {
                         $sn->getPublicActivity($identifierField, $profile);
                     }
 
