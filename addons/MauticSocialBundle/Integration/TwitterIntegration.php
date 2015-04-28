@@ -262,9 +262,11 @@ class TwitterIntegration extends SocialIntegration
             return false;
         }
 
+        // note twitter requires params to be passed as strings
         $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
             'screen_name'      => $identifier,
-            'include_entities' => false
+            'include_entities' => 'false',
+
         ));
 
         if (isset($data[0])) {
