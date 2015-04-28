@@ -419,7 +419,7 @@ class LeadController extends FormController
                         $data[$f->getName()] = $f->getData();
                     }
 
-                    $model->setFieldValues($lead, $data);
+                    $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
                     $model->saveEntity($lead);
@@ -569,7 +569,7 @@ class LeadController extends FormController
                         }
                     }
 
-                    $model->setFieldValues($lead, $data);
+                    $model->setFieldValues($lead, $data, true);
                     //form is valid so process the data
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
 
