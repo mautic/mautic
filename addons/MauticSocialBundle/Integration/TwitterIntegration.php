@@ -146,7 +146,7 @@ class TwitterIntegration extends SocialIntegration
             } else {
                 $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
                     'user_id'          => $id,
-                    'include_entities' => false
+                    'include_entities' => 'false'
                 ));
             }
 
@@ -173,9 +173,9 @@ class TwitterIntegration extends SocialIntegration
             //due to the way Twitter filters, get more than 10 tweets
             $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
                 'user_id'         => $id,
-                'exclude_replies' => true,
+                'exclude_replies' => 'true',
                 'count'           => 25,
-                'trim_user'       => true
+                'trim_user'       => 'true'
             ));
 
             if (!empty($data) && count($data)) {
