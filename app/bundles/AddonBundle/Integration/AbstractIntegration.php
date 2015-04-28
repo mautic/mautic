@@ -906,6 +906,9 @@ abstract class AbstractIntegration
         // Child classes can easily pass in custom settings this way
         $settings = array_merge(array('authorize_session' => true, 'append_callback' => false, 'ssl_verifypeer' => false), $settings);
 
+        // init result to empty string
+        $result = '';
+
         $url = $this->getRequestTokenUrl();
         if (!empty($url)) {
             $result = $this->makeRequest(
