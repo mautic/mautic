@@ -139,8 +139,7 @@ class LeadRepository extends CommonRepository
         $results = array();
 
         // if we didn't get anything return empty
-        if (!count(($idList)))
-        {
+        if (!count(($idList))) {
             return $results;
         }
 
@@ -175,8 +174,6 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId)
     {
-        $results = array();
-
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
