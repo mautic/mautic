@@ -125,6 +125,9 @@ var Mautic = {
     setupBrowserNotifier: function () {
         //request notification support
         notify.requestPermission();
+        notify.config({
+            autoClose: 10000
+        });
 
         Mautic.browserNotifier = {
             isSupported:     notify.isSupported,
