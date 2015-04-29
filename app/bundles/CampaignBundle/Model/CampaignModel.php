@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -655,9 +656,6 @@ class CampaignModel extends CommonFormModel
     {
         defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
 
-        // Set SQL logging to null or else will hit memory limits in dev for sure
-        $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
-
         $repo = $this->getRepository();
 
         // Get a list of leads for all lists associated with the campaign
@@ -686,18 +684,18 @@ class CampaignModel extends CommonFormModel
         }
 
         // Handle by batches
-        $start          = 0;
-        $leadsProcessed = 0;
+        $start = $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
 
         if ($leadCount) {
-            if ($output) {
-                $output->write('0%');
-            }
-
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
 
             // Add leads
             while ($start < $leadCount) {
@@ -728,29 +726,27 @@ class CampaignModel extends CommonFormModel
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
                         if ($output) {
-                            $output->write("...100%\n");
+                            $progress->finish();
                         }
 
                         return $leadsProcessed;
                     }
                 }
 
-                // Determine percentage of each round
-                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
-                if ($output) {
-                    if ($roundPercentage > 100) {
-                        $roundPercentage = 100;
-                    }
-                    $output->write('...'.$roundPercentage.'%');
-                    if ($roundPercentage == 100) {
-                        $output->write("\n");
-                    }
+
+                if ($output && $leadsProcessed < $maxCount) {
+                    $progress->setCurrent($leadsProcessed);
                 }
 
                 unset($newLeadList);
 
                 // Free some memory
                 gc_collect_cycles();
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
             }
         }
 
@@ -764,7 +760,7 @@ class CampaignModel extends CommonFormModel
         );
 
         // Restart batching
-        $start     = 0;
+        $start     = $lastRoundPercentage = 0;
         $leadCount = $removeLeadCount['count'];
 
         if ($output) {
@@ -772,11 +768,12 @@ class CampaignModel extends CommonFormModel
         }
 
         if ($leadCount) {
-            if ($output) {
-                $output->write('0%');
-            }
-
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
 
             // Remove leads
             while ($start < $leadCount) {
@@ -802,9 +799,7 @@ class CampaignModel extends CommonFormModel
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
-                        if ($output) {
-                            $output->write("...100%\n");
-                        }
+                        $progress->finish();
 
                         return $leadsProcessed;
                     }
@@ -812,22 +807,18 @@ class CampaignModel extends CommonFormModel
 
                 $start += $limit;
 
-                // Determine percentage of each round
-                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
-                if ($output) {
-                    if ($roundPercentage > 100) {
-                        $roundPercentage = 100;
-                    }
-                    $output->write('...'.$roundPercentage.'%');
-                    if ($roundPercentage == 100) {
-                        $output->write("\n");
-                    }
+                if ($output && $leadsProcessed < $maxCount) {
+                   $progress->setCurrent($leadsProcessed);
                 }
 
                 unset($removeLeadList);
 
                 // Free some memory
                 gc_collect_cycles();
+            }
+
+            if($output) {
+                $progress->finish();
             }
         }
 

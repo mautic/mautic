@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -297,9 +298,6 @@ class ListModel extends FormModel
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
-        // Set SQL logging to null or else will hit memory limits in dev for sure
-        $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
-
         $id   = $entity->getId();
         $list = array('id' => $id, 'filters' => $entity->getFilters());
 
@@ -331,18 +329,18 @@ class ListModel extends FormModel
         }
 
         // Handle by batches
-        $start          = 0;
-        $leadsProcessed = 0;
+        $start = $lastRoundPercentage = $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
 
         if ($leadCount) {
-            if ($output) {
-                $output->write('0%');
-            }
-
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
 
             // Add leads
             while ($start < $leadCount) {
@@ -384,16 +382,8 @@ class ListModel extends FormModel
 
                 $start += $limit;
 
-                // Determine percentage of each round
-                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
-                if ($output) {
-                    if ($roundPercentage > 100) {
-                        $roundPercentage = 100;
-                    }
-                    $output->write('...' . $roundPercentage . '%');
-                    if ($roundPercentage == 100) {
-                        $output->write("\n");
-                    }
+                if ($output && $leadsProcessed < $maxCount) {
+                    $progress->setCurrent($leadsProcessed);
                 }
 
                 // Dispatch batch event
@@ -413,8 +403,18 @@ class ListModel extends FormModel
                 gc_collect_cycles();
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
                     return $leadsProcessed;
                 }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
             }
         }
 
@@ -442,7 +442,7 @@ class ListModel extends FormModel
         );
 
         // Restart batching
-        $start     = 0;
+        $start     = $lastRoundPercentage = 0;
         $leadCount = $removeLeadCount[$id]['count'];
 
         if ($output) {
@@ -450,11 +450,13 @@ class ListModel extends FormModel
         }
 
         if ($leadCount) {
-            if ($output) {
-                $output->write('0%');
-            }
 
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
 
             // Remove leads
             while ($start < $leadCount) {
@@ -503,16 +505,8 @@ class ListModel extends FormModel
 
                 $start += $limit;
 
-                // Determine percentage of each round
-                $roundPercentage = ceil(($leadsProcessed / $maxCount) * 100);
-                if ($output) {
-                    if ($roundPercentage > 100) {
-                        $roundPercentage = 100;
-                    }
-                    $output->write('...'.$roundPercentage.'%');
-                    if ($roundPercentage == 100) {
-                        $output->write("\n");
-                    }
+                if ($output && $leadsProcessed < $maxCount) {
+                    $progress->setCurrent($leadsProcessed);
                 }
 
 
@@ -522,8 +516,18 @@ class ListModel extends FormModel
                 gc_collect_cycles();
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
                     return $leadsProcessed;
                 }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
             }
         }
 

@@ -39,6 +39,9 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
         $translator = $factory->getTranslator();
         $em         = $factory->getEntityManager();
 
+        // Set SQL logging to null or else will hit memory limits in dev for sure
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
+
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $factory->getModel('campaign');
 
@@ -86,7 +89,7 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
             if ($campaign !== null) {
                 $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
                 $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
-                $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>' . "\n");
+                $output->writeln('<comment>' . $translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>' . "\n");
             } else {
                 $output->writeln('<error>' . $translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)) . '</error>');
             }
@@ -106,7 +109,7 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
 
                     $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
                     $output->writeln(
-                        '<info>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</info>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                     );
                 }
 

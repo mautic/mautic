@@ -42,6 +42,9 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
         $factory    = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
 
+        // Set SQL logging to null or else will hit memory limits in dev for sure
+        $factory->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $factory->getModel('lead.list');
 
@@ -89,7 +92,7 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
             if ($list !== null) {
                 $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
                 $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>');
+                $output->writeln('<comment>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>');
             } else {
                 $output->writeln('<error>' . $translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)) . '</error>');
             }
@@ -107,7 +110,7 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
                 $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $l->getId())) . '</info>');
 
                 $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</info>'."\n");
+                $output->writeln('<comment>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>'."\n");
 
                 unset($l);
             }

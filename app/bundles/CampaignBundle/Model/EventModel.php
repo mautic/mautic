@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -186,7 +186,7 @@ class EventModel extends CommonFormModel
             $leadCampaigns[$leadId] = $campaignModel->getLeadCampaigns($lead, true);
         }
 
-        if (empty($leadCampaigns[$leadId] )) {
+        if (empty($leadCampaigns[$leadId])) {
             $logger->debug('CAMPAIGN: no campaigns found so abort');
 
             return false;
@@ -404,10 +404,13 @@ class EventModel extends CommonFormModel
         // Get a lead count
         $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $ignoreLeads);
 
+        // Get a total number of events that will be processed
+        $totalEvents = $leadCount * count($events);
+
         $output->writeln(
             $this->translator->trans(
-                'mautic.campaign.trigger.lead_count_processed',
-                array('%leads%' => $leadCount, '%batch%' => $limit)
+                'mautic.campaign.trigger.event_count',
+                array('%events%' => $totalEvents, '%batch%' => $limit)
             )
         );
 
@@ -419,14 +422,20 @@ class EventModel extends CommonFormModel
             return 0;
         }
 
-        $start = $eventCount = 0;
+        $start = $eventCount = $processedCount = 0;
 
         // Try to save some memory
         gc_enable();
 
-        $maxCount = ($max) ? $max : $leadCount;
+        $maxCount = ($max) ? $max : $totalEvents;
 
-        while ($eventCount < $leadCount) {
+        if ($output) {
+            $progress = new ProgressBar($output, $maxCount);
+            $progress->start();
+        }
+
+        $continue = true;
+        while ($continue && $eventCount < $maxCount) {
             // Get list of all campaign leads
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
 
@@ -438,7 +447,7 @@ class EventModel extends CommonFormModel
 
             $leads = $leadModel->getEntities(
                 array(
-                    'filter'     => array(
+                    'filter'           => array(
                         'force' => array(
                             array(
                                 'column' => 'l.id',
@@ -447,29 +456,38 @@ class EventModel extends CommonFormModel
                             )
                         )
                     ),
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc'
+                    'orderBy'          => 'l.id',
+                    'orderByDir'       => 'asc',
+                    'ignore_paginator' => true
                 )
             );
 
             if (!count($leads)) {
-                // Just a precaution in case non-existant leads are lingering in the campaign leads table
+                // Just a precaution in case non-existent leads are lingering in the campaign leads table
 
                 break;
             }
 
-            foreach ($events as $event) {
-                // Set campaign ID
-                $event['campaign'] = array('id' => $campaignId);
+            // Keep CPU down
+            sleep(2);
 
+            foreach ($leads as $lead) {
                 // Keep CPU down
-                sleep(2);
+                usleep(500);
 
-                $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
+                $logger->debug('CAMPAIGN: Current Lead ID: '. $lead->getId());
 
-                foreach ($leads as $lead) {
+                if ($eventCount >= $maxCount) {
+                    break;
+                }
 
-                    $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
+                foreach ($events as $event) {
+                    // Set campaign ID
+                    $event['campaign'] = array('id' => $campaignId);
+
+                    $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
+
+                    $eventCount++;
 
                     // Set lead in case this is triggered by the system
                     $leadModel->setSystemCurrentLead($lead);
@@ -487,6 +505,7 @@ class EventModel extends CommonFormModel
                         $log->setTriggerDate($timing);
 
                         $repo->saveEntity($log);
+
                     } elseif ($timing) {
                         // Save log first to prevent subsequent triggers from duplicating
                         $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
@@ -495,7 +514,6 @@ class EventModel extends CommonFormModel
 
                         if (!isset($eventSettings['action'][$event['type']])) {
                             unset($event);
-                            $eventCount++;
 
                             continue;
                         }
@@ -519,47 +537,42 @@ class EventModel extends CommonFormModel
                         // Detach log
                         $this->em->detach($log);
 
-                        $eventCount++;
+                        $processedCount++;
                     }
 
                     if ($max && $eventCount >= $max) {
                         // Hit the max, bye bye
-                        if ($output) {
-                            $output->write("...100%\n");
-                        }
+                        $continue = false;
 
-                        return $eventCount;
+                        break;
                     }
+                }
+
+                // Free some RAM
+                $this->em->detach($lead);
+                unset($lead);
+
+                if ($output && $eventCount < $maxCount) {
+                    $progress->setCurrent($eventCount);
                 }
             }
 
             $start += $limit;
 
-            // Keep CPU down and give small amount of time for events to finish persisting
-            // before detaching all the entities
-            sleep(2);
-
             $this->em->clear('MauticLeadBundle:Lead');
 
             unset($leads, $campaignLeads);
-
-            // Determine percentage of each round
-            if ($output) {
-                $roundPercentage = ceil(($eventCount / $maxCount) * 100);
-                if ($roundPercentage > 100) {
-                    $roundPercentage = 100;
-                }
-                $output->write('...' . $roundPercentage . '%');
-                if ($roundPercentage == 100) {
-                    $output->write("\n");
-                }
-            }
 
             // Free some memory
             gc_collect_cycles();
         }
 
-        return $eventCount;
+        if ($output) {
+            $progress->finish();
+            $output->writeln('');
+        }
+
+        return $processedCount;
     }
 
     /**
@@ -595,7 +608,7 @@ class EventModel extends CommonFormModel
         $output->writeln(
             $this->translator->trans(
                 'mautic.campaign.trigger.event_count',
-                array('%events%' => $totalEventCount, '%batch%' => $limit)
+                array('%events%' => $totalScheduledCount, '%batch%' => $limit)
             )
         );
 
@@ -618,7 +631,11 @@ class EventModel extends CommonFormModel
         gc_enable();
 
         if ($output) {
-            $output->write('0%');
+            $progress = new ProgressBar($output, $maxCount);
+            $progress->start();
+            if ($max) {
+                $progress->setCurrent($totalEventCount);
+            }
         }
 
         while ($eventCount < $totalScheduledCount) {
@@ -631,9 +648,9 @@ class EventModel extends CommonFormModel
                 return $eventCount;
             }
 
-            $leads  = $leadModel->getEntities(
+            $leads = $leadModel->getEntities(
                 array(
-                    'filter'     => array(
+                    'filter'           => array(
                         'force' => array(
                             array(
                                 'column' => 'l.id',
@@ -642,8 +659,9 @@ class EventModel extends CommonFormModel
                             )
                         )
                     ),
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc'
+                    'orderBy'          => 'l.id',
+                    'orderByDir'       => 'asc',
+                    'ignore_paginator' => true
                 )
             );
 
@@ -702,6 +720,11 @@ class EventModel extends CommonFormModel
 
                         unset($campaignEvents, $event, $leads, $eventSettings);
 
+                        if ($output) {
+                            $progress->finish();
+                            $output->writeln('');
+                        }
+
                         // Hit the max, bye bye
                         return $eventCount;
                     }
@@ -723,20 +746,18 @@ class EventModel extends CommonFormModel
 
             unset($events, $leads);
 
-            // Determine percentage of each round
-            if ($output) {
-                $roundPercentage = ($max) ? ceil(($totalEventCount / $maxCount) * 100) : ceil(($eventCount / $maxCount) * 100);
-                if ($roundPercentage > 100) {
-                    $roundPercentage = 100;
-                }
-                $output->write('...' . $roundPercentage . '%');
-                if ($roundPercentage == 100) {
-                    $output->write("\n");
-                }
+            $currentCount = ($max) ? $totalEventCount : $eventCount;
+            if ($output && $currentCount < $maxCount) {
+                $progress->setCurrent($currentCount);
             }
 
             // Free some memory
             gc_collect_cycles();
+        }
+
+        if($output) {
+            $progress->finish();
+            $output->writeln('');
         }
 
         return $eventCount;
@@ -770,7 +791,7 @@ class EventModel extends CommonFormModel
 
         // Get an array of events that are non-action based
         $nonActionEvents = array();
-        foreach($campaignEvents as $id => $e) {
+        foreach ($campaignEvents as $id => $e) {
             if ($e['decisionPath'] == 'no') {
                 $nonActionEvents[$e['parent_id']][$id] = $e;
             }
@@ -793,7 +814,7 @@ class EventModel extends CommonFormModel
             )
         );
 
-        $start = $eventCount = $leadProcessedCount = 0;
+        $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = 0;
 
         $eventSettings = $campaignModel->getEvents();
 
@@ -804,7 +825,11 @@ class EventModel extends CommonFormModel
 
         if ($leadCount) {
             if ($output) {
-                $output->write('0%');
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+                if ($max) {
+                    $progress->advance($totalEventCount);
+                }
             }
 
             while ($start <= $leadCount) {
@@ -836,7 +861,7 @@ class EventModel extends CommonFormModel
                     // Get the leads
                     $leads = $leadModel->getEntities(
                         array(
-                            'filter'     => array(
+                            'filter'           => array(
                                 'force' => array(
                                     array(
                                         'column' => 'l.id',
@@ -845,8 +870,9 @@ class EventModel extends CommonFormModel
                                     )
                                 )
                             ),
-                            'orderBy'    => 'l.id',
-                            'orderByDir' => 'asc'
+                            'orderBy'          => 'l.id',
+                            'orderByDir'       => 'asc',
+                            'ignore_paginator' => true
                         )
                     );
 
@@ -910,8 +936,6 @@ class EventModel extends CommonFormModel
                             if (!$executeAction) {
                                 // Timing is not appropriate so move on to next lead
                                 unset($eventTiming);
-
-                                $leadProcessedCount++;
                                 continue;
                             }
 
@@ -969,7 +993,8 @@ class EventModel extends CommonFormModel
                                 if ($max && $totalEventCount >= $max) {
                                     // Hit the max
                                     if ($output) {
-                                        $output->write("...100%\n");
+                                        $progress->finish();
+                                        $output->writeln('');
                                     }
 
                                     return $eventCount;
@@ -991,8 +1016,6 @@ class EventModel extends CommonFormModel
                                 $pauseBatchCount = 0;
                             }
                         }
-
-                        $leadProcessedCount++;
                     }
 
                     // Save RAM
@@ -1003,25 +1026,25 @@ class EventModel extends CommonFormModel
                 // Next batch
                 $start += $limit;
 
+                $leadProcessedCount += count($campaignLeads);
+
                 // Save RAM
                 $this->em->clear('MauticLeadBundle:Lead');
                 unset($leads, $campaignLeads, $leadLog);
 
-                // Show percentage of progress
-                if ($output) {
-                    $roundPercentage = ($max) ? ceil(($totalEventCount / $maxCount) * 100) : ceil(($leadProcessedCount / $maxCount) * 100);
-                    if ($roundPercentage > 100) {
-                        $roundPercentage = 100;
-                    }
-                    $output->write('...'.$roundPercentage.'%');
-                    if ($roundPercentage == 100) {
-                        $output->write("\n");
-                    }
+                $currentCount = ($max) ? $leadProcessedCount : $eventCount;
+                if ($output && $currentCount < $maxCount) {
+                    $progress->setCurrent($currentCount);
                 }
 
                 // Free some memory
                 gc_collect_cycles();
             }
+        }
+
+        if ($output) {
+            $progress->finish();
+            $output->writeln('');
         }
 
         return $eventCount;
@@ -1111,7 +1134,7 @@ class EventModel extends CommonFormModel
                 $interval = $action['triggerInterval'];
                 $unit     = strtoupper($action['triggerIntervalUnit']);
 
-                $logger->debug('CAMPAIGN: Interval delay of ' . $interval . $unit);
+                $logger->debug('CAMPAIGN: Interval delay of '.$interval.$unit);
 
                 switch ($unit) {
                     case 'Y':
@@ -1131,25 +1154,33 @@ class EventModel extends CommonFormModel
                 $dv = new \DateInterval($dt);
                 $triggerOn->add($dv);
 
-                $logger->debug('CAMPAIGN: Comparison of triggerOn >= now (' . $triggerOn->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
+                $logger->debug('CAMPAIGN: Comparison of triggerOn >= now ('.$triggerOn->format('Y-m-d H:i:s').' >= '.$now->format('Y-m-d H:i:s'));
 
                 if ($triggerOn > $now) {
                     //the event is to be scheduled based on the time interval
                     return $triggerOn;
                 }
             } elseif ($action['triggerMode'] == 'date') {
-                $logger->debug('CAMPAIGN: Date execution on ' . $action['triggerDate']->format('Y-m-d H:i:s'));
+                $logger->debug('CAMPAIGN: Date execution on '.$action['triggerDate']->format('Y-m-d H:i:s'));
 
                 $pastDue = $now >= $action['triggerDate'];
 
                 if ($negate) {
-                    $logger->debug('CAMPAIGN: Negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
+                    $logger->debug(
+                        'CAMPAIGN: Negate comparison of triggerDate >= now ('.$action['triggerDate']->format('Y-m-d H:i:s').' >= '.$now->format(
+                            'Y-m-d H:i:s'
+                        )
+                    );
 
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
                     return ($pastDue) ? true : $action['triggerDate'];
                 } elseif (!$pastDue) {
-                    $logger->debug('CAMPAIGN: Non-negate comparison of triggerDate >= now (' . $action['triggerDate']->format('Y-m-d H:i:s') . ' >= ' . $now->format('Y-m-d H:i:s'));
+                    $logger->debug(
+                        'CAMPAIGN: Non-negate comparison of triggerDate >= now ('.$action['triggerDate']->format('Y-m-d H:i:s').' >= '.$now->format(
+                            'Y-m-d H:i:s'
+                        )
+                    );
 
                     //schedule the event
                     return $action['triggerDate'];
