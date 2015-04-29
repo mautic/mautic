@@ -459,8 +459,7 @@ class EventModel extends CommonFormModel
                         )
                     ),
                     'orderBy'          => 'l.id',
-                    'orderByDir'       => 'asc',
-                    'ignore_paginator' => true
+                    'orderByDir'       => 'asc'
                 )
             );
 
@@ -567,6 +566,7 @@ class EventModel extends CommonFormModel
             $start += $limit;
 
             $this->em->clear('MauticLeadBundle:Lead');
+            $this->em->clear('MauticUserBundle:User');
 
             unset($leads, $campaignLeads);
 
@@ -669,8 +669,7 @@ class EventModel extends CommonFormModel
                         )
                     ),
                     'orderBy'          => 'l.id',
-                    'orderByDir'       => 'asc',
-                    'ignore_paginator' => true
+                    'orderByDir'       => 'asc'
                 )
             );
 
@@ -752,7 +751,7 @@ class EventModel extends CommonFormModel
 
             // Free RAM
             $this->em->clear('MauticLeadBundle:Lead');
-
+            $this->em->clear('MauticUserBundle:User');
             unset($events, $leads);
 
             $currentCount = ($max) ? $totalEventCount : $eventCount;
@@ -882,8 +881,7 @@ class EventModel extends CommonFormModel
                                 )
                             ),
                             'orderBy'          => 'l.id',
-                            'orderByDir'       => 'asc',
-                            'ignore_paginator' => true
+                            'orderByDir'       => 'asc'
                         )
                     );
 
@@ -1041,6 +1039,7 @@ class EventModel extends CommonFormModel
 
                 // Save RAM
                 $this->em->clear('MauticLeadBundle:Lead');
+                $this->em->clear('MauticUserBundle:User');
 
                 unset($leads, $campaignLeads, $leadLog);
 

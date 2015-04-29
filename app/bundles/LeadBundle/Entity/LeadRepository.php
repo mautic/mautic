@@ -398,13 +398,12 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
+        unset($results, $fields);
 
         //get an array of IDs for ORM query
         $ids = array_keys($fieldValues);
 
         if (count($ids)) {
-            unset($results);
-
             //ORM
 
             //build the order by id since the order was applied above
@@ -432,7 +431,11 @@ class LeadRepository extends CommonRepository
             )->setParameter('leadIds', $ids);
 
             $q->orderBy('ORD', 'ASC');
-            $results   = $q->getQuery()->getResult();
+
+            $results = $q->getQuery()
+                ->useQueryCache(false)
+                ->useResultCache(false)
+                ->getResult();
 
             //assign fields
             foreach ($results as $r) {
@@ -443,6 +446,8 @@ class LeadRepository extends CommonRepository
                 $leadId = $r->getId();
                 $r->setFields($fieldValues[$leadId]);
             }
+        } else {
+            $results = array();
         }
 
         return (!empty($args['withTotalCount'])) ?
