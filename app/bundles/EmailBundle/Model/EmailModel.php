@@ -827,7 +827,6 @@ class EmailModel extends FormModel
                 $mailer->setBody($customHtml);
             }
 
-            $mailer->setBody('<h1>hello</h1>');
             $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
             $mailer->message->setSubject($useEmail['entity']->getSubject());
 
