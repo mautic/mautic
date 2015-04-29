@@ -28,12 +28,17 @@ class EmailRepository extends CommonRepository
      */
     public function getDoNotEmailList()
     {
-        $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id, emailAddress}')
-            ->from('MauticEmailBundle:DoNotEmail', 'e', 'e.emailAddress');
-        $results = $q->getQuery()->getArrayResult();
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('lower(e.address) as email')
+            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'e');
+        $results = $q->execute()->fetchAll();
 
-        return array_keys($results);
+        $dnc = array();
+        foreach ($results as $r) {
+            $dnc[] = $r['email'];
+        }
+
+        return $dnc;
     }
 
     /**

@@ -407,12 +407,14 @@ class EventModel extends CommonFormModel
         // Get a total number of events that will be processed
         $totalEvents = $leadCount * count($events);
 
-        $output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.event_count',
-                array('%events%' => $totalEvents, '%batch%' => $limit)
-            )
-        );
+        if ($output) {
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    array('%events%' => $totalEvents, '%batch%' => $limit)
+                )
+            );
+        }
 
         if (empty($leadCount)) {
             $logger->debug('CAMPAIGN: No leads to process');
@@ -472,6 +474,8 @@ class EventModel extends CommonFormModel
             sleep(2);
 
             foreach ($leads as $lead) {
+                sleep(1);
+
                 // Keep CPU down
                 usleep(500);
 
@@ -481,16 +485,22 @@ class EventModel extends CommonFormModel
                     break;
                 }
 
+                // Set lead in case this is triggered by the system
+                $leadModel->setSystemCurrentLead($lead);
+
                 foreach ($events as $event) {
+                    $eventCount++;
+
+                    if (!isset($eventSettings['action'][$event['type']])) {
+                        unset($event);
+
+                        continue;
+                    }
+
                     // Set campaign ID
                     $event['campaign'] = array('id' => $campaignId);
 
                     $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
-
-                    $eventCount++;
-
-                    // Set lead in case this is triggered by the system
-                    $leadModel->setSystemCurrentLead($lead);
 
                     $timing = $this->checkEventTiming($event, new \DateTime());
                     if ($timing instanceof \DateTime) {
@@ -512,12 +522,6 @@ class EventModel extends CommonFormModel
                         $log->setDateTriggered(new \DateTime());
                         $repo->saveEntity($log);
 
-                        if (!isset($eventSettings['action'][$event['type']])) {
-                            unset($event);
-
-                            continue;
-                        }
-
                         if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
                             // Something failed so remove the log
                             $repo->deleteEntity($log);
@@ -536,9 +540,12 @@ class EventModel extends CommonFormModel
                     if (!empty($log)) {
                         // Detach log
                         $this->em->detach($log);
+                        unset($log);
 
                         $processedCount++;
                     }
+
+                    unset($timing, $event);
 
                     if ($max && $eventCount >= $max) {
                         // Hit the max, bye bye
@@ -605,12 +612,14 @@ class EventModel extends CommonFormModel
         // Get a count
         $totalScheduledCount = $repo->getScheduledEvents($campaignId, true);
 
-        $output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.event_count',
-                array('%events%' => $totalScheduledCount, '%batch%' => $limit)
-            )
-        );
+        if ($output) {
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    array('%events%' => $totalScheduledCount, '%batch%' => $limit)
+                )
+            );
+        }
 
         if (empty($totalScheduledCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
@@ -807,12 +816,14 @@ class EventModel extends CommonFormModel
         // Get a count
         $leadCount = $campaignRepo->getCampaignLeadCount($campaignId);
 
-        $output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.lead_count_analyzed',
-                array('%leads%' => $leadCount, '%batch%' => $limit)
-            )
-        );
+        if ($output) {
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.lead_count_analyzed',
+                    array('%leads%' => $leadCount, '%batch%' => $limit)
+                )
+            );
+        }
 
         $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = 0;
 
@@ -1030,6 +1041,7 @@ class EventModel extends CommonFormModel
 
                 // Save RAM
                 $this->em->clear('MauticLeadBundle:Lead');
+
                 unset($leads, $campaignLeads, $leadLog);
 
                 $currentCount = ($max) ? $leadProcessedCount : $eventCount;
@@ -1095,6 +1107,9 @@ class EventModel extends CommonFormModel
             $result = true;
         }
 
+        // Save some RAM for batch processing
+        unset($args, $pass, $reflection, $settings, $lead, $event, $eventDetails);
+
         return $result;
     }
 
@@ -1157,6 +1172,9 @@ class EventModel extends CommonFormModel
                 $logger->debug('CAMPAIGN: Comparison of triggerOn >= now ('.$triggerOn->format('Y-m-d H:i:s').' >= '.$now->format('Y-m-d H:i:s'));
 
                 if ($triggerOn > $now) {
+                    // Save some RAM for batch processing
+                    unset($now, $action, $dv, $dt);
+
                     //the event is to be scheduled based on the time interval
                     return $triggerOn;
                 }
@@ -1174,7 +1192,12 @@ class EventModel extends CommonFormModel
 
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
-                    return ($pastDue) ? true : $action['triggerDate'];
+                    $return = ($pastDue) ? true : $action['triggerDate'];
+
+                    // Save some RAM for batch processing
+                    unset($now, $action);
+
+                    return $return;
                 } elseif (!$pastDue) {
                     $logger->debug(
                         'CAMPAIGN: Non-negate comparison of triggerDate >= now ('.$action['triggerDate']->format('Y-m-d H:i:s').' >= '.$now->format(
@@ -1232,6 +1255,9 @@ class EventModel extends CommonFormModel
         $log->setLead($lead);
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered($systemTriggered);
+
+        // Save some RAM for batch processing
+        unset($event, $campaign, $lead);
 
         return $log;
     }

@@ -345,6 +345,8 @@ class LeadRepository extends CommonRepository
             $fields[$r['alias']] = $r;
         }
 
+        unset($results);
+
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
@@ -401,6 +403,8 @@ class LeadRepository extends CommonRepository
         $ids = array_keys($fieldValues);
 
         if (count($ids)) {
+            unset($results);
+
             //ORM
 
             //build the order by id since the order was applied above

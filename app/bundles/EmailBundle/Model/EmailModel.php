@@ -742,19 +742,23 @@ class EmailModel extends FormModel
         }
 
         if (!$ignoreLeadChecks) {
-            $sent   = $statRepo->getSentStats($email->getId(), $listId);
-            $sendTo = array_diff_key($leads, $sent);
+            static $sent = array();
+            if (!isset($sent[$email->getId()])) {
+                $sent[$email->getId()] = $statRepo->getSentStats($email->getId(), $listId);
+            }
+
+            $sendTo = array_diff_key($leads, $sent[$email->getId()]);
 
             //get the list of do not contacts
-            static $dnc = array();
-            if (empty($dnc)) {
+            static $dnc;
+            if (!is_array($dnc)) {
                 $dnc = $emailRepo->getDoNotEmailList();
             }
 
             //weed out do not contacts
             if (!empty($dnc)) {
                 foreach ($sendTo as $k => $lead) {
-                    if (in_array($lead['email'], $dnc)) {
+                    if (in_array(strtolower($lead['email']), $dnc)) {
                         unset($sendTo[$k]);
                     }
                 }
@@ -787,14 +791,14 @@ class EmailModel extends FormModel
 
         //start at the beginning for this batch
         $useEmail     = reset($emailSettings);
-        $saveEntities = array();
+        $saveEntities = $saveEmails = array();
 
         $error = false;
 
+        $mailer = $this->factory->getMailer();
+
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
-
-            $mailer = $this->factory->getMailer();
 
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
@@ -823,6 +827,7 @@ class EmailModel extends FormModel
                 $mailer->setBody($customHtml);
             }
 
+            $mailer->setBody('<h1>hello</h1>');
             $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
             $mailer->message->setSubject($useEmail['entity']->getSubject());
 
@@ -837,14 +842,16 @@ class EmailModel extends FormModel
             if (!$mailer->send(true)) {
                 $error = true;
 
-                //save some memory
-                unset($mailer);
+                $mailer->reset();
 
                 continue;
             }
 
-            //save some memory
-            unset($mailer);
+            $mailer->reset();
+
+            if (!$ignoreLeadChecks) {
+                $sent[$email->getId()][$lead['id']] = $lead['id'];
+            }
 
             //create a stat
             $stat = new Stat();
@@ -870,9 +877,14 @@ class EmailModel extends FormModel
             //increase the sent counts
             $useEmail['entity']->upSentCounts();
 
+            if (!isset($saveEmails[$useEmail['entity']->getId()])) {
+                $saveEmails[$useEmail['entity']->getId()] = $useEmail['entity'];
+            }
+
             $batchCount++;
             if ($batchCount > $useEmail['limit']) {
-                $saveEntities[] = $useEmail['entity'];
+                unset($useEmail);
+
                 //use the next email
                 $batchCount = 0;
                 $useEmail   = next($emailSettings);
@@ -885,12 +897,17 @@ class EmailModel extends FormModel
         } else {
             $this->getRepository()->saveEntities($saveEntities);
 
+            if (!empty($saveEmails)) {
+                $this->getRepository()->saveEntities($saveEmails);
+                unset($saveEmails);
+            }
+
             foreach ($saveEntities as $stat) {
                 // Save RAM
                 $this->em->detach($stat);
             }
 
-            unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sent, $sendTo);
+            unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sendTo);
 
             return (empty($error));
         }
