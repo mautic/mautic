@@ -527,7 +527,7 @@ class CommonRepository extends EntityRepository
     protected function buildLimiterClauses(&$q, array $args)
     {
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
-        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
+        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 0;
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
