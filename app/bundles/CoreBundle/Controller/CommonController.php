@@ -583,6 +583,7 @@ class CommonController extends Controller implements MauticController
         if ($icon == null) {
             $icon = 'media/images/favicon.ico';
         }
+
         if (strpos($icon, 'http') !== 0) {
             $assetHelper = $this->factory->getHelper('template.assets');
             $icon        = $assetHelper->getUrl($icon, null, null, true);
