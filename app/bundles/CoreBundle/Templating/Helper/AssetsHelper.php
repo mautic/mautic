@@ -65,7 +65,7 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null)
+    public function getUrl($path, $packageName = null, $version = null, $absolute = false)
     {
         // if we have http in the url it is absolute and we can just return it
         if (strpos($path, 'http') === 0) {
@@ -76,7 +76,13 @@ class AssetsHelper extends CoreAssetsHelper
         $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
         $path        = $assetPrefix . $path;
 
-        return parent::getUrl($path, $packageName, $version);
+        $url = parent::getUrl($path, $packageName, $version);
+
+        if ($absolute) {
+            $url = $this->factory->getRequest()->getSchemeAndHttpHost() . $url;
+        }
+
+        return $url;
     }
 
     /**
