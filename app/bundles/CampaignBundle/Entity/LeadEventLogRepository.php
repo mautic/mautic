@@ -189,10 +189,35 @@ class LeadEventLogRepository extends EntityRepository
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
+        // First check to ensure the $toLead doesn't already exist
+        $results = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cl.event_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
+            ->where('cl.lead_id = '.$toLeadId)
+            ->execute()
+            ->fetchAll();
+        $exists = array();
+        foreach ($results as $r) {
+            $exists[] = $r['event_id'];
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log')
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
-            ->execute();
+            ->where('lead_id = '.(int) $fromLeadId);
+
+        if (!empty($exists)) {
+            $q->andWhere(
+                $q->expr()->notIn('event_id', $exists)
+            )->execute();
+
+            // Delete remaining leads as the new lead already belongs
+            $this->_em->getConnection()->createQueryBuilder()
+                ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+                ->where('lead_id = '.(int) $fromLeadId)
+                ->execute();
+        } else {
+            $q->execute();
+        }
     }
 }
