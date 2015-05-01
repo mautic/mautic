@@ -594,7 +594,7 @@ class EmailModel extends FormModel
             'source'          => array('email', $email->getId()),
             'emailSettings'   => $emailSettings,
             'returnEntities'  => true,
-            'ignoreLeadCheck' => true
+            'allowResends'    => false
         );
         foreach ($lists as $list) {
             $options['listId'] = $list->getId();
@@ -708,8 +708,9 @@ class EmailModel extends FormModel
      *     array source array('model', 'id')
      *     array emailSettings
      *     int   listId
-     *     bool  returnEntities; defaults to false
-     *     bool  ignoreLeadChecks  If true, do not contact and already sent checks will be ignored, defaults to false
+     *     bool  returnEntities  If true, entitites will be returned rather than persisted
+     *     bool  allowResends    If false, exact emails (by id) already sent to the lead will not be resent
+     *     bool  ignoreDNC       If true, emails listed in the do not contact table will still get the email
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
@@ -720,7 +721,8 @@ class EmailModel extends FormModel
         $emailSettings    = (isset($options['emailSettings'])) ? $options['emailSettings'] : array();
         $listId           = (isset($options['listId'])) ? $options['listId'] : null;
         $returnEntities   = (isset($options['returnEntities'])) ? $options['returnEntities'] : false;
-        $ignoreLeadChecks = (isset($options['ignoreLeadChecks'])) ? $options['ignoreLeadChecks'] : false;
+        $ignoreDNC        = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
+        $allowResends     = (isset($options['allowResends'])) ? $options['allowResends'] : true;
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
 
         if (!$email->getId()) {
@@ -741,14 +743,17 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        if (!$ignoreLeadChecks) {
+        if (!$allowResends) {
             static $sent = array();
             if (!isset($sent[$email->getId()])) {
                 $sent[$email->getId()] = $statRepo->getSentStats($email->getId(), $listId);
             }
-
             $sendTo = array_diff_key($leads, $sent[$email->getId()]);
+        } else {
+            $sendTo = $leads;
+        }
 
+        if ($ignoreDNC) {
             //get the list of do not contacts
             static $dnc;
             if (!is_array($dnc)) {
@@ -763,8 +768,6 @@ class EmailModel extends FormModel
                     }
                 }
             }
-        } else {
-            $sendTo = $leads;
         }
 
         //get a count of leads
@@ -772,7 +775,7 @@ class EmailModel extends FormModel
 
         //noone to send to so bail
         if (empty($count)) {
-            return array();
+            return true;
         }
 
         //how many of this batch should go to which email
@@ -793,7 +796,7 @@ class EmailModel extends FormModel
         $useEmail     = reset($emailSettings);
         $saveEntities = $saveEmails = array();
 
-        $error = false;
+        $errors = array();
 
         $mailer = $this->factory->getMailer();
 
@@ -839,7 +842,7 @@ class EmailModel extends FormModel
 
             //queue the message
             if (!$mailer->send(true)) {
-                $error = true;
+                $errors[$lead['id']] = true;
 
                 $mailer->reset();
 
@@ -848,7 +851,7 @@ class EmailModel extends FormModel
 
             $mailer->reset();
 
-            if (!$ignoreLeadChecks) {
+            if (!$allowResends) {
                 $sent[$email->getId()][$lead['id']] = $lead['id'];
             }
 
@@ -908,7 +911,7 @@ class EmailModel extends FormModel
 
             unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sendTo);
 
-            return (empty($error));
+            return (count($leads) > 1) ? $errors : (empty($error));
         }
     }
 
