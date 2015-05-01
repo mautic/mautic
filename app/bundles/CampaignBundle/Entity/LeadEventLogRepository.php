@@ -145,9 +145,14 @@ class LeadEventLogRepository extends EntityRepository
         $q->where(
             $q->expr()->andX(
                 $q->expr()->eq('o.campaign_id', (int) $campaignId),
-                $q->expr()->in('o.lead_id', $leadIds)
+                $q->expr()->in('o.lead_id', $leadIds),
+                $q->expr()->orX(
+                    $q->expr()->isNull('o.non_action_path_taken'),
+                    $q->expr()->eq('o.non_action_path_taken', ':false')
+                )
             )
         )
+            ->setParameter('false', false, 'boolean')
             ->groupBy('o.event_id');
 
         $results = $q->execute()->fetchAll();

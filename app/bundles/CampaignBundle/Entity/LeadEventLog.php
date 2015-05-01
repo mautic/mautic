@@ -67,6 +67,11 @@ class LeadEventLog
     private $systemTriggered = false;
 
     /**
+     * @ORM\Column(name="non_action_path_taken", type="boolean", nullable=true)
+     */
+    private $nonActionPathTaken = false;
+
+    /**
      * @return \DateTime
      */
     public function getDateTriggered ()
@@ -192,5 +197,21 @@ class LeadEventLog
     public function setSystemTriggered ($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNonActionPathTaken()
+    {
+        return $this->nonActionPathTaken;
+    }
+
+    /**
+     * @param mixed $nonActionPathTaken
+     */
+    public function setNonActionPathTaken($nonActionPathTaken)
+    {
+        $this->nonActionPathTaken = $nonActionPathTaken;
     }
 }

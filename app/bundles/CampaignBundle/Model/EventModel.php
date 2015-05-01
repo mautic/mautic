@@ -1002,6 +1002,7 @@ class EventModel extends CommonFormModel
                                     // Log the decision
                                     $log = $this->getLogEntity($parentId, $campaign, $l, null, true);
                                     $log->setDateTriggered(new \DateTime());
+                                    $log->setNonActionPathTaken(true);
                                     $repo->saveEntity($log);
                                     $this->em->detach($log);
                                     unset($log);
