@@ -109,9 +109,19 @@ if (isset($mauticParams['site_url'])) {
     $parts = parse_url($mauticParams['site_url']);
 
     if (!empty($parts['host'])) {
+        $path = '';
+
+        if (!empty($parts['path'])) {
+            // Check and remove trailing slash to prevent double // in Symfony cli generated URLs
+            $path = $parts['path'];
+            if (substr($path, -1) == '/') {
+                $path = substr($path, 0, -1);
+            }
+        }
+
         $container->setParameter('router.request_context.host', $parts['host']);
         $container->setParameter('router.request_context.scheme', (!empty($parts['scheme']) ? $parts['scheme'] : 'http'));
-        $container->setParameter('router.request_context.base_url', (!empty($parts['path']) ? $parts['path'] : '/'));
+        $container->setParameter('router.request_context.base_url', $path);
     }
 }
 

@@ -111,12 +111,13 @@ class LeadListRepository extends CommonRepository
     /**
      * Get lists for a specific lead
      *
-     * @param      $lead
-     * @param bool $forList
+     * @param       $lead
+     * @param bool  $forList
+     * @param bool  $singleArrayHydration
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false)
     {
         static $return = array();
 
@@ -148,7 +149,9 @@ class LeadListRepository extends CommonRepository
 
             return $return;
         } else {
-            if (empty($return[$lead])) {
+            $typeKey = $singleArrayHydration ? 'array' : 'object';
+
+            if (empty($return[$lead][$typeKey])) {
                 $q = $this->_em->createQueryBuilder()
                     ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
@@ -164,10 +167,10 @@ class LeadListRepository extends CommonRepository
                     $q->expr()->eq('IDENTITY(il.lead)', (int) $lead)
                 );
 
-                $return[$lead] = $q->getQuery()->getResult();
+                $return[$lead][$typeKey] = ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
             }
 
-            return $return[$lead];
+            return $return[$lead][$typeKey];
         }
     }
 

@@ -97,7 +97,7 @@ class LeadEventLogRepository extends EntityRepository
 
         if (isset($options['scheduled'])) {
             $query->andWhere('ll.isScheduled = :scheduled')
-                ->setParameter('scheduled', $options['scheduled']);
+                ->setParameter('scheduled', $options['scheduled'], 'boolean');
         }
 
         if (isset($options['eventType'])) {

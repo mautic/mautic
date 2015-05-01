@@ -15,6 +15,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class CampaignSubscriber
@@ -31,7 +32,6 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            EmailEvents::EMAIL_ON_SEND        => array('onEmailSend', 0),
             EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0)
         );
     }
@@ -64,17 +64,6 @@ class CampaignSubscriber extends CommonSubscriber
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
         );
         $event->addAction('email.send', $action);
-    }
-
-    /**
-     * Trigger campaign event for sending of an email
-     *
-     * @param EmailSendEvent $event
-     */
-    public function onEmailSend(EmailSendEvent $event)
-    {
-        $email = $event->getEmail();
-        $this->factory->getModel('campaign')->triggerEvent('email.send', $email);
     }
 
     /**

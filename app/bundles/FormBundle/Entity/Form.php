@@ -128,6 +128,10 @@ class Form extends FormEntity
      */
     private $template;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true, name="in_kiosk_mode")
+     */
+    private $inKioskMode = false;
 
     /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", cascade={"all"}, fetch="EXTRA_LAZY")
@@ -588,5 +592,29 @@ class Form extends FormEntity
     public function setTemplate ($template)
     {
         $this->template = $template;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInKioskMode()
+    {
+        return $this->inKioskMode;
+    }
+
+    /**
+     * @param mixed $inKioskMode
+     */
+    public function setInKioskMode($inKioskMode)
+    {
+        $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isInKioskMode()
+    {
+        return $this->getInKioskMode();
     }
 }

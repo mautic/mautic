@@ -120,22 +120,21 @@ class ListModel extends FormModel
      */
     public function regenerateListLeads(LeadList $entity, $isNew = false, $persist = true)
     {
+        $id          = $entity->getId();
+        $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
+
         if (!$isNew) {
-            $id = $entity->getId();
-
             $oldLeadList = $this->getLeadsByList(array('id' => $id), true);
-            $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
 
-            $addLeads     = array_diff($newLeadList[$id], $oldLeadList[$id]);
-            $removeLeads  = array_diff($oldLeadList[$id], $newLeadList[$id]);
+            $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
+            $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
         } else {
-            $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true, true);
-            $addLeads    = $newLeadList['new'];
+            $addLeads    = $newLeadList[$id];
             $removeLeads = array();
         }
 
         foreach ($addLeads as $l) {
-           $this->addLead($l, $entity);
+            $this->addLead($l, $entity);
         }
 
         if (isset($manuallyAdded)) {
@@ -145,7 +144,7 @@ class ListModel extends FormModel
         }
 
         foreach ($removeLeads as $l) {
-           $this->removeLead($l, $entity);
+            $this->removeLead($l, $entity);
         }
 
         if ($persist) {
@@ -340,9 +339,12 @@ class ListModel extends FormModel
      */
     public function addLead($lead, $lists, $manuallyAdded = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
@@ -385,6 +387,11 @@ class ListModel extends FormModel
         $persistLists = array();
 
         foreach ($lists as $l) {
+            if (!isset($this->leadChangeLists[$l])) {
+                // List no longer exists in the DB so continue to the next
+                continue;
+            }
+
             $listLead = $this->getListLeadRepository()->findOneBy(array(
                 'lead' => $lead,
                 'list' => $this->leadChangeLists[$l]
@@ -411,6 +418,9 @@ class ListModel extends FormModel
             }
 
             if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                // Force system lead for actions that use getCurrentLead
+                $leadModel->setSystemCurrentLead($lead);
+
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], true);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
             }
@@ -432,9 +442,12 @@ class ListModel extends FormModel
      */
     public function removeLead($lead, $lists, $manuallyRemoved = false)
     {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $leadModel->getEntity($leadId);
         }
 
         if (!$lists instanceof LeadList) {
@@ -477,6 +490,11 @@ class ListModel extends FormModel
 
         $persistLists = array();
         foreach ($lists as $l) {
+            if (!isset($this->leadChangeLists[$l])) {
+                // List no longer exists in the DB so continue to the next
+                continue;
+            }
+
             $dispatchEvent = false;
 
             $listLead = $this->getListLeadRepository()->findOneBy(array(
@@ -505,6 +523,9 @@ class ListModel extends FormModel
             }
 
             if ($dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                // Force system lead for actions that use getCurrentLead
+                $leadModel->setSystemCurrentLead($lead);
+
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], false);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
             }

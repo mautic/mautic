@@ -29,7 +29,6 @@ class LeadSubscriber extends CommonSubscriber
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
             LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
         );
     }
@@ -72,11 +71,14 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the submissions to the event array
         foreach ($rows as $row) {
+            // Convert to local from UTC
+            $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
+
             $submission = $submissionRepository->getEntity($row['id']);
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => new \DateTime($row['dateSubmitted']),
+                'eventLabel'=> $eventTypeName,
+                'timestamp' => $dtHelper->getLocalDateTime(),
                 'extra'     => array(
                     'submission' => $submission,
                     'form'  => $formModel->getEntity($row['form_id']),
@@ -85,14 +87,6 @@ class LeadSubscriber extends CommonSubscriber
                 'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php'
             ));
         }
-    }
-
-    /**
-     * @param LeadChangeEvent $event
-     */
-    public function onLeadChange(LeadChangeEvent $event)
-    {
-        $this->factory->getModel('form.submission')->getRepository()->updateLeadByTrackingId($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
     }
 
     /**

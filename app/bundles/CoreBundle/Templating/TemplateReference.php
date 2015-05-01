@@ -44,21 +44,31 @@ class TemplateReference extends BaseTemplateReference
         $path     = (empty($controller) ? '' : $controller.'/').$fileName;
 
         if (!empty($this->parameters['bundle'])) {
-            preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
+            $bundleRoot = $this->factory->getSystemPath('bundles', true);
+            $addonRoot  = $this->factory->getSystemPath('addons', true);
 
-            if (!empty($match[1])) {
-                // Check for a system-wide override
-                $themePath      = $this->factory->getSystemPath('themes', true);
-                $systemTemplate = $themePath . '/system/' . $this->parameters['bundle'] . '/' . $path;
-                if (file_exists($systemTemplate)) {
-                    $template = $systemTemplate;
+            // Check for a system-wide override
+            $themePath      = $this->factory->getSystemPath('themes', true);
+            $systemTemplate = $themePath.'/system/'.$this->parameters['bundle'].'/'.$path;
+            if (file_exists($systemTemplate)) {
+                $template = $systemTemplate;
+            } else {
+                $theme = $this->factory->getTheme();
+                //check for an override and load it if there is
+                $themeDir = $theme->getThemePath();
+                if (file_exists($themeDir.'/html/'.$this->parameters['bundle'].'/'.$path)) {
+                    // Theme override
+                    $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {
-                    $theme = $this->factory->getTheme();
-                    //check for an override and load it if there is
-                    $themeDir = $theme->getThemePath();
-                    $template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path;
-                    if (!file_exists($template)) {
-                        $template = '@' . $this->get('bundle') . '/Views/' . $path;
+                    preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
+
+                    if ((!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path))
+                        || file_exists(
+                            $addonRoot.'/'.$this->parameters['bundle'].'/Views/'.$path
+                        )
+                    ) {
+                        // Mautic core template
+                        $template = '@'.$this->get('bundle').'/Views/'.$path;
                     }
                 }
             }
@@ -68,11 +78,12 @@ class TemplateReference extends BaseTemplateReference
                 //this is a file in a specific Mautic theme folder
                 $theme = $this->factory->getTheme($controller);
 
-                $template = $theme->getThemePath() . '/html/' . $fileName;
+                $template = $theme->getThemePath().'/html/'.$fileName;
             }
         }
 
         if (empty($template)) {
+
             //try the parent
             return parent::getPath();
         }

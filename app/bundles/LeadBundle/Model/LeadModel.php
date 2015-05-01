@@ -213,9 +213,10 @@ class LeadModel extends FormModel
         $lead->setSocialCache($socialCache);
 
         //save the field values
-        if (!$isNew && !$lead->isNewlyCreated()) {
-            $fieldValues = $lead->getFields();
-        } else {
+        $fieldValues = $lead->getFields();
+
+        if (empty($fieldValues)) {
+            // Lead is new or they haven't been populated so let's build the fields now
             static $fields;
             if (empty($fields)) {
                 $fields = $this->factory->getModel('lead.field')->getEntities(array(
@@ -326,7 +327,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Gets the details of a lead
+     * Gets the details of a lead if not already set
      *
      * @param $lead
      *
@@ -336,13 +337,17 @@ class LeadModel extends FormModel
     {
         static $details = array();
 
-        $leadId = ($lead instanceof Lead) ? $lead->getId() : (int) $lead;
+        if ($lead instanceof Lead) {
+            $fields = $lead->getFields();
+            if (!empty($fields)) {
 
-        if (!isset($details[$leadId])) {
-            $details[$leadId] = $this->getRepository()->getFieldValues($leadId);
+                return $fields;
+            }
         }
 
-        return $details[$leadId];
+        $leadId = ($lead instanceof Lead) ? $lead->getId() : (int) $lead;
+
+        return $this->getRepository()->getFieldValues($leadId);
     }
 
     /**
@@ -540,6 +545,11 @@ class LeadModel extends FormModel
      */
     function setSystemCurrentLead(Lead $lead = null)
     {
+        $fields = $lead->getFields();
+        if (empty($fields)) {
+            $lead->setFields($this->getLeadDetails($lead));
+        }
+
         $this->systemCurrentLead = $lead;
     }
 
@@ -560,15 +570,16 @@ class LeadModel extends FormModel
     /**
      * Get a list of lists this lead belongs to
      *
-     * @param $lead
-     * @param bool $forLists
+     * @param Lead  $lead
+     * @param bool  $forLists
+     * @param boole $arrayHydration
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false)
     {
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
-        return $repo->getLeadLists($lead->getId(), $forLists);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration);
     }
 
     /**

@@ -275,11 +275,15 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Get updated lead with tracking ID
-        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
-        $submission->setLead($lead);
+        if ($form->isInKioskMode()) {
+            $lead = $leadModel->getCurrentLead();
+        } else {
+            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
 
-        //set tracking ID for stats purposes to determine unique hits
-        $submission->setTrackingId($trackingId);
+            //set tracking ID for stats purposes to determine unique hits
+            $submission->setTrackingId($trackingId);
+        }
+        $submission->setLead($lead);
 
         //save entity after the form submission events are fired in case a new lead is created
         $this->saveEntity($submission);

@@ -80,12 +80,6 @@
     border: solid 1px #00b49d;
 }
 
-.list-campaign-systemaction, a.list-campaign-systemaction {
-    /*background-color: #8393a2;*/
-    border: solid 1px #8393a2;
-    /*color: #fff;*/
-}
-
 .list-campaign-action, a.list-campaign-action {
     /*background-color: #47558f;*/
     border: solid 1px #4e5e9e;

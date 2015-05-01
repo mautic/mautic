@@ -73,7 +73,6 @@ class AssetType extends AbstractType
             'label'      => 'mautic.asset.asset.form.remotePath',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
-            'read_only'  => true,
             'required'   => false
         ));
 
