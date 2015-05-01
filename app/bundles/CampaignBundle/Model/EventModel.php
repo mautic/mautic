@@ -948,12 +948,7 @@ class EventModel extends CommonFormModel
                                 continue;
                             }
 
-                            // Log the decision
-                            $log = $this->getLogEntity($parentId, $campaign, $l, null, true);
-                            $log->setDateTriggered(new \DateTime());
-                            $repo->saveEntity($log);
-                            $this->em->detach($log);
-                            unset($log);
+                            $logDecision = $decisionLogged = false;
 
                             // Execute or schedule events
                             foreach ($eventTiming as $id => $timing) {
@@ -978,6 +973,8 @@ class EventModel extends CommonFormModel
                                     $log->setTriggerDate($timing);
 
                                     $repo->saveEntity($log);
+
+                                    $logDecision = true;
                                 } else {
                                     // Save log first to prevent subsequent triggers from duplicating
                                     $log = $this->getLogEntity($e['id'], $campaign, $l, null, true);
@@ -988,6 +985,8 @@ class EventModel extends CommonFormModel
                                     if (!$this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $l, null, true)) {
                                         $repo->deleteEntity($log);
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');
+
+                                        $logDecision = true;
                                     } else {
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' successfully executed and logged.');
                                     }
@@ -998,6 +997,17 @@ class EventModel extends CommonFormModel
                                 }
 
                                 unset($e, $log);
+
+                                if ($logDecision && !$decisionLogged) {
+                                    // Log the decision
+                                    $log = $this->getLogEntity($parentId, $campaign, $l, null, true);
+                                    $log->setDateTriggered(new \DateTime());
+                                    $repo->saveEntity($log);
+                                    $this->em->detach($log);
+                                    unset($log);
+
+                                    $decisionLogged = true;
+                                }
 
                                 if ($max && $totalEventCount >= $max) {
                                     // Hit the max
@@ -1014,6 +1024,7 @@ class EventModel extends CommonFormModel
 
                                 unset($utcDateString, $grandParentDate);
                             }
+
                         } else {
                             $logger->debug('CAMPAIGN: Decision has already been executed.');
 
