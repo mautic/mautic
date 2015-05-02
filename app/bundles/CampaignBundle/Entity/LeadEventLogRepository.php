@@ -35,12 +35,16 @@ class LeadEventLogRepository extends EntityRepository
                     e.name AS event_name,
                     e.description AS event_description,
                     c.name AS campaign_name,
-                    c.description AS campaign_description')
+                    c.description AS campaign_description,
+                    ll.metadata,
+                    e.type
+                    '
+            )
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
             ->where('ll.lead = ' . (int) $leadId)
             ->andWhere('e.eventType = :eventType')
-            ->setParameter('eventType', 'trigger');
+            ->setParameter('eventType', 'action');
 
         if (!empty($options['ipIds'])) {
             $query->orWhere('ll.ipAddress IN (' . implode(',', $options['ipIds']) . ')');

@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -91,6 +92,11 @@ class LeadTimelineEvent extends Event
 
         // Group by date
         foreach ($events as $e) {
+            if (!$e['timestamp'] instanceof \DateTime) {
+                $dt = new DateTimeHelper($e['timestamp'], 'Y-m-d H:i:s', 'UTC');
+                $e['timestamp'] = $dt->getDateTime();
+                unset($dt);
+            }
             $dateString = $e['timestamp']->format('Y-m-d H:i:s');
             if (!isset($byDate[$dateString])) {
                 $byDate[$dateString] = array();

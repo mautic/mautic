@@ -183,17 +183,26 @@ class LeadSubscriber extends CommonSubscriber
 
         $logs = $logRepository->getLeadLogs($lead->getId(), $options);
 
+        $model         = $this->factory->getModel('campaign');
+        $eventSettings = $model->getEvents();
+
         // Add the hits to the event array
         foreach ($logs as $log) {
-            $event->addEvent(array(
-                'event'           => $eventTypeKey,
-                'eventLabel'      => $eventTypeName,
-                'timestamp'       => $log['dateTriggered'],
-                'extra'           => array(
-                    'log' => $log
-                ),
-                'contentTemplate' => 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php'
-            ));
+            $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
+            $template        = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
+                ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
+
+            $event->addEvent(
+                array(
+                    'event'           => $eventTypeKey,
+                    'eventLabel'      => $eventTypeName,
+                    'timestamp'       => $log['dateTriggered'],
+                    'extra'           => array(
+                        'log' => $log
+                    ),
+                    'contentTemplate' => $template
+                )
+            );
         }
     }
 
