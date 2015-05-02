@@ -228,6 +228,7 @@ class EventModel extends CommonFormModel
             $examinedEvents[$leadId] = array();
         }
 
+        $actionResponses = array();
         foreach ($events as $campaignId => $campaignEvents) {
             foreach ($campaignEvents as $k => $event) {
                 //has this event already been examined via a parent's children?
@@ -331,12 +332,21 @@ class EventModel extends CommonFormModel
                         }
 
                         //trigger the action
-                        if ($this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered)) {
+                        $response = $this->invokeEventCallback($event, $settings, $lead, $eventDetails, $systemTriggered);
+                        if ($response !== false) {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' successfully executed and logged.');
-                            $persist[] = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
+                            $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
 
                             $childrenTriggered = true;
 
+                            if ($response !== true) {
+                                // Some feed back was given to be passed back to the function calling triggerEvent
+                                $actionResponses[$type][$child['id']] = $response;
+                                $log->setMetatdata($response);
+                            }
+
+                            $persist[] = $log;
+                            unset($log);
                         } else {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' execution failed.');
                         }
@@ -359,6 +369,8 @@ class EventModel extends CommonFormModel
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
         }
+
+        return $actionResponses;
     }
 
     /**
@@ -521,12 +533,20 @@ class EventModel extends CommonFormModel
                         $log->setDateTriggered(new \DateTime());
                         $repo->saveEntity($log);
 
-                        if (!$this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
+
+                        //trigger the action
+                        $response = $this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true);
+                        if ($response === false) {
                             // Something failed so remove the log
                             $repo->deleteEntity($log);
 
                             $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
                         } else {
+                            if ($response !== true) {
+                                $log->setMetatdata($response);
+                                $repo->saveEntity($log);
+                            }
+
                             $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
                         }
 
@@ -705,13 +725,19 @@ class EventModel extends CommonFormModel
                     }
 
                     //trigger the action
-                    if ($this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true)) {
+                    $response = $this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true);
+                    if ($response !== false) {
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
 
                         $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
                         $e->setTriggerDate(null);
                         $e->setIsScheduled(false);
                         $e->setDateTriggered(new \DateTime());
+
+                        if ($response !== true) {
+                            $e->setMetadata($response);
+                        }
+
                         $persist[] = $e;
                     } else {
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
@@ -982,13 +1008,19 @@ class EventModel extends CommonFormModel
 
                                     $repo->saveEntity($log);
 
-                                    if (!$this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $l, null, true)) {
+                                    $response = $this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $l, null, true);
+                                    if ($response === false) {
                                         $repo->deleteEntity($log);
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');
 
                                         $logDecision = true;
                                     } else {
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' successfully executed and logged.');
+
+                                        if ($response !== true) {
+                                            $log->setMetatdata($response);
+                                            $repo->saveEntity($log);
+                                        }
                                     }
                                 }
 
