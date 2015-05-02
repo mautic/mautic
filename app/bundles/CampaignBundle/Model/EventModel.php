@@ -869,6 +869,9 @@ class EventModel extends CommonFormModel
             }
 
             while ($start <= $leadCount) {
+                // Keep CPU down
+                sleep(1);
+
                 // Get batched campaign ids
                 $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit);
 
@@ -921,7 +924,6 @@ class EventModel extends CommonFormModel
 
                     // Loop over the non-actions and determine if it has been processed for this lead
                     foreach ($leads as $l) {
-
                         // Set lead for listeners
                         $leadModel->setSystemCurrentLead($l);
 
@@ -1069,6 +1071,12 @@ class EventModel extends CommonFormModel
                                 $pauseBatchCount = 0;
                             }
                         }
+
+                        $currentCount = ($max) ? $eventCount : $leadProcessedCount;
+                        if ($output && $currentCount < $maxCount) {
+                            $progress->setCurrent($currentCount);
+                        }
+
                     }
 
                     // Save RAM
@@ -1087,7 +1095,7 @@ class EventModel extends CommonFormModel
 
                 unset($leads, $campaignLeads, $leadLog);
 
-                $currentCount = ($max) ? $leadProcessedCount : $eventCount;
+                $currentCount = ($max) ? $eventCount : $leadProcessedCount;
                 if ($output && $currentCount < $maxCount) {
                     $progress->setCurrent($currentCount);
                 }
