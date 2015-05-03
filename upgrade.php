@@ -226,14 +226,14 @@ function move_mautic_bundles(array $status)
             $status['updateState']['completedBundles'] = array();
         }
 
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/app/bundles');
+        $completed = true;
+        $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/app/bundles');
 
         // Sanity check, make sure there are actually directories here to process
         $dirs = glob(MAUTIC_UPGRADE_ROOT . '/app/bundles/*', GLOB_ONLYDIR);
 
         if (count($dirs)) {
-            $count     = 0;
-            $completed = true;
+            $count = 0;
 
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
@@ -415,14 +415,14 @@ function move_mautic_vendors(array $status)
             $status['updateState']['completedSymfony'] = array();
         }
 
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
+        $completed = true;
+        $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
 
         // Sanity check, make sure there are actually directories here to process
         $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/symfony/*', GLOB_ONLYDIR);
 
         if (count($dirs)) {
-            $count     = 0;
-            $completed = true;
+            $count = 0;
 
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
@@ -487,14 +487,14 @@ function move_mautic_vendors(array $status)
     }
 
     // Once we've gotten here, we can safely iterate through the rest of the vendor directory; the rest of the contents are rather small in size
-    $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor');
+    $completed = true;
+    $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor');
 
     // Sanity check, make sure there are actually directories here to process
     $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/*', GLOB_ONLYDIR);
 
     if (count($dirs)) {
-        $count     = 0;
-        $completed = true;
+        $count = 0;
 
         /** @var DirectoryIterator $directory */
         foreach ($iterator as $directory) {
@@ -575,8 +575,10 @@ function move_mautic_vendors(array $status)
 /**
  * Copy files from the directory
  *
- * @param $dir
- * @param $errorLog
+ * @param string $dir
+ * @param array  &$errorLog
+ *
+ * @return bool
  */
 function copy_files($dir, &$errorLog) {
     if (is_dir(MAUTIC_UPGRADE_ROOT . $dir)) {
@@ -596,18 +598,19 @@ function copy_files($dir, &$errorLog) {
         }
 
         return true;
-    } else {
-
-        return false;
     }
+
+    return false;
 }
 
 /**
  * Copy directories
  *
- * @param $dir
- * @param $errorLog
- * @param $createDest
+ * @param string $dir
+ * @param array  &$errorLog
+ * @param bool   $createDest
+ *
+ * @return bool|void
  */
 function copy_directories($dir, &$errorLog, $createDest = true) {
     // Ensure the destination directory exists
