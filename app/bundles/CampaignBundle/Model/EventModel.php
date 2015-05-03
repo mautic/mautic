@@ -380,7 +380,7 @@ class EventModel extends CommonFormModel
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerStartingEvents($campaign, $limit = 100, $max = false, OutputInterface $output = null)
+    public function triggerStartingEvents($campaign, &$totalEventCount, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -528,6 +528,8 @@ class EventModel extends CommonFormModel
                         $repo->saveEntity($log);
 
                     } elseif ($timing) {
+                        $processedCount++;
+
                         // Save log first to prevent subsequent triggers from duplicating
                         $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
                         $log->setDateTriggered(new \DateTime());
@@ -542,6 +544,8 @@ class EventModel extends CommonFormModel
 
                             $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
                         } else {
+                            $processedCount++;
+
                             if ($response !== true) {
                                 $log->setMetatdata($response);
                                 $repo->saveEntity($log);
@@ -556,12 +560,12 @@ class EventModel extends CommonFormModel
                         $logger->debug('CAMPAIGN: Timing failed ('.gettype($timing).')');
                     }
 
+                    $totalEventCount++;
+
                     if (!empty($log)) {
                         // Detach log
                         $this->em->detach($log);
                         unset($log);
-
-                        $processedCount++;
                     }
 
                     unset($timing, $event);
@@ -603,16 +607,16 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * Trigger events that are scheduled
-     *
      * @param                 $campaign
+     * @param                 $totalEventCount
      * @param int             $limit
      * @param bool            $max
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerScheduledEvents($campaign, $totalEventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
+    public function triggerScheduledEvents($campaign, &$totalEventCount, $limit = 100, $max = false, OutputInterface $output = null)
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -653,7 +657,7 @@ class EventModel extends CommonFormModel
         // Event settings
         $eventSettings = $campaignModel->getEvents();
 
-        $eventCount = 0;
+        $eventCount = $processedEvents = 0;
         $maxCount   = ($max) ? $max : $totalScheduledCount;
 
         // Try to save some memory
@@ -727,6 +731,8 @@ class EventModel extends CommonFormModel
                     //trigger the action
                     $response = $this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true);
                     if ($response !== false) {
+                        $processedEvents++;
+
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
 
                         $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
@@ -794,7 +800,7 @@ class EventModel extends CommonFormModel
             $output->writeln('');
         }
 
-        return $eventCount;
+        return $processedEvents;
     }
 
     /**
@@ -850,7 +856,7 @@ class EventModel extends CommonFormModel
             );
         }
 
-        $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = 0;
+        $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = $processedCount = 0;
 
         $eventSettings = $campaignModel->getEvents();
 
@@ -988,6 +994,8 @@ class EventModel extends CommonFormModel
                                 $leadModel->setSystemCurrentLead($l);
 
                                 if ($timing instanceof \DateTime) {
+                                    $processedCount++;
+
                                     // Schedule the action
                                     $logger->debug(
                                         'CAMPAIGN: ID# '.$e['id'].' timing is not appropriate and thus scheduled for '.$timing->format(
@@ -1004,6 +1012,8 @@ class EventModel extends CommonFormModel
 
                                     $logDecision = true;
                                 } else {
+                                    $processedCount++;
+
                                     // Save log first to prevent subsequent triggers from duplicating
                                     $log = $this->getLogEntity($e['id'], $campaign, $l, null, true);
                                     $log->setDateTriggered(new \DateTime());
@@ -1072,7 +1082,7 @@ class EventModel extends CommonFormModel
                             }
                         }
 
-                        $currentCount = ($max) ? $eventCount : $leadProcessedCount;
+                        $currentCount = ($max) ? $totalEventCount : $leadProcessedCount;
                         if ($output && $currentCount < $maxCount) {
                             $progress->setCurrent($currentCount);
                         }
@@ -1111,7 +1121,7 @@ class EventModel extends CommonFormModel
 
         }
 
-        return $eventCount;
+        return $processedCount;
     }
 
     /**

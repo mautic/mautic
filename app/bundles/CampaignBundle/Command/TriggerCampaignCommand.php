@@ -128,8 +128,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                 if (!$negativeOnly && !$scheduleOnly) {
                     //trigger starting action events for newly added leads
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                    $processed = $model->triggerStartingEvents($campaign, $batch, $max, $output);
-                    $totalProcessed += $processed;
+                    $processed = $model->triggerStartingEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                     );
@@ -139,7 +138,6 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     //trigger scheduled events
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
                     $processed = $model->triggerScheduledEvents($campaign, $totalProcessed, $batch, $max, $output);
-                    $totalProcessed += $processed;
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                     );
@@ -174,8 +172,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added leads
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                        $processed = $model->triggerStartingEvents($c, $batch, $max, $output);
-                        $totalProcessed += $processed;
+                        $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
                             '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                         );
@@ -190,7 +187,6 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                         //trigger scheduled events
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
                         $processed = $model->triggerScheduledEvents($c, $totalProcessed, $batch, $max, $output);
-                        $totalProcessed += $processed;
                         $output->writeln(
                             '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                         );
