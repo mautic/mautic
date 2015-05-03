@@ -210,6 +210,26 @@ class MailHelper
     }
 
     /**
+     * Set subject
+     *
+     * @param $subject
+     */
+    public function setSubject($subject)
+    {
+        $this->message->setSubject($subject);
+    }
+
+    /**
+     * Set a plain text part
+     *
+     * @param $content
+     */
+    public function setPlainText($content)
+    {
+        $this->message->addPart($content, 'text/plain');
+    }
+
+    /**
      * @param        $content
      * @param string $contentType
      * @param null   $charset
@@ -217,6 +237,70 @@ class MailHelper
     public function setBody($content, $contentType = 'text/html', $charset = null)
     {
         $this->message->setBody($content, $contentType, $charset);
+    }
+
+    /**
+     * Set to address(es)
+     *
+     * @param $addresses
+     * @param $name
+     */
+    public function setTo($addresses, $name = null)
+    {
+        try {
+            $this->message->setTo($addresses, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set CC address(es)
+     *
+     * @param $addresses
+     * @param $name
+     */
+    public function setCc($addresses, $name = null)
+    {
+        try {
+            $this->message->setCc($addresses, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set BCC address(es)
+     *
+     * @param $addresses
+     * @param $name
+     */
+    public function setBcc($addresses, $name = null)
+    {
+        try {
+            $this->message->setBcc($addresses, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set from address (defaults to system)
+     *
+     * @param $address
+     * @param $name
+     */
+    public function setFrom($address, $name = null)
+    {
+        try {
+            $this->message->setFrom($address, $name);
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            $this->factory->getLogger()->log('error', '[MAIL ERROR] ' . $e->getMessage());
+        }
     }
 
     /**
@@ -233,6 +317,9 @@ class MailHelper
     public function setIdHash ($idHash)
     {
         $this->idHash = $idHash;
+
+        // Add the trackingID to the $message object in order to update the stats if the email failed to send
+        $this->message->leadIdHash = $idHash;
     }
 
     /**

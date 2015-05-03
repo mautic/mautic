@@ -31,7 +31,7 @@ class EmailListType extends AbstractType
         $choices = $factory->getModel('email')->getRepository()
             ->getEmailList('', 0, 0, $viewOther, true);
         foreach ($choices as $email) {
-            $this->choices[$email['language']][$email['id']] = $email['id'] . ':' . $email['subject'];
+            $this->choices[$email['language']][$email['id']] = $email['subject'] . " ({$email['id']})";
         }
 
         //sort by language
