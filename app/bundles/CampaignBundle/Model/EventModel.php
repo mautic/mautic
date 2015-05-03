@@ -453,7 +453,7 @@ class EventModel extends CommonFormModel
             // Get list of all campaign leads
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
 
-            if (!count($campaignLeads)) {
+            if (empty($campaignLeads)) {
                 // No leads found
 
                 break;
