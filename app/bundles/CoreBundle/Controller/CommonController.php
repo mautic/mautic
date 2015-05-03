@@ -208,12 +208,16 @@ class CommonController extends Controller implements MauticController
         }
 
         //render flashes
-        $passthrough['flashes']       = $this->getFlashContent();
+        $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
             // Prevent error in case installer is loaded via index_dev.php
             $passthrough['notifications'] = $this->getNotificationContent();
         }
+
+        //render browser notifications
+        $passthrough['browserNotifications'] = $this->factory->getSession()->get('mautic.browser.notifications', array());
+        $this->factory->getSession()->set('mautic.browser.notifications', array());
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
@@ -511,10 +515,89 @@ class CommonController extends Controller implements MauticController
             //message is already translated
             $translatedMessage = $message;
         } else {
-            $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+            if (isset($messageVars['pluralCount'])) {
+                $translatedMessage = $this->get('translator')->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
+            } else {
+                $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
+            }
         }
 
         $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+
+        if (!defined('MAUTIC_INSTALLER') && $addNotification) {
+            switch ($type) {
+                case 'warning':
+                    $iconClass = "text-warning fa-exclamation-triangle";
+                    break;
+                case 'error':
+                    $iconClass = "text-danger fa-exclamation-circle";
+                    break;
+                case 'notice':
+                    $iconClass = "fa-info-circle";
+                default:
+                    break;
+            }
+
+            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            $lastActive = $this->request->get('mauticUserLastActive', 0);
+            $isRead     = $lastActive > 30 ? 0 : 1;
+
+            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
+        }
+    }
+
+    /**
+     * @param        $message
+     * @param array  $messageVars
+     * @param string $domain
+     * @param null   $title
+     * @param null   $icon
+     * @param bool   $addNotification
+     * @param string $type
+     */
+    public function addBrowserNotification($message, $messageVars = array(), $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
+    {
+        if ($domain == null) {
+            $domain = 'flashes';
+        }
+
+        $translator = $this->factory->getTranslator();
+
+        if ($domain === false) {
+            //message is already translated
+            $translatedMessage = $message;
+        } else {
+            if (isset($messageVars['pluralCount'])) {
+                $translatedMessage = $translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
+            } else {
+                $translatedMessage = $translator->trans($message, $messageVars, $domain);
+            }
+        }
+
+        if ($title !== null) {
+            $title = $translator->trans($title);
+        } else {
+            $title = 'Mautic';
+        }
+
+        if ($icon == null) {
+            $icon = 'media/images/favicon.ico';
+        }
+
+        if (strpos($icon, 'http') !== 0) {
+            $assetHelper = $this->factory->getHelper('template.assets');
+            $icon        = $assetHelper->getUrl($icon, null, null, true);
+        }
+
+        $session                = $this->factory->getSession();
+        $browserNotifications   = $session->get('mautic.browser.notifications', array());
+        $browserNotifications[] = array(
+            'message' => $translatedMessage,
+            'title'   => $title,
+            'icon'    => $icon
+        );
+
+        $session->set('mautic.browser.notifications', $browserNotifications);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             switch ($type) {
