@@ -63,10 +63,6 @@ class Consumer implements ConsumerInterface
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.core.name.required')
         ));
-
-        $metadata->addPropertyConstraint('callback', new Assert\NotBlank(
-            array('message' => 'mautic.api.client.callback.notblank')
-        ));
     }
 
     /**
@@ -119,7 +115,6 @@ class Consumer implements ConsumerInterface
     {
         return array($this->callback);
     }
-
 
     /**
      * {@inheritDoc}

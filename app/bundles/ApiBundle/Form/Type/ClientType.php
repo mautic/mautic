@@ -9,6 +9,7 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -108,9 +109,7 @@ class ClientType extends AbstractType
 
                 if ($form->has('redirectUris')) {
                     foreach ($data->getRedirectUris() as $uri) {
-                        $urlConstraint = new Assert\Url(array(
-                            'protocols' => array('http','https')
-                        ));
+                        $urlConstraint = new OAuthCallback();
                         $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', array('%url%' => $uri), 'validators');
 
                         $errors = $validator->validateValue(
@@ -127,14 +126,16 @@ class ClientType extends AbstractType
                 }
             });
         } else {
-            $builder->add('callback', 'text', array(
+            $builder->add(
+                $builder->create('callback', 'text', array(
                 'label'      => 'mautic.api.client.form.callback',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.api.client.form.help.callback',
-                )
-            ));
+                ),
+                'required'   => false
+            ))->addModelTransformer(new Transformers\NullToEmptyTransformer()));
 
             $builder->add('consumerKey', 'text', array(
                 'label'      => 'mautic.api.client.form.consumerkey',
@@ -163,9 +164,7 @@ class ClientType extends AbstractType
 
                 if ($form->has('callback')) {
                     $uri           = $data->getCallback();
-                    $urlConstraint = new Assert\Url(array(
-                        'protocols' => array('http','https')
-                    ));
+                    $urlConstraint = new OAuthCallback();
                     $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', array('%url%' => $uri), 'validators');
 
                     $errors = $validator->validateValue(
