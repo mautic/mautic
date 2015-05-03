@@ -1103,11 +1103,12 @@ class EventModel extends CommonFormModel
                 // Free some memory
                 gc_collect_cycles();
             }
-        }
 
-        if ($output) {
-            $progress->finish();
-            $output->writeln('');
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+
         }
 
         return $eventCount;
