@@ -123,6 +123,80 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Get a list of lead entities
+     *
+     * @param $fields
+     * @param $values
+     *
+     * @return array
+     */
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    {
+        // get the list of IDs
+        $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
+
+        // init to empty array
+        $results = array();
+
+        // if we didn't get anything return empty
+        if (!count(($idList))) {
+            return $results;
+        }
+
+        $ids = array();
+
+        // we know we have at least one
+        foreach ($idList as $r) {
+            $ids[] = $r['id'];
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->select('l')
+            ->from('MauticLeadBundle:Lead', 'l');
+
+        $q->where(
+            $q->expr()->in('l.id', ':ids')
+        )
+            ->setParameter('ids', $ids)
+            ->orderBy('l.dateAdded', 'DESC');
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
+
+    /*
+     * Get list of lead Ids by unique field data.
+     *
+     * @param $uniqueFieldsWithData is an array of columns & values to filter by
+     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     *
+     * @return array
+     */
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        // loop through the fields and
+        foreach($uniqueFieldsWithData as $col => $val) {
+            $q->orWhere("l.$col = :" . $col)
+                ->setParameter($col, $val);
+        }
+
+        // if we have a lead ID lets use it
+        if (!empty($leadId)) {
+            // make sure that its not the id we already have
+            $q->andWhere("l.id != " . $leadId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * @param $email
      */
     public function getLeadByEmail($email)

@@ -86,6 +86,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 $type = 'url';
             } elseif ($name == 'email') {
                 $type = 'email';
+                $entity->setIsUniqueIdentifer(true);
             } else {
                 $type = 'text';
             }
@@ -131,6 +132,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
 
             $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
             $entity->setIsShortVisible($shortVisible);
+
 
             $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
             $entity->setGroup($group);

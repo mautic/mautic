@@ -42,13 +42,24 @@ class LeadApiController extends CommonApiController
         // Check for an email to see if the lead already exists
         $parameters = $this->request->request->all();
 
-        if (array_key_exists('email', $parameters)) {
-            $lead = $this->model->getRepository()->getLeadByEmail($parameters['email']);
+        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueLeadFieldData = array();
 
-            if (!empty($lead)) {
-                // Lead found so edit rather than create a new one
+        foreach ($parameters as $k => $v) {
+            if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
+                $uniqueLeadFieldData[$k] = $v;
+            }
+        }
 
-                return parent::editEntityAction($lead['id']);
+        if (count($uniqueLeadFieldData)) {
+            if (count($uniqueLeadFieldData)) {
+                $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
+
+                if (!empty($existingLeads)) {
+                    // Lead found so edit rather than create a new one
+
+                    return parent::editEntityAction($existingLeads[0]->getId());
+                }
             }
         }
 

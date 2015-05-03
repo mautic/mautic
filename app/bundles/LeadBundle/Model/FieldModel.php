@@ -391,4 +391,18 @@ class FieldModel extends FormModel
 
         return $leadFields;
     }
+
+    /*
+     * Retrieves a list of published fields that are unique identifers
+     *
+     * @return array
+     */
+    public function getUniqueIdentiferFields()
+    {
+        $filters = array ('isPublished' => true, 'isUniqueIdentifer' => true);
+
+        $fields = $this->getFieldList(false, true,  $filters);
+
+        return $fields;
+    }
 }
