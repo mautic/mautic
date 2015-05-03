@@ -515,6 +515,8 @@ class EventModel extends CommonFormModel
 
                     $timing = $this->checkEventTiming($event, new \DateTime());
                     if ($timing instanceof \DateTime) {
+                        $processedCount++;
+
                         //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
                         $logger->debug(
                             'CAMPAIGN: ID# '.$event['id'].' timing is not appropriate and thus scheduled for '.$timing->format('Y-m-d H:m:i T').''
@@ -528,8 +530,6 @@ class EventModel extends CommonFormModel
                         $repo->saveEntity($log);
 
                     } elseif ($timing) {
-                        $processedCount++;
-
                         // Save log first to prevent subsequent triggers from duplicating
                         $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
                         $log->setDateTriggered(new \DateTime());
