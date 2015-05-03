@@ -9,7 +9,7 @@
 
 $query  = (!isset($query)) ? '' : $query;
 $status = $item->getPublishStatus();
-$size   = (!isset($size)) ? 'fa-lg' : $size;
+$size   = (empty($size)) ? 'fa-lg' : $size;
 switch ($status) {
     case 'published':
         $icon = " fa-toggle-on text-success";
