@@ -64,7 +64,17 @@ class PublicController extends CommonFormController
                 //replace tokens
                 $content = $response->getContent();
             } else {
-                $content = $entity->getCustomHtml();
+                $content   = $entity->getCustomHtml();
+                $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
+
+                // Check for html doc
+                if (strpos($content, '<html>') === false) {
+                    $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
+                } elseif (strpos($content, '<head>') === false) {
+                    $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
+                } elseif (!empty($analytics)) {
+                    $content = str_replace('</head>', $analytics . "\n</head>", $content);
+                }
             }
 
             $dispatcher = $this->get('event_dispatcher');
