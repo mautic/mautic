@@ -63,9 +63,20 @@ class oAuthHelper
             $headers['oauth_verifier'] = $this->request->query->get('oauth_verifier');
         }
 
-        //Add the parameters
-        $headers                    = array_merge($headers, $parameters);
-        $base_info                  = $this->buildBaseString($url, $method, $headers);
+
+        if (!empty($this->settings['query'])) {
+            // Include query in the base string if appended
+            $parameters = array_merge($parameters, $this->settings['query']);
+        }
+
+        if (!empty($this->settings['double_encode_basestring_parameters'])) {
+            // Parameters must be encoded before going through buildBaseString
+            array_walk($parameters, create_function('&$val, $key, $oauth', '$val = $oauth->encode($val);'), $this);
+        }
+
+        $signature = array_merge($headers, $parameters);
+
+        $base_info                  = $this->buildBaseString($url, $method, $signature);
         $composite_key              = $this->getCompositeKey();
         $headers['oauth_signature'] = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
 
@@ -79,7 +90,7 @@ class oAuthHelper
      */
     private function getCompositeKey ()
     {
-        if (isset($this->accessTokenSecret) && strlen($this->accessTokenSecret) > 0) {
+        if (strlen($this->accessTokenSecret) > 0) {
             $composite_key = $this->encode($this->clientSecret) . '&' . $this->encode($this->accessTokenSecret);
         } else {
             $composite_key = $this->encode($this->clientSecret) . '&';
@@ -102,11 +113,15 @@ class oAuthHelper
             'oauth_timestamp'        => time(),
             'oauth_version'          => '1.0'
         );
-        if (isset($this->accessToken)) {
+
+        if (empty($this->settings['authorize_session']) && !empty($this->accessToken))  {
             $oauth['oauth_token'] = $this->accessToken;
+        } elseif (!empty($this->settings['request_token'])) {
+            // OAuth1.a access_token request that requires the retrieved request_token to be appended
+            $oauth['oauth_token'] = $this->settings['request_token'];
         }
 
-        if (!empty($this->callback)) {
+        if (!empty($this->settings['append_callback']) && !empty($this->callback)) {
             $oauth['oauth_callback'] = $this->callback;
         }
 
@@ -169,7 +184,7 @@ class oAuthHelper
                     $k = $key;
                 }
                 if ($encode) {
-                    $normalized[] = $this->encode($k) . '=' . $this->encode($v);
+                    $normalized[] = $this->encode($k) . '="' . $this->encode($v).'"';
                 } else {
                     $normalized[] = $k . '=' . $v;
                 }
@@ -184,7 +199,7 @@ class oAuthHelper
      *
      * @param $string
      */
-    private function encode ($string)
+    public function encode ($string)
     {
         return str_replace('%7E', '~', rawurlencode($string));
     }
