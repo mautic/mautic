@@ -242,6 +242,10 @@ class PublicController extends CommonFormController
                 $content = $response->getContent();
             } else {
                 $content = $entity->getCustomHtml();
+                $analytics = $this->factory->getParameter('google_analytics');
+                if (!empty($analytics)) {
+                    $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+                }
             }
 
             $dispatcher = $this->get('event_dispatcher');
