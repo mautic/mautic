@@ -76,10 +76,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
     var domEventId = 'CampaignEvent_' + response.eventId;
     var eventId = '#' + domEventId;
 
-    if (response.label) {
-        Mautic.campaignBuilderLabels[domEventId] = response.label;
-        Mautic.campaignBuilderUpdateLabel(domEventId);
-    }
+    Mautic.campaignBuilderLabels[domEventId] = (response.label) ? response.label : '';
+    Mautic.campaignBuilderUpdateLabel(domEventId);
 
     if (response.deleted) {
         //remove the connections

@@ -22,6 +22,7 @@ class ListChangeEvent extends Event
 {
 
     private $lead;
+    private $leads;
     private $list;
     private $added;
 
@@ -29,9 +30,13 @@ class ListChangeEvent extends Event
      * @param Lead $lead
      * @param List $list
      */
-    public function __construct(Lead $lead, LeadList $list, $added = true)
+    public function __construct($leads, LeadList $list, $added = true)
     {
-        $this->lead   = $lead;
+        if (is_array($leads)) {
+            $this->leads = $leads;
+        } else {
+            $this->lead = $leads;
+        }
         $this->list   = $list;
         $this->added  = $added;
     }
@@ -44,6 +49,16 @@ class ListChangeEvent extends Event
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * Returns batch array of leads
+     *
+     * @return array
+     */
+    public function getLeads()
+    {
+        return $this->leads;
     }
 
     /**

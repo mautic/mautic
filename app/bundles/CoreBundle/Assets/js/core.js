@@ -120,6 +120,28 @@ var Mautic = {
     },
 
     /**
+     * Setups browser notifications
+     */
+    setupBrowserNotifier: function () {
+        //request notification support
+        notify.requestPermission();
+        notify.config({
+            autoClose: 10000
+        });
+
+        Mautic.browserNotifier = {
+            isSupported:     notify.isSupported,
+            permissionLevel: notify.permissionLevel()
+        };
+
+        Mautic.browserNotifier.isSupported        = notify.isSupported;
+        Mautic.browserNotifier.permissionLevel    = notify.permissionLevel();
+        Mautic.browserNotifier.createNotification = function (title, options) {
+            return notify.createNotification(title, options);
+        }
+    },
+
+    /**
      * Stops the ajax page loading indicator
      */
     stopPageLoadingBar: function () {
@@ -484,6 +506,8 @@ var Mautic = {
         if (container == '#app-content' || container == 'body') {
             //register global keyboard shortcuts
             Mautic.bindGlobalKeyboardShortcuts();
+
+            Mautic.setupBrowserNotifier();
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -1038,6 +1062,10 @@ var Mautic = {
                 Mautic.setNotifications(response.notifications);
             }
 
+            if (response.browserNotifications) {
+                Mautic.setBrowserNotifications(response.browserNotifications);
+            }
+
             if (response.route) {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
@@ -1351,6 +1379,14 @@ var Mautic = {
         } else {
             if (response.flashes) {
                 Mautic.setFlashes(response.flashes);
+            }
+
+            if (response.notifications) {
+                Mautic.setNotifications(response.notifications);
+            }
+
+            if (response.browserNotifications) {
+                Mautic.setBrowserNotifications(response.browserNotifications);
             }
 
             if (response.callback) {
@@ -2363,10 +2399,27 @@ var Mautic = {
                 mQuery(me).fadeTo(500, 0).slideUp(500, function () {
                     mQuery(this).remove();
                 });
-            }, 7000);
+            }, 4000);
 
             mQuery(this).removeClass('alert-new');
         });
+    },
+
+    /**
+     * Set browser notifications
+     *
+     * @param notifications
+     */
+    setBrowserNotifications: function (notifications) {
+       mQuery.each(notifications, function (key, notification) {
+          Mautic.browserNotifier.createNotification(
+              notification.title,
+              {
+                  body: notification.message,
+                  icon: notification.icon
+              }
+          );
+       });
     },
 
     /**

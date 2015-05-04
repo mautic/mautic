@@ -198,7 +198,7 @@ class SubmissionModel extends CommonFormModel
                         $parts      = explode('::', $callback);
                         $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
-                        new \ReflectionMethod(null, $callback);
+                        $reflection = new \ReflectionMethod(null, $callback);
                     }
 
                     $pass = array();
@@ -258,7 +258,7 @@ class SubmissionModel extends CommonFormModel
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
-                    new \ReflectionMethod(null, $callback);
+                    $reflection = new \ReflectionMethod(null, $callback);
                 }
 
                 $pass = array();

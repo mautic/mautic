@@ -134,7 +134,7 @@ class Email extends FormEntity
     private $lists;
 
     /**
-     * @ORM\OneToMany(targetEntity="Stat", mappedBy="email", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Stat", mappedBy="email", cascade={"persist"}, indexBy="id", fetch="EXTRA_LAZY")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"emailDetails"})

@@ -41,9 +41,6 @@ $item = $event['extra']['stats'];
 	            <?php if (!empty($item['list_name'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['list_name'])); ?>
 	            <?php endif; ?>
-	            <?php if (!empty($item['isFailed'])) : ?>
-	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
-	            <?php endif; ?>
 	            </p>
 	        </div>
 	    <?php endif; ?>

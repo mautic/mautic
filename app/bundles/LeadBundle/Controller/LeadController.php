@@ -42,7 +42,7 @@ class LeadController extends FormController
             'lead:leads:deleteother'
         ), "RETURN_ARRAY");
 
-        if (!$permissions['lead:leads:viewown'] || !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 
@@ -419,7 +419,7 @@ class LeadController extends FormController
                         $data[$f->getName()] = $f->getData();
                     }
 
-                    $model->setFieldValues($lead, $data);
+                    $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
                     $model->saveEntity($lead);
@@ -569,7 +569,7 @@ class LeadController extends FormController
                         }
                     }
 
-                    $model->setFieldValues($lead, $data);
+                    $model->setFieldValues($lead, $data, true);
                     //form is valid so process the data
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
 
@@ -764,7 +764,8 @@ class LeadController extends FormController
      */
     public function listAction ($objectId)
     {
-        $model = $this->factory->getModel('lead.lead');
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->factory->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
         if ($lead != null && $this->factory->getSecurity()->hasEntityAccess(
@@ -773,15 +774,19 @@ class LeadController extends FormController
         ) {
             /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
             $listModel = $this->factory->getModel('lead.list');
-            $lists     = $listModel->getUserLists('', true);
+            $lists     = $listModel->getUserLists();
+
+            // Get a list of lists for the lead
+            $leadsLists = $model->getLists($lead, true, true);
         } else {
-            $lists = array();
+            $lists = $leadsLists = array();
         }
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'lists' => $lists,
-                'lead'  => $lead
+                'lists'      => $lists,
+                'leadsLists' => $leadsLists,
+                'lead'       => $lead
             ),
             'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
         ));
@@ -889,6 +894,8 @@ class LeadController extends FormController
                 break;
 
             case 4:
+                ignore_user_abort(true);
+
                 $inProgress = $session->get('mautic.lead.import.inprogress', false);
                 $checks     = $session->get('mautic.lead.import.progresschecks', 1);
                 if (!$inProgress || $checks > 5) {
@@ -900,7 +907,6 @@ class LeadController extends FormController
                     $headers      = $session->get('mautic.lead.import.headers', array());
                     $importFields = $session->get('mautic.lead.import.fields', array());
 
-                    $batchSize = 10;
                     $file      = new \SplFileObject($fullPath);
                     if ($file !== false) {
                         $lineNumber = $progress[0];
@@ -909,7 +915,8 @@ class LeadController extends FormController
                             $file->seek($lineNumber);
                         }
 
-                        $config = $session->get('mautic.lead.import.config');
+                        $config    = $session->get('mautic.lead.import.config');
+                        $batchSize = $config['batchlimit'];
 
                         while ($batchSize && !$file->eof()) {
                             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
@@ -969,7 +976,7 @@ class LeadController extends FormController
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
-            if (!$cancelled = $this->isFormCancelled($form)) {
+            if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 $valid = $this->isFormValid($form);
                 switch ($step) {
                     case 1:
@@ -989,8 +996,12 @@ class LeadController extends FormController
                                     unset($config['file']);
                                     unset($config['start']);
 
-                                    foreach ($config as &$c) {
+                                    foreach ($config as $key => &$c) {
                                         $c = htmlspecialchars_decode($c);
+
+                                        if ($key == 'batchlimit') {
+                                            $c = (int) $c;
+                                        }
                                     }
 
                                     $session->set('mautic.lead.import.config', $config);
@@ -1026,6 +1037,12 @@ class LeadController extends FormController
                     case 2:
                         // Save matched fields
                         $matchedFields = $form->getData();
+
+                        if (empty($matchedFields)) {
+                            $this->resetImport($fullPath);
+
+                            return $this->importAction(0, true);
+                        }
 
                         $owner = $matchedFields['owner'];
                         unset($matchedFields['owner']);

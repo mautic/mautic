@@ -87,7 +87,7 @@ class Campaign extends FormEntity
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", fetch="EXTRA_LAZY")
      */
     private $leads;
 
@@ -111,6 +111,15 @@ class Campaign extends FormEntity
         $this->events = new ArrayCollection();
         $this->leads  = new ArrayCollection();
         $this->lists  = new ArrayCollection();
+    }
+
+    /**
+     *
+     */
+    public function __clone()
+    {
+        $this->leads  = new ArrayCollection();
+        $this->id    = null;
     }
 
     /**

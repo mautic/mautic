@@ -32,19 +32,25 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
                     </div>
 
                     <div class="row">
-                        <div class="col-xs-4">
+                        <div class="col-xs-3">
+                            <?php echo $view['form']->label($form['batchlimit']); ?>
+                            <?php echo $view['form']->widget($form['batchlimit']); ?>
+                            <?php echo $view['form']->errors($form['batchlimit']); ?>
+                        </div>
+
+                        <div class="col-xs-3">
                             <?php echo $view['form']->label($form['delimiter']); ?>
                             <?php echo $view['form']->widget($form['delimiter']); ?>
                             <?php echo $view['form']->errors($form['delimiter']); ?>
                         </div>
 
-                        <div class="col-xs-4">
+                        <div class="col-xs-3">
                             <?php echo $view['form']->label($form['enclosure']); ?>
                             <?php echo $view['form']->widget($form['enclosure']); ?>
                             <?php echo $view['form']->errors($form['enclosure']); ?>
                         </div>
 
-                        <div class="col-xs-4">
+                        <div class="col-xs-3">
                             <?php echo $view['form']->label($form['escape']); ?>
                             <?php echo $view['form']->widget($form['escape']); ?>
                             <?php echo $view['form']->errors($form['escape']); ?>

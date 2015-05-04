@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -500,7 +501,8 @@ class AjaxController extends CommonController
             $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
-            $result = $application->run($input);
+            $output      = new NullOutput();
+            $result      = $application->run($input, $output);
         }
 
         if ($result !== 0) {
@@ -618,15 +620,16 @@ class AjaxController extends CommonController
                     $mailer->start();
                     $translator = $this->factory->getTranslator();
 
-                    if (!empty($settings['send_test'])) {
+                    if ($settings['send_test'] == 'true') {
                         $message = new \Swift_Message(
                             $translator->trans('mautic.core.config.form.mailer.transport.test_send.subject'),
                             $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
                         );
 
                         $user = $this->factory->getUser();
+
                         $message->setFrom(array($settings['from_email'] => $settings['from_name']));
-                        $message->setTo(array($user->getEmail() => $user->getFirstName() . ' ' . $user->getLastName()));
+                        $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
 
                         $mailer->send($message);
                     }

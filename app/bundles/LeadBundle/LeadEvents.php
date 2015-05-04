@@ -58,6 +58,16 @@ final class LeadEvents
     const LEAD_LIST_CHANGE   = 'mautic.lead_list_change';
 
     /**
+     * The mautic.lead_list_batch_change event is dispatched if a batch of leads are changed from ListModel::rebuildListLeads()
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListChange instance.
+     *
+     * @var string
+     */
+    const LEAD_LIST_BATCH_CHANGE = 'mautic.lead_list_batch_change';
+
+    /**
      * The mautic.lead_pre_delete event is dispatched before a lead is deleted.
      *
      * The event listener receives a

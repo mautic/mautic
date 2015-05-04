@@ -108,13 +108,6 @@ class LeadSubscriber extends CommonSubscriber
                         $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
                     }
                 }
-
-                //regenerate the lists leads if there are changes AND the lead wasn't created by getCurrentLead
-                if (!$lead->imported && !$lead->isNewlyCreated()) {
-                    /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-                    $model = $this->factory->getModel('lead');
-                    $model->regenerateLeadLists($lead);
-                }
             }
         }
     }

@@ -143,7 +143,13 @@ return array(
             'bazinga.oauth.security.authentication.provider.class'    => 'Mautic\ApiBundle\Security\OAuth1\Authentication\Provider\OAuthProvider',
             'bazinga.oauth.security.authentication.listener.class'    => 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener',
             'bazinga.oauth.event_listener.request.class'              => 'Mautic\ApiBundle\EventListener\OAuth1\OAuthRequestListener',
-            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener'
+            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
+
+            'mautic.validator.oauthcallback' => array(
+                'class'     => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
+                'tag'       => 'validator.constraint_validator',
+                'alias'     => 'oauth_callback'
+            )
         )
     ),
 

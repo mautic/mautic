@@ -44,6 +44,9 @@ class MauticFactory
      */
     private $entityManager = null;
 
+    private $mailHelper = null;
+
+
     /**
      * @param ContainerInterface $container
      */
@@ -245,7 +248,7 @@ class MauticFactory
      */
     public function getTemplating()
     {
-        if (php_sapi_name() == 'cli') {
+        if (defined('IN_MAUTIC_CONSOLE')) {
             //enter the request scope in order to be use the templating.helper.assets service
             $this->container->enterScope('request');
             $this->container->set('request', new Request(), 'request');
@@ -529,9 +532,17 @@ class MauticFactory
      */
     public function getMailer()
     {
-        return new MailHelper($this, $this->container->get('mailer'), array(
-            $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
-        ));
+        if ($this->mailHelper == null) {
+            $this->mailHelper = new MailHelper(
+                $this, $this->container->get('mailer'), array(
+                $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
+            )
+            );
+        } else {
+            $this->mailHelper->reset();
+        }
+
+        return $this->mailHelper;
     }
 
     /**
@@ -554,11 +565,19 @@ class MauticFactory
 
         foreach ($ipHolders as $key) {
             if ($request->server->get($key)) {
-                return $request->server->get($key);
+                $ip = $request->server->get($key);
+
+                if (strpos($ip, ',') !== false) {
+                    // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
+                    $ips = explode(',', $ip);
+                    $ip  = end($ips);
+                }
+
+                return trim($ip);
             }
         }
 
-        // if everything else failes
+        // if everything else fails
         return '127.0.0.1';
     }
 
