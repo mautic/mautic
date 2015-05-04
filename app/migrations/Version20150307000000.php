@@ -54,10 +54,10 @@ class Version20150307000000 extends AbstractMauticMigration
         $lists = $listModel->getEntities(array('ignore_paginator' => true));
 
         foreach ($lists as $l) {
-            $listModel->regenerateListLeads($l);
+            $listModel->rebuildListLeads($l);
         }
 
-        $leads = $listModel->getLeadsByList($lists, true, false, true);
+        $leads = $listModel->getLeadsByList($lists, true);
 
         $persist = array();
         $em = $this->factory->getEntityManager();

@@ -134,7 +134,7 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      */
     private $submissions;

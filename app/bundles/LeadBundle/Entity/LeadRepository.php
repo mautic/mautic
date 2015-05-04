@@ -419,6 +419,8 @@ class LeadRepository extends CommonRepository
             $fields[$r['alias']] = $r;
         }
 
+        unset($results);
+
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
@@ -470,6 +472,7 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
+        unset($results, $fields);
 
         //get an array of IDs for ORM query
         $ids = array_keys($fieldValues);
@@ -490,9 +493,9 @@ class LeadRepository extends CommonRepository
             $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
 
             //ORM - generates lead entities
-            $q = $this
-                ->createQueryBuilder('l');
+            $q = $this->_em->createQueryBuilder();
             $q->select('l, u, i,' . $order)
+                ->from('MauticLeadBundle:Lead', 'l', 'l.id')
                 ->leftJoin('l.ipAddresses', 'i')
                 ->leftJoin('l.owner', 'u');
 
@@ -502,7 +505,11 @@ class LeadRepository extends CommonRepository
             )->setParameter('leadIds', $ids);
 
             $q->orderBy('ORD', 'ASC');
-            $results   = $q->getQuery()->getResult();
+
+            $results = $q->getQuery()
+                ->useQueryCache(false)
+                ->useResultCache(false)
+                ->getResult();
 
             //assign fields
             foreach ($results as $r) {
@@ -513,6 +520,8 @@ class LeadRepository extends CommonRepository
                 $leadId = $r->getId();
                 $r->setFields($fieldValues[$leadId]);
             }
+        } else {
+            $results = array();
         }
 
         return (!empty($args['withTotalCount'])) ?
@@ -546,20 +555,25 @@ class LeadRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->orX(
-            $q->expr()->like('l.firstname', ":$unique"),
-            $q->expr()->like('l.lastname', ":$unique"),
-            $q->expr()->like('l.email', ":$unique"),
-            $q->expr()->like('l.company', ":$unique"),
-            $q->expr()->like('l.city', ":$unique"),
-            $q->expr()->like('l.state', ":$unique"),
-            $q->expr()->like('l.zipcode', ":$unique"),
-            $q->expr()->like('l.country', ":$unique")
-        );
-
         if ($filter->not) {
-            $q->expr()->not($expr);
+            $xFunc    = 'andX';
+            $exprFunc = 'notLike';
+        } else {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+
         }
+
+        $expr = $q->expr()->$xFunc(
+            $q->expr()->$exprFunc('l.firstname', ":$unique"),
+            $q->expr()->$exprFunc('l.lastname', ":$unique"),
+            $q->expr()->$exprFunc('l.email', ":$unique"),
+            $q->expr()->$exprFunc('l.company', ":$unique"),
+            $q->expr()->$exprFunc('l.city', ":$unique"),
+            $q->expr()->$exprFunc('l.state', ":$unique"),
+            $q->expr()->$exprFunc('l.zipcode', ":$unique"),
+            $q->expr()->$exprFunc('l.country', ":$unique")
+        );
 
         return array(
             $expr,

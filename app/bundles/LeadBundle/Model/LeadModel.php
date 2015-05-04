@@ -556,20 +556,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Regenerate the lists this lead currently belongs to
-     *
-     * @param Lead $lead
-     */
-    public function regenerateLeadLists(Lead $lead)
-    {
-        $lists = $this->getLists($lead);
-        $model = $this->factory->getModel('lead.list');
-        foreach ($lists as $lid => $list) {
-            $model->regenerateListLeads($list);
-        }
-    }
-
-    /**
      * Get a list of lists this lead belongs to
      *
      * @param Lead  $lead

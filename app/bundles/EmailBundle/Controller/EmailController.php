@@ -257,7 +257,7 @@ class EmailController extends FormController
                         $parts      = explode('::', $testSettings['callback']);
                         $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
-                        new \ReflectionMethod(null, $testSettings['callback']);
+                        $reflection = new \ReflectionMethod(null, $testSettings['callback']);
                     }
 
                     $pass = array();

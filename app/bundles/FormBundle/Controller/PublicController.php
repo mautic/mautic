@@ -86,7 +86,7 @@ class PublicController extends CommonFormController
                                 $parts      = explode('::', $callback);
                                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                             } else {
-                                new \ReflectionMethod(null, $callback);
+                                $reflection= new \ReflectionMethod(null, $callback);
                             }
 
                             //add the factory to the arguments

@@ -125,6 +125,10 @@ class FormEventHelper
                 $properties['points'],
                 $ipAddress
             );
+
+            // last active time
+            $lead->setLastActive(new \DateTime());
+
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {

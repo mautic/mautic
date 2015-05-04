@@ -60,7 +60,7 @@ class Lead extends FormEntity
     private $pointsChangeLog;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"}, indexBy="ipAddress")
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "detach"}, indexBy="ipAddress")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
@@ -122,7 +122,7 @@ class Lead extends FormEntity
     private $dateIdentified;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", cascade={"remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
     private $notes;

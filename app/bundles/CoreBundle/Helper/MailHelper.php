@@ -30,6 +30,12 @@ class MailHelper
     private $mailer;
 
     /**
+     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     */
+    private $templating = null;
+
+    private $dispatcher = null;
+    /**
      * @var \Swift_Plugins_Loggers_ArrayLogger
      */
     private $logger;
@@ -81,8 +87,8 @@ class MailHelper
      */
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
-        $this->factory = $factory;
-        $this->mailer  = $mailer;
+        $this->factory    = $factory;
+        $this->mailer     = $mailer;
 
         try {
             $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
@@ -92,6 +98,21 @@ class MailHelper
         }
 
         $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email'), $factory->getParameter('mailer_from_name'));
+        $this->message = $this->getMessageInstance();
+    }
+
+    /**
+     * Reset's the mailer
+     */
+    public function reset()
+    {
+        unset($this->message, $this->lead, $this->email, $this->idHash, $this->errors, $this->token, $this->source);
+
+        $this->errors = $this->tokens = $this->source = array();
+        $this->lead   = $this->email  = $this->idHash = null;
+
+        $this->logger->clear();
+
         $this->message = $this->getMessageInstance();
     }
 
@@ -124,14 +145,18 @@ class MailHelper
     {
         if (empty($this->errors)) {
             if ($dispatchSendEvent) {
-                $dispatcher   = $this->factory->getDispatcher();
-                $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
+                if ($this->dispatcher == null) {
+                    $this->dispatcher = $this->factory->getDispatcher();
+                }
+                $hasListeners = $this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
                 if ($hasListeners) {
                     $content = $this->message->getBody();
                     $event   = new EmailSendEvent($content, $this->email, $this->lead, $this->idHash, $this->source, $this->tokens);
-                    $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
+                    $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
                     $content = $event->getContent(true);
                     $this->message->setBody($content);
+
+                    unset($event, $content);
                 }
             }
 
@@ -204,9 +229,15 @@ class MailHelper
      */
     public function setTemplate($template, $vars = array(), $charset = null)
     {
-        $content = $this->factory->getTemplating()->renderResponse($template, $vars)->getContent();
+        if ($this->templating == null) {
+            $this->templating = $this->factory->getTemplating();
+        }
+
+        $content = $this->templating->renderResponse($template, $vars)->getContent();
 
         $this->message->setBody($content, 'text/html', $charset);
+
+        unset($content, $vars);
     }
 
     /**

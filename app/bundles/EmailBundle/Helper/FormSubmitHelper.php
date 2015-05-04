@@ -60,9 +60,9 @@ class FormSubmitHelper
 			} elseif (isset($currentLead)) {
 		    	if (isset($leadFields['email'])) {
 					$options = array(
-						'source' 		   => array('form', $form->getId()),
-						'tokens' 		   => $tokens,
-						'ignoreLeadChecks' => true
+						'source' 	   => array('form', $form->getId()),
+						'tokens' 	   => $tokens,
+                        'ignoreDNC'    => true
 					);
 		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), $options);
 		    	}

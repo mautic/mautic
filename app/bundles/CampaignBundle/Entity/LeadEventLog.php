@@ -37,6 +37,7 @@ class LeadEventLog
 
     /**
      * @ORM\ManyToOne(targetEntity="Campaign")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $campaign;
 
@@ -64,6 +65,16 @@ class LeadEventLog
      * @ORM\Column(name="system_triggered", type="boolean")
      */
     private $systemTriggered = false;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $metadata = array();
+
+    /**
+     * @ORM\Column(name="non_action_path_taken", type="boolean", nullable=true)
+     */
+    private $nonActionPathTaken = false;
 
     /**
      * @return \DateTime
@@ -191,5 +202,42 @@ class LeadEventLog
     public function setSystemTriggered ($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNonActionPathTaken()
+    {
+        return $this->nonActionPathTaken;
+    }
+
+    /**
+     * @param mixed $nonActionPathTaken
+     */
+    public function setNonActionPathTaken($nonActionPathTaken)
+    {
+        $this->nonActionPathTaken = $nonActionPathTaken;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param mixed $metatdata
+     */
+    public function setMetadata($metadata)
+    {
+        if (!is_array($metadata)) {
+            // Assumed output for timeline
+            $metadata = array('timeline' => $metadata);
+        }
+
+        $this->metadata = $metadata;
     }
 }

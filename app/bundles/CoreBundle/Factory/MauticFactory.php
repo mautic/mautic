@@ -44,6 +44,9 @@ class MauticFactory
      */
     private $entityManager = null;
 
+    private $mailHelper = null;
+
+
     /**
      * @param ContainerInterface $container
      */
@@ -529,9 +532,17 @@ class MauticFactory
      */
     public function getMailer()
     {
-        return new MailHelper($this, $this->container->get('mailer'), array(
-            $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
-        ));
+        if ($this->mailHelper == null) {
+            $this->mailHelper = new MailHelper(
+                $this, $this->container->get('mailer'), array(
+                $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
+            )
+            );
+        } else {
+            $this->mailHelper->reset();
+        }
+
+        return $this->mailHelper;
     }
 
     /**

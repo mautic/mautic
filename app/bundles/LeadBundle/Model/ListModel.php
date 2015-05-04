@@ -17,6 +17,8 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -105,51 +107,7 @@ class ListModel extends FormModel
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $repo->saveEntity($entity);
-        $this->regenerateListLeads($entity, $isNew, false);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
-    }
-
-    /**
-     *
-     *
-     * @param LeadList $entity
-     * @param          $isNew
-     * @param          $persist
-     *
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function regenerateListLeads(LeadList $entity, $isNew = false, $persist = true)
-    {
-        $id          = $entity->getId();
-        $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
-
-        if (!$isNew) {
-            $oldLeadList = $this->getLeadsByList(array('id' => $id), true);
-
-            $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
-            $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
-        } else {
-            $addLeads    = $newLeadList[$id];
-            $removeLeads = array();
-        }
-
-        foreach ($addLeads as $l) {
-            $this->addLead($l, $entity);
-        }
-
-        if (isset($manuallyAdded)) {
-            foreach ($manuallyAdded as $l) {
-                $this->addLead($l, $entity, true);
-            }
-        }
-
-        foreach ($removeLeads as $l) {
-            $this->removeLead($l, $entity);
-        }
-
-        if ($persist) {
-            $this->getRepository()->saveEntity($entity);
-        }
     }
 
     /**
@@ -327,6 +285,254 @@ class ListModel extends FormModel
         return $lists;
     }
 
+    /**
+     * Rebuild lead lists
+     *
+     * @param LeadList $entity
+     * @param          $limit
+     * @param          $batchsize
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    {
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+
+        $id   = $entity->getId();
+        $list = array('id' => $id, 'filters' => $entity->getFilters());
+
+        $batchLimiters = array(
+            'dateTime' => $this->factory->getDate()->toUtcString()
+        );
+
+        // Get a count of leads to add
+        $newLeadsCount = $this->getLeadsByList(
+            $list,
+            true,
+            array(
+                'countOnly'     => true,
+                'newOnly'       => true,
+                'dynamic'       => true,
+                'includeManual' => false,
+                'batchLimiters' => $batchLimiters
+            )
+        );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
+
+        // Number of total leads to process
+        $leadCount = (int) $newLeadsCount[$id]['count'];
+
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
+        }
+
+        // Handle by batches
+        $start = $lastRoundPercentage = $leadsProcessed = 0;
+
+        // Try to save some memory
+        gc_enable();
+
+        if ($leadCount) {
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
+
+            // Add leads
+            while ($start < $leadCount) {
+                // Keep CPU down
+                sleep(2);
+
+                $newLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    array(
+                        'dynamic'       => true,
+                        'newOnly'       => true,
+                        'includeManual' => false,
+                        // No start set because of newOnly thus always at 0
+                        'limit'         => $limit,
+                        'batchLimiters' => $batchLimiters
+                    )
+                );
+
+                if (empty($newLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
+                foreach ($newLeadList[$id] as $l) {
+                    // Keep RAM down
+                    usleep(500);
+
+                    $this->addLead($l, $entity, false, true, -1);
+
+                    unset($l);
+
+                    $leadsProcessed++;
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        break;
+                    }
+                }
+
+                $start += $limit;
+
+                if ($output && $leadsProcessed < $maxCount) {
+                    $progress->setCurrent($leadsProcessed);
+                }
+
+                // Dispatch batch event
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    // Keep RAM down
+                    sleep(2);
+
+                    $event = new ListChangeEvent($newLeadList[$id], $entity, true);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
+
+                    unset($event);
+                }
+
+                unset($newLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $leadsProcessed;
+                }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        $fullList = $this->getLeadsByList(
+            $list,
+            true,
+            array(
+                'dynamic'       => true,
+                'existingOnly'  => true,
+                'includeManual' => false,
+                'batchLimiters' => $batchLimiters
+            )
+        );
+
+        // Get a count of leads to be removed
+        $removeLeadCount = $this->getLeadsByList(
+            $list,
+            true,
+            array(
+                'countOnly'     => true,
+                'includeManual' => false,
+                'filterOutIds'  => $fullList[$id],
+                'batchLimiters' => $batchLimiters
+            )
+        );
+
+        // Restart batching
+        $start     = $lastRoundPercentage = 0;
+        $leadCount = $removeLeadCount[$id]['count'];
+
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
+        }
+
+        if ($leadCount) {
+
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = new ProgressBar($output, $maxCount);
+                $progress->start();
+            }
+
+            // Remove leads
+            while ($start < $leadCount) {
+                // Keep CPU down
+                sleep(2);
+
+                $removeLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    array(
+                        // No start because the items are deleted so always 0
+                        'limit'         => $limit,
+                        'filterOutIds'  => $fullList[$id],
+                        'batchLimiters' => $batchLimiters
+                    )
+                );
+
+                if (empty($removeLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
+                foreach ($removeLeadList[$id] as $l) {
+                    // Keep RAM down
+                    usleep(500);
+
+                    $this->removeLead($l, $entity, false, true, true);
+
+                    $leadsProcessed++;
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        break;
+                    }
+                }
+
+                // Dispatch batch event
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    // Keep RAM down
+                    sleep(2);
+
+                    $event = new ListChangeEvent($removeLeadList[$id], $entity, false);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
+
+                    unset($event);
+                }
+
+                $start += $limit;
+
+                if ($output && $leadsProcessed < $maxCount) {
+                    $progress->setCurrent($leadsProcessed);
+                }
+
+
+                unset($removeLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $leadsProcessed;
+                }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        return $leadsProcessed;
+    }
 
     /**
      * Add lead to lists
@@ -334,17 +540,18 @@ class ListModel extends FormModel
      * @param      $lead
      * @param      $lists
      * @param bool $manuallyAdded
+     * @param bool $batchProcess
+     * @param int  $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLead($lead, $lists, $manuallyAdded = false)
+    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $leadModel->getEntity($leadId);
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        } else {
+            $leadId = $lead->getId();
         }
 
         if (!$lists instanceof LeadList) {
@@ -374,6 +581,8 @@ class ListModel extends FormModel
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
+
+            unset($listEntities, $searchForLists);
         } else {
             $this->leadChangeLists[$lists->getId()] = $lists;
 
@@ -392,18 +601,34 @@ class ListModel extends FormModel
                 continue;
             }
 
-            $listLead = $this->getListLeadRepository()->findOneBy(array(
-                'lead' => $lead,
-                'list' => $this->leadChangeLists[$l]
-            ));
+            if ($searchListLead == -1) {
+                $listLead = null;
+            } elseif ($searchListLead) {
+                $listLead = $this->getListLeadRepository()->findOneBy(
+                    array(
+                        'lead' => $lead,
+                        'list' => $this->leadChangeLists[$l]
+                    )
+                );
+            } else {
+                $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
+                    array(
+                        'lead' => $leadId,
+                        'list' => $l
+                    )
+                );
+            }
+
             if ($listLead != null) {
-                if ($listLead->wasManuallyRemoved()) {
+                if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
-                    $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
-                    $persistLists[] = $this->leadChangeLists[$l];
+                    $persistLists[] = $listLead;
                 } else {
+                    // Detach from Doctrine
+                    $this->em->detach($listLead);
+
                     continue;
                 }
             } else {
@@ -413,22 +638,33 @@ class ListModel extends FormModel
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded(new \DateTime());
 
-                $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
-                $persistLists[] = $this->leadChangeLists[$l];
+                $persistLists[] = $listLead;
             }
 
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                // Force system lead for actions that use getCurrentLead
-                $leadModel->setSystemCurrentLead($lead);
-
+            if (!$batchProcess && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], true);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+
+                unset($event);
             }
         }
 
         if (!empty($persistLists)) {
-            $this->saveEntities($persistLists, false);
+            $this->getRepository()->saveEntities($persistLists);
+
+            // Detach the entities to save memory
+            foreach ($persistLists as $l) {
+                $this->em->detach($l);
+                unset($l);
+            }
         }
+
+        if ($batchProcess) {
+            // Detach for batch processing to preserve memory
+            $this->em->detach($lead);
+        }
+
+        unset($lead, $persistLists, $lists);
     }
 
     /**
@@ -437,17 +673,18 @@ class ListModel extends FormModel
      * @param      $lead
      * @param      $lists
      * @param bool $manuallyRemoved
+     * @param bool $batchProcess
+     * @param bool $skipFindOne
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function removeLead($lead, $lists, $manuallyRemoved = false)
+    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $leadModel->getEntity($leadId);
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        } else {
+            $leadId = $lead->getId();
         }
 
         if (!$lists instanceof LeadList) {
@@ -477,18 +714,20 @@ class ListModel extends FormModel
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
+
+            unset($listEntities, $searchForLists);
+
         } else {
             $this->leadChangeLists[$lists->getId()] = $lists;
 
             $lists = array($lists->getId());
         }
 
-
         if (!is_array($lists)) {
             $lists = array($lists);
         }
 
-        $persistLists = array();
+        $persistLists = $deleteLists = array();
         foreach ($lists as $l) {
             if (!isset($this->leadChangeLists[$l])) {
                 // List no longer exists in the DB so continue to the next
@@ -497,10 +736,15 @@ class ListModel extends FormModel
 
             $dispatchEvent = false;
 
-            $listLead = $this->getListLeadRepository()->findOneBy(array(
-                'lead' => $lead,
-                'list' => $this->leadChangeLists[$l]
-            ));
+            $listLead = (!$skipFindOne) ?
+                $this->getListLeadRepository()->findOneBy(array(
+                    'lead' => $lead,
+                    'list' => $this->leadChangeLists[$l]
+                )) :
+                $this->em->getReference('MauticLeadBundle:ListLead', array(
+                    'lead' => $leadId,
+                    'list' => $l
+                ));
 
             if ($listLead == null) {
                 // Lead is not part of this list
@@ -511,42 +755,59 @@ class ListModel extends FormModel
                 //lead was manually added and now manually removed or was not manually added and now being removed
                 $dispatchEvent = true;
 
-                $this->leadChangeLists[$l]->removeLead($listLead);
-                $persistLists[] = $this->leadChangeLists[$l];
+                $deleteLists[] = $listLead;
             } elseif ($manuallyRemoved && !$listLead->wasManuallyAdded()) {
                 $dispatchEvent = true;
 
                 $listLead->setManuallyRemoved(true);
 
-                $this->leadChangeLists[$l]->addLead($lead->getId(), $listLead);
-                $persistLists[] = $this->leadChangeLists[$l];
+                $persistLists[] = $listLead;
             }
 
-            if ($dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                // Force system lead for actions that use getCurrentLead
-                $leadModel->setSystemCurrentLead($lead);
+            unset($listLead);
 
+            if (!$batchProcess && $dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], false);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+
+                unset($event);
             }
         }
 
         if (!empty($persistLists)) {
-            $this->saveEntities($persistLists, false);
+            $this->getRepository()->saveEntities($persistLists);
+
+            // Detach the entities to save memory
+            foreach ($persistLists as $l) {
+                $this->em->detach($l);
+                unset($l);
+            }
         }
+
+        if (!empty($deleteLists)) {
+            $this->getRepository()->deleteEntities($deleteLists);
+        }
+
+        if ($batchProcess) {
+            // Detach for batch processing to preserve memory
+            $this->em->detach($lead);
+        }
+
+        unset($lead, $deleteLists, $persistLists, $lists);
     }
 
 
     /**
-     * @param      $lists
-     * @param bool $idOnly
-     * @param bool $dynamic
-     * @param bool $ignoreCache
+     * @param       $lists
+     * @param bool  $idOnly
+     * @param array $args
      *
      * @return mixed
      */
-    public function getLeadsByList($lists, $idOnly = false, $dynamic = false, $ignoreCache = false)
+    public function getLeadsByList($lists, $idOnly = false, $args = array())
     {
-        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic, true, $ignoreCache);
+        $args['idOnly'] = $idOnly;
+
+        return $this->getRepository()->getLeadsByList($lists, $args);
     }
 }
