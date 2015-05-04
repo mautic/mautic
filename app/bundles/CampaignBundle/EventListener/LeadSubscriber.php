@@ -188,7 +188,9 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the hits to the event array
         foreach ($logs as $log) {
-            $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
+            if (!is_array($log['metadata'])) {
+                $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
+            }
             $template        = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                 ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 

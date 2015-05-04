@@ -9,6 +9,7 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -735,16 +736,20 @@ class EventModel extends CommonFormModel
 
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
 
-                        $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
-                        $e->setTriggerDate(null);
-                        $e->setIsScheduled(false);
-                        $e->setDateTriggered(new \DateTime());
+                        try {
+                            $e = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
+                            $e->setTriggerDate(null);
+                            $e->setIsScheduled(false);
+                            $e->setDateTriggered(new \DateTime());
 
-                        if ($response !== true) {
-                            $e->setMetadata($response);
+                            if ($response !== true) {
+                                $e->setMetadata($response);
+                            }
+
+                            $persist[] = $e;
+                        } catch (EntityNotFoundException $e) {
+                            // The lead has been likely removed from this lead/list
                         }
-
-                        $persist[] = $e;
                     } else {
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
                     }

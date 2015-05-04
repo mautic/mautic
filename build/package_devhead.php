@@ -37,6 +37,7 @@ system('cp ../.htaccess packaging/');
 system('cp ../index.php packaging/');
 system('cp ../LICENSE.txt packaging/');
 system('cp ../robots.txt packaging/');
+system('cp ../favicon.ico packaging/');
 
 // Generate the bootstrap.php.cache file
 system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
@@ -46,4 +47,4 @@ include_once __DIR__ . '/processfiles.php';
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ favicon.ico .htaccess index.php LICENSE.txt robots.txt > /dev/null');

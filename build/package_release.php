@@ -112,7 +112,7 @@ file_put_contents(__DIR__ . '/packaging/modified_files.txt', implode("\n", $file
 chdir(__DIR__ . '/packaging');
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/' . $version . '.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+system('zip -r ../packages/' . $version . '.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ favicon.ico .htaccess index.php LICENSE.txt robots.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/' . $version . '-update.zip -@ < modified_files.txt > /dev/null');

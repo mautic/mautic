@@ -84,7 +84,7 @@ class FormEventHelper
 
         //update the lead rather than creating a new one if there is for sure identifier match ($leadId is to exclude lead from getCurrentLead())
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
-        $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId);
+        $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
 
         if (count($leads)) {
             //merge with current lead if not in kiosk mode
