@@ -7,6 +7,8 @@
 
 set_time_limit(0);
 
+defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
+
 require_once __DIR__.'/bootstrap.php.cache';
 require_once __DIR__.'/AppKernel.php';
 
