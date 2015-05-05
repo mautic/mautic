@@ -333,7 +333,7 @@ class EventModel extends CommonFormModel
                         }
 
                         //trigger the action
-                        $response = $this->invokeEventCallback($event, $settings, $lead, $eventDetails, $systemTriggered);
+                        $response = $this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered);
                         if ($response !== false) {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' successfully executed and logged.');
                             $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
@@ -342,7 +342,7 @@ class EventModel extends CommonFormModel
 
                             if ($response !== true) {
                                 // Some feed back was given to be passed back to the function calling triggerEvent
-                                $actionResponses[$type][$child['id']] = $response;
+                                $actionResponses[$child['eventType']][$child['id']] = $response;
                                 $log->setMetadata($response);
                             }
 
