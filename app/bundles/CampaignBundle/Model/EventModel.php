@@ -343,7 +343,7 @@ class EventModel extends CommonFormModel
                             if ($response !== true) {
                                 // Some feed back was given to be passed back to the function calling triggerEvent
                                 $actionResponses[$type][$child['id']] = $response;
-                                $log->setMetatdata($response);
+                                $log->setMetadata($response);
                             }
 
                             $persist[] = $log;
@@ -548,7 +548,7 @@ class EventModel extends CommonFormModel
                             $processedCount++;
 
                             if ($response !== true) {
-                                $log->setMetatdata($response);
+                                $log->setMetadata($response);
                                 $repo->saveEntity($log);
                             }
 
@@ -1035,7 +1035,7 @@ class EventModel extends CommonFormModel
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' successfully executed and logged.');
 
                                         if ($response !== true) {
-                                            $log->setMetatdata($response);
+                                            $log->setMetadata($response);
                                             $repo->saveEntity($log);
                                         }
                                     }
