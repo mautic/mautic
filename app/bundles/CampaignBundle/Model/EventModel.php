@@ -342,7 +342,7 @@ class EventModel extends CommonFormModel
 
                             if ($response !== true) {
                                 // Some feed back was given to be passed back to the function calling triggerEvent
-                                $actionResponses[$type][$child['id']] = $response;
+                                $actionResponses[$child['eventType']][$child['id']] = $response;
                                 $log->setMetadata($response);
                             }
 
