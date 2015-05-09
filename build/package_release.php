@@ -24,7 +24,6 @@ echo "Preparing environment\n";
 umask(022);
 chdir(__DIR__);
 system('rm -rf packaging');
-@unlink(__DIR__ . '/packages/mautic-' . $version . '.zip');
 
 // Preparation - Provision packaging space
 mkdir(__DIR__ . '/packaging');
@@ -111,8 +110,10 @@ file_put_contents(__DIR__ . '/packaging/modified_files.txt', implode("\n", $file
 // Post-processing - ZIP it up
 chdir(__DIR__ . '/packaging');
 
+system("rm -f ../packages/{$version}.zip ../packages/{$version}-update.zip");
+
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/' . $version . '.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ favicon.ico .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+system('zip -r ../packages/' . $version . '.zip . -x@../excludefiles.txt');
 
 echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/' . $version . '-update.zip -@ < modified_files.txt > /dev/null');

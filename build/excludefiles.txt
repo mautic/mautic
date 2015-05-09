@@ -1,0 +1,15 @@
+build/*
+node_modules/*
+.DS_Store
+*.idea*
+*.git*
+.gitignore
+composer.json
+composer.lock
+deleted_files.txt
+Gruntfile.js
+index_dev.php
+modified_files.txt
+package.json
+README.md
+upgrade.php
