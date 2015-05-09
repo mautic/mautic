@@ -265,6 +265,56 @@ class PublicController extends CommonFormController
     }
 
     /**
+     * @param $id
+     *
+     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     */
+    public function previewAction($id)
+    {
+        $model      = $this->factory->getModel('page');
+        $entity     = $model->getEntity($id);
+        $translator = $this->get('translator');
+
+        if ($entity === null || !$entity->isPublished(false)) {
+            throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+        }
+
+        if ($entity->getContentMode() == 'builder') {
+            //all the checks pass so display the content
+            $template   = $entity->getTemplate();
+            $slots      = $this->factory->getTheme($template)->getSlots('page');
+
+            $response = $this->render('MauticPageBundle::public.html.php', array(
+                'slots'           => $slots,
+                'content'         => $entity->getContent(),
+                'page'            => $entity,
+                'template'        => $template,
+                'googleAnalytics' => $this->factory->getParameter('google_analytics'),
+                'public'          => true
+            ));
+
+            $content = $response->getContent();
+        } else {
+            $content = $entity->getCustomHtml();
+            $analytics = $this->factory->getParameter('google_analytics');
+            if (!empty($analytics)) {
+                $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+            }
+        }
+
+        $dispatcher = $this->get('event_dispatcher');
+        if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
+            $event = new PageDisplayEvent($content, $entity);
+            $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $content = $event->getContent();
+        }
+
+        return new Response($content);
+    }
+
+    /**
      * @return Response
      */
     public function trackingImageAction()
