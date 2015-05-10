@@ -2384,6 +2384,7 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+        delete MauticVars.moderatedIntervals[key];
     },
 
     /**

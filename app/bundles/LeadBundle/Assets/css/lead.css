@@ -102,3 +102,7 @@ ul.tag-cloud li {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+.card.highlight {
+    border: 3px solid #faf2cc;
+}

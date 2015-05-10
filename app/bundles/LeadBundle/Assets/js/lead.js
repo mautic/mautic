@@ -97,6 +97,10 @@ Mautic.leadOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.leadEngagementChart;
     }
+
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
+    }
 };
 
 Mautic.getLeadId = function() {
@@ -571,4 +575,45 @@ Mautic.reloadLeadImportProgress = function() {
             }
         });
     }
+};
+
+Mautic.toggleLiveLeadListUpdate = function () {
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
+        Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
+        mQuery('#liveModeButton .fa').addClass('fa-spin');
+    } else {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
+        mQuery('#liveModeButton .fa').removeClass('fa-spin');
+    }
+};
+
+Mautic.updateLeadList = function () {
+    var maxLeadId = mQuery('#liveModeButton').data('max-id');
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "get",
+        data: "action=lead:getNewLeads&maxId=" + maxLeadId,
+        dataType: "json",
+        success: function (response) {
+            if (response.leads) {
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tbody').prepend(response.leads);
+                } else {
+                    var items = mQuery(response.leads);
+                    mQuery('.shuffle-grid').prepend(items);
+                    mQuery('.shuffle-grid').shuffle('appended', items);
+                    mQuery('.shuffle-grid').shuffle('update');
+
+                    mQuery('#liveModeButton').data('max-id', response.maxId);
+                }
+            }
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        }
+    });
 };

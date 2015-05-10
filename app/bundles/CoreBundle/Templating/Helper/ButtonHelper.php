@@ -139,7 +139,9 @@ class ButtonHelper extends Helper
             }
 
             $buttonContent  = (isset($c['iconClass'])) ? '<i class="' . $c['iconClass'] . '"></i> ' : '';
-            $buttonContent .= $this->translator->trans($c['btnText']);
+            if (!empty($c['btnText'])) {
+                $buttonContent .= $this->translator->trans($c['btnText']);
+            }
             $buttons       .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltipAttr}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
         }
 

@@ -748,4 +748,17 @@ class LeadRepository extends CommonRepository
 
         return (count($result)) ? $result[0] : null;
     }
+
+    /**
+     * Gets the ID of the latest ID
+     */
+    public function getMaxLeadId()
+    {
+        $result = $this->_em->getConnection()->createQueryBuilder()
+            ->select('max(id) as max_lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->execute()->fetchAll();
+
+        return $result[0]['max_lead_id'];
+    }
 }
