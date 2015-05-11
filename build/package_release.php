@@ -113,7 +113,7 @@ chdir(__DIR__ . '/packaging');
 system("rm -f ../packages/{$version}.zip ../packages/{$version}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/' . $version . '.zip . -x@../excludefiles.txt');
+system('zip -r ../packages/' . $version . '.zip . -x@../excludefiles.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/' . $version . '-update.zip -@ < modified_files.txt > /dev/null');

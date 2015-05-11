@@ -26,7 +26,7 @@ mkdir(__DIR__ . '/packaging');
 
 // Copy working files to packaging space
 echo "Copying files\n";
-system("rsync -az --exclude-from 'excludefiles.txt' ../ packaging");
+system("rsync -az --exclude-from 'excludefiles.txt' ../ packaging > /dev/null");
 
 // Generate the bootstrap.php.cache file
 system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
@@ -38,4 +38,4 @@ include_once __DIR__ . '/processfiles.php';
 echo "Packaging Mautic\n";
 chdir(__DIR__ . '/packaging');
 
-system('zip -r ../packages/mautic-head.zip . -x@../excludefiles.txt');
+system('zip -r ../packages/mautic-head.zip . -x@../excludefiles.txt > /dev/null');
