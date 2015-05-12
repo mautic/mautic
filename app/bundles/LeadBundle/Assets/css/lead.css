@@ -104,5 +104,6 @@ ul.tag-cloud li {
 }
 
 .card.highlight {
-    border: 3px solid #faf2cc;
+    background-color: #faf2cc;
+    border: 3px solid #4e5d9d !important;
 }

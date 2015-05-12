@@ -608,6 +608,28 @@ Mautic.updateLeadList = function () {
                 }
             }
 
+            if (typeof IdleTimer != 'undefined' && !IdleTimer.isIdle()) {
+                console.log(IdleTimer.isIdle(), IdleTimer.getLastActive(), IdleTimer.isAway());
+                // Remove highlighted classes
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tr.warning').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('warning', 1000)
+                        }, 5000);
+                    });
+                } else {
+                    mQuery('.shuffle-grid .highlight').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('highlight', 1000, function() {
+                                mQuery(that).css('border-top-color', mQuery(that).data('color'));
+                            })
+                        }, 5000);
+                    });
+                }
+            }
+
             Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
         },
         error: function (request, textStatus, errorThrown) {
