@@ -24,7 +24,7 @@
                                 <?php $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>
                             <?php else : ?>
                                 <?php $socialData = $item->getSocialCache(); ?>
-                                <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
+                                <?php $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']); ?>
                             <?php endif; ?>
                             <img class="img img-responsive"
                                  src="<?php echo $img; ?>" />
