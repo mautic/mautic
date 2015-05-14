@@ -208,7 +208,9 @@ class LeadModel extends FormModel
         list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles($lead, $data, true, null, false, true);
 
         //set the social cache while we have it
-        $lead->setSocialCache($socialCache);
+        if (!empty($socialCache)) {
+            $lead->setSocialCache($socialCache);
+        }
 
         //save the field values
         $fieldValues = $lead->getFields();
