@@ -135,7 +135,11 @@ class EmailRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('dne.lead_id')->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne');
+        $sq->select('dne.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
+            ->where(
+                $sq->expr()->isNotNull('dne.lead_id')
+            );
 
         $sq2 = $this->_em->getConnection()->createQueryBuilder();
         $sq2->select('stat.lead_id')
