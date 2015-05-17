@@ -26,6 +26,4 @@ foreach ($slots as $slot) {
 }
 
 //add tracking pixel to builder slot
-$view['slots']->set('builder', '<img height="1" width="1" src="' . $view['router']->generate('mautic_email_tracker', array(
-    'idHash' => $idHash
-), true) . '" />');
+$view['slots']->set('builder', '<img style="display:none;" height="1" width="1" src="{tracking_pixel}" />');

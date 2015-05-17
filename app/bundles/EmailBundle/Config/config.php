@@ -55,6 +55,10 @@ return array(
             'mautic_email_resubscribe' => array(
                 'path'       => '/email/resubscribe/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:resubscribe'
+            ),
+            'mautic_mailer_transport_callback' => array(
+                'path'         => '/mailer/{transport}/callback',
+                'controller'   => 'MauticEmailBundle:Public:mailerCallback'
             )
         )
     ),

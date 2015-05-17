@@ -869,12 +869,21 @@ class EmailController extends FormController
 
         if ($catPublished && $published && $this->request->getMethod() == 'POST') {
             //process and send
-            $model->sendEmailToLists($entity);
-            $flashes[] = array(
-                'type'    => 'notice',
-                'msg'     => 'mautic.email.notice.send.success',
-                'msgVars' => array('%subject%' => $entity->getSubject())
-            );
+            $failed    = $model->sendEmailToLists($entity);
+
+            if (!empty($failed)) {
+                $flashes[] = array(
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.email.notice.send.with_errors',
+                    'msgVars' => array('%subject%' => $entity->getSubject())
+                );
+            } else {
+                $flashes[] = array(
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.email.notice.send.success',
+                    'msgVars' => array('%subject%' => $entity->getSubject())
+                );
+            }
         } else {
             $flashes[] = array(
                 'type'    => 'error',
@@ -949,8 +958,7 @@ class EmailController extends FormController
                 'content'   => $entity->getContent(),
                 'email'     => $entity,
                 'lead'      => null,
-                'template'  => $template,
-                'idHash'    => $idHash
+                'template'  => $template
             ));
 
             //replace tokens
@@ -959,12 +967,13 @@ class EmailController extends FormController
             $content = $entity->getCustomHtml();
         }
 
-        $dispatcher = $this->get('event_dispatcher');
-        if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-            $event = new EmailSendEvent($content, $entity, null, $idHash);
-            $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-            $content = $event->getContent();
-        }
+        // Override tracking_pixel
+        $tokens = array('{tracking_pixel}' => '');
+
+        // Generate and replace tokens
+        $event = new EmailSendEvent($content, $entity, null, $idHash, array(), $tokens);
+        $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $content = $event->getContent();
 
         return new Response($content);
     }

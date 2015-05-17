@@ -345,4 +345,14 @@ class StatRepository extends CommonRepository
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
     }
+
+    /**
+     * Delete a stat
+     *
+     * @param $id
+     */
+    public function deleteStat($id)
+    {
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
+    }
 }

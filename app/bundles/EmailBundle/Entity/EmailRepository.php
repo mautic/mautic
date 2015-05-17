@@ -51,13 +51,13 @@ class EmailRepository extends CommonRepository
     public function checkDoNotEmail($email)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id}')
+        $q->select('partial e.{id, unsubscribed, bounced, comments}')
             ->from('MauticEmailBundle:DoNotEmail', 'e')
             ->where('e.emailAddress = :email')
             ->setParameter('email', $email);
         $results = $q->getQuery()->getArrayResult();
 
-        return (!empty($results)) ? true : false;
+        return (!empty($results)) ? $results[0] : false;
     }
 
     /**
@@ -74,6 +74,16 @@ class EmailRepository extends CommonRepository
             ->setParameter(':email', $email);
 
         $qb->getQuery()->execute();
+    }
+
+    /**
+     * Delete DNC row
+     *
+     * @param $id
+     */
+    public function deleteDoNotEmailEntry($id)
+    {
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_donotemail', array('id' => (int) $id));
     }
 
     /**

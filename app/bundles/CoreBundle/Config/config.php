@@ -67,7 +67,7 @@ return array(
             'mautic_update_bc_redirect' => array(
                 'path'         => '/update',
                 'controller'   => 'MauticCoreBundle:Default:updateBcRedirect'
-            ),
+            )
         )
     ),
 
@@ -291,8 +291,8 @@ return array(
                 'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
+                    'setUsername'   => array('%mautic.mailer_user%'),
+                    'setPassword'   => array('%mautic.mailer_password%')
                 )
             ),
             'mautic.transport.sendgrid'          => array(

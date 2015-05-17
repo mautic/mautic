@@ -156,9 +156,7 @@ class SubmissionModel extends CommonFormModel
             //save the result
             $results[$alias] = $value;
 
-            $tokens['search'][$alias]  = "{formfield={$alias}}";
-            $tokens['replace'][$alias] = $value;
-
+            $tokens["{formfield={$alias}}"] = $value;
         }
 
         $submission->setResults($results);
