@@ -20,7 +20,7 @@ if ($tmpl == 'index')
                 $style  = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
             ?>
             <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
-                <div class="panel card ovf-h" style="border-top: 3px solid <?php echo $color; ?>;">
+                <div class="panel card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
                     <div class="box-layout">
                         <div class="col-xs-4 va-m">
                             <div class="panel-body">
