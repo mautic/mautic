@@ -77,7 +77,7 @@ class CampaignEventHelper
 
             if ($email != null && $email->isPublished()) {
                 $options   = array('source' => array('campaign', $event['campaign']['id']));
-                $emailSent = $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
+                $emailSent = $emailModel->sendEmail($email, $leadCredentials, $options);
             }
         }
 
