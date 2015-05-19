@@ -16,12 +16,6 @@ use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
  */
 abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport implements \Swift_Transport, InterfaceBatchTransport
 {
-
-    /**
-     * @var
-     */
-    private $dispatcher;
-
     /**
      * @var
      */
@@ -31,11 +25,6 @@ abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport im
      * @var
      */
     private $password;
-
-    /**
-     * @var \Mautic\CoreBundle\Swiftmailer\Message\MauticMessage
-     */
-    protected $message;
 
     /**
      * @param $username
@@ -147,9 +136,9 @@ abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport im
      */
     protected function post($settings = array())
     {
-        $payload  = $this->getPayload();
-        $headers  = $this->getHeaders();
-        $endpoint = $this->getApiEndpoint();
+        $payload  = empty($settings['payload']) ? $this->getPayload() : $settings['payload'];
+        $headers  = empty($settings['headers']) ? $this->getHeaders() : $settings['headers'];
+        $endpoint = empty($settings['url']) ? $this->getApiEndpoint() : $settings['url'];
 
         $ch = curl_init();
 
@@ -161,8 +150,10 @@ abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport im
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
-        foreach ($settings as $key => $value) {
-            curl_setopt($ch, $key, $value);
+        if (!empty($curl['curl_options'])) {
+            foreach ($settings['curl_options'] as $key => $value) {
+                curl_setopt($ch, $key, $value);
+            }
         }
 
         $response = curl_exec($ch);
@@ -208,54 +199,6 @@ abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport im
      * @return array
      */
     abstract protected function handlePostResponse($response, $curlInfo);
-
-    /**
-     * Test if this Transport mechanism has started.
-     *
-     * @return bool
-     */
-    public function isStarted()
-    {
-        return false;
-    }
-
-    /**
-     * Start this Transport mechanism.
-     */
-    public function start()
-    {
-
-    }
-
-    /**
-     * Stop this Transport mechanism.
-     */
-    public function stop()
-    {
-
-    }
-
-    /**
-     * Register a plugin in the Transport.
-     *
-     * @param \Swift_Events_EventListener $plugin
-     */
-    public function registerPlugin(\Swift_Events_EventListener $plugin)
-    {
-        $this->getDispatcher()->bindEventListener($plugin);
-    }
-
-    /**
-     * @return \Swift_Events_SimpleEventDispatcher
-     */
-    protected function getDispatcher()
-    {
-        if ($this->dispatcher == null) {
-            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
-        }
-
-        return $this->dispatcher;
-    }
 
     /**
      * Get the metadata from a MauticMessage

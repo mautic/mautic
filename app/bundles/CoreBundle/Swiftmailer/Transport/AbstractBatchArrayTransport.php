@@ -18,9 +18,67 @@ use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
 {
     /**
-     * @var \Swift_Mime_Message
+     * @var \Swift_Message
      */
     protected $message;
+
+    /**
+     * @var
+     */
+    private $dispatcher;
+
+    /**
+     * @var bool
+     */
+    protected $started = false;
+
+    /**
+     * Test if this Transport mechanism has started.
+     *
+     * @return bool
+     */
+    public function isStarted()
+    {
+        return $this->started;
+    }
+
+    /**
+     * Stop this Transport mechanism.
+     */
+    public function stop()
+    {
+
+    }
+
+    /**
+     * Start this Transport mechanism.
+     */
+    public function start()
+    {
+
+    }
+
+    /**
+     * Register a plugin in the Transport.
+     *
+     * @param \Swift_Events_EventListener $plugin
+     */
+    public function registerPlugin(\Swift_Events_EventListener $plugin)
+    {
+        $this->getDispatcher()->bindEventListener($plugin);
+    }
+
+    /**
+     * @return \Swift_Events_SimpleEventDispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher == null) {
+            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
+        }
+
+        return $this->dispatcher;
+    }
 
     /**
      * @param \Swift_Mime_Message $message

@@ -127,6 +127,20 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
     }
 
     /**
+     * Start this Transport mechanism.
+     */
+    public function start()
+    {
+        // Make an API call to the ping endpoint
+        $this->post(array(
+            'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
+            'payload' => json_encode(array('key' => $this->getPassword()))
+        ));
+
+        $this->started = true;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $response
