@@ -38,21 +38,28 @@ $properties = (isset($form['properties'])) ? $form['properties'] : array();
     </div>
 
     <div class="row">
-        <?php foreach ($form->children as $child): ?>
-        <?php if ($child->isRendered()) continue; ?>
-        <?php if (!empty($child['text'])) continue; ?>
+        <?php foreach ($form->children as $childName => $child): ?>
+        <?php if ($child->isRendered() || !empty($child['text']) || $childName == 'properties' || in_array('hidden', $child->vars['block_prefixes']) || $child->vars['id'] == 'formfield_buttons') continue; ?>
         <div class="col-md-6">
             <?php echo $view['form']->row($child); ?>
         </div>
         <?php endforeach; ?>
 
-        <?php foreach ($properties as $name => $property): ?>
-        <?php if ($name == 'test'): ?>
-        <?php echo $view['form']->rowIfExists($properties, $name, '<div class="col-md-12">{content}</div>'); ?>
+        <?php if (isset($properties['list']) && count($properties) === 1): ?>
+        <div class="col-md-6">
+            <?php echo $view['form']->row($form['properties']); ?>
+        </div>
         <?php else: ?>
-        <?php echo $view['form']->rowIfExists($properties, $name, $template); ?>
-        <?php endif; ?>
+
+        <?php foreach ($properties as $name => $property): ?>
+        <?php if ($form['properties'][$name]->isRendered()) continue; ?>
+        <?php $col = ($name == 'text') ? 12 : 6; ?>
+        <div class="col-md-<?php echo $col; ?>">
+            <?php echo $view['form']->row($form['properties'][$name]); ?>
+        </div>
         <?php endforeach; ?>
+
+        <?php endif; ?>
     </div>
     <?php echo $view['form']->end($form); ?>
 </div>
