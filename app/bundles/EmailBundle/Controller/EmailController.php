@@ -830,7 +830,6 @@ class EmailController extends FormController
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $session->get('mautic.email.page', 1);
-        $flashes = array();
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $page));
@@ -848,15 +847,18 @@ class EmailController extends FormController
         //not found
         if ($entity === null) {
             return $this->postActionRedirect(
-                array_merge($postActionVars, array(
-                    'flashes' => array(
-                        array(
-                            'type'    => 'error',
-                            'msg'     => 'mautic.email.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
+                array_merge(
+                    $postActionVars,
+                    array(
+                        'flashes' => array(
+                            array(
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.notfound',
+                                'msgVars' => array('%id%' => $objectId)
+                            )
                         )
                     )
-                ))
+                )
             );
         } elseif (!$this->factory->getSecurity()->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
@@ -867,35 +869,75 @@ class EmailController extends FormController
         $catPublished = (!empty($category)) ? $category->isPublished() : true;
         $published    = $entity->isPublished();
 
-        if ($catPublished && $published && $this->request->getMethod() == 'POST') {
-            //process and send
-            $failed    = $model->sendEmailToLists($entity);
-
-            if (!empty($failed)) {
-                $flashes[] = array(
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.email.notice.send.with_errors',
-                    'msgVars' => array('%subject%' => $entity->getSubject())
-                );
-            } else {
-                $flashes[] = array(
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.email.notice.send.success',
-                    'msgVars' => array('%subject%' => $entity->getSubject())
-                );
-            }
-        } else {
-            $flashes[] = array(
-                'type'    => 'error',
-                'msg'     => 'mautic.email.error.send',
-                'msgVars' => array('%subject%' => $entity->getSubject())
+        if (!$catPublished || !$published) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    array(
+                        'flashes' => array(
+                            array(
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.send',
+                                'msgVars' => array('%id%' => $objectId)
+                            )
+                        )
+                    )
+                )
             );
         }
 
-        return $this->postActionRedirect(
-            array_merge($postActionVars, array(
-                'flashes' => $flashes
-            ))
+        $action   = $this->generateUrl('mautic_email_action', array('objectAction' => 'send', 'objectId' => $objectId));
+        $pending  = $model->getPendingLeads($entity, null, true);
+        $form     = $this->get('form.factory')->create('batch_send', array(), array('action' => $action));
+        $complete = $this->request->request->get('complete', false);
+
+        if ($this->request->getMethod() == 'POST' && ($complete || $this->isFormValid($form))) {
+            if (!$complete) {
+                $progress = array(0, (int) $pending);
+                $session->set('mautic.email.send.progress', $progress);
+
+                $stats  = array('sent' => 0, 'failed' => 0);
+                $session->set('mautic.email.send.stats', $stats);
+
+                $status     = 'inprogress';
+                $batchlimit = $form['batchlimit']->getData();
+
+                $session->set('mautic.email.send.active', false);
+            } else {
+                $stats      = $session->get('mautic.email.send.stats');
+                $progress   = $session->get('mautic.email.send.progress');
+                $batchlimit = 100;
+                $status     = (!empty($stats['failed'])) ? 'with_errors' : 'success';
+            }
+
+            $contentTemplate = 'MauticEmailBundle:Send:progress.html.php';
+            $viewParameters  = array(
+                'progress'   => $progress,
+                'stats'      => $stats,
+                'status'     => $status,
+                'email'      => $entity,
+                'batchlimit' => $batchlimit
+            );
+
+        } else {
+            //process and send
+            $contentTemplate = 'MauticEmailBundle:Send:form.html.php';
+            $viewParameters  = array(
+                'form'    => $form->createView(),
+                'email'   => $entity,
+                'pending' => $pending
+            );
+        }
+
+        return $this->delegateView(
+            array(
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => $contentTemplate,
+                'passthroughVars' => array(
+                    'mauticContent' => 'emailSend',
+                    'route'         => $action
+                )
+            )
         );
     }
 

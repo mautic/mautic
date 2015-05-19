@@ -85,13 +85,12 @@ if ($tmpl == 'index') {
                         'nameGetter' => 'getSubject',
                         'customButtons' => array(
                             array(
-                                'confirm' => array(
-                                    'message'       => $view["translator"]->trans("mautic.email.form.confirmsend", array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")),
-                                    'confirmText'   => $view["translator"]->trans("mautic.email.send"),
-                                    'confirmAction' => $view['router']->generate('mautic_email_action', array("objectAction" => "send", "objectId" => $item->getId())),
-                                    'iconClass'     => 'fa fa-send-o',
-                                    'btnText'       => $view["translator"]->trans("mautic.email.send")
-                                )
+                                'attr' => array(
+                                    'data-toggle' => 'ajax',
+                                    'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
+                                ),
+                                'iconClass' => 'fa fa-send-o',
+                                'btnText'   => 'mautic.email.send'
                             )
                         )
                     ));

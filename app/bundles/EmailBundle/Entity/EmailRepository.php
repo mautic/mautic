@@ -140,7 +140,7 @@ class EmailRepository extends CommonRepository
     /**
      * @param $emailId
      */
-    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false)
+    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false, $limit = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -172,6 +172,19 @@ class EmailRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->in('ll.leadlist_id', $listIds)
             );
+        }
+
+        // Has an email
+        $q->andWhere(
+            $q->expr()->orX(
+                $q->expr()->isNotNull('l.email'),
+                $q->expr()->neq('l.email', $q->expr()->literal(''))
+            )
+        );
+
+        if (!empty($limit)) {
+            $q->setFirstResult(0)
+                ->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();

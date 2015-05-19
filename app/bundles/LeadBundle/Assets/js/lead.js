@@ -571,7 +571,7 @@ Mautic.reloadLeadImportProgress = function() {
             }
         });
     }
-};};
+};
 
 Mautic.removeBounceStatus = function (el, dncId) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');

@@ -146,6 +146,10 @@ return array(
             'mautic.email.type.email_abtest_settings'     => array(
                 'class' => 'Mautic\EmailBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'email_abtest_settings'
+            ),
+            'mautic.email.type.batch_send'     => array(
+                'class' => 'Mautic\EmailBundle\Form\Type\BatchSendType',
+                'alias' => 'batch_send'
             )
         ),
         'other'  => array(
