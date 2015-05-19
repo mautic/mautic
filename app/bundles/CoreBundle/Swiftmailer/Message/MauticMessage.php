@@ -48,4 +48,11 @@ class MauticMessage extends \Swift_Message
     {
         return $this->metadata;
     }
+
+    /**
+     * Clears the metadata
+     */
+    public function clearMetadata() {
+        $this->metadata = array();
+    }
 }

@@ -10,6 +10,8 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxedException;
+use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceBatchTransport;
 use Mautic\EmailBundle\EmailEvents;
@@ -264,9 +266,8 @@ class MailHelper
      * Extract plain text from message
      *
      * @param \Swift_Message $message
-     * @param                $type
      *
-     * @return stirng
+     * @return string
      */
     static public function getPlainText(\Swift_Message $message)
     {
@@ -395,13 +396,32 @@ class MailHelper
     /**
      * Send batched mail to mailer
      *
-     * @return bool True if no errors
+     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
+     *
+     * @return bool
      */
-    public function flushQueue()
+    public function flushQueue($resetEmailTypes = array('To', 'Cc', 'Bcc'))
     {
         $to = $this->message->getTo();
         if (!empty($to)) {
-            return $this->send(false);
+            $result = $this->send(false);
+
+            // Clear queued to recipients
+            $this->queuedRecipients = array();
+
+            foreach ($resetEmailTypes as $type) {
+                $type    = ucfirst($type);
+                $headers = $this->message->getHeaders();
+
+                if ($headers->has($type)) {
+                    $this->message->getHeaders()->remove($type);
+                }
+            }
+
+            // Clear metadat for the previous recipients
+            $this->message->clearMetadata();
+
+            return $result;
         }
 
         return false;
@@ -451,6 +471,8 @@ class MailHelper
      * @param array  $vars
      * @param bool   $replaceTokens
      * @param null   $charset
+     *
+     * @return void
      */
     public function setTemplate($template, $vars = array(), $returnContent = false, $charset = null)
     {
@@ -516,6 +538,8 @@ class MailHelper
             $addresses = array($addresses => $name);
         }
 
+        $this->checkBatchMaxRecipients(count($addresses));
+
         try {
             $this->message->setTo($addresses);
             $this->queuedRecipients = array_merge($this->queuedRecipients, $addresses);
@@ -532,6 +556,8 @@ class MailHelper
      */
     public function addTo($address, $name = null)
     {
+        $this->checkBatchMaxRecipients();
+
         try {
             $this->message->addTo($address, $name);
             $this->queuedRecipients[$address] = $name;
@@ -548,6 +574,8 @@ class MailHelper
      */
     public function setCc($addresses, $name = null)
     {
+        $this->checkBatchMaxRecipients(count($addresses), 'cc');
+
         try {
             $this->message->setCc($addresses, $name);
         } catch (\Exception $e) {
@@ -563,6 +591,8 @@ class MailHelper
      */
     public function addCc($address, $name = null)
     {
+        $this->checkBatchMaxRecipients(1, 'cc');
+
         try {
             $this->message->addCc($address, $name);
         } catch (\Exception $e) {
@@ -578,6 +608,8 @@ class MailHelper
      */
     public function setBcc($addresses, $name = null)
     {
+        $this->checkBatchMaxRecipients(count($addresses), 'bcc');
+
         try {
             $this->message->setBcc($addresses, $name);
         } catch (\Exception $e) {
@@ -593,10 +625,34 @@ class MailHelper
      */
     public function addBcc($address, $name = null)
     {
+        $this->checkBatchMaxRecipients(1, 'bcc');
+
         try {
             $this->message->addBcc($address, $name);
         } catch (\Exception $e) {
             $this->logError($e);
+        }
+    }
+
+    /**
+     * @param int    $toBeAdded
+     * @param string $type
+     *
+     * @throws BatchQueueMaxException
+     */
+    private function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
+    {
+        if ($this->useBatching) {
+            // Check if max batching has been hit
+            $maxAllowed = $this->transport->getMaxBatchLimit();
+
+            if ($maxAllowed > 0) {
+                $currentCount = $this->transport->getBatchRecipientCount($this->message, $toBeAdded, $type);
+
+                if ($currentCount > $maxAllowed) {
+                    throw new BatchQueueMaxException();
+                }
+            }
         }
     }
 

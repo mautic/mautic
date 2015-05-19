@@ -39,7 +39,7 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
             }
         }
 
-        $message = $this->messageToArray($mauticTokens, $mandrillMergePlaceholders );
+        $message = $this->messageToArray($mauticTokens, $mandrillMergePlaceholders);
 
         $message['from_email'] = $message['from']['email'];
         $message['from_name']  = $message['from']['name'];
@@ -167,9 +167,31 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
     }
 
     /**
+     * @return int
+     */
+    public function getMaxBatchLimit()
+    {
+        // Not used by Mandrill API
+        return 0;
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param int            $toBeAdded
+     * @param string         $type
+     *
+     * @return int
+     */
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    {
+        // Not used by Mandrill API
+        return 0;
+    }
+
+    /**
      * Handle response
      *
-     * @param Request $request
+     * @param Request       $request
      * @param MauticFactory $factory
      *
      * @return mixed
@@ -178,9 +200,7 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
     {
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
-        file_put_contents($factory->getSystemPath('cache').'/mailercallback.txt', print_r($mandrillEvents, true) . "\n\n", FILE_APPEND);
-
-        $bounces = array(
+        $bounces        = array(
             'hashIds' => array(),
             'emails'  => array()
         );
