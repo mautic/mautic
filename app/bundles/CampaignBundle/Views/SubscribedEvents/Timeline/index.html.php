@@ -19,18 +19,21 @@ $item = $event['extra']['log'];
 	    		<a href="<?php echo $view['router']->generate('mautic_campaign_action',
 				    array("objectAction" => "view", "objectId" => $item['campaign_id'])); ?>"
 				   data-toggle="ajax">
-				    <?php echo $item['campaignName']; ?>
+				    <?php echo $item['campaign_name']; ?>
 				</a>
 			</h3>
 	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
         <div class="panel-footer">
-            <p><?php echo $view['translator']->trans('mautic.campaign.user.event.triggered', array('%event%' => $item['eventName'])); ?></p>
-			<?php if ($item['campaignDescription']): ?>
-			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['campaignDescription'])); ?></p>
+            <?php if (!empty($item['metadata']['timeline'])): ?>
+            <p><?php echo $item['metadata']['timeline']; ?></p>
+            <?php endif; ?>
+            <p><?php echo $view['translator']->trans('mautic.campaign.user.event.triggered', array('%event%' => $item['event_name'])); ?></p>
+			<?php if ($item['campaign_description']): ?>
+			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['campaign_description'])); ?></p>
 			<?php endif; ?>
-			<?php if ($item['eventDescription']): ?>
-			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['eventDescription'])); ?></p>
+			<?php if ($item['event_description']): ?>
+			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['event_description'])); ?></p>
 			<?php endif; ?>
         </div>
 	</div>

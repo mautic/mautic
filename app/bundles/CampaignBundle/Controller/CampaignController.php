@@ -130,6 +130,7 @@ class CampaignController extends FormController
 
         $page  = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model    = $this->factory->getModel('campaign');
         $security = $this->factory->getSecurity();
         $entity   = $model->getEntity($objectId);
@@ -168,16 +169,19 @@ class CampaignController extends FormController
         }
 
         $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
-        $eventLogRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $events       = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
-        $leadCount    = $campaignLeadRepo->countLeads($entity->getId());
-        $campaignLogs = $eventLogRepo->getCampaignLog($entity->getId());
+        $eventLogRepo     = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $events       = $model->getEventRepository()->getCampaignEvents($entity->getId());
+
+        $campaignLeads = $model->getRepository()->getCampaignLeadIds($entity->getId());
+
+        $leadCount     = count($campaignLeads);
+        $campaignLogs  = $eventLogRepo->getCampaignLogCounts($entity->getId(), $campaignLeads);
 
         foreach ($events as &$event) {
             $event['logCount'] = 0;
             $event['percent']  = 0;
             if (isset($campaignLogs[$event['id']])) {
-                $event['logCount'] = count($campaignLogs[$event['id']]);
+                $event['logCount'] = $campaignLogs[$event['id']];
             }
             if ($leadCount) {
                 $event['percent'] = round($event['logCount'] / $leadCount * 100);
@@ -329,9 +333,6 @@ class CampaignController extends FormController
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->factory->getModel('campaign');
 
-        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
-        $eventModel = $this->factory->getModel('campaign.event');
-
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
 
@@ -455,9 +456,6 @@ class CampaignController extends FormController
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->factory->getModel('campaign');
-
-        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-        $eventModel = $this->factory->getModel('campaign.event');
 
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
@@ -638,8 +636,7 @@ class CampaignController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $model      = $this->factory->getModel('campaign');
-        $eventModel = $this->factory->getModel('campaign.event');
+        $model  = $this->factory->getModel('campaign');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -656,7 +653,6 @@ class CampaignController extends FormController
             $campaign->setIsPublished(false);
 
             // Clone the campaign's events
-            $newEvents = array();
             foreach ($events as $event) {
                 $campaign->removeEvent($event);
 

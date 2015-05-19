@@ -56,10 +56,12 @@ class FormEventHelper
             $leadId = null;
         }
 
+        $uniqueLeadFields = $factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueFieldsWithData = array();
+
         foreach ($leadFields as $f) {
             $id    = $f->getId();
             $alias = $f->getAlias();
-            $type  = $f->getType();
 
             $data[$alias] = '';
 
@@ -71,23 +73,35 @@ class FormEventHelper
                         $value        = is_array($post[$fieldName]) ? implode(', ', $post[$fieldName]) : $post[$fieldName];
                         $data[$alias] = $value;
 
-                        //update the lead rather than creating a new one if there is for sure identifier match
-                        if ($type == 'email') {
-                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue($alias, $value, $leadId);
-                            if (count($leads)) {
-                                //merge with current lead if not in kiosk mode
-                                $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
-                            } elseif (!$inKioskMode) {
-                                //create a new lead if details differ
-                                $currentEmail = $currentFields['core']['email']['value'];
-                                if (!empty($currentEmail) && strtolower($currentEmail) != strtolower($value)) {
-                                    //for sure a different lead so create a new one
-                                    $lead = new Lead();
-                                    $lead->setNewlyCreated(true);
-                                }
-                            }
+                        // make sure the value is actually there and the field is one of our uniques
+                        if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
+                            $uniqueFieldsWithData[$alias] = $value;
                         }
                     }
+                }
+            }
+        }
+
+        //update the lead rather than creating a new one if there is for sure identifier match ($leadId is to exclude lead from getCurrentLead())
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
+        $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
+
+        if (count($leads)) {
+            //merge with current lead if not in kiosk mode
+            $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
+        } elseif (!$inKioskMode) {
+            // Flatten current fields
+            $currentFields = $model->flattenFields($currentFields);
+
+            // Create a new lead if unique identifiers differ from getCurrentLead() and submitted data
+            foreach ($uniqueLeadFields as $alias => $value) {
+                //create a new lead if details differ
+                $currentValue = $currentFields[$alias];
+                if (!empty($currentValue) && strtolower($currentValue) != strtolower($value)) {
+                    //for sure a different lead so create a new one
+                    $lead = new Lead();
+                    $lead->setNewlyCreated(true);
+                    break;
                 }
             }
         }
@@ -111,6 +125,10 @@ class FormEventHelper
                 $properties['points'],
                 $ipAddress
             );
+
+            // last active time
+            $lead->setLastActive(new \DateTime());
+
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {

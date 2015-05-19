@@ -76,7 +76,7 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
-     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", fetch="EXTRA_LAZY")
      *
      * @var ArrayCollection
      */
@@ -240,37 +240,6 @@ class LeadList extends FormEntity
     public function getAlias()
     {
         return $this->alias;
-    }
-
-    /**
-     * Add lead
-     *
-     * @param $key
-     * @param ListLead $lead
-     *
-     * @return Campaign
-     */
-    public function addLead($key, ListLead $lead)
-    {
-        $action = ($this->leads->contains($lead)) ? 'updated' : 'added';
-
-        $leadEntity = $lead->getLead();
-        $this->changes['leads'][$action][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-        $this->leads[$key] = $lead;
-
-        return $this;
-    }
-
-    /**
-     * Remove lead
-     *
-     * @param ListLead $lead
-     */
-    public function removeLead(ListLead $lead)
-    {
-        $leadEntity = $lead->getLead();
-        $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-        $this->leads->removeElement($lead);
     }
 
     /**

@@ -7,32 +7,28 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Command;
+namespace Mautic\CampaignBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateLeadListsCommand extends ContainerAwareCommand
+class UpdateLeadCampaignsCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('mautic:leadlists:update')
+            ->setName('mautic:campaigns:update')
             ->setAliases(array(
-                'mautic:lists:update',
-                'mautic:update:leadlists',
-                'mautic:update:lists',
-                'mautic:rebuild:leadlists',
-                'mautic:leadlists:rebuild',
-                'mautic:lists:rebuild',
-                'mautic:rebuild:lists',
+                'mautic:update:campaigns',
+                'mautic:rebuild:campaigns',
+                'mautic:campaigns:rebuild',
             ))
-            ->setDescription('Update leads in smart lists based on new lead data.')
-            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
-            ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per list for this script execution. Defaults to all.', false)
-            ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
+            ->setDescription('Rebuild campaigns based on lead lists.')
+            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
+            ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per campaign for this script execution. Defaults to all.', false)
+            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
     }
 
@@ -41,21 +37,22 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
         $container  = $this->getContainer();
         $factory    = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
+        $em         = $factory->getEntityManager();
 
         // Set SQL logging to null or else will hit memory limits in dev for sure
-        $factory->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel = $factory->getModel('lead.list');
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel = $factory->getModel('campaign');
 
-        $id    = $input->getOption('list-id');
+        $id    = $input->getOption('campaign-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-leads');
         $force = $input->getOption('force');
 
         // Prevent script overlap
         $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
-        $command        = 'mautic:leadlist:update';
+        $command        = 'mautic:campaign:update';
         $key            = ($id) ? $id : 'all';
         $executionTimes = array();
 
@@ -88,34 +85,39 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
         }
 
         if ($id) {
-            $list = $listModel->getEntity($id);
-            if ($list !== null) {
-                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
-                $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                $output->writeln('<comment>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>');
+            $campaign = $campaignModel->getEntity($id);
+            if ($campaign !== null) {
+                $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
+                $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
+                $output->writeln('<comment>' . $translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>' . "\n");
             } else {
-                $output->writeln('<error>' . $translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)) . '</error>');
+                $output->writeln('<error>' . $translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)) . '</error>');
             }
         } else {
-            $lists = $listModel->getEntities(
+            $campaigns = $campaignModel->getEntities(
                 array(
                     'iterator_mode' => true
                 )
             );
 
-            while (($l = $lists->next()) !== false) {
+            while (($c = $campaigns->next()) !== false) {
                 // Get first item; using reset as the key will be the ID and not 0
-                $l = reset($l);
+                $c = reset($c);
 
-                $output->writeln('<info>' . $translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $l->getId())) . '</info>');
+                if ($c->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $c->getId())).'</info>');
 
-                $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                $output->writeln('<comment>' . $translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>'."\n");
+                    $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
+                    );
+                }
 
-                unset($l);
+                $em->detach($c);
+                unset($c);
             }
 
-            unset($lists);
+            unset($campaigns);
         }
 
         unset($executionTimes['in_progress'][$command][$key]);

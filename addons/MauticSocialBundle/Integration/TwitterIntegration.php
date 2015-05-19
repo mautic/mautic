@@ -65,17 +65,27 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getAccessTokenUrl ()
     {
-        return 'https://api.twitter.com/oauth2/token';
+        return 'https://api.twitter.com/oauth/access_token';
+    }
+
+    public function getAuthLoginUrl()
+    {
+        $url = 'https://api.twitter.com/oauth/authorize';
+
+        // Get request token
+        $requestToken = $this->getRequestToken();
+
+        $url .= '?oauth_token=' . $requestToken['oauth_token'];
+
+        return $url;
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
-     *
      * @return string
      */
-    public function getAuthenticationUrl ()
+    public function getRequestTokenUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+        return 'https://api.twitter.com/oauth/request_token';
     }
 
     /**
@@ -83,26 +93,32 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getAuthenticationType ()
     {
-        return 'oauth2';
+        return 'oauth1a';
     }
 
     /**
-     * Generate a Twitter bearer token
+     * {@inheritdoc}
      *
-     * @param $inAuthorization
-     *
-     * @return string
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
      */
-    public function getBearerToken ($inAuthorization = false)
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
-        if ($inAuthorization) {
-            $consumer_key    = rawurlencode($this->keys[$this->getClientIdKey()]);
-            $consumer_secret = rawurlencode($this->keys[$this->getClientSecretKey()]);
+        // Prevent SSL issues
+        $settings['ssl_verifypeer'] = false;
 
-            return base64_encode($consumer_key . ':' . $consumer_secret);
-        } else {
-            return $this->keys[$this->getAuthTokenKey()];
+        if (empty($settings['authorize_session'])) {
+            // Twitter requires oauth_token_secret to be part of composite key
+            $settings['token_secret'] = $this->keys['oauth_token_secret'];
+
+            //Twitter also requires double encoding of parameters in building base string
+            $settings['double_encode_basestring_parameters'] = true;
         }
+
+        return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
     /**
@@ -130,7 +146,7 @@ class TwitterIntegration extends SocialIntegration
             } else {
                 $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
                     'user_id'          => $id,
-                    'include_entities' => false
+                    'include_entities' => 'false'
                 ));
             }
 
@@ -157,9 +173,9 @@ class TwitterIntegration extends SocialIntegration
             //due to the way Twitter filters, get more than 10 tweets
             $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
                 'user_id'         => $id,
-                'exclude_replies' => true,
+                'exclude_replies' => 'true',
                 'count'           => 25,
-                'trim_user'       => true
+                'trim_user'       => 'true'
             ));
 
             if (!empty($data) && count($data)) {
@@ -246,9 +262,11 @@ class TwitterIntegration extends SocialIntegration
             return false;
         }
 
+        // note twitter requires params to be passed as strings
         $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
             'screen_name'      => $identifier,
-            'include_entities' => false
+            'include_entities' => 'false',
+
         ));
 
         if (isset($data[0])) {
@@ -284,6 +302,11 @@ class TwitterIntegration extends SocialIntegration
      */
     public function parseCallbackResponse ($data, $postAuthorization = false)
     {
+        if ($postAuthorization) {
+            parse_str($data, $parsed);
+
+            return $parsed;
+        }
         return json_decode($data, true);
     }
 }

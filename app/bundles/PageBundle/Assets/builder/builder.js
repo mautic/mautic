@@ -48,8 +48,8 @@ mQuery(document).ready(function () {
 
 var SlideshowManager = {};
 
-SlideshowManager.toggleFileOpened = false;
 SlideshowManager.slotConfigs = {};
+SlideshowManager.urlobj;
 
 // add newProp (dot separated string) to obj with new value
 SlideshowManager.addValueToObj = function (obj, newProp, value) {
@@ -124,51 +124,6 @@ SlideshowManager.saveConfigObject = function (slot) {
     });
 }
 
-SlideshowManager.toggleFileManager = function () {
-    var listOfSlides = mQuery('.modal.slides-config .list-of-slides li:not(.active)');
-    var activeSlide = mQuery('.modal.slides-config .list-of-slides li.active');
-    var configFields = mQuery('.modal.slides-config .config-fields .row:not(:last-child)');
-    var fileManager = mQuery('#fileManager');
-    var newSlideBtn = mQuery('.btn.new-slide');
-    var handle = mQuery('.list-of-slides .ui-sortable-handle');
-
-    listOfSlides.animate({
-        opacity: "toggle",
-        padding: "toggle",
-        height: "toggle"
-    }, 300);
-    configFields.animate({
-        opacity: "toggle",
-        padding: "toggle",
-        height: "toggle"
-    }, 300);
-    fileManager.animate({
-        height: "toggle",
-        opacity: "toggle"
-    }, 300);
-    newSlideBtn.animate({
-        height: "toggle",
-        opacity: "toggle"
-    }, 300);
-    handle.animate({
-        opacity: "toggle"
-    }, 300);
-
-    if (SlideshowManager.toggleFileOpened) {
-        activeSlide.animate({
-            borderRadius: "0px"
-        }, 500, function () {
-            activeSlide.removeAttr('style');
-        });
-    } else {
-        activeSlide.animate({
-            borderRadius: "21px"
-        }, 500);
-    }
-
-    SlideshowManager.toggleFileOpened = !SlideshowManager.toggleFileOpened;
-}
-
 SlideshowManager.newSlide = function () {
     var tabPaneExisting = mQuery('.config-fields .tab-pane').first();
 
@@ -205,17 +160,29 @@ SlideshowManager.newSlide = function () {
     listGroupItemExisting.parent().append(listGroupItemNew);
 }
 
-SlideshowManager.preloadFileManager = function () {
-    filebrowserImageBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images';
-    var iframe = mQuery("<iframe id='filemanager_iframe' />").attr({src: filebrowserImageBrowseUrl});
-    mQuery("#fileManager").hide().append(iframe);
-    iframe.load(function () {
-        var fileManager = mQuery('#filemanager_iframe').contents().find('body');
-        fileManager.click(function () {
-            var copyBtn = fileManager.find('#copy-button');
-            if (copyBtn.length) {
-                mQuery('.tab-pane.active.in input.background-image').val(copyBtn.attr('data-clipboard-text'));
-            }
-        });
-    });
+SlideshowManager.BrowseServer = function(obj)
+{
+    SlideshowManager.urlobj = obj;
+    SlideshowManager.OpenServerBrowser(
+    mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images',
+    screen.width * 0.7,
+    screen.height * 0.7 ) ;
+}
+
+SlideshowManager.OpenServerBrowser = function( url, width, height )
+{
+    var iLeft = (screen.width - width) / 2 ;
+    var iTop = (screen.height - height) / 2 ;
+    var sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
+    sOptions += ",width=" + width ;
+    sOptions += ",height=" + height ;
+    sOptions += ",left=" + iLeft ;
+    sOptions += ",top=" + iTop ;
+    var oWindow = window.open( url, "BrowseWindow", sOptions ) ;
+}
+
+function SetUrl( url, width, height, alt )
+{
+    document.getElementById(SlideshowManager.urlobj).value = url ;
+    oWindow = null;
 }

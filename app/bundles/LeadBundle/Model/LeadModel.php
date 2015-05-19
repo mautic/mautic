@@ -201,13 +201,11 @@ class LeadModel extends FormModel
      * @param $overwriteWithBlank
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
+    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false)
     {
         //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
         //generate the social cache
         list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles($lead, $data, true, null, false, true);
-
-        $isNew = ($lead->getId()) ? false : true;
 
         //set the social cache while we have it
         $lead->setSocialCache($socialCache);
@@ -235,29 +233,33 @@ class LeadModel extends FormModel
                     $field['value'] = null;
                 }
 
-                $curValue = $field['value'];
-                $newValue = (isset($data[$alias])) ? $data[$alias] : "";
-                if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
-                    $field['value'] = $newValue;
-                    $lead->addUpdatedField($alias, $newValue, $curValue);
-                }
+                // Only update fields that are part of the passed $data array
+                if (array_key_exists($alias, $data)) {
+                    $curValue = $field['value'];
+                    $newValue = $data[$alias];
 
-                //if empty, check for social media data to plug the hole
-                if (empty($newValue) && !empty($socialCache)) {
-                    foreach ($socialCache as $service => $details) {
-                        //check to see if a field has been assigned
+                    if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
+                        $field['value'] = $newValue;
+                        $lead->addUpdatedField($alias, $newValue, $curValue);
+                    }
 
-                        if (!empty($socialFeatureSettings[$service]['leadFields']) &&
-                            in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
-                        ) {
+                    //if empty, check for social media data to plug the hole
+                    if (empty($newValue) && !empty($socialCache)) {
+                        foreach ($socialCache as $service => $details) {
+                            //check to see if a field has been assigned
 
-                            //check to see if the data is available
-                            $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
-                            if (isset($details['profile'][$key])) {
-                                //Found!!
-                                $field['value'] = $details['profile'][$key];
-                                $lead->addUpdatedField($alias, $details['profile'][$key]);
-                                break;
+                            if (!empty($socialFeatureSettings[$service]['leadFields'])
+                                && in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
+                            ) {
+
+                                //check to see if the data is available
+                                $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
+                                if (isset($details['profile'][$key])) {
+                                    //Found!!
+                                    $field['value'] = $details['profile'][$key];
+                                    $lead->addUpdatedField($alias, $details['profile'][$key]);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -431,7 +433,7 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if ($this->systemCurrentLead) {
+        if (!$returnTracking && $this->systemCurrentLead) {
             // Just return the system set lead
             return $this->systemCurrentLead;
         }
@@ -551,20 +553,6 @@ class LeadModel extends FormModel
         }
 
         $this->systemCurrentLead = $lead;
-    }
-
-    /**
-     * Regenerate the lists this lead currently belongs to
-     *
-     * @param Lead $lead
-     */
-    public function regenerateLeadLists(Lead $lead)
-    {
-        $lists = $this->getLists($lead);
-        $model = $this->factory->getModel('lead.list');
-        foreach ($lists as $lid => $list) {
-            $model->regenerateListLeads($list);
-        }
     }
 
     /**

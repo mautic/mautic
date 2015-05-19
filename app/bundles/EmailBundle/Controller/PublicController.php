@@ -64,7 +64,17 @@ class PublicController extends CommonFormController
                 //replace tokens
                 $content = $response->getContent();
             } else {
-                $content = $entity->getCustomHtml();
+                $content   = $entity->getCustomHtml();
+                $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
+
+                // Check for html doc
+                if (strpos($content, '<html>') === false) {
+                    $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
+                } elseif (strpos($content, '<head>') === false) {
+                    $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
+                } elseif (!empty($analytics)) {
+                    $content = str_replace('</head>', $analytics . "\n</head>", $content);
+                }
             }
 
             $dispatcher = $this->get('event_dispatcher');
@@ -148,8 +158,8 @@ class PublicController extends CommonFormController
             $template = $formTemplate;
         }
         $theme  = $this->factory->getTheme($template);
-        if ($theme->getName() != $template) {
-            $template = $theme->getName();
+        if ($theme->getTheme() != $template) {
+            $template = $theme->getTheme();
         }
         $config = $theme->getConfig();
 
@@ -204,13 +214,13 @@ class PublicController extends CommonFormController
         }
 
         $theme  = $this->factory->getTheme($template);
-        if ($theme->getName() != $template) {
-            $template = $theme->getName();
+        if ($theme->getTheme() != $template) {
+            $template = $theme->getTheme();
         }
 
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
-        if (empty($theme) || $theme->getName() !== $template) {
+        if (empty($theme) || $theme->getTheme() !== $template) {
             $template = $this->factory->getParameter('theme');
         }
 

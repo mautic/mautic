@@ -38,7 +38,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 3;
+    const PATCH_VERSION = 6;
 
     /**
      * Extra version identifier
@@ -48,7 +48,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-dev';
 
     /**
      * @var array
@@ -141,16 +141,15 @@ class AppKernel extends Kernel
         $searchPath = __DIR__ . '/bundles';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
+            ->followLinks()
             ->in($searchPath)
             ->depth('1')
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
-            $path      = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
-            $parts     = explode(DIRECTORY_SEPARATOR, $path);
-            $class     = array_pop($parts);
-            $namespace = "Mautic\\" . implode('\\', $parts);
-            $class     = $namespace . '\\' . $class;
+            $dirname  = basename($file->getRelativePath());
+            $filename = substr($file->getFilename(), 0, -4);
+            $class    = '\\Mautic' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
                 $bundleInstance = new $class();
                 if (method_exists($bundleInstance, 'isEnabled')) {
@@ -167,16 +166,15 @@ class AppKernel extends Kernel
         $searchPath = dirname(__DIR__) . '/addons';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
+            ->followLinks()
             ->depth('1')
             ->in($searchPath)
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
-            $path      = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
-            $parts     = explode(DIRECTORY_SEPARATOR, $path);
-            $class     = array_pop($parts);
-            $namespace = "MauticAddon\\" . implode('\\', $parts);
-            $class     = $namespace . '\\' . $class;
+            $dirname  = basename($file->getRelativePath());
+            $filename = substr($file->getFilename(), 0, -4);
+            $class    = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
                 $bundles[] = new $class();
             }

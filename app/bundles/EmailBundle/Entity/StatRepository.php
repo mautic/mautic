@@ -51,7 +51,7 @@ class StatRepository extends CommonRepository
     public function getSentStats($emailId, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('s.*')
+        $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where('s.email_id = :email')
             ->setParameter('email', $emailId);
@@ -66,8 +66,10 @@ class StatRepository extends CommonRepository
         //index by lead
         $stats = array();
         foreach ($result as $r) {
-            $stats[$r['lead_id']] = $r;
+            $stats[$r['lead_id']] = $r['lead_id'];
         }
+
+        unset($result);
 
         return $stats;
     }
