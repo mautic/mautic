@@ -35,7 +35,10 @@ include 'action_button_helper.php';
                     'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
                     'precheck'      => 'batchActionPrecheck'
                 ));
+                $buttonCount++;
             endif;
+
+            echo $view['buttons']->renderPostCustomButtons($buttonCount);
             ?>
         </div>
     </div>
