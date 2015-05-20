@@ -6,19 +6,25 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$labelAttr = 'id="mauticform_label_' . $field['alias'] . '" for="mauticform_input_' . $field['alias'] . '" ' . $field['labelAttributes'];
-if (strpos($labelAttr, 'class') === false)
-    $labelAttr .= ' class="mauticform-label"';
 
-$inputAttr = 'id="mauticform_input_' . $field['alias'] . '" '. $field['inputAttributes'];
-if (strpos($inputAttr, 'class') === false) {
-    $inputAttr .= ' class="mauticform-selectbox' . (!empty($inForm) ? ' not-chosen' : '') . '"';
-} elseif ((!empty($inForm))) {
-    $inputAttr = str_replace('class="', 'class="not-chosen ', $labelAttr);
+$labelAttr = 'id="mauticform_label_' . $field['alias'] . '" for="mauticform_input_' . $field['alias'] . '"';
+$inputAttr = 'id="mauticform_input_' . $field['alias'] . '"';
+
+if (!empty($inForm)) {
+    $labelAttr = 'class="mauticform-label"';
+    $inputAttr = 'disabled="disabled" class="mauticform-selectbox not-chosen"';
+} else {
+    $labelAttr .= ' ' . $field['labelAttributes'];
+
+    if (strpos($labelAttr, 'class') === false)
+        $labelAttr .= ' class="mauticform-label"';
+
+    $inputAttr .= ' ' . $field['inputAttributes'];
+
+    if (strpos($inputAttr, 'class') === false) {
+        $inputAttr .= ' class="mauticform-selectbox';
+    }
 }
-
-if (!empty($inForm))
-    $inputAttr .= ' disabled="disabled"';
 
 $properties = $field['properties'];
 

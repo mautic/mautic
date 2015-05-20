@@ -6,15 +6,19 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$inputAttr = $field['inputAttributes'];
 
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform-button"';
+
+if (!empty($inForm)) {
+    $inputAttr = 'disabled="disabled" class="mauticform-button"';
+} else {
+    $inputAttr = $field['inputAttributes'];
+
+    if (strpos($inputAttr, 'class') === false)
+        $inputAttr .= ' class="mauticform-button"';
+
+}
 
 $properties = $field['properties'];
-
-if (!empty($inForm))
-    $inputAttr .= 'disabled="disabled"';
 
 $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
 ?>

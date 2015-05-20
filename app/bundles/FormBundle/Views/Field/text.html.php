@@ -8,16 +8,24 @@
  */
 $type = (isset($type)) ? $type : 'text';
 
-$labelAttr = 'id="mauticform_label_' . $field['alias'] . '" for="mauticform_input_' . $field['alias'] . '" ' . $field['labelAttributes'];
-if (strpos($labelAttr, 'class') === false)
-    $labelAttr .= ' class="mauticform-label"';
+$labelAttr = 'id="mauticform_label_' . $field['alias'] . '" for="mauticform_input_' . $field['alias'] . '"';
+$inputAttr = 'id="mauticform_input_' . $field['alias'] . '" name="mauticform['.$field['alias'].']" value="' . $field['defaultValue'] . '"';
 
-$inputAttr = 'id="mauticform_input_' . $field['alias'] . '" name="mauticform['.$field['alias'].']" value="' . $field['defaultValue'] . '" ' . $field['inputAttributes'];
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform-input"';
+if (!empty($inForm)) {
+    $labelAttr = 'class="mauticform-label"';
+    $inputAttr = 'disabled="disabled" class="mauticform-input"';
+} else {
+    $labelAttr .= ' ' . $field['labelAttributes'];
 
-if (!empty($inForm))
-    $inputAttr .= ' disabled="disabled"';
+    if (strpos($labelAttr, 'class') === false)
+        $labelAttr .= ' class="mauticform-label"';
+
+    $inputAttr .= ' ' . $field['inputAttributes'];
+
+    if (strpos($inputAttr, 'class') === false) {
+        $inputAttr .= ' class="mauticform-input';
+    }
+}
 
 $properties     = $field['properties'];
 if (!empty($properties['placeholder']))

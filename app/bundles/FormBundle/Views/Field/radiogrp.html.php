@@ -6,17 +6,20 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$labelAttr = $field['labelAttributes'];
-$inputAttr = $field['inputAttributes'];
 
-if (strpos($labelAttr, 'class') === false)
-    $labelAttr .= ' class="mauticform-label"';
+if (!empty($inForm)) {
+    $labelAttr = 'class="mauticform-label"';
+    $inputAttr = 'disabled="disabled" class="mauticform-radiogrp-radio"';
+} else {
+    $labelAttr = $field['labelAttributes'];
+    $inputAttr = $field['inputAttributes'];
 
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform-radiogrp-radio"';
+    if (strpos($labelAttr, 'class') === false)
+        $labelAttr .= ' class="mauticform-label"';
 
-if (!empty($inForm))
-    $inputAttr .= 'disabled="disabled"';
+    if (strpos($inputAttr, 'class') === false)
+        $inputAttr .= ' class="mauticform-radiogrp-radio"';
+}
 
 $properties = $field['properties'];
 $list  = $properties['list'];
