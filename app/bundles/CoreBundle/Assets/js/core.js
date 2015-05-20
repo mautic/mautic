@@ -1471,11 +1471,11 @@ var Mautic = {
                 .html(cancelText);
         }
 
-        confirmFooterDiv.append(confirmButton);
-
         if (typeof cancelButton != 'undefined') {
             confirmFooterDiv.append(cancelButton);
         }
+
+        confirmFooterDiv.append(confirmButton);
 
         confirmContentDiv.append(confirmHeaderDiv);
         confirmContentDiv.append(confirmFooterDiv);

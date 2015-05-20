@@ -27,7 +27,22 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'routeBase'   => 'form',
         'templateButtons' => array(
             'delete' => $permissions['form:forms:deleteown'] || $permissions['form:forms:deleteother']
-        )
+        ),
+        'preCustomButtons' => array(
+            array(
+                'confirm'      => array(
+                    'message'         => $view['translator']->trans('mautic.form.confirm_batch_rebuild'),
+                    'confirmText'     => $view['translator']->trans("mautic.form.rebuild"),
+                    'confirmAction'   => $view['router']->generate('mautic_form_action', array_merge(array('objectAction' => 'batchRebuildHtml'))),
+                    'tooltip'         => $view['translator']->trans('mautic.form.rebuild.batch_tooltip'),
+                    'iconClass'       => 'fa fa-fw fa-refresh',
+                    'btnText'         => false,
+                    'btnClass'        => 'btn btn-sm btn-default',
+                    'precheck'        => 'batchActionPrecheck',
+                    'confirmCallback' => 'executeBatchAction'
+                )
+            )
+        ),
     )); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

@@ -814,4 +814,67 @@ class FormController extends CommonFormController
         $session->remove('mautic.form.'.$sessionId.'.actions.modified');
         $session->remove('mautic.form.'.$sessionId.'.actions.deleted');
     }
+
+    /**
+     *
+     */
+    public function batchRebuildHtmlAction()
+    {
+        $page        = $this->factory->getSession()->get('mautic.form.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_form_index',
+                'mauticContent' => 'form'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\FormBundle\Model\FormModel $model */
+            $model     = $this->factory->getModel('form');
+            $ids       = json_decode($this->request->query->get('ids', ''));
+            $count     = 0;
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.form.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    'form:forms:editown', 'form:forms:editother', $entity->getCreatedBy()
+                )) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
+                } else {
+                    $model->generateHtml($entity);
+                    $count++;
+                }
+            }
+
+            $flashes[] = array(
+                'type' => 'notice',
+                'msg'  => 'mautic.form.notice.batch_html_generated',
+                'msgVars' => array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
 }
