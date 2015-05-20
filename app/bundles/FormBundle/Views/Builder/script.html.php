@@ -19,11 +19,18 @@ var MauticForm_<?php echo $formName; ?> = {
 
         function validateOptions(elOptions) {
             var optionsValid = false;
-            var i = 0;
-            while (!optionsValid && i < elOptions.length) {
-                if (elOptions[i].checked) optionsValid = true;
-                i++;
+
+            if (elOptions.length == undefined) {
+                elOptions = [ elOptions ];
             }
+
+            for (var i=0; i < elOptions.length; i++) {
+                if (elOptions[i].checked) {
+                    optionsValid = true;
+                    break;
+                }
+            }
+
             return optionsValid;
         }
 
