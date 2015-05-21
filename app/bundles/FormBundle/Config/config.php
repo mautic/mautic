@@ -26,6 +26,10 @@ return array(
                 'path'       => '/forms/{page}',
                 'controller' => 'MauticFormBundle:Form:index'
             ),
+            'mautic_form_results'         => array(
+                'path'       => '/forms/results/{objectId}/{page}',
+                'controller' => 'MauticFormBundle:Result:index',
+            ),
             'mautic_form_export'          => array(
                 'path'       => '/forms/results/{objectId}/export/{format}',
                 'controller' => 'MauticFormBundle:Result:export',
@@ -33,9 +37,12 @@ return array(
                     'format' => 'csv'
                 )
             ),
-            'mautic_form_results'         => array(
-                'path'       => '/forms/results/{objectId}/{page}',
-                'controller' => 'MauticFormBundle:Result:index',
+            'mautic_form_results_delete'   => array(
+                'path'       => '/forms/results/{formId}/delete/{objectId}',
+                'controller' => 'MauticFormBundle:Result:delete',
+                'defaults'   => array(
+                    'objectId' => 0
+                )
             ),
             'mautic_form_action'          => array(
                 'path'       => '/forms/{objectAction}/{objectId}',

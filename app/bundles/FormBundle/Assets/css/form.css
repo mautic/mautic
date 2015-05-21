@@ -54,6 +54,6 @@ textarea.form-html {
     margin-top: 10px;
 }
 
-.formresult-list th:not(.col-formresult-id) {
+.formresult-list th:not(.col-formresult-id):not(.col-actions) {
     min-width: 125px;
 }

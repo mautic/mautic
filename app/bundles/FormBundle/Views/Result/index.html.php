@@ -15,15 +15,28 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
 
 $buttons = array(
     array(
-        'attr' => array(
-            'target' => '_new',
-            'data-toggle' => '',
-            'class'       => 'btn btn-default btn-nospin',
-            'href'   => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'html'))
-        ),
-        'btnText' => $view['translator']->trans('mautic.form.result.export.html'),
-        'iconClass' => 'fa fa-file-code-o'
+        'confirm' => array (
+            'message'         => $view['translator']->trans('mautic.form.results.form.confirmbatchdelete'),
+            'confirmText'     => $view['translator']->trans('mautic.core.form.delete'),
+            'confirmAction'   => $view['router']->generate('mautic_form_results_delete', array_merge(array('formId' => $form->getId()))),
+            'confirmCallback' => 'executeBatchAction',
+            'iconClass'       => 'fa fa-trash-o text-danger',
+            'btnText'         => $view['translator']->trans('mautic.core.form.delete'),
+            'tooltip'         => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
+            'precheck'        => 'batchActionPrecheck'
+        )
+    )
+);
+
+$buttons[] = array(
+    'attr' => array(
+        'target' => '_new',
+        'data-toggle' => '',
+        'class'       => 'btn btn-default btn-nospin',
+        'href'   => $view['router']->generate('mautic_form_export', array('objectId' => $form->getId(), 'format' => 'html'))
     ),
+    'btnText' => $view['translator']->trans('mautic.form.result.export.html'),
+    'iconClass' => 'fa fa-file-code-o'
 );
 
 $buttons[] = array(
