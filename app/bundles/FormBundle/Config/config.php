@@ -160,6 +160,10 @@ return array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldCaptchaType',
                 'alias' => 'formfield_captcha'
             ),
+            'mautic.form.type.field_propertygroup'      => array(
+                'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
+                'alias' => 'formfield_group'
+            ),
             'mautic.form.type.pointaction_formsubmit'    => array(
                 'class' => 'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',
                 'alias' => 'pointaction_formsubmit'

@@ -122,9 +122,9 @@ class FieldType extends AbstractType
                     break;
                 case 'checkboxgrp':
                 case 'radiogrp':
-                    $builder->add('properties', 'sortablelist', array(
-                        'label'      => 'mautic.core.form.list',
-                        'label_attr' => array('class' => 'control-label'),
+                    $builder->add('properties', 'formfield_group', array(
+                        'label' => false,
+                        'data'  => (isset($options['data']['properties'])) ? $options['data']['properties'] : array()
                     ));
                     break;
                 case 'freetext':
