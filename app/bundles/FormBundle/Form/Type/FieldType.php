@@ -29,8 +29,9 @@ class FieldType extends AbstractType
     {
         // Populate settings
         $cleanMasks = array(
-            'labelAttributes' => 'string',
-            'inputAttributes' => 'string'
+            'labelAttributes'     => 'string',
+            'inputAttributes'     => 'string',
+            'containerAttributes' => 'string'
         );
 
         $addHelpMessage =
@@ -38,6 +39,7 @@ class FieldType extends AbstractType
         $addDefaultValue =
         $addLabelAttributes =
         $addInputAttributes =
+        $addContainerAttributes =
         $addIsRequired = true;
 
         if (!empty($options['customParameters'])) {
@@ -60,6 +62,8 @@ class FieldType extends AbstractType
                 'labelAttributesText',
                 'addInputAttributes',
                 'inputAttributesText',
+                'addContainerAttributes',
+                'containerAttributesText',
                 'addIsRequired');
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
@@ -213,6 +217,19 @@ class FieldType extends AbstractType
                 'attr'       => array(
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.field.help.attr'
+                ),
+                'required'   => false
+            ));
+        }
+
+
+        if ($addContainerAttributes) {
+            $builder->add('containerAttributes', 'text', array(
+                'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.field.help.container_attr'
                 ),
                 'required'   => false
             ));
