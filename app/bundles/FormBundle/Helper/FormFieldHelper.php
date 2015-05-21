@@ -148,7 +148,13 @@ class FormFieldHelper
 
                 if (count($violations)) {
                     foreach ($violations as $v) {
-                        $errors[] = $this->translator->trans($v->getMessage(), $v->getMessageParameters(), 'validators');
+                        $transParameters = $v->getMessageParameters();
+
+                        if ($f !== null) {
+                            $transParameters['%label%'] = "&quot;" . $f->getLabel() . "&quot;";
+                        }
+
+                        $errors[] = $this->translator->trans($v->getMessage(), $transParameters, 'validators');
                     }
                 }
             }
