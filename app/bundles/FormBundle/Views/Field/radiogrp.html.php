@@ -7,37 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!empty($inForm)) {
-    $labelAttr = 'class="mauticform-label"';
-    $inputAttr = 'disabled="disabled" class="mauticform-radiogrp-radio"';
-} else {
-    $labelAttr = $field['labelAttributes'];
-    $inputAttr = $field['inputAttributes'];
+$defaultInputClass = 'radiogrp-radio';
+$containerType     = 'radiogrp';
+$ignoreId          = true;
 
-    if (strpos($labelAttr, 'class') === false)
-        $labelAttr .= ' class="mauticform-label"';
+include __DIR__ . '/field_helper.php';
 
-    if (strpos($inputAttr, 'class') === false)
-        $inputAttr .= ' class="mauticform-radiogrp-radio"';
-}
-
-$properties = $field['properties'];
 $list  = $properties['list'];
 $count = 0;
 
-$containerClass  = ($field['isRequired']) ? ' mauticform-required' : '';
-$containerClass .= (!empty($deleted)) ? ' bg-danger' : '';
-$helpMessage    = $field['helpMessage'];
+$firstId = 'mauticform_radiogrp_radio_' . $field['alias'] . '_' . \Mautic\CoreBundle\Helper\InputHelper::alphanum($list[0]);
 
-if ($field['isRequired']) {
-    $validationMessage = $field['validationMessage'];
-    if (empty($validationMessage))
-        $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
-}
 ?>
-
-<?php $firstId = 'mauticform_radiogrp_radio_' . $field['alias'] . '_' . \Mautic\CoreBundle\Helper\InputHelper::alphanum($list[0]); ?>
-<div class="mauticform-row mauticform-radiogrp<?php echo $containerClass; ?> mauticform-row-<?php echo $field['alias']; ?>" id="mauticform_<?php echo $id; ?>">
+<div <?php echo $containerAttr; ?>>
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
@@ -55,9 +37,11 @@ if ($field['isRequired']) {
     <?php foreach($list as $l): ?>
     <?php $id = $field['alias'] . '_' . \Mautic\CoreBundle\Helper\InputHelper::alphanum($l); ?>
     <div class="mauticform-radiogrp-row">
-        <?php $checked = ($field['defaultValue'] == $l) ? 'checked="checked"' : ''; ?>
-        <input <?php echo $inputAttr . ' ' . $checked; ?> id="mauticform_radiogrp_radio_<?php echo $id; ?>" type="radio" name="mauticform[<?php echo $field['alias']; ?>]" value="<?php echo $view->escape($l); ?>" />
-        <label class="mauticform-radiogrp-label" id="mauticform_radiogrp_label_<?php echo $id; ?>" for="mauticform_radiogrp_radio_<?php echo $id; ?>"><?php echo $view->escape($l); ?></label>
+        <label class="mauticform-radiogrp-label" id="mauticform_radiogrp_label_<?php echo $id; ?>" for="mauticform_radiogrp_radio_<?php echo $id; ?>">
+            <?php $checked = ($field['defaultValue'] == $l) ? 'checked="checked"' : ''; ?>
+            <input <?php echo $inputAttr . ' ' . $checked; ?> id="mauticform_radiogrp_radio_<?php echo $id; ?>" type="radio" value="<?php echo $view->escape($l); ?>" />
+            <?php echo $view->escape($l); ?>
+        </label>
     </div>
     <?php endforeach; ?>
     <?php if (!empty($validationMessage)): ?>

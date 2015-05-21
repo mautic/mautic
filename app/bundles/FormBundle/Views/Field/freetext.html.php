@@ -7,25 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+$defaultInputClass = $containerType = 'freetext';
+include __DIR__ . '/field_helper.php';
 
-if (!empty($inForm)) {
-    $labelAttr = 'class="mauticform-label"';
-    $inputAttr = '';
-} else {
-    $labelAttr = $field['labelAttributes'];
-    $inputAttr = $field['inputAttributes'];
-
-    if (strpos($labelAttr, 'class') === false)
-        $labelAttr .= ' class="mauticform-label"';
-}
-
-$properties = $field['properties'];
-$text       = $view->escape($properties['text']);
-
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
+$text = $view->escape($properties['text']);
 ?>
 
-<div class="mauticform-row mauticform-freetext mauticform-row-<?php echo $field['alias'].$containerClass; ?>" id="mauticform_<?php echo $id; ?>">
+<div <?php echo $containerAttr; ?>>
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(

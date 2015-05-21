@@ -7,36 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!empty($inForm)) {
-    $labelAttr = 'class="mauticform-label"';
-    $inputAttr = 'disabled="disabled" class="mauticform-checkboxgrp-checkbox"';
-} else {
-    $labelAttr = $field['labelAttributes'];
-    $inputAttr = $field['inputAttributes'];
+$defaultInputClass = 'checkboxgrp-checkbox';
+$containerType     = 'checkboxgrp';
+$ignoreId          = true;
+$ignoreName        = true;
 
-    if (strpos($labelAttr, 'class') === false)
-        $labelAttr .= ' class="mauticform-label"';
+include __DIR__ . '/field_helper.php';
 
-    if (strpos($inputAttr, 'class') === false)
-        $inputAttr .= ' class="mauticform-checkboxgrp-checkbox"';
-}
-
-$properties = $field['properties'];
-$list  = $properties['list'];
-$count = 0;
-
-$containerClass  = ($field['isRequired']) ? ' mauticform-required' : '';
-$containerClass .= (!empty($deleted)) ? ' bg-danger' : '';
-$helpMessage     = $field['helpMessage'];
-if ($field['isRequired']) {
-    $validationMessage = $field['validationMessage'];
-    if (empty($validationMessage))
-        $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
-}
+$list        = $properties['list'];
+$count       = 0;
 ?>
 
 <?php $firstId = 'mauticform_checkboxgrp_checkbox_' . $field['alias'] . '_' . \Mautic\CoreBundle\Helper\InputHelper::alphanum($list[0]); ?>
-<div class="mauticform-row mauticform-checkboxgrp<?php echo $containerClass; ?> mauticform-row-<?php echo $field['alias']; ?>" id="mauticform_<?php echo $id; ?>">
+<div <?php echo $containerAttr; ?>>
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
@@ -56,9 +39,11 @@ if ($field['isRequired']) {
     <?php $id = $field['alias'] . '_' . \Mautic\CoreBundle\Helper\InputHelper::alphanum($l); ?>
 
     <div class="mauticform-checkboxgrp-row">
-        <?php $checked = ($field['defaultValue'] == $l) ? 'checked="checked"' : ''; ?>
-        <input <?php echo $inputAttr . ' ' . $checked; ?> id="mauticform_checkboxgrp_checkbox_<?php echo $id; ?>" type="checkbox" name="mauticform[<?php echo $field['alias']; ?>][]" value="<?php echo $view->escape($l); ?>" />
-        <label class="mauticform-checkboxgrp-label" id="mauticform_checkboxgrp_label_<?php echo $id; ?>" for="mauticform_checkboxgrp_checkbox_<?php echo $id; ?>"><?php echo $view->escape($l); ?></label>
+        <label class="mauticform-checkboxgrp-label" id="mauticform_checkboxgrp_label_<?php echo $id; ?>" for="mauticform_checkboxgrp_checkbox_<?php echo $id; ?>">
+            <?php $checked = ($field['defaultValue'] == $l) ? 'checked="checked"' : ''; ?>
+            <input <?php echo $inputAttr . ' ' . $checked; ?> id="mauticform_checkboxgrp_checkbox_<?php echo $id; ?>" type="checkbox" name="mauticform[<?php echo $field['alias']; ?>][]" value="<?php echo $view->escape($l); ?>" />
+            <?php echo $view->escape($l); ?>
+        </label>
     </div>
     <?php endforeach; ?>
     <?php if (!empty($validationMessage)): ?>

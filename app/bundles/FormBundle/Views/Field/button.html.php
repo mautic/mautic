@@ -7,23 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-if (!empty($inForm)) {
-    $inputAttr = 'disabled="disabled" class="mauticform-button"';
-} else {
-    $inputAttr = $field['inputAttributes'];
-
-    if (strpos($inputAttr, 'class') === false)
-        $inputAttr .= ' class="mauticform-button"';
-
-}
-
-$properties = $field['properties'];
-
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
+$defaultInputClass = $containerType = 'button';
+include __DIR__ . '/field_helper.php';
 ?>
 
-<div class="mauticform-row mauticform-button<?php echo $containerClass; ?>" id="mauticform_<?php echo $id; ?>">
+<div <?php echo $containerAttr; ?>>
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
