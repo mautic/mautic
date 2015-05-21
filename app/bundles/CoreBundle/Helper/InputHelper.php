@@ -34,7 +34,7 @@ class InputHelper
                 'embed',
                 'frame',
                 'frameset',
-                'iframe',
+                //'iframe',
                 'ilayer',
                 'layer',
                 'object',
