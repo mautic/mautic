@@ -2923,7 +2923,7 @@ var Mautic = {
 
         mQuery('#BuilderLinkModal').modal('hide');
         mQuery('#BuilderLinkModal input[name="editor"]').val('');
-        mQuery('#BuilderLinkModal input[name="link"]').val('');
+        mQuery('#BuilderLinkModal input[name="url"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
     },
