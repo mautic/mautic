@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -243,8 +244,6 @@ class FormController extends CommonFormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $submits = $session->get('mautic.form.'.$sessionId.'.fields.submits', array());
-
                     //only save fields that are not to be deleted
                     $fields   = array_diff_key($modifiedFields, array_flip($deletedFields));
                     //only save actions that are not to be deleted
@@ -255,12 +254,6 @@ class FormController extends CommonFormController
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.form.form.fields.notempty', array(), 'validators')
-                        ));
-                        $valid = false;
-                    } elseif (empty($submits)) {
-                        //set the error
-                        $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.form.form.submits.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
@@ -325,6 +318,20 @@ class FormController extends CommonFormController
             $modifiedFields = $modifiedActions = $deletedActions = $deletedFields = array();
 
             $form->get('sessionId')->setData($sessionId);
+
+            //add a submit button
+            $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+            $field = new Field();
+
+            $modifiedFields[$keyId]              = $field->convertToArray();
+            $modifiedFields[$keyId]['label']     = $this->factory->getTranslator()->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['alias']     = 'submit';
+            $modifiedFields[$keyId]['showLabel'] = 1;
+            $modifiedFields[$keyId]['type']      = 'button';
+            $modifiedFields[$keyId]['id']        = $keyId;
+            $modifiedFields[$keyId]['formId']    = $sessionId;
+            unset($modifiedFields[$keyId]['form']);
+            $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
         }
 
         //fire the form builder event
@@ -426,19 +433,11 @@ class FormController extends CommonFormController
                 $actions        = array_diff_key($modifiedActions, array_flip($deletedActions));
 
                 if ($valid = $this->isFormValid($form)) {
-                    $submits = $session->get('mautic.form.'.$objectId.'.fields.submits', array());
-
                     //make sure that at least one field is selected
                     if (empty($fields)) {
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.form.form.fields.notempty', array(), 'validators')
-                        ));
-                        $valid = false;
-                    } elseif (empty($submits)) {
-                        //set the error
-                        $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.form.form.submits.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
@@ -517,19 +516,13 @@ class FormController extends CommonFormController
             $this->clearSessionComponents($objectId);
 
             //load existing fields into session
-            $modifiedFields     = array();
-            $submits        = array();
+            $modifiedFields = array();
             $existingFields = $entity->getFields()->toArray();
             foreach ($existingFields as $f) {
                 $id = $f->getId();
                 $field = $f->convertToArray();
                 unset($field['form']);
                 $modifiedFields[$id] = $field;
-                if ($field['type'] == 'button') {
-                    if ($field['properties']['type'] == 'submit') {
-                        $submits[] = $id;
-                    }
-                }
             }
             if (!empty($reorder)) {
                 uasort($modifiedFields, function ($a, $b) {
@@ -538,7 +531,6 @@ class FormController extends CommonFormController
             }
 
             $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
-            $session->set('mautic.form.'.$objectId.'.fields.submits', $submits);
             $deletedFields = array();
 
             //load existing actions into session
@@ -809,7 +801,6 @@ class FormController extends CommonFormController
         $session = $this->factory->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
         $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
-        $session->remove('mautic.form.'.$sessionId.'.fields.submits');
 
         $session->remove('mautic.form.'.$sessionId.'.actions.modified');
         $session->remove('mautic.form.'.$sessionId.'.actions.deleted');

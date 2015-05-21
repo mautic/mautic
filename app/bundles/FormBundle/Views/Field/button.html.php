@@ -9,16 +9,19 @@
 
 $defaultInputClass = $containerType = 'button';
 include __DIR__ . '/field_helper.php';
+
+$buttonType = (isset($properties['type'])) ? $properties['type'] : 'submit';
 ?>
 
 <div <?php echo $containerAttr; ?>>
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id,
-            'formId'  => $formId
+            'deleted'     => false,
+            'id'          => $id,
+            'formId'      => $formId,
+            'disallowDelete' => true
         ));
     ?>
-    <button type="<?php echo $properties['type']; ?>" name="mauticform[<?php echo $field['alias']; ?>]" <?php echo $inputAttr; ?> value="1"><?php echo $field['label']; ?></button>
+    <button type="<?php echo $buttonType; ?>" name="mauticform[<?php echo $field['alias']; ?>]" <?php echo $inputAttr; ?> value="1"><?php echo $field['label']; ?></button>
 </div>

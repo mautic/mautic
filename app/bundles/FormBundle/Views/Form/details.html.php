@@ -36,7 +36,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $activeForm->getId())),
             ),
             'iconClass' => 'fa fa-camera',
-            'btnText'   => 'mautic.form.form.preview'
+            'btnText'   => 'mautic.form.form.preview',
+            'btnClass'  => 'btn btn-default btn-nospin'
         ),
         array(
             'attr' => array(

@@ -30,7 +30,7 @@ class FormFieldHelper
         'text' => array(),
         'textarea' => array(),
         'country'  => array(),
-        'button'  => array(),
+        //'button'  => array(),
         'select' => array(),
         'date' => array(),
         'email' => array(

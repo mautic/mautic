@@ -144,10 +144,6 @@ return array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldTextType',
                 'alias' => 'formfield_text'
             ),
-            'mautic.form.type.field_propertybutton'      => array(
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldButtonType',
-                'alias' => 'formfield_button'
-            ),
             'mautic.form.type.field_propertyplaceholder' => array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldPlaceholderType',
                 'alias' => 'formfield_placeholder'

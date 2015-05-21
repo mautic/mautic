@@ -134,11 +134,6 @@ class FieldType extends AbstractType
                         'editor'   => true
                     ));
                     break;
-                case 'button':
-                    $builder->add('properties', 'formfield_button', array(
-                        'label' => false
-                    ));
-                    break;
                 case 'date':
                 case 'email':
                 case 'number':
@@ -222,7 +217,6 @@ class FieldType extends AbstractType
             ));
         }
 
-
         if ($addContainerAttributes) {
             $builder->add('containerAttributes', 'text', array(
                 'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
@@ -237,7 +231,7 @@ class FieldType extends AbstractType
 
         $builder->add('type', 'hidden');
 
-        $update = (!empty($options['data']['properties'])) ? true : false;
+        $update = (!empty($options['data']['id'])) ? true : false;
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
             $btnIcon  = 'fa fa-pencil';
@@ -258,7 +252,6 @@ class FieldType extends AbstractType
         ));
 
         $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
-
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
