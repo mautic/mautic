@@ -39,7 +39,7 @@ class MailchimpApi extends EmailMarketingApi{
 
     public function getLists()
     {
-        return $this->request('lists/list');
+        return $this->request('lists/list', array('limit' => 100));
     }
 
     /**
