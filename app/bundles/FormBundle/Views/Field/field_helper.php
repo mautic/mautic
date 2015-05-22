@@ -57,17 +57,22 @@ if (!empty($inForm)) {
 }
 
 // Container
-$containerClass = '';
+$containerAttr         = 'id="mauticform_' . $id . '" ' . $field['containerAttributes'];
+$defaultContainerClass = 'mauticform-row mauticform-' . $containerType;
 if ($field['isRequired']) {
-    $containerClass .= ' mauticform-required';
+    $defaultContainerClass .= ' mauticform-required';
     $validationMessage = $field['validationMessage'];
     if (empty($validationMessage))
         $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
 } elseif (!empty($required)) {
-    $containerClass .= ' mauticform-required';
+    $defaultContainerClass .= ' mauticform-required';
 }
 
 if (!empty($deleted))
-    $containerClass .= ' bg-danger';
+    $defaultContainerClass .= ' bg-danger';
 
-$containerAttr  = 'class="mauticform-row mauticform-' . $containerType . $containerClass . '" id="mauticform_' . $id . '"';
+if (stripos($containerAttr, 'class') === false) {
+    $containerAttr .= ' class="' . $defaultContainerClass . '"';
+} else {
+    $containerAttr = str_ireplace('class="', 'class="' . $defaultContainerClass . ' ', $containerAttr);
+}

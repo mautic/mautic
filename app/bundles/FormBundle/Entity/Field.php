@@ -144,6 +144,14 @@ class Field
     private $inputAttributes;
 
     /**
+     * @ORM\Column(name="container_attr", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
+     */
+    private $containerAttributes;
+
+    /**
      * @ORM\Column(name="lead_field", type="string", nullable=true)
      */
     private $leadField;
@@ -476,6 +484,26 @@ class Field
     public function getInputAttributes()
     {
         return $this->inputAttributes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContainerAttributes()
+    {
+        return $this->containerAttributes;
+    }
+
+    /**
+     * @param $containerAttributes
+     *
+     * @return $this
+     */
+    public function setContainerAttributes($containerAttributes)
+    {
+        $this->containerAttributes = $containerAttributes;
+
+        return $this;
     }
 
     /**
