@@ -16,6 +16,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -66,11 +67,12 @@ class SubmissionModel extends CommonFormModel
         $referer = InputHelper::url($referer, null, null, array('mauticError', 'mauticMessage'));
         $submission->setReferer($referer);
 
-        $fields     = $form->getFields();
-        $errors     = array();
-        $fieldArray = array();
-        $results    = array();
-        $tokens     = array();
+        $fields           = $form->getFields();
+        $errors           = array();
+        $fieldArray       = array();
+        $results          = array();
+        $tokens           = array();
+        $leadFieldMatches = array();
 
         foreach ($fields as $f) {
             $id    = $f->getId();
@@ -153,12 +155,18 @@ class SubmissionModel extends CommonFormModel
                 $value = implode(", ", $value);
             }
 
-            //save the result
-            $results[$alias] = $value;
-
             $tokens['search'][$alias]  = "{formfield={$alias}}";
             $tokens['replace'][$alias] = $value;
 
+            //save the result
+            if ($f->getSaveResult() !== false) {
+                $results[$alias] = $value;
+            }
+
+            $leadField = $f->getLeadField();
+            if (!empty($leadField)) {
+                $leadFieldMatches[$leadField] = $value;
+            }
         }
 
         $submission->setResults($results);
@@ -236,6 +244,11 @@ class SubmissionModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $this->createLeadFromSubmit($form, $leadFieldMatches);
+        }
+
         // Now handle post submission actions
         foreach ($actions as $action) {
             $key = $action->getType();
@@ -301,6 +314,119 @@ class SubmissionModel extends CommonFormModel
 
         //made it to the end so return false that there was not an error
         return false;
+    }
+
+    /**
+     * Create/update lead from form submit
+     *
+     * @param       $form
+     * @param array $leadFieldMatches
+     *
+     * @return Lead
+     */
+    protected function createLeadFromSubmit($form, array $leadFieldMatches)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model      = $this->factory->getModel('lead');
+        $em         = $this->factory->getEntityManager();
+
+        //set the mapped data
+        $leadFields = $this->factory->getModel('lead.field')->getRepository()->getAliases(null, true, false);
+        $data       = array();
+
+        $inKioskMode = $form->isInKioskMode();
+
+        if (!$inKioskMode) {
+            $lead          = $model->getCurrentLead();
+            $leadId        = $lead->getId();
+            $currentFields = $lead->getFields();
+        } else {
+            $lead = new Lead();
+            $lead->setNewlyCreated(true);
+
+            $leadId = null;
+        }
+
+        $uniqueLeadFields     = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueFieldsWithData = array();
+
+        foreach ($leadFields as $alias) {
+            $data[$alias] = '';
+
+            if (isset($leadFieldMatches[$alias])) {
+                $value        = $leadFieldMatches[$alias];
+                $data[$alias] = $value;
+
+                // make sure the value is actually there and the field is one of our uniques
+                if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
+                    $uniqueFieldsWithData[$alias] = $value;
+                }
+            }
+        }
+
+        //update the lead rather than creating a new one if there is for sure identifier match ($leadId is to exclude lead from getCurrentLead())
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
+        $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
+
+        if (count($leads)) {
+            //merge with current lead if not in kiosk mode
+            $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
+        } elseif (!$inKioskMode) {
+            // Flatten current fields
+            $currentFields = $model->flattenFields($currentFields);
+
+            // Create a new lead if unique identifiers differ from getCurrentLead() and submitted data
+            foreach ($uniqueLeadFields as $alias => $value) {
+                //create a new lead if details differ
+                $currentValue = $currentFields[$alias];
+                if (!empty($currentValue) && strtolower($currentValue) != strtolower($value)) {
+                    //for sure a different lead so create a new one
+                    $lead = new Lead();
+                    $lead->setNewlyCreated(true);
+                    break;
+                }
+            }
+        }
+
+        //check for existing IP address
+        $ipAddress = $this->factory->getIpAddress();
+
+        //no lead was found by a mapped email field so create a new one
+        if ($lead->isNewlyCreated()) {
+            if (!$inKioskMode) {
+                $lead->addIpAddress($ipAddress);
+            }
+
+            // last active time
+            $lead->setLastActive(new \DateTime());
+
+        } elseif (!$inKioskMode) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
+        }
+
+        //set the mapped fields
+        $model->setFieldValues($lead, $data, false);
+
+        if (!empty($event)) {
+            $event->setIpAddress($ipAddress);
+            $lead->addPointsChangeLog($event);
+        }
+
+        //create a new lead
+        $model->saveEntity($lead, false);
+
+        if (!$inKioskMode) {
+            // Set the current lead which will generate tracking cookies
+            $model->setCurrentLead($lead);
+        } else {
+            // Set system current lead which will still allow execution of events without generating tracking cookies
+            $model->setSystemCurrentLead($lead);
+        }
+
+        return $lead;
     }
 
     /**

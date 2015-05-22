@@ -144,6 +144,16 @@ class Field
     private $inputAttributes;
 
     /**
+     * @ORM\Column(name="lead_field", type="string", nullable=true)
+     */
+    private $leadField;
+
+    /**
+     * @ORM\Column(name="save_result", type="boolean", nullable=true)
+     */
+    private $saveResult = true;
+
+    /**
      * @var array
      */
     private $changes;
@@ -608,5 +618,37 @@ class Field
     public function setSessionId ($sessionId)
     {
         $this->sessionId = $sessionId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLeadField()
+    {
+        return $this->leadField;
+    }
+
+    /**
+     * @param mixed $leadField
+     */
+    public function setLeadField($leadField)
+    {
+        $this->leadField = $leadField;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSaveResult()
+    {
+        return $this->saveResult;
+    }
+
+    /**
+     * @param mixed $saveResult
+     */
+    public function setSaveResult($saveResult)
+    {
+        $this->saveResult = $saveResult;
     }
 }

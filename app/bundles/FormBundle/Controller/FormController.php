@@ -184,6 +184,30 @@ class FormController extends CommonFormController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId);
 
+        // Only show actions and fields that still exist
+        $customComponents  = $model->getCustomComponents();
+        $activeFormActions = array();
+        foreach ($activeForm->getActions() as $action) {
+            if (!isset($customComponents['actions'][$action->getType()])) {
+                continue;
+            }
+            $type                          = explode('.', $action->getType());
+            $activeFormActions[$type[0]][] = $action;
+        }
+
+        $activeFormFields = array();
+        $fieldHelper      = new FormFieldHelper($this->get('translator'));
+        $availableFields  = $fieldHelper->getList($customComponents['fields']);
+        foreach ($activeForm->getFields() as $field) {
+            if (!isset($availableFields[$field->getType()])) {
+                continue;
+            }
+
+            $activeFormFields[] = $field;
+        }
+
+        $model->getEntities(array('factory' => $this->factory));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'activeForm'  => $activeForm,
@@ -193,7 +217,9 @@ class FormController extends CommonFormController
                 'security'    => $this->factory->getSecurity(),
                 'stats'       => array(
                     'submissionsInTime' => $timeStats,
-                )
+                ),
+                'activeFormActions' => $activeFormActions,
+                'activeFormFields'  => $activeFormFields
             ),
             'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
             'passthroughVars' => array(
@@ -511,18 +537,33 @@ class FormController extends CommonFormController
             $form->get('sessionId')->setData($objectId);
         }
 
+        // Get field and action settings
+        $customComponents = $model->getCustomComponents();
+        $fieldHelper      = new FormFieldHelper($this->get('translator'));
+        $availableFields  = $fieldHelper->getList($customComponents['fields']);
+
         if ($cleanSlate) {
             //clean slate
             $this->clearSessionComponents($objectId);
 
             //load existing fields into session
             $modifiedFields = array();
+            $usedLeadFields = array();
             $existingFields = $entity->getFields()->toArray();
             foreach ($existingFields as $f) {
+                // Check to see if the field still exists
+                if (!isset($availableFields[$f->getType()])) {
+                    continue;
+                }
+
                 $id = $f->getId();
                 $field = $f->convertToArray();
                 unset($field['form']);
                 $modifiedFields[$id] = $field;
+
+                if (!empty($field['leadField'])) {
+                    $usedLeadFields[$id] = $field['leadField'];
+                }
             }
             if (!empty($reorder)) {
                 uasort($modifiedFields, function ($a, $b) {
@@ -533,10 +574,16 @@ class FormController extends CommonFormController
             $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
             $deletedFields = array();
 
-            //load existing actions into session
+            // Load existing actions into session
             $modifiedActions = array();
             $existingActions = $entity->getActions()->toArray();
+
             foreach ($existingActions as $a) {
+                // Check to see if the action still exists
+                if (!isset($customComponents['actions'][$a->getType()])) {
+                    continue;
+                }
+
                 $id     = $a->getId();
                 $action = $a->convertToArray();
                 unset($action['form']);
@@ -553,13 +600,9 @@ class FormController extends CommonFormController
             $deletedActions = array();
         }
 
-        $customComponents = $model->getCustomComponents();
-
-        $fieldHelper = new FormFieldHelper($this->get('translator'));
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'fields'         => $fieldHelper->getList($customComponents['fields']),
+                'fields'         => $availableFields,
                 'actions'        => $customComponents['choices'],
                 'formFields'     => $modifiedFields,
                 'formActions'    => $modifiedActions,
@@ -801,6 +844,7 @@ class FormController extends CommonFormController
         $session = $this->factory->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
         $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
+        $session->remove('mautic.form.'.$sessionId.'.fields.leadfields');
 
         $session->remove('mautic.form.'.$sessionId.'.actions.modified');
         $session->remove('mautic.form.'.$sessionId.'.actions.deleted');

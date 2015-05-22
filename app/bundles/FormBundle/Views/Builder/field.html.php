@@ -16,35 +16,39 @@ $properties = (isset($form['properties'])) ? $form['properties'] : array();
     </div>
 
     <?php echo $view['form']->start($form); ?>
+
+    <h4 class="mt-md mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.general'); ?></h4>
     <div class="row">
         <?php echo $view['form']->rowIfExists($form, 'label', $template); ?>
         <?php echo $view['form']->rowIfExists($form, 'showLabel', $template); ?>
-        <?php echo $view['form']->rowIfExists($properties, 'captcha', $template); ?>
-
+        <?php echo $view['form']->rowIfExists($form, 'defaultValue', $template); ?>
+        <?php echo $view['form']->rowIfExists($form, 'saveResult', $template); ?>
+        <?php echo $view['form']->rowIfExists($form, 'helpMessage', $template); ?>
     </div>
+
+    <?php if (isset($form['leadField'])): ?>
+        <hr />
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.leadfield'); ?></h4>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['leadField']); ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($form['isRequired'])): ?>
+    <hr />
+    <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.validation'); ?></h4>
     <div class="row">
         <?php echo $view['form']->rowIfExists($form, 'validationMessage', $template); ?>
         <?php echo $view['form']->rowIfExists($form, 'isRequired', $template); ?>
     </div>
+    <?php endif; ?>
 
+    <?php if (isset($form['properties'])): ?>
+    <hr />
+    <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?></h4>
     <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'defaultValue', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'helpMessage', $template); ?>
-        <?php echo $view['form']->rowIfExists($properties, 'errorMessage', $template); ?>
-    </div>
-    <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
-    </div>
-
-    <div class="row">
-        <?php foreach ($form->children as $childName => $child): ?>
-        <?php if ($child->isRendered() || !empty($child['text']) || $childName == 'properties' || in_array('hidden', $child->vars['block_prefixes']) || $child->vars['id'] == 'formfield_buttons') continue; ?>
-        <div class="col-md-6">
-            <?php echo $view['form']->row($child); ?>
-        </div>
-        <?php endforeach; ?>
-
         <?php if (isset($properties['list']) && count($properties) === 1): ?>
         <div class="col-md-6">
             <?php echo $view['form']->row($form['properties']); ?>
@@ -52,7 +56,7 @@ $properties = (isset($form['properties'])) ? $form['properties'] : array();
         <?php else: ?>
 
         <?php foreach ($properties as $name => $property): ?>
-        <?php if ($form['properties'][$name]->isRendered()) continue; ?>
+        <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
         <?php $col = ($name == 'text') ? 12 : 6; ?>
         <div class="col-md-<?php echo $col; ?>">
             <?php echo $view['form']->row($form['properties'][$name]); ?>
@@ -61,5 +65,18 @@ $properties = (isset($form['properties'])) ? $form['properties'] : array();
 
         <?php endif; ?>
     </div>
+    <?php endif; ?>
+
+    <?php if (isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes'])): ?>
+        <hr />
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.attributes'); ?></h4>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
+            <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
+            <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>
+            <?php echo $view['form']->rowIfExists($properties, 'labelAttributes', $template); ?>
+        </div>
+    <?php endif; ?>
+
     <?php echo $view['form']->end($form); ?>
 </div>

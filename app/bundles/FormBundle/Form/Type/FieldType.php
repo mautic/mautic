@@ -11,7 +11,6 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -40,6 +39,8 @@ class FieldType extends AbstractType
         $addLabelAttributes =
         $addInputAttributes =
         $addContainerAttributes =
+        $addLeadFieldList =
+        $addSaveResult =
         $addIsRequired = true;
 
         if (!empty($options['customParameters'])) {
@@ -64,6 +65,8 @@ class FieldType extends AbstractType
                 'inputAttributesText',
                 'addContainerAttributes',
                 'containerAttributesText',
+                'addLeadFieldList',
+                'addaddSaveResult',
                 'addIsRequired');
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
@@ -74,7 +77,7 @@ class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage = $addDefaultValue = $addIsRequired = false;
+                    $addHelpMessage = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -84,13 +87,13 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = false;
+                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
                     break;
                 case 'hidden':
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = false;
                     break;
             }
         }
@@ -173,7 +176,10 @@ class FieldType extends AbstractType
             $builder->add('helpMessage', 'text', array(
                 'label'      => 'mautic.form.field.form.helpmessage',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'tooltip' => 'mautic.form.field.help.helpmessage'
+                ),
                 'required'   => false
             ));
         }
@@ -229,6 +235,58 @@ class FieldType extends AbstractType
             ));
         }
 
+        if ($addSaveResult) {
+            $default = (!isset($options['data']['saveResult']) || $options['data']['saveResult'] === null) ? true : (boolean) $options['data']['saveResult'];
+            $builder->add(
+                'saveResult',
+                'yesno_button_group',
+                array(
+                    'label' => 'mautic.form.field.form.saveresult',
+                    'data'  => $default,
+                    'attr'  => array(
+                        'tooltip' => 'mautic.form.field.help.saveresult'
+                    )
+                )
+            );
+        }
+
+        if ($addLeadFieldList) {
+
+            if (!isset($options['data']['leadField'])) {
+                switch ($type) {
+                    case 'email':
+                        $data = 'email';
+                        break;
+                    case 'country':
+                        $data = 'country';
+                        break;
+                    case 'tel':
+                        $data = 'phone';
+                        break;
+                    default:
+                        $data = '';
+                        break;
+                }
+
+            } elseif (isset($options['data']['leadField'])) {
+                $data = $options['data']['leadField'];
+            } else {
+                $data = '';
+            }
+
+            $builder->add('leadField', 'choice', array(
+                'choices'    => $options['leadFields'],
+                'label'      => 'mautic.form.field.form.lead_field',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.field.help.lead_field'
+                ),
+                'required'   => false,
+                'data'       => $data
+            ));
+        }
+
         $builder->add('type', 'hidden');
 
         $update = (!empty($options['data']['id'])) ? true : false;
@@ -268,6 +326,8 @@ class FieldType extends AbstractType
         ));
 
         $resolver->setOptional(array('customParameters'));
+
+        $resolver->setRequired(array('leadFields'));
     }
 
     /**
