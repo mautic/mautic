@@ -630,6 +630,10 @@ Mautic.updateLeadList = function () {
                 }
             }
 
+            if (response.maxId) {
+                mQuery('#liveModeButton').data('max-id', response.maxId);
+            }
+
             Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
         },
         error: function (request, textStatus, errorThrown) {
