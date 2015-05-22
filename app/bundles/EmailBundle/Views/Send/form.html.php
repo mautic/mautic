@@ -35,10 +35,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                                         'confirmCallback' => 'submitSendForm',
                                         'iconClass'       => 'fa fa-send-o',
                                         'btnText'         => $view['translator']->trans('mautic.email.send'),
-                                        'btnClass'        => 'btn btn-primary btn-send',
-                                        'attr'            => array(
-                                            'disabled' => (!$pending)
-                                        )
+                                        'btnClass'        => 'btn btn-primary btn-send' . ((!$pending) ? ' disabled' : '')
                                     ));
                                     ?>
                                 </span>
@@ -46,6 +43,9 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                             <?php echo $view['form']->errors($form['batchlimit']); ?>
                             <div class="text-center">
                                 <span class="label label-primary mt-lg"><?php echo $view['translator']->transChoice('mautic.email.send.pending', $pending, array('%pending%' => $pending)); ?></span>
+                                <div class="mt-sm">
+                                    <a class="text-danger mt-md" href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email->getId())); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
+                                </div>
                             </div>
                         </div>
                     </div>
