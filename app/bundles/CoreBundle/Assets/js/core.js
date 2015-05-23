@@ -50,8 +50,8 @@ mQuery( document ).ready(function() {
 
     if (typeof IdleTimer != 'undefined') {
         IdleTimer.init({
-            idleTimeout: 900000, //15 minutes = 900000
-            awayTimeout: 18000000, //30 minutes = 18000000
+            idleTimeout: 60000, //1 min
+            awayTimeout: 900000, //15 min
             statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
@@ -2384,6 +2384,7 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+        delete MauticVars.moderatedIntervals[key];
     },
 
     /**
