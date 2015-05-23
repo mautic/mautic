@@ -19,7 +19,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy())
     ),
     'routeBase' => 'form',
-    'langVar'   => 'form.form',
+    'langVar'   => 'form',
     'customButtons'    => array(
         array(
             'attr' => array(
