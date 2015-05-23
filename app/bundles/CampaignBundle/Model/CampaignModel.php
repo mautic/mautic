@@ -105,6 +105,17 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @param object $entity
+     */
+    public function deleteEntity($entity)
+    {
+        // Null all the event parents for this campaign to avoid database constraints
+        $this->getEventRepository()->nullEventParents($entity->getId());
+
+        parent::deleteEntity($entity);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
@@ -159,6 +170,8 @@ class CampaignModel extends CommonFormModel
      * @param          $sessionEvents
      * @param          $sessionConnections
      * @param          $deletedEvents
+     *
+     * @return array
      */
     public function setEvents (Campaign &$entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
@@ -853,6 +866,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param $id
+     *
+     * @return array
      */
     public function getCampaignListIds($id)
     {
