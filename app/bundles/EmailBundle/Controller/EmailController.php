@@ -896,7 +896,7 @@ class EmailController extends FormController
                 $progress = array(0, (int) $pending);
                 $session->set('mautic.email.send.progress', $progress);
 
-                $stats  = array('sent' => 0, 'failed' => 0);
+                $stats  = array('sent' => 0, 'failed' => 0, 'failedRecipients' => array());
                 $session->set('mautic.email.send.stats', $stats);
 
                 $status     = 'inprogress';
