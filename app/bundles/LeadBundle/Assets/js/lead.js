@@ -97,6 +97,10 @@ Mautic.leadOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.leadEngagementChart;
     }
+
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
+    }
 };
 
 Mautic.getLeadId = function() {
@@ -579,4 +583,71 @@ Mautic.removeBounceStatus = function (el, dncId) {
     Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
-}
+};
+
+Mautic.toggleLiveLeadListUpdate = function () {
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
+        Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
+        mQuery('#liveModeButton .fa').addClass('fa-spin');
+    } else {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
+        mQuery('#liveModeButton .fa').removeClass('fa-spin');
+    }
+};
+
+Mautic.updateLeadList = function () {
+    var maxLeadId = mQuery('#liveModeButton').data('max-id');
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "get",
+        data: "action=lead:getNewLeads&maxId=" + maxLeadId,
+        dataType: "json",
+        success: function (response) {
+            if (response.leads) {
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tbody').prepend(response.leads);
+                } else {
+                    var items = mQuery(response.leads);
+                    mQuery('.shuffle-grid').prepend(items);
+                    mQuery('.shuffle-grid').shuffle('appended', items);
+                    mQuery('.shuffle-grid').shuffle('update');
+
+                    mQuery('#liveModeButton').data('max-id', response.maxId);
+                }
+            }
+
+            if (typeof IdleTimer != 'undefined' && !IdleTimer.isIdle()) {
+                console.log(IdleTimer.isIdle(), IdleTimer.getLastActive(), IdleTimer.isAway());
+                // Remove highlighted classes
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tr.warning').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('warning', 1000)
+                        }, 5000);
+                    });
+                } else {
+                    mQuery('.shuffle-grid .highlight').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('highlight', 1000, function() {
+                                mQuery(that).css('border-top-color', mQuery(that).data('color'));
+                            })
+                        }, 5000);
+                    });
+                }
+            }
+
+            if (response.maxId) {
+                mQuery('#liveModeButton').data('max-id', response.maxId);
+            }
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        }
+    });
+};

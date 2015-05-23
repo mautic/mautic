@@ -617,6 +617,14 @@ class LeadModel extends FormModel
      */
     public function setLeadCookie($leadId)
     {
+        // Remove the old if set
+        $request       = $this->factory->getRequest();
+        $cookies       = $request->cookies;
+        $oldTrackingId = $cookies->get('mautic_session_id');
+        if (!empty($oldTrackingId)) {
+            $this->factory->getHelper('cookie')->setCookie($oldTrackingId, null, -3600);
+        }
+
         list($trackingId, $generated) = $this->getTrackingCookie();
         $this->factory->getHelper('cookie')->setCookie($trackingId, $leadId);
     }

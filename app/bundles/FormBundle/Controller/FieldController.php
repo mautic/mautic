@@ -57,9 +57,19 @@ class FieldController extends CommonFormController
 
         $customParams = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
 
+
+        // Only show the lead fields not already used
+        $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());
+        $testLeadFields = array_flip($usedLeadFields);
+        $leadFields     = $this->factory->getModel('lead.field')->getFieldList();
+        foreach ($leadFields as &$group) {
+            $group = array_diff_key($group, $testLeadFields);
+        }
+
         $form = $this->get('form.factory')->create('formfield', $formField, array(
             'action'           => $this->generateUrl('mautic_formfield_action', array('objectAction' => 'new')),
-            'customParameters' => $customParams
+            'customParameters' => $customParams,
+            'leadFields'       => $leadFields
         ));
         $form->get('formId')->setData($formId);
 
@@ -94,12 +104,13 @@ class FieldController extends CommonFormController
 
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
-                    //take note if this is a submit button or not
-                    if ($fieldType == 'button' && $formField['properties']['type'] == 'submit') {
-                        $submits   = $session->get('mautic.form.'.$formId.'.fields.submits', array());
-                        $submits[] = $keyId;
-                        $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
+                    // Keep track of used lead fields
+                    if (!empty($formData['leadField'])) {
+                        $usedLeadFields[$keyId] = $formData['leadField'];
+                    } else {
+                        unset($usedLeadFields[$keyId]);
                     }
+                    $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
                 } else {
                     $success = 0;
                 }
@@ -185,9 +196,18 @@ class FieldController extends CommonFormController
             //set custom params from event if applicable
             $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : array();
 
+            // Only show the lead fields not already used
+            $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());
+            $testLeadFields = array_flip($usedLeadFields);
+            $leadFields     = $this->factory->getModel('lead.field')->getFieldList();
+            foreach ($leadFields as &$group) {
+                $group = array_diff_key($group, $testLeadFields);
+            }
+
             $form = $this->get('form.factory')->create('formfield', $formField, array(
                 'action'           => $this->generateUrl('mautic_formfield_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
-                'customParameters' => $customParams
+                'customParameters' => $customParams,
+                'leadFields'       => $leadFields
             ));
             $form->get('formId')->setData($formId);
 
@@ -220,20 +240,13 @@ class FieldController extends CommonFormController
                         $fields[$objectId] = $formField;
                         $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
-                        //take note if this is a submit button or not
-                        if ($fieldType == 'button') {
-                            $submits = $session->get('mautic.form.'.$formId.'.fields.submits', array());
-                            if ($formField['properties']['type'] == 'submit' && !in_array($objectId, $submits)) {
-                                //button type updated to submit
-                                $submits[] = $objectId;
-                                $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
-                            } elseif ($formField['properties']['type'] != 'submit' && in_array($objectId, $submits)) {
-                                //button type updated to something other than submit
-                                $key = array_search($objectId, $submits);
-                                unset($submits[$key]);
-                                $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
-                            }
+                        // Keep track of used lead fields
+                        if (!empty($formData['leadField'])) {
+                            $usedLeadFields[$objectId] = $formData['leadField'];
+                        } else {
+                            unset($usedLeadFields[$objectId]);
                         }
+                        $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
                     }
                 }
             }
@@ -328,17 +341,6 @@ class FieldController extends CommonFormController
                 $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
             }
 
-            //take note if this is a submit button or not
-            if ($formField['type'] == 'button') {
-                $submits    = $session->get('mautic.form.'.$formId.'.fields.submits', array());
-                $properties = $formField['properties'];
-                if ($properties['type'] == 'submit' && in_array($objectId, $submits)) {
-                    $key = array_search($objectId, $submits);
-                    unset($submits[$key]);
-                    $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
-                }
-            }
-
             if (!empty($customParams)) {
                 $template = $customParams['template'];
             } else {
@@ -406,16 +408,6 @@ class FieldController extends CommonFormController
                 $key = array_search($objectId, $delete);
                 unset($delete[$key]);
                 $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
-            }
-
-            //take note if this is a submit button or not
-            if ($formField['type'] == 'button') {
-                $properties = $formField['properties'];
-                if ($properties['type'] == 'submit') {
-                    $submits   = $session->get('mautic.form.'.$formId.'.fields.submits', array());
-                    $submits[] = $objectId;
-                    $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
-                }
             }
 
             if (!empty($customParams)) {

@@ -145,12 +145,21 @@ class EmailRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('dne.lead_id')->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne');
+        $sq->select('dne.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
+            ->where(
+                $sq->expr()->isNotNull('dne.lead_id')
+            );
 
         $sq2 = $this->_em->getConnection()->createQueryBuilder();
         $sq2->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
-            ->where('stat.email_id = el.email_id');
+            ->where(
+                $sq2->expr()->andX(
+                    $sq2->expr()->isNotNull('stat.lead_id'),
+                    $sq2->expr()->eq('stat.email_id', 'el.email_id')
+                )
+            );
 
         if ($countOnly) {
             $q->select('count(l.id) as count');

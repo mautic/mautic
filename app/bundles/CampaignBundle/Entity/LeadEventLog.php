@@ -37,7 +37,6 @@ class LeadEventLog
 
     /**
      * @ORM\ManyToOne(targetEntity="Campaign")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $campaign;
 

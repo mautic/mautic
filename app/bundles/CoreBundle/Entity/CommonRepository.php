@@ -266,10 +266,20 @@ class CommonRepository extends EntityRepository
                         $forceParameters  = array();
                         $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
-                            list ($expr, $parameters) = $this->getFilterExpr($q, $f);
-                            $forceExpressions->add($expr);
-                            if (is_array($parameters)) {
-                                $forceParameters = array_merge($forceParameters, $parameters);
+                            if (is_array($f)) {
+                                list ($expr, $parameters) = $this->getFilterExpr($q, $f);
+                                $forceExpressions->add($expr);
+                                if (is_array($parameters)) {
+                                    $forceParameters = array_merge($forceParameters, $parameters);
+                                }
+                            } else {
+                                //string so parse as advanced search
+                                $parsed = $filterHelper->parseSearchString($f);
+                                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
+                                $forceExpressions->add($expr);
+                                if (is_array($parameters)) {
+                                    $forceParameters = array_merge($forceParameters, $parameters);
+                                }
                             }
                         }
                     } else {

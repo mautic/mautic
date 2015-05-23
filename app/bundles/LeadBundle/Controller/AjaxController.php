@@ -325,4 +325,95 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Get the rows for new leads
+     *
+     * @param Request $request
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected function getNewLeadsAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $maxId     = $request->get('maxId');
+
+        if (!empty($maxId)) {
+            //set some permissions
+            $permissions = $this->factory->getSecurity()->isGranted(array(
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother'
+            ), "RETURN_ARRAY");
+
+            if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+                return $this->accessDenied(true);
+            }
+
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model   = $this->factory->getModel('lead.lead');
+            $session = $this->factory->getSession();
+
+            $search = $session->get('mautic.lead.filter', '');
+
+            $filter     = array('string' => $search, 'force' => array());
+            $translator = $this->factory->getTranslator();
+            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+            $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+
+            $session->set('mautic.lead.indexmode', $indexMode);
+
+            // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
+            if ($indexMode != 'list') {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'][] = "!$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'][] = $mine;
+            }
+
+            $filter['force'][] = array(
+                'column' => 'l.id',
+                'expr'   => 'gt',
+                'value'  => $maxId
+            );
+
+            $results = $model->getEntities(
+                array(
+                    'filter'         => $filter,
+                    'withTotalCount' => true
+                )
+            );
+            $count = $results['count'];
+
+            if (!empty($count)) {
+                // Get the max ID of the latest lead added
+                $maxLeadId = $model->getRepository()->getMaxLeadId();
+
+                // We need the EmailRepository to check if a lead is flagged as do not contact
+                /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+                $emailRepo = $this->factory->getModel('email')->getRepository();
+                $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+                $template  = ($indexMode == 'list') ? 'list_rows' : 'grid_cards';
+                $dataArray['leads'] = $this->factory->getTemplating()->render("MauticLeadBundle:Lead:{$template}.html.php", array(
+                    'items'         => $results['results'],
+                    'noContactList' => $emailRepo->getDoNotEmailList(),
+                    'permissions'   => $permissions,
+                    'security'      => $this->factory->getSecurity(),
+                    'highlight'      => true
+                ));
+                $dataArray['indexMode'] = $indexMode;
+                $dataArray['maxId']     = $maxLeadId;
+                $dataArray['success']   = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }
