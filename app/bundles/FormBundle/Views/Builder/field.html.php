@@ -48,6 +48,7 @@ $properties = (isset($form['properties'])) ? $form['properties'] : array();
     <?php if (isset($form['properties'])): ?>
     <hr />
     <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?></h4>
+    <?php echo $view['form']->errors($form['properties']); ?>
     <div class="row">
         <?php if (isset($properties['list']) && count($properties) === 1): ?>
         <div class="col-md-6">
