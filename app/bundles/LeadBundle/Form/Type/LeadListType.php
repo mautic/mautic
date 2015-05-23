@@ -50,7 +50,8 @@ class LeadListType extends AbstractType
 
                 return $choices;
             },
-            'global_only' => false
+            'global_only' => false,
+            'required'    => false
         ));
     }
 

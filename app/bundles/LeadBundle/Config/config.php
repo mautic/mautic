@@ -213,15 +213,6 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadlist'
             ),
-            'mautic.form.type.lead.submitaction.createlead'   => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\FormSubmitActionCreateLeadType',
-                'alias' => 'lead_submitaction_createlead'
-            ),
-            'mautic.form.type.lead.submitaction.mappedfields' => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionMappedFieldsType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'lead_submitaction_mappedfields'
-            ),
             'mautic.form.type.lead.submitaction.pointschange' => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
                 'arguments' => 'mautic.factory',
