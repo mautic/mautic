@@ -839,7 +839,7 @@ class EmailModel extends FormModel
                         // Prevent the stat from saving
                         foreach ($sendFailures['failures'] as $failedEmail) {
                             // Add lead ID to list of failures
-                            $errors[$saveEntities[$failedEmail]->getLead()->getId()] = true;
+                            $errors[$saveEntities[$failedEmail]->getLead()->getId()] = $failedEmail;
 
                             // Down sent counts
                             $saveEntities[$failedEmail]->getEmail()->downSentCounts();
@@ -920,7 +920,7 @@ class EmailModel extends FormModel
 
             //queue or send the message
             if (!$mailer->queue(true)) {
-                $errors[$lead['id']] = true;
+                $errors[$lead['id']] = $lead['email'];
 
                 continue;
             }
