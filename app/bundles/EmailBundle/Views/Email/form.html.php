@@ -35,28 +35,46 @@ $contentMode = $form['contentMode']->vars['data'];
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['subject']); ?>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['contentMode']); ?>
-                    </div>
-                </div>
-                <div id="customHtmlContainer"<?php echo ($contentMode == 'builder') ? ' class="hide"' : ''; ?>>
-                    <?php echo $view['form']->row($form['customHtml']); ?>
-                </div>
-                <div id="builderHtmlContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['template']); ?>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mt-20 pt-2">
-                                <button type="button" class="btn btn-primary" onclick="Mautic.launchBuilder('emailform');">
-                                    <i class="fa fa-cube text-mautic "></i> <?php echo $view['translator']->trans('mautic.email.launch.builder'); ?>
+                        <div class="form-group">
+                            <?php echo $view['form']->label($form['contentMode']); ?>
+                            <div>
+                                <?php echo $view['form']->widget($form['contentMode']); ?>
+                                <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('emailform', 'email');">
+                                    <i class="fa fa-cube text-mautic "></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
                                 </button>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide' : ''; ?>">
+                            <?php echo $view['form']->row($form['template']); ?>
+                        </div>
+                    </div>
                 </div>
-                <?php echo $view['form']->row($form['plainText']); ?>
+
+                <div class="row">
+                    <div class="form-group col-xs-12">
+                        <div>
+                            <div class="pull-left">
+                                <?php echo $view['form']->label($form['plainText']); ?>
+                            </div>
+                            <div class="text-right pr-10">
+                                <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <?php echo $view['form']->widget($form['plainText']); ?>
+                    </div>
+                </div>
+
+                <div id="customHtmlContainer" class="hide">
+                    <?php echo $view['form']->row($form['customHtml']); ?>
+                </div>
             </div>
         </div>
         <div class="col-md-3 bg-white height-auto bdr-l">
@@ -86,11 +104,19 @@ $contentMode = $form['contentMode']->vars['data'];
         <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
-        <p>
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('email');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
-        </p>
-        <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
-        <div class="panel-group margin-sm-top" id="pageTokensPanel">
+        <div class="builder-panel-top">
+            <p>
+                <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('email');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
+            </p>
+            <div class="well well-small mb-10" id="customHtmlDropzone">
+                <div class="template-dnd-help<?php echo ($contentMode == 'custom') ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
+                <div class="custom-dnd-help<?php echo ($contentMode == 'custom') ? '' : ' hide'; ?>">
+                    <div class="custom-drop-message hide text-center"><?php echo $view['translator']->trans('mautic.core.builder.token.drophere'); ?></div>
+                    <div class="custom-general-message"><?php echo $view['translator']->trans('mautic.core.builder.token.help_custom'); ?></div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-group builder-tokens" id="emailTokensPanel">
             <?php foreach ($tokens as $k => $t): ?>
                 <div class="panel panel-default">
                     <div class="panel-heading">

@@ -596,7 +596,7 @@ class Email extends FormEntity
      */
     public function setPlainText ($plainText)
     {
-        $this->plainText = $plainText;
+        $this->plainText = strip_tags($plainText);
     }
 
     /**

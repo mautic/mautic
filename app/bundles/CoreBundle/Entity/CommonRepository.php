@@ -9,6 +9,8 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -88,6 +90,7 @@ class CommonRepository extends EntityRepository
         } catch (\Exception $e) {
             $entity = null;
         }
+
         return $entity;
     }
 
@@ -115,7 +118,7 @@ class CommonRepository extends EntityRepository
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
-            $hydrationMode = constant("\\Doctrine\\ORM\\Query::" . strtoupper($args['hydration_mode']));
+            $hydrationMode = constant("\\Doctrine\\ORM\\Query::".strtoupper($args['hydration_mode']));
             $query->setHydrationMode($hydrationMode);
         } else {
             $hydrationMode = Query::HYDRATE_OBJECT;
@@ -167,8 +170,9 @@ class CommonRepository extends EntityRepository
     public function saveEntity($entity, $flush = true)
     {
         $this->_em->persist($entity);
-        if ($flush)
+        if ($flush) {
             $this->_em->flush();
+        }
     }
 
     /**
@@ -205,8 +209,9 @@ class CommonRepository extends EntityRepository
         //delete entity
         $this->_em->remove($entity);
 
-        if ($flush)
+        if ($flush) {
             $this->_em->flush();
+        }
     }
 
 
@@ -266,7 +271,14 @@ class CommonRepository extends EntityRepository
                         $forceParameters  = array();
                         $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
-                            if (is_array($f)) {
+                            if ($f instanceof Query\Expr || $f instanceof ExpressionBuilder) {
+                                $expr = $f;
+
+                                if (isset($expr->parameters)) {
+                                    $forceParameters = $expr->parameters;
+                                    unset($expr->parameters);
+                                }
+                            } elseif (is_array($f)) {
                                 list ($expr, $parameters) = $this->getFilterExpr($q, $f);
                                 $forceExpressions->add($expr);
                                 if (is_array($parameters)) {
@@ -324,7 +336,7 @@ class CommonRepository extends EntityRepository
                     foreach ($parameters as $k => $v) {
                         if ($v === true || $v === false) {
                             $q->setParameter($k, $v, 'boolean');
-                        }  else {
+                        } else {
                             $q->setParameter($k, $v);
                         }
                     }
@@ -374,7 +386,7 @@ class CommonRepository extends EntityRepository
                 if (isset($filter['strict']) && !$filter['strict']) {
                     $filter['value'] = "%{$filter['value']}%";
                 }
-                $expr      = $q->expr()->{$func}($filter['column'], ':' . $unique);
+                $expr      = $q->expr()->{$func}($filter['column'], ':'.$unique);
                 $parameter = array($unique => $filter['value']);
             }
             if (!empty($filter['not'])) {
@@ -431,7 +443,7 @@ class CommonRepository extends EntityRepository
                         list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
                     } else {
                         //treat the command:string as if its a single word
-                        $f->string = $f->command . ":" . $f->string;
+                        $f->string = $f->command.":".$f->string;
                         $f->not    = false;
                         $f->strict = true;
                         list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
@@ -488,6 +500,7 @@ class CommonRepository extends EntityRepository
             } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}") {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
+
                 return true;
             }
         }
@@ -536,8 +549,8 @@ class CommonRepository extends EntityRepository
      */
     protected function buildLimiterClauses(&$q, array $args)
     {
-        $start      = array_key_exists('start', $args) ? $args['start'] : 0;
-        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 0;
+        $start = array_key_exists('start', $args) ? $args['start'] : 0;
+        $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
@@ -551,6 +564,7 @@ class CommonRepository extends EntityRepository
     protected function generateRandomParameterName()
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
         return substr(str_shuffle($alpha_numeric), 0, 8);
     }
 
@@ -563,19 +577,20 @@ class CommonRepository extends EntityRepository
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->like($col,  ":$unique")
+                $q->expr()->like($col, ":$unique")
             );
         }
 
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
+
         return array(
             $expr,
             array("$unique" => $string)
@@ -598,26 +613,26 @@ class CommonRepository extends EntityRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $expr            = $q->expr()->eq("$prefix.isPublished", ":$unique");
                 $forceParameters = array($unique => true);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $expr            = $q->expr()->eq("$prefix.isPublished", ":$unique");
                 $forceParameters = array($unique => false);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
+                $expr            = $q->expr()->orX(
                     $q->expr()->isNull("$prefix.category"),
                     $q->expr()->eq("$prefix.category", $q->expr()->literal(''))
                 );
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq("IDENTITY($prefix.createdBy)", $this->currentUser->getId());
+                $expr            = $q->expr()->eq("IDENTITY($prefix.createdBy)", $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like("c.alias", ":$unique");
+                $expr           = $q->expr()->like("c.alias", ":$unique");
                 $filter->strict = true;
                 break;
         }
@@ -658,7 +673,7 @@ class CommonRepository extends EntityRepository
      *
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param string                     $alias
-     * @param Expr                       $includeExpr  Expression to include in the andX
+     * @param Expr                       $includeExpr Expression to include in the andX
      *
      * @return \Doctrine\ORM\Query\Expr\AndX
      */
@@ -714,9 +729,9 @@ class CommonRepository extends EntityRepository
 
         if (empty($baseCols[$convertCamelCase][$entityClass])) {
             //get a list of properties from the Lead entity so that anything not listed is a custom field
-            $entity = new $entityClass();
-            $reflect    = new \ReflectionClass($entity);
-            $props      = $reflect->getProperties();
+            $entity  = new $entityClass();
+            $reflect = new \ReflectionClass($entity);
+            $props   = $reflect->getProperties();
 
             if ($parentClass = $reflect->getParentClass()) {
                 $parentProps = $parentClass->getProperties();
@@ -729,8 +744,8 @@ class CommonRepository extends EntityRepository
                     $n = $p->name;
 
                     if ($convertCamelCase) {
-                        $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
-                        $n = strtolower($n);
+                        $n                                                   = preg_replace('/(?<=\\w)(?=[A-Z])/', "_$1", $n);
+                        $n                                                   = strtolower($n);
                         $baseCols[$convertCamelCase][$entityClass][$p->name] = $n;
                     } else {
                         $baseCols[$convertCamelCase][$entityClass][] = $n;
@@ -764,11 +779,11 @@ class CommonRepository extends EntityRepository
                 }
 
                 if (in_array($col, $properties)) {
-                    $col = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $col);
+                    $col = preg_replace('/(?<=\\w)(?=[A-Z])/', "_$1", $col);
                     $col = strtolower($col);
                 }
 
-                $f['column'] = (!empty($alias)) ? $alias . '.' . $col : $col;
+                $f['column'] = (!empty($alias)) ? $alias.'.'.$col : $col;
             }
         }
 
@@ -782,11 +797,11 @@ class CommonRepository extends EntityRepository
                     }
 
                     if (in_array($o, $properties)) {
-                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $o);
+                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/', "_$1", $o);
                         $o = strtolower($o);
                     }
 
-                    $o = (!empty($alias)) ? $alias . '.' . $o : $o;
+                    $o = (!empty($alias)) ? $alias.'.'.$o : $o;
                 }
             }
         }
@@ -804,8 +819,8 @@ class CommonRepository extends EntityRepository
      */
     public function createFromArray($className, &$data)
     {
-        $entity = new $className();
-        $meta = $this->_em->getClassMetadata($className);
+        $entity        = new $className();
+        $meta          = $this->_em->getClassMetadata($className);
         $ormProperties = $this->getBaseColumns($className, true);
 
         foreach ($ormProperties as $property => $dbCol) {
@@ -814,13 +829,13 @@ class CommonRepository extends EntityRepository
 
                 if ($v && $meta->hasAssociation($property)) {
                     $map = $meta->getAssociationMapping($property);
-                    $v = $this->_em->getRepository($map['targetEntity'])->find($v);
+                    $v   = $this->_em->getRepository($map['targetEntity'])->find($v);
                     if (empty($v)) {
                         throw new \Exception('Associate data not found');
                     }
                 }
 
-                $method = "set" . ucfirst($property);
+                $method = "set".ucfirst($property);
                 if (method_exists($entity, $method)) {
                     $entity->$method($v);
                 }
@@ -831,4 +846,61 @@ class CommonRepository extends EntityRepository
 
         return $entity;
     }
+
+
+    /**
+     * Gets a list of published entities as an array id => label
+     *
+     * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
+     * @param array               $parameters  Parameters used in $expr
+     * @param string              $labelColumn Column that houses the label
+     *
+     * @return array
+     */
+    public function getSimpleList(CompositeExpression $expr = null, array $parameters = array(), $labelColumn = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $alias = $prefix = $this->getTableAlias();
+        if (!empty($prefix)) {
+            $prefix .= '.';
+        }
+
+        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+
+        $class      = '\\' . $this->getClassName();
+        $reflection = new \ReflectionClass(new $class());
+
+        // Get the label column if necessary
+        if ($labelColumn == null) {
+            if ($reflection->hasMethod('getTitle')) {
+                $labelColumn = 'title';
+            } else {
+                $labelColumn = 'name';
+            }
+        }
+
+        $q->select($prefix.'id, '.$prefix.$labelColumn.' as label')
+            ->from(MAUTIC_TABLE_PREFIX.$tableName, $alias)
+            ->orderBy($prefix.'id');
+
+        if ($expr !== null && $expr->count()) {
+            $q->where($expr);
+        }
+
+        // Published only
+        if ($reflection->hasMethod('getIsPublished')) {
+            $q->andWhere(
+                $q->expr()->eq($prefix . 'is_published', ':true')
+            )
+                ->setParameter('true', true, 'boolean');
+        }
+
+        if (!empty($parameters)) {
+            $q->setParameters($parameters);
+        }
+
+        return $q->execute()->fetchAll();
+    }
 }
+

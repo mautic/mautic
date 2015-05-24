@@ -62,7 +62,7 @@ class PageController extends FormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['page:pages:viewother']) {
-            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $translator = $this->get('translator');
@@ -390,11 +390,10 @@ class PageController extends FormController
             }
         }
 
-        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'tokens'      => $builderComponents['pageTokens'],
+                'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -522,11 +521,10 @@ class PageController extends FormController
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
         }
 
-        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'tokens'      => $builderComponents['pageTokens'],
+                'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -732,7 +730,7 @@ class PageController extends FormController
         } else {
             $isNew    = false;
             $entity = $model->getEntity($objectId);
-            if (!$this->factory->getSecurity()->hasEntityAccess(
+            if ($entity == null || !$this->factory->getSecurity()->hasEntityAccess(
                 'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
             )) {
                 return $this->accessDenied();

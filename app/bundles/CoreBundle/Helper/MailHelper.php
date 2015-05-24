@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceBatchTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 
 /**
  * Class MailHelper
@@ -469,7 +470,7 @@ class MailHelper
      *
      * @param string $template
      * @param array  $vars
-     * @param bool   $replaceTokens
+     * @param bool   $returnContent
      * @param null   $charset
      *
      * @return void
@@ -770,27 +771,12 @@ class MailHelper
             $content = $this->message->getBody();
         }
 
-        // Remove line breaks (to prevent unwanted white space) then convert p and br to line breaks
-        $search = array(
-            "\n",
-            "</p>",
-            "<br />",
-            "<br>"
-        );
+        $request = $this->factory->getRequest();
+        $parser  = new PlainTextHelper(array(
+            'base_url' => $request->getSchemeAndHttpHost() . $request->getBasePath()
+        ));
 
-        $replace = array(
-            '',
-            "\n\n",
-            "\n",
-            "\n"
-        );
-
-        $content = str_ireplace($search, $replace, $content);
-
-        // Strip tags
-        $content = strip_tags($content);
-
-        $this->plainText = $content;
+        $this->plainText = $parser->setHtml($content)->getText();
     }
 
     /**

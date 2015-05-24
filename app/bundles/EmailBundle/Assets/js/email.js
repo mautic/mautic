@@ -25,6 +25,25 @@ Mautic.emailOnLoad = function (container, response) {
         }
 
         window.close();
+    } else if (mQuery('#emailform_plainText').length) {
+        // Activate the plain text editor to support token inserts
+
+        // Get the plain text first
+        var plainText = mQuery('#emailform_plainText').val();
+
+        // Now empty it so that ckeditor doesn't load it as html
+        mQuery('#emailform_plainText').val('');
+
+        mQuery('#emailform_plainText').ckeditor({
+            removePlugins: 'toolbar,elementspath,resize',
+            extraPlugins: 'tokens',
+            autoParagraph: false,
+            on: {
+                instanceReady: function( event ) {
+                    event.editor.insertText(plainText);
+                }
+            }
+        });
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'email');
@@ -41,6 +60,11 @@ Mautic.emailOnLoad = function (container, response) {
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
+    }
+
+    if (mQuery('#emailform_plainText').length) {
+        // Activate the plain text editor to support token inserts
+        CKEDITOR.instances['emailform_plainText'].destroy(true);
     }
 };
 
@@ -78,18 +102,6 @@ Mautic.initializeEmailFilters = function(container) {
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
     editor[instance].insertText(token);
-};
-
-Mautic.toggleEmailContentMode = function (el) {
-    var builder = (mQuery(el).val() === '0') ? false : true;
-
-    if (builder) {
-        mQuery('#customHtmlContainer').addClass('hide');
-        mQuery('#builderHtmlContainer').removeClass('hide');
-    } else {
-        mQuery('#customHtmlContainer').removeClass('hide');
-        mQuery('#builderHtmlContainer').addClass('hide');
-    }
 };
 
 Mautic.getEmailAbTestWinnerForm = function(abKey) {
@@ -210,4 +222,27 @@ Mautic.sendEmailBatch = function () {
 
         Mautic.moderatedIntervalCallbackIsComplete('emailSendProgress');
     });
+};
+
+Mautic.autoGeneratePlaintext = function() {
+    mQuery('.plaintext-spinner').removeClass('hide');
+
+    var mode = (mQuery('#emailform_contentMode_0').prop('checked')) ? 'custom' : 'template';
+    var custom = mQuery('#emailform_customHtml').val();
+    var id = mQuery('#emailform_sessionId').val();
+
+    var data = {
+        mode: mode,
+        id: id,
+        custom: custom
+    };
+
+    Mautic.ajaxActionRequest(
+        'email:generatePlaintText',
+        data,
+        function (response) {
+            CKEDITOR.instances['emailform_plainText'].insertText(response.text);
+            mQuery('.plaintext-spinner').addClass('hide');
+        }
+    );
 };

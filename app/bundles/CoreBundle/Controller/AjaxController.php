@@ -575,6 +575,8 @@ class AjaxController extends CommonController
      * Tests mail transport settings
      *
      * @param Request $request
+     *
+     * @return JsonResponse
      */
     protected function testEmailServerConnectionAction(Request $request)
     {
@@ -639,6 +641,36 @@ class AjaxController extends CommonController
 
                 } catch (\Exception $e) {
                     $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function getBuilderTokensAction(Request $request)
+    {
+        $dataArray = array();
+
+        if (method_exists($this, 'getBuilderTokens')) {
+            $query = $request->get('query');
+            if ($query && $query !== '{' && $query !== '{@') {
+                $tokens = $this->getBuilderTokens($query);
+
+                asort($tokens);
+
+                if (!empty($tokens)) {
+                    $dataArray['html'] = $this->render(
+                        'MauticCoreBundle:Helper:buildertoken_list.html.php',
+                        array(
+                            'tokens' => $tokens
+                        )
+                    )->getContent();
                 }
             }
         }

@@ -7,20 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AssetBundle\Controller\SubscribedEvents;
+namespace Mautic\FormBundle\Controller\SubscribedEvents;
+
 
 /**
  * Class BuilderTokenController
  */
 class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEvents\BuilderTokenController
 {
-    protected function getViewPermissionBase()
-    {
-        return 'asset:assets';
-    }
-
+    /**
+     * @return string
+     */
     protected function getModelName()
     {
-        return 'asset';
+        return 'form';
     }
 }

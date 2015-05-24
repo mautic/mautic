@@ -390,26 +390,45 @@ class EmailModel extends FormModel
 
 
     /**
-     * Get array of email builder tokens from bundles subscribed EmailEvents::EMAIL_ON_BUILD
+     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
-     * @param null|Email  $email
-     * @param null|string $component null | tokens | abTestWinnerCriteria
+     * @param null|Email   $email
+     * @param array|string $requestedComponents all | tokens | tokenSections | abTestWinnerCriteria
+     * @param null|string  $tokenFilter
      *
-     * @return mixed
+     * @return array
      */
-    public function getBuilderComponents (Email $email = null, $component = null)
+    public function getBuilderComponents (Email $email = null, $requestedComponents = 'all', $tokenFilter = null)
     {
-        static $components;
+        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
+        $components      = array();
+        $event           = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
+        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
 
-        if (empty($components)) {
-            $components = array();
-            $event      = new EmailBuilderEvent($this->translator, $email);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
-            $components['tokens']               = $event->getTokenSections();
-            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+        if (!is_array($requestedComponents)) {
+            $requestedComponents = array($requestedComponents);
         }
 
-        return ($component !== null && isset($components[$component])) ? $components[$component] : $components;
+        foreach ($requestedComponents as $requested) {
+            switch ($requested) {
+                case 'tokens':
+                    $components[$requested] = $event->getTokens();
+                    break;
+                case 'tokenSections':
+                    $components[$requested] = $event->getTokenSections();
+                    break;
+                case 'abTestWinnerCriteria':
+                    $components[$requested] = $event->getAbTestWinnerCriteria();
+                    break;
+                default:
+                    $components['tokens']               = $event->getTokens();
+                    $components['tokenSections']        = $event->getTokenSections();
+                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+                    break;
+            }
+        }
+
+        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
     }
 
     /**
