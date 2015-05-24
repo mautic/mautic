@@ -14,8 +14,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
-use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class CampaignSubscriber

@@ -308,9 +308,30 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function removeBounceStatusAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $dncId     = $request->request->get('id');
+
+        if (!empty($dncId)) {
+            $this->factory->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
      * Get the rows for new leads
      *
      * @param Request $request
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function getNewLeadsAction(Request $request)
     {

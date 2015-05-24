@@ -25,13 +25,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'nameGetter' => 'getSubject',
     'customButtons' => array(
         array(
-            'confirm' => array(
-                'message'       => $view["translator"]->trans("mautic.email.form.confirmsend", array("%name%" => $email->getSubject() . " (" . $email->getId() . ")")),
-                'confirmText'   => $view["translator"]->trans("mautic.email.send"),
-                'confirmAction' => $view['router']->generate('mautic_email_action', array("objectAction" => "send", "objectId" => $email->getId())),
-                'iconClass'     => 'fa fa-send-o',
-                'btnText'       => $view["translator"]->trans("mautic.email.send")
-            )
+            'attr' => array(
+                'data-toggle' => 'ajax',
+                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $email->getId())),
+            ),
+            'iconClass' => 'fa fa-send-o',
+            'btnText'   => 'mautic.email.send'
         ),
         array(
             'attr' => array(

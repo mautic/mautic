@@ -248,12 +248,9 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $dispatcher = $this->get('event_dispatcher');
-            if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-                $event = new PageDisplayEvent($content, $entity);
-                $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
-                $content = $event->getContent();
-            }
+            $event = new PageDisplayEvent($content, $entity);
+            $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $content = $event->getContent();
 
             $model->hitPage($entity, $this->request, 200);
 

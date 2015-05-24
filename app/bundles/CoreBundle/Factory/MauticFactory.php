@@ -44,6 +44,9 @@ class MauticFactory
      */
     private $entityManager = null;
 
+    /**
+     * @var MailHelper
+     */
     private $mailHelper = null;
 
 
@@ -431,9 +434,11 @@ class MauticFactory
      * returns a ThemeHelper instance for the given theme
      *
      * @param string $theme
-     * @param bool $throwException
+     * @param bool   $throwException
      *
-     * @return \Mautic\CoreBundle\Templating\Helper\ThemeHelper
+     * @return mixed
+     * @throws FileNotFoundException
+     * @throws \Exception
      */
     public function getTheme($theme = 'current', $throwException = false)
     {
@@ -528,9 +533,11 @@ class MauticFactory
     /**
      * Returns MailHelper wrapper for Swift_Message via $helper->message
      *
+     * @param bool $cleanSlate False to preserve current settings, i.e. to process batched emails
+     *
      * @return MailHelper
      */
-    public function getMailer()
+    public function getMailer($cleanSlate = true)
     {
         if ($this->mailHelper == null) {
             $this->mailHelper = new MailHelper(
@@ -539,7 +546,7 @@ class MauticFactory
             )
             );
         } else {
-            $this->mailHelper->reset();
+            $this->mailHelper->reset($cleanSlate);
         }
 
         return $this->mailHelper;
@@ -690,7 +697,12 @@ class MauticFactory
     /**
      * Gets an array of a specific bundle's config settings
      *
-     * @return mixed array | string
+     * @param        $bundleName
+     * @param string $configKey
+     * @param bool   $includeAddons
+     *
+     * @return mixed
+     * @throws \Exception
      */
     public function getBundleConfig($bundleName, $configKey = '', $includeAddons = false)
     {

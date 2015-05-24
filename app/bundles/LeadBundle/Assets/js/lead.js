@@ -577,6 +577,14 @@ Mautic.reloadLeadImportProgress = function() {
     }
 };
 
+Mautic.removeBounceStatus = function (el, dncId) {
+    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+        mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
+    });
+};
+
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);

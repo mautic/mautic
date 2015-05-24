@@ -45,7 +45,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * @var array
      */
-    private $tokens;
+    private $tokens = array();
 
     /**
      * @param string $content
@@ -89,23 +89,9 @@ class EmailSendEvent extends CommonEvent
      *
      * @return array
      */
-    public function getContent($finalContent = false)
+    public function getContent()
     {
-        if ($finalContent && !empty($this->tokens)) {
-            // Parse custom tokens
-            $this->content = str_ireplace($this->tokens['search'], $this->tokens['replace'], $this->content);
-        }
         return $this->content;
-    }
-
-    /**
-     * Set email content
-     *
-     * @param string $content
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
     }
 
     /**
@@ -130,5 +116,32 @@ class EmailSendEvent extends CommonEvent
     public function getSource()
     {
         return $this->source;
+    }
+
+    /**
+     * @return array
+     */
+    public function addTokens(array $tokens)
+    {
+        $this->tokens = array_merge($this->tokens, $tokens);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function addToken($key, $value)
+    {
+        $this->tokens[$key] = $value;
+    }
+
+    /**
+     * Get token array
+     *
+     * @return array
+     */
+    public function getTokens()
+    {
+        return $this->tokens;
     }
 }

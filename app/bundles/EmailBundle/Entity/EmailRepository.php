@@ -51,13 +51,13 @@ class EmailRepository extends CommonRepository
     public function checkDoNotEmail($email)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id}')
+        $q->select('partial e.{id, unsubscribed, bounced, comments}')
             ->from('MauticEmailBundle:DoNotEmail', 'e')
             ->where('e.emailAddress = :email')
             ->setParameter('email', $email);
         $results = $q->getQuery()->getArrayResult();
 
-        return (!empty($results)) ? true : false;
+        return (!empty($results)) ? $results[0] : false;
     }
 
     /**
@@ -74,6 +74,16 @@ class EmailRepository extends CommonRepository
             ->setParameter(':email', $email);
 
         $qb->getQuery()->execute();
+    }
+
+    /**
+     * Delete DNC row
+     *
+     * @param $id
+     */
+    public function deleteDoNotEmailEntry($id)
+    {
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_donotemail', array('id' => (int) $id));
     }
 
     /**
@@ -130,7 +140,7 @@ class EmailRepository extends CommonRepository
     /**
      * @param $emailId
      */
-    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false)
+    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false, $limit = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -171,6 +181,19 @@ class EmailRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->in('ll.leadlist_id', $listIds)
             );
+        }
+
+        // Has an email
+        $q->andWhere(
+            $q->expr()->orX(
+                $q->expr()->isNotNull('l.email'),
+                $q->expr()->neq('l.email', $q->expr()->literal(''))
+            )
+        );
+
+        if (!empty($limit)) {
+            $q->setFirstResult(0)
+                ->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();

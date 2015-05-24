@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,8 +58,7 @@ class PublicController extends CommonFormController
                     'content'         => $entity->getContent(),
                     'email'           => $entity,
                     'lead'            => $lead,
-                    'template'        => $template,
-                    'idHash'          => $idHash
+                    'template'        => $template
                 ));
 
                 //replace tokens
@@ -77,13 +77,14 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $dispatcher = $this->get('event_dispatcher');
-            if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-                $tokens = $stat->getTokens();
-                $event  = new EmailSendEvent($content, $entity, $lead, $idHash, array(), $tokens);
-                $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-                $content = $event->getContent(true);
-            }
+            $tokens = $stat->getTokens();
+
+            // Override tracking_pixel so as to not cause a double hit
+            $tokens['{tracking_pixel}'] = '';
+
+            $event  = new EmailSendEvent($content, $entity, $lead, $idHash, array(), $tokens);
+            $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+            $content = $event->getContent(true);
 
             return new Response($content);
         }
@@ -231,5 +232,31 @@ class PublicController extends CommonFormController
             'lead'     => $lead,
             'template' => $template
         ));
+    }
+
+    /**
+     * Handles mailer transport webhook post
+     *
+     * @param $transport
+     */
+    public function mailerCallbackAction($transport)
+    {
+        ignore_user_abort(true);
+        
+        // Check to see if transport matches currently used transport
+        $currentTransport = $this->factory->getMailer()->getTransport();
+
+        if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
+            $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
+            if (!empty($response['bounces'])) {
+                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                $model = $this->factory->getModel('email');
+                $model->updateBouncedStats($response['bounces']);
+            }
+
+            return new Response('success');
+        }
+
+        throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
     }
 }
