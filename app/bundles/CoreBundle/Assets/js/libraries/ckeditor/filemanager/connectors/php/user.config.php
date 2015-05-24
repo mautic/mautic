@@ -48,31 +48,34 @@ function auth() {
 // 	$fm = new Filemanager($config);
 // }
 
-$userDir = $_SESSION['_sf2_attributes']['mautic.imagepath'];
-$baseDir = $_SESSION['_sf2_attributes']['mautic.basepath'];
 
-if (substr($userDir, -1) !== '/') {
-    $userDir .= '/';
-}
+$fm = new Filemanager();
 
-if ($baseDir && $baseDir != '/') {
-    if (substr($baseDir, 0, 1) == '/') {
-        $baseDir = substr($baseDir, 1);
+if (isset($_SESSION['_sf2_attributes'])) {
+    $userDir = $_SESSION['_sf2_attributes']['mautic.imagepath'];
+    $baseDir = $_SESSION['_sf2_attributes']['mautic.basepath'];
+
+    if (substr($userDir, -1) !== '/') {
+        $userDir .= '/';
     }
 
-    if (substr($baseDir, -1) == '/') {
-        $baseDir = substr($baseDir, 0, -1);
-    }
+    if ($baseDir && $baseDir != '/') {
+        if (substr($baseDir, 0, 1) == '/') {
+            $baseDir = substr($baseDir, 1);
+        }
 
-    if (substr($userDir, 0, 1) == '/') {
+        if (substr($baseDir, -1) == '/') {
+            $baseDir = substr($baseDir, 0, -1);
+        }
+
+        if (substr($userDir, 0, 1) == '/') {
+            $userDir = substr($userDir, 1);
+        }
+
+        $userDir = $baseDir.'/'.$userDir;
+    } elseif (substr($userDir, 0, 1) == '/') {
         $userDir = substr($userDir, 1);
     }
 
-    $userDir = $baseDir . '/' . $userDir;
-} elseif (substr($userDir, 0, 1) == '/') {
-    $userDir = substr($userDir, 1);
+    $fm->setFileRoot($userDir);
 }
-
-$fm = new Filemanager();
-$fm->setFileRoot($userDir);
-?>
