@@ -573,7 +573,7 @@ class TriggerController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('lead');
+            $model     = $this->factory->getModel('point.trigger');
             $ids       = json_decode($this->request->query->get('ids', array()));
             $deleteIds = array();
 
