@@ -888,16 +888,16 @@ class CommonRepository extends EntityRepository
             $q->where($expr);
         }
 
+        if (!empty($parameters)) {
+            $q->setParameters($parameters);
+        }
+
         // Published only
         if ($reflection->hasMethod('getIsPublished')) {
             $q->andWhere(
                 $q->expr()->eq($prefix . 'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
-        }
-
-        if (!empty($parameters)) {
-            $q->setParameters($parameters);
         }
 
         return $q->execute()->fetchAll();
