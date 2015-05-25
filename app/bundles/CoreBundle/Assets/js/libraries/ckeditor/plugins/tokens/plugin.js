@@ -183,18 +183,24 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
         $('.token-suggestions').remove();
 
         if (rsp && rsp.html) {
+
+            var position = 'absolute';
             if (editor.editable().isInline()) {
                 editor.insertHtml('<span id="dummy-element">placeholder</span>');
-
-                var dummyEl = $('#dummy-element');
-                var x = 10;
-                var y = 0;
 
                 // Account for left/right scrolling
                 var scrollTop = $(document).scrollTop();
                 var scrollLeft = $(document).scrollLeft();
 
-                var position = 'fixed';
+                // Dummy offset
+                var dummyEl = $('#dummy-element');
+                var dummyOffset = $(dummyEl).offset();
+                var dummyTop    = dummyOffset.top;
+                var dummyLeft   = dummyOffset.left;
+
+
+                var x = 10 + dummyLeft - scrollLeft;
+                var y = 10 + dummyTop - scrollTop;
             } else {
                 var dummyElement = editor.document.createElement('img',
                     {
@@ -208,27 +214,54 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
 
                 editor.insertElement(dummyElement);
 
+                // Parent offset
+                var parentOffset = $(par).offset();
+                var parentTop    = parentOffset.top;
+                var parentLeft   = parentOffset.left;
+
+                // Editor offset
                 var el = $('#cke_' + element_id + ' iframe');
-                var dummyEl = $('#cke_' + element_id + ' iframe').contents().find('#dummy-element');
+                var editorOffset  = $(el).offset();
+                var editorTop     = editorOffset.top;
+                var editorLeft    = editorOffset.left;
 
-                var editorOffset = $(el).offset();
-                var x = editorOffset.left;
-                var y = editorOffset.top;
-
+                // Editor scrolling
                 var scrollTop = $('#cke_' + element_id + ' iframe').contents().scrollTop();
-                var scrollLeft = 0;
-                var position = 'absolute';
+                var scrollLeft = $('#cke_' + element_id + ' iframe').contents().scrollLeft();;
+
+                // Dummy offset
+                var dummyEl     = $('#cke_' + element_id + ' iframe').contents().find('#dummy-element');
+                var dummyOffset = $(dummyEl).offset();
+                var dummyTop    = dummyOffset.top;
+                var dummyLeft   = dummyOffset.left;
+
+                var x = (editorLeft - parentLeft) + (dummyLeft - scrollLeft);
+                var y = (editorTop - parentTop) + (dummyTop - scrollTop);
             }
 
-            var dummyOffset = $(dummyEl).offset();
-            x += dummyOffset.left;
-            y += dummyOffset.top;
-
-            x -= scrollLeft;
-            y -= scrollTop;
-
-            // Give just a little buffer
+            // Give some buffer
             x += 10;
+            y += 10;
+
+            // Keep it from going off the page right and bottom
+            var documentWidth = ($(el).parents('.builder-content').length) ? $(el).parents('.builder-content').width() : $(document).width();
+            if ((x + 240) > documentWidth) {
+                x = x - str.length - 240;
+            }
+
+            var documentHeight = ($(el).parents('.builder-content').length) ? $(el).parents('.builder-content').height() : $(document).height();
+            if ((y + 200) > documentHeight) {
+                y = y - 205;
+            }
+
+            // Keep it from going off the page top and left
+            if (x < 0) {
+                x = 0;
+            }
+
+            if (y < 0) {
+                y = 0;
+            }
 
             $(dummyEl).remove();
 
@@ -236,10 +269,37 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
                 $('#cke_' + element_id).hide();
             }
 
-            $('<div class="token-suggestions" style="position: ' + position + '; top: ' + y + 'px; left: ' + x + 'px; z-index: 10000;">' + rsp.html + '</div>').insertAfter(par);
+            $('<div class="token-suggestions" style="position: ' + position + '; top: ' + y + 'px; left: ' + x + 'px; z-index: 10000;">' + rsp.html + '</div>').appendTo(par);
+
+            $(document).on('keyup.tokenSuggestion', (function(e) {
+                if (e.keyCode == 27) { // esc keycode
+                    $(document).off('click.tokenSuggestions');
+                    $(document).off('keyup.tokenSuggestion');
+
+                    var tokens = CKEDITOR_tokens.get_instance(editor);
+                    tokens.stop_observing();
+
+                    $('.token-suggestions').remove();
+                }
+            }));
+
+            $(document).on('click.tokenSuggestions', function(event) {
+                if (event.target && !mQuery(event.target).hasClass('inline-token')) {
+                    $(document).off('click.tokenSuggestions');
+                    $(document).off('keyup.tokenSuggestion');
+
+                    var tokens = CKEDITOR_tokens.get_instance(editor);
+                    tokens.stop_observing();
+
+                    $('.token-suggestions').remove();
+                }
+            });
         }
 
         $('.inline-token').click(function (e) {
+            $(document).off('click.tokenSuggestions');
+            $(document).off('keyup.tokenSuggestion');
+
             if(editor.editable().isInline()) {
                 $('#cke_' + element_id).show();
             }

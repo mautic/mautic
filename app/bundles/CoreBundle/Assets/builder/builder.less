@@ -29,8 +29,10 @@ div[contentEditable=true]:empty:not(:focus):before {
 .inline-token-list {
   max-height: 200px;
   overflow-y: auto;
+  overflow-x: hidden;
   margin-bottom: 20px;
   padding-left: 0;
+  width: 240px;
 }
 
 .inline-token {
@@ -58,6 +60,9 @@ div[contentEditable=true]:empty:not(:focus):before {
 a.inline-token {
   color: #f7f7f7;
   text-decoration: none;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  line-height: 1.3856;
+
   &:hover,
   &:focus {
     background-color: #616161;

@@ -2772,6 +2772,12 @@ var Mautic = {
                     });
 
                     mQuery('.btn-close-builder').prop('disabled', false);
+
+                    // Activate draggables
+                    Mautic.activateBuilderDragTokens();
+
+                    //make the panel full screen
+                    mQuery('.builder').addClass('builder-active').removeClass('hide');
                 });
         } else {
             // Custom HTML
@@ -2792,13 +2798,22 @@ var Mautic = {
 
                     mQuery('#builder-overlay').addClass('hide');
                     mQuery('.btn-close-builder').prop('disabled', false);
+
+                    // Activate draggables
+                    Mautic.activateBuilderDragTokens();
+
+                    //make the panel full screen
+                    mQuery('.builder').addClass('builder-active').removeClass('hide', {
+                        complete: function() {
+                            CKEDITOR.instances['builder-custom-content'].resize('100%', mQuery('.builder-content').height());
+                        }
+                    });
                 },
                 {
                     toolbar: 'fullpage',
                     fullPage: true,
                     extraPlugins: 'sourcedialog,docprops,tokens',
-                    width: '100%',
-                    height: mQuery(window).height() - 100
+                    width: '100%'
                 }
             );
 
@@ -2818,11 +2833,6 @@ var Mautic = {
                 }
             });
         }
-
-        Mautic.activateBuilderDragTokens();
-
-        //make the panel full screen
-        mQuery('.builder').addClass('builder-active').removeClass('hide');
     },
 
     /**
