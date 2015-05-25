@@ -11,10 +11,10 @@
             <?php
                 $fields = $item->getFields();
                 $color  = $item->getColor();
-                if (empty($color)) $color = '#a0acb8';
+                if (empty($color)) $color = 'a0acb8';
             ?>
             <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
-                <div data-color="<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) echo " highlight"; ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
+                <div data-color="#<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) echo " highlight"; ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
                     <div class="box-layout">
                         <div class="col-xs-4 va-m">
                             <div class="panel-body">
