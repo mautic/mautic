@@ -2900,7 +2900,7 @@ var Mautic = {
                     builderContents.find('.mautic-editable').droppable('destroy');
 
                     // Kill draggables
-                    mQuery("*[data-token]").draggable('destroy');
+                    mQuery(".ui-draggable[data-token]").draggable('destroy');
 
                     // Kill the overlay
                     mQuery('#builder-overlay').remove();
@@ -2921,7 +2921,7 @@ var Mautic = {
             mQuery('#customHtmlDropzone').droppable('destroy');
 
             // Kill draggables
-            mQuery("*[data-token]").draggable('destroy');
+            mQuery(".ui-draggable[data-token]").draggable('destroy');
 
             // Get the contents of the editor
             mQuery('.custom-html-content').val(CKEDITOR.instances['builder-custom-content'].getData());
