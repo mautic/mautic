@@ -54,10 +54,11 @@ class BuilderTokenHelper
     /**
      * @param int   $page
      * @param array $entityArguments
+     * @param array $viewParameters
      *
      * @return string
      */
-    public function getTokenContent($page = 1, $entityArguments = array())
+    public function getTokenContent($page = 1, $entityArguments = array(), $viewParameters = array())
     {
         if (is_array($page)) {
             // Laziness
@@ -128,14 +129,14 @@ class BuilderTokenHelper
 
         return $this->factory->getTemplating()->render(
             $this->bundleName.':SubscribedEvents\BuilderToken:list.html.php',
-            array(
+            array_merge($viewParameters, array(
                 'items'       => $items,
                 'page'        => $page,
                 'limit'       => $limit,
                 'totalCount'  => $count,
                 'tmpl'        => $request->get('tmpl', 'index'),
                 'searchValue' => $search
-            )
+            ))
         );
     }
 
