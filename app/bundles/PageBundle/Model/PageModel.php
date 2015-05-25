@@ -274,6 +274,12 @@ class PageModel extends FormModel
      */
     public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
+        // If this is a variant, then get the parent's URL
+        $parent = $entity->getVariantParent();
+        if ($parent != null) {
+            $entity = $parent;
+        }
+
         $slug = $this->generateSlug($entity);
 
         return $this->buildUrl('mautic_page_public', array('slug' => $slug), $absolute, $clickthrough);
