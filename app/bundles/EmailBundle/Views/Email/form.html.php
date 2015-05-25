@@ -42,16 +42,6 @@ $contentMode = $form['contentMode']->vars['data'];
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-12 col-lg-6">
                         <?php echo $view['form']->row($form['description']); ?>
                     </div>
@@ -95,7 +85,27 @@ $contentMode = $form['contentMode']->vars['data'];
                     </div>
                 </div>
 
+                <div class="well">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['fromName']); ?>
+                        </div>
 
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['fromAddress']); ?>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['replyToAddress']); ?>
+                        </div>
+
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['bccAddress']); ?>
+                        </div>
+                    </div>
+                </div>
                 <div id="customHtmlContainer" class="hide">
                     <?php echo $view['form']->row($form['customHtml']); ?>
                 </div>
@@ -108,22 +118,16 @@ $contentMode = $form['contentMode']->vars['data'];
                     <?php echo $view['form']->row($form['isPublished']); ?>
                     <?php echo $view['form']->row($form['publishUp']); ?>
                     <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php endif; ?>
-
-                <?php echo $view['form']->row($form['fromName']); ?>
-                <?php echo $view['form']->row($form['fromAddress']); ?>
-                <?php echo $view['form']->row($form['replyToAddress']); ?>
-                <?php echo $view['form']->row($form['bccAddress']); ?>
-
-                <?php if (!isset($form['variantSettings'])): ?>
+                <?php else: ?>
                 <?php echo $view['form']->row($form['category']); ?>
                 <?php echo $view['form']->row($form['lists']); ?>
                 <?php echo $view['form']->row($form['language']); ?>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php echo $view['form']->row($form['unsubscribeForm']); ?>
                 <?php endif; ?>
+
+                <?php echo $view['form']->row($form['unsubscribeForm']); ?>
 
                 <?php echo $view['form']->rest($form); ?>
             </div>
