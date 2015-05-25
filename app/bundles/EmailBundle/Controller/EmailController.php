@@ -591,6 +591,7 @@ class EmailController extends FormController
 
             /** @var \Mautic\EmailBundle\Entity\Email $clone */
             $clone = clone $entity;
+            $clone->clearStats();
             $clone->setSentCount(0);
             $clone->setReadCount(0);
             $clone->setRevision(0);
@@ -746,6 +747,7 @@ class EmailController extends FormController
             $clone = clone $entity;
 
             //reset
+            $clone->clearStats();
             $clone->setSentCount(0);
             $clone->setRevision(0);
             $clone->setVariantSentCount(0);
@@ -764,6 +766,8 @@ class EmailController extends FormController
      * Make the variant the main
      *
      * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function winnerAction ($objectId)
     {

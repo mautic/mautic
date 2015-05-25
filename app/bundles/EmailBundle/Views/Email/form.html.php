@@ -103,17 +103,19 @@ $contentMode = $form['contentMode']->vars['data'];
         </div>
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <?php echo $view['form']->row($form['fromName']); ?>
-                <?php echo $view['form']->row($form['fromAddress']); ?>
-                <?php echo $view['form']->row($form['replyToAddress']); ?>
-                <?php echo $view['form']->row($form['bccAddress']); ?>
-
                 <?php if (isset($form['variantSettings'])): ?>
                     <?php echo $view['form']->row($form['variantSettings']); ?>
                     <?php echo $view['form']->row($form['isPublished']); ?>
                     <?php echo $view['form']->row($form['publishUp']); ?>
                     <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php else: ?>
+                <?php endif; ?>
+
+                <?php echo $view['form']->row($form['fromName']); ?>
+                <?php echo $view['form']->row($form['fromAddress']); ?>
+                <?php echo $view['form']->row($form['replyToAddress']); ?>
+                <?php echo $view['form']->row($form['bccAddress']); ?>
+
+                <?php if (!isset($form['variantSettings'])): ?>
                 <?php echo $view['form']->row($form['category']); ?>
                 <?php echo $view['form']->row($form['lists']); ?>
                 <?php echo $view['form']->row($form['language']); ?>
@@ -122,6 +124,7 @@ $contentMode = $form['contentMode']->vars['data'];
                 <?php echo $view['form']->row($form['publishDown']); ?>
                 <?php echo $view['form']->row($form['unsubscribeForm']); ?>
                 <?php endif; ?>
+
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>

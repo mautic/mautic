@@ -264,6 +264,14 @@ class Email extends FormEntity
     }
 
     /**
+     *
+     */
+    public function clearStats()
+    {
+        $this->stats = new ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)

@@ -103,7 +103,9 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
                     Mautic.onPageLoad('#page_variantSettings_properties', response);
                 }
             }
-            spinner.remove();
+
+            Mautic.removeLabelLoadingIndicator();
+
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);

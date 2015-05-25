@@ -38,13 +38,8 @@ $contentMode = $form['contentMode']->vars['data'];
                 </div>
                 <div class="col-md-6">
                     <?php if (!isset($form['variantSettings'])): ?>
-                        <?php echo $view['form']->row($form['alias']); ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['alias']); ?>
+                    <?php else: ?>
                     <div class="form-group">
                         <?php echo $view['form']->label($form['contentMode']); ?>
                         <div>
@@ -54,6 +49,23 @@ $contentMode = $form['contentMode']->vars['data'];
                             </button>
                         </div>
                     </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <?php if (!isset($form['variantSettings'])): ?>
+                    <div class="form-group">
+                        <?php echo $view['form']->label($form['contentMode']); ?>
+                        <div>
+                            <?php echo $view['form']->widget($form['contentMode']); ?>
+                            <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('page');">
+                                <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-6">
                     <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide"' : ''; ?>">
@@ -83,9 +95,13 @@ $contentMode = $form['contentMode']->vars['data'];
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
             ?>
+
+            <?php if (isset($form['metaDescription'])): ?>
             <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
+            <?php endif; ?>
+
             <?php echo $view['form']->rest($form); ?>
         </div>
     </div>
