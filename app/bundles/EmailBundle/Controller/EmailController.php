@@ -408,6 +408,7 @@ class EmailController extends FormController
                     'updateSelect'  => $form['updateSelect']->getData(),
                     'emailId'       => $entity->getId(),
                     'emailSubject'  => $entity->getSubject(),
+                    'emailName'     => $entity->getName(),
                     'emailLang'     => $entity->getLanguage()
                 ));
             }
