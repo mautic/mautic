@@ -62,20 +62,24 @@ class BuilderSubscriber extends CommonSubscriber
         $lead   = $event->getLead();
         $leadId = ($lead !== null) ? $lead['id'] : null;
         $email  = $event->getEmail();
-        $this->replaceTokens($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
+        $tokens = $this->generateTokens($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
+        $event->addTokens($tokens);
     }
 
     public function onPageDisplay (PageDisplayEvent $event)
     {
         $page   = $event->getPage();
         $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;
-        $this->replaceTokens($event, $leadId, array('page', $page->getId()));
+        $tokens = $this->generateTokens($event, $leadId, array('page', $page->getId()));
+
+        $content = $event->getContent();
+        if (!empty($tokens)) {
+            $content = str_ireplace(array_keys($tokens), $tokens, $content);
+        }
     }
 
-    private function replaceTokens ($event, $leadId, $source = array(), $emailId = null)
+    private function generateTokens ($event, $leadId, $source = array(), $emailId = null)
     {
-        static $assets = array();
-
         $content       = $event->getContent();
         $pagelinkRegex = '/{assetlink=(.*?)}/';
 
@@ -91,19 +95,22 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['email'] = $emailId;
         }
 
+        $tokens = array();
+
         preg_match_all($pagelinkRegex, $content, $matches);
         if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
-                if (empty($assets[$match])) {
-                    $assets[$match] = $model->getEntity($match);
+            foreach ($matches[1] as $key => $assetId) {
+                $token = $matches[0][$key];
+
+                if (isset($tokens[$token])) {
+                    continue;
                 }
 
-                $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
-
-                $content = str_ireplace('{assetlink=' . $match . '}', $url, $content);
+                $asset          = $model->getEntity($assetId);
+                $tokens[$token] = ($asset !== null) ? $model->generateUrl($asset, true, $clickthrough) : '';
             }
         }
 
-        $event->setContent($content);
+        return $tokens;
     }
 }

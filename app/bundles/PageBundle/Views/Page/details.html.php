@@ -403,19 +403,34 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <?php $trans = (!empty($variants['parent']) && $variants['parent']->getId() != $activePage->getId()) ? 'mautic.page.urlvariant' : 'mautic.page.url'; ?>
-                <div class="panel-title"><?php echo $view['translator']->trans($trans); ?></div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
-                <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                value="<?php echo $pageUrl; ?>" />
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                    value="<?php echo $pageUrl; ?>" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.preview.url'); ?></div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                           value="<?php echo $previewUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
+                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>
-            </div>
+                </div>
             </div>
         </div>
         <!--/ preview URL -->

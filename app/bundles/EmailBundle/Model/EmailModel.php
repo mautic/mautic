@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Model;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -19,7 +20,6 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -38,6 +38,14 @@ class EmailModel extends FormModel
     public function getRepository ()
     {
         return $this->em->getRepository('MauticEmailBundle:Email');
+    }
+
+    /**
+     * @return \Mautic\EmailBundle\Entity\StatRepository
+     */
+    public function getStatRepository ()
+    {
+        return $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
     }
 
     /**
@@ -411,7 +419,7 @@ class EmailModel extends FormModel
      */
     public function getEmailStatus ($idHash)
     {
-        return $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getEmailStatus($idHash);
+        return $this->getStatRepository()->getEmailStatus($idHash);
     }
 
     /**
@@ -564,12 +572,13 @@ class EmailModel extends FormModel
      * @param Email $email
      * @param mixed $listId     Leads for a specific lead list
      * @param bool  $countOnly  If true, return count otherwise array of leads
+     * @param int   $limit      Max number of leads to retrieve
      *
-     * @return int
+     * @return int|array
      */
-    public function getPendingLeads(Email $email, $listId = null, $countOnly = false)
+    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null)
     {
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $listId, $countOnly);
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $listId, $countOnly, $limit);
 
         return $total;
     }
@@ -579,8 +588,10 @@ class EmailModel extends FormModel
      *
      * @param Email $email
      * @param array $lists
+     *
+     * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
-    public function sendEmailToLists (Email $email, $lists = null)
+    public function sendEmailToLists (Email $email, $lists = null, $limit = null)
     {
         //get the leads
         if (empty($lists)) {
@@ -589,31 +600,44 @@ class EmailModel extends FormModel
 
         //get email settings such as templates, weights, etc
         $emailSettings = $this->getEmailSettings($email);
-        $saveEntities  = array();
         $options       = array(
-            'source'          => array('email', $email->getId()),
-            'emailSettings'   => $emailSettings,
-            'returnEntities'  => true,
-            'allowResends'    => false
+            'source'        => array('email', $email->getId()),
+            'emailSettings' => $emailSettings,
+            'allowResends'  => false
         );
+
+        $failed      = array();
+        $sentCount   = 0;
+        $failedCount = 0;
         foreach ($lists as $list) {
+            if ($limit !== null && $limit <= 0) {
+                // Hit the max for this batch
+                break;
+            }
+
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId());
-            $listSaveEntities  = $this->sendEmail($email, $leads, $options);
-            if (!empty($listSaveEntities)) {
-                $saveEntities = array_merge($saveEntities, $listSaveEntities);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit);
+            $leadCount         = count($leads);
+            $sentCount        += $leadCount;
+
+            if ($limit != null) {
+                // Only retrieve the difference between what has already been sent and the limit
+                $limit -= $leadCount;
+            }
+
+            $listErrors = $this->sendEmail($email, $leads, $options);
+
+            if (!empty($listErrors)) {
+                $listFailedCount = count($listErrors);
+
+                $sentCount   -= $listFailedCount;
+                $failedCount += $listFailedCount;
+
+                $failed[$options['listId']] = $listErrors;
             }
         }
 
-        //set the sent count and save
-        foreach ($emailSettings as $e) {
-            $saveEntities[] = $e['entity'];
-        }
-
-        if (!empty($saveEntities)) {
-            //save the stats and emails
-            $this->saveEntities($saveEntities);
-        }
+        return array($sentCount, $failedCount, $failed);
     }
 
     /**
@@ -708,9 +732,9 @@ class EmailModel extends FormModel
      *     array source array('model', 'id')
      *     array emailSettings
      *     int   listId
-     *     bool  returnEntities  If true, entitites will be returned rather than persisted
      *     bool  allowResends    If false, exact emails (by id) already sent to the lead will not be resent
      *     bool  ignoreDNC       If true, emails listed in the do not contact table will still get the email
+     *     bool  sendBatchMail   If false, the function will not send batched mail but will defer to calling function to handle it
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
@@ -720,21 +744,23 @@ class EmailModel extends FormModel
         $source           = (isset($options['source'])) ? $options['source'] : null;
         $emailSettings    = (isset($options['emailSettings'])) ? $options['emailSettings'] : array();
         $listId           = (isset($options['listId'])) ? $options['listId'] : null;
-        $returnEntities   = (isset($options['returnEntities'])) ? $options['returnEntities'] : false;
         $ignoreDNC        = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
         $allowResends     = (isset($options['allowResends'])) ? $options['allowResends'] : true;
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
+        $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
 
         if (!$email->getId()) {
-            return ($returnEntities) ? array() : false;
+            return false;
         }
 
+        $singleEmail = false;
         if (isset($leads['id'])) {
+            $singleEmail = true;
             $leads = array($leads['id'] => $leads);
         }
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $statRepo  = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
 
@@ -775,7 +801,7 @@ class EmailModel extends FormModel
 
         //noone to send to so bail
         if (empty($count)) {
-            return true;
+            return $singleEmail ? true : array();
         }
 
         //how many of this batch should go to which email
@@ -793,68 +819,120 @@ class EmailModel extends FormModel
         shuffle($sendTo);
 
         //start at the beginning for this batch
-        $useEmail     = reset($emailSettings);
-        $saveEntities = $saveEmails = array();
+        $useEmail = reset($emailSettings);
+        $errors   = array();
+        // Store stat entities
+        $saveEntities = array();
 
-        $errors = array();
+        $mailer = $this->factory->getMailer(!$sendBatchMail);
 
-        $mailer = $this->factory->getMailer();
+        $contentGenerated = false;
+
+        $flushQueue = function($reset = true) use (&$mailer, &$saveEntities, &$errors, $sendBatchMail) {
+            if ($sendBatchMail) {
+                $flushResult = $mailer->flushQueue();
+                if (!$flushResult) {
+                    $sendFailures = $mailer->getErrors();
+
+                    // Check to see if failed recipients were stored by the transport
+                    if (!empty($sendFailures['failures'])) {
+                        // Prevent the stat from saving
+                        foreach ($sendFailures['failures'] as $failedEmail) {
+                            // Add lead ID to list of failures
+                            $errors[$saveEntities[$failedEmail]->getLead()->getId()] = $failedEmail;
+
+                            // Down sent counts
+                            $saveEntities[$failedEmail]->getEmail()->downSentCounts();
+
+                            // Delete the stat
+                            unset($saveEntities[$failedEmail]);
+                        }
+                    }
+                }
+
+                if ($reset) {
+                    $mailer->reset(true);
+                }
+
+                return $flushResult;
+            }
+
+            return true;
+        };
 
         foreach ($sendTo as $lead) {
+            usleep(100);
+
+            // Generate content
+            if ($useEmail['entity']->getId() !== $contentGenerated) {
+                // Flush the mail queue if applicable
+                $flushQueue();
+
+                if ($useEmail['entity']->getContentMode() == 'builder') {
+                    $customHtml = $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                        'slots'    => $useEmail['slots'],
+                        'content'  => $useEmail['entity']->getContent(),
+                        'email'    => $useEmail['entity'],
+                        'template' => $useEmail['template']
+                    ), true);
+                } else {
+                    // Tak on the tracking pixel token
+                    $customHtml  = $useEmail['entity']->getCustomHtml();
+                    $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+                    if (strpos($customHtml, '</body>') !== false) {
+                        $customHtml = str_replace('</body>', $trackingImg . '</body>', $customHtml);
+                    } else {
+                        $customHtml .= $trackingImg;
+                    }
+                }
+
+                $contentGenerated = $useEmail['entity']->getId();
+
+                // Use batching if supported
+                $mailer->useMailerBatching();
+                $mailer->setSource($source);
+                $mailer->setBody($customHtml);
+                $mailer->setPlainText($useEmail['entity']->getPlainText());
+                $mailer->setSubject($useEmail['entity']->getSubject());
+                $mailer->setEmail($useEmail['entity']);
+            }
+
             $idHash = uniqid();
 
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
-            $mailer->setSource($source);
-            $mailer->setEmail($useEmail['entity']);
+
+            try {
+                $mailer->addTo($lead['email'], $lead['firstname'] . ' ' . $lead['lastname']);
+            } catch (BatchQueueMaxException $e) {
+                // Queue full so flush then try again
+                $flushQueue(false);
+
+                $mailer->addTo($lead['email'], $lead['firstname'] . ' ' . $lead['lastname']);
+            }
+
+            // Add tracking pixel token
+            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true);
             $mailer->setCustomTokens($tokens);
 
-            if ($useEmail['entity']->getContentMode() == 'builder') {
-                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                    'slots'    => $useEmail['slots'],
-                    'content'  => $useEmail['entity']->getContent(),
-                    'email'    => $useEmail['entity'],
-                    'template' => $useEmail['template'],
-                    'idHash'   => $idHash
-                ));
-            } else {
-                // Tak on the tracking URL
-                $customHtml  = $useEmail['entity']->getCustomHtml();
-                $trackingImg = '<img height="1" width="1" src="' . $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true) . '" />';
-                if (strpos($customHtml, '</body>') !== false) {
-                    $customHtml = str_replace('</body>', $trackingImg . '</body>', $customHtml);
-                } else {
-                    $customHtml .= $trackingImg;
-                }
+            // Unset tracking pixel for the stat entry
+            unset($tokens['{tracking_pixel}']);
 
-                $mailer->setBody($customHtml);
-            }
-
-            $mailer->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
-            $mailer->setSubject($useEmail['entity']->getSubject());
-
-            if ($plaintext = $useEmail['entity']->getPlainText()) {
-                $mailer->setPlainText($plaintext);
-            }
-
-            //queue the message
-            if (!$mailer->send(true)) {
-                $errors[$lead['id']] = true;
-
-                $mailer->reset();
+            //queue or send the message
+            if (!$mailer->queue(true)) {
+                $errors[$lead['id']] = $lead['email'];
 
                 continue;
             }
 
-            $mailer->reset();
-
             if (!$allowResends) {
-                $sent[$email->getId()][$lead['id']] = $lead['id'];
+                $sent[$useEmail['entity']->getId()][$lead['id']] = $lead['id'];
             }
 
             //create a stat
             $stat = new Stat();
             $stat->setDateSent(new \DateTime());
+
             //use reference to set the email to avoid persist errors
             $stat->setEmail($useEmail['entity']);
             $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
@@ -869,16 +947,14 @@ class EmailModel extends FormModel
             }
             //Set custom tokens specific to this email
             $stat->setTokens($tokens);
-            $saveEntities[] = $stat;
 
+            $saveEntities[$lead['email']] = $stat;
+
+            // Down sent counts
+            $saveEntities[$lead['email']]->getEmail()->upSentCounts();
+
+            // Save RAM
             unset($stat);
-
-            //increase the sent counts
-            $useEmail['entity']->upSentCounts();
-
-            if (!isset($saveEmails[$useEmail['entity']->getId()])) {
-                $saveEmails[$useEmail['entity']->getId()] = $useEmail['entity'];
-            }
 
             $batchCount++;
             if ($batchCount > $useEmail['limit']) {
@@ -890,26 +966,21 @@ class EmailModel extends FormModel
             }
         }
 
-        if ($returnEntities) {
+        // Send batched mail if applicable
+        $flushQueue();
 
-            return $saveEntities;
-        } else {
-            $this->getRepository()->saveEntities($saveEntities);
+        // Persist stats
+        $statRepo->saveEntities($saveEntities);
 
-            if (!empty($saveEmails)) {
-                $this->getRepository()->saveEntities($saveEmails);
-                unset($saveEmails);
-            }
-
-            foreach ($saveEntities as $stat) {
-                // Save RAM
-                $this->em->detach($stat);
-            }
-
-            unset($emailSettings, $options, $tokens, $saveEntities, $useEmail, $sendTo);
-
-            return (count($leads) > 1) ? $errors : (empty($error));
+        // Free RAM
+        foreach ($saveEntities as $stat) {
+            $this->em->detach($stat);
+            unset($stat);
         }
+
+        unset($emailSettings, $options, $tokens, $useEmail, $sendTo);
+
+        return $singleEmail ? (empty($errors)) : $errors;
     }
 
     /**
@@ -996,8 +1067,9 @@ class EmailModel extends FormModel
      * @param Stat   $stat
      * @param        $reason
      * @param string $tag
+     * @param bool   $flush
      */
-    public function setDoNotContact (Stat $stat, $reason, $tag = 'bounced')
+    public function setDoNotContact (Stat $stat, $reason, $tag = 'bounced', $flush = true)
     {
         $lead    = $stat->getLead();
         $email   = $stat->getEmail();
@@ -1016,7 +1088,34 @@ class EmailModel extends FormModel
             $em = $this->factory->getEntityManager();
             $em->persist($dnc);
 
-            $em->flush();
+            if ($flush) {
+                $em->flush();
+            }
+        }
+    }
+
+    /**
+     * @param        $email
+     * @param string $reason
+     * @param bool   $flush
+     */
+    public function setBounceDoNotContact($email, $reason = '', $flush = true)
+    {
+        $repo = $this->getRepository();
+
+        if (!$repo->checkDoNotEmail($email)) {
+            $dnc = new DoNotEmail();
+            $dnc->setEmailAddress($email);
+            $dnc->setDateAdded(new \DateTime());
+            $dnc->setBounced();
+            $dnc->setComments($reason);
+
+            $em = $this->factory->getEntityManager();
+            $em->persist($dnc);
+
+            if ($flush) {
+                $em->flush();
+            }
         }
     }
 
@@ -1028,5 +1127,67 @@ class EmailModel extends FormModel
     public function removeDoNotContact ($email)
     {
         $this->getRepository()->removeFromDoNotEmailList($email);
+    }
+
+    /**
+     * @param $bouncedHashIds
+     */
+    public function updateBouncedStats(array $bounces)
+    {
+        if (empty($bounces)) {
+            return;
+        }
+
+        $batch = 20;
+        $count = 0;
+
+        if (!empty($bounces['hashIds'])) {
+            $statRepo = $this->getStatRepository();
+
+            $alias = $statRepo->getTableAlias();
+            if (!empty($alias)) {
+                $alias .= '.';
+            }
+
+            $stats = $this->getStatRepository()->getEntities(
+                array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => $alias.'trackingHash',
+                                'expr'   => 'in',
+                                'value'  => array_keys($bounces['hashIds'])
+                            )
+                        )
+                    )
+                )
+            );
+
+            /** @var \Mautic\EmailBundle\Entity\Stat $s */
+            foreach ($stats as $s) {
+                $this->setDoNotContact($s, $bounces['hashIds'][$s->getTrackingHash()], 'bounced', ($count === $batch));
+
+                $s->setIsFailed(true);
+                $this->em->persist($s);
+
+                if ($count === $batch) {
+                    $count = 0;
+                }
+            }
+        }
+
+
+        if (!empty($bounces['emails'])) {
+            foreach ($bounces['emails'] as $email => $reason) {
+                $this->setBounceDoNotContact($email, $reason, ($count === $batch));
+
+                if ($count === $batch) {
+                    $count = 0;
+                }
+            }
+
+        }
+
+        $this->em->flush();
     }
 }

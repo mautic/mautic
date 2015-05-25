@@ -347,7 +347,7 @@ class FormModel extends CommonFormModel
         );
         $ignoreTypes = array('button', 'freetext');
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes)) {
+            if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
                 $columns[] = array(
                     'name'    => $f->getAlias(),
                     'type'    => 'text',

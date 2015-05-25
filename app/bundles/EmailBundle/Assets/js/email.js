@@ -150,3 +150,64 @@ Mautic.loadNewEmailWindow = function(options) {
         }, 100);
     }
 };
+
+Mautic.submitSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'batch_send\']').submit();
+};
+
+Mautic.emailSendOnLoad = function (container, response) {
+    if (mQuery('.email-send-progress').length) {
+        if (!mQuery('#emailSendProgress').length) {
+            Mautic.clearModeratedInterval('emailSendProgress');
+        } else {
+            Mautic.setModeratedInterval('emailSendProgress', 'sendEmailBatch', 2000);
+        }
+    }
+};
+
+Mautic.emailSendOnUnload = function () {
+    if (mQuery('.email-send-progress').length) {
+        Mautic.clearModeratedInterval('emailSendProgress');
+        if (typeof Mautic.sendEmailBatchXhr != 'undefined') {
+            Mautic.sendEmailBatchXhr.abort();
+            delete Mautic.sendEmailBatchXhr;
+        }
+    }
+};
+
+Mautic.sendEmailBatch = function () {
+    var data = 'id=' + mQuery('.progress-bar').data('email') + '&pending=' + mQuery('.progress-bar').attr('aria-valuemax') + '&batchlimit=' + mQuery('.progress-bar').data('batchlimit');
+    Mautic.sendEmailBatchXhr = Mautic.ajaxActionRequest('email:sendBatch', data, function (response) {
+        if (response.progress) {
+            if (response.progress[0] > 0) {
+                mQuery('.imported-count').html(response.progress[0]);
+                mQuery('.progress-bar').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
+                mQuery('.progress-bar span.sr-only').html(response.percent + '%');
+            }
+
+            if (response.progress[0] >= response.progress[1]) {
+                Mautic.clearModeratedInterval('emailSendProgress');
+
+                setTimeout(function () {
+                    mQuery.ajax({
+                        type: 'POST',
+                        showLoadingBar: false,
+                        url: window.location,
+                        data: 'complete=1',
+                        success: function (response) {
+
+                            if (response.newContent) {
+                                // It's done so pass to process page
+                                Mautic.processPageContent(response);
+                            }
+                        }
+                    });
+                }, 1000);
+            }
+        }
+
+        Mautic.moderatedIntervalCallbackIsComplete('emailSendProgress');
+    });
+};

@@ -60,6 +60,20 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
         'routeBase'   => 'lead',
+        'preCustomButtons' => array(
+            array(
+                'attr'      => array(
+                    'class'   => 'btn btn-default btn-sm btn-nospin',
+                    'href'    => 'javascript: void(0)',
+                    'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
+                    'id'      => 'liveModeButton',
+                    'data-toggle' => false,
+                    'data-max-id' => $maxLeadId
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
+                'iconClass' => 'fa fa-refresh'
+            )
+        ),
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
         )

@@ -64,7 +64,7 @@ class FormSubmitHelper
 						'tokens' 	   => $tokens,
                         'ignoreDNC'    => true
 					);
-		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), $options);
+		    		$emailModel->sendEmail($email, $currentLead, $options);
 		    	}
 		    }
 		}

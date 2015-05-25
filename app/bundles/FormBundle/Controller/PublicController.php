@@ -37,7 +37,7 @@ class PublicController extends CommonFormController
 
         if (!empty($return)) {
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
-            $return = InputHelper::url($return, null, null, null, array('mauticError', 'mauticMessage'));
+            $return = InputHelper::url($return, null, null, null, array('mauticError', 'mauticMessage'), true);
             $query  = (strpos($return, '?') === false) ? '?' : '&';
         }
 
@@ -116,6 +116,7 @@ class PublicController extends CommonFormController
                 $msgType = 'error';
             }
         } elseif ($postAction == 'redirect') {
+
             return $this->redirect($postActionProperty);
         } elseif ($postAction == 'return') {
             if (!empty($return)) {

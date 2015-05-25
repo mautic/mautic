@@ -151,6 +151,9 @@ class LeadController extends FormController
             }
         }
 
+        // Get the max ID of the latest lead added
+        $maxLeadId = $model->getRepository()->getMaxLeadId();
+
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
@@ -169,7 +172,8 @@ class LeadController extends FormController
                 'currentList'   => $list,
                 'security'      => $this->factory->getSecurity(),
                 'inSingleList'  => $inSingleList,
-                'noContactList' => $emailRepo->getDoNotEmailList()
+                'noContactList' => $emailRepo->getDoNotEmailList(),
+                'maxLeadId'     => $maxLeadId
             ),
             'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
             'passthroughVars' => array(

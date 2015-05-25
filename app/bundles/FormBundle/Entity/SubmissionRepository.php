@@ -384,4 +384,34 @@ class SubmissionRepository extends CommonRepository
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
     }
+
+    /**
+     * Validates that an array of submission IDs belong to a specific form
+     *
+     * @param $ids
+     * @param $formId
+     *
+     * @return array
+     */
+    public function validateSubmissions($ids, $formId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('s.form_id', (int) $formId),
+                    $q->expr()->in('s.id', $ids)
+                )
+            );
+
+        $validIds = array();
+        $results  = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $validIds[] = $r['id'];
+        }
+
+        return $validIds;
+    }
 }

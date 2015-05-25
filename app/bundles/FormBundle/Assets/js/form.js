@@ -78,7 +78,7 @@ Mautic.formFieldOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#mauticforms_fields');
+            mQuery(newHtml).insertBefore('#mauticforms_fields .mauticform-button-wrapper');
             var newField = true;
         }
         //activate new stuff

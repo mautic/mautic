@@ -31,6 +31,10 @@ return array(
             'mautic_page_redirect' => array(
                 'path'       => '/redirect/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'
+            ),
+            'mautic_page_preview' => array(
+                'path'       => '/page/preview/{id}',
+                'controller' => 'MauticPageBundle:Public:preview'
             )
         ),
         'api'    => array(

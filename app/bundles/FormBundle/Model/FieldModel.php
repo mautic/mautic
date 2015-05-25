@@ -68,7 +68,12 @@ class FieldModel extends CommonFormModel
      */
     public function generateAlias($label, &$aliases)
     {
-        $alias = strtolower(InputHelper::alphanum($label));
+        // Some labels are quite long if a question so cut this short
+        $alias = substr(strtolower(InputHelper::alphanum($label, false, '_')), 0, 25);
+
+        if (substr($alias, -1) == '_') {
+            $alias = substr($alias, 0, -1);
+        }
 
         //make sure alias is not already taken
         $testAlias = $alias;

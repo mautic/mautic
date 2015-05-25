@@ -86,7 +86,10 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace('{sharebuttons}', $buttons, $content);
         }
 
-        $this->renderPageUrl($content, array('source' => array('page', $page->getId())));
+        $tokens  = $this->generatePageUrlTokens($content, array('source' => array('page', $page->getId())));
+        if (!empty($tokens)) {
+            $content = str_ireplace(array_keys($tokens), $tokens, $content);
+        }
 
         $event->setContent($content);
     }
@@ -216,21 +219,20 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['lead'] = $lead['id'];
         }
 
-        $this->renderPageUrl($content, $clickthrough);
+        $tokens = $this->generatePageUrlTokens($content, $clickthrough);
 
-        $event->setContent($content);
+        $event->addTokens($tokens);
     }
 
     /**
      * @param       $content
      * @param array $clickthrough
      *
-     * @return void
+     * @return array
      */
-    protected function renderPageUrl (&$content, $clickthrough = array())
+    protected function generatePageUrlTokens ($content, $clickthrough)
     {
-        static $pages = array(), $links = array();
-
+        $pages             = $links = array();
         $pagelinkRegex     = '/{pagelink=(.*?)}/';
         $externalLinkRegex = '/{externallink=(.*?)}/';
 
@@ -241,27 +243,33 @@ class BuilderSubscriber extends CommonSubscriber
         $redirectModel = $this->factory->getModel('page.redirect');
 
         preg_match_all($pagelinkRegex, $content, $matches);
+
+        $tokens = array();
         if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
-                if (empty($pages[$match])) {
-                    $pages[$match] = $pageModel->getEntity($match);
+            foreach ($matches[1] as $key => $pageId) {
+                $token = $matches[0][$key];
+                if (!empty($tokens[$token])) {
+                    continue;
                 }
 
-                $url     = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
-                $content = str_ireplace('{pagelink=' . $match . '}', $url, $content);
+                $page           = $pageModel->getEntity($pageId);
+                $tokens[$token] = ($page !== null) ? $pageModel->generateUrl($page, true, $clickthrough) : '';
             }
         }
 
         preg_match_all($externalLinkRegex, $content, $matches);
         if (!empty($matches[1])) {
             foreach ($matches[1] as $match) {
-                if (empty($links[$match])) {
-                    $links[$match] = $redirectModel->getRedirect($match, true);
+                $token = $matches[0][$key];
+                if (!empty($tokens[$token])) {
+                    continue;
                 }
 
-                $url     = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
-                $content = str_ireplace('{externallink=' . $match . '}', $url, $content);
+                $link           = $redirectModel->getRedirect($match, true);
+                $tokens[$token] = ($link !== null) ? $redirectModel->generateRedirectUrl($link, $clickthrough) : '';
             }
         }
+
+        return $tokens;
     }
 }

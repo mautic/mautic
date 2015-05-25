@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -338,7 +337,7 @@ class LeadListRepository extends CommonRepository
                 // Set batch limiters to ensure the same group is used
                 if ($batchLimiters) {
                     $expr->add(
-                        // Only leads in the list at the time of count
+                    // Only leads in the list at the time of count
                         $q->expr()->orX(
                             $q->expr()->isNull('ll.lead_id'),
                             $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
@@ -363,7 +362,7 @@ class LeadListRepository extends CommonRepository
                                 $dq->expr()->eq('new_check.lead_id', 'l.id')
                             )
                         );
-                    $q->andWhere('l.id NOT IN ' . sprintf('(%s)', $dq->getSQL()));
+                    $q->andWhere('l.id NOT IN '.sprintf('(%s)', $dq->getSQL()));
                 } elseif ($existingOnly) {
                     $expr->add(
                         $q->expr()->andX(
@@ -570,14 +569,14 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param      $filters
-     * @param      $parameters
-     * @param      $q
-     * @param bool $not
+     * @param                                                              $filters
+     * @param                                                              $parameters
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param bool                                                         $not
      *
      * @return mixed
      */
-    public function getListFilterExpr($filters, &$parameters, &$q, $not = false, $list = null)
+    public function getListFilterExpr($filters, &$parameters, &$q, $not = false)
     {
         $group   = false;
         $options = $this->getFilterExpressionFunctions();
@@ -623,18 +622,26 @@ class LeadListRepository extends CommonRepository
                 unset($useExpr);
                 $useExpr =& $expr;
             }
+
             if ($func == 'notEmpty') {
                 $useExpr->add(
                     $q->expr()->andX(
-                        $q->expr()->isNotNull($field, $uniqueFilter),
+                        $q->expr()->isNotNull($field),
                         $q->expr()->neq($field, $q->expr()->literal(''))
                     )
                 );
             } elseif ($func == 'empty') {
                 $useExpr->add(
                     $q->expr()->orX(
-                        $q->expr()->isNull($field, $uniqueFilter),
+                        $q->expr()->isNull($field),
                         $q->expr()->eq($field, $q->expr()->literal(''))
+                    )
+                );
+            } elseif ($func == 'neq') {
+                $useExpr->add(
+                    $q->expr()->orX(
+                        $q->expr()->isNull($field),
+                        $q->expr()->neq($field, $uniqueFilter)
                     )
                 );
             } else {
@@ -723,8 +730,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
@@ -748,8 +755,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */

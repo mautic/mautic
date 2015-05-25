@@ -50,8 +50,8 @@ mQuery( document ).ready(function() {
 
     if (typeof IdleTimer != 'undefined') {
         IdleTimer.init({
-            idleTimeout: 900000, //15 minutes = 900000
-            awayTimeout: 18000000, //30 minutes = 18000000
+            idleTimeout: 60000, //1 min
+            awayTimeout: 900000, //15 min
             statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
@@ -1471,11 +1471,11 @@ var Mautic = {
                 .html(cancelText);
         }
 
-        confirmFooterDiv.append(confirmButton);
-
         if (typeof cancelButton != 'undefined') {
             confirmFooterDiv.append(cancelButton);
         }
+
+        confirmFooterDiv.append(confirmButton);
 
         confirmContentDiv.append(confirmHeaderDiv);
         confirmContentDiv.append(confirmFooterDiv);
@@ -2384,6 +2384,7 @@ var Mautic = {
     clearModeratedInterval: function (key) {
         Mautic.moderatedIntervalCallbackIsComplete(key);
         clearTimeout(MauticVars.moderatedIntervals[key]);
+        delete MauticVars.moderatedIntervals[key];
     },
 
     /**
@@ -2923,7 +2924,7 @@ var Mautic = {
 
         mQuery('#BuilderLinkModal').modal('hide');
         mQuery('#BuilderLinkModal input[name="editor"]').val('');
-        mQuery('#BuilderLinkModal input[name="link"]').val('');
+        mQuery('#BuilderLinkModal input[name="url"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').val('');
         mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
     },

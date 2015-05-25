@@ -118,4 +118,46 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    protected function sendBatchAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model    = $this->factory->getModel('email');
+        $objectId = $request->request->get('id', 0);
+        $pending  = $request->request->get('pending', 0);
+        $limit    = $request->request->get('batchlimit', 100);
+
+        if ($objectId && $entity = $model->getEntity($objectId)) {
+            $dataArray['success'] = 1;
+            $session              = $this->factory->getSession();
+            $progress             = $session->get('mautic.email.send.progress', array(0, (int) $pending));
+            $stats                = $session->get('mautic.email.send.stats', array('sent' => 0, 'failed' => 0, 'failedRecipients' => array()));
+
+            if ($pending && !$inProgress = $session->get('mautic.email.send.active', false)) {
+                $session->set('mautic.email.send.active', true);
+                list($batchSentCount, $batchFailedCount, $batchFailedRecipients) = $model->sendEmailToLists($entity, null, $limit);
+
+                $progress[0]     += ($batchSentCount + $batchFailedCount);
+                $stats['sent']   += $batchSentCount;
+                $stats['failed'] += $batchFailedCount;
+
+                foreach ($batchFailedRecipients as $list => $emails) {
+                    $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
+                }
+
+                $session->set('mautic.email.send.progress', $progress);
+                $session->set('mautic.email.send.stats', $stats);
+                $session->set('mautic.email.send.active', false);
+            }
+
+            $dataArray['percent'] = ($progress[1]) ? ceil(($progress[0] / $progress[1]) * 100) : 100;
+
+            $dataArray['progress'] = $progress;
+            $dataArray['stats']    = $stats;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }
