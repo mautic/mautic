@@ -58,17 +58,23 @@ class EmailSubscriber extends CommonSubscriber
 
         preg_match_all($regex, $content, $matches);
         if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
-                $urlencode = (strpos($match, '|true') !== false);
-                $alias = ($urlencode) ? str_replace('|true', '', $match) : $match;
+            $tokenList = array();
+            foreach ($matches[1] as $key => $match) {
+                $token = $matches[0][$key];
 
-                if (isset($lead[$alias])) {
-                    $value   = ($urlencode) ? urlencode($lead[$alias]) : $lead[$alias];
-                    $content = str_ireplace('{leadfield=' . $match . '}', $value, $content);
+                if (isset($tokenList[$token])) {
+                    continue;
                 }
-            }
-        }
 
-        $event->setContent($content);
+                $urlencode = (strpos($match, '|true') !== false);
+                $alias     = ($urlencode) ? str_replace('|true', '', $match) : $match;
+                $value     = (isset($lead[$alias])) ? $lead[$alias] : '';
+
+                $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
+            }
+
+            $event->addTokens($tokenList);
+            unset($tokenList);
+        }
     }
 }

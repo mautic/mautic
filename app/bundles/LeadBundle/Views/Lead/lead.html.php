@@ -269,14 +269,23 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <hr />
             </div>
             <?php if ($doNotContact) : ?>
-                <div class="panel-heading text-center">
-                    <h4 class="fw-sb">
-                        <span class="label label-danger">
-                            <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                        </span>
-                    </h4>
+                <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
+                    <div class="panel-heading text-center">
+                        <h4 class="fw-sb">
+                            <?php if ($doNotContact['unsubscribed']): ?>
+                            <span class="label label-danger">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                            </span>
+                            <?php elseif ($doNotContact['bounced']): ?>
+                            <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
+                                <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_bounce_status'); ?>"><i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i></span>
+                            </span>
+                            <?php endif; ?>
+                        </h4>
+                    </div>
+                    <hr />
                 </div>
-                <hr />
             <?php endif; ?>
             <div class="panel-heading">
                 <div class="panel-title">

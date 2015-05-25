@@ -40,17 +40,6 @@ class FormSubscriber extends CommonSubscriber
     {
         //add lead generation submit action
         $action = array(
-            'group'        => 'mautic.lead.lead.submitaction',
-            'label'        => 'mautic.lead.lead.submitaction.createlead',
-            'description'  => 'mautic.lead.lead.submitaction.createlead_descr',
-            'formType'     => 'lead_submitaction_createlead',
-            'formTheme'    => 'MauticLeadBundle:FormTheme\\FormActionCreateLead',
-            'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::createLead'
-        );
-        $event->addSubmitAction('lead.create', $action);
-
-        //add lead generation submit action
-        $action = array(
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',

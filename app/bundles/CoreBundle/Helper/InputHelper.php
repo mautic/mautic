@@ -34,7 +34,7 @@ class InputHelper
                 'embed',
                 'frame',
                 'frameset',
-                'iframe',
+                //'iframe',
                 'ilayer',
                 'layer',
                 'object',
@@ -239,10 +239,11 @@ class InputHelper
      * @param array  $allowedProtocols
      * @param string $defaultProtocol
      * @param array  $removeQuery
+     * @param bool   $ignoreFragment
      *
      * @return mixed
      */
-    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
+    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array(), $ignoreFragment = false)
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -285,7 +286,7 @@ class InputHelper
                 (!empty($parts["port"])     ? ":".$parts["port"]     :"") .
                 (!empty($parts["path"])     ? $parts["path"]         :"") .
                 (!empty($parts["query"])    ? "?".$parts["query"]    :"") .
-                (!empty($parts["fragment"]) ? "#".$parts["fragment"] :"");
+                (!$ignoreFragment && !empty($parts["fragment"]) ? "#".$parts["fragment"] :"");
         } else {
             //must have a really bad URL since parse_url returned false so let's just clean it
             $value = self::clean($value);

@@ -55,6 +55,10 @@ return array(
             'mautic_email_resubscribe' => array(
                 'path'       => '/email/resubscribe/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:resubscribe'
+            ),
+            'mautic_mailer_transport_callback' => array(
+                'path'         => '/mailer/{transport}/callback',
+                'controller'   => 'MauticEmailBundle:Public:mailerCallback'
             )
         )
     ),
@@ -142,6 +146,10 @@ return array(
             'mautic.email.type.email_abtest_settings'     => array(
                 'class' => 'Mautic\EmailBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'email_abtest_settings'
+            ),
+            'mautic.email.type.batch_send'     => array(
+                'class' => 'Mautic\EmailBundle\Form\Type\BatchSendType',
+                'alias' => 'batch_send'
             )
         ),
         'other'  => array(

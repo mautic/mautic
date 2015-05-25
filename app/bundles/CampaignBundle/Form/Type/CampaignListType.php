@@ -44,7 +44,7 @@ class CampaignListType extends AbstractType
                 $choices = array();
                 $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true);
                 foreach ($campaigns as $campaign) {
-                    $choices[$campaign['id']] = $campaign['id'] . ':' . $campaign['name'];
+                    $choices[$campaign['id']] = $campaign['name'];
                 }
 
                 //sort by language

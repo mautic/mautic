@@ -11,14 +11,6 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
 $view['slots']->set("headerTitle", $activeForm->getName());
 
-/** @var \Mautic\FormBundle\Entity\Form $activeForm */
-$actions = $activeForm->getActions();
-$activeFormActions = array();
-foreach ($activeForm->getActions() as $action) {
-    $type                    = explode('.', $action->getType());
-    $activeFormActions[$type[0]][] = $action;
-}
-
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'      => $activeForm,
     'templateButtons' => array(
@@ -27,7 +19,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy())
     ),
     'routeBase' => 'form',
-    'langVar'   => 'form.form',
+    'langVar'   => 'form',
     'customButtons'    => array(
         array(
             'attr' => array(
@@ -36,7 +28,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $activeForm->getId())),
             ),
             'iconClass' => 'fa fa-camera',
-            'btnText'   => 'mautic.form.form.preview'
+            'btnText'   => 'mautic.form.form.preview',
+            'btnClass'  => 'btn btn-default btn-nospin'
         ),
         array(
             'attr' => array(
@@ -205,7 +198,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                   <h5 class="fw-sb mb-xs">Form Field</h5>
                   <ul class="list-group mb-xs">
                       <?php /** @var \Mautic\FormBundle\Entity\Field $field */
-                      foreach ($activeForm->getFields() as $field) : ?>
+                      foreach ($activeFormFields as $field) : ?>
                           <li class="list-group-item bg-auto bg-light-xs">
                               <div class="box-layout">
                                   <div class="col-md-1 va-m">
