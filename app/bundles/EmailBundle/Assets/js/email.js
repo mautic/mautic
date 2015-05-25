@@ -19,7 +19,7 @@ Mautic.emailOnLoad = function (container, response) {
                 opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
             }
 
-            var choseOneOption = opener.mQuery(el + ' option:first');
+            var chooseOneOption = opener.mQuery(el + ' option:first');
 
             var optionGroups = opener.mQuery(el + ' optgroup');
             optionGroups.sort(function(a, b) {
@@ -49,7 +49,12 @@ Mautic.emailOnLoad = function (container, response) {
                 mQuery(this).html(options);
             });
 
-            opener.mQuery(el).html(choseOneOption);
+            if (opener.mQuery(el).prop('disabled')) {
+                opener.mQuery(el).prop('disabled', false);
+                chooseOneOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+            }
+
+            opener.mQuery(el).html(chooseOneOption);
             optionGroups.appendTo(opener.mQuery(el));
 
             newOption.prop('selected', true);
