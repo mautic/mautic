@@ -453,6 +453,10 @@ var Mautic = {
                         settings.extraPlugins = "sourcedialog,docprops";
                     }
 
+                    if (editorClass == 'editor') {
+                        settings.removePlugins = 'resize';
+                    }
+
                     mQuery(this).ckeditor(settings);
                 });
             }

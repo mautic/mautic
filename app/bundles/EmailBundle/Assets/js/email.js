@@ -35,9 +35,10 @@ Mautic.emailOnLoad = function (container, response) {
         mQuery('#emailform_plainText').val('');
 
         mQuery('#emailform_plainText').ckeditor({
-            removePlugins: 'toolbar,elementspath,resize',
+            removePlugins: 'elementspath,toolbar',
             extraPlugins: 'tokens',
             autoParagraph: false,
+            height: "235px",
             on: {
                 instanceReady: function( event ) {
                     event.editor.insertText(plainText);

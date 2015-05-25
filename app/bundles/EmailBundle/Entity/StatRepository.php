@@ -210,7 +210,7 @@ class StatRepository extends CommonRepository
     public function getLeadStats($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('s')
-            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name')
+            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
             ->where('s.lead = ' . $leadId);
@@ -222,7 +222,7 @@ class StatRepository extends CommonRepository
         if (isset($options['filters']['search']) && $options['filters']['search']) {
             $query->andWhere($query->expr()->orX(
                 $query->expr()->like('e.subject', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('e.plainText', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
             ));
         }
 

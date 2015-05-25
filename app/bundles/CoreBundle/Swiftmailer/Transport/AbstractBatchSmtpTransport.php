@@ -22,6 +22,11 @@ abstract class AbstractBatchSmtpTransport extends \Swift_SmtpTransport implement
     protected $message;
 
     /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
      * @param \Swift_Mime_Message $message
      * @param null                $failedRecipients
      *
@@ -50,5 +55,13 @@ abstract class AbstractBatchSmtpTransport extends \Swift_SmtpTransport implement
     public function getMetadata()
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : array();
+    }
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function setMauticFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 }

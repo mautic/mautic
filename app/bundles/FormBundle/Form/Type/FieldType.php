@@ -252,8 +252,9 @@ class FieldType extends AbstractType
                     'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.attr'
+                        'class'     => 'form-control',
+                        'tooltip'   => 'mautic.form.field.help.attr',
+                        'maxlength' => '255'
                     ),
                     'required'   => false
                 )
@@ -269,7 +270,8 @@ class FieldType extends AbstractType
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.attr'
+                        'tooltip' => 'mautic.form.field.help.attr',
+                        'maxlength' => '255'
                     ),
                     'required'   => false
                 )
@@ -285,7 +287,8 @@ class FieldType extends AbstractType
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.container_attr'
+                        'tooltip' => 'mautic.form.field.help.container_attr',
+                        'maxlength' => '255'
                     ),
                     'required'   => false
                 )

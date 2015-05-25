@@ -29,11 +29,6 @@ class PageType extends AbstractType
     private $translator;
 
     /**
-     * @var array
-     */
-    private $themes;
-
-    /**
      * @var bool|mixed
      */
     private $defaultTheme;
@@ -248,7 +243,19 @@ class PageType extends AbstractType
             );
         }
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', 'form_buttons', array(
+            'pre_extra_buttons' => array(
+                array(
+                    'name'  => 'builder',
+                    'label' => 'mautic.core.builder',
+                    'attr'  => array(
+                        'class'   => 'btn btn-default btn-dnd btn-nospin text-primary',
+                        'icon'    => 'fa fa-cube',
+                        'onclick' => "Mautic.launchBuilder('page');"
+                    )
+                )
+            )
+        ));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

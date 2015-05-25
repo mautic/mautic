@@ -45,11 +45,32 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
         $message['from_name']  = $message['from']['name'];
         unset($message['from']);
 
-        // Do not expose all the emails in the "to"
-        $message['preserve_recipients'] = false;
+        if (!empty($metadata)) {
+            // Mandrill will only send a single email to cc and bcc of the first set of tokens
+            // so we have to manually set them as to addresses
+
+            // Problem is that it's not easy to know what email is sent so will tack it at the top
+            $insertCcEmailHeader = true;
+
+            $message['html'] = '*|HTMLCCEMAILHEADER|*'.$message['html'];
+            if (!empty($message['text'])) {
+                $message['text'] = '*|TEXTCCEMAILHEADER|*'.$message['text'];
+            }
+
+            // Do not expose all the emails in the if using metadata
+            $message['preserve_recipients'] = false;
+
+            $bcc = $message['recipients']['bcc'];
+            $cc  = $message['recipients']['cc'];
+
+            // Unset the cc and bcc as they will need to be sent as To with each set of tokens
+            unset($message['recipients']['bcc'], $message['recipients']['cc']);
+        }
 
         // Generate the recipients
         $recipients = $rcptMergeVars = $rcptMetadata = array();
+
+        $translator = $this->factory->getTranslator();
 
         foreach ($message['recipients'] as $type => $typeRecipients) {
             foreach ($typeRecipients as $rcpt) {
@@ -62,15 +83,101 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
                             'rcpt' => $rcpt['email'],
                             'vars' => array()
                         );
+
+                        // This must not be included for CC and BCCs
+                        $trackingPixelToken = array();
+
                         foreach ($metadata[$rcpt['email']]['tokens'] as $token => $value) {
+                            if ($token == '{tracking_pixel}') {
+                                $trackingPixelToken = array(
+                                    array(
+                                        'name'    => $mandrillMergeVars[$token],
+                                        'content' => $value
+                                    )
+                                );
+
+                                continue;
+                            }
+
                             $mergeVars['vars'][] = array(
                                 'name'    => $mandrillMergeVars[$token],
                                 'content' => $value
                             );
                         }
+
+                        if (!empty($insertCcEmailHeader)) {
+                            // Make a copy before inserted the blank tokens
+                            $ccMergeVars       = $mergeVars;
+                            $mergeVars['vars'] = array_merge(
+                                $mergeVars['vars'],
+                                $trackingPixelToken,
+                                array(
+                                    array(
+                                        'name'    => 'HTMLCCEMAILHEADER',
+                                        'content' => ''
+                                    ),
+                                    array(
+                                        'name'    => 'TEXTCCEMAILHEADER',
+                                        'content' => ''
+                                    )
+                                )
+                            );
+                        } else {
+                            // Just merge the tracking pixel tokens
+                            $mergeVars['vars'] = array_merge($mergeVars['vars'], $trackingPixelToken);
+                        }
+
+                        // Add the vars
                         $rcptMergeVars[] = $mergeVars;
 
-                        unset($mergeVars, $metadata[$rcpt['email']]['tokens']);
+                        // Special handling of CC and BCC with tokens
+                        if (!empty($cc) || !empty($bcc)) {
+                            $ccMergeVars['vars'] = array_merge(
+                                $ccMergeVars['vars'],
+                                array(
+                                    array(
+                                        'name'    => 'HTMLCCEMAILHEADER',
+                                        'content' => $translator->trans('mautic.core.email.cc.copy',
+                                            array(
+                                                '%email%' => $rcpt['email']
+                                            )
+                                        ) . "<br /><br />"
+                                    ),
+                                    array(
+                                        'name'    => 'TEXTCCEMAILHEADER',
+                                        'content' => $translator->trans('mautic.core.email.cc.copy',
+                                            array(
+                                                '%email%' => $rcpt['email']
+                                            )
+                                        ) . "\n\n"
+                                    ),
+                                    array(
+                                        'name'    => 'TRACKINGPIXEL',
+                                        'content' => ''
+                                    )
+                                )
+                            );
+
+                            // Send same tokens to each CC
+                            if (!empty($cc)) {
+                                foreach ($cc as $ccRcpt) {
+                                    $recipients[]        = $ccRcpt;
+                                    $ccMergeVars['rcpt'] = $ccRcpt['email'];
+                                    $rcptMergeVars[]     = $ccMergeVars;
+                                }
+                            }
+
+                            // And same to BCC
+                            if (!empty($bcc)) {
+                                foreach ($bcc as $ccRcpt) {
+                                    $recipients[]        = $ccRcpt;
+                                    $ccMergeVars['rcpt'] = $ccRcpt['email'];
+                                    $rcptMergeVars[]     = $ccMergeVars;
+                                }
+                            }
+                        }
+
+                        unset($ccMergeVars, $mergeVars, $metadata[$rcpt['email']]['tokens']);
                     }
 
                     if (!empty($metadata[$rcpt['email']])) {
@@ -85,6 +192,7 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
         }
 
         $message['to'] = $recipients;
+
         unset($message['recipients']);
 
         // Set the merge vars

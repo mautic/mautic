@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceBatchTransport;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 
@@ -147,12 +148,17 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email'), $factory->getParameter('mailer_from_name'));
+        $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
         $this->message = $this->getMessageInstance();
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceBatchTransport) {
             $this->batchingSupported = true;
+        }
+
+        // Set factory if supported
+        if (method_exists($this->transport, 'setMauticFactory')) {
+            $this->transport->setMauticFactory($factory);
         }
     }
 
@@ -747,11 +753,42 @@ class MailHelper
     }
 
     /**
-     * @param null $email
+     * @param Email $email
+     * @param bool  $allowBcc
      */
-    public function setEmail($email)
+    public function setEmail(Email $email, $allowBcc = true)
     {
         $this->email = $email;
+
+        // Set message settings from the email
+
+        $this->setSubject($email->getSubject());
+
+        $fromEmail = $email->getFromAddress();
+        $fromName  = $email->getFromName();
+        if (!empty($fromEmail) && !empty($fromEmail)) {
+            $this->setFrom($fromEmail, $fromName);
+        } else if (!empty($fromEmail)) {
+            $this->setFrom($fromEmail, $this->from);
+        } else if (!empty($fromName)) {
+            $this->setFrom(key($this->from), $fromName);
+        }
+
+        $replyTo = $email->getReplyToAddress();
+        if (!empty($replyTo)) {
+            $this->setReplyTo($replyTo);
+        }
+
+        if ($allowBcc) {
+            $bccAddress = $email->getBccAddress();
+            if (!empty($bccAddress)) {
+                $this->addBcc($bccAddress);
+            }
+        }
+
+        if ($plainText = $email->getPlainText()) {
+            $this->setPlainText($plainText);
+        }
     }
 
     /**

@@ -12,13 +12,13 @@ $view['slots']->set('mauticContent', 'email');
 
 $variantParent = $email->getVariantParent();
 $subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', array(
-    '%name%' => $email->getSubject(),
-    '%parent%' => $variantParent->getSubject()
+    '%name%' => $email->getName(),
+    '%parent%' => $variantParent->getName()
 )) . '</span></div>' : '';
 
 $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.edit',
-        array('%name%' => $email->getSubject())) :
+        array('%name%' => $email->getName())) :
     $view['translator']->trans('mautic.email.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
@@ -33,9 +33,48 @@ $contentMode = $form['contentMode']->vars['data'];
             <div class="pa-md">
                 <div class="row">
                     <div class="col-md-6">
+                        <?php echo $view['form']->row($form['name']); ?>
+                    </div>
+
+                    <div class="col-md-6">
                         <?php echo $view['form']->row($form['subject']); ?>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-lg-6">
+                        <?php echo $view['form']->row($form['description']); ?>
+                    </div>
+
+                    <div class="col-md-12 col-lg-6">
+                        <div class="row">
+                            <div class="form-group col-xs-12">
+                                <div>
+                                    <div class="pull-left">
+                                        <?php echo $view['form']->label($form['plainText']); ?>
+                                    </div>
+                                    <div class="text-right pr-10">
+                                        <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                        <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <?php echo $view['form']->widget($form['plainText']); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="row">
                     <div class="col-md-6">
@@ -44,7 +83,7 @@ $contentMode = $form['contentMode']->vars['data'];
                             <div>
                                 <?php echo $view['form']->widget($form['contentMode']); ?>
                                 <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('emailform', 'email');">
-                                    <i class="fa fa-cube text-mautic "></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
+                                    <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
                                 </button>
                             </div>
                         </div>
@@ -56,21 +95,6 @@ $contentMode = $form['contentMode']->vars['data'];
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-xs-12">
-                        <div>
-                            <div class="pull-left">
-                                <?php echo $view['form']->label($form['plainText']); ?>
-                            </div>
-                            <div class="text-right pr-10">
-                                <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                        <?php echo $view['form']->widget($form['plainText']); ?>
-                    </div>
-                </div>
 
                 <div id="customHtmlContainer" class="hide">
                     <?php echo $view['form']->row($form['customHtml']); ?>
@@ -79,6 +103,11 @@ $contentMode = $form['contentMode']->vars['data'];
         </div>
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
+                <?php echo $view['form']->row($form['fromName']); ?>
+                <?php echo $view['form']->row($form['fromAddress']); ?>
+                <?php echo $view['form']->row($form['replyToAddress']); ?>
+                <?php echo $view['form']->row($form['bccAddress']); ?>
+
                 <?php if (isset($form['variantSettings'])): ?>
                     <?php echo $view['form']->row($form['variantSettings']); ?>
                     <?php echo $view['form']->row($form['isPublished']); ?>

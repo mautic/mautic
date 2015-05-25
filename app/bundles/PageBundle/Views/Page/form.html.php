@@ -50,7 +50,7 @@ $contentMode = $form['contentMode']->vars['data'];
                         <div>
                             <?php echo $view['form']->widget($form['contentMode']); ?>
                             <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('page');">
-                                <i class="fa fa-cube text-mautic "></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
+                                <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
                             </button>
                         </div>
                     </div>

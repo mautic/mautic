@@ -58,14 +58,6 @@ class EmailModel extends FormModel
 
     /**
      * {@inheritdoc}
-     */
-    public function getNameGetter ()
-    {
-        return "getSubject";
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @param       $entity
      * @param       $unlock
@@ -607,7 +599,7 @@ class EmailModel extends FormModel
      *
      * @param Email $email
      * @param array $lists
-     *
+     * @param int   $limit
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
     public function sendEmailToLists (Email $email, $lists = null, $limit = null)
@@ -911,8 +903,6 @@ class EmailModel extends FormModel
                 $mailer->useMailerBatching();
                 $mailer->setSource($source);
                 $mailer->setBody($customHtml);
-                $mailer->setPlainText($useEmail['entity']->getPlainText());
-                $mailer->setSubject($useEmail['entity']->getSubject());
                 $mailer->setEmail($useEmail['entity']);
             }
 
@@ -1032,9 +1022,27 @@ class EmailModel extends FormModel
             return false;
         }
 
-        foreach ($users as $user) {
-            $idHash = uniqid();
+        $idHash = uniqid();
 
+        $mailer = $this->factory->getMailer();
+        $mailer->setLead($lead);
+        $mailer->setCustomTokens($tokens);
+
+        if ($email->getContentMode() == 'builder') {
+            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                'slots'    => $emailSettings[$emailId]['slots'],
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $emailSettings[$emailId]['template'],
+                'idHash'   => $idHash
+            ));
+        } else {
+            $mailer->setBody($email->getCustomHtml());
+        }
+
+        $mailer->setEmail($email, false);
+
+        foreach ($users as $user) {
             if (!is_array($user)) {
                 $id   = $user;
                 $user = array('id' => $id);
@@ -1051,35 +1059,14 @@ class EmailModel extends FormModel
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            $mailer = $this->factory->getMailer();
-            $mailer->setLead($lead);
-            $mailer->setCustomTokens($tokens);
-
-            if ($email->getContentMode() == 'builder') {
-                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                    'slots'    => $emailSettings[$emailId]['slots'],
-                    'content'  => $email->getContent(),
-                    'email'    => $email,
-                    'template' => $emailSettings[$emailId]['template'],
-                    'idHash'   => $idHash
-                ));
-            } else {
-                $mailer->setBody($email->getCustomHtml());
-            }
-
-            $mailer->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
-            $mailer->setSubject($email->getSubject());
-
-            if ($plaintext = $email->getPlainText()) {
-                $mailer->setPlainText($plaintext);
-            }
-
-            //queue the message
-            $mailer->send(true);
-
-            //save some memory
-            unset($mailer);
+            $mailer->addto($user['email'], $user['firstname'] . ' ' . $user['lastname']);
         }
+
+        //queue the message
+        $mailer->send(true);
+
+        //save some memory
+        unset($mailer);
     }
 
     /**

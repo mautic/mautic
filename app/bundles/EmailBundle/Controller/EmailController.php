@@ -368,7 +368,7 @@ class EmailController extends FormController
                     $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.created', array(
-                        '%name%'      => $entity->getSubject(),
+                        '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_email_index',
                         '%url%'       => $this->generateUrl('mautic_email_action', array(
                             'objectAction' => 'edit',
@@ -516,7 +516,7 @@ class EmailController extends FormController
                     $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.updated', array(
-                        '%name%'      => $entity->getSubject(),
+                        '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_email_index',
                         '%url%'       => $this->generateUrl('mautic_email_action', array(
                             'objectAction' => 'edit',
@@ -654,7 +654,7 @@ class EmailController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
-                    '%name%' => $entity->getSubject(),
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId
                 )
             );
@@ -809,7 +809,7 @@ class EmailController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.email.notice.activated',
                 'msgVars' => array(
-                    '%name%' => $entity->getSubject(),
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId
                 )
             );
@@ -892,7 +892,7 @@ class EmailController extends FormController
                             array(
                                 'type'    => 'error',
                                 'msg'     => 'mautic.email.error.send',
-                                'msgVars' => array('%id%' => $objectId)
+                                'msgVars' => array('%name%' => $entity->getName())
                             )
                         )
                     )
