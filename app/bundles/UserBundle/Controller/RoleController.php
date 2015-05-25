@@ -272,7 +272,8 @@ class RoleController extends FormController
                 return $this->postActionRedirect($postActionVars);
             } else {
                 //the form has to be rebuilt because the permissions were updated
-                $form = $model->createForm($entity, $this->get('form.factory'), $action);
+                $permissionsConfig = $this->getPermissionsConfig($entity);
+                $form              = $model->createForm($entity, $this->get('form.factory'), $action, array('permissionsConfig' => $permissionsConfig['config']));
             }
         } else {
             //lock the entity
