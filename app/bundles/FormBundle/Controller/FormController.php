@@ -83,7 +83,8 @@ class FormController extends CommonFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
+
             $this->factory->getSession()->set('mautic.form.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $lastPage));
 

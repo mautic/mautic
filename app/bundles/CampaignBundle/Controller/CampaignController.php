@@ -71,7 +71,7 @@ class CampaignController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.campaign.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_campaign_index', array('page' => $lastPage));
@@ -283,7 +283,7 @@ class CampaignController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.campaign.lead.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_campaign_leads', array('objectId' => $objectId, 'page' => $lastPage));

@@ -98,8 +98,9 @@ class EmailController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (floor($count / $limit)) ?: 1;
             }
+
             $this->factory->getSession()->set('mautic.email.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $lastPage));
 
