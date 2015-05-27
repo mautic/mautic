@@ -336,7 +336,7 @@ class EventModel extends CommonFormModel
                         $response = $this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered);
                         if ($response !== false) {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' successfully executed and logged.');
-                            $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
+                            $log = $this->getLogEntity($child['id'], $child['campaign']['id'], $lead, $ipAddress, $systemTriggered);
 
                             $childrenTriggered = true;
 
