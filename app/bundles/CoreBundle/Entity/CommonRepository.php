@@ -881,7 +881,7 @@ class CommonRepository extends EntityRepository
         }
 
         $q->select($prefix.'id, '.$prefix.$labelColumn.' as label')
-            ->from(MAUTIC_TABLE_PREFIX.$tableName, $alias)
+            ->from($tableName, $alias)
             ->orderBy($prefix.'id');
 
         if ($expr !== null && $expr->count()) {
