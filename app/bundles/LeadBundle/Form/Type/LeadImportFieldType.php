@@ -47,11 +47,87 @@ class LeadImportFieldType extends AbstractType
             ));
         }
 
+        $properties = $builder->create('properties', 'form', array('virtual' => true));
+
+        $properties->add('dateAdded', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'dateAdded',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('createdByUser', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'createdByUser',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('dateModified', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'dateModified',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('modifiedByUser', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'modifiedByUser',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('lastActive', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'lastActive',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('dateIdentified', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'dateIdentified',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('ip', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'ip',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('points', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'points',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $properties->add('doNotEmail', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'doNotEmail',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $builder->add($properties);
+
         $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
             $this->factory->getEntityManager(),
             'MauticUserBundle:User'
         );
-        
+
         $builder->add(
             $builder->create('owner', 'user_list', array(
                 'label'      => 'mautic.lead.lead.field.owner',

@@ -887,9 +887,9 @@ class LeadController extends FormController
                 $importFields = $session->get('mautic.lead.import.importfields', array());
 
                 $form = $this->get('form.factory')->create('lead_field_import', array(), array(
-                    'action'        => $action,
-                    'lead_fields'   => $leadFields,
-                    'import_fields' => $importFields
+                    'action'          => $action,
+                    'lead_fields'     => $leadFields,
+                    'import_fields'   => $importFields
                 ));
                 break;
             case 3:
