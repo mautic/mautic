@@ -29,15 +29,20 @@ div[contentEditable=true]:empty:not(:focus):before {
   margin-bottom: 20px;
   padding-left: 0;
   width: 240px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-top: 1px solid #d5d4d4;
+  border-bottom: 1px solid #d5d4d4;
 }
 .inline-token {
   position: relative;
   display: block;
   padding: 5px;
   margin-bottom: -1px;
-  background-color: #8f8f8f;
-  border: 1px solid #f7f7f7;
-  color: #f7f7f7;
+  background-color: #FFFFFF;
+  border: 1px solid #d5d5d5;
+  color: #222222;
   font-size: 12px;
 }
 .inline-token:first-child {
@@ -50,12 +55,12 @@ div[contentEditable=true]:empty:not(:focus):before {
   border-bottom-left-radius: 4px;
 }
 a.inline-token {
-  color: #f7f7f7;
+  color: #222222;
   text-decoration: none;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   line-height: 1.3856;
 }
 a.inline-token:hover,
 a.inline-token:focus {
-  background-color: #616161;
+  background-color: rgba(78, 94, 158, 0.2);
 }

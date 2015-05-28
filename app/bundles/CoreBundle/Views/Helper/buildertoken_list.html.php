@@ -11,7 +11,7 @@
 <div class="inline-token-list">
     <?php foreach ($tokens as $token => $description): ?>
     <a href="#" class="inline-token" data-token="<?php echo $token; ?>">
-        <span><?php echo $token; ?> <?php echo $description; ?></span>
+        <span><?php echo $description; ?></span> <span class="text-muted"><?php echo $token; ?></span>
     </a>
     <?php endforeach; ?>
 </div>
