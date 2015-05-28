@@ -588,10 +588,10 @@ Mautic.removeBounceStatus = function (el, dncId) {
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
-        mQuery('#liveModeButton .fa').addClass('fa-spin');
+        mQuery('#liveModeButton').addClass('btn-primary');
     } else {
         Mautic.clearModeratedInterval('leadListLiveUpdate');
-        mQuery('#liveModeButton .fa').removeClass('fa-spin');
+        mQuery('#liveModeButton').removeClass('btn-primary');
     }
 };
 
@@ -617,7 +617,6 @@ Mautic.updateLeadList = function () {
             }
 
             if (typeof IdleTimer != 'undefined' && !IdleTimer.isIdle()) {
-                console.log(IdleTimer.isIdle(), IdleTimer.getLastActive(), IdleTimer.isAway());
                 // Remove highlighted classes
                 if (response.indexMode == 'list') {
                     mQuery('#leadTable tr.warning').each(function() {
