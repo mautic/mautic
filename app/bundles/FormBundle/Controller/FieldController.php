@@ -100,7 +100,17 @@ class FieldController extends CommonFormController
                     }
                     $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
 
-                    $fields[$keyId]  = $formField;
+                    // Add it to the next to last assuming the last is the submit button
+                    if (count($fields)) {
+                        $lastField = end($fields);
+                        $lastKey   = key($fields);
+                        array_pop($fields);
+
+                        $fields[$keyId]   = $formField;
+                        $fields[$lastKey] = $lastField;
+                    } else {
+                        $fields[$keyId] = $formField;
+                    }
 
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 

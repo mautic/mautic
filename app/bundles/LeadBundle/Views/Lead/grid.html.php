@@ -37,7 +37,7 @@ if ($tmpl == 'index')
             "baseUrl"         => (isset($objectId)) ? $view['router']->generate($link, array('objectId' => $objectId)) : $view['router']->generate($link),
             "tmpl"            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
             'sessionVar'      => (isset($sessionVar)) ? $sessionVar : 'lead',
-            'target'          => (isset($target)) ? $target : 'page-list'
+            'target'          => (isset($target)) ? $target : '.page-list'
         ));
         ?>
     </div>

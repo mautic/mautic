@@ -57,17 +57,25 @@ class DetailsType extends AbstractType
 
         $features = $options['integration_object']->getSupportedFeatures();
         if (!empty($features)) {
+
+            // Check to see if the integration is a new entry and thus not configured
+            $configured      = $options['data']->getId() !== null;
+            $enabledFeatures = $options['data']->getSupportedFeatures();
+            $data            = ($configured) ? $enabledFeatures : $features;
+
             $labels = array();
             foreach ($features as $f) {
                 $labels[] = 'mautic.integration.form.feature.' . $f;
             }
+
             $builder->add('supportedFeatures', 'choice', array(
                 'choice_list' => new ChoiceList($features, $labels),
                 'expanded'    => true,
                 'label_attr'  => array('class' => 'control-label'),
                 'multiple'    => true,
                 'label'       => 'mautic.integration.form.features',
-                'required'    => false
+                'required'    => false,
+                'data'        => $data
             ));
 
             $builder->add('featureSettings', 'integration_featuresettings', array(

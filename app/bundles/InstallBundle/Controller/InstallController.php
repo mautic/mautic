@@ -421,8 +421,9 @@ class InstallController extends CommonController
      */
     private function performDatabaseInstallation ($dbParams)
     {
-        $dbName             = $dbParams['dbname'];
-        $dbParams['dbname'] = null;
+        $dbName              = $dbParams['dbname'];
+        $dbParams['dbname']  = null;
+        $dbParams['charset'] = 'UTF8';
 
         //suppress display of errors as we know its going to happen while testing the connection
         ini_set('display_errors', 0);
@@ -872,6 +873,9 @@ class InstallController extends CommonController
                 $dbParams['dbname'] = $dbParams['name'];
                 unset($dbParams['name']);
             }
+
+            // Ensure UTF8 charset
+            $dbParams['charset'] = 'UTF8';
 
             $paths = $namespaces = array();
 
