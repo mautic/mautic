@@ -48,7 +48,7 @@ class CampaignListType extends AbstractType
                 }
 
                 //sort by language
-                ksort($choices);
+                asort($choices);
 
                 if ($options['include_this']) {
                     $choices = array('this' => $msg) + $choices;

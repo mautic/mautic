@@ -551,14 +551,14 @@ class FormController extends CommonFormController
             $modifiedFields = array();
             $usedLeadFields = array();
             $existingFields = $entity->getFields()->toArray();
-            foreach ($existingFields as $f) {
+            foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
-                if (!isset($availableFields[$f->getType()])) {
+                if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
                     continue;
                 }
 
-                $id = $f->getId();
-                $field = $f->convertToArray();
+                $id = $formField->getId();
+                $field = $formField->convertToArray();
                 unset($field['form']);
                 $modifiedFields[$id] = $field;
 
@@ -579,14 +579,14 @@ class FormController extends CommonFormController
             $modifiedActions = array();
             $existingActions = $entity->getActions()->toArray();
 
-            foreach ($existingActions as $a) {
+            foreach ($existingActions as $formAction) {
                 // Check to see if the action still exists
-                if (!isset($customComponents['actions'][$a->getType()])) {
+                if (!isset($customComponents['actions'][$formAction->getType()])) {
                     continue;
                 }
 
-                $id     = $a->getId();
-                $action = $a->convertToArray();
+                $id     = $formAction->getId();
+                $action = $formAction->convertToArray();
                 unset($action['form']);
                 $modifiedActions[$id] = $action;
             }

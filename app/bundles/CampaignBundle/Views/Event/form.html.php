@@ -9,8 +9,11 @@
 ?>
 
 <div class="bundle-form">
-    <div class="bundle-form-header">
+    <div class="bundle-form-header mb-10">
         <h3><?php echo $eventHeader; ?></h3>
+        <?php if (!empty($eventDescription)): ?>
+        <h6 class="text-muted"><?php echo $eventDescription; ?></h6>
+        <?php endif; ?>
     </div>
 
     <?php echo $view['form']->start($form); ?>
