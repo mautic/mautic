@@ -71,7 +71,10 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
             </div>
             <div class="panel-body">
                 <div class="col-xs-4">
-                    <?php echo $view['form']->widget($form['owner']); ?>
+                    <?php echo $view['form']->row($form['owner']); ?>
+                </div>
+                <div class="col-xs-4">
+                    <?php echo $view['form']->row($form['list']); ?>
                 </div>
             </div>
         </div>

@@ -634,9 +634,9 @@ class LeadModel extends FormModel
     /**
      * Add lead to lists
      *
-     * @param      $lead
-     * @param      $lists
-     * @param bool $manuallyAdded
+     * @param array|Lead        $lead
+     * @param array|LeadList    $lists
+     * @param bool              $manuallyAdded
      */
     public function addToLists($lead, $lists, $manuallyAdded = true)
     {
@@ -735,7 +735,7 @@ class LeadModel extends FormModel
      * @return Lead
      * @throws \Doctrine\ORM\ORMException
      */
-    public function importLead($fields, $data, $owner = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $persist = true)
     {
         // Let's check for an existing lead by email
         if (!empty($fields['email']) && !empty($data[$fields['email']])) {
@@ -762,6 +762,10 @@ class LeadModel extends FormModel
 
         if ($persist) {
             $this->saveEntity($lead);
+
+            if ($list !== null) {
+                $this->addToLists($lead, array($list));
+            }
 
             return $merged;
         }

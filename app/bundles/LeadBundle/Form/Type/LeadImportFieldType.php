@@ -51,6 +51,7 @@ class LeadImportFieldType extends AbstractType
             $this->factory->getEntityManager(),
             'MauticUserBundle:User'
         );
+        
         $builder->add(
             $builder->create('owner', 'user_list', array(
                 'label'      => 'mautic.lead.lead.field.owner',
@@ -62,6 +63,18 @@ class LeadImportFieldType extends AbstractType
                 'multiple'   => false
             ))
                 ->addModelTransformer($transformer)
+        );
+
+        $builder->add(
+            $builder->create('list', 'leadlist_choices', array(
+                'label'      => 'mautic.lead.lead.field.list',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control'
+                ),
+                'required'   => false,
+                'multiple'   => false
+            ))
         );
 
         $builder->add('buttons', 'form_buttons', array(
