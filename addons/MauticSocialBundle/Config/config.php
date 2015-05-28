@@ -8,7 +8,7 @@
  */
 
 return array(
-    'name'        => 'Social Media Integrations',
+    'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',
     'version'     => '1.0',
     'author'      => 'Mautic',
