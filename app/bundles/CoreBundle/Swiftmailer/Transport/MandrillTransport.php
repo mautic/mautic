@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -153,7 +154,7 @@ class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceC
                                     ),
                                     array(
                                         'name'    => 'TRACKINGPIXEL',
-                                        'content' => ''
+                                        'content' => MailHelper::getBlankPixel()
                                     )
                                 )
                             );

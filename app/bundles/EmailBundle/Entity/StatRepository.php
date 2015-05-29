@@ -45,8 +45,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param        $emailId
-     * @param string $listId
+     * @param      $emailId
+     * @param null $listId
+     *
+     * @return array
      */
     public function getSentStats($emailId, $listId = null)
     {
@@ -75,8 +77,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
-     * @param $listId
+     * @param int $emailId
+     * @param int $listId
+     *
+     * @return int
      */
     public function getSentCount($emailId = 0, $listId = 0)
     {
@@ -104,6 +108,8 @@ class StatRepository extends CommonRepository
     /**
      * @param $emailId
      * @param $listId
+     *
+     * @return int
      */
     public function getReadCount($emailId, $listId)
     {
@@ -179,19 +185,25 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
-     * @param $listId
+     * @param      $emailId
+     * @param null $listId
+     *
+     * @return int
      */
-    public function getFailedCount($emailId, $listId)
+    public function getFailedCount($emailId, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as failed_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where('email_id = ' . $emailId)
-            ->andWhere('list_id = ' . $listId)
             ->andWhere('is_failed = :true')
             ->setParameter('true', true, 'boolean');
+
+        if (!empty($listId)) {
+            $q->andWhere('list_id = ' . $listId);
+        }
+
         $results = $q->execute()->fetchAll();
 
         return (isset($results[0])) ? $results[0]['failed_count'] : 0;
@@ -354,5 +366,56 @@ class StatRepository extends CommonRepository
     public function deleteStat($id)
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
+    }
+
+    /**
+     * Fetch stats for some period of time.
+     *
+     * @param $emailId
+     * @param $fromDate
+     * @param $state
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getEmailStats($emailId, $fromDate, $state)
+    {
+        // Load points for selected period
+        $q = $this->createQueryBuilder('s');
+
+        $dateColumn = ($state == 'sent') ? 'dateSent' : 'dateRead';
+
+        $q->select('s.id, 1 as data, s.'.$dateColumn.' as date');
+
+        $q->where(
+            $q->expr()->eq('IDENTITY(s.email)', ':email')
+        )
+            ->setParameter('email', $emailId);
+
+        if ($state != 'sent') {
+            $q->andWhere(
+                $q->expr()->eq('s.is'.ucfirst($state), ':true')
+            )
+                ->setParameter('true', true, 'boolean');
+        }
+
+        $q->andwhere(
+            $q->expr()->gte('s.'.$dateColumn, ':date')
+        )
+            ->setParameter('date', $fromDate)
+            ->orderBy('s.'.$dateColumn, 'ASC');
+
+        $stats = $q->getQuery()->getArrayResult();
+
+        return $stats;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 's';
     }
 }
