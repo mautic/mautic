@@ -93,12 +93,17 @@ if (isset($list)) {
                     ?>
                 </td>
                 <td>
-                    <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
-                        <?php echo $item->getName(); ?>
-                        <?php if ($hasVariants): ?>
-                        <span><i class="fa fa-fw fa-sitemap"></i></span>
-                        <?php endif; ?>
-                    </a>
+                    <div></div>
+                        <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $item->getName(); ?>
+                            <?php if ($hasVariants): ?>
+                            <span><i class="fa fa-fw fa-sitemap"></i></span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                    <?php if ($description = $item->getDescription()): ?>
+                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
+                    <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $category = $item->getCategory(); ?>
