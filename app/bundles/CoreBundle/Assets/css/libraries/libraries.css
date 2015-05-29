@@ -4707,6 +4707,10 @@ a.thumbnail.active {
   border-color: rgba(0, 0, 0, 0.03);
   color: #ffffff;
 }
+.alert-mautic .media-body > div > a {
+  color: #ffffff;
+  text-decoration: underline;
+}
 .alert-mautic hr {
   border-top-color: rgba(0, 0, 0, 0.03);
 }
