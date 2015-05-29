@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -258,7 +259,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
-        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
+        $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
 
@@ -394,7 +395,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntity($objectId);
-        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
+        $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
         $method     = $this->request->getMethod();
@@ -668,7 +669,7 @@ class AssetController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\AssetBundle\Model\AssetModel $model */
             $model     = $this->factory->getModel('asset');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete
