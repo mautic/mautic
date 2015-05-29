@@ -8,7 +8,7 @@
  */
 
 return array(
-    'name'        => 'CRM Integrations',
+    'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
     'version'     => '1.0',
     'author'      => 'Mautic'
