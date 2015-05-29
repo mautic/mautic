@@ -137,7 +137,6 @@ var MauticForm_<?php echo $formName; ?> = {
                     var storedData = localStorage.getItem('<?php echo $formName; ?>');
                     if (storedData) {
                         var vars = JSON.parse(storedData);
-                        console.log(vars);
                         var key;
                         var el;
                         for (key in vars) {

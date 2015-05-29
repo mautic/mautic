@@ -204,34 +204,20 @@ Mautic.initReportGraphs = function () {
 }
 
 Mautic.updateReportGraph = function(element, options) {
-	var id = options.graphName.replace(/\./g, '-');
-	var element = mQuery(element);
-	var wrapper = element.closest('ul');
-	var button  = mQuery('#time-scopes .button-label');
-	var reportId = Mautic.getReportId();
-	wrapper.find('a').removeClass('bg-primary');
-	element.addClass('bg-primary');
-	button.text(element.text());
-	var query = "action=report:updateGraph&reportId=" + reportId + '&' + mQuery.param(options);
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-            	Mautic.reportGraphs[id].destroy();
-            	delete Mautic.reportGraphs[id];
-            	var mGraph = mQuery('#' + id);
-            	if (typeof response.graph.datasets != 'undefined') {
-            		Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph);
-            	}
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
+	var id       = options.graphName.replace(/\./g, '-');
+	var reportId = Mautic.getEntityId();
+	var query    = "reportId=" + reportId + '&' + mQuery.param(options);
+
+    var callback = function(response) {
+        Mautic.reportGraphs[id].destroy();
+        delete Mautic.reportGraphs[id];
+        var mGraph = mQuery('#' + id);
+        if (typeof response.graph.datasets != 'undefined') {
+            Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph);
         }
-    });
+    };
+
+    Mautic.getChartData(element, 'report:updateGraph', query, callback);
 }
 
 Mautic.renderReportLineGraph = function (canvas, chartData) {
@@ -245,8 +231,4 @@ Mautic.renderReportPieGraph = function (canvas, chartData) {
         tooltipFontSize: 10,
         tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
     Mautic.pageTimePie = new Chart(canvas).Pie(chartData, options);
-}
-
-Mautic.getReportId = function() {
-	return mQuery('#reportId').val();
 }
