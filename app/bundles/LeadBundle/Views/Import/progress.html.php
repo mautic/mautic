@@ -41,7 +41,7 @@ $header   = ($complete) ? 'mautic.lead.import.success': 'mautic.lead.import.dono
                 <div>
                     <a class="text-danger mt-md" href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'import', 'cancel' => 1)); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
                 </div>
-                <?php endif: ?>
+                <?php else: ?>
                 <div>
                     <a class="btn btn-success" href="<?php echo $view['router']->generate('mautic_lead_index'); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.lead.list.view_leads'); ?></a>
                 </div>
