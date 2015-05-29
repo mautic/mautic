@@ -234,7 +234,6 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true)
     {
-
         //generate cached HTML and JS
         $templating = $this->factory->getTemplating();
 
