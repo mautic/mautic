@@ -58,7 +58,7 @@ class PageSubscriber extends CommonSubscriber
         }
 
         if ($event->tokensRequested($this->formRegex)) {
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex);
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
         }
     }
 
