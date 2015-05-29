@@ -4196,6 +4196,9 @@ lesshat-selector {
 .pl-0 {
   padding-left: 0px !important;
 }
+.w-44 {
+  width: 44px;
+}
 .no-focus.form-control,
 .form-control .no-focus {
   border-color: transparent;
