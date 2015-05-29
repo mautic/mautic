@@ -62,7 +62,7 @@ class ReportController extends FormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['report:reports:viewother']) {
-            $filter['force'][] = array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'][] = array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $this->factory->getSession()->get('mautic.report.orderby', 'r.name');
@@ -81,7 +81,7 @@ class ReportController extends FormController
         $count = count($reports);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.report.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $lastPage));
 

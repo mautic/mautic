@@ -10,12 +10,12 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\PageBundle\Helper\BuilderTokenHelper;
 
 /**
  * Class BuilderSubscriber
@@ -23,10 +23,15 @@ use Mautic\PageBundle\Helper\BuilderTokenHelper;
 class BuilderSubscriber extends CommonSubscriber
 {
 
+    private $pageTokenRegex = '{pagelink=(.*?)}';
+    private $externalTokenRegex = '{externallink=(.*?)}';
+    private $langBarRegex = '{langbar}';
+    private $shareButtonsRegex = '{sharebuttons}';
+
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
         return array(
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
@@ -42,51 +47,83 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @param Events\PageBuilderEvent $event
      */
-    public function onPageBuild (Events\PageBuilderEvent $event)
+    public function onPageBuild(Events\PageBuilderEvent $event)
     {
-        //add page tokens
-        $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
-        $event->addTokenSection('page.extratokens', 'mautic.page.builder.header.extra', $content, 2);
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
 
-        //add email tokens
-        $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('page.pagetokens', 'mautic.page.pages', $tokenHelper->getTokenContent(), -254);
+        if ($event->tokenSectionsRequested()) {
+            //add extra tokens
+            $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
+            $event->addTokenSection('page.extratokens', 'mautic.page.builder.header.extra', $content, 2);
 
-        //add AB Test Winner Criteria
-        $bounceRate = array(
-            'group'    => 'mautic.page.abtest.criteria',
-            'label'    => 'mautic.page.abtest.criteria.bounce',
-            'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner'
-        );
-        $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
+            //add pagetokens
+            $event->addTokenSection(
+                'page.pagetokens',
+                'mautic.page.pages',
+                $tokenHelper->getTokenContent(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array('column' => 'p.variantParent', 'expr' => 'isNull')
+                            )
+                        )
+                    )
+                ),
+                -254
+            );
+        }
 
-        $dwellTime = array(
-            'group'    => 'mautic.page.abtest.criteria',
-            'label'    => 'mautic.page.abtest.criteria.dwelltime',
-            'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner'
-        );
-        $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $bounceRate = array(
+                'group'    => 'mautic.page.abtest.criteria',
+                'label'    => 'mautic.page.abtest.criteria.bounce',
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner'
+            );
+            $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
+
+            $dwellTime = array(
+                'group'    => 'mautic.page.abtest.criteria',
+                'label'    => 'mautic.page.abtest.criteria.dwelltime',
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner'
+            );
+            $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
+        }
+
+        if ($event->tokensRequested(array($this->pageTokenRegex, $this->externalTokenRegex))) {
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
+
+            $event->addTokens(
+                $event->filterTokens(
+                    array(
+                        $this->externalTokenRegex => $this->translator->trans('mautic.page.builder.externallink'),
+                        $this->shareButtonsRegex  => $this->translator->trans('mautic.page.token.lang'),
+                        $this->langBarRegex       => $this->translator->trans('mautic.page.token.share'),
+                    )
+                )
+            );
+        }
     }
 
     /**
      * @param Events\PageDisplayEvent $event
      */
-    public function onPageDisplay (Events\PageDisplayEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event)
     {
         $content = $event->getContent();
         $page    = $event->getPage();
 
-        if (strpos($content, '{langbar}') !== false) {
+        if (strpos($content, $this->langBarRegex) !== false) {
             $langbar = $this->renderLanguageBar($page);
-            $content = str_ireplace('{langbar}', $langbar, $content);
+            $content = str_ireplace($this->langBarRegex, $langbar, $content);
         }
 
-        if (strpos($content, '{sharebuttons}') !== false) {
+        if (strpos($content, $this->shareButtonsRegex) !== false) {
             $buttons = $this->renderSocialShareButtons();
-            $content = str_ireplace('{sharebuttons}', $buttons, $content);
+            $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        $tokens  = $this->generatePageUrlTokens($content, array('source' => array('page', $page->getId())));
+        $tokens = $this->generatePageUrlTokens($content, array('source' => array('page', $page->getId())));
         if (!empty($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
@@ -99,7 +136,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSocialShareButtons ()
+    protected function renderSocialShareButtons()
     {
         static $content = "";
 
@@ -126,7 +163,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderLanguageBar ($page)
+    protected function renderLanguageBar($page)
     {
         static $langbar = '';
 
@@ -151,18 +188,20 @@ class BuilderSubscriber extends CommonSubscriber
 
             if (!empty($children)) {
                 $lang  = $parent->getLanguage();
-                $trans = $this->translator->trans('mautic.page.lang.' . $lang);
-                if ($trans == 'mautic.page.lang.' . $lang)
+                $trans = $this->translator->trans('mautic.page.lang.'.$lang);
+                if ($trans == 'mautic.page.lang.'.$lang) {
                     $trans = $lang;
+                }
                 $related[$parent->getId()] = array(
                     "lang" => $trans,
                     "url"  => $model->generateUrl($parent, false)
                 );
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
-                    $trans = $this->translator->trans('mautic.page.lang.' . $lang);
-                    if ($trans == 'mautic.page.lang.' . $lang)
+                    $trans = $this->translator->trans('mautic.page.lang.'.$lang);
+                    if ($trans == 'mautic.page.lang.'.$lang) {
                         $trans = $lang;
+                    }
                     $related[$c->getId()] = array(
                         "lang" => $trans,
                         "url"  => $model->generateUrl($c, false)
@@ -171,9 +210,12 @@ class BuilderSubscriber extends CommonSubscriber
             }
 
             //sort by language
-            uasort($related, function ($a, $b) {
-                return strnatcasecmp($a['lang'], $b['lang']);
-            });
+            uasort(
+                $related,
+                function ($a, $b) {
+                    return strnatcasecmp($a['lang'], $b['lang']);
+                }
+            );
 
             if (empty($related)) {
                 return;
@@ -190,11 +232,36 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onEmailBuild (EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event)
     {
-        //add email tokens
-        $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('page.emailtokens', 'mautic.page.pages', $tokenHelper->getTokenContent(), -254);
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
+
+        if ($event->tokenSectionsRequested()) {
+            $event->addTokenSection(
+                'page.emailtokens',
+                'mautic.page.pages',
+                $tokenHelper->getTokenContent(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array('column' => 'p.variantParent', 'expr' => 'isNull')
+                            )
+                        )
+                    )
+                ),
+                -254
+            );
+        }
+
+        if ($event->tokensRequested(array($this->pageTokenRegex, $this->externalTokenRegex))) {
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
+
+            $event->addTokens(
+                $event->filterTokens(
+                    array($this->externalTokenRegex => $this->translator->trans('mautic.page.builder.externallink'))
+                )
+            );
+        }
     }
 
     /**
@@ -202,11 +269,11 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onEmailGenerate (EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content      = $event->getContent();
-        $source       = $event->getSource();
-        $email        = $event->getEmail();
+        $content = $event->getContent();
+        $source  = $event->getSource();
+        $email   = $event->getEmail();
 
         $clickthrough = array(
             //what entity is sending the email?
@@ -230,11 +297,10 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return array
      */
-    protected function generatePageUrlTokens ($content, $clickthrough)
+    protected function generatePageUrlTokens($content, $clickthrough)
     {
-        $pages             = $links = array();
-        $pagelinkRegex     = '/{pagelink=(.*?)}/';
-        $externalLinkRegex = '/{externallink=(.*?)}/';
+        $pagelinkRegex     = '/'.$this->pageTokenRegex.'/';
+        $externalLinkRegex = '/'.$this->externalTokenRegex.'/';
 
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel = $this->factory->getModel('page');

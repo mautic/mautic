@@ -37,12 +37,60 @@ class Email extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails", "emailList"})
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $subject;
+
+    /**
+     * @ORM\Column(type="string", name="from_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $fromAddress;
+
+    /**
+     * @ORM\Column(type="string", name="from_name", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $fromName;
+
+    /**
+     * @ORM\Column(type="string", name="reply_to_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $replyToAddress;
+
+    /**
+     * @ORM\Column(type="string", name="bcc_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $bccAddress;
 
     /**
      * @ORM\Column(type="string")
@@ -216,13 +264,53 @@ class Email extends FormEntity
     }
 
     /**
+     *
+     */
+    public function clearStats()
+    {
+        $this->stats = new ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('subject', new NotBlank(array(
-            'message' => 'mautic.email.subject.notblank'
-        )));
+        $metadata->addPropertyConstraint(
+            'name',
+            new NotBlank(
+                array(
+                    'message' => 'mautic.core.name.required'
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'fromAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required'
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'replyToAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required'
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bccAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required'
+                )
+            )
+        );
     }
 
     /**
@@ -246,6 +334,46 @@ class Email extends FormEntity
     }
 
     /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     *
+     * @return Email
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
@@ -264,12 +392,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $category
+     * @param $category
+     *
+     * @return $this
      */
     public function setCategory ($category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
+
+        return $this;
     }
 
     /**
@@ -281,12 +413,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param array $content
+     * @param $content
+     *
+     * @return $this
      */
     public function setContent ($content)
     {
         $this->isChanged('content', $content);
         $this->content = $content;
+
+        return $this;
     }
 
     /**
@@ -298,11 +434,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $readCount
+     * @param $readCount
+     *
+     * @return $this
      */
     public function setReadCount ($readCount)
     {
         $this->readCount = $readCount;
+
+        return $this;
     }
 
     /**
@@ -314,12 +454,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $language
+     * @param $language
+     *
+     * @return $this
      */
     public function setLanguage ($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+
+        return $this;
     }
 
     /**
@@ -331,11 +475,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $revision
+     * @param $revision
+     *
+     * @return $this
      */
     public function setRevision ($revision)
     {
         $this->revision = $revision;
+
+        return $this;
     }
 
     /**
@@ -347,11 +495,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $sessionId
+     * @param $sessionId
+     *
+     * @return $this
      */
     public function setSessionId ($sessionId)
     {
         $this->sessionId = $sessionId;
+
+        return $this;
     }
 
     /**
@@ -363,12 +515,96 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $subject
+     * @param $subject
+     *
+     * @return $this
      */
     public function setSubject ($subject)
     {
         $this->isChanged('subject', $subject);
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromAddress()
+    {
+        return $this->fromAddress;
+    }
+
+    /**
+     * @param mixed $fromAddress
+     *
+     * @return Email
+     */
+    public function setFromAddress($fromAddress)
+    {
+        $this->fromAddress = $fromAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromName()
+    {
+        return $this->fromName;
+    }
+
+    /**
+     * @param mixed $fromName
+     *
+     * @return Email
+     */
+    public function setFromName($fromName)
+    {
+        $this->fromName = $fromName;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReplyToAddress()
+    {
+        return $this->replyToAddress;
+    }
+
+    /**
+     * @param mixed $replyToAddress
+     *
+     * @return Email
+     */
+    public function setReplyToAddress($replyToAddress)
+    {
+        $this->replyToAddress = $replyToAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBccAddress()
+    {
+        return $this->bccAddress;
+    }
+
+    /**
+     * @param mixed $bccAddress
+     *
+     * @return Email
+     */
+    public function setBccAddress($bccAddress)
+    {
+        $this->bccAddress = $bccAddress;
+
+        return $this;
     }
 
     /**
@@ -380,12 +616,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $template
+     * @param $template
+     *
+     * @return $this
      */
     public function setTemplate ($template)
     {
         $this->isChanged('template', $template);
         $this->template = $template;
+
+        return $this;
     }
 
     /**
@@ -478,12 +718,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantStartDate
+     * @param $variantStartDate
+     *
+     * @return $this
      */
     public function setVariantStartDate ($variantStartDate)
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;
+
+        return $this;
     }
 
     /**
@@ -495,12 +739,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $publishDown
+     * @param $publishDown
+     *
+     * @return $this
      */
     public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
+
+        return $this;
     }
 
     /**
@@ -512,12 +760,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $publishUp
+     * @param $publishUp
+     *
+     * @return $this
      */
     public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
+
+        return $this;
     }
 
     /**
@@ -529,11 +781,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $sentCount
+     * @param $sentCount
+     *
+     * @return $this
      */
     public function setSentCount ($sentCount)
     {
         $this->sentCount = $sentCount;
+
+        return $this;
     }
 
     /**
@@ -545,11 +801,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantSentCount
+     * @param $variantSentCount
+     *
+     * @return $this
      */
     public function setVariantSentCount ($variantSentCount)
     {
         $this->variantSentCount = $variantSentCount;
+
+        return $this;
     }
 
     /**
@@ -592,11 +852,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $plainText
+     * @param $plainText
+     *
+     * @return $this
      */
     public function setPlainText ($plainText)
     {
         $this->plainText = $plainText;
+
+        return $this;
     }
 
     /**
@@ -632,11 +896,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantReadCount
+     * @param $variantReadCount
+     *
+     * @return $this
      */
     public function setVariantReadCount ($variantReadCount)
     {
         $this->variantReadCount = $variantReadCount;
+
+        return $this;
     }
 
     /**
@@ -668,11 +936,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $customHtml
+     * @param $customHtml
+     *
+     * @return $this
      */
     public function setCustomHtml ($customHtml)
     {
         $this->customHtml = $customHtml;
+
+        return $this;
     }
 
     /**
@@ -684,11 +956,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $contentMode
+     * @param $contentMode
+     *
+     * @return $this
      */
     public function setContentMode ($contentMode)
     {
         $this->contentMode = $contentMode;
+
+        return $this;
     }
 
     /**
@@ -700,10 +976,14 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $unsubscribeForm
+     * @param Form $unsubscribeForm
+     *
+     * @return $this
      */
     public function setUnsubscribeForm (Form $unsubscribeForm)
     {
         $this->unsubscribeForm = $unsubscribeForm;
+
+        return $this;
     }
 }

@@ -12,7 +12,7 @@ return array(
         'main'   => array(
             'mautic_form_pagetoken_index' => array(
                 'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\PageToken:index'
+                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index'
             ),
             'mautic_formaction_action'    => array(
                 'path'       => '/forms/action/{objectAction}/{objectId}',

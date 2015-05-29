@@ -69,7 +69,7 @@ class TriggerController extends FormController
 
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.point.trigger.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $lastPage));
 

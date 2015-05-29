@@ -56,11 +56,11 @@ class VariantType extends AbstractType
             )
         ));
 
-        $builderComponents = $this->factory->getModel('page.page')->getBuilderComponents();
+        $abTestWinnerCriteria = $this->factory->getModel('page.page')->getBuilderComponents(null, 'abTestWinnerCriteria');
 
-        if (!empty($builderComponents['abTestWinnerCriteria'])) {
-            $criteria = $builderComponents['abTestWinnerCriteria']['criteria'];
-            $choices  = $builderComponents['abTestWinnerCriteria']['choices'];
+        if (!empty($abTestWinnerCriteria)) {
+            $criteria = $abTestWinnerCriteria['criteria'];
+            $choices  = $abTestWinnerCriteria['choices'];
 
             $builder->add('winnerCriteria', 'choice', array(
                 'label'      => 'mautic.page.form.abtestwinner',

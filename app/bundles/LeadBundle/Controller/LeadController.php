@@ -106,7 +106,7 @@ class LeadController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.lead.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $lastPage));

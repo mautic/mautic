@@ -138,7 +138,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
+     * @param      $emailId
+     * @param null $listIds
+     * @param bool $countOnly
+     * @param null $limit
+     *
+     * @return array|int
      */
     public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false, $limit = null)
     {
@@ -223,10 +228,10 @@ class EmailRepository extends CommonRepository
     public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false)
     {
         $q = $this->createQueryBuilder('e');
-        $q->select('partial e.{id, subject, language}');
+        $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.subject', ':search'))
+            $q->andWhere($q->expr()->like('e.name', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
@@ -239,7 +244,7 @@ class EmailRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
-        $q->orderBy('e.subject');
+        $q->orderBy('e.name');
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
@@ -259,7 +264,11 @@ class EmailRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->like('e.subject',  ":$unique");
+        $expr = $q->expr()->orX(
+            $q->expr()->like('e.name',  ":$unique"),
+            $q->expr()->like('e.subject', ":$unique")
+        );
+
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
@@ -355,7 +364,7 @@ class EmailRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('e.subject', 'ASC')
+            array('e.name', 'ASC')
         );
     }
 

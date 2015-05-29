@@ -73,7 +73,7 @@ class ListController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.leadlist.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));

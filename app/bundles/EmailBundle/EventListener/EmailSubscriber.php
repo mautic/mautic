@@ -70,7 +70,7 @@ class EmailSubscriber extends CommonSubscriber
             "object"     => "email",
             "objectId"   => $email->deletedId,
             "action"     => "delete",
-            "details"    => array('name' => $email->getSubject()),
+            "details"    => array('name' => $email->getName()),
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);

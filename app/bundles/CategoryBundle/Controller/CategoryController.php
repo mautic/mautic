@@ -99,7 +99,7 @@ class CategoryController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $viewParams['page'] = $lastPage;
             $session->set('mautic.category.page', $lastPage);

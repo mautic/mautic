@@ -10,10 +10,10 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Helper\EmailTokenHelper;
 
 /**
  * Class EmailSubscriber
@@ -22,6 +22,8 @@ use Mautic\LeadBundle\Helper\EmailTokenHelper;
  */
 class EmailSubscriber extends CommonSubscriber
 {
+
+    private $leadFieldRegex = '{leadfield=(.*?)}';
 
     /**
      * @return array
@@ -37,9 +39,37 @@ class EmailSubscriber extends CommonSubscriber
 
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        //add email tokens
-        $tokenHelper = new EmailTokenHelper($this->factory);
-        $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent(), 255);
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
+        $tokenHelper->setPermissionSet(array('lead:fields:full'));
+
+        if ($event->tokenSectionsRequested()) {
+            //add email tokens
+            $event->addTokenSection(
+                'lead.emailtokens',
+                'mautic.lead.email.header.index',
+                $tokenHelper->getTokenContent(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'f.isPublished',
+                                    'expr'   => 'eq',
+                                    'value'  => true
+                                )
+                            )
+                        ),
+                        'orderBy'        => 'f.label',
+                        'orderByDir'     => 'ASC',
+                        'hydration_mode' => 'HYDRATE_ARRAY'
+                    )
+                ),
+                255
+            );
+        }
+
+        if ($event->tokensRequested($this->leadFieldRegex)) {
+            $event->addTokensFromHelper($tokenHelper, $this->leadFieldRegex, 'label');
+        }
     }
 
     public function onEmailDisplay(EmailSendEvent $event)
@@ -51,8 +81,8 @@ class EmailSubscriber extends CommonSubscriber
 
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content  = $event->getContent();
-        $regex    = '/{leadfield=(.*?)}/';
+        $content = $event->getContent();
+        $regex   = '/' . $this->leadFieldRegex . '/';
 
         $lead = $event->getLead();
 
