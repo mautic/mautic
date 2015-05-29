@@ -7,23 +7,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (isset($list)) {
+if (isset($template)) {
     // Ajax update
-    extract($list);
+    extract($template);
 }
 ?>
 
 <?php if (count($items)): ?>
 <div class="table-responsive">
-    <table class="table table-hover table-striped table-bordered email-list">
+    <table class="table table-hover table-striped table-bordered email-template">
         <thead>
         <tr>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'checkall' => 'true',
-                'target'   => '.email-list',
-                'tmpl'     => 'list',
-                'target'   => '.list-container'
+                'target'   => '.email-template',
+                'tmpl'     => 'template'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -32,8 +31,7 @@ if (isset($list)) {
                 'text'       => 'mautic.core.name',
                 'class'      => 'col-email-name',
                 'default'    => true,
-                'tmpl'       => 'list',
-                'target'   => '.list-container'
+                'tmpl'       => 'template'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -41,8 +39,7 @@ if (isset($list)) {
                 'orderBy'    => 'c.title',
                 'text'       => 'mautic.core.category',
                 'class'      => 'visible-md visible-lg col-email-category',
-                'tmpl'       => 'list',
-                'target'   => '.list-container'
+                'tmpl'       => 'template'
             ));
             ?>
 
@@ -54,8 +51,7 @@ if (isset($list)) {
                 'orderBy'    => 'e.id',
                 'text'       => 'mautic.core.id',
                 'class'      => 'visible-md visible-lg col-email-id',
-                'tmpl'       => 'list',
-                'target'   => '.list-container'
+                'tmpl'       => 'template'
             ));
             ?>
         </tr>
@@ -78,21 +74,12 @@ if (isset($list)) {
                             'delete'     => $security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $item->getCreatedBy()),
                             'abtest'     => (!$hasVariants && $edit && $permissions['email:emails:create']),
                         ),
-                        'routeBase'  => 'email',
-                        'customButtons' => array(
-                            array(
-                                'attr' => array(
-                                    'data-toggle' => 'ajax',
-                                    'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
-                                ),
-                                'iconClass' => 'fa fa-send-o',
-                                'btnText'   => 'mautic.email.send'
-                            )
-                        )
+                        'routeBase'  => 'email'
                     ));
                     ?>
                 </td>
                 <td>
+                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
                     <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                         <?php if ($hasVariants): ?>
@@ -107,7 +94,6 @@ if (isset($list)) {
                     <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-sm visible-md visible-lg col-stats">
-                    <span class="mt-xs label label-info"><?php echo $view['translator']->trans('mautic.email.stat.leadcount', array('%count%' => $model->getPendingLeads($item, null, true))); ?></span>
                     <span class="mt-xs label label-warning"><?php echo $view['translator']->trans('mautic.email.stat.sentcount', array('%count%' => $item->getSentCount())); ?></span>
                     <span class="mt-xs label label-success"><?php echo $view['translator']->trans('mautic.email.stat.readcount', array('%count%' => $item->getReadCount())); ?></span>
                 </td>
@@ -119,13 +105,12 @@ if (isset($list)) {
 </div>
 <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        'totalItems'      => $totalItems,
-        'page'            => $page,
-        'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_email_index'),
-        'sessionVar'      => 'email.list',
-        'tmpl'            => 'list',
-        'target'          => '.list-container'
+        "totalItems"      => $totalItems,
+        "page"            => $page,
+        "limit"           => $limit,
+        "baseUrl"         => $view['router']->generate('mautic_email_index'),
+        'sessionVar'      => 'email.template',
+        'tmpl'            => 'template'
     )); ?>
 </div>
 <?php else: ?>

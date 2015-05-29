@@ -83,6 +83,11 @@ Mautic.emailOnLoad = function (container, response) {
                 }
             }
         });
+
+        if (mQuery('#emailform_emailType').val() == '') {
+            mQuery('body').css('overflow-y', 'hidden');
+        }
+
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'email');
@@ -92,13 +97,37 @@ Mautic.emailOnLoad = function (container, response) {
             Mautic.renderListCompareChart();
         }
 
-        Mautic.initializeEmailFilters(container);
+        if (typeof Mautic.emailStatsLineGraph === 'undefined') {
+            Mautic.renderEmailStatsChart();
+        }
+
+        // Show tab based on hash
+        var hash  = document.location.hash;
+        var prefix = 'tab-';
+
+        if (hash) {
+            var hashPieces = hash.split('?');
+            hash           = hashPieces[0].replace("#", "#" + prefix);
+            var activeTab  = '.nav-tabs a[href=' + hash + ']';
+
+            if (mQuery(activeTab).length) {
+                mQuery('.nav-tabs li').removeClass('active');
+                mQuery('.tab-pane').removeClass('in active');
+                mQuery(activeTab).parent().addClass('active');
+                mQuery(hash).addClass('in active');
+            }
+        }
+
+        mQuery('.nav-tabs a').on('shown.bs.tab', function (e) {
+            window.location.hash = e.target.hash.replace("#" + prefix, "#");
+        });
     }
 };
 
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
+        delete Mautic.emailStatsLineGraph;
     }
 
     if (mQuery('#emailform_plainText').length) {
@@ -122,20 +151,36 @@ Mautic.renderListCompareChart = function () {
     Mautic.listCompareChart.update();
 };
 
-Mautic.initializeEmailFilters = function(container) {
-    var emailForm = mQuery(container + ' #email-filters');
-    if (emailForm.length) {
-        emailForm.on('change', function() {
-            emailForm.submit();
-        }).on('keyup', function() {
-            emailForm.delay(200).submit();
-        }).on('submit', function(e) {
-            e.preventDefault();
-            var formData = emailForm.serialize();
-            var request = window.location.pathname + '?tmpl=list&name=email&' + formData;
-            Mautic.loadContent(request, '', 'POST', '.page-list');
-        });
+Mautic.renderEmailStatsChart = function (chartData) {
+    if (!mQuery("#stat-chart").length) {
+        return;
     }
+
+    var canvas = document.getElementById("stat-chart");
+
+    if (!chartData) {
+        var chartData = mQuery.parseJSON(mQuery('#stat-chart-data').text());
+    } else if (chartData.stats) {
+        chartData = chartData.stats;
+    }
+
+    if (typeof Mautic.emailStatsLineGraph !== 'undefined') {
+        Mautic.emailStatsLineGraph.destroy();
+    }
+
+    Mautic.emailStatsLineGraph = new Chart(canvas.getContext("2d")).Line(chartData);
+
+    var legendHolder = document.createElement('div');
+    legendHolder.innerHTML = Mautic.emailStatsLineGraph.generateLegend();
+    mQuery('#legend').html(legendHolder.firstChild);
+    Mautic.emailStatsLineGraph.update();
+};
+
+Mautic.updateEmailStatsChart = function(element, amount, unit) {
+    var emailId = Mautic.getEntityId();
+    var query = "amount=" + amount + "&unit=" + unit + "&emailId=" + emailId;
+
+    Mautic.getChartData(element, 'email:updateStatsChart', query, 'renderEmailStatsChart');
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
@@ -266,7 +311,7 @@ Mautic.sendEmailBatch = function () {
 Mautic.autoGeneratePlaintext = function() {
     mQuery('.plaintext-spinner').removeClass('hide');
 
-    var mode = (mQuery('#emailform_contentMode_0').prop('checked')) ? 'custom' : 'template';
+    var mode = (mQuery('#emailform_template').val() == '') ? 'custom' : 'template';
     var custom = mQuery('#emailform_customHtml').val();
     var id = mQuery('#emailform_sessionId').val();
 
@@ -284,4 +329,37 @@ Mautic.autoGeneratePlaintext = function() {
             mQuery('.plaintext-spinner').addClass('hide');
         }
     );
+};
+
+Mautic.selectEmailType = function(emailType) {
+    if (emailType == 'list') {
+        mQuery('#leadList').removeClass('hide');
+        mQuery('#publishStatus').addClass('hide');
+        mQuery('.page-header h3').text(mauticLang.newListEmail);
+    } else {
+        mQuery('#publishStatus').removeClass('hide');
+        mQuery('#leadList').addClass('hide');
+        mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+    }
+
+    mQuery('#emailform_emailType').val(emailType);
+
+    mQuery('body').css('overflow-y', '');
+
+    mQuery('.email-type-modal').remove();
+    mQuery('.email-type-modal-backdrop').remove();
+};
+
+Mautic.getTotalAttachmentSize = function() {
+    var assets = mQuery('#emailform_assetAttachments').val();
+    if (assets) {
+        assets = {
+            'assets': assets
+        };
+        Mautic.ajaxActionRequest('email:getAttachmentsSize', assets, function(response) {
+            mQuery('#attachment-size').text(response.size);
+        });
+    } else {
+        mQuery('#attachment-size').text('0');
+    }
 };

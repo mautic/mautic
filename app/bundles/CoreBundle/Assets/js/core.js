@@ -3075,7 +3075,6 @@ var Mautic = {
 
             mQuery('body').css('overflow-y', '');
 
-
             Mautic.stopIconSpinPostEvent();
         }
 

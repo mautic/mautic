@@ -12,16 +12,28 @@ include 'action_button_helper.php';
 ?>
 <div class="panel-body">
     <div class="box-layout">
-        <div class="col-xs-6 va-m">
+        <div class="col-xs-8 col-lg-10 va-m form-inline">
             <?php if (isset($searchValue)): ?>
             <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
+                    'searchId'    => (empty($searchId)) ? null : $searchId,
                     'searchValue' => $searchValue,
                     'action'      => $action,
-                    'searchHelp'  => (isset($searchHelp)) ? $searchHelp : ''
+                    'searchHelp'  => (isset($searchHelp)) ? $searchHelp : '',
+                    'target'      => (empty($target)) ? null : $target,
+                    'tmpl'        => (empty($tmpl)) ? null : $tmpl
+                )); ?>
+            <?php endif; ?>
+
+            <?php if (!empty($filters)): ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:list_filters.html.php', array(
+                    'filters' => $filters,
+                    'target'  => (empty($target)) ? null : $target,
+                    'tmpl'    => (empty($tmpl)) ? null : $tmpl
                 )); ?>
             <?php endif; ?>
         </div>
-        <div class="col-xs-6 va-m text-right">
+
+        <div class="col-xs-4 col-lg-2 va-m text-right">
             <?php //TODO - Support more buttons
             include 'action_button_helper.php';
             $buttonCount = 0;
@@ -33,7 +45,8 @@ include 'action_button_helper.php';
                     'confirmAction' => $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array('objectAction' => 'batchDelete'), $query)),
                     'template'      => 'batchdelete',
                     'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
-                    'precheck'      => 'batchActionPrecheck'
+                    'precheck'      => 'batchActionPrecheck',
+                    'target'        => (empty($target)) ? null : $target
                 ));
                 $buttonCount++;
             endif;

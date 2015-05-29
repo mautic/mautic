@@ -25,6 +25,10 @@ if (!isset($query)) {
     $query = array();
 }
 
+if (isset($tmpl)) {
+    $query['tmpl'] = $tmpl;
+}
+
 //Edit mode for edit/actions (allows use of ajaxmodal)
 if (!isset($editMode)) {
     $editMode = "ajax";

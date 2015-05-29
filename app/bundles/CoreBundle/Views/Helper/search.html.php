@@ -9,35 +9,34 @@
 
 $searchValue = (empty($searchValue)) ? '' : $searchValue;
 $target      = (empty($target)) ? '.page-list' : $target;
+$id          = (empty($searchId)) ? 'list-search' : $searchId;
+$tmpl        = (empty($tmpl)) ? 'list' : $tmpl;
 ?>
 
-<div class="row">
-	<div class="col-sm-8 nm pa5">
-		<div class="input-group">
-			<?php if (!empty($searchHelp)): ?>
-		     <div class="input-group-btn">
-		        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#search-help">
-		            <i class="fa fa-question-circle"></i>
-		        </button>
-			</div>
-			<?php endif; ?>
 
-            <input type="search" class="form-control search" id="list-search" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="off" data-toggle="livesearch" data-target="<?php echo $target; ?>" data-action="<?php echo $action; ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
-			<div class="input-group-btn">
-		        <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="list-search">
-		            <i class="fa fa-search fa-fw"></i>
-		        </button>
-			</div>
-		</div>
+<div class="input-group">
+    <?php if (!empty($searchHelp)): ?>
+     <div class="input-group-btn">
+        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#<?php echo $searchId; ?>-search-help">
+            <i class="fa fa-question-circle"></i>
+        </button>
+    </div>
+    <?php endif; ?>
 
-        <?php
-		if ($searchHelp):
-        echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-            'id'     => 'search-help',
-            'header' => $view['translator']->trans('mautic.core.search.header'),
-            'body'   => $view['translator']->trans('mautic.core.search.help') . $view['translator']->trans($searchHelp)
-        ));
-		endif;
-        ?>
-	</div>
+    <input type="search" class="form-control search" id="<?php echo $id; ?>" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="off" data-toggle="livesearch" data-target="<?php echo $target; ?>" data-tmpl="<?php echo $tmpl; ?>" data-action="<?php echo $action; ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
+    <div class="input-group-btn">
+        <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="<?php echo $id; ?>">
+            <i class="fa fa-search fa-fw"></i>
+        </button>
+    </div>
 </div>
+
+<?php
+if ($searchHelp):
+echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+    'id'     => $searchId . '-search-help',
+    'header' => $view['translator']->trans('mautic.core.search.header'),
+    'body'   => $view['translator']->trans('mautic.core.search.help') . $view['translator']->trans($searchHelp)
+));
+endif;
+?>
