@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -745,6 +746,14 @@ class LeadModel extends FormModel
         } else {
             $lead   = new Lead();
             $merged = false;
+        }
+
+        if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
+            try {
+                $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
+                $lead->setDateAdded($dateAdded->getUtcDateTime());
+            } catch (Exception $e) {}
+            unset($fields['dateAdded']);
         }
 
         if ($owner !== null) {
