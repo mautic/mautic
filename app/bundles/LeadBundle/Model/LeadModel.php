@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Entity\User;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -754,6 +755,15 @@ class LeadModel extends FormModel
                 $lead->setDateAdded($dateAdded->getUtcDateTime());
             } catch (Exception $e) {}
             unset($fields['dateAdded']);
+        }
+
+        if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
+            $userRepo = $this->em->getRepository('MauticUserBundle:User');
+            $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
+            if ($createdByUser !== null) {
+                $lead->setCreatedBy($createdByUser);
+            }
+            unset($fields['createdByUser']);
         }
 
         if ($owner !== null) {
