@@ -43,7 +43,8 @@ class LeadImportFieldType extends AbstractType
                 'label'      => $label,
                 'required'   => false,
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'data'       => $this->getDefaultValue($field, $options['import_fields'])
             ));
         }
 
@@ -54,7 +55,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'dateAdded',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateAdded', $options['import_fields'])
         ));
 
         $properties->add('createdByUser', 'choice', array(
@@ -62,7 +64,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'createdByUser',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('createdByUser', $options['import_fields'])
         ));
 
         $properties->add('dateModified', 'choice', array(
@@ -70,7 +73,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'dateModified',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateModified', $options['import_fields'])
         ));
 
         $properties->add('modifiedByUser', 'choice', array(
@@ -78,7 +82,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'modifiedByUser',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('modifiedByUser', $options['import_fields'])
         ));
 
         $properties->add('lastActive', 'choice', array(
@@ -86,7 +91,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'lastActive',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('lastActive', $options['import_fields'])
         ));
 
         $properties->add('dateIdentified', 'choice', array(
@@ -94,7 +100,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'dateIdentified',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateIdentified', $options['import_fields'])
         ));
 
         $properties->add('ip', 'choice', array(
@@ -102,7 +109,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'ip',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('ip', $options['import_fields'])
         ));
 
         $properties->add('points', 'choice', array(
@@ -110,7 +118,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'points',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('points', $options['import_fields'])
         ));
 
         $properties->add('doNotEmail', 'choice', array(
@@ -118,7 +127,8 @@ class LeadImportFieldType extends AbstractType
             'label'      => 'doNotEmail',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('doNotEmail', $options['import_fields'])
         ));
 
         $builder->add($properties);
@@ -175,7 +185,24 @@ class LeadImportFieldType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
+    public function getName() 
+    {
         return "lead_field_import";
+    }
+
+    /**
+     * @param  string $fieldName
+     * @param  array  $importFields
+     *
+     * @return string
+     */
+    public function getDefaultValue($fieldName, array $importFields)
+    {
+        if (isset($importFields[$fieldName]))
+        {
+            return $importFields[$fieldName];
+        }
+
+        return null;
     }
 }
