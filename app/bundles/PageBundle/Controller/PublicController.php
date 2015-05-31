@@ -225,11 +225,10 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if ($entity->getContentMode() == 'builder') {
+            $template = $entity->getTemplate();
+            if (!empty($template)) {
                 //all the checks pass so display the content
-                $template   = $entity->getTemplate();
-                $slots      = $this->factory->getTheme($template)->getSlots('page');
-
+                $slots    = $this->factory->getTheme($template)->getSlots('page');
                 $response = $this->render('MauticPageBundle::public.html.php', array(
                     'slots'           => $slots,
                     'content'         => $entity->getContent(),
@@ -278,11 +277,10 @@ class PublicController extends CommonFormController
             throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
         }
 
-        if ($entity->getContentMode() == 'builder') {
+        $template = $entity->getTemplate();
+        if (!empty($template)) {
             //all the checks pass so display the content
-            $template   = $entity->getTemplate();
-            $slots      = $this->factory->getTheme($template)->getSlots('page');
-
+            $slots    = $this->factory->getTheme($template)->getSlots('page');
             $response = $this->render('MauticPageBundle::public.html.php', array(
                 'slots'           => $slots,
                 'content'         => $entity->getContent(),
