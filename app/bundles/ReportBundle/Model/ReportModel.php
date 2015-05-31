@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -88,7 +89,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(array('Report'));
@@ -108,7 +109,7 @@ class ReportModel extends FormModel
                 $name = ReportEvents::REPORT_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -121,7 +122,7 @@ class ReportModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
