@@ -11,9 +11,10 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getName());
 
-$isVariant = $email->isVariant(true);
-$emailType = $email->getEmailType();
-$sentCount = $email->getSentCount();
+$isVariant    = $email->isVariant(true);
+$showVariants = count($variants['children']);
+$emailType    = $email->getEmailType();
+$sentCount    = $email->getSentCount();
 
 $edit = ($emailType == 'template' || empty($sentCount)) && $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
 
@@ -128,13 +129,62 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                    'email' => $email
                )
            ); ?>
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.click_tracks'); ?>
+                    </a>
+                </li>
+                <?php if ($showVariants): ?>
+                <li>
+                    <a href="#variants-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.variants'); ?>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+            <!--/ tabs controls -->
         </div>
 
-        <?php if (count($variants['children'])): ?>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
+            <div class="tab-pane active bdr-w-0" id="clicks-container">
+                <?php if (!empty($trackableLinks)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered click-list">
+                        <thead>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.page.url'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_count'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_unique_count'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_track_id'); ?></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($trackableLinks as $link): ?>
+                            <tr>
+                                <td><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
+                                <td class="text-center"><?php echo $link['hits']; ?></td>
+                                <td class="text-center"><?php echo $link['unique_hits']; ?></td>
+                                <td><?php echo $link['redirect_id']; ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php else: ?>
+                    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array(
+                        'header'  => 'mautic.email.click_tracks.header_none',
+                        'message' => 'mautic.email.click_tracks.none'
+                    )); ?>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($showVariants): ?>
             <!-- #variants-container -->
-            <div class="tab-pane active bdr-w-0" id="variants-container">
+            <div class="tab-pane bdr-w-0" id="variants-container">
                 <!-- header -->
                 <?php if ($variants['parent']->getVariantStartDate() != null): ?>
                     <div class="box-layout mb-lg">
@@ -271,9 +321,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 </ul>
                 <!--/ end: variants list -->
             </div>
-        <!--/ #variants-container -->
+            <!--/ #variants-container -->
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
     <!--/ left section -->
 
