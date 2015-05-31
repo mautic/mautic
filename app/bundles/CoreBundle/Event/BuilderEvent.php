@@ -36,7 +36,7 @@ class BuilderEvent extends Event
         $this->translator        = $translator;
         $this->entity            = $entity;
         $this->requested         = $requested;
-        $this->tokenFilterTarget = (strpos( $tokenFilter, '{@') === 0) ? 'label' : 'token';
+        $this->tokenFilterTarget = (strpos($tokenFilter, '{@') === 0) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(array('{@', '{', '}'), '', $tokenFilter);
         $this->tokenFilter       = ($this->tokenFilterTarget == 'label') ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -170,9 +170,16 @@ class BuilderEvent extends Event
     /**
      * @param array $tokens
      * @param bool  $allowVisualPlaceholder
+     * @param bool  $convertToLinks
      */
-    public function addTokens(array $tokens, $allowVisualPlaceholder = false)
+    public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
     {
+        if ($convertToLinks) {
+            array_walk($tokens, function(&$val, $key) {
+                $val = 'a:' . $val;
+            });
+        }
+
         $this->tokens = array_merge($this->tokens, $tokens);
 
         if ($allowVisualPlaceholder) {
@@ -275,14 +282,20 @@ class BuilderEvent extends Event
 
         if ($this->tokenFilterTarget == 'label') {
             // Do a search against the label
-            $tokens = array_filter($tokens, function ($v) use ($filter) {
-                return (stripos($v, $filter) === 0);
-            });
+            $tokens = array_filter(
+                $tokens,
+                function ($v) use ($filter) {
+                    return (stripos($v, $filter) === 0);
+                }
+            );
         } else {
             // Do a search against the token
-            $found = array_filter(array_keys($tokens), function ($k) use ($filter) {
-                return (stripos($k, $filter) === 0);
-            });
+            $found = array_filter(
+                array_keys($tokens),
+                function ($k) use ($filter) {
+                    return (stripos($k, $filter) === 0);
+                }
+            );
 
             $tokens = array_intersect_key($tokens, array_flip($found));
         }
@@ -298,12 +311,21 @@ class BuilderEvent extends Event
      * @param string             $labelColumn
      * @param string             $valueColumn
      * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
+     * @param bool               $convertToLinks         If true, the tokens will be converted to links
+     *
      */
-    public function addTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id', $allowVisualPlaceholder = false)
-    {
+    public function addTokensFromHelper(
+        BuilderTokenHelper $tokenHelper,
+        $tokens,
+        $labelColumn = 'name',
+        $valueColumn = 'id',
+        $allowVisualPlaceholder = false,
+        $convertToLinks = false
+    ) {
         $this->addTokens(
             $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn),
-            $allowVisualPlaceholder
+            $allowVisualPlaceholder,
+            $convertToLinks
         );
     }
 
@@ -319,7 +341,12 @@ class BuilderEvent extends Event
      */
     public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
     {
-        return $tokenHelper->getTokens($tokens, ($this->tokenFilterTarget == 'label' ? $this->tokenFilterText : ''), $labelColumn, $valueColumn);
+        return $tokenHelper->getTokens(
+            $tokens,
+            ($this->tokenFilterTarget == 'label' ? $this->tokenFilterText : ''),
+            $labelColumn,
+            $valueColumn
+        );
     }
 
     /**

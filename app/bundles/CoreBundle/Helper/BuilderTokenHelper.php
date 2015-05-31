@@ -147,17 +147,22 @@ class BuilderTokenHelper
     }
 
     /**
-     * @param string              $tokenRegex  Token regex without wrapping regex escape characters.  Use (value) or (.*?) where the ID of the
-     *                                         entity should go. i.e. {pagelink=(value)}
-     * @param string              $filter      String to filter results by
-     * @param string              $labelColumn The column that houses the label
-     * @param string              $valueColumn The column that houses the value
-     * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
+     * @param string              $tokenRegex     Token regex without wrapping regex escape characters.  Use (value) or (.*?) where the ID of the
+     *                                            entity should go. i.e. {pagelink=(value)}
+     * @param string              $filter         String to filter results by
+     * @param string              $labelColumn    The column that houses the label
+     * @param string              $valueColumn    The column that houses the value
+     * @param CompositeExpression $expr           Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
      * @return array|void
      */
-    public function getTokens($tokenRegex, $filter = '', $labelColumn = 'name', $valueColumn = 'id', CompositeExpression $expr = null)
-    {
+    public function getTokens(
+        $tokenRegex,
+        $filter = '',
+        $labelColumn = 'name',
+        $valueColumn = 'id',
+        CompositeExpression $expr = null
+    ) {
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             $this->permissionSet,
