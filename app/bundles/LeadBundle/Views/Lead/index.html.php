@@ -71,7 +71,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     'data-max-id' => $maxLeadId
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
-                'iconClass' => 'fa fa-refresh'
+                'iconClass' => 'fa fa-bolt'
             )
         ),
         'templateButtons' => array(

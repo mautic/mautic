@@ -106,7 +106,9 @@ if ($tmpl == 'index') {
                     <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-md visible-lg">
-                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index"><?php echo $i['submission_count']; ?></a>
+                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo ($i['submission_count'] == 0) ? "disabled=disabled" : ""; ?>>
+                        <?php echo $view['translator']->transChoice('mautic.form.form.viewresults', $i['submission_count'], array('%count%' => $i['submission_count'])); ?>
+                    </a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
