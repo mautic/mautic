@@ -67,7 +67,7 @@ class LeadImportFieldType extends AbstractType
         $builder->add('buttons', 'form_buttons', array(
             'apply_text'   => false,
             'save_text'    => 'mautic.lead.import.start',
-            'save_class'   => 'btn btn-danger',
+            'save_class'   => 'btn btn-primary',
             'save_icon'    => 'fa fa-user-plus',
             'cancel_icon'  => 'fa fa-times'
         ));

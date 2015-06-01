@@ -340,6 +340,30 @@ var Mautic = {
             Mautic.activateMultiSelect(this);
         });
 
+        //initialize tab/hash activation
+        mQuery(container + " .nav-tabs[data-toggle='tab-hash']").each(function() {
+            // Show tab based on hash
+            var hash  = document.location.hash;
+            var prefix = 'tab-';
+
+            if (hash) {
+                var hashPieces = hash.split('?');
+                hash           = hashPieces[0].replace("#", "#" + prefix);
+                var activeTab  = mQuery(this).find('a[href=' + hash + ']').first();
+
+                if (mQuery(activeTab).length) {
+                    mQuery('.nav-tabs li').removeClass('active');
+                    mQuery('.tab-pane').removeClass('in active');
+                    mQuery(activeTab).parent().addClass('active');
+                    mQuery(hash).addClass('in active');
+                }
+            }
+
+            mQuery(this).find('a').on('shown.bs.tab', function (e) {
+                window.location.hash = e.target.hash.replace("#" + prefix, "#");
+            });
+        });
+
         //spin icons on button click
         mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function (event) {
             Mautic.startIconSpinOnEvent(event);
@@ -806,9 +830,9 @@ var Mautic = {
      * @param target
      * @param showPageLoading
      * @param callback
+     * @param data
      */
     loadContent: function (route, link, method, target, showPageLoading, callback, data) {
-        var xhrVar = (target) ? target : 'none';
         if (typeof Mautic.loadContentXhr == 'undefined') {
             Mautic.loadContentXhr = {};
         } else if (typeof Mautic.loadContentXhr[target] != 'undefined') {
@@ -822,6 +846,7 @@ var Mautic = {
             url: route,
             type: method,
             dataType: "json",
+            data: data,
             success: function (response) {
                 if (response) {
                     response.stopPageLoading = showPageLoading;
@@ -1566,7 +1591,7 @@ var Mautic = {
             baseUrl = baseUrl + "?tmpl=" + tmpl
         }
 
-        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
+        var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -1586,7 +1611,7 @@ var Mautic = {
             baseUrl = baseUrl + "?tmpl=" + tmpl
         }
 
-        var route = baseUrl + "?tmpl=" + tmpl + "&name=" + name + "&limit=" + limit;
+        var route = baseUrl + "&name=" + name + "&limit=" + limit;
         Mautic.loadContent(route, '', 'POST', target);
     },
 
@@ -3387,9 +3412,24 @@ var Mautic = {
 
     /**
      * Get entity ID of pages that have an input with id of entityId
+     *
      * @returns {*}
      */
     getEntityId: function() {
         return (mQuery('input#entityId').length) ? mQuery('input#entityId').val() : 0;
+    },
+
+    /**
+     * Close the given modal and redirect to a URL
+     *
+     * @param el
+     * @param url
+     */
+    closeModalAndRedirect: function(el, url) {
+        Mautic.startModalLoadingBar(el);
+
+        Mautic.loadContent(url);
+
+        mQuery('body').css('overflow-y', '');
     }
 };

@@ -26,8 +26,6 @@ $required = array();
 			echo $view->render($template, array('field' => $f->convertToArray(), 'id' => $f->getAlias()));
 	endforeach; ?>
 
-	<div class="mauticform-row mauticform-hidden">
-	    <input type="hidden" name="mauticform[formid]" value="<?php echo $form->getId(); ?>" />
-	    <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
-	</div>
+    <input type="hidden" name="mauticform[formid]" value="<?php echo $form->getId(); ?>" />
+    <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
 </form>

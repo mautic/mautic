@@ -214,7 +214,8 @@ class EmailController extends FormController
         $viewParameters = array_merge($viewParameters, array(
             'permissions' => $permissions,
             'model'       => $model,
-            'security'    => $this->factory->getSecurity()
+            'security'    => $this->factory->getSecurity(),
+            'tmpl'        => $tmpl
         ));
 
         $route = $this->generateUrl('mautic_email_index', array('page' => $page));
@@ -222,10 +223,11 @@ class EmailController extends FormController
             $route .= '#'.$tmpl;
         }
 
+        $template = ($tmpl == 'index') ? 'index' : 'list';
         return $this->delegateView(
             array(
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticEmailBundle:Email:'.$tmpl.'.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:'.$template.'.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
