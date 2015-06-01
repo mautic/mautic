@@ -127,7 +127,7 @@ $contentMode = $form['contentMode']->vars['data'];
                 <?php echo $view['form']->row($form['publishDown']); ?>
                 <?php endif; ?>
 
-                <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+                <?php echo isset($form['unsubscribeForm']) ? $view['form']->row($form['unsubscribeForm']) : ''; ?>
 
                 <?php echo $view['form']->rest($form); ?>
             </div>
