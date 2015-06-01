@@ -23,7 +23,7 @@ $tabs = array('template', 'list');
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <!-- tabs controls -->
-    <ul class="nav nav-tabs pr-md pl-md bg-auto">
+    <ul class="nav nav-tabs pr-md pl-md bg-auto" data-toggle="tab-hash">
         <?php foreach ($tabs as $k => $tab): ?>
         <li<?php if ($k === 0) echo ' class="active"'; ?>>
             <a href="#tab-<?php echo $tab; ?>" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.email.type.' . $tab); ?></a>
@@ -51,14 +51,15 @@ $tabs = array('template', 'list');
                     )); ?>
 
                     <div class="<?php echo $tab; ?>-container">
-                        <?php echo $view->render('MauticEmailBundle:Email:' . $tab . '.html.php', array(
+                        <?php echo $view->render('MauticEmailBundle:Email:list.html.php', array(
                             'items'       => ${$tab}['items'],
                             'totalItems'  => ${$tab}['totalItems'],
                             'page'        => ${$tab}['page'],
                             'limit'       => ${$tab}['limit'],
                             'permissions' => $permissions,
                             'security'    => $security,
-                            'model'       => $model
+                            'model'       => $model,
+                            'tmpl'        => ${$tab}['tmpl'],
                         ));?>
                     </div>
                 </div>

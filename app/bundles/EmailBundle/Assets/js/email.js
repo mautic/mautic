@@ -100,27 +100,6 @@ Mautic.emailOnLoad = function (container, response) {
         if (typeof Mautic.emailStatsLineGraph === 'undefined') {
             Mautic.renderEmailStatsChart();
         }
-
-        // Show tab based on hash
-        var hash  = document.location.hash;
-        var prefix = 'tab-';
-
-        if (hash) {
-            var hashPieces = hash.split('?');
-            hash           = hashPieces[0].replace("#", "#" + prefix);
-            var activeTab  = '.nav-tabs a[href=' + hash + ']';
-
-            if (mQuery(activeTab).length) {
-                mQuery('.nav-tabs li').removeClass('active');
-                mQuery('.tab-pane').removeClass('in active');
-                mQuery(activeTab).parent().addClass('active');
-                mQuery(hash).addClass('in active');
-            }
-        }
-
-        mQuery('.nav-tabs a').on('shown.bs.tab', function (e) {
-            window.location.hash = e.target.hash.replace("#" + prefix, "#");
-        });
     }
 };
 

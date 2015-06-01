@@ -192,5 +192,23 @@ if (!isset($attachmentSize)) {
 </div>
 
 <?php if ($email->getEmailType() === null || !empty($forceTypeSelection)):
-    echo $view->render('MauticEmailBundle:Email:form_select_type.html.php', array('email' => $email));
+    echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
+        array(
+            'item'               => $email,
+            'mauticLang'         => array(
+                'newListEmail' => 'mautic.email.type.list.header',
+                'newTemplateEmail'   => 'mautic.email.type.template.header'
+            ),
+            'typePrefix'         => 'email',
+            'cancelUrl'          => 'mautic_email_index',
+            'header'             => 'mautic.email.type.header',
+            'typeOneHeader'      => 'mautic.email.type.list.header',
+            'typeOneIconClass'   => 'fa-list',
+            'typeOneDescription' => 'mautic.email.type.list.description',
+            'typeOneOnClick'     => "Mautic.selectEmailType('list');",
+            'typeTwoHeader'      => 'mautic.email.type.template.header',
+            'typeTwoIconClass'   => 'fa-cube',
+            'typeTwoDescription' => 'mautic.email.type.template.description',
+            'typeTwoOnClick'     => "Mautic.selectEmailType('template');"
+        ));
 endif;
