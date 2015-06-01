@@ -14,6 +14,7 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PointBundle\Entity\Point;
 
 /**
@@ -187,6 +188,46 @@ class Version20150521000000 extends AbstractMauticMigration
             )
             ->execute();
 
+        // Convert email landing page hits to redirects
+        $q = $this->connection->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
+            ->set('email_id', 'source_id')
+            ->where(
+                $q->expr()->eq('source', $q->expr()->literal('email')),
+                $q->expr()->isNull('email_id')
+            )
+            ->execute();
+
+        $q = $this->connection->createQueryBuilder();
+        $clicks = $q->select('ph.url, ph.email_id, count(distinct(ph.tracking_id)) as unique_click_count, count(ph.tracking_id) as click_count')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull('email_id'),
+                    $q->expr()->isNotNull('page_id')
+                )
+            )
+            ->groupBy('ph.url, ph.email_id')
+            ->execute()->fetchAll();
+
+        // See which already have URLs created as redirects
+        $redirectEntities = array();
+        $em = $this->factory->getEntityManager();
+        foreach ($clicks as $click) {
+            $redirect = new Redirect();
+            $redirect->setDateAdded(new \DateTime());
+            $redirect->setEmail($em->getReference('MauticEmailBundle:Email', $click['email_id']));
+            $redirect->setUrl($click['url']);
+            $redirect->setHits($click['click_count']);
+            $redirect->setUniqueHits($click['unique_click_count']);
+            $redirect->setRedirectId();
+            $redirectEntities[] = $redirect;
+        }
+
+        if (!empty($redirectEntities)) {
+            $this->factory->getModel('page.redirect')->getRepository()->saveEntities($redirectEntities);
+            $em->clear('MauticPageBundle:Redirect');
+        }
 
         // Copy subjects as names
         $q = $this->connection->createQueryBuilder();
@@ -387,8 +428,31 @@ class Version20150521000000 extends AbstractMauticMigration
             // Create new variants
             $emailModel->saveEntities($persistVariants);
 
-            // Now update lead log stats
+            // Now update lead log stats, page hit stats, and email stats
             foreach ($persistListEmails as $templateId => $listEmail) {
+                // Update page hits
+                $sq = $this->connection->createQueryBuilder();
+                $sq->select('es.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+                    ->where(
+                        $sq->expr()->andX(
+                            $sq->expr()->eq('es.email_id', $templateId),
+                            $q->expr()->isNotNull('es.list_id')
+                        )
+                    );
+                $q = $this->connection->createQueryBuilder();
+                $q->update(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+                    ->set('ph.email_id', $listEmail->getId())
+                    ->where('ph.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ph.email_id = ' . $templateId)
+                    ->execute();
+
+                // Update download hits
+                $q = $this->connection->createQueryBuilder();
+                $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad')
+                    ->set('ad.email_id', $listEmail->getId())
+                    ->where('ad.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ad.email_id = ' . $templateId)
+                    ->execute();
+
                 $q = $this->connection->createQueryBuilder();
                 $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
                     ->set('email_id', $listEmail->getId())
@@ -450,6 +514,12 @@ class Version20150521000000 extends AbstractMauticMigration
         );
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'pages CHANGE template template VARCHAR(255) DEFAULT NULL');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
+        $this->addSql(
+            'ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL'
+        );
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
     }
 
     /**
@@ -495,6 +565,11 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER help_message TYPE TEXT');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER template DROP NOT NULL');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
     }
 
     /**
@@ -529,6 +604,10 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD save_result BIT');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER COLUMN template NVARCHAR(255)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN supported_features VARCHAR(MAX)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN api_keys VARCHAR(MAX) NOT NULL');
