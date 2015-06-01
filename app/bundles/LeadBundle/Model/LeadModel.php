@@ -761,7 +761,8 @@ class LeadModel extends FormModel
         if (!empty($fields['dateModified']) && !empty($data[$fields['dateModified']])) {
             try {
                 $dateModified = new DateTimeHelper($data[$fields['dateModified']]);
-                $lead->setDateAdded($dateModified->getUtcDateTime());
+                $lead->setDateModified($dateModified->getUtcDateTime());
+                var_dump($dateModified);
             } catch (Exception $e) {}
             unset($fields['dateModified']);
         }
@@ -786,7 +787,7 @@ class LeadModel extends FormModel
             $userRepo = $this->em->getRepository('MauticUserBundle:User');
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if ($createdByUser !== null) {
-                $lead->setModifiedBy($createdByUser);
+                $lead->setCreatedBy($createdByUser);
             }
             unset($fields['createdByUser']);
         }
