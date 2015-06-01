@@ -12,7 +12,7 @@ return array(
         'main' => array(
             'mautic_lead_emailtoken_index' => array(
                 'path'       => '/leads/emailtokens/{page}',
-                'controller' => 'MauticLeadBundle:SubscribedEvents\EmailToken:index'
+                'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index'
             ),
             'mautic_leadlist_index'        => array(
                 'path'       => '/leads/lists/{page}',

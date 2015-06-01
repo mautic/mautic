@@ -9,31 +9,19 @@
 
 namespace Mautic\PageBundle\Controller\SubscribedEvents;
 
-use Mautic\CoreBundle\Controller\FormController;
 use Mautic\PageBundle\Helper\BuilderTokenHelper;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class BuilderTokenController
  */
-class BuilderTokenController extends FormController
+class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEvents\BuilderTokenController
 {
+
     /**
-     * @param int $page
-     *
-     * @return JsonResponse
+     * @return string
      */
-    public function indexAction($page = 1)
+    protected function getModelName()
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory);
-
-        $dataArray = array(
-            'newContent'     => $tokenHelper->getTokenContent($page),
-            'mauticContent'  => 'builder'
-        );
-
-        $response  = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
-        return $response;
+        return 'page';
     }
 }

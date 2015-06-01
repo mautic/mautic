@@ -9,6 +9,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 

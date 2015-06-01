@@ -10,7 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'emailSend');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send.list', array('%subject%' => $email->getSubject())));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send.list', array('%name%' => $email->getName())));
 
 ?>
 <div class="row">
@@ -30,7 +30,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                                 <?php echo $view['form']->widget($form['batchlimit']); ?>
                                 <span class="input-group-btn">
                                     <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php', array(
-                                        'message'         => $view['translator']->trans('mautic.email.form.confirmsend', array('%name%' => $email->getSubject() . ' (' . $email->getId() . ')')),
+                                        'message'         => $view['translator']->trans('mautic.email.form.confirmsend', array('%name%' => $email->getName() . ' (' . $email->getId() . ')')),
                                         'confirmText'     => $view['translator']->trans('mautic.email.send'),
                                         'confirmCallback' => 'submitSendForm',
                                         'iconClass'       => 'fa fa-send-o',

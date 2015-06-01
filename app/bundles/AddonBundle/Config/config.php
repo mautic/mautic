@@ -45,14 +45,7 @@ return array(
                     'id'        => 'mautic_addon_root',
                     'iconClass' => 'fa-plus-circle',
                     'access'    => 'addon:addons:manage',
-                    'children'  => array(
-                        'mautic.addon.manage.addons'       => array(
-                            'route' => 'mautic_addon_index',
-                        ),
-                        'mautic.addon.manage.integrations' => array(
-                            'route' => 'mautic_addon_integration_index'
-                        ),
-                    )
+                    'route'     => 'mautic_addon_index'
                 )
             )
         )

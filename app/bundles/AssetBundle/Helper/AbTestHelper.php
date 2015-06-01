@@ -69,7 +69,7 @@ class AbTestHelper
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$downloadsLabel][] = 0;
                     $data[$hitsLabel][]        = 0;
-                    $support['labels'][]      = $parent->getId() . ':' . (($type == 'page') ? $parent->getTitle() : $parent->getSubject()) . ' (0%)';
+                    $support['labels'][]      = $parent->getId() . ':' . (($type == 'page') ? $parent->getTitle() : $parent->getName()) . ' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -77,7 +77,7 @@ class AbTestHelper
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$downloadsLabel][] = 0;
                             $data[$hitsLabel][]        = 0;
-                            $support['labels'][]      = $c->getId() . ':' . (($type == 'page') ? $c->getTitle() : $c->getSubject()) . ' (0%)';
+                            $support['labels'][]      = $c->getId() . ':' . (($type == 'page') ? $c->getTitle() : $c->getName()) . ' (0%)';
                         }
                     }
                 }

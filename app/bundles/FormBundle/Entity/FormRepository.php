@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class FormRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      */
@@ -29,14 +28,14 @@ class FormRepository extends CommonRepository
             ->select('count(fs.id)')
             ->from('MauticFormBundle:Submission', 'fs')
             ->where('fs.form = f');
-        $q = $this->createQueryBuilder('f');
 
+        $q = $this->createQueryBuilder('f');
         $q->select('f, ('.$sq->getDql().') as submission_count');
         $q->leftJoin('f.category', 'c');
-        $this->buildClauses($q, $args);
 
-        $query = $q->getQuery();
-        return new Paginator($query);
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
     }
 
     /**

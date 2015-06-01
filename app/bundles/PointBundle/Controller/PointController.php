@@ -66,7 +66,7 @@ class PointController extends FormController
 
         $count = count($points);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.point.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_point_index', array('page' => $lastPage));
 
@@ -439,7 +439,7 @@ class PointController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             $model     = $this->factory->getModel('point');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete

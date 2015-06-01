@@ -106,7 +106,7 @@ class LeadController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.lead.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $lastPage));
@@ -715,7 +715,7 @@ class LeadController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             $model     = $this->factory->getModel('lead');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete

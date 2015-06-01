@@ -64,7 +64,7 @@ class AssetController extends FormController
 
         if (!$permissions['asset:assets:viewother']) {
             $filter['force'][] =
-                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $this->factory->getSession()->get('mautic.asset.orderby', 'a.title');
@@ -85,7 +85,7 @@ class AssetController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.asset.asset', $lastPage);
             $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $lastPage));
@@ -258,7 +258,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
-        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B 
+        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
 
@@ -394,7 +394,7 @@ class AssetController extends FormController
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntity($objectId);
-        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B 
+        $entity->setMaxSize($model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
         $method     = $this->request->getMethod();

@@ -28,8 +28,9 @@ class FormFieldGroupType extends AbstractType
             'label'      => 'mautic.form.field.group.labelattr',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.form.field.help.group.labelattr'
+                'class'     => 'form-control',
+                'tooltip'   => 'mautic.form.field.help.group.labelattr',
+                'maxlength' => '255'
             ),
             'required'   => false
         ));

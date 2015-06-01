@@ -36,24 +36,41 @@ class BuilderSubscriber extends CommonSubscriber
 
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        //add email tokens
-        $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
-        $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
+        if ($event->tokenSectionsRequested()) {
+            //add email tokens
+            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
+            $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
+        }
 
-        //add AB Test Winner Criteria
-        $openRate = array(
-            'group'    => 'mautic.email.abtest.criteria',
-            'label'    => 'mautic.email.abtest.criteria.open',
-            'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
-        );
-        $event->addAbTestWinnerCriteria('email.openrate', $openRate);
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $openRate = array(
+                'group'    => 'mautic.email.abtest.criteria',
+                'label'    => 'mautic.email.abtest.criteria.open',
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
+            );
+            $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
-        $clickThrough = array(
-            'group'    => 'mautic.email.abtest.criteria',
-            'label'    => 'mautic.email.abtest.criteria.clickthrough',
-            'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
+            $clickThrough = array(
+                'group'    => 'mautic.email.abtest.criteria',
+                'label'    => 'mautic.email.abtest.criteria.clickthrough',
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
+            );
+            $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
+        }
+
+        $tokens = array(
+            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{unsubscribe_url}'  => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
+            '{webview_url}'      => $this->translator->trans('mautic.email.token.webview_url')
         );
-        $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
+
+        if ($event->tokensRequested(array_keys($tokens))) {
+            $event->addTokens(
+                $event->filterTokens($tokens)
+            );
+        }
     }
 
     public function onEmailGenerate(EmailSendEvent $event)

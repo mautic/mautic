@@ -86,7 +86,7 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 )
             );
-            $columns       = array_merge($columns, $event->getStandardColumns($prefix, array('name')), $event->getCategoryColumns());
+            $columns       = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
             $data          = array(
                 'display_name' => 'mautic.email.emails',
                 'columns'      => $columns

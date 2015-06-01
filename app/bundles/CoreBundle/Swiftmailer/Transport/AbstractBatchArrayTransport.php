@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Swiftmailer\Transport;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 
@@ -31,6 +32,11 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
      * @var bool
      */
     protected $started = false;
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
 
     /**
      * Test if this Transport mechanism has started.
@@ -134,7 +140,7 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
 
         $to = $this->message->getTo();
         foreach ($to as $email => $name) {
-            $message['recipients']['to'][] = array(
+            $message['recipients']['to'][$email] = array(
                 'email' => $email,
                 'name'  => $name
             );
@@ -143,7 +149,7 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
         $cc = $this->message->getCc();
         if (!empty($cc)) {
             foreach ($cc as $email => $name) {
-                $message['recipients']['cc'][] = array(
+                $message['recipients']['cc'][$email] = array(
                     'email' => $email,
                     'name'  => $name
                 );
@@ -153,7 +159,7 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
         $bcc = $this->message->getBcc();
         if (!empty($bcc)) {
             foreach ($bcc as $email => $name) {
-                $message['recipients']['bcc'][] = array(
+                $message['recipients']['bcc'][$email] = array(
                     'email' => $email,
                     'name'  => $name
                 );
@@ -185,5 +191,13 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
         $message['attachments'] = $attachments;
 
         return $message;
+    }
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function setMauticFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 }
