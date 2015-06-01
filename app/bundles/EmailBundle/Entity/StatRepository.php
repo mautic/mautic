@@ -139,8 +139,12 @@ class StatRepository extends CommonRepository
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('e.email_id, count(e.id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
-            ->where('e.is_failed = 0')
-            ->andWhere($sq->expr()->in('e.email_id', $inIds));
+            ->where(
+                $sq->expr()->andX(
+                    $sq->expr()->eq('e.is_failed', ':false'),
+                    $sq->expr()->in('e.email_id', $inIds)
+                )
+            )->setParameter('false', false, 'boolean');
 
         if ($fromDate !== null) {
             //make sure the date is UTC
@@ -319,8 +323,12 @@ class StatRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
-            ->where('e.is_failed = 0')
-            ->andWhere($q->expr()->in('e.email_id', $emailIds));
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('e.email_id', $emailIds),
+                    $q->expr()->eq('e.is_failed', ':false')
+                )
+            )->setParameter('false', false, 'boolean');
 
         if ($fromDate !== null) {
             //make sure the date is UTC
