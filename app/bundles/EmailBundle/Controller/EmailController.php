@@ -278,7 +278,7 @@ class EmailController extends FormController
         $stats = $model->getEmailListStats($email);
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId());
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_email_action', array(
