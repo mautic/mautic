@@ -52,7 +52,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('dateAdded', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'dateAdded',
+            'label'      => 'mautic.lead.import.label.dateAdded',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -61,7 +61,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('createdByUser', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'createdByUser',
+            'label'      => 'mautic.lead.import.label.createdByUser',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -70,7 +70,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('dateModified', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'dateModified',
+            'label'      => 'mautic.lead.import.label.dateModified',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -79,7 +79,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('modifiedByUser', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'modifiedByUser',
+            'label'      => 'mautic.lead.import.label.modifiedByUser',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -88,7 +88,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('lastActive', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'lastActive',
+            'label'      => 'mautic.lead.import.label.lastActive',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -97,7 +97,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('dateIdentified', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'dateIdentified',
+            'label'      => 'mautic.lead.import.label.dateIdentified',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -106,7 +106,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('ip', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'ip',
+            'label'      => 'mautic.lead.import.label.ip',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -115,7 +115,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('points', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'points',
+            'label'      => 'mautic.lead.import.label.points',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
@@ -124,7 +124,7 @@ class LeadImportFieldType extends AbstractType
 
         $properties->add('doNotEmail', 'choice', array(
             'choices'    => $options['import_fields'],
-            'label'      => 'doNotEmail',
+            'label'      => 'mautic.lead.import.label.doNotEmail',
             'required'   => false,
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
