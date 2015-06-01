@@ -6,9 +6,13 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
-    $view->extend('MauticFormBundle:Form:index.html.php');
+
+
+if (isset($$tmpl)) {
+    // Ajax update
+    extract($$tmpl);
 }
+
 ?>
 <?php if (count($items)): ?>
 <div class="table-responsive">
@@ -18,7 +22,9 @@ if ($tmpl == 'index') {
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'checkall' => 'true',
-                    'target'   => '#formTable'
+                    'target'   => '#formTable',
+                    'tmpl'     => $tmpl,
+                    'target'   => '.' . $tmpl . '-container'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -26,28 +32,36 @@ if ($tmpl == 'index') {
                     'orderBy'    => 'f.name',
                     'text'       => 'mautic.core.name',
                     'class'      => 'col-form-name',
-                    'default'    => true
+                    'default'    => true,
+                    'tmpl'     => $tmpl,
+                    'target'   => '.' . $tmpl . '-container'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'c.title',
                     'text'       => 'mautic.core.category',
-                    'class'      => 'visible-md visible-lg col-form-category'
+                    'class'      => 'visible-md visible-lg col-form-category',
+                    'tmpl'     => $tmpl,
+                    'target'   => '.' . $tmpl . '-container'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'submission_count',
                     'text'       => 'mautic.form.form.results',
-                    'class'      => 'visible-md visible-lg col-form-submissions'
+                    'class'      => 'visible-md visible-lg col-form-submissions',
+                    'tmpl'     => $tmpl,
+                    'target'   => '.' . $tmpl . '-container'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'f.id',
                     'text'       => 'mautic.core.id',
-                    'class'      => 'visible-md visible-lg col-form-id'
+                    'class'      => 'visible-md visible-lg col-form-id',
+                    'tmpl'     => $tmpl,
+                    'target'   => '.' . $tmpl . '-container'
                 ));
                 ?>
             </tr>
@@ -117,11 +131,13 @@ if ($tmpl == 'index') {
     </table>
     <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => $totalItems,
-        "page"            => $page,
-        "limit"           => $limit,
-        "baseUrl"         => $view['router']->generate('mautic_form_index'),
-        'sessionVar'      => 'form'
+        'totalItems'      => $totalItems,
+        'page'            => $page,
+        'limit'           => $limit,
+        'baseUrl'         => $view['router']->generate('mautic_form_index'),
+        'sessionVar'      => 'form.' . $tmpl,
+        'tmpl'            => $tmpl,
+        'target'          => '.' . $tmpl . '-container'
     )); ?>
     </div>
 </div>

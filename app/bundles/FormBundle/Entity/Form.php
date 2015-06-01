@@ -147,6 +147,11 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
+     * @ORM\Column(type="string", nullable=true, name="form_type")
+     */
+    private $formType;
+
+    /**
      * @return void
      */
     public function __clone()
@@ -553,6 +558,14 @@ class Form extends FormEntity
     }
 
     /**
+     * Removes all actions
+     */
+    public function clearActions()
+    {
+        $this->actions = new ArrayCollection();
+    }
+
+    /**
      * Get actions
      *
      * @return \Doctrine\Common\Collections\Collection
@@ -616,5 +629,33 @@ class Form extends FormEntity
     public function isInKioskMode()
     {
         return $this->getInKioskMode();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFormType()
+    {
+        return $this->formType;
+    }
+
+    /**
+     * @param mixed $formType
+     *
+     * @return Form
+     */
+    public function setFormType($formType)
+    {
+        $this->formType = $formType;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStandalone()
+    {
+        return ($this->formType != 'campaign');
     }
 }

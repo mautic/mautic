@@ -158,6 +158,12 @@ class Version20150521000000 extends AbstractMauticMigration
             ->setParameter('true', true, 'boolean')
             ->execute();
 
+        // Set all forms as standalone
+        $q = $this->connection->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'forms')
+            ->set('form_type', $q->expr()->literal('standalone'))
+            ->execute();
+
         // Rebuild all the forms
         /** @var \Mautic\FormBundle\Model\FormModel $formModel */
         $formModel = $this->factory->getModel('form');
@@ -520,6 +526,8 @@ class Version20150521000000 extends AbstractMauticMigration
             'ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL'
         );
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
     }
 
     /**
@@ -570,6 +578,8 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
 
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
     }
 
     /**
@@ -608,6 +618,8 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type NVARCHAR(255)');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN supported_features VARCHAR(MAX)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN api_keys VARCHAR(MAX) NOT NULL');
