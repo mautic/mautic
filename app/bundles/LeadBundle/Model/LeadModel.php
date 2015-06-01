@@ -11,11 +11,12 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\UserBundle\Entity\User;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -757,13 +758,89 @@ class LeadModel extends FormModel
             unset($fields['dateAdded']);
         }
 
+        if (!empty($fields['dateModified']) && !empty($data[$fields['dateModified']])) {
+            try {
+                $dateModified = new DateTimeHelper($data[$fields['dateModified']]);
+                $lead->setDateAdded($dateModified->getUtcDateTime());
+            } catch (Exception $e) {}
+            unset($fields['dateModified']);
+        }
+
+        if (!empty($fields['lastActive']) && !empty($data[$fields['lastActive']])) {
+            try {
+                $lastActive = new DateTimeHelper($data[$fields['lastActive']]);
+                $lead->setLastActive($lastActive->getUtcDateTime());
+            } catch (Exception $e) {}
+            unset($fields['lastActive']);
+        }
+
+        if (!empty($fields['dateIdentified']) && !empty($data[$fields['dateIdentified']])) {
+            try {
+                $dateIdentified = new DateTimeHelper($data[$fields['dateIdentified']]);
+                $lead->setDateIdentified($dateIdentified->getUtcDateTime());
+            } catch (Exception $e) {}
+            unset($fields['dateIdentified']);
+        }
+
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
             $userRepo = $this->em->getRepository('MauticUserBundle:User');
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if ($createdByUser !== null) {
-                $lead->setCreatedBy($createdByUser);
+                $lead->setModifiedBy($createdByUser);
             }
             unset($fields['createdByUser']);
+        }
+
+        if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
+            $userRepo = $this->em->getRepository('MauticUserBundle:User');
+            $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
+            if ($modifiedByUser !== null) {
+                $lead->setModifiedBy($modifiedByUser);
+            }
+            unset($fields['modifiedByUser']);
+        }
+
+        if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
+            $addresses = explode(',', $data[$fields['ip']]);
+            foreach ($addresses as $address) {
+                $ipAddress = new IpAddress;
+                $ipAddress->setIpAddress(trim($address));
+                $lead->addIpAddress($ipAddress);
+            }
+            unset($fields['ip']);
+        }
+
+        if (!empty($fields['points']) && !empty($data[$fields['points']]) && $lead->getId() === null) {
+            // Add points only for new leads
+            $lead->setPoints($data[$fields['points']]);
+
+            //add a lead point change log
+            $log = new PointsChangeLog();
+            $log->setDelta($data[$fields['points']]);
+            $log->setLead($lead);
+            $log->setType('lead');
+            $log->setEventName($this->factory->getTranslator()->trans('mautic.lead.import.event.name'));
+            $log->setActionName($this->factory->getTranslator()->trans('mautic.lead.import.action.name', array(
+                '%name%' => $this->factory->getUser()->getUsername()
+            )));
+            $log->setIpAddress($this->factory->getIpAddress());
+            $log->setDateAdded(new \DateTime());
+            $lead->addPointsChangeLog($log);
+
+            unset($fields['points']);
+        }
+
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $lead->getId() === null) {
+            $model = $this->factory->getModel('email.email');
+            // $stat  = $model->getEmailStatus($message->leadIdHash); // @todo [John]: where to get leadIdHash? 
+
+            // if ($stat !== null) {
+            //     $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.failed', array(
+            //         "%subject%" => $message->getSubject()
+            //     ));
+            //     $model->setDoNotContact($stat, $reason);
+            // }
+            unset($fields['doNotEmail']);
         }
 
         if ($owner !== null) {
