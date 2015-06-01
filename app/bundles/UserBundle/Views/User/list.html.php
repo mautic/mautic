@@ -80,7 +80,7 @@ endif;
                     ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <img class="img img-responsive img-thumbnail" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
+                    <img class="img img-responsive img-thumbnail w-44" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
                     <div><?php echo $item->getName(true); ?></div>

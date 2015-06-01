@@ -100,6 +100,11 @@ class FieldController extends CommonFormController
                     }
                     $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
 
+                    // Force required for captcha
+                    if ($formField['type'] == 'captcha') {
+                        $formField['isRequired'] = true;
+                    }
+
                     // Add it to the next to last assuming the last is the submit button
                     if (count($fields)) {
                         $lastField = end($fields);
@@ -111,6 +116,7 @@ class FieldController extends CommonFormController
                     } else {
                         $fields[$keyId] = $formField;
                     }
+
 
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
@@ -233,6 +239,7 @@ class FieldController extends CommonFormController
                         $session  = $this->factory->getSession();
                         $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
                         $formData = $form->getData();
+
                         //overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
