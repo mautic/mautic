@@ -47,10 +47,10 @@
             <?php foreach ($filter['groups'] as $groupLabel => $groupFilter): ?>
             <optgroup label="<?php echo $view['translator']->trans($groupLabel); ?>"<?php if (isset($groupFilter['prefix'])) echo ' data-prefix="' . $groupFilter['prefix'] . '"'; ?>>
                 <?php if (isset($groupFilter['options'])): ?>
-                <?php foreach ($groupFilter['options'] as $label => $value):
-                    if (is_array($value)):
-                        $label = (!empty($value['label'])) ? $value['label'] : (!empty($value['title']) ? $value['title'] : $value['name']);
-                        $value = (!empty($value['value'])) ? $value['value'] : $value['id'];
+                <?php foreach ($groupFilter['options'] as $value => $label):
+                    if (is_array($label)):
+                        $value = (!empty($label['value'])) ? $label['value'] : $label['id'];
+                        $label = (!empty($label['label'])) ? $label['label'] : (!empty($label['title']) ? $label['title'] : $label['name']);
                     endif;
 
                     $selected = (isset($groupFilter['values']) && in_array($value, $groupFilter['values'])) ? ' selected' : '';
@@ -66,10 +66,10 @@
             <?php endforeach; ?>
 
             <?php elseif (isset($filter['options'])): ?>
-            <?php foreach ($filter['options'] as $label => $value):
-                if (is_array($value)):
-                    $label = (!empty($value['label'])) ? $value['label'] : (!empty($value['title']) ? $value['title'] : $value['name']);
-                    $value = (!empty($value['value'])) ? $value['value'] : $value['id'];
+            <?php foreach ($filter['options'] as $value => $label):
+                if (is_array($label)):
+                    $value = (!empty($label['value'])) ? $label['value'] : $label['id'];
+                    $label = (!empty($label['label'])) ? $label['label'] : (!empty($label['title']) ? $label['title'] : $label['name']);
                 endif;
 
                 $selected = (isset($groupFilter['values']) && in_array($value, $groupFilter['values'])) ? ' selected' : '';

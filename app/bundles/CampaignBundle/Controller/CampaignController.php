@@ -23,6 +23,10 @@ class CampaignController extends FormController
      */
     public function indexAction($page = 1)
     {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+        $model   = $this->factory->getModel('campaign');
+        $session = $this->factory->getSession();
+
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             array(
@@ -45,26 +49,96 @@ class CampaignController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get('mautic.campaign.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.campaign.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.campaign.filter', ''));
-        $this->factory->getSession()->set('mautic.campaign.filter', $search);
+        $search = $this->request->get('search', $session->get('mautic.campaign.filter', ''));
+        $session->set('mautic.campaign.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.campaign.orderby', 'c.name');
-        $orderByDir = $this->factory->getSession()->get('mautic.campaign.orderbydir', 'ASC');
 
-        $campaigns = $this->factory->getModel('campaign')->getEntities(
+        $currentFilters = $session->get('mautic.campaign.list_filters', array());
+        $updatedFilters = $this->request->get('filters', false);
+
+        $sourceLists = $model->getSourceLists();
+        $listFilters = array(
+            'filters'      => array(
+                'multiple' => true,
+                'groups'   => array(
+                    'mautic.campaign.leadsource.form' => array(
+                        'options' => $sourceLists['forms'],
+                        'prefix'  => 'form'
+                    ),
+                    'mautic.campaign.leadsource.list' => array(
+                        'options' => $sourceLists['lists'],
+                        'prefix'  => 'list'
+                    )
+                )
+            )
+        );
+
+        if ($updatedFilters) {
+            // Filters have been updated
+
+            // Parse the selected values
+            $newFilters     = array();
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    list($clmn, $fltr) = explode(':', $updatedFilter);
+
+                    $newFilters[$clmn][] = $fltr;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = array();
+            }
+        }
+        $session->get('mautic.campaign.list_filters', $currentFilters);
+
+        $joinLists = $joinForms = false;
+        if (!empty($currentFilters)) {
+            $listIds = $catIds = array();
+            foreach ($currentFilters as $type => $typeFilters) {
+                $listFilters['filters']['groups']['mautic.campaign.leadsource.' . $type]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ($type == 'list') {
+                        $listIds[] = (int) $fltr;
+                    } else {
+                        $formIds[] = (int) $fltr;
+                    }
+                }
+            }
+
+            if (!empty($listIds)) {
+                $joinLists = true;
+                $filter['force'][] = array('column' => 'l.id', 'expr' => 'in', 'value' => $listIds);
+            }
+
+            if (!empty($formIds)) {
+                $joinForms = true;
+                $filter['force'][] = array('column' => 'f.id', 'expr' => 'in', 'value' => $formIds);
+            }
+        }
+
+        $orderBy    = $session->get('mautic.campaign.orderby', 'c.name');
+        $orderByDir = $session->get('mautic.campaign.orderbydir', 'ASC');
+
+        $campaigns = $model->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'orderByDir' => $orderByDir,
+                'joinLists'  => $joinLists,
+                'joinForms'  => $joinForms
             )
         );
 
@@ -76,7 +150,7 @@ class CampaignController extends FormController
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
-            $this->factory->getSession()->set('mautic.campaign.page', $lastPage);
+            $session->set('mautic.campaign.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_campaign_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(
@@ -93,7 +167,7 @@ class CampaignController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.campaign.page', $page);
+        $session->set('mautic.campaign.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -105,7 +179,8 @@ class CampaignController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl
+                    'tmpl'        => $tmpl,
+                    'filters'     => $listFilters
                 ),
                 'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.php',
                 'passthroughVars' => array(

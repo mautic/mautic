@@ -26,7 +26,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'routeBase'   => 'campaign',
         'templateButtons' => array(
             'delete' => $permissions['campaign:campaigns:delete']
-        )
+        ),
+        'filters'     => $filters
     )); ?>
 
     <div class="page-list">

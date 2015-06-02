@@ -31,6 +31,14 @@ class CampaignRepository extends CommonRepository
             ->from('MauticCampaignBundle:Campaign', $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
+        if (!empty($args['joinLists'])) {
+            $q->leftJoin($this->getTableAlias().'.lists', 'l');
+        }
+
+        if (!empty($args['joinForms'])) {
+            $q->leftJoin($this->getTableAlias().'.forms', 'f');
+        }
+
         $args['qb'] = $q;
 
         return parent::getEntities($args);
