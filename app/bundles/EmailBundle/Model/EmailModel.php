@@ -926,7 +926,7 @@ class EmailModel extends FormModel
 
             // Add tracking pixel token
             if (!empty($tokens)) {
-                $mailer->setCustomTokens($tokens);
+                $mailer->setTokens($tokens);
             }
 
             $mailer->setLead($lead);
@@ -1038,7 +1038,7 @@ class EmailModel extends FormModel
 
         $mailer = $this->factory->getMailer();
         $mailer->setLead($lead, true);
-        $mailer->setCustomTokens($tokens);
+        $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
 
         $mailer->useMailerBatching();
