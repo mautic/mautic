@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -395,6 +396,118 @@ class CampaignModel extends CommonFormModel
         }
 
         return $events;
+    }
+
+    /**
+     * Get list of sources for a campaign
+     *
+     * @param $campaign
+     *
+     * @return array
+     */
+    public function getLeadSources($campaign)
+    {
+        $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
+
+        $sources = array();
+
+        // Lead lists
+        $sources['lists'] = $this->getRepository()->getCampaignListSources($campaignId);
+
+        // Forms
+        $sources['forms'] = $this->getRepository()->getCampaignFormSources($campaignId);
+
+        return $sources;
+    }
+
+    /**
+     * Add and/or delete lead sources from a campaign
+     *
+     * @param $entity
+     * @param $addedSources
+     * @param $deletedSources
+     */
+    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
+    {
+        foreach ($addedSources as $type => $sources) {
+            foreach ($sources as $id) {
+                switch ($type) {
+                    case 'lists':
+                        $entity->addList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        break;
+                    case 'forms':
+                        $entity->addForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        foreach ($deletedSources as $type => $sources) {
+            foreach ($sources as $id) {
+                switch ($type) {
+                    case 'lists':
+                        $entity->removeList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        break;
+                    case 'forms':
+                        $entity->removeForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Get a list of source choices
+     *
+     * @param $sourceType
+     *
+     * @return array
+     */
+    public function getSourceLists($sourceType = null)
+    {
+        $choices = array();
+        switch ($sourceType) {
+            case 'lists':
+            case null:
+                $model = $this->factory->getModel('lead.list');
+                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+
+                foreach ($lists as $list) {
+                    $choices['lists'][$list['id']] = $list['name'];
+                }
+
+            case 'forms':
+            case null:
+                $viewOther = $this->factory->getSecurity()->isGranted('form:forms:viewother');
+                $repo      = $this->factory->getModel('form')->getRepository();
+
+                $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
+                foreach ($forms as $form) {
+                    $choices['forms'][$form['id']] = $form['name'];
+                }
+        }
+
+        foreach ($choices as &$typeChoices) {
+            asort($typeChoices);
+        }
+
+        return ($sourceType == null) ? $choices : $choices[$sourceType];
+    }
+
+    /**
+     * @param mixed $form
+     *
+     * @return array
+     */
+    public function getCampaignsByForm($form)
+    {
+        $formId = ($form instanceof Form) ? $form->getId() : $form;
+
+        return $this->getRepository()->findByFormId($formId);
     }
 
     /**

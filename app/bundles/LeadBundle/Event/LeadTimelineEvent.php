@@ -97,7 +97,7 @@ class LeadTimelineEvent extends Event
                 $e['timestamp'] = $dt->getDateTime();
                 unset($dt);
             }
-            $dateString = $e['timestamp']->format('Y-m-d H:i:s');
+            $dateString = $e['timestamp']->format('Y-m-d H:i');
             if (!isset($byDate[$dateString])) {
                 $byDate[$dateString] = array();
             }
@@ -110,12 +110,12 @@ class LeadTimelineEvent extends Event
 
         // Sort by certain event actions
         $order = array(
+            'lead.ipadded',
             'page.hit',
-            'asset.download',
             'form.submitted',
+            'asset.download',
             'lead.merge',
             'lead.create',
-            'lead.ipadded',
             'lead.identified'
         );
 

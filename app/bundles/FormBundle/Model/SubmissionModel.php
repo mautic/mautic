@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -39,11 +40,11 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param $post
      * @param $server
-     * @param $form
+     * @param Form $form
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
      */
-    public function saveSubmission(&$post, &$server, &$form)
+    public function saveSubmission($post, $server, Form $form)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
 
@@ -174,7 +175,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setResults($results);
 
         //execute submit actions
-        $actions          = $form->getActions();
+        $actions = $form->getActions();
 
         //get post submit actions to make sure it still exists
         $components       = $this->factory->getModel('form')->getCustomComponents();
@@ -251,41 +252,43 @@ class SubmissionModel extends CommonFormModel
             $this->createLeadFromSubmit($form, $leadFieldMatches);
         }
 
-        // Now handle post submission actions
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
-
-            $settings       = $availableActions[$key];
-            $args['action'] = $action;
-            $args['config'] = $action->getProperties();
-
-            // Set the lead each time in case an action updates it
-            $args['lead']   = $leadModel->getCurrentLead();
-
-            $callback       = $settings['callback'];
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
-                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                } else {
-                    $reflection = new \ReflectionMethod(null, $callback);
+        if ($form->isStandalone()) {
+            // Now handle post submission actions
+            foreach ($actions as $action) {
+                $key = $action->getType();
+                if (!isset($availableActions[$key])) {
+                    continue;
                 }
 
-                $pass = array();
-                foreach ($reflection->getParameters() as $param) {
-                    if (isset($args[$param->getName()])) {
-                        $pass[] = $args[$param->getName()];
+                $settings       = $availableActions[$key];
+                $args['action'] = $action;
+                $args['config'] = $action->getProperties();
+
+                // Set the lead each time in case an action updates it
+                $args['lead'] = $leadModel->getCurrentLead();
+
+                $callback = $settings['callback'];
+                if (is_callable($callback)) {
+                    if (is_array($callback)) {
+                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    } elseif (strpos($callback, '::') !== false) {
+                        $parts      = explode('::', $callback);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
-                        $pass[] = null;
+                        $reflection = new \ReflectionMethod(null, $callback);
                     }
+
+                    $pass = array();
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    $returned               = $reflection->invokeArgs($this, $pass);
+                    $args['feedback'][$key] = $returned;
                 }
-                $returned               = $reflection->invokeArgs($this, $pass);
-                $args['feedback'][$key] = $returned;
             }
         }
 
@@ -299,6 +302,20 @@ class SubmissionModel extends CommonFormModel
             $submission->setTrackingId($trackingId);
         }
         $submission->setLead($lead);
+
+        if (!$form->isStandalone()) {
+            // Find and add the lead to the associated campaigns
+
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+            $campaignModel = $this->factory->getModel('campaign');
+
+            $campaigns = $campaignModel->getCampaignsByForm($form);
+            if (!empty($campaigns)) {
+                foreach ($campaigns as $campaign) {
+                    $campaignModel->addLead($campaign, $lead);
+                }
+            }
+        }
 
         //save entity after the form submission events are fired in case a new lead is created
         $this->saveEntity($submission);

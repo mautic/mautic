@@ -32,7 +32,10 @@ $view['slots']->set("headerTitle", $header);
                     <?php echo $view['form']->row($form['name']); ?>
                 </div>
                 <div class="col-md-6">
-                    <?php echo $view['form']->row($form['lists']); ?>
+                    <div class="alert alert-warning pa-sm">
+                        <div><strong><?php echo $view['translator']->trans('mautic.campaign.leadsource.header'); ?></strong></div>
+                        <div><?php echo $view['translator']->trans('mautic.campaign.leadsource.alert'); ?></div>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -56,8 +59,9 @@ $view['slots']->set("headerTitle", $header);
 
 <?php echo $view['form']->end($form); ?>
 <?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array(
-    'campaignId'     => $form['sessionId']->vars['data'],
-    'campaignEvents' => $campaignEvents,
-    'eventSettings'  => $eventSettings,
-    'canvasSettings' => $entity->getCanvasSettings()
+    'campaignId'      => $form['sessionId']->vars['data'],
+    'campaignEvents'  => $campaignEvents,
+    'campaignSources' => $campaignSources,
+    'eventSettings'   => $eventSettings,
+    'canvasSettings'  => $entity->getCanvasSettings()
 )); ?>

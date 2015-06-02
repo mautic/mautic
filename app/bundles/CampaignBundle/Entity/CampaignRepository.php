@@ -150,7 +150,9 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of list IDs assigned to this campaign
      *
-     * @param $id
+     * @param null $id
+     *
+     * @return array
      */
     public function getCampaignListIds($id = null)
     {
@@ -175,6 +177,78 @@ class CampaignRepository extends CommonRepository
         }
 
         return $lists;
+    }
+
+    /**
+     * Get array of list IDs => name assigned to this campaign
+     *
+     * @param null $id
+     *
+     * @return array
+     */
+    public function getCampaignListSources($id)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cl.leadlist_id, l.name')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
+        $q->where(
+            $q->expr()->eq('cl.campaign_id', $id)
+        );
+
+        $lists  = array();
+        $results = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $lists[$r['leadlist_id']] = $r['name'];
+        }
+
+        return $lists;
+    }
+
+    /**
+     * Get array of form IDs => name assigned to this campaign
+     *
+     * @param $id
+     *
+     * @return array
+     */
+    public function getCampaignFormSources($id)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cf.form_id, f.name')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'cf')
+            ->join('cf', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = cf.form_id');
+        $q->where(
+            $q->expr()->eq('cf.campaign_id', $id)
+        );
+
+        $forms   = array();
+        $results = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $forms[$r['form_id']] = $r['name'];
+        }
+
+        return $forms;
+    }
+
+    /**
+     * @param $formId
+     *
+     * @return array
+     */
+    public function findByFormId($formId)
+    {
+        $q = $this->createQueryBuilder('c')
+            ->join('c.forms', 'f');
+        $q->where(
+            $q->expr()->eq('f.id', $formId)
+        );
+
+        $campaigns = $q->getQuery()->getResult();
+
+        return $campaigns;
     }
 
     /**

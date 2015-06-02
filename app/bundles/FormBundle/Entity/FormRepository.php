@@ -43,10 +43,11 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
+     * @param null   $formType
      *
      * @return array
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false)
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null)
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -59,6 +60,12 @@ class FormRepository extends CommonRepository
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('IDENTITY(f.createdBy)', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
+        }
+
+        if (!empty($formType)) {
+            $q->andWhere(
+                $q->expr()->eq('f.formType', ':type')
+            )->setParameter('type', $formType);
         }
 
         $q->orderBy('f.name');

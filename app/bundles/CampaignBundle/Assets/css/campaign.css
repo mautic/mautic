@@ -34,7 +34,7 @@
     z-index: 1000;
 }
 
-.list-campaign-event {
+.list-campaign-event, .list-campaign-source {
     width: 200px;
     height: 45px;
     position: absolute;
@@ -44,7 +44,7 @@
     background: #FFFFFF;
 }
 
-.list-campaign-event:hover {
+.list-campaign-event:hover, .list-campaign-source:hover {
     border:1px solid #123456;
     /*
     box-shadow: 2px 2px 19px #444;
@@ -86,6 +86,11 @@
     /*color: #fff;*/
 }
 
+.list-campaign-leadsource, a.list-campaign-leadsource {
+    /*background-color: #47558f;*/
+    border: solid 1px #fdb933;
+    /*color: #fff;*/
+}
 
 .campaign-builder .list-group-item.ui-draggable-dragging {
     width: 206px;

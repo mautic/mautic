@@ -12,7 +12,7 @@ $fields   = $form->getFields();
 $required = array();
 ?>
 
-<form autocomplete="off" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" onsubmit="return MauticForm_<?php echo $formName; ?>.validateForm();">
+<form autocomplete="off" target="<?php $formName . '_iframe'; ?>" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" onsubmit="return MauticForm_<?php echo $formName; ?>.validateForm();">
 	<div class="mauticform-error" id="mauticform_<?php echo $formName ?>_error"></div>
 	<div class="mauticform-message" id="mauticform_<?php echo $formName ?>_message"></div>
 	<?php foreach ($fields as $f):
@@ -29,3 +29,4 @@ $required = array();
     <input type="hidden" name="mauticform[formid]" value="<?php echo $form->getId(); ?>" />
     <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
 </form>
+<iframe name="<?php $formName . '_iframe'; ?>" style="display: none; margin: 0; padding: 0; border: none; width: 0; height: 0"></iframe>

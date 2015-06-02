@@ -1245,6 +1245,10 @@ var Mautic = {
      * @returns {boolean}
      */
     ajaxifyLink: function (el, event) {
+        if (mQuery(el).hasClass('disabled')) {
+            return false;
+        }
+
         var route = mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0 || MauticVars.routeInProgress === route) {
             return false;
@@ -1298,9 +1302,14 @@ var Mautic = {
      *
      * @param el
      * @param event
+     *
      * @returns {boolean}
      */
     ajaxifyModal: function (el, event) {
+        if (mQuery(el).hasClass('disabled')) {
+            return false;
+        }
+
         var target = mQuery(el).attr('data-target');
 
         var route = mQuery(el).attr('href');
