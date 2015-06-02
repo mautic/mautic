@@ -12,6 +12,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -55,6 +56,9 @@ class FormSubmitHelper
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $factory->getModel('asset');
         $url   = $model->generateUrl($asset, true, array('form', $form->getId()));
+
+        return new RedirectResponse($url);
+
         $msg   = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
             '%url%' => $url
         ));

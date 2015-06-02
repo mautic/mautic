@@ -39,6 +39,19 @@ class TemplateReference extends BaseTemplateReference
     public function getPath()
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
+        //check for template specific theme override
+        preg_match('/^(.*?)\|(.*?)$/', $controller, $templateOverride);
+
+        if (!empty($templateOverride[1])) {
+            $this->parameters['controller'] = $controller = $templateOverride[2];
+            try {
+                $theme    = $this->factory->getTheme($templateOverride[1]);
+                $themeDir = $theme->getThemePath();
+            } catch (\Exception $e) {}
+        } else {
+            $theme    = $this->factory->getTheme();
+            $themeDir = $theme->getThemePath();
+        }
 
         $fileName = $this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
         $path     = (empty($controller) ? '' : $controller.'/').$fileName;
@@ -50,13 +63,12 @@ class TemplateReference extends BaseTemplateReference
             // Check for a system-wide override
             $themePath      = $this->factory->getSystemPath('themes', true);
             $systemTemplate = $themePath.'/system/'.$this->parameters['bundle'].'/'.$path;
+
             if (file_exists($systemTemplate)) {
                 $template = $systemTemplate;
             } else {
-                $theme = $this->factory->getTheme();
                 //check for an override and load it if there is
-                $themeDir = $theme->getThemePath();
-                if (file_exists($themeDir.'/html/'.$this->parameters['bundle'].'/'.$path)) {
+                if (!empty($themeDir) && file_exists($themeDir.'/html/'.$this->parameters['bundle'].'/'.$path)) {
                     // Theme override
                     $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {
