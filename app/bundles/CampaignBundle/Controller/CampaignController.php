@@ -99,7 +99,7 @@ class CampaignController extends FormController
                 $currentFilters = array();
             }
         }
-        $session->get('mautic.campaign.list_filters', $currentFilters);
+        $session->set('mautic.campaign.list_filters', $currentFilters);
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
