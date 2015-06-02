@@ -994,6 +994,18 @@ class MailHelper
     }
 
     /**
+     * Set custom tokens
+     *
+     * @param array $tokens
+     *
+     * @depracated Since 1.1.  Use setTokens() instead. To be removed in 2.0
+     */
+    public function setCustomTokens(array $tokens)
+    {
+        $this->setTokens($tokens);
+    }
+
+    /**
      * Get tokens
      *
      * @return array
