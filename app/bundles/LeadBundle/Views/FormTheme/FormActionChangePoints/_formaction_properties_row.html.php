@@ -17,18 +17,3 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-6">
-        <?php echo $view['form']->row($form['leadField']); ?>
-    </div>
-    <div class="col-xs-6">
-        <?php echo $view['form']->row($form['formField']); ?>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-xs-6">
-        <?php echo $view['form']->row($form['matchMode']); ?>
-    </div>
-</div>
-
