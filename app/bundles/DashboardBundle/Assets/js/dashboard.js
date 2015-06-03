@@ -1,7 +1,7 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
     Mautic.renderDashboardMap();
-    Mautic.renderOpenRateDoughnut();
+    Mautic.renderReturnRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
 
@@ -16,7 +16,7 @@ Mautic.dashboardOnUnload = function(id) {
         delete Mautic.dashboardMapData;
         Mautic.dashboardMap.remove();
         delete Mautic.dashboardClickRateDoughnutObject;
-        delete Mautic.dashboardOpenRateDoughnutObject;
+        delete Mautic.dashboardReturnRateDoughnutObject;
         delete Mautic.ActiveVisitorsCount;
     }
     Mautic.clearModeratedInterval('ActiveVisitorsLoop');
@@ -66,32 +66,32 @@ Mautic.renderDashboardMap = function () {
     Mautic.dashboardMap = element.vectorMap('get', 'mapObject');
 }
 
-Mautic.renderOpenRateDoughnut = function () {
+Mautic.renderReturnRateDoughnut = function () {
     // Initilize chart only for first time
-    if (typeof Mautic.dashboardOpenRateDoughnutObject === 'object') {
+    if (typeof Mautic.dashboardReturnRateDoughnutObject === 'object') {
         return;
     }
-    var element = mQuery('#open-rate');
-    var sentCount = +element.attr('data-sent-count');
-    var readCount = +element.attr('data-read-count');
+    var element = mQuery('#return-rate');
+    var visitCount = +element.attr('data-visit-count');
+    var returnCount = +element.attr('data-return-count');
     var options = {percentageInnerCutout: 65, responsive: false}
     var data = [
         {
-            value: readCount,
+            value: returnCount,
             color:"#4E5D9D",
             highlight: "#353F6A",
-            label: "Opened"
+            label: "Returned"
         },
         {
-            value: sentCount - readCount,
+            value: visitCount - returnCount,
             color: "#efeeec",
             highlight: "#EBEBEB",
-            label: "Not opened"
+            label: "Unique"
         }
     ];
     data = Mautic.emulateNoDataForPieChart(data);
-    var ctx = document.getElementById("open-rate").getContext("2d");
-    Mautic.dashboardOpenRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
+    var ctx = document.getElementById("return-rate").getContext("2d");
+    Mautic.dashboardReturnRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
 }
 
 Mautic.renderClickRateDoughnut = function () {
@@ -100,7 +100,7 @@ Mautic.renderClickRateDoughnut = function () {
         return;
     }
     var element = mQuery('#click-rate');
-    var readCount = +element.attr('data-read-count');
+    var readCount = +element.attr('data-sent-count');
     var clickCount = +element.attr('data-click-count');
     var options = {percentageInnerCutout: 65, responsive: false}
     var data = [

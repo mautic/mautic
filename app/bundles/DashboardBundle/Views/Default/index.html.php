@@ -26,10 +26,10 @@ $colspan = 12/$cols;
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
-                                <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sent_count'] ?>" data-read-count="<?php echo $sentReadCount['read_count'] ?>"></canvas>
-        			            <div class="doughnut-inner-text doughnut-open-rate">
-                                <?php echo $view['translator']->trans('mautic.dashboard.label.open.rate'); ?>
-                                <br><?php echo $openRate ?>%
+                                <canvas id="return-rate" width="110" height="110" data-visit-count="<?php echo array_sum($newReturningVisitors) ?>" data-return-count="<?php echo $newReturningVisitors['returning'] ?>"></canvas>
+        			            <div class="doughnut-inner-text doughnut-return-rate">
+                                <?php echo $view['translator']->trans('mautic.dashboard.label.return.rate'); ?>
+                                <br><?php echo $returnRate ?>%
                                 </div>
     			            </div>
                             <ul class="list-group">
@@ -47,7 +47,7 @@ $colspan = 12/$cols;
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
     			            <div class="text-center doughnut-wrapper">
-                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['read_count'] ?>" data-click-count="<?php echo $clickthroughCount ?>"></canvas>
+                                <canvas id="click-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sent_count'] ?>" data-click-count="<?php echo $clickthroughCount ?>"></canvas>
                                 <div class="doughnut-inner-text doughnut-click-rate">
                                     <?php echo $view['translator']->trans('mautic.dashboard.label.click.rate'); ?>
                                     <br><?php echo $clickRate ?>%
