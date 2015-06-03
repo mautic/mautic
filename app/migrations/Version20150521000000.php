@@ -458,8 +458,8 @@ class Version20150521000000 extends AbstractMauticMigration
     public function postgresqlUp(Schema $schema)
     {
         $this->addSql('CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, PRIMARY KEY(email_id, asset_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id') . '  ON ' . $this->prefix . 'email_assets_xref (email_id)'));
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id') . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)'));
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  ON ' . $this->prefix . 'email_assets_xref (email_id)');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . '  FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . '  FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
 
@@ -503,8 +503,8 @@ class Version20150521000000 extends AbstractMauticMigration
     public function mssqlUp(Schema $schema)
     {
         $this->addSql('CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, PRIMARY KEY (email_id, asset_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id') . '  ON ' . $this->prefix . 'email_assets_xref (email_id)'));
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id') . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)'));
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  ON ' . $this->prefix . 'email_assets_xref (email_id)');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . '  FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . '  FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'assets ADD size INT');
