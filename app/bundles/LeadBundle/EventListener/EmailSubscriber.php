@@ -68,7 +68,7 @@ class EmailSubscriber extends CommonSubscriber
         }
 
         if ($event->tokensRequested($this->leadFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, $this->leadFieldRegex, 'label');
+            $event->addTokensFromHelper($tokenHelper, $this->leadFieldRegex, 'label', 'alias', true);
         }
     }
 

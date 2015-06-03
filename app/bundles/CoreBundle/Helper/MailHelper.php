@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxedException;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -76,9 +77,19 @@ class MailHelper
     private $lead = null;
 
     /**
+     * @var bool
+     */
+    private $internalSend = false;
+
+    /**
      * @var null
      */
     private $idHash = null;
+
+    /**
+     * @var bool
+     */
+    private $appendTrackingPixel = false;
 
     /**
      * @var array
@@ -125,11 +136,26 @@ class MailHelper
     /**
      * @var array
      */
+    private $assets = array();
+
+    /**
+     * @var array
+     */
+    private $assetStats = array();
+
+    /**
+     * @var array
+     */
     private $body = array(
         'content'     => '',
         'contentType' => 'text/html',
         'charset'     => null
     );
+
+    /**
+     * @var bool
+     */
+    private $fatal = false;
 
     /**
      * @param MauticFactory $factory
@@ -169,12 +195,17 @@ class MailHelper
      */
     public function reset($cleanSlate = true)
     {
-        unset($this->lead, $this->email, $this->idHash, $this->tokens, $this->source, $this->queuedRecipients);
+        unset($this->lead, $this->email, $this->assets, $this->idHash, $this->tokens, $this->source, $this->queuedRecipients, $this->errors);
 
-        $this->tokens = $this->source = $this->queuedRecipients = array();
-        $this->lead   = $this->email  = $this->idHash = null;
+        $this->tokens       = $this->source = $this->queuedRecipients = $this->errors = $this->assets = array();
+        $this->lead         = $this->email = $this->idHash = null;
+        $this->internalSend = $this->fatal = false;
+
+        $this->logger->clear();
 
         if ($cleanSlate) {
+            $this->appendTrackingPixel = false;
+
             unset($this->message, $this->subject, $this->body, $this->plainText);
 
             $this->subject = $this->plainText = '';
@@ -183,10 +214,6 @@ class MailHelper
                 'contentType' => 'text/html',
                 'charset'     => null
             );
-
-            $this->errors = array();
-
-            $this->logger->clear();
 
             $this->useBatching = false;
 
@@ -292,6 +319,14 @@ class MailHelper
     }
 
     /**
+     * @return string
+     */
+    static public function getBlankPixel()
+    {
+        return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    }
+
+    /**
      * Get a MauticMessage/Swift_Message instance
      *
      * @return bool|MauticMessage
@@ -313,10 +348,11 @@ class MailHelper
      * Send the message
      *
      * @param bool $dispatchSendEvent
+     * @param bool $fromQueue
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false)
+    public function send($dispatchSendEvent = false, $fromQueue = false)
     {
         // Set from email
         $from = $this->message->getFrom();
@@ -333,14 +369,38 @@ class MailHelper
                 $this->message->addPart($this->plainText, 'text/plain');
             }
 
-            $tokens = ($dispatchSendEvent) ? $this->dispatchSendEvent() : false;
+            // Replace token content
+            if ($dispatchSendEvent) {
+                // Generate custom tokens from listeners
+                $this->dispatchSendEvent();
+            }
 
-            if (!empty($tokens)) {
+            if (!$this->appendTrackingPixel) {
+                $this->tokens['{tracking_pixel}'] = self::getBlankPixel();
+            }
+
+            if (!empty($this->tokens)) {
                 // Replace tokens
-                $search  = array_keys($tokens);
-                $replace = $tokens;
+                $search  = array_keys($this->tokens);
+                $replace = $this->tokens;
 
                 self::searchReplaceTokens($search, $replace, $this->message);
+            }
+
+            // Attach assets
+            if (!empty($this->assets)) {
+                foreach ($this->assets as $asset) {
+                    $this->attachFile(
+                        $asset->getAbsolutePath(),
+                        $asset->getOriginalFileName(),
+                        $asset->getMime()
+                    );
+                }
+            }
+
+            if (!$fromQueue) {
+                // Queue an asset stat if applicable
+                $this->queueAssetDownloadEntry();
             }
 
             try {
@@ -356,7 +416,11 @@ class MailHelper
             }
         }
 
-        return empty($this->errors);
+        $error = empty($this->errors);
+
+        $this->createAssetDownloadEntries();
+
+        return $error;
     }
 
     /**
@@ -371,6 +435,12 @@ class MailHelper
     public function queue($dispatchSendEvent = false, $resetMessageIfNotQueued = true)
     {
         if ($this->useBatching) {
+
+            // Dispatch event to get custom tokens from listeners
+            if ($dispatchSendEvent) {
+                $this->dispatchSendEvent();
+            }
+
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
                 $this->message->addMetadata($email,
@@ -379,11 +449,15 @@ class MailHelper
                         'emailId'  => (!empty($this->email)) ? $this->email->getId() : null,
                         'hashId'   => $this->idHash,
                         'source'   => $this->source,
-                        'tokens'   => ($dispatchSendEvent) ? $this->dispatchSendEvent() : array()
+                        'tokens'   => $this->tokens
                     )
                 );
             }
 
+            // Add asset stats if applicable
+            $this->queueAssetDownloadEntry();
+
+            // Reset recipients
             $this->queuedRecipients = array();
 
             // Assume success
@@ -409,29 +483,34 @@ class MailHelper
      */
     public function flushQueue($resetEmailTypes = array('To', 'Cc', 'Bcc'))
     {
-        $to = $this->message->getTo();
-        if (!empty($to)) {
-            $result = $this->send(false);
+        if ($this->useBatching) {
+            $to = $this->message->getTo();
+            if (!empty($to)) {
+                $result = $this->send(false, true);
 
-            // Clear queued to recipients
-            $this->queuedRecipients = array();
+                // Clear queued to recipients
+                $this->queuedRecipients = array();
 
-            foreach ($resetEmailTypes as $type) {
-                $type    = ucfirst($type);
-                $headers = $this->message->getHeaders();
+                foreach ($resetEmailTypes as $type) {
+                    $type    = ucfirst($type);
+                    $headers = $this->message->getHeaders();
 
-                if ($headers->has($type)) {
-                    $this->message->getHeaders()->remove($type);
+                    if ($headers->has($type)) {
+                        $this->message->getHeaders()->remove($type);
+                    }
                 }
+
+                // Clear metadat for the previous recipients
+                $this->message->clearMetadata();
+
+                return $result;
             }
 
-            // Clear metadat for the previous recipients
-            $this->message->clearMetadata();
-
-            return $result;
+            return false;
         }
 
-        return false;
+        // Batching was not enabled and thus sent with queue()
+        return true;
     }
 
     /**
@@ -469,6 +548,27 @@ class MailHelper
         }
 
         $this->message->attach($attachment);
+    }
+
+    /**
+     * @param int|Asset $asset
+     */
+    public function attachAsset($asset)
+    {
+        $model = $this->factory->getModel('asset');
+
+        if (!$asset instanceof Asset) {
+            $asset = $model->getEntity($asset);
+
+            if ($asset == null) {
+                return;
+            }
+        }
+
+        if ($asset->isPublished()) {
+            $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+            $this->assets[$asset->getId()] = $asset;
+        }
     }
 
     /**
@@ -526,11 +626,29 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null)
     {
+        // Append tracking pixel
+        $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+        if (strpos($content, '</body>') !== false) {
+            $content = str_replace('</body>', $trackingImg.'</body>', $content);
+        } else {
+            $content .= $trackingImg;
+        }
+
         $this->body = array(
             'content'     => $content,
             'contentType' => $contentType,
             'charset'     => $charset
         );
+    }
+
+    /**
+     * Get a copy of the raw body
+     *
+     * @return mixed
+     */
+    public function getBody()
+    {
+        return $this->body['content'];
     }
 
     /**
@@ -708,6 +826,17 @@ class MailHelper
     {
         $this->idHash = $idHash;
 
+        // Append pixel to body before send
+        $this->appendTrackingPixel = true;
+
+        $this->tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
+            'mautic_email_tracker',
+            array(
+                'idHash' => $this->idHash
+            ),
+            true
+        );
+
         // Add the trackingID to the $message object in order to update the stats if the email failed to send
         $this->message->leadIdHash = $idHash;
     }
@@ -722,10 +851,13 @@ class MailHelper
 
     /**
      * @param null $lead
+     * @param bool internalSend  Set to true if the email is not being sent to this lead
      */
-    public function setLead($lead)
+    public function setLead($lead, $interalSend = false)
     {
         $this->lead = $lead;
+
+        $this->internalSend = $interalSend;
     }
 
     /**
@@ -754,9 +886,11 @@ class MailHelper
 
     /**
      * @param Email $email
-     * @param bool  $allowBcc
+     * @param bool  $allowBcc           Honor BCC if set in email
+     * @param array $slots              Slots configured in theme
+     * @param array $assetAttachments   Assets to send
      */
-    public function setEmail(Email $email, $allowBcc = true)
+    public function setEmail(Email $email, $allowBcc = true, $slots = array(), $assetAttachments = array())
     {
         $this->email = $email;
 
@@ -789,18 +923,74 @@ class MailHelper
         if ($plainText = $email->getPlainText()) {
             $this->setPlainText($plainText);
         }
+
+        $template = $email->getTemplate();
+        if (!empty($template)) {
+            if (empty($slots)) {
+                $template = $email->getTemplate();
+                $slots    = $this->factory->getTheme($template)->getSlots('email');
+            }
+
+            $customHtml = $this->setTemplate('MauticEmailBundle::public.html.php', array(
+                'slots'    => $slots,
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $template
+            ), true);
+        } else {
+            // Tak on the tracking pixel token
+            $customHtml = $email->getCustomHtml();
+        }
+
+        if (empty($assetAttachments)) {
+            if ($assets = $email->getAssetAttachments()) {
+                foreach ($assets as $asset) {
+                    $this->attachAsset($asset);
+                }
+            }
+        } else {
+            foreach ($assetAttachments as $asset) {
+                $this->attachAsset($asset);
+            }
+        }
+
+        $this->setBody($customHtml);
     }
 
     /**
+     * Append tokens
+     *
      * @param array $tokens
      */
-    public function setCustomTokens(array $tokens)
+    public function addCustomTokens(array $tokens)
     {
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
     /**
+     * Set tokens; be sure to call this BEFORE setIdHash()!
+     *
+     * @param array $tokens
+     */
+    public function setCustomTokens(array $tokens)
+    {
+        $this->tokens = $tokens;
+    }
+
+    /**
+     * Get tokens
+     *
+     * @return array
+     */
+    public function getTokens()
+    {
+        return $this->tokens;
+    }
+
+    /**
      * Parses html into basic plaintext
+     *
+     * @param string $content
      */
     public function parsePlainText($content = null)
     {
@@ -848,11 +1038,7 @@ class MailHelper
 
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
-        $tokens = $event->getTokens();
-
-        unset($event);
-
-        return $tokens;
+        $this->tokens = $event->getTokens();
     }
 
     /**
@@ -862,7 +1048,11 @@ class MailHelper
      */
     private function logError($error)
     {
-        $error = ($error instanceof \Exception) ? $error->getMessage() : $error;
+        if ($error instanceof \Exception) {
+            $error = $error->getMessage();
+
+            $this->fatal = true;
+        }
 
         $this->errors[] = $error;
 
@@ -884,5 +1074,57 @@ class MailHelper
     public function getTransport()
     {
         return $this->transport;
+    }
+
+    /**
+     * Creates a download stat for the asset
+     */
+    private function createAssetDownloadEntries()
+    {
+        // Nothing was sent out so bail
+        if ($this->fatal || empty($this->assetStats)) {
+            return;
+        }
+
+        if (isset($this->errors['failures'])) {
+            // Remove the failures from the asset queue
+            foreach ($this->errors['failures'] as $failed) {
+                unset($this->assetStats[$failed]);
+            }
+        }
+
+        // Create a download entry if there is an Asset attachment
+        if (!empty($this->assetStats)) {
+            /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
+            $assetModel = $this->factory->getModel('asset');
+            foreach ($this->assets as $asset) {
+                foreach ($this->assetStats as $stat) {
+                    $assetModel->trackDownload(
+                        $asset,
+                        null,
+                        200,
+                        $stat
+                    );
+                }
+            }
+        }
+
+        // Reset the stat
+        $this->assetStats = array();
+    }
+
+    /**
+     * Queues the details to note if a lead received an asset if no errors are generated
+     */
+    private function queueAssetDownloadEntry()
+    {
+        if (!$this->internalSend && !empty($this->lead) && !empty($this->assets)) {
+            $this->assetStats[$this->lead['email']] = array(
+                'lead'        => $this->lead['id'],
+                'email'       => $this->email->getId(),
+                'source'      => array('email', $this->email->getId()),
+                'tracking_id' => $this->idHash
+            );
+        }
     }
 }

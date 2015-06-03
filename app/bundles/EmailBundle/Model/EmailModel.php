@@ -59,7 +59,7 @@ class EmailModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
+     * @param Email $entity
      * @param       $unlock
      *
      * @return mixed
@@ -286,37 +286,15 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Get list of entities for autopopulate fields
-     *
-     * @param $type
-     * @param $filter
-     * @param $limit
-     *
-     * @return array
-     */
-    public function getLookupResults ($type, $filter = '', $limit = 10)
-    {
-        $results = array();
-        switch ($type) {
-            case 'email':
-                $viewOther = $this->security->isGranted('email:emails:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->factory->getUser());
-                $results = $repo->getEmailList($filter, $limit, 0, $viewOther);
-                break;
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param      $trackingHash
+     * @param string|Stat   $stat
      * @param      $request
      * @param bool $viaBrowser
      */
-    public function hitEmail ($trackingHash, $request, $viaBrowser = false)
+    public function hitEmail ($stat, $request, $viaBrowser = false)
     {
-        $stat = $this->getEmailStatus($trackingHash);
+        if (!$stat instanceof Stat) {
+            $stat = $this->getEmailStatus($stat);
+        }
 
         if (!$stat) {
             return;
@@ -324,32 +302,40 @@ class EmailModel extends FormModel
 
         $email = $stat->getEmail();
 
-        if (!empty($stat) && (int)$stat->isRead()) {
+        if ((int) $stat->isRead()) {
             if ($viaBrowser && !$stat->getViewedInBrowser()) {
                 //opened via browser so note it
                 $stat->setViewedInBrowser($viaBrowser);
-                $this->em->persist($stat);
-                $this->em->flush();
             }
-
-            return;
         }
 
-        $stat->setIsRead(true);
-        $stat->setDateRead(new \Datetime());
-        $stat->setViewedInBrowser($viaBrowser);
+        $readDateTime = $this->factory->getDate();
+        $stat->setLastOpened($readDateTime->getDateTime());
 
-        $readCount = $email->getReadCount();
-        $readCount++;
-        $email->setReadCount($readCount);
+        if (!$stat->getIsRead()) {
+            $stat->setIsRead(true);
+            $stat->setDateRead($readDateTime->getDateTime());
 
-        if ($email->isVariant()) {
-            $variantReadCount = $email->getVariantReadCount();
-            $variantReadCount++;
-            $email->setVariantReadCount($variantReadCount);
+            $readCount = $email->getReadCount();
+            $readCount++;
+            $email->setReadCount($readCount);
+
+            if ($email->isVariant()) {
+                $variantReadCount = $email->getVariantReadCount();
+                $variantReadCount++;
+                $email->setVariantReadCount($variantReadCount);
+            }
         }
 
-        $this->em->persist($email);
+        if ($viaBrowser) {
+            $stat->setViewedInBrowser($viaBrowser);
+        }
+
+        $stat->addOpenDetails(array(
+            'datetime'  => $readDateTime->toUtcString(),
+            'useragent' => $request->server->get('HTTP_USER_AGENT'),
+            'inBrowser' => $viaBrowser
+        ));
 
         //check for existing IP
         $ipAddress = $this->factory->getIpAddress();
@@ -362,10 +348,13 @@ class EmailModel extends FormModel
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
 
+            /*
+            // @todo too many webmail clients mask IP address
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
                 $leadModel->saveEntity($lead, true);
             }
+            */
 
             // Set the lead as current lead
             $leadModel->setCurrentLead($lead);
@@ -376,10 +365,10 @@ class EmailModel extends FormModel
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
         }
 
+        $this->em->persist($email);
         $this->em->persist($stat);
         $this->em->flush();
     }
-
 
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
@@ -405,6 +394,9 @@ class EmailModel extends FormModel
             switch ($requested) {
                 case 'tokens':
                     $components[$requested] = $event->getTokens();
+                    break;
+                case 'visualTokens':
+                    $components[$requested] = $event->getVisualTokens();
                     break;
                 case 'tokenSections':
                     $components[$requested] = $event->getTokenSections();
@@ -528,43 +520,39 @@ class EmailModel extends FormModel
 
         $combined = $this->translator->trans('mautic.email.lists.combined');
         $datasets = array(
-            $combined => array(0, 0, 0, 0)
+            $combined => array(0, 0, 0)
         );
 
         $labels = array(
-            $this->translator->trans('mautic.email.total'),
             $this->translator->trans('mautic.email.sent'),
             $this->translator->trans('mautic.email.read'),
             $this->translator->trans('mautic.email.failed')
         );
 
         if ($listCount) {
-            $listRepo = $this->em->getRepository('MauticLeadBundle:LeadList');
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
             foreach ($lists as $l) {
                 $name = $l->getName();
 
-                $recipientCount = $listRepo->getLeadCount($l->getId());
-                $datasets[$combined][0] += $recipientCount;
-
                 $sentCount = $statRepo->getSentCount($entity->getId(), $l->getId());
-                $datasets[$combined][1] += $sentCount;
+                $datasets[$combined][0] += $sentCount;
 
                 $readCount = $statRepo->getReadCount($entity->getId(), $l->getId());
-                $datasets[$combined][2] += $readCount;
+                $datasets[$combined][1] += $readCount;
 
                 $failedCount = $statRepo->getFailedCount($entity->getId(), $l->getId());
-                $datasets[$combined][3] += $failedCount;
+                $datasets[$combined][2] += $failedCount;
 
                 $datasets[$name] = array();
 
                 $datasets[$name] = array(
-                    $recipientCount,
                     $sentCount,
                     $readCount,
                     $failedCount
                 );
+
+                $datasets[$name]['datasetKey'] = $l->getId();
             }
         }
 
@@ -575,6 +563,38 @@ class EmailModel extends FormModel
         $data = GraphHelper::prepareBarGraphData($labels, $datasets);
 
         return $data;
+    }
+
+    /**
+     * @param int    $emailId
+     * @param int    $amount
+     * @param string $unit
+     *
+     * @return array
+     */
+    public function getEmailGeneralStats ($emailId, $amount = 30, $unit = 'D')
+    {
+        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+
+        $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
+            array(
+                $this->translator->trans('mautic.email.stat.sent'),
+                $this->translator->trans('mautic.email.stat.read'),
+                $this->translator->trans('mautic.email.stat.failed')
+            )
+        );
+        $fromDate = $graphData['fromDate'];
+
+        $sentData  = $statRepo->getEmailStats($emailId, $fromDate, 'sent');
+        $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
+
+        $readData  = $statRepo->getEmailStats($emailId, $fromDate, 'read');
+        $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
+
+        $failedData  = $statRepo->getEmailStats($emailId, $fromDate, 'failed');
+        $graphData = GraphHelper::mergeLineGraphData($graphData, $failedData, $unit, 2, 'date', 'data');
+
+        return $graphData;
     }
 
     /**
@@ -675,7 +695,7 @@ class EmailModel extends FormModel
             $emailSettings = array(
                 $email->getId() => array(
                     'template'     => $email->getTemplate(),
-                    'slots'        => $this->factory->getTheme($email->getTemplate())->getSlots('email'),
+                    'slots'        => $slots,
                     'sentCount'    => $email->getSentCount(),
                     'variantCount' => $email->getVariantSentCount(),
                     'entity'       => $email
@@ -743,9 +763,10 @@ class EmailModel extends FormModel
      *     array source array('model', 'id')
      *     array emailSettings
      *     int   listId
-     *     bool  allowResends    If false, exact emails (by id) already sent to the lead will not be resent
-     *     bool  ignoreDNC       If true, emails listed in the do not contact table will still get the email
-     *     bool  sendBatchMail   If false, the function will not send batched mail but will defer to calling function to handle it
+     *     bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *     bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *     bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
+     *     array assetAttachments Array of optional Asset IDs to attach
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
@@ -759,6 +780,7 @@ class EmailModel extends FormModel
         $allowResends     = (isset($options['allowResends'])) ? $options['allowResends'] : true;
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
+        $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : array();
 
         if (!$email->getId()) {
             return false;
@@ -879,34 +901,20 @@ class EmailModel extends FormModel
                 // Flush the mail queue if applicable
                 $flushQueue();
 
-                if ($useEmail['entity']->getContentMode() == 'builder') {
-                    $customHtml = $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                        'slots'    => $useEmail['slots'],
-                        'content'  => $useEmail['entity']->getContent(),
-                        'email'    => $useEmail['entity'],
-                        'template' => $useEmail['template']
-                    ), true);
-                } else {
-                    // Tak on the tracking pixel token
-                    $customHtml  = $useEmail['entity']->getCustomHtml();
-                    $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
-                    if (strpos($customHtml, '</body>') !== false) {
-                        $customHtml = str_replace('</body>', $trackingImg . '</body>', $customHtml);
-                    } else {
-                        $customHtml .= $trackingImg;
-                    }
-                }
-
                 $contentGenerated = $useEmail['entity']->getId();
 
                 // Use batching if supported
                 $mailer->useMailerBatching();
                 $mailer->setSource($source);
-                $mailer->setBody($customHtml);
-                $mailer->setEmail($useEmail['entity']);
+                $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
             }
 
             $idHash = uniqid();
+
+            // Add tracking pixel token
+            if (!empty($tokens)) {
+                $mailer->setCustomTokens($tokens);
+            }
 
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
@@ -919,13 +927,6 @@ class EmailModel extends FormModel
 
                 $mailer->addTo($lead['email'], $lead['firstname'] . ' ' . $lead['lastname']);
             }
-
-            // Add tracking pixel token
-            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate('mautic_email_tracker', array('idHash' => $idHash), true);
-            $mailer->setCustomTokens($tokens);
-
-            // Unset tracking pixel for the stat entry
-            unset($tokens['{tracking_pixel}']);
 
             //queue or send the message
             if (!$mailer->queue(true)) {
@@ -942,7 +943,6 @@ class EmailModel extends FormModel
             $stat = new Stat();
             $stat->setDateSent(new \DateTime());
 
-            //use reference to set the email to avoid persist errors
             $stat->setEmail($useEmail['entity']);
             $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
             if ($listId) {
@@ -954,8 +954,8 @@ class EmailModel extends FormModel
                 $stat->setSource($source[0]);
                 $stat->setSourceId($source[1]);
             }
-            //Set custom tokens specific to this email
-            $stat->setTokens($tokens);
+            $stat->setCopy($mailer->getBody());
+            $stat->setTokens($mailer->getTokens());
 
             $saveEntities[$lead['email']] = $stat;
 
@@ -999,11 +999,12 @@ class EmailModel extends FormModel
      * @param       $users
      * @param mixed $lead
      * @param array $tokens
+     * @param array $assetAttachments
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser ($email, $users, $lead = null, $tokens = array())
+    public function sendEmailToUser ($email, $users, $lead = null, $tokens = array(), $assetAttachments = array())
     {
         if (!$emailId = $email->getId()) {
             return false;
@@ -1022,27 +1023,17 @@ class EmailModel extends FormModel
             return false;
         }
 
-        $idHash = uniqid();
-
         $mailer = $this->factory->getMailer();
-        $mailer->setLead($lead);
+        $mailer->setLead($lead, true);
         $mailer->setCustomTokens($tokens);
+        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
 
-        if ($email->getContentMode() == 'builder') {
-            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                'slots'    => $emailSettings[$emailId]['slots'],
-                'content'  => $email->getContent(),
-                'email'    => $email,
-                'template' => $emailSettings[$emailId]['template'],
-                'idHash'   => $idHash
-            ));
-        } else {
-            $mailer->setBody($email->getCustomHtml());
-        }
-
-        $mailer->setEmail($email, false);
+        $mailer->useMailerBatching();
 
         foreach ($users as $user) {
+            $idHash = uniqid();
+            $mailer->setIdHash($idHash);
+
             if (!is_array($user)) {
                 $id   = $user;
                 $user = array('id' => $id);
@@ -1059,11 +1050,32 @@ class EmailModel extends FormModel
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            $mailer->addto($user['email'], $user['firstname'] . ' ' . $user['lastname']);
+            $mailer->setTo($user['email'], $user['firstname'] . ' ' . $user['lastname']);
+
+            $mailer->queue();
+
+            //create a stat
+            $stat = new Stat();
+            $stat->setDateSent(new \DateTime());
+            $stat->setEmail($email);
+            $stat->setEmailAddress($user);
+            $stat->setTrackingHash($idHash);
+            if (!empty($source)) {
+                $stat->setSource($source[0]);
+                $stat->setSourceId($source[1]);
+            }
+            $stat->setCopy($mailer->getBody());
+            $stat->setTokens($mailer->getTokens());
+
+            $saveEntities[] = $stat;
         }
 
-        //queue the message
-        $mailer->send(true);
+        //flush the message
+        $mailer->flushQueue();
+
+        if (isset($saveEntities)) {
+            $this->getStatRepository()->saveEntities($saveEntities);
+        }
 
         //save some memory
         unset($mailer);
@@ -1136,7 +1148,7 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param $bouncedHashIds
+     * @param array $bounces
      */
     public function updateBouncedStats(array $bounces)
     {

@@ -52,6 +52,7 @@ function CKEDITOR_tokens(editor) {
     this.observe = 0;
     this.char_input = [];
     this.timeout_id = null;
+    this.ajaxUrl = '';
 
     if (CKEDITOR_tokens.caller !== CKEDITOR_tokens.get_instance) {
         throw new Error("This object cannot be instanciated");
@@ -175,45 +176,40 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
     var element = range.startContainer.$;
     var tokenAction = $('#' + element_id).data('token-callback');
 
-    $.get(mauticAjaxUrl + '?action=' + tokenAction, {query: str}, function (rsp) {
-
+    $.get(CKEDITOR_tokens.ajaxUrl + '?action=' + tokenAction, {query: str}, function (rsp) {
         var ckel = $('#' + element_id);
-        var par = ckel.parent();
+        var par  = ckel.parent();
 
         $('.token-suggestions').remove();
 
         if (rsp && rsp.html) {
 
             var position = 'absolute';
+            var dummyElement = editor.document.createElement('img',
+                {
+                    attributes: {
+                        src: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+                        width: 0,
+                        height: 0,
+                        id: 'dummy-element'
+                    }
+                });
+
+            editor.insertElement(dummyElement);
+
+
             if (editor.editable().isInline()) {
-                editor.insertHtml('<span id="dummy-element">placeholder</span>');
-
-                // Account for left/right scrolling
-                var scrollTop = $(document).scrollTop();
-                var scrollLeft = $(document).scrollLeft();
-
                 // Dummy offset
-                var dummyEl = $('#dummy-element');
+                var dummyEl     = $('#dummy-element');
                 var dummyOffset = $(dummyEl).offset();
                 var dummyTop    = dummyOffset.top;
                 var dummyLeft   = dummyOffset.left;
 
+                var x = dummyLeft;
+                var y = dummyTop;
 
-                var x = 10 + dummyLeft - scrollLeft;
-                var y = 10 + dummyTop - scrollTop;
+                var appendToMe = $('body');
             } else {
-                var dummyElement = editor.document.createElement('img',
-                    {
-                        attributes: {
-                            src: 'null',
-                            width: 0,
-                            height: 0,
-                            id: 'dummy-element'
-                        }
-                    });
-
-                editor.insertElement(dummyElement);
-
                 // Parent offset
                 var parentOffset = $(par).offset();
                 var parentTop    = parentOffset.top;
@@ -237,6 +233,8 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
 
                 var x = (editorLeft - parentLeft) + (dummyLeft - scrollLeft);
                 var y = (editorTop - parentTop) + (dummyTop - scrollTop);
+
+                var appendToMe = par;
             }
 
             // Give some buffer
@@ -269,8 +267,9 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
                 $('#cke_' + element_id).hide();
             }
 
-            $('<div class="token-suggestions" style="position: ' + position + '; top: ' + y + 'px; left: ' + x + 'px; z-index: 10000;">' + rsp.html + '</div>').appendTo(par);
+            $('<div class="token-suggestions" style="position: ' + position + '; top: ' + y + 'px; left: ' + x + 'px; z-index: 10000;">' + rsp.html + '</div>').appendTo(appendToMe);
 
+            /*
             $(document).on('keyup.tokenSuggestion', (function(e) {
                 if (e.keyCode == 27) { // esc keycode
                     $(document).off('click.tokenSuggestions');
@@ -294,6 +293,7 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
                     $('.token-suggestions').remove();
                 }
             });
+            */
         }
 
         $('.inline-token').click(function (e) {
@@ -312,8 +312,20 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
             // Shorten text node
             element.textContent = element.textContent.substr(0, startOffset);
 
-            // Create link
-            var tokenContent = document.createTextNode($(this).data('token'));
+            if ($(this).data('visual')) {
+                // Placeholder
+                var tokenContent = document.createElement('strong');
+                var em           = document.createElement('em');
+                tokenContent.appendChild(em);
+
+                tokenContent.setAttribute('data-token', $(this).data('token'));
+                tokenContent.setAttribute('contenteditable', 'false');
+
+                var description = document.createTextNode('**' + $(this).data('description') + '**');
+                em.appendChild(description);
+            } else {
+                var tokenContent = document.createTextNode($(this).data('token'));
+            }
 
             // Insert link after text node
             // this is used when the link is inserted not at the end of the text
@@ -326,11 +338,10 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
             }
 
             editor.focus();
-            var range = editor.createRange(),
+            var range = editor.createRange();
                 el = new CKEDITOR.dom.element(tokenContent.parentNode);
             range.moveToElementEditablePosition(el, tokenContent.parentNode.textContent.length);
             range.select();
-
         });
     });
 
@@ -363,12 +374,12 @@ CKEDITOR_tokens.prototype.break_on = function (charcode) {
 ///////////////////////////////////////////////////////////////
 //      Plugin implementation
 ///////////////////////////////////////////////////////////////
-(function ($) {
+(function ($, ajaxUrl) {
     CKEDITOR.plugins.add('tokens', {
         icons: '',
         init: function (editor) {
             var tokens = CKEDITOR_tokens.get_instance(editor);
-
+            CKEDITOR_tokens.ajaxUrl = ajaxUrl;
             /* The only way (it seems) to get a reliable, cross-browser and platform return for which key was pressed,
              * is using the jquery which function onkeypress. On keydown or up returns different values!
              * see also: http://jsfiddle.net/SpYk3/NePCm/
@@ -420,5 +431,5 @@ CKEDITOR_tokens.prototype.break_on = function (charcode) {
             }); // end editor.on
         } // end init function
     });
-})(mQuery);
+})(mQuery, mauticAjaxUrl);
 

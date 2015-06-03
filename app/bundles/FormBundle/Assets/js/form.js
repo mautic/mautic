@@ -57,10 +57,6 @@ Mautic.formOnLoad = function (container) {
     }
 };
 
-Mautic.getFormId = function() {
-    return mQuery('input#formId').val();
-}
-
 Mautic.formOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.formSubmissionChart;
@@ -193,7 +189,10 @@ Mautic.renderSubmissionChart = function (chartData) {
     }
     if (!chartData) {
         chartData = mQuery.parseJSON(mQuery('#submission-chart-data').text());
+    } else if (chartData.stats) {
+        chartData = chartData.stats;
     }
+
     var ctx = document.getElementById("submission-chart").getContext("2d");
     var options = {};
 
@@ -206,26 +205,8 @@ Mautic.renderSubmissionChart = function (chartData) {
 };
 
 Mautic.updateSubmissionChart = function(element, amount, unit) {
-    var element = mQuery(element);
-    var wrapper = element.closest('ul');
-    var button  = mQuery('#time-scopes .button-label');
-    var formId = Mautic.getFormId();
-    wrapper.find('a').removeClass('bg-primary');
-    element.addClass('bg-primary');
-    button.text(element.text());
-    var query = "action=form:updateSubmissionChart&amount=" + amount + "&unit=" + unit + "&formId=" + formId;
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-                Mautic.renderSubmissionChart(response.stats);
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
-    });
+    var formId = Mautic.getEntityId();
+    var query = "amount=" + amount + "&unit=" + unit + "&formId=" + formId;
+
+    Mautic.getChartData(element, 'form:updateSubmissionChart', query, 'renderSubmissionChart');
 }
