@@ -18,7 +18,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'langVar'   => 'form.form'
 )));
 
-$tabs = array('standalone', 'campaign');
+$tabs = array('campaign', 'standalone');
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

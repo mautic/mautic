@@ -202,13 +202,13 @@ if (!isset($attachmentSize)) {
             'typePrefix'         => 'email',
             'cancelUrl'          => 'mautic_email_index',
             'header'             => 'mautic.email.type.header',
-            'typeOneHeader'      => 'mautic.email.type.list.header',
-            'typeOneIconClass'   => 'fa-list',
-            'typeOneDescription' => 'mautic.email.type.list.description',
-            'typeOneOnClick'     => "Mautic.selectEmailType('list');",
-            'typeTwoHeader'      => 'mautic.email.type.template.header',
-            'typeTwoIconClass'   => 'fa-cube',
-            'typeTwoDescription' => 'mautic.email.type.template.description',
-            'typeTwoOnClick'     => "Mautic.selectEmailType('template');"
+            'typeOneHeader'      => 'mautic.email.type.template.header',
+            'typeOneIconClass'   => 'fa-cube',
+            'typeOneDescription' => 'mautic.email.type.template.description',
+            'typeOneOnClick'     => "Mautic.selectEmailType('template');",
+            'typeTwoHeader'      => 'mautic.email.type.list.header',
+            'typeTwoIconClass'   => 'fa-list',
+            'typeTwoDescription' => 'mautic.email.type.list.description',
+            'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
         ));
 endif;

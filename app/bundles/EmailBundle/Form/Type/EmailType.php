@@ -359,7 +359,7 @@ class EmailType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => array(
-                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary',
+                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
                     'icon'    => 'fa fa-cube',
                     'onclick' => "Mautic.launchBuilder('emailform', 'email');"
                 )

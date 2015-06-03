@@ -413,8 +413,8 @@ var Mautic = {
                     var buttons = mQuery(container + " .bottom-form-buttons").html();
 
                     //make sure working with a clean slate
-                    mQuery(container + ' .toolbar-form-buttons .hidden-xs').html('');
-                    mQuery(container + ' .toolbar-form-buttons .hidden-md .drop-menu').html('');
+                    mQuery(container + ' .toolbar-form-buttons .toolbar-standard').html('');
+                    mQuery(container + ' .toolbar-form-buttons .toolbar-dropdown .drop-menu').html('');
 
                     var lastIndex = mQuery(buttons).filter("button").length - 1;
                     mQuery(buttons).filter("button").each(function (i, v) {
@@ -438,10 +438,10 @@ var Mautic = {
                             .attr('id', mQuery(this).attr('id') + '_toolbar')
                             .html(mQuery(this).html())
                             .on('click.ajaxform', buttonClick)
-                            .appendTo('.toolbar-form-buttons .hidden-sm');
+                            .appendTo('.toolbar-form-buttons .toolbar-standard');
 
                         if (i === lastIndex) {
-                            mQuery(".toolbar-form-buttons .hidden-md .btn-main")
+                            mQuery(".toolbar-form-buttons .toolbar-dropdown .btn-main")
                                 .off('.ajaxform')
                                 .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
                                 .html(mQuery(this).html())
@@ -451,7 +451,7 @@ var Mautic = {
                                 .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
                                 .html(mQuery(this).html())
                                 .on('click.ajaxform', buttonClick)
-                                .appendTo(mQuery('<li />').prependTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
+                                .appendTo(mQuery('<li />').prependTo('.toolbar-form-buttons .toolbar-dropdown .dropdown-menu'))
                         }
 
                     });
@@ -3129,11 +3129,42 @@ var Mautic = {
             mQuery('.template-dnd-help').removeClass('hide');
             mQuery('.custom-dnd-help').addClass('hide');
             mQuery('.template-fields').removeClass('hide');
+            Mautic.toggleBuilderButton(false);
+
         } else {
             mQuery('.custom-html-mask').addClass('hide');
             mQuery('.template-dnd-help').addClass('hide');
             mQuery('.custom-dnd-help').removeClass('hide');
             mQuery('.template-fields').addClass('hide');
+            Mautic.toggleBuilderButton(true);
+        }
+    },
+
+    /**
+     *
+     * @param formName
+     */
+    toggleBuilderButton: function (hide) {
+        if (mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder')) {
+            if (hide) {
+                // Move the builder button out of the group and hide it
+                mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder')
+                    .addClass('hide btn-standard-toolbar')
+                    .appendTo('.toolbar-form-buttons')
+
+                mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().addClass('hide');
+            } else {
+                if (!mQuery('.btn-standard-toolbar.btn-builder').length) {
+                    mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder').addClass('btn-standard-toolbar')
+                } else {
+                    // Move the builder button out of the group and hide it
+                    mQuery('.toolbar-form-buttons .btn-standard-toolbar.btn-builder')
+                        .prependTo('.toolbar-form-buttons .toolbar-standard')
+                        .removeClass('hide');
+
+                    mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().removeClass('hide');
+                }
+            }
         }
     },
 

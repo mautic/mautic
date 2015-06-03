@@ -473,6 +473,8 @@ class CampaignModel extends CommonFormModel
         switch ($sourceType) {
             case 'lists':
             case null:
+                $choices['lists'] = array();
+
                 $model = $this->factory->getModel('lead.list');
                 $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
 
@@ -482,6 +484,8 @@ class CampaignModel extends CommonFormModel
 
             case 'forms':
             case null:
+                $choices['forms'] = array();
+
                 $viewOther = $this->factory->getSecurity()->isGranted('form:forms:viewother');
                 $repo      = $this->factory->getModel('form')->getRepository();
 

@@ -31,12 +31,6 @@ $view['slots']->set("headerTitle", $header);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
                 </div>
-                <div class="col-md-6">
-                    <div class="alert alert-warning pa-sm">
-                        <div><strong><?php echo $view['translator']->trans('mautic.campaign.leadsource.header'); ?></strong></div>
-                        <div><?php echo $view['translator']->trans('mautic.campaign.leadsource.alert'); ?></div>
-                    </div>
-                </div>
             </div>
             <div class="row">
                 <div class="col-md-12">

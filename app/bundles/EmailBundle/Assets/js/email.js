@@ -88,6 +88,7 @@ Mautic.emailOnLoad = function (container, response) {
             mQuery('body').css('overflow-y', 'hidden');
         }
 
+        Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'email');
