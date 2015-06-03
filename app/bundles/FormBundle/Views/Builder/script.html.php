@@ -38,7 +38,7 @@ if ((in_array($type, array('select', 'country')) && !empty($properties['multiple
         '<?php echo $f->getAlias(); ?>': {
             type: '<?php echo $f->getType(); ?>',
             name: '<?php echo $name; ?>'
-        }
+        },
 <?php endforeach; ?>
     };
 </script>

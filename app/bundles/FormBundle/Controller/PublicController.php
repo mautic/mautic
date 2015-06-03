@@ -124,7 +124,7 @@ class PublicController extends CommonFormController
             $data = array('success' => 1);
             if (!empty($error)) {
                 if (is_array($error)) {
-                    $data['vaidationErrors'] = $error;
+                    $data['validationErrors'] = $error;
                 } else {
                     $data['errorMessage'] = $error;
                 }

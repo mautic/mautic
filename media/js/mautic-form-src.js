@@ -230,9 +230,9 @@
                 parseFormResponse: function (response) {
                     if (response.redirect) {
                         window.location = response.redirect;
-                    } else if (response.vaidationErrors) {
-                        for (var field in response.vaidationErrors) {
-                            markError('mauticform_' + field, false, response.validationErrors[field]);
+                    } else if (response.validationErrors) {
+                        for (var field in response.validationErrors) {
+                            this.markError('mauticform_' + field, false, response.validationErrors[field]);
                         }
                     } else if (response.errorMessage) {
                         this.setMessage(response.errorMessage, 'error');
