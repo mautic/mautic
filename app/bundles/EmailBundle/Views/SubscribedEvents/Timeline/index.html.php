@@ -30,7 +30,7 @@ $item = $event['extra']['stats'];
 	            <?php if (empty($item['dateRead'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
 	            <?php else : ?>
-	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.read', array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']))); ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.' . $event['extra']['type'], array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']), '%sent%' => $view['date']->toFull($item['dateSent']))); ?>
 	            <?php endif; ?>
 	            <?php if (!empty($item['viewedInBrowser'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.viewed.in.browser'); ?>
