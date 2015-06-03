@@ -23,7 +23,7 @@ $header = ($activePage->getId()) ?
 
 $view['slots']->set("headerTitle", $header.$subheader);
 
-$contentMode = $form['contentMode']->vars['data'];
+$template = $form['template']->vars['data'];
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -40,42 +40,33 @@ $contentMode = $form['contentMode']->vars['data'];
                     <?php if (!isset($form['variantSettings'])): ?>
                     <?php echo $view['form']->row($form['alias']); ?>
                     <?php else: ?>
-                    <div class="form-group">
-                        <?php echo $view['form']->label($form['contentMode']); ?>
-                        <div>
-                            <?php echo $view['form']->widget($form['contentMode']); ?>
-                            <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('page');">
-                                <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
-                            </button>
-                        </div>
-                    </div>
+                    <?php echo $view['form']->row($form['template']); ?>
                     <?php endif; ?>
                 </div>
             </div>
 
+            <?php if (!isset($form['variantSettings'])): ?>
             <div class="row">
                 <div class="col-md-6">
-                    <?php if (!isset($form['variantSettings'])): ?>
-                    <div class="form-group">
-                        <?php echo $view['form']->label($form['contentMode']); ?>
-                        <div>
-                            <?php echo $view['form']->widget($form['contentMode']); ?>
-                            <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('page');">
-                                <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
-                            </button>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                </div>
-                <div class="col-md-6">
-                    <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide"' : ''; ?>">
-                        <?php echo $view['form']->row($form['template']); ?>
-                    </div>
+                    <?php echo $view['form']->row($form['template']); ?>
                 </div>
             </div>
+            <?php endif; ?>
 
-            <div id="customHtmlContainer" class="hide">
-                <?php echo $view['form']->row($form['customHtml']); ?>
+            <div class="row">
+                <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+                    <div class="custom-html-mask<?php if (!$template) echo ' hide'; ?>">
+                        <div class="well text-center" style="position: absolute; top: 110px; width: 50%; left:0; right:0; margin-left:auto; margin-right:auto; z-index: 1010;">
+                            <h3 style="padding: 30px;">
+                                <a href="javascript: void(0);" onclick="Mautic.launchBuilder('page');">
+                                    <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
+                                </a>
+                            </h3>
+                        </div>
+                        <div style="height: 100%; width: 100%; position: absolute; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.8; background-color: #fff; z-index: 1000"></div>
+                    </div>
+                    <?php echo $view['form']->row($form['customHtml']); ?>
+                </div>
             </div>
         </div>
     </div>
@@ -97,7 +88,7 @@ $contentMode = $form['contentMode']->vars['data'];
             ?>
 
             <?php if (isset($form['metaDescription'])): ?>
-            <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide"' : ''; ?>">
+            <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
             <?php endif; ?>
@@ -118,8 +109,8 @@ $contentMode = $form['contentMode']->vars['data'];
                 <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('page');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
             </p>
             <div class="well well-small mb-10" id="customHtmlDropzone">
-            <div class="template-dnd-help<?php echo ($contentMode == 'custom') ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
-                <div class="custom-dnd-help<?php echo ($contentMode == 'custom') ? '' : ' hide'; ?>">
+            <div class="template-dnd-help<?php echo (!$template) ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
+                <div class="custom-dnd-help<?php echo (!$template) ? '' : ' hide'; ?>">
                     <div class="custom-drop-message hide text-center"><?php echo $view['translator']->trans('mautic.core.builder.token.drophere'); ?></div>
                     <div class="custom-general-message"><?php echo $view['translator']->trans('mautic.core.builder.token.help_custom'); ?></div>
                 </div>

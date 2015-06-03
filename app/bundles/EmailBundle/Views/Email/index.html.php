@@ -17,29 +17,55 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     ),
     'routeBase' => 'email'
 )));
+
+$tabs = array('template', 'list');
 ?>
 
-<div class="box-layout">
-	<!-- filters -->
-    <?php echo $view->render('MauticEmailBundle:Email:filters.html.php', array('filters' => $filters)); ?>
-    <!--/ filters -->
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <!-- tabs controls -->
+    <ul class="nav nav-tabs pr-md pl-md bg-auto" data-toggle="tab-hash">
+        <?php foreach ($tabs as $k => $tab): ?>
+        <li<?php if ($k === 0) echo ' class="active"'; ?>>
+            <a href="#tab-<?php echo $tab; ?>" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.email.type.' . $tab); ?></a>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+    <!--/ tabs controls -->
+    <div class="tab-content">
+        <?php foreach ($tabs as $k => $tab): ?>
+        <div class="tab-pane fade bdr-w-0<?php if ($k === 0) echo ' in active'; ?>" id="tab-<?php echo $tab; ?>">
+            <div class="pl-0 pr-0 bg-auto bdr-l">
+                <div class="panel panel-default bdr-t-wdh-0 bdr-l-wdh-0 mb-0">
+                    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
+                        'searchValue' => ${$tab}['searchValue'],
+                        'searchHelp'  => 'mautic.email.help.searchcommands',
+                        'searchId'    => $tab . '-search',
+                        'action'      => $currentRoute,
+                        'routeBase'   => 'email',
+                        'templateButtons' => array(
+                            'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
+                        ),
+                        'target'      => '.' . $tab . '-container',
+                        'tmpl'        => $tab,
+                        'filters'     => ${$tab}['filters']
+                    )); ?>
 
-    <div class="col-md-9 bg-auto height-auto bdr-l">
-        <div class="panel panel-default bdr-t-wdh-0 bdr-l-wdh-0 mb-0">
-            <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
-                'searchValue' => $searchValue,
-                'searchHelp'  => 'mautic.email.help.searchcommands',
-                'action'      => $currentRoute,
-                'routeBase'   => 'email',
-                'templateButtons' => array(
-                    'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
-                )
-            )); ?>
-
-            <div class="page-list">
-                <?php $view['slots']->output('_content'); ?>
+                    <div class="<?php echo $tab; ?>-container">
+                        <?php echo $view->render('MauticEmailBundle:Email:list.html.php', array(
+                            'items'       => ${$tab}['items'],
+                            'totalItems'  => ${$tab}['totalItems'],
+                            'page'        => ${$tab}['page'],
+                            'limit'       => ${$tab}['limit'],
+                            'permissions' => $permissions,
+                            'security'    => $security,
+                            'model'       => $model,
+                            'tmpl'        => ${$tab}['tmpl'],
+                        ));?>
+                    </div>
+                </div>
             </div>
         </div>
+        <?php endforeach; ?>
     </div>
 </div>
 

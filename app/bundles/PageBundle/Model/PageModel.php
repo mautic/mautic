@@ -598,6 +598,9 @@ class PageModel extends FormModel
                 case 'tokens':
                     $components[$requested] = $event->getTokens();
                     break;
+                case 'visualTokens':
+                    $components[$requested] = $event->getVisualTokens();
+                    break;
                 case 'tokenSections':
                     $components[$requested] = $event->getTokenSections();
                     break;

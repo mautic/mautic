@@ -68,39 +68,16 @@ class PageType extends AbstractType
             )
         );
 
-        $contentMode = $options['data']->getContentMode();
-        if (empty($contentMode)) {
-            $contentMode = 'builder';
-        }
-        $builder->add(
-            'contentMode',
-            'button_group',
-            array(
-                'choice_list'        => new ChoiceList(
-                    array('custom', 'builder'),
-                    array('mautic.page.form.contentmode.custom', 'mautic.page.form.contentmode.template')
-                ),
-                'expanded'           => true,
-                'multiple'           => false,
-                'label'              => 'mautic.page.form.contentmode',
-                'empty_value'        => false,
-                'required'           => false,
-                'data'               => $contentMode,
-                'attr'               => array(
-                    'onChange' => 'Mautic.onBuilderModeSwitch(this);'
-                ),
-                'button_group_class' => ''
-            )
-        );
-
         $builder->add(
             'customHtml',
             'textarea',
             array(
-                'label'      => false, //'mautic.page.form.customhtml',
+                'label'      => 'mautic.page.form.customhtml',
                 'required'   => false,
                 'attr'       => array(
-                    'class' => 'custom-html-content'
+                    'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                    'data-token-callback'  => 'page:getBuilderTokens',
+                    'data-token-activator' => '{'
                 )
             )
         );
@@ -117,8 +94,10 @@ class PageType extends AbstractType
                 'data'    => $template,
                 'attr'    => array(
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help'
-                )
+                    'tooltip' => 'mautic.page.form.template.help',
+                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
+                ),
+                'empty_value' => 'mautic.core.none'
             )
         );
 

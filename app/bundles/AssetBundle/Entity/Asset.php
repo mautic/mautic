@@ -195,6 +195,14 @@ class Asset extends FormEntity
      */
     private $mime;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $size;
+
     public function __clone()
     {
         $this->id = null;
@@ -661,12 +669,10 @@ class Asset extends FormEntity
                 // get some basic information about the file type
                 $fileInfo   = $this->getFileInfo();
 
-                $extension  = $fileInfo['extension'];
-                $mime       = $fileInfo['mime'];
-
                 // set the mime and extension column values
-                $this->setExtension($extension);
-                $this->setMime($mime);
+                $this->setExtension($fileInfo['extension']);
+                $this->setMime($fileInfo['mime']);
+                $this->setSize($fileInfo['size']);
             }
             return;
         }
@@ -679,12 +685,10 @@ class Asset extends FormEntity
         // get some basic information about the file type
         $fileInfo   = $this->getFileInfo();
 
-        $extension  = $fileInfo['extension'];
-        $mime       = $fileInfo['mime'];
-
         // set the mime and extension column values
-        $this->setExtension($extension);
-        $this->setMime($mime);
+        $this->setExtension($fileInfo['extension']);
+        $this->setMime($fileInfo['mime']);
+        $this->setSize($fileInfo['size']);
 
         // check if we have an old asset
         if (isset($this->temp) && file_exists($filePath)) {
@@ -847,11 +851,13 @@ class Asset extends FormEntity
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_HEADER, 1);
             curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             curl_exec($ch);
 
             // build an array of handy info
             $fileInfo['mime']       = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
             $fileInfo['extension']  = $this->getFileType();
+            $fileInfo['size']       = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
             return $fileInfo;
         }
@@ -863,6 +869,7 @@ class Asset extends FormEntity
         // return an array of file type info
         $fileInfo['mime']       = $this->loadFile()->getMimeType();
         $fileInfo['extension']  = $this->getFileType();
+        $fileInfo['size']       = $this->getSize(false, true);
 
         return $fileInfo;
     }
@@ -891,30 +898,6 @@ class Asset extends FormEntity
         $type = $this->loadFile()->getMimeType();
 
         return $type;
-    }
-
-    /**
-     * Returns file size in kB
-     *
-     * @return int
-     */
-    public function getFileSize()
-    {
-        if ($this->getStorageLocation() == 'remote') {
-            $ch = curl_init($this->getRemotePath());
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
-            curl_exec($ch);
-            return round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD) / 1000);
-        }
-
-        if ($this->loadFile() === null) {
-            return '';
-        }
-
-        return round($this->loadFile()->getSize() / 1000);
     }
 
     /**
@@ -1198,5 +1181,105 @@ class Asset extends FormEntity
     public function getTempName()
     {
         return $this->tempName;
+    }
+
+    /**
+     * @param bool   $humanReadable
+     * @param bool   $forceUpdate
+     * @param string $inUnit
+     *
+     * @return float|string
+     */
+    public function getSize($humanReadable = true, $forceUpdate = false, $inUnit = '')
+    {
+        if (empty($this->size) || $forceUpdate) {
+            // Try to fetch it
+            if ($this->getStorageLocation() == 'remote') {
+                $ch = curl_init($this->getRemotePath());
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_HEADER, 1);
+                curl_setopt($ch, CURLOPT_NOBODY, 1);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+                curl_exec($ch);
+
+                $this->setSize(round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD)));
+            }
+
+            if ($this->loadFile() === null) {
+                return 0;
+            }
+
+            $this->setSize(round($this->loadFile()->getSize()));
+        }
+
+        return ($humanReadable) ? static::convertBytesToHumanReadable($this->size, $inUnit) :  $this->size;
+    }
+
+    /**
+     * @param mixed $size
+     *
+     * @return Asset
+     */
+    public function setSize($size)
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+
+    /**
+     * Borrowed from Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize
+     *
+     * @param $size
+     *
+     * @return int|string
+     */
+    static public function convertSizeToBytes($size)
+    {
+        if ('' === $size) {
+            return PHP_INT_MAX;
+        }
+
+        $max = ltrim($size, '+');
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = intval($max);
+        }
+
+        switch (strtolower(substr($size, -1))) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
+    }
+
+    /**
+     * @param        $size
+     * @param string $unit
+     *
+     * @return string
+     */
+    static public function convertBytesToHumanReadable($size, $unit = "")
+    {
+        if ((!$unit && $size >= 1 << 30) || $unit == "GB") {
+            return number_format($size / (1 << 30), 2). " GB";
+        }
+        if ((!$unit && $size >= 1 << 20) || $unit == "MB") {
+            return number_format($size / (1 << 20), 2)." MB";
+        }
+        if ((!$unit && $size >= 1 << 10) || $unit == "KB") {
+            return number_format($size / (1 << 10), 2)." KB";
+        }
+
+        return number_format($size) . " bytes";
     }
 }

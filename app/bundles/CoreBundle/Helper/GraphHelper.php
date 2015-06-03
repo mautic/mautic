@@ -234,13 +234,23 @@ class GraphHelper
                 $j = 0;
             }
 
-            $data['datasets'][] = array(
+            $set = array(
                 'label'                => $label,
                 'fillColor'            => self::$colors[$j]['fill'],
                 'highlightFill'        => self::$colors[$j]['highlight'],
                 'strokeColor'          => self::$colors[$j]['fillStroke'],
                 'data'                 => $dataset
             );
+
+            if (isset($dataset['datasetKey'])) {
+                $key = $dataset['datasetKey'];
+                unset($set['data']['datasetKey']);
+
+                $data['datasets'][$key] = $set;
+            } else {
+                $data['datasets'][] = $set;
+            }
+
             $j++;
         }
 

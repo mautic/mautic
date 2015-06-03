@@ -15,8 +15,10 @@ if ($tmpl == 'index') {
     <div class="list-group ma-5">
         <?php
         if (count($items)):
-        foreach ($items as $i):?>
-            <a href="#" class="list-group-item" data-token="{form=<?php echo $i[0]->getId(); ?>}">
+        foreach ($items as $i):
+        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{form=' . $i[0]->getId() . '}', $i[0]->getName()))
+        ?>
+            <a href="#" class="list-group-item" data-token="<?php echo $token; ?>">
                 <div>
                     <span><i class="fa fa-fw fa-list"></i><?php echo $i[0]->getName(); ?></span>
                 </div>

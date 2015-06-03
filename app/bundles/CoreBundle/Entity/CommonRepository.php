@@ -271,7 +271,7 @@ class CommonRepository extends EntityRepository
                         $forceParameters  = array();
                         $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
-                            if ($f instanceof Query\Expr || $f instanceof ExpressionBuilder) {
+                            if ($f instanceof Query\Expr || $f instanceof CompositeExpression) {
                                 $expr = $f;
 
                                 if (isset($expr->parameters)) {
@@ -281,7 +281,7 @@ class CommonRepository extends EntityRepository
                             } elseif (is_array($f)) {
                                 list ($expr, $parameters) = $this->getFilterExpr($q, $f);
                                 $forceExpressions->add($expr);
-                                if (is_array($parameters)) {
+                                if (!empty($parameters) && is_array($parameters)) {
                                     $forceParameters = array_merge($forceParameters, $parameters);
                                 }
                             } else {
@@ -289,7 +289,7 @@ class CommonRepository extends EntityRepository
                                 $parsed = $filterHelper->parseSearchString($f);
                                 list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
                                 $forceExpressions->add($expr);
-                                if (is_array($parameters)) {
+                                if (!empty($parameters) && is_array($parameters)) {
                                     $forceParameters = array_merge($forceParameters, $parameters);
                                 }
                             }
@@ -354,9 +354,23 @@ class CommonRepository extends EntityRepository
     public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
         $unique    = ($parameterName) ? $parameterName : $this->generateRandomParameterName();
-        $parameter = false;
+        $parameter = array();
 
-        if (strpos($filter['column'], ',') !== false) {
+        if (isset($filter['group'])) {
+            $expr = $q->expr()->orX();
+            foreach ($filter['group'] as $orGroup) {
+                $groupExpr = $q->expr()->andX();
+                foreach ($orGroup as $subFilter) {
+                    list($subExpr, $subParameters) = $this->getFilterExpr($q, $subFilter);
+
+                    $groupExpr->add($subExpr);
+                    if (!empty($subParameters)) {
+                        $parameter = array_merge($parameter, $subParameters);
+                    }
+                }
+                $expr->add($groupExpr);
+            }
+        } elseif (strpos($filter['column'], ',') !== false) {
             $columns      = explode(',', $filter['column']);
             $expr         = $q->expr()->orX();
             $setParameter = false;
@@ -854,10 +868,11 @@ class CommonRepository extends EntityRepository
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      * @param array               $parameters  Parameters used in $expr
      * @param string              $labelColumn Column that houses the label
+     * @param string              $valueColumn Column that houses the value
      *
      * @return array
      */
-    public function getSimpleList(CompositeExpression $expr = null, array $parameters = array(), $labelColumn = null)
+    public function getSimpleList(CompositeExpression $expr = null, array $parameters = array(), $labelColumn = null, $valueColumn = 'id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -880,9 +895,9 @@ class CommonRepository extends EntityRepository
             }
         }
 
-        $q->select($prefix.'id, '.$prefix.$labelColumn.' as label')
+        $q->select($prefix.$valueColumn . ' as value, '.$prefix.$labelColumn.' as label')
             ->from($tableName, $alias)
-            ->orderBy($prefix.'id');
+            ->orderBy($prefix.$valueColumn);
 
         if ($expr !== null && $expr->count()) {
             $q->where($expr);
