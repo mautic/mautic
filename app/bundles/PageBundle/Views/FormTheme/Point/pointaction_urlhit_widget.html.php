@@ -24,13 +24,13 @@
 </div>
 
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-6">
         <?php echo $view['form']->row($form['returns_within']); ?>
     </div>
-    <div class="col-xs-12">
+    <div class="col-xs-6">
         <?php echo $view['form']->row($form['returns_after']); ?>
     </div>
-    <div class="col-xs-12">
+    <div class="col-xs-6">
         <?php echo $view['form']->row($form['accumulative_time']); ?>
     </div>
 </div>

@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\DataTransformer\SecondsConversionTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -54,44 +55,47 @@ class PointActionUrlHitType extends AbstractType
             )
         ));
 
-        $builder->add('accumulative_time', 'time', array(
-            'label'         => 'mautic.page.point.action.form.accumulative.time',
-            'input'         => 'timestamp',
-            'widget'        => 'choice',
-            'required'      => false,
-            'with_seconds'  => true,
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'          => array(
-                'class'         => 'time-input',
-                'tooltip'       => 'mautic.page.point.action.form.accumulative.time.descr'
-            )
-        ));
+        $secondsTransformer = new SecondsConversionTransformer('i');
 
-        $builder->add('returns_within', 'time', array(
-            'label'         => 'mautic.page.point.action.form.returns.within',
-            'input'         => 'timestamp',
-            'widget'        => 'choice',
-            'required'      => false,
-            'with_seconds'  => true,
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'          => array(
-                'class'         => 'time-input',
-                'tooltip'       => 'mautic.page.point.action.form.returns.within.descr'
-            )
-        ));
+        $builder->add(
+            $builder->create('accumulative_time', 'number', array(
+                'precision'     => 2,
+                'label'         => 'mautic.page.point.action.form.accumulative.time',
+                'required'      => false,
+                'label_attr'    => array('class' => 'control-label'),
+                'attr'          => array(
+                    'class'         => 'form-control',
+                    'tooltip'       => 'mautic.page.point.action.form.accumulative.time.descr'
+                )
+            ))->addModelTransformer($secondsTransformer)
+        );
 
-        $builder->add('returns_after', 'time', array(
-            'label'         => 'mautic.page.point.action.form.returns.after',
-            'input'         => 'timestamp',
-            'widget'        => 'choice',
-            'required'      => false,
-            'with_seconds'  => true,
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'          => array(
-                'class'         => 'time-input',
-                'tooltip'       => 'mautic.page.point.action.form.returns.after.descr'
-            )
-        ));
+        $secondsTransformer->setViewFormat('H');
+        $builder->add(
+            $builder->create('returns_within', 'number', array(
+                'precision'     => 2,
+                'label'         => 'mautic.page.point.action.form.returns.within',
+                'required'      => false,
+                'label_attr'    => array('class' => 'control-label'),
+                'attr'          => array(
+                    'class'         => 'form-control',
+                    'tooltip'       => 'mautic.page.point.action.form.returns.within.descr'
+                )
+            ))->addModelTransformer($secondsTransformer)
+        );
+
+        $builder->add(
+            $builder->create('returns_after', 'number', array(
+                'precision'     => 2,
+                'label'         => 'mautic.page.point.action.form.returns.after',
+                'required'      => false,
+                'label_attr'    => array('class' => 'control-label'),
+                'attr'          => array(
+                    'class'         => 'form-control',
+                    'tooltip'       => 'mautic.page.point.action.form.returns.after.descr'
+                )
+            ))->addModelTransformer($secondsTransformer)
+        );
     }
 
     /**
