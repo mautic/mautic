@@ -17,6 +17,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\HtmlFormatHelper;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -234,10 +235,9 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true)
     {
-        //generate cached HTML and JS
+        //generate cached HTML
         $templating = $this->factory->getTemplating();
-
-        $theme = $entity->getTemplate();
+        $theme      = $entity->getTemplate();
 
         if (!empty($theme)) {
             $theme .= '|';

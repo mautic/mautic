@@ -17,6 +17,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateR
  */
 class TemplateReference extends BaseTemplateReference
 {
+    /**
+     * @var
+     */
+    protected $themeOverride;
 
     /**
      * @var MauticFactory
@@ -34,18 +38,25 @@ class TemplateReference extends BaseTemplateReference
     }
 
     /**
+     * Set a template specific theme override
+     *
+     * @param $theme
+     */
+    public function setThemeOverride($theme)
+    {
+        $this->themeOverride = $theme;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPath()
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
-        //check for template specific theme override
-        preg_match('/^(.*?)\|(.*?)$/', $controller, $templateOverride);
 
-        if (!empty($templateOverride[1])) {
-            $this->parameters['controller'] = $controller = $templateOverride[2];
+        if (!empty($this->themeOverride)) {
             try {
-                $theme    = $this->factory->getTheme($templateOverride[1]);
+                $theme    = $this->factory->getTheme($this->themeOverride);
                 $themeDir = $theme->getThemePath();
             } catch (\Exception $e) {}
         } else {

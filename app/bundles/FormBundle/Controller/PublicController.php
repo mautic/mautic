@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -28,6 +29,7 @@ class PublicController extends CommonFormController
         }
 
         $post   = $this->request->request->get('mauticform');
+        $messengerMode = (!empty($post['messenger']));
         $server = $this->request->server->all();
         $return = (isset($post['return'])) ? $post['return'] : false;
         if (empty($return)) {
@@ -43,12 +45,12 @@ class PublicController extends CommonFormController
 
         $translator = $this->get('translator');
 
-        //check to ensure there is a formid
-        if (!isset($post['formid'])) {
+        //check to ensure there is a formId
+        if (!isset($post['formId'])) {
             $error =  $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
         } else {
             $formModel = $this->factory->getModel('form.form');
-            $form      = $formModel->getEntity($post['formid']);
+            $form      = $formModel->getEntity($post['formId']);
 
             //check to see that the form was found
             if ($form === null) {
@@ -74,9 +76,13 @@ class PublicController extends CommonFormController
                 } else {
                     $result = $this->factory->getModel('form.submission')->saveSubmission($post, $server, $form);
                     if (!empty($result['errors'])) {
-                        $error = ($result['errors']) ?
-                            $this->get('translator')->trans('mautic.form.submission.errors') . '<br /><ol><li>' .
-                            implode("</li><li>", $result['errors']) . '</li></ol>' : false;
+                        if ($messengerMode) {
+                            $error = $result['errors'];
+                        } else {
+                            $error = ($result['errors']) ?
+                                $this->get('translator')->trans('mautic.form.submission.errors').'<br /><ol><li>'.
+                                implode("</li><li>", $result['errors']).'</li></ol>' : false;
+                        }
                     } elseif (!empty($result['callback'])) {
                         $callback = $result['callback']['callback'];
                         if (is_callable($callback)) {
@@ -93,6 +99,7 @@ class PublicController extends CommonFormController
                             $result['callback']['factory'] = $this->factory;
 
                             $pass = array();
+                            $result['callback']['messengerMode'] = $messengerMode;
                             foreach ($reflection->getParameters() as $param) {
                                 if (isset($result['callback'][$param->getName()])) {
                                     $pass[] = $result['callback'][$param->getName()];
@@ -101,43 +108,85 @@ class PublicController extends CommonFormController
                                 }
                             }
 
-                            return $reflection->invokeArgs($this, $pass);
+                            $callbackResponse = $reflection->invokeArgs($this, $pass);
+
+                            if (!$messengerMode) {
+                                return $callbackResponse;
+                            }
                         }
                     }
                 }
             }
         }
 
-        if (!empty($error)) {
-            if ($return) {
-                return $this->redirect($return . $query . 'mauticError=' . rawurlencode($error) . '#' . $form->getAlias());
-            } else {
-                $msg     = $error;
-                $msgType = 'error';
-            }
-        } elseif ($postAction == 'redirect') {
-
-            return $this->redirect($postActionProperty);
-        } elseif ($postAction == 'return') {
-            if (!empty($return)) {
-                if (!empty($postActionProperty)) {
-                    $return .= $query . 'mauticMessage=' . rawurlencode($postActionProperty);
+        if ($messengerMode) {
+            // Return the call via postMessage API
+            $data = array('success' => 1);
+            if (!empty($error)) {
+                if (is_array($error)) {
+                    $data['vaidationErrors'] = $error;
+                } else {
+                    $data['errorMessage'] = $error;
                 }
-                return $this->redirect($return);
+                $data['success'] = 0;
             } else {
-                $msg = $this->get('translator')->trans('mautic.form.submission.thankyou');
+                if ($postAction == 'redirect') {
+                    $data['redirect'] = $postActionProperty;
+                } elseif (!empty($postActionProperty)) {
+                    $data['successMessage'] = $postActionProperty;
+                }
+
+                if (!empty($callbackResponse)) {
+                    if ($callbackResponse instanceof RedirectResponse) {
+                        $data['redirect'] = $callbackResponse->getTargetUrl();
+                    } else {
+                        $data['successMessage'] = $callbackResponse->getContent();
+                    }
+                }
             }
+
+            if (isset($post['formName'])) {
+                $data['formName'] = $post['formName'];
+            }
+            $response = json_encode($data);
+
+            return $this->render('MauticFormBundle::messenger.html.php', array('response' => $response));
         } else {
-            $msg = $postActionProperty;
+            if (!empty($error)) {
+                if ($return) {
+                    return $this->redirect($return.$query.'mauticError='.rawurlencode($error).'#'.$form->getAlias());
+                } else {
+                    $msg     = $error;
+                    $msgType = 'error';
+                }
+            } elseif ($postAction == 'redirect') {
+
+                return $this->redirect($postActionProperty);
+            } elseif ($postAction == 'return') {
+                if (!empty($return)) {
+                    if (!empty($postActionProperty)) {
+                        $return .= $query.'mauticMessage='.rawurlencode($postActionProperty);
+                    }
+
+                    return $this->redirect($return);
+                } else {
+                    $msg = $this->get('translator')->trans('mautic.form.submission.thankyou');
+                }
+            } else {
+                $msg = $postActionProperty;
+            }
+
+            $session = $this->factory->getSession();
+            $session->set(
+                'mautic.emailbundle.message',
+                array(
+                    'message' => $msg,
+                    'type'    => (empty($msgType)) ? 'notice' : $msgType
+                )
+            );
+
+            return $this->redirect($this->generateUrl('mautic_form_postmessage'));
         }
-
-        $session = $this->factory->getSession();
-        $session->set('mautic.emailbundle.message', array(
-            'message'  => $msg,
-            'type'     => (empty($msgType)) ? 'notice' : $msgType
-        ));
-
-        return $this->redirect($this->generateUrl('mautic_form_postmessage'));
     }
 
     /**
@@ -163,7 +212,11 @@ class PublicController extends CommonFormController
     /**
      * Gives a preview of the form
      *
+     * @param int $id
+     *
      * @return Response
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     public function previewAction($id = 0)
     {
