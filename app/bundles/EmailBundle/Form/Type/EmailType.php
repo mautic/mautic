@@ -77,17 +77,6 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            'description',
-            'textarea',
-            array(
-                'label'      => 'mautic.core.description',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control editor'),
-                'required'   => false
-            )
-        );
-
-        $builder->add(
             'subject',
             'text',
             array(

@@ -117,10 +117,6 @@ if (!isset($attachmentSize)) {
                                 <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
-
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['description']); ?>
-                            </div>
                         </div>
                     </div>
                 </div>
