@@ -57,16 +57,6 @@ class EmailType extends AbstractType
         $isVariant     = !empty($variantParent);
 
         $builder->add(
-            'subject',
-            'text',
-            array(
-                'label'      => 'mautic.email.subject',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
-        );
-
-        $builder->add(
             'name',
             'text',
             array(
