@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\Event;
 class BuilderEvent extends Event
 {
     protected $tokens = array();
+    protected $visualTokens = array();
     protected $tokenSections = array();
     protected $abTestWinnerCriteria = array();
     protected $translator;
@@ -35,7 +36,7 @@ class BuilderEvent extends Event
         $this->translator        = $translator;
         $this->entity            = $entity;
         $this->requested         = $requested;
-        $this->tokenFilterTarget = (strpos( $tokenFilter, '{@') === 0) ? 'label' : 'token';
+        $this->tokenFilterTarget = (strpos($tokenFilter, '{@') === 0) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(array('{@', '{', '}'), '', $tokenFilter);
         $this->tokenFilter       = ($this->tokenFilterTarget == 'label') ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -168,19 +169,36 @@ class BuilderEvent extends Event
 
     /**
      * @param array $tokens
+     * @param bool  $allowVisualPlaceholder
+     * @param bool  $convertToLinks
      */
-    public function addTokens(array $tokens)
+    public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
     {
+        if ($convertToLinks) {
+            array_walk($tokens, function(&$val, $key) {
+                $val = 'a:' . $val;
+            });
+        }
+
         $this->tokens = array_merge($this->tokens, $tokens);
+
+        if ($allowVisualPlaceholder) {
+            $this->visualTokens = array_merge($this->visualTokens, array_keys($tokens));
+        }
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param      $key
+     * @param      $value
+     * @param bool $allowVisualPlaceholder
      */
-    public function addToken($key, $value)
+    public function addToken($key, $value, $allowVisualPlaceholder = false)
     {
         $this->tokens[$key] = $value;
+
+        if ($allowVisualPlaceholder) {
+            $this->visualTokens[] = $key;
+        }
     }
 
     /**
@@ -194,9 +212,17 @@ class BuilderEvent extends Event
     }
 
     /**
+     * @return array
+     */
+    public function getVisualTokens()
+    {
+        return $this->visualTokens;
+    }
+
+    /**
      * Check if tokens have been requested.
      *
-     * @param null $tokenKeys Pass in string or arary of tokens to filter against if filterType == token
+     * @param null $tokenKeys Pass in string or array of tokens to filter against if filterType == token
      *
      * @return bool
      */
@@ -256,14 +282,20 @@ class BuilderEvent extends Event
 
         if ($this->tokenFilterTarget == 'label') {
             // Do a search against the label
-            $tokens = array_filter($tokens, function ($v) use ($filter) {
-                return (stripos($v, $filter) === 0);
-            });
+            $tokens = array_filter(
+                $tokens,
+                function ($v) use ($filter) {
+                    return (stripos($v, $filter) === 0);
+                }
+            );
         } else {
             // Do a search against the token
-            $found = array_filter(array_keys($tokens), function ($k) use ($filter) {
-                return (stripos($k, $filter) === 0);
-            });
+            $found = array_filter(
+                array_keys($tokens),
+                function ($k) use ($filter) {
+                    return (stripos($k, $filter) === 0);
+                }
+            );
 
             $tokens = array_intersect_key($tokens, array_flip($found));
         }
@@ -277,11 +309,23 @@ class BuilderEvent extends Event
      * @param BuilderTokenHelper $tokenHelper
      * @param                    $tokens
      * @param string             $labelColumn
+     * @param string             $valueColumn
+     * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
+     * @param bool               $convertToLinks         If true, the tokens will be converted to links
+     *
      */
-    public function addTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name')
-    {
+    public function addTokensFromHelper(
+        BuilderTokenHelper $tokenHelper,
+        $tokens,
+        $labelColumn = 'name',
+        $valueColumn = 'id',
+        $allowVisualPlaceholder = false,
+        $convertToLinks = false
+    ) {
         $this->addTokens(
-            $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn)
+            $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn),
+            $allowVisualPlaceholder,
+            $convertToLinks
         );
     }
 
@@ -291,12 +335,18 @@ class BuilderEvent extends Event
      * @param BuilderTokenHelper $tokenHelper
      * @param                    $tokens
      * @param                    $labelColumn
+     * @param                    $valueColumn
      *
      * @return array|void
      */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name')
+    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
     {
-        return $tokenHelper->getTokens($tokens, ($this->tokenFilterTarget == 'label' ? $this->tokenFilterText : ''), $labelColumn);
+        return $tokenHelper->getTokens(
+            $tokens,
+            ($this->tokenFilterTarget == 'label' ? $this->tokenFilterText : ''),
+            $labelColumn,
+            $valueColumn
+        );
     }
 
     /**

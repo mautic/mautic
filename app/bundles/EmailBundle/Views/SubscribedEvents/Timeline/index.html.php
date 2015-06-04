@@ -16,10 +16,8 @@ $item = $event['extra']['stats'];
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a href="<?php echo $view['router']->generate('mautic_email_action',
-				    array("objectAction" => "view", "objectId" => $item['email_id'])); ?>"
-				   data-toggle="ajax">
-				    <?php echo $item['subject']; ?>
+	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
+				    <?php echo (!empty($item['subject'])) ? $item['subject'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
 				</a>
 			</h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
@@ -30,7 +28,7 @@ $item = $event['extra']['stats'];
 	            <?php if (empty($item['dateRead'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
 	            <?php else : ?>
-	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.read', array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']))); ?>
+	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.' . $event['extra']['type'], array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']), '%sent%' => $view['date']->toFull($item['dateSent']))); ?>
 	            <?php endif; ?>
 	            <?php if (!empty($item['viewedInBrowser'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.viewed.in.browser'); ?>

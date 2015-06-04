@@ -23,116 +23,133 @@ $header = ($email->getId()) ?
 
 $view['slots']->set("headerTitle", $header.$subheader);
 
-$contentMode = $form['contentMode']->vars['data'];
+$template  = $form['template']->vars['data'];
+$emailType = $form['emailType']->vars['data'];
+
+if (!isset($attachmentSize)) {
+    $attachmentSize = 0;
+}
 ?>
-    <!-- start: box layout -->
+
+
 <?php echo $view['form']->start($form); ?>
-    <div class="box-layout">
-        <!-- container -->
-        <div class="col-md-9 bg-auto height-auto">
-            <div class="pa-md">
-                <div class="row">
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['name']); ?>
-                    </div>
-
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['subject']); ?>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12 col-lg-6">
-                        <?php echo $view['form']->row($form['description']); ?>
-                    </div>
-
-                    <div class="col-md-12 col-lg-6">
+<div class="box-layout">
+    <div class="col-md-9 height-auto bg-white">
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- tabs controls -->
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                    <li class="active"><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.email.email'); ?></a></li>
+                    <li class=""><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
+                </ul>
+                <!--/ tabs controls -->
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
-                            <div class="form-group col-xs-12">
-                                <div>
-                                    <div class="pull-left">
-                                        <?php echo $view['form']->label($form['plainText']); ?>
+                            <div class="col-md-8">
+                                <?php echo $view['form']->row($form['subject']); ?>
+                            </div>
+
+                            <div class="col-md-4">
+                                <?php echo $view['form']->row($form['template']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+                                <div class="custom-html-mask<?php if (!$template) echo ' hide'; ?>">
+                                    <div class="well text-center" style="position: absolute; top: 110px; width: 50%; left:0; right:0; margin-left:auto; margin-right:auto; z-index: 1010;">
+                                        <h3 style="padding: 30px;">
+                                            <a href="javascript: void(0);" onclick="Mautic.launchBuilder('emailform', 'email');">
+                                                <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
+                                            </a>
+                                        </h3>
                                     </div>
-                                    <div class="text-right pr-10">
-                                        <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                        <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                                    </div>
-                                    <div class="clearfix"></div>
+                                    <div style="height: 100%; width: 100%; position: absolute; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.8; background-color: #fff; z-index: 1000"></div>
                                 </div>
+                                <?php echo $view['form']->row($form['customHtml']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['plainText']); ?>
+                                </div>
+                                <div class="text-right pr-10">
+                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                                </div>
+                                <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                    <div class="tab-pane fade bdr-w-0" id="advanced-container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['fromName']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['fromAddress']); ?>
+                            </div>
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <?php echo $view['form']->label($form['contentMode']); ?>
-                            <div>
-                                <?php echo $view['form']->widget($form['contentMode']); ?>
-                                <button type="button" class="btn btn-primary ml-10" onclick="Mautic.launchBuilder('emailform', 'email');">
-                                    <i class="fa fa-cube"></i> <?php echo $view['translator']->trans('mautic.core.builder'); ?>
-                                </button>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['replyToAddress']); ?>
+                            </div>
+
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['bccAddress']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['assetAttachments']); ?>
+                                </div>
+                                <div class="text-right pr-10">
+                                    <span class="label label-info" id="attachment-size"><?php echo $attachmentSize; ?></span>
+                                </div>
+                                <div class="clearfix"></div>
+                                <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="template-fields<?php echo ($contentMode == 'custom') ? ' hide' : ''; ?>">
-                            <?php echo $view['form']->row($form['template']); ?>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="well">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['fromName']); ?>
-                        </div>
-
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['fromAddress']); ?>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['replyToAddress']); ?>
-                        </div>
-
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['bccAddress']); ?>
-                        </div>
-                    </div>
-                </div>
-                <div id="customHtmlContainer" class="hide">
-                    <?php echo $view['form']->row($form['customHtml']); ?>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 bg-white height-auto bdr-l">
-            <div class="pr-lg pl-lg pt-md pb-md">
-                <?php if (isset($form['variantSettings'])): ?>
-                    <?php echo $view['form']->row($form['variantSettings']); ?>
-                    <?php echo $view['form']->row($form['isPublished']); ?>
-                    <?php echo $view['form']->row($form['publishUp']); ?>
-                    <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php else: ?>
-                <?php echo $view['form']->row($form['category']); ?>
-                <?php echo $view['form']->row($form['lists']); ?>
-                <?php echo $view['form']->row($form['language']); ?>
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php endif; ?>
-
-                <?php echo $view['form']->row($form['unsubscribeForm']); ?>
-
-                <?php echo $view['form']->rest($form); ?>
             </div>
         </div>
     </div>
+    <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['name']); ?>
+            <?php if (isset($form['variantSettings'])): ?>
+                <?php echo $view['form']->row($form['variantSettings']); ?>
+                <?php echo $view['form']->row($form['isPublished']); ?>
+                <?php echo $view['form']->row($form['publishUp']); ?>
+                <?php echo $view['form']->row($form['publishDown']); ?>
+            <?php else: ?>
+            <div id="leadList"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['lists']); ?>
+            </div>
+            <?php echo $view['form']->row($form['category']); ?>
+            <?php echo $view['form']->row($form['language']); ?>
+            <div id="publishStatus"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['isPublished']); ?>
+                <?php echo $view['form']->row($form['publishUp']); ?>
+                <?php echo $view['form']->row($form['publishDown']); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+
+            <?php echo $view['form']->rest($form); ?>
+        </div>
+    </div>
+</div>
 <?php echo $view['form']->end($form); ?>
 
 <div class="hide builder email-builder">
@@ -145,8 +162,8 @@ $contentMode = $form['contentMode']->vars['data'];
                 <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('email');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
             </p>
             <div class="well well-small mb-10" id="customHtmlDropzone">
-                <div class="template-dnd-help<?php echo ($contentMode == 'custom') ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
-                <div class="custom-dnd-help<?php echo ($contentMode == 'custom') ? '' : ' hide'; ?>">
+                <div class="template-dnd-help<?php echo (!$template) ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
+                <div class="custom-dnd-help<?php echo (!$template) ? '' : ' hide'; ?>">
                     <div class="custom-drop-message hide text-center"><?php echo $view['translator']->trans('mautic.core.builder.token.drophere'); ?></div>
                     <div class="custom-general-message"><?php echo $view['translator']->trans('mautic.core.builder.token.help_custom'); ?></div>
                 </div>
@@ -169,3 +186,27 @@ $contentMode = $form['contentMode']->vars['data'];
         </div>
     </div>
 </div>
+
+<?php
+$type = $email->getEmailType();
+if (empty($type) || !empty($forceTypeSelection)):
+    echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
+        array(
+            'item'               => $email,
+            'mauticLang'         => array(
+                'newListEmail' => 'mautic.email.type.list.header',
+                'newTemplateEmail'   => 'mautic.email.type.template.header'
+            ),
+            'typePrefix'         => 'email',
+            'cancelUrl'          => 'mautic_email_index',
+            'header'             => 'mautic.email.type.header',
+            'typeOneHeader'      => 'mautic.email.type.list.header',
+            'typeOneIconClass'   => 'fa-list',
+            'typeOneDescription' => 'mautic.email.type.list.description',
+            'typeOneOnClick'     => "Mautic.selectEmailType('list');",
+            'typeTwoHeader'      => 'mautic.email.type.template.header',
+            'typeTwoIconClass'   => 'fa-cube',
+            'typeTwoDescription' => 'mautic.email.type.template.description',
+            'typeTwoOnClick'     => "Mautic.selectEmailType('template');"
+        ));
+endif;

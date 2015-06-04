@@ -11,6 +11,8 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\EmailBundle\EmailEvents;
@@ -22,11 +24,12 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
  */
 class BuilderSubscriber extends CommonSubscriber
 {
-
-    private $pageTokenRegex = '{pagelink=(.*?)}';
+    private $pageTokenRegex     = '{pagelink=(.*?)}';
     private $externalTokenRegex = '{externallink=(.*?)}';
-    private $langBarRegex = '{langbar}';
-    private $shareButtonsRegex = '{sharebuttons}';
+    private $trackedTokenRegex  = '{trackedlink=(.*?)}';
+    private $langBarRegex       = '{langbar}';
+    private $shareButtonsRegex  = '{sharebuttons}';
+    private $emailTrackedLinks  = array();
 
     /**
      * {@inheritdoc}
@@ -37,8 +40,10 @@ class BuilderSubscriber extends CommonSubscriber
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
             PageEvents::PAGE_ON_BUILD     => array('onPageBuild', 0),
             EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0)
+
+            // Make sure these are last priority in order to catch all links
+            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', -254),
+            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', -254)
         );
     }
 
@@ -90,15 +95,14 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
-        if ($event->tokensRequested(array($this->pageTokenRegex, $this->externalTokenRegex))) {
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
+        if ($event->tokensRequested(array($this->pageTokenRegex))) {
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
 
             $event->addTokens(
                 $event->filterTokens(
                     array(
-                        $this->externalTokenRegex => $this->translator->trans('mautic.page.builder.externallink'),
-                        $this->shareButtonsRegex  => $this->translator->trans('mautic.page.token.lang'),
-                        $this->langBarRegex       => $this->translator->trans('mautic.page.token.share'),
+                        $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.lang'),
+                        $this->langBarRegex      => $this->translator->trans('mautic.page.token.share'),
                     )
                 )
             );
@@ -123,7 +127,7 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        $tokens = $this->generatePageUrlTokens($content, array('source' => array('page', $page->getId())));
+        $tokens = $this->generateUrlTokens($content, array('source' => array('page', $page->getId())));
         if (!empty($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
@@ -253,14 +257,8 @@ class BuilderSubscriber extends CommonSubscriber
             );
         }
 
-        if ($event->tokensRequested(array($this->pageTokenRegex, $this->externalTokenRegex))) {
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
-
-            $event->addTokens(
-                $event->filterTokens(
-                    array($this->externalTokenRegex => $this->translator->trans('mautic.page.builder.externallink'))
-                )
-            );
+        if ($event->tokensRequested(array($this->pageTokenRegex))) {
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
         }
     }
 
@@ -286,56 +284,334 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['lead'] = $lead['id'];
         }
 
-        $tokens = $this->generatePageUrlTokens($content, $clickthrough);
+
+        $tokens = $this->generateUrlTokens($content, $clickthrough, (($email === null) ? 0 : $email->getId()), $email, $event);
 
         $event->addTokens($tokens);
     }
 
     /**
-     * @param       $content
-     * @param array $clickthrough
+     * @param                $content
+     * @param                $clickthrough
+     * @param null           $emailId
+     * @param Email          $email
+     * @param EmailSendEvent $event
      *
      * @return array
      */
-    protected function generatePageUrlTokens($content, $clickthrough)
+    protected function generateUrlTokens($content, $clickthrough, $emailId = null, Email $email = null, EmailSendEvent $event = null)
     {
-        $pagelinkRegex     = '/'.$this->pageTokenRegex.'/';
-        $externalLinkRegex = '/'.$this->externalTokenRegex.'/';
+        if ($emailId !== null && isset($this->emailTrackedLinks[$emailId])) {
+            // Tokenization is supported and the links have already been parsed so rebuild tokens from saved links
 
+            /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+            $redirectModel = $this->factory->getModel('page.redirect');
+
+            foreach ($this->emailTrackedLinks[$emailId] as $url => $link) {
+                $trackedUrl = $redirectModel->generateRedirectUrl($link, $clickthrough);
+
+                if (strpos($url, '{') === 0) {
+                    // pageurl, externallink, or trackedlink tokens
+                    $tokens[$url] = $trackedUrl;
+                } else {
+                    $tokens['{trackedlink='.$link->getRedirectId().'}'] = $trackedUrl;
+                }
+            }
+        } else {
+            $trackedLinks = $tokens = $persistEntities = array();
+
+            $this->generatePageTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email);
+
+            $this->generateExternalLinkTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email);
+
+            if ($emailId !== null) {
+                $this->generateTrackedLinkTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email, $event);
+            } elseif (!empty($persistEntities)) {
+                /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+                $redirectModel = $this->factory->getModel('page.redirect');
+
+                $redirectModel->getRepository()->saveEntities($persistEntities);
+            }
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * @param       $content
+     * @param       $clickthrough
+     * @param       $tokens
+     * @param       $persistEntities
+     * @param       $trackedLinks
+     * @param null  $emailId
+     * @param Email $email
+     */
+    protected function generatePageTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null)
+    {
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel = $this->factory->getModel('page');
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
+        $pagelinkRegex = '/'.$this->pageTokenRegex.'/';
         preg_match_all($pagelinkRegex, $content, $matches);
 
-        $tokens = array();
         if (!empty($matches[1])) {
+            $foundTokens = array();
             foreach ($matches[1] as $key => $pageId) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
                     continue;
                 }
 
-                $page           = $pageModel->getEntity($pageId);
-                $tokens[$token] = ($page !== null) ? $pageModel->generateUrl($page, true, $clickthrough) : '';
+                $page = $pageModel->getEntity($pageId);
+
+                if (!$page) {
+                    continue;
+                }
+
+                if ($emailId !== null) {
+                    // Emails will have clickthroughs tracked separately so just generate the URL
+                    if (!in_array($token, $foundTokens) && !in_array($token, $trackedLinks)) {
+                        $foundTokens[$token] = $pageModel->generateUrl($page, true);
+                    }
+                } else {
+                    $tokens[$token] = $pageModel->generateUrl($page, true, $clickthrough);
+                }
+            }
+
+            if (!empty($foundTokens)) {
+                $links = $redirectModel->getRedirectListByUrls($foundTokens, $email);
+
+                foreach ($links as $token => $link) {
+                    if (!$link->getId() && !isset($persistEntities[$token])) {
+                        $persistEntities[$token] = $link;
+                    }
+
+                    $trackedLinks[$token] = $link;
+                }
             }
         }
+    }
 
+    /**
+     * @param       $content
+     * @param       $clickthrough
+     * @param       $tokens
+     * @param       $persistEntities
+     * @param       $trackedLinks
+     * @param null  $emailId
+     * @param Email $email
+     *
+     * @deprecated Since version 1.1
+     */
+    protected function generateExternalLinkTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null)
+    {
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        $externalLinkRegex = '/'.$this->externalTokenRegex.'/';
         preg_match_all($externalLinkRegex, $content, $matches);
+
         if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
+            $foundTokens = array();
+            foreach ($matches[1] as $key => $match) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
                     continue;
                 }
 
-                $link           = $redirectModel->getRedirect($match, true);
-                $tokens[$token] = ($link !== null) ? $redirectModel->generateRedirectUrl($link, $clickthrough) : '';
+                $foundTokens[$token] = $match;
+            }
+
+            $links = $redirectModel->getRedirectListByUrls($foundTokens, $email);
+            foreach ($links as $token => $link) {
+                if ($emailId !== null) {
+                    if (!isset($trackedLinks[$token])) {
+                        $trackedLinks[$token] = $link;
+                    }
+                } else {
+                    $tokens[$token] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
+                }
+
+                if (!$link->getId() && !isset($persistEntities[$token])) {
+                    $persistEntities[$token] = $link;
+                }
+            }
+
+            unset($foundTokens, $links);
+        }
+    }
+
+    /**
+     * @param                $content
+     * @param                $clickthrough
+     * @param                $tokens
+     * @param                $persistEntities
+     * @param                $trackedLinks
+     * @param null           $emailId
+     * @param Email          $email
+     * @param EmailSendEvent $event
+     */
+    protected function generateTrackedLinkTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null, EmailSendEvent $event = null)
+    {
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        // Set tokens for urls that were converted to trackable links already
+        $trackedLinkRegex = '/'.$this->trackedTokenRegex.'/';
+        preg_match_all($trackedLinkRegex, $content, $matches);
+        if (!empty($matches[1])) {
+            $foundTokens = array();
+
+            foreach ($matches[1] as $key => $match) {
+                $token = $matches[0][$key];
+
+                if (!empty($tokens[$token])) {
+                    continue;
+                }
+
+                $foundTokens[$token] = $match;
+            }
+
+            $links = $redirectModel->getRedirectListByIds($foundTokens, $email);
+
+            foreach ($links as $token => $link) {
+                $tokens[$token] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
+            }
+
+            unset($foundTokens, $links);
+        }
+
+        $this->convertTrackableLinks($event, $persistEntities, $trackedLinks, $email);
+
+        if (!empty($persistEntities)) {
+            $redirectModel->getRepository()->saveEntities($persistEntities);
+        }
+
+        if (!empty($trackedLinks)) {
+            $search = $replace = array();
+
+            foreach ($trackedLinks as $url => $link) {
+                $trackedUrl = $redirectModel->generateRedirectUrl($link, $clickthrough);
+
+                if (strpos($url, '{') === 0) {
+                    // pageurl, externallink, or trackedlink tokens
+                    $tokens[$url] = $trackedUrl;
+
+                    // Add search and replace entries to correct editor auto-prepended http:// or https://
+                    $search[]  = 'http://' . $url;
+                    $replace[] = $url;
+
+                    $search[]  = 'https://' . $url;
+                    $replace[] = $url;
+                } else {
+                    $token = '{trackedlink='.$link->getRedirectId().'}';
+                    $search[]       = $url;
+                    $replace[]      = $token;
+                    $tokens[$token] = $trackedUrl;
+                }
+            }
+
+            $content = str_ireplace($search, $replace, $content);
+            $event->setContent($content);
+
+            if ($plainText = $event->getPlainText()) {
+                $plainText = str_ireplace($search, $replace, $plainText);
+                $event->setPlainText($plainText);
             }
         }
 
-        return $tokens;
+        $this->emailTrackedLinks[$emailId] = $trackedLinks;
+    }
+
+    /**
+     * Converts links to trackable links and tokens
+     *
+     * @param EmailSendEvent $event
+     * @param                $persistEntities
+     * @param                $trackedLinks
+     * @param                $email
+     */
+    protected function convertTrackableLinks(EmailSendEvent $event, &$persistEntities, &$trackedLinks, Email $email = null)
+    {
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        // Parse the content for links
+        $body = $event->getContent();
+
+        // Find links using DOM to only find <a> tags
+        $libxmlPreviousState = libxml_use_internal_errors(true);
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument;
+        $dom->loadHTML('<?xml encoding="UTF-8">'.$body);
+        libxml_clear_errors();
+        libxml_use_internal_errors($libxmlPreviousState);
+
+        $links = $dom->getElementsByTagName('a');
+
+        $foundLinks = array();
+        foreach ($links as $link) {
+            $url = $link->getAttribute('href');
+
+            // Ensure a valid URL
+            if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks) && !in_array($url, $trackedLinks)) {
+                continue;
+            }
+
+            if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false) {
+                // The editor appended an URL token with http
+                continue;
+            }
+
+            $foundLinks[$url] = $url;
+        }
+
+        // Process plain text as well
+        $plainText = $event->getPlainText();
+
+        if (!empty($plainText)) {
+            // Plaintext links
+            preg_match_all(
+                '@(?<![.*">])\b(?:(?:https?|ftp|file)://|[a-z]\.)[-A-Z0-9+&#/%=~_|$?!:,.]*[A-Z0-9+&#/%=~_|$]@i',
+                $plainText,
+                $matches
+            );
+
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $url) {
+                    // Remove anything left on at the end; just inc ase
+                    $url = preg_replace('/^\PL+|\PL\z/', '', trim($url));
+
+                    // Ensure a valid URL
+                    if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks) && !in_array($url, $trackedLinks)) {
+                        continue;
+                    }
+
+                    if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false) {
+                        // The editor appended an URL token with http
+                        continue;
+                    }
+
+                    $foundLinks[$url] = $url;
+                }
+            }
+        }
+
+        if (!empty($foundLinks)) {
+            $links = $redirectModel->getRedirectListByUrls($foundLinks, $email);
+
+            foreach ($links as $url => $link) {
+                if (!$link->getId() && !isset($persistEntities[$url])) {
+                    $persistEntities[$url] = $link;
+                }
+
+                $trackedLinks[$url] = $link;
+            }
+        }
+
+        unset($foundLinks, $links);
     }
 }

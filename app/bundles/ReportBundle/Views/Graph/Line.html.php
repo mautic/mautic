@@ -28,39 +28,7 @@
                 <?php endif; ?>
             </div>
             <div class="col-xs-6 va-m">
-                <div class="dropdown pull-right">
-                    <button id="time-scopes" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                        <span class="button-label"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?></span>
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="time-scopes">
-                        <li role="presentation">
-                            <a href="#" onclick="Mautic.updateReportGraph(this, {'amount': 24, 'unit': 'H', 'graphName': '<?php echo $graph['name']; ?>'});return false;" role="menuitem" tabindex="-1">
-                                <?php echo $view['translator']->trans('mautic.asset.asset.downloads.hourly'); ?>
-                            </a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#" class="bg-primary" onclick="Mautic.updateReportGraph(this, {'amount': 30, 'unit': 'D', 'graphName': '<?php echo $graph['name']; ?>'});return false;" role="menuitem" tabindex="-1">
-                                <?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?>
-                            </a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#" onclick="Mautic.updateReportGraph(this, {'amount': 20, 'unit': 'W', 'graphName': '<?php echo $graph['name']; ?>'});return false;" role="menuitem" tabindex="-1">
-                                <?php echo $view['translator']->trans('mautic.asset.asset.downloads.weekly'); ?>
-                            </a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#" onclick="Mautic.updateReportGraph(this, {'amount': 24, 'unit': 'M', 'graphName': '<?php echo $graph['name']; ?>'});return false;" role="menuitem" tabindex="-1">
-                                <?php echo $view['translator']->trans('mautic.asset.asset.downloads.monthly'); ?>
-                            </a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#" onclick="Mautic.updateReportGraph(this, {'amount': 10, 'unit': 'Y', 'graphName': '<?php echo $graph['name']; ?>'});return false;" role="menuitem" tabindex="-1">
-                                <?php echo $view['translator']->trans('mautic.asset.asset.downloads.yearly'); ?>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateReportGraph')); ?>
             </div>
         </div>
         <div class="pt-0 pl-15 pb-10 pr-15">

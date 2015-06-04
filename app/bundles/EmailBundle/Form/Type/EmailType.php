@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -58,33 +57,12 @@ class EmailType extends AbstractType
         $isVariant     = !empty($variantParent);
 
         $builder->add(
-            'subject',
-            'text',
-            array(
-                'label'      => 'mautic.email.subject',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
-        );
-
-        $builder->add(
             'name',
             'text',
             array(
-                'label'      => 'mautic.core.name',
+                'label'      => 'mautic.email.form.internal.name',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
-            )
-        );
-
-        $builder->add(
-            'description',
-            'textarea',
-            array(
-                'label'      => 'mautic.core.description',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control editor'),
-                'required'   => false
             )
         );
 
@@ -159,20 +137,17 @@ class EmailType extends AbstractType
             )
         );
 
-        $template = $options['data']->getTemplate();
-        if (empty($template)) {
-            $template = $this->defaultTheme;
-        }
         $builder->add(
             'template',
             'theme_list',
             array(
-                'feature' => 'email',
-                'data'    => $template,
-                'attr'    => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.form.template.help'
-                )
+                'feature'     => 'email',
+                'attr'        => array(
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.form.template.help',
+                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
+                ),
+                'empty_value' => 'mautic.core.none'
             )
         );
 
@@ -227,12 +202,15 @@ class EmailType extends AbstractType
             )
         );
 
-        $url = $this->request->getSchemeAndHttpHost() . $this->request->getBasePath();
-        $builder->addEventListener(FormEvents::PRE_SUBMIT,
+        $url = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($url) {
-                $parser  = new PlainTextHelper(array(
-                    'base_url' => $url
-                ));
+                $parser = new PlainTextHelper(
+                    array(
+                        'base_url' => $url
+                    )
+                );
 
                 $data = $event->getData();
 
@@ -242,41 +220,40 @@ class EmailType extends AbstractType
             }
         );
 
-        $contentMode = $options['data']->getContentMode();
-        if (empty($contentMode)) {
-            $contentMode = 'custom';
-        }
-        $builder->add(
-            'contentMode',
-            'button_group',
-            array(
-                'choice_list'        => new ChoiceList(
-                    array('custom', 'builder'),
-                    array('mautic.email.form.contentmode.custom', 'mautic.email.form.contentmode.builder')
-                ),
-                'expanded'           => true,
-                'multiple'           => false,
-                'label'              => 'mautic.email.form.contentmode',
-                'empty_value'        => false,
-                'required'           => false,
-                'data'               => $contentMode,
-                'attr'               => array(
-                    'onChange' => 'Mautic.onBuilderModeSwitch(this);'
-                ),
-                'button_group_class' => ''
-            )
-        );
-
         $builder->add(
             'customHtml',
             'textarea',
             array(
-                'label'    => false,
-                'required' => false,
-                'attr'     => array(
-                    'class' => 'custom-html-content'
+                'label'      => 'mautic.email.form.body',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'attr'       => array(
+                    'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                    'data-token-callback'  => 'email:getBuilderTokens',
+                    'data-token-activator' => '{'
                 )
             )
+        );
+
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
+        $builder->add(
+            $builder->create(
+                'unsubscribeForm',
+                'form_list',
+                array(
+                    'label'       => 'mautic.email.form.unsubscribeform',
+                    'label_attr'  => array('class' => 'control-label'),
+                    'attr'        => array(
+                        'class'            => 'form-control',
+                        'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
+                        'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone')
+                    ),
+                    'required'    => false,
+                    'multiple'    => false,
+                    'empty_value' => '',
+                )
+            )
+                ->addModelTransformer($transformer)
         );
 
         if ($isVariant) {
@@ -288,27 +265,6 @@ class EmailType extends AbstractType
                 )
             );
         } else {
-            $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
-            $builder->add(
-                $builder->create(
-                    'unsubscribeForm',
-                    'form_list',
-                    array(
-                        'label'       => 'mautic.email.form.unsubscribeform',
-                        'label_attr'  => array('class' => 'control-label'),
-                        'attr'        => array(
-                            'class'            => 'form-control',
-                            'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
-                            'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone')
-                        ),
-                        'required'    => false,
-                        'multiple'    => false,
-                        'empty_value' => '',
-                    )
-                )
-                    ->addModelTransformer($transformer)
-            );
-
             //add category
             $builder->add(
                 'category',
@@ -332,12 +288,11 @@ class EmailType extends AbstractType
                         ),
                         'multiple'   => true,
                         'expanded'   => false,
-                        'required'   => false
+                        'required'   => true
                     )
                 )
                     ->addModelTransformer($transformer)
             );
-
 
             $builder->add(
                 'language',
@@ -353,7 +308,30 @@ class EmailType extends AbstractType
             );
         }
 
+
+        //add lead lists
+        $transformer = new IdToEntityModelTransformer(
+            $this->em,
+            'MauticAssetBundle:Asset',
+            'id',
+            true
+        );
+        $builder->add(
+            $builder->create('assetAttachments', 'asset_list', array(
+                'label'      => 'mautic.email.attachments',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'onchange' => 'Mautic.getTotalAttachmentSize();'
+                ),
+                'multiple' => true,
+                'expanded' => false
+            ))
+                ->addModelTransformer($transformer)
+        );
+
         $builder->add('sessionId', 'hidden');
+        $builder->add('emailType', 'hidden');
 
         $customButtons = array(
             array(
@@ -407,7 +385,11 @@ class EmailType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Mautic\EmailBundle\Entity\Email'
+                'data_class'        => 'Mautic\EmailBundle\Entity\Email',
+                'validation_groups' => array(
+                    'Mautic\EmailBundle\Entity\Email',
+                    'determineValidationGroups',
+                ),
             )
         );
 

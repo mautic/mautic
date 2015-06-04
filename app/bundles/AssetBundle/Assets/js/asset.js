@@ -17,17 +17,16 @@ Mautic.assetOnUnload = function(id) {
     }
 };
 
-Mautic.getAssetId = function() {
-    return mQuery('input#itemId').val();
-};
-
 Mautic.renderDownloadChart = function (chartData) {
     if (!mQuery('#download-chart').length) {
         return;
     }
     if (!chartData) {
         chartData = mQuery.parseJSON(mQuery('#download-chart-data').text());
+    } else if (chartData.stats) {
+        chartData = chartData.stats;
     }
+
     var ctx = document.getElementById("download-chart").getContext("2d");
     var options = {};
 
@@ -40,28 +39,10 @@ Mautic.renderDownloadChart = function (chartData) {
 };
 
 Mautic.updateDownloadChart = function(element, amount, unit) {
-    var element = mQuery(element);
-    var wrapper = element.closest('ul');
-    var button  = mQuery('#time-scopes .button-label');
-    var assetId = Mautic.getAssetId();
-    wrapper.find('a').removeClass('bg-primary');
-    element.addClass('bg-primary');
-    button.text(element.text());
-    var query = "action=asset:updateDownloadChart&amount=" + amount + "&unit=" + unit + "&assetId=" + assetId;
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-                Mautic.renderDownloadChart(response.stats);
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
-    });
+    var assetId = Mautic.getEntityId();
+    var query = "amount=" + amount + "&unit=" + unit + "&assetId=" + assetId;
+
+    Mautic.getChartData(element, 'asset:updateDownloadChart', query, 'renderDownloadChart');
 };
 
 Mautic.updateRemoteBrowser = function(provider, path) {

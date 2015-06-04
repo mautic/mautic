@@ -30,7 +30,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                                 <?php echo $view['form']->widget($form['batchlimit']); ?>
                                 <span class="input-group-btn">
                                     <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php', array(
-                                        'message'         => $view['translator']->trans('mautic.email.form.confirmsend', array('%name%' => $email->getName() . ' (' . $email->getId() . ')')),
+                                        'message'         => $view['translator']->trans('mautic.email.form.confirmsend', array('%name%' => $email->getName())),
                                         'confirmText'     => $view['translator']->trans('mautic.email.send'),
                                         'confirmCallback' => 'submitSendForm',
                                         'iconClass'       => 'fa fa-send-o',

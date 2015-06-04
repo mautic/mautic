@@ -33,7 +33,7 @@ switch ($status) {
         break;
 }
 
-$clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-click-event';
+$clickAction = (isset($disableToggle) && $disableToggle === true) ? ' disabled' : ' has-click-event';
 $idClass     = str_replace('.', '-', $model) . '-publish-icon' . $item->getId();
 ?>
 

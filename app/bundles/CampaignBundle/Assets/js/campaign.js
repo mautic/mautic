@@ -212,6 +212,7 @@ Mautic.updateCampaignEventLinks = function () {
  */
 Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
+    mQuery('body').css('overflow-y', 'hidden');
 
     mQuery('.builder').addClass('builder-active');
     mQuery('.builder').removeClass('hide');
@@ -520,13 +521,14 @@ Mautic.closeCampaignBuilder = function() {
         dataType: "json",
         success: function (response) {
             mQuery('#builder-overlay').remove();
-
+            mQuery('body').css('overflow-y', '');
             if (response.success) {
                 mQuery('.builder').addClass('hide');
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
+            mQuery('body').css('overflow-y', '');
         }
     });
 };

@@ -8,24 +8,32 @@
  */
 
 $defaultInputClass = $containerType = 'freetext';
-include __DIR__ . '/field_helper.php';
+include __DIR__.'/field_helper.php';
 
-$text = $view->escape($properties['text']);
-?>
+$text = html_entity_decode($properties['text']);
 
-<div <?php echo $containerAttr; ?>>
-    <?php
-    if (!empty($inForm))
-        echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id,
-            'formId'  => $formId
-        ));
-    ?>
-    <?php if ($field['showLabel']): ?>
-    <h3 <?php echo $labelAttr; ?> id="mauticform_label_<?php echo $field['alias'] ?>" for="mauticform_input_<?php echo $field['alias'] ?>"><?php echo $view->escape($field['label']); ?></h3>
-    <?php endif; ?>
-    <div <?php echo $inputAttr; ?> id="mauticform_input_<?php echo $field['alias'] ?>">
-        <?php echo html_entity_decode($text); ?>
-    </div>
-</div>
+$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
+    array(
+        'deleted' => (!empty($deleted)) ? $deleted : false,
+        'id'      => $id,
+        'formId'  => $formId
+    )) : '';
+
+$label = (!$field['showLabel']) ? '' :
+<<<HTML
+
+                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input_{$field['alias']}">{$view->escape($field['label'])}</h3>
+HTML;
+
+
+$html = <<<HTML
+
+            <div $containerAttr>{$formButtons}{$label}
+                <div $inputAttr id="mauticform_input_{$field['alias']}">
+                    $text
+                </div>
+            </div>
+
+HTML;
+
+echo $html;
