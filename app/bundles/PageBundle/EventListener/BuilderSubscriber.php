@@ -356,6 +356,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         $pagelinkRegex = '/'.$this->pageTokenRegex.'/';
         preg_match_all($pagelinkRegex, $content, $matches);
+
         if (!empty($matches[1])) {
             $foundTokens = array();
             foreach ($matches[1] as $key => $pageId) {
@@ -412,6 +413,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         $externalLinkRegex = '/'.$this->externalTokenRegex.'/';
         preg_match_all($externalLinkRegex, $content, $matches);
+
         if (!empty($matches[1])) {
             $foundTokens = array();
             foreach ($matches[1] as $key => $match) {
@@ -497,8 +499,15 @@ class BuilderSubscriber extends CommonSubscriber
                 if (strpos($url, '{') === 0) {
                     // pageurl, externallink, or trackedlink tokens
                     $tokens[$url] = $trackedUrl;
+
+                    // Add search and replace entries to correct editor auto-prepended http:// or https://
+                    $search[]  = 'http://' . $url;
+                    $replace[] = $url;
+
+                    $search[]  = 'https://' . $url;
+                    $replace[] = $url;
                 } else {
-                    $token          = '{trackedlink='.$link->getRedirectId().'}';
+                    $token = '{trackedlink='.$link->getRedirectId().'}';
                     $search[]       = $url;
                     $replace[]      = $token;
                     $tokens[$token] = $trackedUrl;
@@ -552,6 +561,11 @@ class BuilderSubscriber extends CommonSubscriber
                 continue;
             }
 
+            if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false) {
+                // The editor appended an URL token with http
+                continue;
+            }
+
             $foundLinks[$url] = $url;
         }
 
@@ -573,6 +587,11 @@ class BuilderSubscriber extends CommonSubscriber
 
                     // Ensure a valid URL
                     if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks) && !in_array($url, $trackedLinks)) {
+                        continue;
+                    }
+
+                    if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false) {
+                        // The editor appended an URL token with http
                         continue;
                     }
 
