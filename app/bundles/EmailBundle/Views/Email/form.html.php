@@ -187,7 +187,9 @@ if (!isset($attachmentSize)) {
     </div>
 </div>
 
-<?php if ($email->getEmailType() === null || !empty($forceTypeSelection)):
+<?php
+$type = $email->getEmailType();
+if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         array(
             'item'               => $email,
