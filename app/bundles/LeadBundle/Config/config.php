@@ -257,7 +257,11 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_field_import'
-            )
+            ),
+            'mautic.form.type.lead_quickemail'                    => array(
+                'class' => 'Mautic\LeadBundle\Form\Type\EmailType',
+                'alias' => 'lead_quickemail'
+            ),
         ),
         'other'  => array(
             'mautic.validator.leadlistaccess' => array(
