@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,6 +29,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class EmailType extends AbstractType
 {
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -45,6 +56,28 @@ class EmailType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => false
+            )
+        );
+
+        $user    = $this->factory->getUser();
+        $default = (empty($options['data']['from'])) ? $user->getEmail() : $options['data']['from'];
+        $builder->add(
+            'from',
+            'text',
+            array(
+                'label'      => 'mautic.email.from_email',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false,
+                'data'       => $default,
+                'constraints' => array(
+                    new NotBlank(array(
+                        'message' => 'mautic.core.email.required'
+                    )),
+                    new Email(array(
+                        'message' => 'mautic.core.email.required'
+                    )),
+                )
             )
         );
 

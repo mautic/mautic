@@ -259,8 +259,9 @@ return array(
                 'alias'     => 'lead_field_import'
             ),
             'mautic.form.type.lead_quickemail'                    => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\EmailType',
-                'alias' => 'lead_quickemail'
+                'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_quickemail'
             ),
         ),
         'other'  => array(
