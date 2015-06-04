@@ -7,11 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-if (isset($$tmpl)) {
-    // Ajax update
-    extract($$tmpl);
-}
+if ($tmpl == 'index')
+    $view->extend('MauticFormBundle:Form:index.html.php');
 
 ?>
 <?php if (count($items)): ?>
@@ -107,6 +104,9 @@ if (isset($$tmpl)) {
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'form.form')); ?>
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                             <?php echo $item->getName(); ?>
+                            <?php if ($item->getFormType() == 'campaign'): ?>
+                                <i class="fa fa-fw fa-cube"></i>
+                            <?php endif; ?>
                         </a>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
@@ -135,9 +135,7 @@ if (isset($$tmpl)) {
         'page'            => $page,
         'limit'           => $limit,
         'baseUrl'         => $view['router']->generate('mautic_form_index'),
-        'sessionVar'      => 'form.' . $tmpl,
-        'tmpl'            => $tmpl,
-        'target'          => '.' . $tmpl . '-container'
+        'sessionVar'      => 'form',
     )); ?>
     </div>
 </div>

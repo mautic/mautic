@@ -50,105 +50,81 @@ class FormController extends CommonFormController
             $this->setListFilters();
         }
 
-        $tmpl  = $this->request->get('tmpl', 'index');
-        $types = array();
-        if ($tmpl == 'index' || $tmpl == 'standalone') {
-            $types[] = 'standalone';
+        $session = $this->factory->getSession();
+
+        //set limits
+        $limit = $session->get('mautic.form.limit', $this->factory->getParameter('default_pagelimit'));
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
         }
-        if ($tmpl == 'index' || $tmpl == 'campaign') {
-            $types[] = 'campaign';
+
+        $search = $this->request->get('search', $session->get('mautic.form.filter', ''));
+        $session->set('mautic.form.filter', $search);
+
+        $filter = array('string' => $search, 'force' => array());
+
+
+        if (!$permissions['form:forms:viewother']) {
+            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
-        $session        = $this->factory->getSession();
-        $viewParameters = array();
+        $orderBy    = $session->get('mautic.form.orderby', 'f.name');
+        $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
 
-        foreach ($types as $formType) {
-            //set limits
-            $limit = $session->get('mautic.form.'.$formType.'.limit', $this->factory->getParameter('default_pagelimit'));
-            $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-            if ($start < 0) {
-                $start = 0;
-            }
+        $forms = $this->factory->getModel('form.form')->getEntities(
+            array(
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
+            )
+        );
 
-            $search = $this->request->get('search', $session->get('mautic.form.'.$formType.'.filter', ''));
-            $session->set('mautic.form.'.$formType.'.filter', $search);
+        $count = count($forms);
 
-            $filter = array('string' => $search, 'force' => array(
-                array('column' => 'f.formType', 'expr' => 'eq', 'value' => $formType)
-            ));
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            $lastPage = ($count === 1) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
 
-            if (!$permissions['form:forms:viewother']) {
-                $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
-            }
+            $session->set('mautic.form.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $lastPage));
 
-            $orderBy    = $session->get('mautic.form.'.$formType.'.orderby', 'f.name');
-            $orderByDir = $session->get('mautic.form.'.$formType.'.orderbydir', 'ASC');
-
-            $forms = $this->factory->getModel('form.form')->getEntities(
+            return $this->postActionRedirect(
                 array(
-                    'start'      => $start,
-                    'limit'      => $limit,
-                    'filter'     => $filter,
-                    'orderBy'    => $orderBy,
-                    'orderByDir' => $orderByDir
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => array('page' => $lastPage),
+                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_form_index',
+                        'mauticContent' => 'form'
+                    )
                 )
             );
-
-            $count = count($forms);
-
-            if ($count && $count < ($start + 1)) {
-                //the number of entities are now less then the current page so redirect to the last page
-                $lastPage = ($count === 1) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
-
-                $session->set('mautic.form.'.$formType.'.page', $lastPage);
-                $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $lastPage));
-
-                return $this->postActionRedirect(
-                    array(
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => array('page' => $lastPage),
-                        'contentTemplate' => 'MauticFormBundle:Form:index',
-                        'passthroughVars' => array(
-                            'activeLink'    => '#mautic_form_index',
-                            'mauticContent' => 'form'
-                        )
-                    )
-                );
-            }
-
-            //set what page currently on so that we can return here after form submission/cancellation
-            $session->set('mautic.form.'.$formType.'.page', $page);
-
-            $viewParameters[$formType] = array(
-                'searchValue' => $search,
-                'items'       => $forms,
-                'totalItems'  => $count,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $formType
-            );
         }
 
-        $viewParameters = array_merge($viewParameters, array(
+        //set what page currently on so that we can return here after form submission/cancellation
+        $session->set('mautic.form.page', $page);
+
+        $viewParameters = array(
+            'searchValue' => $search,
+            'items'       => $forms,
+            'totalItems'  => $count,
+            'page'        => $page,
+            'limit'       => $limit,
             'permissions' => $permissions,
             'security'    => $this->factory->getSecurity(),
-            'tmpl'        => $tmpl
-        ));
-
-        $route = $this->generateUrl('mautic_form_index', array('page' => $page));
-        if ($tmpl != 'index') {
-            $route .= '#'.$tmpl;
-        }
-
-        $template = ($tmpl == 'index') ? 'index' : 'list';
+            'tmpl'        => $this->request->get('tmpl', 'index')
+        );
 
         return $this->delegateView(array(
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticFormBundle:Form:' . $template . '.html.php',
+            'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_form_index',
                 'mauticContent'  => 'form',
-                'route'          => $route
+                'route'          => $this->generateUrl('mautic_form_index', array('page' => $page))
             )
         ));
     }
