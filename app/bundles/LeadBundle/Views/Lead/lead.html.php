@@ -61,6 +61,20 @@ if ($edit) {
     );
 }
 
+if (!empty($fields['core']['email']['value'])) {
+    $preButtons[] = array(
+        'attr'      => array(
+            'id'          => 'sendEmailButton',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
+            'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'email'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
+        'iconClass' => 'fa fa-send'
+    );
+}
+
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'ajaxmodal',

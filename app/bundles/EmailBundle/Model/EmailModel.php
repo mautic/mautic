@@ -316,14 +316,16 @@ class EmailModel extends FormModel
             $stat->setIsRead(true);
             $stat->setDateRead($readDateTime->getDateTime());
 
-            $readCount = $email->getReadCount();
-            $readCount++;
-            $email->setReadCount($readCount);
+            if ($email) {
+                $readCount = $email->getReadCount();
+                $readCount++;
+                $email->setReadCount($readCount);
 
-            if ($email->isVariant()) {
-                $variantReadCount = $email->getVariantReadCount();
-                $variantReadCount++;
-                $email->setVariantReadCount($variantReadCount);
+                if ($email->isVariant()) {
+                    $variantReadCount = $email->getVariantReadCount();
+                    $variantReadCount++;
+                    $email->setVariantReadCount($variantReadCount);
+                }
             }
         }
 
@@ -360,12 +362,14 @@ class EmailModel extends FormModel
             $leadModel->setCurrentLead($lead);
         }
 
-        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
-            $event = new EmailOpenEvent($stat, $request);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+        if ($email) {
+            if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
+                $event = new EmailOpenEvent($stat, $request);
+                $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            }
+            $this->em->persist($email);
         }
 
-        $this->em->persist($email);
         $this->em->persist($stat);
         $this->em->flush();
     }
