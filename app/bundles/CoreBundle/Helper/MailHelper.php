@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceTokenTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 
@@ -646,10 +647,11 @@ class MailHelper
      * @param        $content
      * @param string $contentType
      * @param null   $charset
+     * @param bool   $ignoreTrackingPixel
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if (strpos($content, '{tracking_pixel}') === false) {
+        if (!$ignoreTrackingPixel) {
             // Append tracking pixel
             $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
             if (strpos($content, '</body>') !== false) {
@@ -847,8 +849,12 @@ class MailHelper
     /**
      * @param null $idHash
      */
-    public function setIdHash($idHash)
+    public function setIdHash($idHash = null)
     {
+        if ($idHash === null) {
+            $idHash = uniqid();
+        }
+
         $this->idHash = $idHash;
 
         // Append pixel to body before send
@@ -903,11 +909,12 @@ class MailHelper
 
     /**
      * @param Email $email
-     * @param bool  $allowBcc           Honor BCC if set in email
-     * @param array $slots              Slots configured in theme
-     * @param array $assetAttachments   Assets to send
+     * @param bool  $allowBcc            Honor BCC if set in email
+     * @param array $slots               Slots configured in theme
+     * @param array $assetAttachments    Assets to send
+     * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = array(), $assetAttachments = array())
+    public function setEmail(Email $email, $allowBcc = true, $slots = array(), $assetAttachments = array(), $ignoreTrackingPixel = false)
     {
         $this->email = $email;
 
@@ -970,7 +977,7 @@ class MailHelper
             }
         }
 
-        $this->setBody($customHtml);
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
     }
 
     /**
@@ -1197,5 +1204,34 @@ class MailHelper
         $link = $redirectModel->getRedirectByUrl($url, $this->email);
 
         return $link;
+    }
+
+    /**
+     * Create an email stat
+     */
+    public function createLeadEmailStat()
+    {
+        if (!$this->lead) {
+            return;
+        }
+
+        //create a stat
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setEmail($this->email);
+        $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+
+        $stat->setEmailAddress($this->lead['email']);
+        $stat->setTrackingHash($this->idHash);
+        if (!empty($this->source)) {
+            $stat->setSource($this->source[0]);
+            $stat->setSourceId($this->source[1]);
+        }
+        $stat->setCopy($this->getBody());
+        $stat->setTokens($this->getTokens());
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+        $emailModel->getStatRepository()->saveEntity($stat);
     }
 }

@@ -178,7 +178,7 @@ class AssetController extends FormController
         $timeStats = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($activeAsset->getId());
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId());
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_asset_action', array(
