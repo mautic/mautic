@@ -9,10 +9,9 @@
 
 echo $view['form']->start($form);
 
-echo $view['form']->row($form['subject']);
 echo $view['form']->row($form['from']);
+echo $view['form']->row($form['subject']);
 echo $view['form']->row($form['body']);
 echo $view['form']->row($form['templates']);
-
 
 echo $view['form']->end($form);
