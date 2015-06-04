@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\AddonBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
@@ -415,5 +416,41 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function getEmailTemplateAction(Request $request)
+    {
+        $data    = array('success' => 1, 'body' => '', 'subject' => '');
+        $emailId = $request->get('template');
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model    = $this->factory->getModel('email');
+
+        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        $email    = $model->getEntity($emailId);
+
+        if ($email !== null && $this->factory->getSecurity()->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
+        )
+        ) {
+
+            $mailer = $this->factory->getMailer();
+            $mailer->setEmail($email, true, array(), array(), true);
+
+            $data['body']    = $mailer->getBody();
+            $data['subject'] = $email->getSubject();
+
+            // Parse tokens into view data
+            $tokens = $model->getBuilderComponents($email, array('tokens', 'visualTokens'));
+
+            BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
+        }
+
+        return $this->sendJsonResponse($data);
     }
 }

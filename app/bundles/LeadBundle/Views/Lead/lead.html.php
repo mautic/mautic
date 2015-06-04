@@ -50,7 +50,7 @@ $buttons = $preButtons = array();
 if ($edit) {
     $preButtons[] = array(
         'attr'      => array(
-            'id'          => 'addNoteButton',
+            'id'          => 'emailLead',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#leadModal',
             'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
@@ -58,6 +58,20 @@ if ($edit) {
         ),
         'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
         'iconClass' => 'fa fa-file-o'
+    );
+}
+
+if (!empty($fields['core']['email']['value'])) {
+    $preButtons[] = array(
+        'attr'      => array(
+            'id'          => 'addNoteButton',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
+            'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'email'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
+        'iconClass' => 'fa fa-send'
     );
 }
 
