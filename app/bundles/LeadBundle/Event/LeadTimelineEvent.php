@@ -190,11 +190,12 @@ class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included
      *
-     * @param $eventType
+     * @param      $eventType
+     * @param bool $inclusive
      *
      * @return bool
      */
-    public function isApplicable($eventType)
+    public function isApplicable($eventType, $inclusive = false)
     {
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
@@ -204,6 +205,8 @@ class LeadTimelineEvent extends Event
             if (!in_array($eventType, $this->filters['includeEvents'])) {
                 return false;
             }
+        } elseif ($inclusive) {
+            return false;
         }
 
         return true;

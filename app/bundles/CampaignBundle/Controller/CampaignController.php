@@ -277,7 +277,7 @@ class CampaignController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
 
         // Hit count per day for last 30 days
         $hits = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(

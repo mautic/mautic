@@ -57,13 +57,18 @@ class AuditLogSubscriber extends CommonSubscriber
                     ),
                     array(
                         'column' => 'e.action',
-                        'expr'   => 'neq',
-                        'value'  => 'update'
+                        'expr'   => 'in',
+                        'value'  => array("'create'", "'identified'", "'ipadded'")
                     ),
                     array(
                         'column' => 'e.objectId',
                         'expr'   => 'eq',
                         'value'  => $lead->getId()
+                    ),
+                    array(
+                        'column' => 'e.dateAdded',
+                        'expr'   => 'gte',
+                        'value'  => $lead->getDateAdded()
                     )
                 )
             )

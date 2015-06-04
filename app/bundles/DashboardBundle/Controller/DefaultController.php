@@ -71,7 +71,7 @@ class DefaultController extends CommonController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null);
 
         // Get names of log's items
         $router = $this->factory->getRouter();

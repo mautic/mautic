@@ -225,11 +225,16 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('s')
-            ->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name')
+        $query = $this->createQueryBuilder('s');
+
+        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
-            ->where('s.lead = ' . $leadId);
+            ->where(
+                $query->expr()->andX(
+                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
+                    $query->expr()->eq('s.isFailed', ':false'))
+            )->setParameter('false', false, 'boolean');
 
         if (!empty($options['ipIds'])) {
             $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');

@@ -188,7 +188,7 @@ class FormController extends CommonFormController
         $timeStats = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission')->getSubmissionsSince($activeForm->getId());
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId);
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Only show actions and fields that still exist
         $customComponents  = $model->getCustomComponents();

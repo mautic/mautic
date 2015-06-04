@@ -56,8 +56,14 @@ if ($tmpl == 'index')
                     'class'      => 'col-lead-lastactive visible-md visible-lg',
                     'default'    => true
                 ));
-                ?>
 
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.id',
+                    'text'       => 'mautic.core.id',
+                    'class'      => 'col-lead-id visible-md visible-lg'
+                ));
+                ?>
             </tr>
         </thead>
         <tbody>
