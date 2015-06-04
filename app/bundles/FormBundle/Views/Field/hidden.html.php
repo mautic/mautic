@@ -9,20 +9,27 @@
 
 $defaultInputClass = $containerType = 'hidden';
 
-include __DIR__ . '/field_helper.php';
-?>
+include __DIR__.'/field_helper.php';
 
-<?php if (!empty($inForm)): ?>
-<div <?php echo $containerAttr; ?>>
-    <?php
-    echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
+$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
+    array(
         'deleted' => (!empty($deleted)) ? $deleted : false,
         'id'      => $id,
         'formId'  => $formId
-    ));
-    ?>
-    <label class="text-muted"><?php echo $field['label']; ?></label>
+    )) : '';
+
+if ((empty($inForm))):
+$html = <<<HTML
+<div $containerAttr>$formButtons
+    <label class="text-muted">{$field['label']}</label>
 </div>
-<?php else: ?>
-<input <?php echo $inputAttr; ?> type="hidden" />
-<?php endif; ?>
+HTML;
+
+else:
+$html = <<<HTML
+
+                <input $inputAttr type="hidden" />
+HTML;
+endif;
+
+echo $html;
