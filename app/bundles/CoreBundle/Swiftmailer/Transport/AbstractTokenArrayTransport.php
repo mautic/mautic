@@ -14,9 +14,9 @@ use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 
 /**
- * Class AbstractBatchArrayTransport
+ * Class AbstractTokenArrayTransport
  */
-abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
+abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 {
     /**
      * @var \Swift_Message
@@ -123,7 +123,7 @@ abstract class AbstractBatchArrayTransport implements InterfaceBatchTransport
 
         $message = array(
             'html'       => $this->message->getBody(),
-            'text'       => MailHelper::getPlainText($this->message),
+            'text'       => MailHelper::getPlainTextFromMessage($this->message),
             'subject'    => $this->message->getSubject(),
             'from'       => array(
                 'name'  => $fromName,

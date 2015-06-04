@@ -117,10 +117,6 @@ if (!isset($attachmentSize)) {
                                 <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
-
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['description']); ?>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,7 +187,9 @@ if (!isset($attachmentSize)) {
     </div>
 </div>
 
-<?php if ($email->getEmailType() === null || !empty($forceTypeSelection)):
+<?php
+$type = $email->getEmailType();
+if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         array(
             'item'               => $email,

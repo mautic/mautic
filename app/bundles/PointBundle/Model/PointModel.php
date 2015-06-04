@@ -16,6 +16,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -77,7 +78,7 @@ class PointModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(array('Point'));
@@ -97,7 +98,7 @@ class PointModel extends CommonFormModel
                 $name = PointEvents::POINT_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -110,7 +111,7 @@ class PointModel extends CommonFormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**

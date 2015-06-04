@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MandrillTransport
  */
-class MandrillTransport extends AbstractBatchHttpTransport implements InterfaceCallbackTransport
+class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
 {
 
     /**

@@ -75,7 +75,13 @@ class PublicController extends CommonFormController
                 // Override tracking_pixel so as to not cause a double hit
                 $tokens['{tracking_pixel}'] = '';
 
-                $event = new EmailSendEvent($content, $entity, $lead, $idHash, array(), $tokens);
+                $event = new EmailSendEvent(array(
+                    'content' => $content,
+                    'lead'    => $lead,
+                    'email'   => $entity,
+                    'idHash'  => $idHash,
+                    'tokens'  => $tokens
+                ));
                 $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
                 $content = $event->getContent(true);
             }

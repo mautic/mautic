@@ -251,7 +251,7 @@ class EmailController extends FormController
         $security = $this->factory->getSecurity();
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
-        $email    = $model->getEntity($objectId);
+        $email = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.email.page', 1);
 
@@ -364,6 +364,9 @@ class EmailController extends FormController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
+        // Get click through stats
+        $trackableLinks = $model->getEmailClickStats($email->getId());
+
         return $this->delegateView(
             array(
                 'returnUrl'       => $this->generateUrl(
@@ -374,17 +377,18 @@ class EmailController extends FormController
                     )
                 ),
                 'viewParameters'  => array(
-                    'email'         => $email,
-                    'stats'         => $stats,
-                    'pending'       => $model->getPendingLeads($email, null, true),
-                    'logs'          => $logs,
-                    'variants'      => array(
+                    'email'          => $email,
+                    'stats'          => $stats,
+                    'trackableLinks' => $trackableLinks,
+                    'pending'        => $model->getPendingLeads($email, null, true),
+                    'logs'           => $logs,
+                    'variants'       => array(
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,
                         'criteria'   => $criteria['criteria']
                     ),
-                    'permissions'   => $security->isGranted(
+                    'permissions'    => $security->isGranted(
                         array(
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -398,9 +402,9 @@ class EmailController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'abTestResults' => $abTestResults,
-                    'security'      => $security,
-                    'previewUrl'    => $this->generateUrl(
+                    'abTestResults'  => $abTestResults,
+                    'security'       => $security,
+                    'previewUrl'     => $this->generateUrl(
                         'mautic_email_action',
                         array(
                             'objectAction' => 'preview',
@@ -1258,7 +1262,12 @@ class EmailController extends FormController
         $tokens = array('{tracking_pixel}' => '');
 
         // Generate and replace tokens
-        $event = new EmailSendEvent($content, $entity, null, $idHash, array(), $tokens);
+        $event = new EmailSendEvent(null, array(
+            'content' => $content,
+            'email'   => $entity,
+            'idHash'  => $idHash,
+            'tokens'  => $tokens
+        ));
         $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
         $content = $event->getContent();
 

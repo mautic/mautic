@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\EmailEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -248,7 +249,7 @@ class EmailModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(array('Email'));
@@ -268,7 +269,7 @@ class EmailModel extends FormModel
                 $name = EmailEvents::EMAIL_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -281,7 +282,7 @@ class EmailModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -602,6 +603,18 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Get an array of tracked links
+     *
+     * @param $emailId
+     *
+     * @return array
+     */
+    public function getEmailClickStats($emailId)
+    {
+        return $this->factory->getModel('page.redirect')->getRedirectListBySource('email', $emailId);
+    }
+
+    /**
      * Get the number of leads this email will be sent to
      *
      * @param Email $email
@@ -907,8 +920,8 @@ class EmailModel extends FormModel
 
                 $contentGenerated = $useEmail['entity']->getId();
 
-                // Use batching if supported
-                $mailer->useMailerBatching();
+                // Use batching/tokenization if supported
+                $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
             }
@@ -917,7 +930,7 @@ class EmailModel extends FormModel
 
             // Add tracking pixel token
             if (!empty($tokens)) {
-                $mailer->setCustomTokens($tokens);
+                $mailer->setTokens($tokens);
             }
 
             $mailer->setLead($lead);
@@ -1029,7 +1042,7 @@ class EmailModel extends FormModel
 
         $mailer = $this->factory->getMailer();
         $mailer->setLead($lead, true);
-        $mailer->setCustomTokens($tokens);
+        $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
 
         $mailer->useMailerBatching();

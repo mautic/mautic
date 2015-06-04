@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class BuilderSubscriber extends CommonSubscriber
 {
 
+
     /**
      * @return array
      */

@@ -15,6 +15,7 @@ use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -93,7 +94,7 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Client && !$entity instanceof Consumer) {
             throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
@@ -107,7 +108,7 @@ class ClientModel extends FormModel
                 $name = ApiEvents::CLIENT_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -119,7 +120,7 @@ class ClientModel extends FormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**

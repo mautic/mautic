@@ -16,6 +16,7 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -157,7 +158,7 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(array('Trigger'));
@@ -177,7 +178,7 @@ class TriggerModel extends CommonFormModel
                 $name = PointEvents::TRIGGER_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -189,7 +190,7 @@ class TriggerModel extends CommonFormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**
