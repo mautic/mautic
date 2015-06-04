@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
@@ -38,7 +39,7 @@ class PublicController extends CommonFormController
                 $tokens = $stat->getTokens();
                 if (!empty($tokens)) {
                     // Override tracking_pixel so as to not cause a double hit
-                    $tokens['{tracking_pixel}'] = '';
+                    $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
                     $content = str_ireplace(array_keys($tokens), $tokens, $content);
                 }
@@ -73,7 +74,7 @@ class PublicController extends CommonFormController
                 $tokens = $stat->getTokens();
 
                 // Override tracking_pixel so as to not cause a double hit
-                $tokens['{tracking_pixel}'] = '';
+                $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
                 $event = new EmailSendEvent(array(
                     'content' => $content,

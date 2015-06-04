@@ -1270,7 +1270,13 @@ class LeadController extends FormController
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
 
-        $inList = ($this->request->getMethod() == 'GET') ? $this->request->get('list', 0) : $this->request->request->get('lead_quickemail[list]', 0, true);
+        $inList = ($this->request->getMethod() == 'GET')
+            ? $this->request->get('list', 0)
+            : $this->request->request->get(
+                'lead_quickemail[list]',
+                0,
+                true
+            );
         $email  = array('list' => $inList);
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'email', 'objectId' => $objectId));
         $form   = $this->get('form.factory')->create('lead_quickemail', $email, array('action' => $action));
@@ -1290,9 +1296,10 @@ class LeadController extends FormController
 
                         // From user
                         $user = $this->factory->getUser();
+
                         $mailer->setFrom(
-                            $user->getEmail(),
-                            $user->getFirstName().' '.$user->getLastName()
+                            $email['from'],
+                            (strtolower($user->getEmail()) !== strtolower($email['from'])) ? null : $user->getFirstName().' '.$user->getLastName()
                         );
 
                         // Set Content
@@ -1325,9 +1332,11 @@ class LeadController extends FormController
                             );
                         }
                     } else {
-                        $form['body']->addError(new FormError(
-                            $this->get('translator')->trans('mautic.lead.email.body.required', array(), 'validators')
-                        ));
+                        $form['body']->addError(
+                            new FormError(
+                                $this->get('translator')->trans('mautic.lead.email.body.required', array(), 'validators')
+                            )
+                        );
                         $valid = false;
                     }
                 }
