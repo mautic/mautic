@@ -235,22 +235,22 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true)
     {
-        //generate cached HTML and JS
+        //generate cached HTML
         $templating = $this->factory->getTemplating();
+        $theme      = $entity->getTemplate();
 
-        $html = $templating->render('MauticFormBundle:Builder:form.html.php', array(
-            'form' => $entity
-        ));
+        if (!empty($theme)) {
+            $theme .= '|';
+        }
 
-        $style  = $templating->render('MauticFormBundle:Builder:style.html.php', array(
-            'form' => $entity
-        ));
+        $html = $templating->render(
+            $theme.'MauticFormBundle:Builder:form.html.php',
+            array(
+                'form'  => $entity,
+                'theme' => $theme,
+            )
+        );
 
-        $script = $templating->render('MauticFormBundle:Builder:script.html.php', array(
-            'form' => $entity
-        ));
-
-        $html = $style . $html . $script;
         $entity->setCachedHtml($html);
 
         if ($persist) {
