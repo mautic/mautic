@@ -147,7 +147,7 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', array());
+            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', array(), null, 10);
             $languages = json_decode($data->body, true);
             $languages = $languages['languages'];
         } catch (\Exception $exception) {
