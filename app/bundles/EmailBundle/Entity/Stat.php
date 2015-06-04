@@ -32,7 +32,7 @@ class Stat
 
     /**
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      **/
     private $email;
 
@@ -172,7 +172,7 @@ class Stat
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email = null)
+    public function setEmail (Email $email)
     {
         $this->email = $email;
     }
@@ -236,7 +236,7 @@ class Stat
     /**
      * @param mixed $lead
      */
-    public function setLead (Lead $lead = null)
+    public function setLead (Lead $lead)
     {
         $this->lead = $lead;
     }

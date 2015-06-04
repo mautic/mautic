@@ -32,21 +32,8 @@
                                 'data-toggle' => "ajax",
                                 'data-method' => 'POST'
                             ),
-                            'btnText' => 'mautic.lead.lead.remove.fromlist',
-                            'iconClass'  => 'fa fa-remove'
-                        );
-                    }
-
-                    if (!empty($fields['core']['email']['value'])) {
-                        $custom[] = array(
-                            'attr'      => array(
-                                'data-toggle' => 'ajaxmodal',
-                                'data-target' => '#MauticSharedModal',
-                                'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
-                                'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $item->getId(), 'objectAction' => 'email', 'list' => 1))
-                            ),
-                            'btnText'   => 'mautic.lead.email.send_email',
-                            'iconClass'    => 'fa fa-send'
+                            'label' => 'mautic.lead.lead.remove.fromlist',
+                            'icon'  => 'fa-remove'
                         );
                     }
 
@@ -58,7 +45,7 @@
                         ),
                         'routeBase' => 'lead',
                         'langVar'   => 'lead.lead',
-                        'customButtons' => $custom
+                        'custom'    => $custom
                     ));
                     ?>
                 </td>

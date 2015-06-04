@@ -461,7 +461,7 @@ var Mautic = {
         }
 
         //activate editors
-        mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
+        mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
                     var settings = {};
@@ -477,7 +477,7 @@ var Mautic = {
                         settings.allowedContent = true;
                     }
 
-                    if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
+                    if (editorClass == 'editor-fullpage') {
                         // Allow full page editing and add tools to update html document
                         settings.fullPage     = true;
                         settings.extraPlugins = "sourcedialog,docprops";

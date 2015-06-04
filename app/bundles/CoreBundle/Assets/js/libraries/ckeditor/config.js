@@ -28,9 +28,8 @@ CKEDITOR.editorConfig = function( config ) {
             { name: 'basicstyles', items : [ 'Bold','Italic' ] },
             { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
             { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-            { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
-            { name: 'tools', items : [ 'Sourcedialog' ] }
-
+            { name: 'tools', items : [ 'Sourcedialog' ] },
+            { name: 'links', items : [ 'Link','Unlink','Anchor' ] }
         ];
 
     config.toolbar_advanced_2rows =
@@ -70,15 +69,6 @@ CKEDITOR.editorConfig = function( config ) {
             '/',
             { name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] },
             { name: 'colors', items : [ 'TextColor','BGColor' ] },
-            { name: 'tools', items : [ 'Sourcedialog', 'DocProps', 'Maximize' ] }
-        ];
-
-    config.toolbar_basic_fullpage =
-        [
-            { name: 'basicstyles', items : [ 'Bold','Italic' ] },
-            { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
-            { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-            { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
             { name: 'tools', items : [ 'Sourcedialog', 'DocProps', 'Maximize' ] }
         ];
 };

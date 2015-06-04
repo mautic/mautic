@@ -650,17 +650,3 @@ Mautic.updateLeadList = function () {
         }
     });
 };
-
-/**
- * Obtains the HTML for an email
- *
- * @param el
- */
-Mautic.getLeadEmailContent = function (el) {
-    Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
-    Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
-        CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
-        mQuery('#lead_quickemail_subject').val(response.subject);
-        Mautic.removeLabelLoadingIndicator();
-    });
-};
