@@ -1268,10 +1268,12 @@ class LeadController extends FormController
         $leadFields       = $model->flattenFields($lead->getFields());
         $leadFields['id'] = $lead->getId();
         $leadEmail        = $leadFields['email'];
-        $leadName         = $leadFields['firstname'] . ' ' . $leadFields['lastname'];
+        $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
 
+        $inList = ($this->request->getMethod() == 'GET') ? $this->request->get('list', 0) : $this->request->request->get('lead_quickemail[list]', 0, true);
+        $email  = array('list' => $inList);
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'email', 'objectId' => $objectId));
-        $form   = $this->get('form.factory')->create('lead_quickemail', array(), array('action' => $action));
+        $form   = $this->get('form.factory')->create('lead_quickemail', $email, array('action' => $action));
 
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
@@ -1279,55 +1281,80 @@ class LeadController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $email = $form->getData();
 
-                    $mailer = $this->factory->getMailer();
+                    $bodyCheck = trim(strip_tags($email['body']));
+                    if (!empty($bodyCheck)) {
+                        $mailer = $this->factory->getMailer();
 
-                    // To lead
-                    $mailer->addTo($leadEmail, $leadName);
+                        // To lead
+                        $mailer->addTo($leadEmail, $leadName);
 
-                    // From user
-                    $user = $this->factory->getUser();
-                    $mailer->setFrom(
-                        $user->getEmail(),
-                        $user->getFirstName() . ' ' . $user->getLastName()
-                    );
+                        // From user
+                        $user = $this->factory->getUser();
+                        $mailer->setFrom(
+                            $user->getEmail(),
+                            $user->getFirstName().' '.$user->getLastName()
+                        );
 
-                    // Set Content
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($email['body']);
-                    $mailer->setBody($email['body']);
-                    $mailer->parsePlainText($email['body']);
+                        // Set Content
+                        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($email['body']);
+                        $mailer->setBody($email['body']);
+                        $mailer->parsePlainText($email['body']);
 
-                    // Set lead
-                    $mailer->setLead($leadFields);
-                    $mailer->setIdHash();
+                        // Set lead
+                        $mailer->setLead($leadFields);
+                        $mailer->setIdHash();
 
-                    $mailer->setSubject($email['subject']);
+                        $mailer->setSubject($email['subject']);
 
-                    if ($error = $mailer->send(true)) {
-                        $mailer->createLeadEmailStat();
-                        $this->addFlash('mautic.lead.email.notice.sent', array(
-                            '%subject%' => $email['subject'],
-                            '%email%'   => $leadEmail
-                        ));
+                        if ($error = $mailer->send(true)) {
+                            $mailer->createLeadEmailStat();
+                            $this->addFlash(
+                                'mautic.lead.email.notice.sent',
+                                array(
+                                    '%subject%' => $email['subject'],
+                                    '%email%'   => $leadEmail
+                                )
+                            );
+                        } else {
+                            $this->addFlash(
+                                'mautic.lead.email.error.failed',
+                                array(
+                                    '%subject%' => $email['subject'],
+                                    '%email%'   => $leadEmail
+                                )
+                            );
+                        }
                     } else {
-                        $this->addFlash('mautic.lead.email.error.failed', array(
-                            '%subject%' => $email['subject'],
-                            '%email%'   => $leadEmail
+                        $form['body']->addError(new FormError(
+                            $this->get('translator')->trans('mautic.lead.email.body.required', array(), 'validators')
                         ));
+                        $valid = false;
                     }
                 }
             }
         }
 
         if (empty($leadEmail) || $valid || $cancelled) {
-            $viewParameters = array(
-                'objectAction' => 'view',
-                'objectId'     => $objectId
-            );
+            if ($inList) {
+                $route          = 'mautic_lead_index';
+                $viewParameters = array(
+                    'page' => $this->factory->getSession()->get('mautic.lead.page', 1)
+                );
+                $func           = 'index';
+            } else {
+                $route          = 'mautic_lead_action';
+                $viewParameters = array(
+                    'objectAction' => 'view',
+                    'objectId'     => $objectId
+                );
+                $func           = 'view';
+            }
+
             return $this->postActionRedirect(
                 array(
-                    'returnUrl'       => $this->generateUrl('mautic_lead_action',$viewParameters),
+                    'returnUrl'       => $this->generateUrl($route, $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                    'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
                     'passthroughVars' => array(
                         'mauticContent' => 'lead',
                         'closeModal'    => 1
@@ -1336,15 +1363,17 @@ class LeadController extends FormController
             );
         }
 
-        return $this->ajaxAction(array(
-            'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
-            'viewParameters'  => array(
-                'form'           => $form->createView()
-            ),
-            'passthroughVars' => array(
-                'mauticContent' => 'leadEmail',
-                'route'         => false
+        return $this->ajaxAction(
+            array(
+                'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
+                'viewParameters'  => array(
+                    'form' => $form->createView()
+                ),
+                'passthroughVars' => array(
+                    'mauticContent' => 'leadEmail',
+                    'route'         => false
+                )
             )
-        ));
+        );
     }
 }

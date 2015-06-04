@@ -58,14 +58,11 @@ class EmailType extends AbstractType
                     'class'                => 'form-control editor-basic-fullpage editor-builder-tokens',
                     'data-token-callback'  => 'email:getBuilderTokens',
                     'data-token-activator' => '{'
-                ),
-                'constraints' => array(
-                    new NotBlank(array(
-                        'message' => 'mautic.core.value.required'
-                    ))
                 )
             )
         );
+
+        $builder->add('list', 'hidden');
 
         $builder->add(
             'templates',
