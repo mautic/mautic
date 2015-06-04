@@ -7,8 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+if (!isset($target))
+    $target = '.page-list';
+
+if (!empty($checkall)):
 ?>
-<?php if (!empty($checkall)): ?>
 <th class="col-actions pl-20">
     <div class="checkbox-inline custom-primary">
         <label class="mb-0 pl-10">
@@ -17,9 +20,8 @@
         </label>
     </div>
 </th>
-<?php else: ?>
 <?php
-$target       = (!empty($target)) ? $target : '.page-list';
+else:
 $defaultOrder = (!empty($default)) ? $orderBy : "";
 $order        = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
 $dir          = (!empty($dir))? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", "ASC");
