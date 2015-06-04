@@ -51,7 +51,7 @@ class DoNotEmail
     private $emailAddress;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="doNotEmail")
      * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
