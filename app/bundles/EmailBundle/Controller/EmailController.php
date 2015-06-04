@@ -208,8 +208,7 @@ class EmailController extends FormController
                 )
             );
         }
-
-        $route = $this->generateUrl('mautic_email_index', array('page' => $page));
+        $session->set('mautic.email.page', $page);
 
         return $this->delegateView(
             array(
@@ -229,7 +228,7 @@ class EmailController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
-                    'route'         => $route
+                    'route'         => $this->generateUrl('mautic_email_index', array('page' => $page))
                 )
             )
         );
