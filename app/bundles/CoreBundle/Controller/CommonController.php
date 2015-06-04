@@ -248,14 +248,14 @@ class CommonController extends Controller implements MauticController
             }
 
             $dataArray = array_merge(
-                $updatedContent,
-                $passthrough
+                $passthrough,
+                $updatedContent
             );
         } else {
             //just retrieve the content
             $dataArray = array_merge(
-                array('newContent'  => $newContent),
-                $passthrough
+                $passthrough,
+                array('newContent'  => $newContent)
             );
         }
 

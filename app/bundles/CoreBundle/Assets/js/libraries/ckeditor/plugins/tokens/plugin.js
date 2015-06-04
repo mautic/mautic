@@ -269,7 +269,6 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
 
             $('<div class="token-suggestions" style="position: ' + position + '; top: ' + y + 'px; left: ' + x + 'px; z-index: 10000;">' + rsp.html + '</div>').appendTo(appendToMe);
 
-            /*
             $(document).on('keyup.tokenSuggestion', (function(e) {
                 if (e.keyCode == 27) { // esc keycode
                     $(document).off('click.tokenSuggestions');
@@ -293,7 +292,6 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
                     $('.token-suggestions').remove();
                 }
             });
-            */
         }
 
         $('.inline-token').click(function (e) {
@@ -315,7 +313,7 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
             if ($(this).data('visual')) {
                 // Placeholder
                 var tokenContent = document.createElement('strong');
-                var em           = document.createElement('em');
+                var em = document.createElement('em');
                 tokenContent.appendChild(em);
 
                 tokenContent.setAttribute('data-token', $(this).data('token'));
@@ -323,6 +321,11 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
 
                 var description = document.createTextNode('**' + $(this).data('description') + '**');
                 em.appendChild(description);
+            } else if ($(this).data('link')) {
+                var tokenContent = document.createElement('a');
+                tokenContent.setAttribute('href', $(this).data('token'));
+                var description = document.createTextNode($(this).data('description'));
+                tokenContent.appendChild(description);
             } else {
                 var tokenContent = document.createTextNode($(this).data('token'));
             }

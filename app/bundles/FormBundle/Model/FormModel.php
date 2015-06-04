@@ -17,7 +17,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
-use Mautic\FormBundle\Helper\HtmlFormatHelper;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -82,7 +82,7 @@ class FormModel extends CommonFormModel
      * @return bool|FormEvent|void
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(array('Form'));
@@ -102,7 +102,7 @@ class FormModel extends CommonFormModel
                 $name = FormEvents::FORM_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -114,7 +114,7 @@ class FormModel extends CommonFormModel
             $this->dispatcher->dispatch($name, $event);
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

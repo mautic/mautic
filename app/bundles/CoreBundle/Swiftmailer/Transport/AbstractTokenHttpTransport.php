@@ -12,9 +12,9 @@ namespace Mautic\CoreBundle\Swiftmailer\Transport;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 
 /**
- * Class AbstractBatchHttpTransport
+ * Class AbstractTokenHttpTransport
  */
-abstract class AbstractBatchHttpTransport extends AbstractBatchArrayTransport implements \Swift_Transport, InterfaceBatchTransport
+abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport
 {
     /**
      * @var

@@ -14,9 +14,10 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxedException;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceBatchTransport;
+use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceTokenTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 
@@ -104,19 +105,24 @@ class MailHelper
     /**
      * @var array
      */
-    private $tokens = array();
+    private $globalTokens = array();
 
     /**
-     * Tells the mailer to use batching if it's available
+     * @var array
+     */
+    private $eventTokens   = array();
+
+    /**
+     * Tells the mailer to use batching/tokenized emails if it's available
      *
      * @var bool
      */
-    private $useBatching = false;
+    private $tokenizationEnabled = false;
 
     /**
      * @var bool
      */
-    private $batchingSupported = false;
+    private $tokenizationSupported = false;
 
     /**
      * @var array
@@ -178,8 +184,8 @@ class MailHelper
         $this->message = $this->getMessageInstance();
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceBatchTransport) {
-            $this->batchingSupported = true;
+        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
+            $this->tokenizationSupported = true;
         }
 
         // Set factory if supported
@@ -189,16 +195,185 @@ class MailHelper
     }
 
     /**
+     * Send the message
+     *
+     * @param bool $dispatchSendEvent
+     * @param bool $isQueueFlush
+     *
+     * @return bool
+     */
+    public function send($dispatchSendEvent = false, $isQueueFlush = false)
+    {
+        // Set from email
+        $from = $this->message->getFrom();
+        if (empty($from)) {
+            $this->setFrom($this->from);
+        }
+
+        if (empty($this->errors)) {
+
+            // Search/replace tokens if this is not a queue flush
+            if (!$isQueueFlush) {
+                // Generate tokens from listeners
+                if ($dispatchSendEvent) {
+                    $this->dispatchSendEvent();
+                }
+
+                // Queue an asset stat if applicable
+                $this->queueAssetDownloadEntry();
+            }
+
+            $this->message->setSubject($this->subject);
+
+            $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+
+            if (!empty($this->plainText)) {
+                $this->message->addPart($this->plainText, 'text/plain');
+            }
+
+            if (!$isQueueFlush) {
+                // Replace token content
+                $tokens = $this->getTokens();
+                if (!empty($tokens)) {
+                    // Replace tokens
+                    $search  = array_keys($tokens);
+                    $replace = $tokens;
+
+                    self::searchReplaceTokens($search, $replace, $this->message);
+                }
+            }
+
+            // Attach assets
+            if (!empty($this->assets)) {
+                foreach ($this->assets as $asset) {
+                    $this->attachFile(
+                        $asset->getAbsolutePath(),
+                        $asset->getOriginalFileName(),
+                        $asset->getMime()
+                    );
+                }
+            }
+
+            try {
+                $failures = array();
+                $this->mailer->send($this->message, $failures);
+
+                if (!empty($failures)) {
+                    $this->errors['failures'] = $failures;
+                    $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$this->logger->dump());
+                }
+            } catch (\Exception $e) {
+                $this->logError($e);
+            }
+        }
+
+        $error = empty($this->errors);
+
+        $this->createAssetDownloadEntries();
+
+        return $error;
+    }
+
+    /**
+     * If batching is supported and enabled, the message will be queued and will on be sent upon flushQueue().
+     * Otherwise, the message will be sent to the transport immediately
+     *
+     * @param bool $dispatchSendEvent
+     *
+     * @return bool
+     */
+    public function queue($dispatchSendEvent = false)
+    {
+        if ($this->tokenizationEnabled) {
+
+            // Dispatch event to get custom tokens from listeners
+            if ($dispatchSendEvent) {
+                $this->dispatchSendEvent();
+            }
+
+            // Metadata has to be set for each recipient
+            foreach ($this->queuedRecipients as $email => $name) {
+                $this->message->addMetadata($email,
+                    array(
+                        'leadId'   => (!empty($this->lead)) ? $this->lead['id'] : null,
+                        'emailId'  => (!empty($this->email)) ? $this->email->getId() : null,
+                        'hashId'   => $this->idHash,
+                        'source'   => $this->source,
+                        'tokens'   => $this->getTokens()
+                    )
+                );
+            }
+
+            // Add asset stats if applicable
+            $this->queueAssetDownloadEntry();
+
+            // Reset recipients
+            $this->queuedRecipients = array();
+
+            // Assume success
+            return true;
+        } else {
+            $success = $this->send($dispatchSendEvent);
+
+            // Reset the message for the next
+            $this->queuedRecipients = array();
+            $this->message          = $this->getMessageInstance();
+
+            return $success;
+        }
+    }
+
+    /**
+     * Send batched mail to mailer
+     *
+     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
+     *
+     * @return bool
+     */
+    public function flushQueue($resetEmailTypes = array('To', 'Cc', 'Bcc'))
+    {
+        if ($this->tokenizationEnabled) {
+            $to = $this->message->getTo();
+            if (!empty($to)) {
+                $result = $this->send(false, true);
+
+                // Clear queued to recipients
+                $this->queuedRecipients = array();
+
+                foreach ($resetEmailTypes as $type) {
+                    $type    = ucfirst($type);
+                    $headers = $this->message->getHeaders();
+
+                    if ($headers->has($type)) {
+                        $this->message->getHeaders()->remove($type);
+                    }
+                }
+
+                // Clear metadat for the previous recipients
+                $this->message->clearMetadata();
+
+                return $result;
+            }
+
+            return false;
+        }
+
+        // Batching was not enabled and thus sent with queue()
+        return true;
+    }
+
+
+    /**
      * Reset's the mailer
      *
      * @param bool $cleanSlate
      */
     public function reset($cleanSlate = true)
     {
-        unset($this->lead, $this->email, $this->assets, $this->idHash, $this->tokens, $this->source, $this->queuedRecipients, $this->errors);
+        unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
-        $this->tokens       = $this->source = $this->queuedRecipients = $this->errors = $this->assets = array();
-        $this->lead         = $this->email = $this->idHash = null;
+        $this->eventTokens  = $this->queuedRecipients = $this->errors = array();
+        $this->lead         = $this->idHash = null;
         $this->internalSend = $this->fatal = false;
 
         $this->logger->clear();
@@ -206,8 +381,10 @@ class MailHelper
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
 
-            unset($this->message, $this->subject, $this->body, $this->plainText);
+            unset($this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText);
 
+            $this->source  = $this->assets = $this->globalTokens = array();
+            $this->email   = null;
             $this->subject = $this->plainText = '';
             $this->body    = array(
                 'content'     => '',
@@ -215,7 +392,7 @@ class MailHelper
                 'charset'     => null
             );
 
-            $this->useBatching = false;
+            $this->tokenizationEnabled = false;
 
             $this->message = $this->getMessageInstance();
         }
@@ -303,7 +480,7 @@ class MailHelper
      *
      * @return string
      */
-    static public function getPlainText(\Swift_Message $message)
+    static public function getPlainTextFromMessage(\Swift_Message $message)
     {
         $children = (array) $message->getChildren();
 
@@ -342,175 +519,6 @@ class MailHelper
 
             return false;
         }
-    }
-
-    /**
-     * Send the message
-     *
-     * @param bool $dispatchSendEvent
-     * @param bool $fromQueue
-     *
-     * @return bool
-     */
-    public function send($dispatchSendEvent = false, $fromQueue = false)
-    {
-        // Set from email
-        $from = $this->message->getFrom();
-        if (empty($from)) {
-            $this->setFrom($this->from);
-        }
-
-        if (empty($this->errors)) {
-            $this->message->setSubject($this->subject);
-
-            $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
-
-            if (!empty($this->plainText)) {
-                $this->message->addPart($this->plainText, 'text/plain');
-            }
-
-            // Replace token content
-            if ($dispatchSendEvent) {
-                // Generate custom tokens from listeners
-                $this->dispatchSendEvent();
-            }
-
-            if (!$this->appendTrackingPixel) {
-                $this->tokens['{tracking_pixel}'] = self::getBlankPixel();
-            }
-
-            if (!empty($this->tokens)) {
-                // Replace tokens
-                $search  = array_keys($this->tokens);
-                $replace = $this->tokens;
-
-                self::searchReplaceTokens($search, $replace, $this->message);
-            }
-
-            // Attach assets
-            if (!empty($this->assets)) {
-                foreach ($this->assets as $asset) {
-                    $this->attachFile(
-                        $asset->getAbsolutePath(),
-                        $asset->getOriginalFileName(),
-                        $asset->getMime()
-                    );
-                }
-            }
-
-            if (!$fromQueue) {
-                // Queue an asset stat if applicable
-                $this->queueAssetDownloadEntry();
-            }
-
-            try {
-                $failures = array();
-                $this->mailer->send($this->message, $failures);
-
-                if (!empty($failures)) {
-                    $this->errors['failures'] = $failures;
-                    $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$this->logger->dump());
-                }
-            } catch (\Exception $e) {
-                $this->logError($e);
-            }
-        }
-
-        $error = empty($this->errors);
-
-        $this->createAssetDownloadEntries();
-
-        return $error;
-    }
-
-    /**
-     * If batching is supported and enabled, the message will be queued and will on be sent upon flushQueue().
-     * Otherwise, the message will be sent to the mailer immediately
-     *
-     * @param bool $dispatchSendEvent
-     * @param bool $resetMessageIfNotQueued If the email is sent immediately due to the mailer not supporting batching, reset message
-     *
-     * @return bool
-     */
-    public function queue($dispatchSendEvent = false, $resetMessageIfNotQueued = true)
-    {
-        if ($this->useBatching) {
-
-            // Dispatch event to get custom tokens from listeners
-            if ($dispatchSendEvent) {
-                $this->dispatchSendEvent();
-            }
-
-            // Metadata has to be set for each recipient
-            foreach ($this->queuedRecipients as $email => $name) {
-                $this->message->addMetadata($email,
-                    array(
-                        'leadId'   => (!empty($this->lead)) ? $this->lead['id'] : null,
-                        'emailId'  => (!empty($this->email)) ? $this->email->getId() : null,
-                        'hashId'   => $this->idHash,
-                        'source'   => $this->source,
-                        'tokens'   => $this->tokens
-                    )
-                );
-            }
-
-            // Add asset stats if applicable
-            $this->queueAssetDownloadEntry();
-
-            // Reset recipients
-            $this->queuedRecipients = array();
-
-            // Assume success
-            return true;
-        } else {
-            $success = $this->send($dispatchSendEvent);
-
-            if ($resetMessageIfNotQueued) {
-                unset($this->message);
-                $this->message = $this->getMessageInstance();
-            }
-
-            return $success;
-        }
-    }
-
-    /**
-     * Send batched mail to mailer
-     *
-     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
-     *
-     * @return bool
-     */
-    public function flushQueue($resetEmailTypes = array('To', 'Cc', 'Bcc'))
-    {
-        if ($this->useBatching) {
-            $to = $this->message->getTo();
-            if (!empty($to)) {
-                $result = $this->send(false, true);
-
-                // Clear queued to recipients
-                $this->queuedRecipients = array();
-
-                foreach ($resetEmailTypes as $type) {
-                    $type    = ucfirst($type);
-                    $headers = $this->message->getHeaders();
-
-                    if ($headers->has($type)) {
-                        $this->message->getHeaders()->remove($type);
-                    }
-                }
-
-                // Clear metadat for the previous recipients
-                $this->message->clearMetadata();
-
-                return $result;
-            }
-
-            return false;
-        }
-
-        // Batching was not enabled and thus sent with queue()
-        return true;
     }
 
     /**
@@ -610,6 +618,14 @@ class MailHelper
     }
 
     /**
+     * @return string
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
      * Set a plain text part
      *
      * @param $content
@@ -620,18 +636,29 @@ class MailHelper
     }
 
     /**
+     * @return string
+     */
+    public function getPlainText()
+    {
+        return $this->plainText;
+    }
+
+    /**
      * @param        $content
      * @param string $contentType
      * @param null   $charset
+     * @param bool   $ignoreTrackingPixel
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        // Append tracking pixel
-        $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
-        if (strpos($content, '</body>') !== false) {
-            $content = str_replace('</body>', $trackingImg.'</body>', $content);
-        } else {
-            $content .= $trackingImg;
+        if (!$ignoreTrackingPixel) {
+            // Append tracking pixel
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+            if (strpos($content, '</body>') !== false) {
+                $content = str_replace('</body>', $trackingImg.'</body>', $content);
+            } else {
+                $content .= $trackingImg;
+            }
         }
 
         $this->body = array(
@@ -767,7 +794,7 @@ class MailHelper
      */
     private function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
     {
-        if ($this->useBatching) {
+        if ($this->tokenizationEnabled) {
             // Check if max batching has been hit
             $maxAllowed = $this->transport->getMaxBatchLimit();
 
@@ -822,20 +849,16 @@ class MailHelper
     /**
      * @param null $idHash
      */
-    public function setIdHash($idHash)
+    public function setIdHash($idHash = null)
     {
+        if ($idHash === null) {
+            $idHash = uniqid();
+        }
+
         $this->idHash = $idHash;
 
         // Append pixel to body before send
         $this->appendTrackingPixel = true;
-
-        $this->tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
-            'mautic_email_tracker',
-            array(
-                'idHash' => $this->idHash
-            ),
-            true
-        );
 
         // Add the trackingID to the $message object in order to update the stats if the email failed to send
         $this->message->leadIdHash = $idHash;
@@ -886,16 +909,16 @@ class MailHelper
 
     /**
      * @param Email $email
-     * @param bool  $allowBcc           Honor BCC if set in email
-     * @param array $slots              Slots configured in theme
-     * @param array $assetAttachments   Assets to send
+     * @param bool  $allowBcc            Honor BCC if set in email
+     * @param array $slots               Slots configured in theme
+     * @param array $assetAttachments    Assets to send
+     * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = array(), $assetAttachments = array())
+    public function setEmail(Email $email, $allowBcc = true, $slots = array(), $assetAttachments = array(), $ignoreTrackingPixel = false)
     {
         $this->email = $email;
 
         // Set message settings from the email
-
         $this->setSubject($email->getSubject());
 
         $fromEmail = $email->getFromAddress();
@@ -954,7 +977,7 @@ class MailHelper
             }
         }
 
-        $this->setBody($customHtml);
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
     }
 
     /**
@@ -962,19 +985,31 @@ class MailHelper
      *
      * @param array $tokens
      */
-    public function addCustomTokens(array $tokens)
+    public function addTokens(array $tokens)
     {
-        $this->tokens = array_merge($this->tokens, $tokens);
+        $this->globalTokens = array_merge($this->globalTokens, $tokens);
     }
 
     /**
-     * Set tokens; be sure to call this BEFORE setIdHash()!
+     * Set tokens
      *
      * @param array $tokens
      */
+    public function setTokens(array $tokens)
+    {
+        $this->globalTokens = $tokens;
+    }
+
+    /**
+     * Set custom tokens
+     *
+     * @param array $tokens
+     *
+     * @depracated Since 1.1.  Use setTokens() instead. To be removed in 2.0
+     */
     public function setCustomTokens(array $tokens)
     {
-        $this->tokens = $tokens;
+        $this->setTokens($tokens);
     }
 
     /**
@@ -984,7 +1019,22 @@ class MailHelper
      */
     public function getTokens()
     {
-        return $this->tokens;
+        $tokens = array_merge($this->globalTokens, $this->eventTokens);
+
+        // Include the tracking pixel token as it's auto appended to the body
+        if ($this->appendTrackingPixel) {
+            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
+                'mautic_email_tracker',
+                array(
+                    'idHash' => $this->idHash
+                ),
+                true
+            );
+        } else {
+            $tokens['{tracking_pixel}'] = self::getBlankPixel();
+        }
+
+        return $tokens;
     }
 
     /**
@@ -1007,20 +1057,19 @@ class MailHelper
     }
 
     /**
-     * Tell the mailer to use batching if available.  It's up to the function calling to execute the batch send.
+     * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
      *
-     * @param bool $useBatching
+     * @param bool $tokenizationEnabled
      *
-     * @return bool Returns true if batching is supported by the mailer
+     * @return bool Returns true if batching/tokenization is supported by the mailer
      */
-    public function useMailerBatching($useBatching = true)
+    public function useMailerTokenization($tokenizationEnabled = true)
     {
-
-        if ($this->batchingSupported) {
-            $this->useBatching = $useBatching;
+        if ($this->tokenizationSupported) {
+            $this->tokenizationEnabled = $tokenizationEnabled;
         }
 
-        return $this->batchingSupported;
+        return $this->tokenizationSupported;
     }
 
     /**
@@ -1034,11 +1083,11 @@ class MailHelper
             $this->dispatcher = $this->factory->getDispatcher();
         }
 
-        $event = new EmailSendEvent($this->body['content'], $this->email, $this->lead, $this->idHash, $this->source, $this->tokens, $this->useBatching);
+        $event = new EmailSendEvent($this);
 
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
-        $this->tokens = $event->getTokens();
+        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
     }
 
     /**
@@ -1126,5 +1175,63 @@ class MailHelper
                 'tracking_id' => $this->idHash
             );
         }
+    }
+
+    /**
+     * Returns if the mailer supports and is in tokenization mode
+     *
+     * @return bool
+     */
+    public function inTokenizationMode()
+    {
+        return $this->tokenizationEnabled;
+    }
+
+    /**
+     * @param $url
+     *
+     * @return \Mautic\PageBundle\Entity\Redirect|null|object
+     */
+    public function getTrackableLink($url)
+    {
+        // Ensure a valid URL and that it has not already been found
+        if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
+            return null;
+        }
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        $link = $redirectModel->getRedirectByUrl($url, $this->email);
+
+        return $link;
+    }
+
+    /**
+     * Create an email stat
+     */
+    public function createLeadEmailStat()
+    {
+        if (!$this->lead) {
+            return;
+        }
+
+        //create a stat
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setEmail($this->email);
+        $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+
+        $stat->setEmailAddress($this->lead['email']);
+        $stat->setTrackingHash($this->idHash);
+        if (!empty($this->source)) {
+            $stat->setSource($this->source[0]);
+            $stat->setSourceId($this->source[1]);
+        }
+        $stat->setCopy($this->getBody());
+        $stat->setTokens($this->getTokens());
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+        $emailModel->getStatRepository()->saveEntity($stat);
     }
 }

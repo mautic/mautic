@@ -52,17 +52,7 @@ class EmailController extends FormController
             $this->setListFilters();
         }
 
-        $tmpl  = $this->request->get('tmpl', 'index');
-        $types = array();
-        if ($tmpl == 'index' || $tmpl == 'list') {
-            $types[] = 'list';
-        }
-        if ($tmpl == 'index' || $tmpl == 'template') {
-            $types[] = 'template';
-        }
-
-        $session        = $this->factory->getSession();
-        $viewParameters = array();
+        $session = $this->factory->getSession();
 
         $listFilters = array(
             'filters'      => array(
@@ -70,168 +60,175 @@ class EmailController extends FormController
             ),
         );
 
-        foreach ($types as $emailType) {
-            // Reset available groups
-            $listFilters['filters']['groups'] = array();
+        // Reset available groups
+        $listFilters['filters']['groups'] = array();
 
-            //set limits
-            $limit = $session->get('mautic.email.'.$emailType.'.limit', $this->factory->getParameter('default_pagelimit'));
-            $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-            if ($start < 0) {
-                $start = 0;
-            }
+        //set limits
+        $limit = $session->get('mautic.email.limit', $this->factory->getParameter('default_pagelimit'));
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
 
-            $search  = $this->request->get('search', $session->get('mautic.email.'.$emailType.'.filter', ''));
-            $session->set('mautic.email.'.$emailType.'.filter', $search);
+        $search  = $this->request->get('search', $session->get('mautic.email.filter', ''));
+        $session->set('mautic.email.filter', $search);
 
-            $filter = array(
-                'string' => $search,
-                'force'  => array(
-                    array('column' => 'e.variantParent', 'expr' => 'isNull'),
-                    array('column' => 'e.emailType', 'expr' => 'eq', 'value' => $emailType)
-                )
-            );
-            if (!$permissions['email:emails:viewother']) {
-                $filter['force'][] =
-                    array('column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
-            }
+        $filter = array(
+            'string' => $search,
+            'force'  => array(
+                array('column' => 'e.variantParent', 'expr' => 'isNull')
+            )
+        );
+        if (!$permissions['email:emails:viewother']) {
+            $filter['force'][] =
+                array('column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+        }
 
-            //retrieve a list of categories
-            $listFilters['filters']['groups']['mautic.email.filter.categories'] = array(
-                'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
-                'prefix'   => 'category'
-            );
+        //retrieve a list of categories
+        $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
+            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
+            'prefix'   => 'category'
+        );
 
-            if ($emailType == 'list') {
-                //retrieve a list of Lead Lists
-                $listFilters['filters']['groups']['mautic.email.filter.lists'] = array(
-                    'options'  => $this->factory->getModel('lead.list')->getUserLists(),
-                    'prefix'   => 'list'
-                );
-            }
+        //retrieve a list of Lead Lists
+        $listFilters['filters']['groups']['mautic.core.filter.lists'] = array(
+            'options'  => $this->factory->getModel('lead.list')->getUserLists(),
+            'prefix'   => 'list'
+        );
 
-            $currentFilters = $session->get('mautic.email.'.$emailType.'.list_filters', array());
-            $updatedFilters = $this->request->get('filters', false);
+        //retrieve a list of themes
+        $listFilters['filters']['groups']['mautic.core.filter.themes'] = array(
+            'options'  => array_flip($this->factory->getInstalledThemes('email')),
+            'prefix'   => 'theme'
+        );
+
+        $currentFilters = $session->get('mautic.email.list_filters', array());
+        $updatedFilters = $this->request->get('filters', false);
+
+        if ($updatedFilters) {
+            // Filters have been updated
+
+            // Parse the selected values
+            $newFilters     = array();
+            $updatedFilters = json_decode($updatedFilters, true);
 
             if ($updatedFilters) {
-                // Filters have been updated
+                foreach ($updatedFilters as $updatedFilter) {
+                    list($clmn, $fltr) = explode(':', $updatedFilter);
 
-                // Parse the selected values
-                $newFilters     = array();
-                $updatedFilters = json_decode($updatedFilters, true);
-
-                if ($updatedFilters) {
-                    foreach ($updatedFilters as $updatedFilter) {
-                        list($clmn, $fltr) = explode(':', $updatedFilter);
-
-                        $newFilters[$clmn][] = $fltr;
-                    }
-
-                    $currentFilters = $newFilters;
-                } else {
-                    $currentFilters = array();
+                    $newFilters[$clmn][] = $fltr;
                 }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = array();
             }
-            $session->set('mautic.email.'.$emailType.'.list_filters', $currentFilters);
+        }
+        $session->set('mautic.email.list_filters', $currentFilters);
 
-            if (!empty($currentFilters)) {
-                $listIds = $catIds = array();
-                foreach ($currentFilters as $type => $typeFilters) {
-                    $key = ($type == 'list') ? 'lists' : 'categories';
+        if (!empty($currentFilters)) {
+            $listIds = $catIds = $templates = array();
+            foreach ($currentFilters as $type => $typeFilters) {
+                switch ($type) {
+                    case 'list':
+                        $key = 'lists';
+                        break;
+                    case 'category':
+                        $key = 'categories';
+                        break;
+                    case 'theme':
+                        $key = 'themes';
+                        break;
+                }
 
-                    $listFilters['filters']['groups']['mautic.email.filter.' . $key]['values'] = $typeFilters;
+                $listFilters['filters']['groups']['mautic.core.filter.' . $key]['values'] = $typeFilters;
 
-                    foreach ($typeFilters as $fltr) {
-                        if ($type == 'list') {
+                foreach ($typeFilters as $fltr) {
+                    switch ($type) {
+                        case 'list':
                             $listIds[] = (int) $fltr;
-                        } else {
+                            break;
+                        case 'category':
                             $catIds[] = (int) $fltr;
-                        }
+                            break;
+                        case 'theme':
+                            $templates[] = $fltr;
+                            break;
                     }
-                }
-
-                if (!empty($listIds)) {
-                    $filter['force'][] = array('column' => 'l.id', 'expr' => 'in', 'value' => $listIds);
-                }
-
-                if (!empty($catIds)) {
-                    $filter['force'][] = array('column' => 'c.id', 'expr' => 'in', 'value' => $catIds);
                 }
             }
 
-            $orderBy    = $session->get('mautic.email.'.$emailType.'.orderby', 'e.subject');
-            $orderByDir = $session->get('mautic.email.'.$emailType.'.orderbydir', 'DESC');
+            if (!empty($listIds)) {
+                $filter['force'][] = array('column' => 'l.id', 'expr' => 'in', 'value' => $listIds);
+            }
 
-            $emails = $model->getEntities(
+            if (!empty($catIds)) {
+                $filter['force'][] = array('column' => 'c.id', 'expr' => 'in', 'value' => $catIds);
+            }
+
+            if (!empty($templates)) {
+                $filter['force'][] = array('column' => 'e.template', 'expr' => 'in', 'value' => $templates);
+            }
+        }
+
+        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
+        $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
+
+        $emails = $model->getEntities(
+            array(
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
+            )
+        );
+
+        $count = count($emails);
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($count / $limit)) ?: 1;
+            }
+
+            $session->set('mautic.email.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $lastPage));
+
+            return $this->postActionRedirect(
                 array(
-                    'start'      => $start,
-                    'limit'      => $limit,
-                    'filter'     => $filter,
-                    'orderBy'    => $orderBy,
-                    'orderByDir' => $orderByDir
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => array('page' => $lastPage),
+                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_email_index',
+                        'mauticContent' => 'email'
+                    )
                 )
             );
-
-            $count = count($emails);
-            if ($count && $count < ($start + 1)) {
-                //the number of entities are now less then the current page so redirect to the last page
-                if ($count === 1) {
-                    $lastPage = 1;
-                } else {
-                    $lastPage = (floor($count / $limit)) ?: 1;
-                }
-
-                $session->set('mautic.email.'.$emailType.'.page', $lastPage);
-                $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $lastPage));
-
-                return $this->postActionRedirect(
-                    array(
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => array('page' => $lastPage),
-                        'contentTemplate' => 'MauticEmailBundle:Email:index',
-                        'passthroughVars' => array(
-                            'activeLink'    => '#mautic_email_index',
-                            'mauticContent' => 'email'
-                        )
-                    )
-                );
-            }
-
-            //set what page currently on so that we can return here after form submission/cancellation
-            $session->set('mautic.email.'.$emailType.'.page', $page);
-
-            $viewParameters[$emailType] = array(
-                'searchValue' => $search,
-                'filters'     => $listFilters,
-                'items'       => $emails,
-                'totalItems'  => $count,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $emailType
-            );
         }
+        $session->set('mautic.email.page', $page);
 
-        $viewParameters = array_merge($viewParameters, array(
-            'permissions' => $permissions,
-            'model'       => $model,
-            'security'    => $this->factory->getSecurity(),
-            'tmpl'        => $tmpl
-        ));
-
-        $route = $this->generateUrl('mautic_email_index', array('page' => $page));
-        if ($tmpl != 'index') {
-            $route .= '#'.$tmpl;
-        }
-
-        $template = ($tmpl == 'index') ? 'index' : 'list';
         return $this->delegateView(
             array(
-                'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticEmailBundle:Email:'.$template.'.html.php',
+                'viewParameters'  =>  array(
+                    'searchValue' => $search,
+                    'filters'     => $listFilters,
+                    'items'       => $emails,
+                    'totalItems'  => $count,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'tmpl'        => $this->request->get('tmpl', 'index'),
+                    'permissions' => $permissions,
+                    'model'       => $model,
+                    'security'    => $this->factory->getSecurity(),
+                ),
+                'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
-                    'route'         => $route
+                    'route'         => $this->generateUrl('mautic_email_index', array('page' => $page))
                 )
             )
         );
@@ -251,7 +248,7 @@ class EmailController extends FormController
         $security = $this->factory->getSecurity();
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
-        $email    = $model->getEntity($objectId);
+        $email = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.email.page', 1);
 
@@ -364,6 +361,9 @@ class EmailController extends FormController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
+        // Get click through stats
+        $trackableLinks = $model->getEmailClickStats($email->getId());
+
         return $this->delegateView(
             array(
                 'returnUrl'       => $this->generateUrl(
@@ -374,17 +374,18 @@ class EmailController extends FormController
                     )
                 ),
                 'viewParameters'  => array(
-                    'email'         => $email,
-                    'stats'         => $stats,
-                    'pending'       => $model->getPendingLeads($email, null, true),
-                    'logs'          => $logs,
-                    'variants'      => array(
+                    'email'          => $email,
+                    'stats'          => $stats,
+                    'trackableLinks' => $trackableLinks,
+                    'pending'        => $model->getPendingLeads($email, null, true),
+                    'logs'           => $logs,
+                    'variants'       => array(
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,
                         'criteria'   => $criteria['criteria']
                     ),
-                    'permissions'   => $security->isGranted(
+                    'permissions'    => $security->isGranted(
                         array(
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -398,9 +399,9 @@ class EmailController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'abTestResults' => $abTestResults,
-                    'security'      => $security,
-                    'previewUrl'    => $this->generateUrl(
+                    'abTestResults'  => $abTestResults,
+                    'security'       => $security,
+                    'previewUrl'     => $this->generateUrl(
                         'mautic_email_action',
                         array(
                             'objectAction' => 'preview',
@@ -1258,7 +1259,12 @@ class EmailController extends FormController
         $tokens = array('{tracking_pixel}' => '');
 
         // Generate and replace tokens
-        $event = new EmailSendEvent($content, $entity, null, $idHash, array(), $tokens);
+        $event = new EmailSendEvent(null, array(
+            'content' => $content,
+            'email'   => $entity,
+            'idHash'  => $idHash,
+            'tokens'  => $tokens
+        ));
         $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
         $content = $event->getContent();
 
@@ -1275,10 +1281,9 @@ class EmailController extends FormController
         $page      = $this->factory->getSession()->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $page));
         $flashes   = array();
-        $tmpl      = $this->request->get('tmpl', 'template');
 
         $postActionVars = array(
-            'returnUrl'       => $returnUrl . '#' . $tmpl,
+            'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticEmailBundle:Email:index',
             'passthroughVars' => array(

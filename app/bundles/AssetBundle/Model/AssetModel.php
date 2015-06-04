@@ -19,6 +19,7 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -266,7 +267,7 @@ class AssetModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(array('Asset'));
@@ -286,7 +287,7 @@ class AssetModel extends FormModel
                 $name = AssetEvents::ASSET_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -298,7 +299,7 @@ class AssetModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

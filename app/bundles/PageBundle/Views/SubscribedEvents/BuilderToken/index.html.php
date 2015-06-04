@@ -18,11 +18,3 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
     </div>
 </div>
 <?php $view['slots']->output('_content'); ?>
-
-<div class="list-group mt-sm">
-    <a href="#" class="list-group-item" data-token='<a href="{externallink=%url%}">%text%</a>' data-drop="showBuilderLinkModal">
-        <div>
-            <span><i class="fa fa-external-link fa-fw"></i><?php echo $view['translator']->trans('mautic.page.builder.externallink'); ?></span>
-        </div>
-    </a>
-</div>

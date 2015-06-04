@@ -49,7 +49,7 @@ class FormSubmitHelper
 
         $mailer->setSubject($config['subject']);
 
-        $mailer->setCustomTokens($tokens);
+        $mailer->setTokens($tokens);
         $mailer->setBody($config['message']);
         $mailer->parsePlainText($config['message']);
 

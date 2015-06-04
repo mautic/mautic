@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\EmailEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -248,7 +249,7 @@ class EmailModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(array('Email'));
@@ -268,7 +269,7 @@ class EmailModel extends FormModel
                 $name = EmailEvents::EMAIL_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -281,7 +282,7 @@ class EmailModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -316,14 +317,16 @@ class EmailModel extends FormModel
             $stat->setIsRead(true);
             $stat->setDateRead($readDateTime->getDateTime());
 
-            $readCount = $email->getReadCount();
-            $readCount++;
-            $email->setReadCount($readCount);
+            if ($email) {
+                $readCount = $email->getReadCount();
+                $readCount++;
+                $email->setReadCount($readCount);
 
-            if ($email->isVariant()) {
-                $variantReadCount = $email->getVariantReadCount();
-                $variantReadCount++;
-                $email->setVariantReadCount($variantReadCount);
+                if ($email->isVariant()) {
+                    $variantReadCount = $email->getVariantReadCount();
+                    $variantReadCount++;
+                    $email->setVariantReadCount($variantReadCount);
+                }
             }
         }
 
@@ -360,12 +363,14 @@ class EmailModel extends FormModel
             $leadModel->setCurrentLead($lead);
         }
 
-        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
-            $event = new EmailOpenEvent($stat, $request);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+        if ($email) {
+            if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
+                $event = new EmailOpenEvent($stat, $request);
+                $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            }
+            $this->em->persist($email);
         }
 
-        $this->em->persist($email);
         $this->em->persist($stat);
         $this->em->flush();
     }
@@ -595,6 +600,18 @@ class EmailModel extends FormModel
         $graphData = GraphHelper::mergeLineGraphData($graphData, $failedData, $unit, 2, 'date', 'data');
 
         return $graphData;
+    }
+
+    /**
+     * Get an array of tracked links
+     *
+     * @param $emailId
+     *
+     * @return array
+     */
+    public function getEmailClickStats($emailId)
+    {
+        return $this->factory->getModel('page.redirect')->getRedirectListBySource('email', $emailId);
     }
 
     /**
@@ -903,8 +920,8 @@ class EmailModel extends FormModel
 
                 $contentGenerated = $useEmail['entity']->getId();
 
-                // Use batching if supported
-                $mailer->useMailerBatching();
+                // Use batching/tokenization if supported
+                $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
             }
@@ -913,7 +930,7 @@ class EmailModel extends FormModel
 
             // Add tracking pixel token
             if (!empty($tokens)) {
-                $mailer->setCustomTokens($tokens);
+                $mailer->setTokens($tokens);
             }
 
             $mailer->setLead($lead);
@@ -1025,7 +1042,7 @@ class EmailModel extends FormModel
 
         $mailer = $this->factory->getMailer();
         $mailer->setLead($lead, true);
-        $mailer->setCustomTokens($tokens);
+        $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
 
         $mailer->useMailerBatching();
