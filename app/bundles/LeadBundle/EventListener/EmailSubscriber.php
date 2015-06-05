@@ -96,10 +96,22 @@ class EmailSubscriber extends CommonSubscriber
                     continue;
                 }
 
-                $urlencode = (strpos($match, '|true') !== false);
-                $alias     = ($urlencode) ? str_replace('|true', '', $match) : $match;
-                $value     = (isset($lead[$alias])) ? $lead[$alias] : '';
+                $fallbackCheck = explode('|', $match);
+                $fallback      = $urlencode = false;
 
+                if (isset($fallbackCheck[1])) {
+                    // There is a fallback or to be urlencoded
+                    $alias = $fallbackCheck[0];
+
+                    if ($fallbackCheck[1] === 'true') {
+                        $urlencode = true;
+                        $fallback  = '';
+                    } else {
+                        $fallback = $fallbackCheck[1];
+                    }
+                }
+
+                $value             = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;
                 $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
             }
 
