@@ -31,6 +31,8 @@ class SecondsConversionTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
+        $value = (int) $value;
+
         switch ($this->viewFormat) {
             case 'i':
                 $value *= 60;
@@ -58,9 +60,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (empty($value)) {
-            return $value;
-        }
+        $value = (int) $value;
 
         switch ($this->viewFormat) {
             case 'i':
@@ -77,14 +77,6 @@ class SecondsConversionTransformer implements DataTransformerInterface
                 break;
         }
 
-        return number_format($value, 2, '.', '');
-    }
-
-    /**
-     * @param $format
-     */
-    public function setViewFormat($format)
-    {
-        $this->viewFormat = $format;
+        return $value;
     }
 }
