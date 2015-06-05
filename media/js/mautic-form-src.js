@@ -25,7 +25,7 @@
         var Profiler = {};
 
         //global configuration
-        var config = {devmode: false, debug: false};
+        var config = {devmode: false, debug: true};
 
         Profiler.startTime = function() {
             this._startTime = performance.now();
@@ -228,7 +228,17 @@
                 },
 
                 parseFormResponse: function (response) {
-                    if (response.redirect) {
+                    if (response.download) {
+                        // Hit the download in the iframe
+                        document.getElementById('mauticiframe_' + formId).src = response.download;
+
+                        // Register a callback for a redirect
+                        if (response.redirect) {
+                            setTimeout(function () {
+                                window.location = response.redirect;
+                            }, 2000);
+                        }
+                    } else if (response.redirect) {
                         window.location = response.redirect;
                     } else if (response.validationErrors) {
                         for (var field in response.validationErrors) {
@@ -292,15 +302,7 @@
             return validator;
         };
 
-        Core.getValidator = function(formId) {
-            return Form.validator(formId);
-        };
-
-        Core.validateForm = function(formId) {
-            return Core.getValidator(formId).validateForm();
-        };
-
-        Core.registerFormMessenger = function() {
+        Form.registerFormMessenger = function() {
             window.addEventListener('message', function(event) {
                 if (Core.debug()) console.log(event);
 
@@ -314,7 +316,17 @@
                 } catch (err) {
                     if (Core.debug()) console.log(err);
                 }
-            },false);
+            }, false);
+
+            if (Core.debug()) console.log('Messenger listener started.');
+        };
+
+        Core.getValidator = function(formId) {
+            return Form.validator(formId);
+        };
+
+        Core.validateForm = function(formId) {
+            return Core.getValidator(formId).validateForm();
         };
 
         Modal.loadStyle = function() {
@@ -459,28 +471,9 @@
             Modal.open(options);
         };
 
-        Core.ready = function (handler) {
-            var ready = {
-                readyHandlers: [],
-                onReady: function (handler) {
-                    this.readyHandlers.push(handler);
-                    this.handleState();
-                },
-                handleState: function () {
-                    if (['interactive', 'complete'].indexOf(document.readyState) > -1) {
-                        while (this.readyHandlers.length > 0) {
-                            (this.readyHandlers.shift())();
-                        }
-                    }
-                }
-            };
-
-            ready.onReady(handler);
-
-            return ready;
+        Core.onLoad = function() {
+            Form.registerFormMessenger();
         };
-
-        document.onreadystatechange = Core.ready.handleState;
 
         return Core;
     }
@@ -495,11 +488,5 @@
             MauticSDK.initialize(sParts[0]);
             break;
         }
-
-        MauticSDK.ready(function() {
-            if (typeof MauticFormValidations !== 'undefined') {
-                MauticSDK.registerFormMessenger();
-            }
-        });
     }
 })( window );
