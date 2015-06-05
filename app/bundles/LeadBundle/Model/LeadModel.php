@@ -731,18 +731,19 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Add a do not contact entry for the lead
+     *
      * @param Lead   $lead
      * @param string $emailAddress
      * @param string $reason
-     *
-     * @return void
+     * @param bool   $persist
      */
-    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '')
+    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
     {
         if (empty($emailAddress)) {
             $fields = $lead->getFields();
             $emailAddress = $fields['core']['email']['value'];
-            
+
             if (empty($emailAddress)) {
                 return;
             }
@@ -756,7 +757,13 @@ class LeadModel extends FormModel
             $dnc->setDateAdded(new \DateTime());
             $dnc->setUnsubscribed();
             $dnc->setComments($reason);
-            $repo->saveEntity($dnc);
+
+            if ($persist) {
+                $repo->saveEntity($dnc);
+            } else {
+
+                return $dnc;
+            }
         }
     }
 
@@ -859,7 +866,8 @@ class LeadModel extends FormModel
                 $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
-                $this->setDoNotContact($lead, $data[$fields['email']], $reason);
+                $dnc = $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
+                $lead->addDoNotEmailEntry($dnc);
             }
         }
         unset($fields['doNotEmail']);
