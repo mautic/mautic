@@ -52,6 +52,11 @@ Mautic.formOnLoad = function (container) {
         });
     }
 
+
+    if (mQuery('#mauticform_formType').length && mQuery('#mauticform_formType').val() == '') {
+        mQuery('body').css('overflow-y', 'hidden');
+    }
+
     if (typeof Mautic.formSubmissionChart === 'undefined') {
         Mautic.renderSubmissionChart();
     }
@@ -210,3 +215,22 @@ Mautic.updateSubmissionChart = function(element, amount, unit) {
 
     Mautic.getChartData(element, 'form:updateSubmissionChart', query, 'renderSubmissionChart');
 }
+
+Mautic.selectFormType = function(formType) {
+    if (formType == 'standalone') {
+        mQuery('#actions-tab').removeClass('hide');
+        mQuery('#actions-container').removeClass('hide')
+        mQuery('.page-header h3').text(mauticLang.newStandaloneForm);
+    } else {
+        mQuery('#actions-tab').addClass('hide');
+        mQuery('#actions-container').addClass('hide');
+        mQuery('.page-header h3').text(mauticLang.newCampaignForm);
+    }
+
+    mQuery('#mauticform_formType').val(formType);
+
+    mQuery('body').css('overflow-y', '');
+
+    mQuery('.form-type-modal').remove();
+    mQuery('.form-type-modal-backdrop').remove();
+};

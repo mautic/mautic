@@ -8075,6 +8075,9 @@ button.close {
   position: relative;
   vertical-align: middle;
 }
+.chosen-container .group-name {
+  margin-right: 2px;
+}
 .chosen-container .chosen-drop {
   background: #ffffff;
   border: 1px solid #d5d5d5;
@@ -8325,9 +8328,6 @@ button.close {
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close:hover {
   background-position: right -11px;
-}
-.chosen-container-multi .chosen-choices .search-choice .group-name {
-  margin-right: 2px;
 }
 .chosen-container-multi .chosen-choices .search-choice-focus {
   background: #d4d4d4;

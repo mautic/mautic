@@ -41,6 +41,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         )
     )
 )));
+
+$isStandalone = $activeForm->isStandalone();
 ?>
   <!-- start: box layout -->
   <div class="box-layout">
@@ -114,14 +116,17 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
+                  <?php if ($isStandalone): ?>
                   <li class="active"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.actions'); ?></a></li>
-                  <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.fields'); ?></a></li>
+                  <?php endif; ?>
+                  <li class="<?php if (!$isStandalone) echo 'active'; ?>"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.fields'); ?></a></li>
               </ul>
               <!--/ tabs controls -->
           </div>
 
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
+              <?php if ($isStandalone): ?>
               <!-- #actions-container -->
               <div class="tab-pane active fade in bdr-w-0" id="actions-container">
                   <?php foreach ($activeFormActions as $group => $groupActions) : ?>
@@ -156,15 +161,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                               </li>
                           <?php endforeach; ?>
                       </ul>
-                  <?php endforeach; ?>
-              </div>
-              <!--/ #actions-container -->
+                    <?php endforeach; ?>
+                </div>
+                <!--/ #actions-container -->
+                <?php endif; ?>
 
-              <!-- #fields-container -->
-              <div class="tab-pane fade bdr-w-0" id="fields-container">
+                <!-- #fields-container -->
+                <div class="tab-pane fade<?php if (!$isStandalone) echo ' active in'; ?> bdr-w-0" id="fields-container">
 
-                  <h5 class="fw-sb mb-xs">Form Field</h5>
-                  <ul class="list-group mb-xs">
+                    <h5 class="fw-sb mb-xs">Form Field</h5>
+                    <ul class="list-group mb-xs">
                       <?php /** @var \Mautic\FormBundle\Entity\Field $field */
                       foreach ($activeFormFields as $field) : ?>
                           <li class="list-group-item bg-auto bg-light-xs">
@@ -183,9 +189,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                               </div>
                           </li>
                       <?php endforeach; ?>
-                  </ul>
-              </div>
-              <!--/ #fields-container -->
+                    </ul>
+                </div>
+                <!--/ #fields-container -->
           </div>
           <!--/ end: tab-content -->
       </div>

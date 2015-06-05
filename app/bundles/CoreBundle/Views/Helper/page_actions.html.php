@@ -35,10 +35,10 @@ $forceVisible = (count($buttonGroupTypes) === 1);
 foreach ($buttonGroupTypes as $groupType) {
     $buttonCount = 0;
     if ($groupType == 'group') {
-        echo '<div class="btn-group' . ((!$forceVisible) ? ' hidden-xs hidden-sm' : '') .'">';
+        echo '<div class="std-toolbar btn-group' . ((!$forceVisible) ? ' hidden-xs hidden-sm' : '') .'">';
         $dropdownOpenHtml = '';
     } else {
-        echo '<div class="btn-group' . ((!$forceVisible) ? ' hidden-md hidden-lg' : '') . '">';
+        echo '<div class="dropdown-toolbar btn-group' . ((!$forceVisible) ? ' hidden-md hidden-lg' : '') . '">';
         $dropdownOpenHtml  = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
         $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">' . "\n";
     }

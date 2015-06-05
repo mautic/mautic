@@ -17,12 +17,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'routeBase' => 'form',
     'langVar'   => 'form.form'
 )));
+
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
         'searchValue' => $searchValue,
         'searchHelp'  => 'mautic.form.form.help.searchcommands',
+        'searchId'    => 'form-search',
         'action'      => $currentRoute,
         'routeBase'   => 'form',
         'templateButtons' => array(
@@ -44,7 +46,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             )
         ),
     )); ?>
+
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>
 </div>
+

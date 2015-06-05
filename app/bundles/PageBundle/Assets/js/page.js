@@ -10,6 +10,10 @@ Mautic.pageOnLoad = function (container) {
         Mautic.renderPageReturningVisitsPie();
         Mautic.renderPageTimePie();
     }
+
+    if (mQuery(container + ' #page_template').length) {
+        Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
+    }
 };
 
 Mautic.pageOnUnload = function(id) {
