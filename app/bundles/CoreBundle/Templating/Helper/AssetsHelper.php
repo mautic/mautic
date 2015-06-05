@@ -38,7 +38,7 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Gets asset prefix
      *
-     * @param bool $forceEndingSlash
+     * @param bool $includeEndingSlash
      *
      * @return string
      */

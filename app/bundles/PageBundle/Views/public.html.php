@@ -10,8 +10,8 @@
 //extend the template chosen
 $view->extend(":$template:page.html.php");
 
-if (!empty($googleAnalytics)) {
-    $view['assets']->addCustomDeclaration(htmlspecialchars_decode($googleAnalytics));
+if ($code = $view['analytics']->getCode()) {
+    $view['assets']->addCustomDeclaration($code);
 }
 
 //Set the slots

@@ -75,7 +75,7 @@ class FormSubmitHelper
             '%url%' => $url
         ));
 
-        $content = $factory->getTemplating()->renderResponse('MauticEmailBundle::message.html.php', array(
+        $content = $factory->getTemplating()->renderResponse('MauticCoreBundle::message.html.php', array(
             'message'  => $msg,
             'type'     => 'notice',
             'template' => $factory->getParameter('theme')

@@ -166,6 +166,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'gravatar'
             ),
+            'mautic.helper.template.analytics'  => array(
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'analytics'
+            ),
             'mautic.helper.template.mautibot'  => array(
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
                 'alias' => 'mautibot'

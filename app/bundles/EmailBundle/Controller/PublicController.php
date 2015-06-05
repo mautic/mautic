@@ -187,7 +187,7 @@ class PublicController extends CommonFormController
             'message'  => $message,
             'type'     => 'notice',
         );
-        $contentTemplate = 'MauticEmailBundle::message.html.php';
+        $contentTemplate = 'MauticCoreBundle::message.html.php';
 
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
@@ -245,7 +245,7 @@ class PublicController extends CommonFormController
             $template = $this->factory->getParameter('theme');
         }
 
-        return $this->render('MauticEmailBundle::message.html.php', array(
+        return $this->render('MauticCoreBundle::message.html.php', array(
             'message'  => $message,
             'type'     => 'notice',
             'email'    => $email,
