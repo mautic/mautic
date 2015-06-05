@@ -25,7 +25,7 @@ class PublicController extends CommonFormController
     public function submitAction()
     {
         if ($this->request->getMethod() !== 'POST') {
-            return $this->accessDenied();
+           // return $this->accessDenied();
         }
 
         $post   = $this->request->request->get('mauticform');
@@ -202,7 +202,7 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        return $this->render('MauticEmailBundle::message.html.php', array(
+        return $this->render('MauticCoreBundle::message.html.php', array(
             'message'  => $msg,
             'type'     => $msgType,
             'template' => $this->factory->getParameter('theme')
@@ -220,15 +220,11 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
-        $objectId     = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
-        $css          = InputHelper::raw($this->request->get('css'));
-        $model        = $this->factory->getModel('form.form');
-        $form         = $model->getEntity($objectId);
-        $customStyles = '';
-
-        foreach (explode(',', $css) as $cssStyle) {
-            $customStyles .= sprintf('<link rel="stylesheet" type="text/css" href="%s">', $cssStyle);
-        }
+        $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
+        $css               = InputHelper::raw($this->request->get('css'));
+        $model             = $this->factory->getModel('form.form');
+        $form              = $model->getEntity($objectId);
+        $customStylesheets = (!empty($css)) ? explode(',', $css) : array();
 
         if ($form === null || !$form->isPublished()) {
             throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
@@ -239,6 +235,12 @@ class PublicController extends CommonFormController
 
             $model->populateValuesWithGetParameters($form, $html);
 
+            $viewParams = array(
+                'content'     => $html,
+                'stylesheets' => $customStylesheets,
+                'name'        => $name
+            );
+
             $template = $form->getTemplate();
             if (!empty($template)) {
                 $theme = $this->factory->getTheme($template);
@@ -247,28 +249,15 @@ class PublicController extends CommonFormController
                     if (in_array('form', $config['features'])) {
                         $template = $theme->getTheme();
                     } else {
-                        $templateNotFound = true;
+                        $template = null;
                     }
-                }
-
-                if (empty($templateNotFound)) {
-                    $viewParams = array(
-                        'template'        => $template,
-                        'content'         => $html,
-                        'googleAnalytics' => $this->factory->getParameter('google_analytics')
-                    );
-
-                    return $this->render('MauticFormBundle::form.html.php', $viewParams);
                 }
             }
         }
 
-        $response = new Response();
-        $response->setContent('<html><head><title>' . $name . '</title>' . $customStyles . '</head><body>' . $html . '</body></html>');
-        $response->setStatusCode(Response::HTTP_OK);
-        $response->headers->set('Content-Type', 'text/html');
+        $viewParams['template'] = $template;
 
-        return $response;
+        return $this->render('MauticFormBundle::form.html.php', $viewParams);
     }
 
     /**

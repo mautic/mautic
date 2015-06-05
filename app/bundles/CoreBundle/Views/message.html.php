@@ -7,5 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//extend the template chosen
+// Used to show the message page from themes
+if ($code = $view['analytics']->getCode()) {
+    $view['assets']->addCustomDeclaration($code);
+}
+
 $view->extend(":$template:message.html.php");

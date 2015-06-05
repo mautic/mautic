@@ -236,7 +236,6 @@ class PublicController extends CommonFormController
                     'content'         => $entity->getContent(),
                     'page'            => $entity,
                     'template'        => $template,
-                    'googleAnalytics' => $this->factory->getParameter('google_analytics'),
                     'public'          => true
                 ));
 
@@ -288,7 +287,6 @@ class PublicController extends CommonFormController
                 'content'         => $entity->getContent(),
                 'page'            => $entity,
                 'template'        => $template,
-                'googleAnalytics' => $this->factory->getParameter('google_analytics'),
                 'public'          => true
             ));
 

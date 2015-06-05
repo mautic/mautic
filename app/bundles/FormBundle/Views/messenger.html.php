@@ -12,6 +12,8 @@
         <script type="text/javascript">
             parent.postMessage("<?php echo $view->escape($response, 'js'); ?>", '<?php echo $view['assets']->getBaseUrl(); ?>');
         </script>
+
+        <?php echo $view['analytics']->getCode(); ?>
     </head>
 
     <body></body>
