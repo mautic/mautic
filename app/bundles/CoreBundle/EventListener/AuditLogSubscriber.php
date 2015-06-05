@@ -58,7 +58,7 @@ class AuditLogSubscriber extends CommonSubscriber
                     array(
                         'column' => 'e.action',
                         'expr'   => 'in',
-                        'value'  => array("'create'", "'identified'", "'ipadded'")
+                        'value'  => array("create", "identified", "ipadded")
                     ),
                     array(
                         'column' => 'e.objectId',

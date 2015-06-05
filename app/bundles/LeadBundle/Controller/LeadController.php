@@ -986,6 +986,7 @@ class LeadController extends FormController
                         'import_fields' => $importFields
                     )
                 );
+
                 break;
             case 3:
                 // Just show the progress form
@@ -1003,6 +1004,7 @@ class LeadController extends FormController
 
                     // Batch process
                     $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
+                    $defaultList  = $session->get('mautic.lead.import.defaultlist', null);
                     $headers      = $session->get('mautic.lead.import.headers', array());
                     $importFields = $session->get('mautic.lead.import.fields', array());
 
@@ -1037,7 +1039,7 @@ class LeadController extends FormController
                                 if (empty($data)) {
                                     $stats['ignored']++;
                                 } else {
-                                    $merged = $model->importLead($importFields, $data, $defaultOwner);
+                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList);
 
                                     if ($merged) {
                                         $stats['merged']++;
@@ -1148,6 +1150,9 @@ class LeadController extends FormController
                         $owner = $matchedFields['owner'];
                         unset($matchedFields['owner']);
 
+                        $list = $matchedFields['list'];
+                        unset($matchedFields['list']);
+
                         foreach ($matchedFields as $k => $f) {
                             if (empty($f)) {
                                 unset($matchedFields[$k]);
@@ -1165,6 +1170,7 @@ class LeadController extends FormController
                             $defaultOwner = ($owner) ? $owner->getId() : null;
                             $session->set('mautic.lead.import.fields', $matchedFields);
                             $session->set('mautic.lead.import.defaultowner', $defaultOwner);
+                            $session->set('mautic.lead.import.defaultlist', $list);
                             $session->set('mautic.lead.import.step', 3);
 
                             return $this->importAction(0, true);
@@ -1235,6 +1241,7 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.progress', array(0, 0));
         $session->set('mautic.lead.import.fields', array());
         $session->set('mautic.lead.import.defaultowner', null);
+        $session->set('mautic.lead.import.defaultlist', null);
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', array());
         unlink($filepath);

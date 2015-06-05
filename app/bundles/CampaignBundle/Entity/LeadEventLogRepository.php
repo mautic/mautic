@@ -131,11 +131,13 @@ class LeadEventLogRepository extends EntityRepository
     }
 
     /**
-     * @param int        $campaignId
-     * @param null       $eventId
-     * @param null|array $leadIds
+     * @param      $campaignId
+     * @param      $leadIds
+     * @param bool $excludeScheduled
+     *
+     * @return array
      */
-    public function getCampaignLogCounts($campaignId, $leadIds)
+    public function getCampaignLogCounts($campaignId, $leadIds, $excludeScheduled = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('o.event_id, count(o.lead_id) as lead_count')
@@ -146,16 +148,22 @@ class LeadEventLogRepository extends EntityRepository
             $leadIds = array(0);
         }
 
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('o.campaign_id', (int) $campaignId),
-                $q->expr()->in('o.lead_id', $leadIds),
-                $q->expr()->orX(
-                    $q->expr()->isNull('o.non_action_path_taken'),
-                    $q->expr()->eq('o.non_action_path_taken', ':false')
-                )
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('o.campaign_id', (int) $campaignId),
+            $q->expr()->in('o.lead_id', $leadIds),
+            $q->expr()->orX(
+                $q->expr()->isNull('o.non_action_path_taken'),
+                $q->expr()->eq('o.non_action_path_taken', ':false')
             )
-        )
+        );
+
+        if ($excludeScheduled) {
+            $expr->add(
+                $q->expr()->eq('o.is_scheduled', ':false')
+            );
+        }
+
+        $q->where($expr)
             ->setParameter('false', false, 'boolean')
             ->groupBy('o.event_id');
 

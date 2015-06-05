@@ -37,7 +37,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                             </tr>
                             <tr>
                                 <td><?php echo $view['translator']->trans('mautic.core.update.announcement'); ?></td>
-                                <td><a href="<?php echo $updateData['announcement']; ?>" target="_blank"><?php echo $updateData['announcement']; ?></a></td>
+                                <td class="break-word"><a href="<?php echo $updateData['announcement']; ?>" target="_blank"><?php echo $updateData['announcement']; ?></a></td>
                             </tr>
                             <tr>
                                 <td colspan="2" class="text-center text-danger"><?php echo $view['translator']->trans('mautic.core.update.backup_warning'); ?></td>

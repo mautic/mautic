@@ -262,8 +262,8 @@ class CampaignController extends FormController
 
         $campaignLeads = $model->getRepository()->getCampaignLeadIds($entity->getId());
 
-        $leadCount    = count($campaignLeads);
-        $campaignLogs = $eventLogRepo->getCampaignLogCounts($entity->getId(), $campaignLeads);
+        $leadCount     = count($campaignLeads);
+        $campaignLogs  = $eventLogRepo->getCampaignLogCounts($entity->getId(), $campaignLeads, true);
 
         foreach ($events as &$event) {
             $event['logCount'] = 0;

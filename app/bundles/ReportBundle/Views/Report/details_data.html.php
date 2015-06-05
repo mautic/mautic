@@ -86,10 +86,20 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
 <div class="mt-lg">
     <div class="row">
         <div class="pa-md">
-            <?php foreach ($graphOrder as $key): ?>
-            <?php $details =  $graphs[$key]; ?>
-            <?php echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report)); ?>
-            <?php endforeach; ?>
+            <div class="row equal">
+            <?php
+            $rowCount = 0;
+            foreach ($graphOrder as $key):
+                $details =  $graphs[$key];
+                if ($rowCount >= 12):
+                    echo '</div><div class="row equal">';
+                    $rowCount = 0;
+                endif;
+                echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
+                $rowCount += ($details['type'] == 'line') ? 12 : 4;
+            endforeach;
+            ?>
+            </div>
         </div>
     </div>
 </div>

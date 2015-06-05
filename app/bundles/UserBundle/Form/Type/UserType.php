@@ -83,8 +83,9 @@ class UserType extends AbstractType
             'label'      => 'mautic.core.username',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'    => 'form-control',
-                'preaddon' => 'fa fa-user'
+                'class'        => 'form-control',
+                'preaddon'     => 'fa fa-user',
+                'autocomplete' => 'off'
             )
         ));
 
@@ -130,10 +131,11 @@ class UserType extends AbstractType
                 'label'      => 'mautic.core.password',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
-                    'class'       => 'form-control',
-                    'placeholder' => $placeholder,
-                    'tooltip'     => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon'    => 'fa fa-lock'
+                    'class'        => 'form-control',
+                    'placeholder'  => $placeholder,
+                    'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
+                    'preaddon'     => 'fa fa-lock',
+                    'autocomplete' => 'off'
                 ),
                 'required'   => $required,
                 'error_bubbling'    => false
@@ -143,10 +145,11 @@ class UserType extends AbstractType
                 'label'      => 'mautic.user.user.form.passwordconfirm',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
-                    'class'       => 'form-control',
-                    'placeholder' => $placeholder,
-                    'tooltip'     => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon'    => 'fa fa-lock'
+                    'class'        => 'form-control',
+                    'placeholder'  => $placeholder,
+                    'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
+                    'preaddon'     => 'fa fa-lock',
+                    'autocomplete' => 'off'
                 ),
                 'required'   => $required,
                 'error_bubbling'    => false
