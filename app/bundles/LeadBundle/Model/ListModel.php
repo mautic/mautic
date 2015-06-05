@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -155,7 +156,7 @@ class ListModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
@@ -175,7 +176,7 @@ class ListModel extends FormModel
                 $name = LeadEvents::LIST_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -187,7 +188,7 @@ class ListModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

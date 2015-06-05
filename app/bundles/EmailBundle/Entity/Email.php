@@ -11,9 +11,11 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -93,7 +95,7 @@ class Email extends FormEntity
     private $bccAddress;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $template;
 
@@ -121,9 +123,9 @@ class Email extends FormEntity
     private $customHtml;
 
     /**
-     * @ORM\Column(name="content_mode", type="string")
+     * @ORM\Column(name="email_type", type="string", nullable=true)
      */
-    private $contentMode = 'custom';
+    private $emailType;
 
     /**
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
@@ -247,6 +249,15 @@ class Email extends FormEntity
     private $unsubscribeForm;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Mautic\AssetBundle\Entity\Asset", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="email_assets_xref",
+     *   joinColumns={@ORM\JoinColumn(name="email_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="asset_id", referencedColumnName="id")}
+     * )
+     */
+    private $assetAttachments;
+
+    /**
      * Used to identify the page for the builder
      *
      * @var
@@ -259,8 +270,10 @@ class Email extends FormEntity
 
     public function __construct()
     {
-        $this->lists = new ArrayCollection();
-        $this->stats = new ArrayCollection();
+        $this->lists            = new ArrayCollection();
+        $this->stats            = new ArrayCollection();
+        $this->variantChildren  = new ArrayCollection();
+        $this->assetAttachments = new ArrayCollection();
     }
 
     /**
@@ -272,6 +285,15 @@ class Email extends FormEntity
     }
 
     /**
+     *
+     */
+    public function clearVariants()
+    {
+        $this->variantChildren = new ArrayCollection();
+        $this->variantParent   = null;
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -280,7 +302,8 @@ class Email extends FormEntity
             'name',
             new NotBlank(
                 array(
-                    'message' => 'mautic.core.name.required'
+                    'message' => 'mautic.core.name.required',
+                    'groups'  => array('General')
                 )
             )
         );
@@ -289,7 +312,8 @@ class Email extends FormEntity
             'fromAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required'
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
                 )
             )
         );
@@ -298,7 +322,8 @@ class Email extends FormEntity
             'replyToAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required'
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
                 )
             )
         );
@@ -307,10 +332,41 @@ class Email extends FormEntity
             'bccAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required'
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
                 )
             )
         );
+
+        $metadata->addPropertyConstraint(
+            'lists',
+            new LeadListAccess(
+                array(
+                    'message' => 'mautic.lead.lists.required',
+                    'groups'  => array('List')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'lists',
+            new NotBlank(
+                array(
+                    'message' => 'mautic.lead.lists.required',
+                    'groups'  => array('List')
+                )
+            )
+        );
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array
+     */
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
+        return ($form->getData()->getEmailType() == 'list') ? array('General', 'List') : array('General');
     }
 
     /**
@@ -908,11 +964,13 @@ class Email extends FormEntity
     }
 
     /**
+     * @param bool $isChild True to return if the email is a variant of a parent
+     *
      * @return bool
      */
-    public function isVariant($parentOnly = false)
+    public function isVariant($isChild = false)
     {
-        if ($parentOnly) {
+        if ($isChild) {
             return ($this->variantParent === null) ? false : true;
         } else {
             return (!empty($this->variantParent) || count($this->variantChildren)) ? true : false;
@@ -950,26 +1008,6 @@ class Email extends FormEntity
     /**
      * @return mixed
      */
-    public function getContentMode ()
-    {
-        return $this->contentMode;
-    }
-
-    /**
-     * @param $contentMode
-     *
-     * @return $this
-     */
-    public function setContentMode ($contentMode)
-    {
-        $this->contentMode = $contentMode;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getUnsubscribeForm ()
     {
         return $this->unsubscribeForm;
@@ -986,4 +1024,60 @@ class Email extends FormEntity
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailType()
+    {
+        return $this->emailType;
+    }
+
+    /**
+     * @param mixed $emailType
+     *
+     * @return Email
+     */
+    public function setEmailType($emailType)
+    {
+        $this->emailType = $emailType;
+
+        return $this;
+    }
+
+
+    /**
+     * Add asset
+     *
+     * @param Asset  $asset
+     *
+     * @return Email
+     */
+    public function addAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments[] = $asset;
+
+        return $this;
+    }
+
+    /**
+     * Remove asset
+     *
+     * @param Asset $asset
+     */
+    public function removeAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments->removeElement($asset);
+    }
+
+    /**
+     * Get assetAttachments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAssetAttachments()
+    {
+        return $this->assetAttachments;
+    }
+
 }

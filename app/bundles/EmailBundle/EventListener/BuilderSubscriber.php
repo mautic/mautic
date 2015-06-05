@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class BuilderSubscriber extends CommonSubscriber
 {
 
+
     /**
      * @return array
      */
@@ -45,14 +46,14 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $openRate = array(
-                'group'    => 'mautic.email.abtest.criteria',
+                'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
                 'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
             );
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
             $clickThrough = array(
-                'group'    => 'mautic.email.abtest.criteria',
+                'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.clickthrough',
                 'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
             );
@@ -67,8 +68,10 @@ class BuilderSubscriber extends CommonSubscriber
         );
 
         if ($event->tokensRequested(array_keys($tokens))) {
+            unset($tokens['{leadfield}']);
             $event->addTokens(
-                $event->filterTokens($tokens)
+                $event->filterTokens($tokens),
+                true
             );
         }
     }

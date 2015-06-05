@@ -45,10 +45,18 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
 $groups = array_keys($fields);
 $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
-$buttons = $preButtons = array();
+$buttons = array();
 
 if ($edit) {
-    $preButtons[] = array(
+    $buttons[] = array(
+        'attr' => array(
+            'href' => $view['router']->generate( 'mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'edit'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
+        'iconClass' => 'fa fa-pencil-square-o'
+    );
+
+    $buttons[] = array(
         'attr'      => array(
             'id'          => 'addNoteButton',
             'data-toggle' => 'ajaxmodal',
@@ -58,6 +66,20 @@ if ($edit) {
         ),
         'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
         'iconClass' => 'fa fa-file-o'
+    );
+}
+
+if (!empty($fields['core']['email']['value'])) {
+    $buttons[] = array(
+        'attr'      => array(
+            'id'          => 'sendEmailButton',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
+            'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'email'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
+        'iconClass' => 'fa fa-send'
     );
 }
 
@@ -85,15 +107,20 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     );
 }
 
+if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) {
+    $buttons[] = array(
+        'confirm'      => array(
+            'message'       => $view["translator"]->trans('mautic.lead.lead.form.confirmdelete', array('%name%' => $lead->getName() . ' (' . $lead->getId() . ')')),
+            'confirmAction' => $view['router']->generate('mautic_lead_action', array_merge(array('objectAction' => 'delete', 'objectId' => $lead->getId()))),
+            'template'      => 'delete'
+        )
+    );
+}
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $lead,
-    'templateButtons' => array(
-        'edit'       => $edit,
-        'delete'     => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())
-    ),
     'routeBase'  => 'lead',
     'langVar'    => 'lead.lead',
-    'preCustomButtons' => $preButtons,
     'customButtons' => $buttons
 )));
 ?>

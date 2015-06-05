@@ -149,7 +149,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model  = $this->factory->getModel('page');
 
-        return $model->getBuilderComponents(null, 'tokens', $query);
+        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
     }
 
 }

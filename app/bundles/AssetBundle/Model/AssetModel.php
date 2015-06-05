@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -16,6 +17,9 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\AssetEvents;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -68,12 +72,19 @@ class AssetModel extends FormModel
      * @param        $asset
      * @param        $request
      * @param string $code
+     * @param array  $systemEntry
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function trackDownload($asset, $request, $code = '200')
+    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = array())
     {
         //don't skew results with in-house downloads
-        if (!$this->factory->getSecurity()->isAnonymous()) {
+        if (empty($systemEntry) && !$this->factory->getSecurity()->isAnonymous()) {
             return;
+        }
+
+        if ($request == null) {
+            $request = $this->factory->getRequest();
         }
 
         $download = new Download();
@@ -82,37 +93,77 @@ class AssetModel extends FormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
-        //check for any clickthrough info
-        $clickthrough = $request->get('ct', false);
-        if (!empty($clickthrough)) {
-            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
+        // Download triggered by lead
+        if (empty($systemEntry)) {
 
-            if (!empty($clickthrough['lead'])) {
-                $lead = $leadModel->getEntity($clickthrough['lead']);
-                if ($lead !== null) {
-                    $leadModel->setLeadCookie($clickthrough['lead']);
-                    list($trackingId, $generated) = $leadModel->getTrackingCookie();
-                    $leadClickthrough = true;
+            //check for any clickthrough info
+            $clickthrough = $request->get('ct', false);
+            if (!empty($clickthrough)) {
+                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
-                    $leadModel->setCurrentLead($lead);
+                if (!empty($clickthrough['lead'])) {
+                    $lead = $leadModel->getEntity($clickthrough['lead']);
+                    if ($lead !== null) {
+                        $leadModel->setLeadCookie($clickthrough['lead']);
+                        list($trackingId, $generated) = $leadModel->getTrackingCookie();
+                        $leadClickthrough = true;
+
+                        $leadModel->setCurrentLead($lead);
+                    }
+                }
+
+                if (!empty($clickthrough['source'])) {
+                    $download->setSource($clickthrough['source'][0]);
+                    $download->setSourceId($clickthrough['source'][1]);
+                }
+
+                if (!empty($clickthrough['email'])) {
+                    $download->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
                 }
             }
 
-            if (!empty($clickthrough['source'])) {
-                $download->setSource($clickthrough['source'][0]);
-                $download->setSourceId($clickthrough['source'][1]);
+            if (empty($leadClickthrough)) {
+                list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
             }
 
-            if (!empty($clickthrough['email'])) {
-                $download->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+            $download->setLead($lead);
+        } else {
+            $trackingId = '';
+
+            if (isset($systemEntry['lead'])) {
+                $lead = $systemEntry['lead'];
+                if (!$lead instanceof Lead) {
+                    $leadId = is_array($lead) ? $lead['id'] : $lead;
+                    $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                }
+
+                $download->setLead($lead);
+            }
+
+            if (!empty($systemEntry['source'])) {
+                $download->setSource($systemEntry['source'][0]);
+                $download->setSourceId($systemEntry['source'][1]);
+            }
+
+            if (isset($systemEntry['email'])) {
+                $email = $systemEntry['email'];
+                if (!$email instanceof Email) {
+                    $emailId = is_array($email) ? $email['id'] : $email;
+                    $email   = $this->em->getReference('MauticEmailBundle:Email', $emailId);
+                }
+
+                $download->setEmail($email);
+            }
+
+            if (isset($systemEntry['tracking_id'])) {
+                $trackingId = $systemEntry['tracking_id'];
+            } elseif ($this->factory->getSecurity()->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
+                // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
+                // system forced download such as an email
+                list($trackingId, $generated) = $leadModel->getTrackingCookie();
             }
         }
 
-        if (empty($leadClickthrough)) {
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
-        }
-
-        $download->setLead($lead);
         $download->setTrackingId($trackingId);
 
         if (!empty($asset)) {
@@ -123,7 +174,7 @@ class AssetModel extends FormModel
             $asset->setDownloadCount($downloadCount);
 
             //check for a download count from tracking id
-            $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
+            $countById = ($systemEntry) ? 0 : $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
             if (empty($countById)) {
                 $uniqueDownloadCount = $asset->getUniqueDownloadCount();
                 $uniqueDownloadCount++;
@@ -134,14 +185,7 @@ class AssetModel extends FormModel
         }
 
         //check for existing IP
-        $ip = $this->factory->getIpAddressFromRequest();
-        $ipAddress = $this->em->getRepository('MauticCoreBundle:IpAddress')
-            ->findOneByIpAddress($ip);
-
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
-        }
+        $ipAddress = $this->factory->getIpAddress();
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
@@ -223,7 +267,7 @@ class AssetModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(array('Asset'));
@@ -243,7 +287,7 @@ class AssetModel extends FormModel
                 $name = AssetEvents::ASSET_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -255,7 +299,7 @@ class AssetModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -311,10 +355,10 @@ class AssetModel extends FormModel
      */
     public function getMaxUploadSize()
     {
-        $maxAssetSize  = $this->convertSizeToBytes($this->factory->getParameter('max_size') . 'M');
-        $maxPostSize   = $this->convertSizeToBytes(ini_get('post_max_size'));
-        $maxUploadSize = $this->convertSizeToBytes(ini_get('upload_max_filesize'));
-        $memoryLimit   = $this->convertSizeToBytes(ini_get('memory_limit'));
+        $maxAssetSize  = Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M');
+        $maxPostSize   = Asset::convertSizeToBytes(ini_get('post_max_size'));
+        $maxUploadSize = Asset::convertSizeToBytes(ini_get('upload_max_filesize'));
+        $memoryLimit   = Asset::convertSizeToBytes(ini_get('memory_limit'));
 
         $maxAllowed    =  min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
 
@@ -322,34 +366,35 @@ class AssetModel extends FormModel
     }
 
     /**
-     * Borrowed from Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize
-     *
-     * @param $size
+     * @param $assets
      *
      * @return int|string
      */
-    public function convertSizeToBytes($size)
+    public function getTotalFilesize($assets)
     {
-        if ('' === $size) {
-            return PHP_INT_MAX;
+        if ($assets instanceof PersistentCollection) {
+            $assetIds = array();
+            foreach ($assets as $asset) {
+                $assetIds[] = $asset->getId();
+            }
+            $assets = $assetIds;
         }
 
-        $max = ltrim($size, '+');
-        if (0 === strpos($max, '0x')) {
-            $max = intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
-            $max = intval($max, 8);
-        } else {
-            $max = intval($max);
+        if (!is_array($assets)) {
+            $assets = array($assets);
         }
 
-        switch (strtolower(substr($size, -1))) {
-            case 't': $max *= 1024;
-            case 'g': $max *= 1024;
-            case 'm': $max *= 1024;
-            case 'k': $max *= 1024;
+        if (empty($assets)) {
+            return 0;
         }
 
-        return $max;
+        $repo = $this->getRepository();
+        $size = $repo->getAssetSize($assets);
+
+        if ($size) {
+            $size = Asset::convertBytesToHumanReadable($size);
+        }
+
+        return $size;
     }
 }

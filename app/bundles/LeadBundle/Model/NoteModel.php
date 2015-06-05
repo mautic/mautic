@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -89,7 +90,7 @@ class NoteModel extends FormModel
       * @param $isNew
       * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
       */
-     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
      {
          if (!$entity instanceof LeadNote) {
              throw new MethodNotAllowedHttpException(array('LeadNote'));
@@ -109,7 +110,7 @@ class NoteModel extends FormModel
                  $name = LeadEvents::NOTE_POST_DELETE;
                  break;
              default:
-                 return false;
+                 return null;
          }
 
          if ($this->dispatcher->hasListeners($name)) {
@@ -122,7 +123,7 @@ class NoteModel extends FormModel
 
              return $event;
          } else {
-             return false;
+             return null;
          }
      }
 

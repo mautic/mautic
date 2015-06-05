@@ -9,8 +9,12 @@
 
 namespace Mautic\CoreBundle\Swiftmailer\Transport;
 
-
-interface InterfaceBatchTransport
+/**
+ * Tokenized Transport Support
+ *
+ * Interface InterfaceTokenTransport
+ */
+interface InterfaceTokenTransport
 {
 
     /**

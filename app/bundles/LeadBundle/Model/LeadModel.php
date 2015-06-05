@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -132,7 +133,7 @@ class LeadModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(array('Lead'), 'Entity must be of class Lead()');
@@ -152,7 +153,7 @@ class LeadModel extends FormModel
                 $name = LeadEvents::LEAD_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -164,7 +165,7 @@ class LeadModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

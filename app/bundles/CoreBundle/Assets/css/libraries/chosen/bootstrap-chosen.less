@@ -7,7 +7,7 @@
 // Submit bugfixes to: http://github.com/alxlit/bootstrap-chosen
 //
 
-@import "bootstrap-chosen-variables";
+@import "bootstrap-chosen-variables.less";
 
 .chosen-select { width: 100%; }
 .chosen-select-deselect { width: 100%; }
@@ -130,8 +130,8 @@
   .chosen-single {
     background-color: @chosen-background;
     -webkit-background-clip: padding-box;
-       -moz-background-clip: padding;
-            background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
     border: @chosen-border;
     .border-top-radius(@chosen-border-radius);
     .border-bottom-radius(@chosen-border-radius);
@@ -188,10 +188,6 @@
     }
   }
 
-  .chosen-default {
-    color: @gray-light;
-  }
-
   .chosen-search {
     margin: 0;
     padding: 3px 4px;
@@ -215,8 +211,8 @@
     margin-top: -1px;
     .border-bottom-radius(@chosen-border-radius);
     -webkit-background-clip: padding-box;
-       -moz-background-clip: padding;
-            background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
   }
 }
 
@@ -253,7 +249,7 @@
       margin: 0;
       padding: 0;
       white-space: nowrap;
-      width: 100%;
+
       input[type="text"] {
         background: transparent !important;
         border: 0 !important;
@@ -263,18 +259,17 @@
         margin: 0;
         padding: 4px;
         outline: 0;
-        width: 100% !important;
       }
 
       .default {
-        color: #999;
+        //color: #999;
       }
     }
 
     .search-choice {
       -webkit-background-clip: padding-box;
-         -moz-background-clip: padding;
-              background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
       background-color: @gray-lighter;
       border: @chosen-border;
       .border-top-radius(@chosen-border-radius);
@@ -301,6 +296,10 @@
         &:hover {
           background-position: right -11px;
         }
+      }
+
+      .group-name {
+        margin-right: 2px;
       }
     }
 
@@ -441,6 +440,35 @@
     background: url("@{chosen-sprite-path}") no-repeat -28px -20px, @chosen-background;
     direction: rtl;
     padding: 4px 5px 4px 20px;
+  }
+}
+
+.input-group {
+  .chosen-container:last-child {
+    .chosen-single, .chosen-default, .chosen-choices {
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+    }
+  }
+  .chosen-container:not(:last-child) {
+    .chosen-single, .chosen-default, .chosen-choices {
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+}
+
+.form-inline {
+  .chosen-container {
+    display: inline-table;
+    vertical-align: middle;
+    min-width: 200px;
+  }
+}
+
+.chosen-container {
+  .default, .chosen-default {
+    color: @gray-light !important;
   }
 }
 

@@ -61,6 +61,8 @@ if ($cancelText) {
 if ($cancelCallback) {
     $attr[] = "data-cancel-callback=\"$cancelCallback\"";
 }
+if (isset($target))
+    $attr[] = "data-target=\"$target\"";
 
 if (!isset($openTag)) {
     $tag = "a";

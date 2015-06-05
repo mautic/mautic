@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -303,7 +304,7 @@ class FieldModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(array('LeadField'));
@@ -323,7 +324,7 @@ class FieldModel extends FormModel
                 $name = LeadEvents::FIELD_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -336,7 +337,7 @@ class FieldModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

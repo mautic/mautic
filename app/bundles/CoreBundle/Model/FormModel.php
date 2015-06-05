@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -209,7 +210,6 @@ class FormModel extends CommonModel
         return false;
     }
 
-
     /**
      * Set timestamps and user ids
      *
@@ -324,9 +324,9 @@ class FormModel extends CommonModel
      * @param string $action
      * @param object $entity
      * @param bool   $isNew
-     * @param bool   $event
+     * @param Event  $event
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         //...
     }

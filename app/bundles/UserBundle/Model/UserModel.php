@@ -14,6 +14,7 @@ use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
@@ -129,7 +130,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
@@ -149,7 +150,7 @@ class UserModel extends FormModel
                 $name = UserEvents::USER_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -162,7 +163,7 @@ class UserModel extends FormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**

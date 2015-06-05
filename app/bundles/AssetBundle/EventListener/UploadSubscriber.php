@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
@@ -86,11 +87,9 @@ class UploadSubscriber extends CommonSubscriber
      */
     public function onUploadValidation (ValidationEvent $event)
     {
-        $model = $this->factory->getModel('asset');
-
         $file       = $event->getFile();
         $extensions = $this->factory->getParameter('allowed_extensions');
-        $maxSize    = $model->convertSizeToBytes($this->factory->getParameter('max_size') . 'M'); // max size is set in MB
+        $maxSize    = Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M'); // max size is set in MB
 
         if ($file !== null) {
             if ($file->getSize() > $maxSize) {

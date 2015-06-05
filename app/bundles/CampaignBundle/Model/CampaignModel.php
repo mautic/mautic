@@ -125,7 +125,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, \Symfony\Component\EventDispatcher\Event $event = null)
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
             return;
@@ -149,7 +149,7 @@ class CampaignModel extends CommonFormModel
                 $name = CampaignEvents::CAMPAIGN_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -161,7 +161,7 @@ class CampaignModel extends CommonFormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

@@ -13,10 +13,6 @@ $view->extend(":$template:email.html.php");
 //add no index header for when viewing via web
 if (!empty($inBrowser)) {
     $view['assets']->addCustomDeclaration('<meta name="robots" content="noindex">');
-
-    if (!empty($googleAnalytics)) {
-        $view['assets']->addCustomDeclaration(htmlspecialchars_decode($googleAnalytics));
-    }
 }
 
 //Set the slots
@@ -24,6 +20,3 @@ foreach ($slots as $slot) {
     $value = isset($content[$slot]) ? $content[$slot] : "";
     $view['slots']->set($slot, $value);
 }
-
-//add tracking pixel to builder slot
-$view['slots']->set('builder', '<img style="display:none;" height="1" width="1" src="{tracking_pixel}" />');

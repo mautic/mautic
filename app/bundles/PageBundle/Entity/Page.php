@@ -53,7 +53,7 @@ class Page extends FormEntity
     private $alias;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $template;
 
@@ -69,11 +69,6 @@ class Page extends FormEntity
      * @ORM\Column(name="custom_html", type="text", nullable=true)
      */
     private $customHtml;
-
-    /**
-     * @ORM\Column(name="content_mode", type="string")
-     */
-    private $contentMode = 'builder';
 
     /**
      * @ORM\Column(name="content", type="array", nullable=true)
@@ -797,22 +792,6 @@ class Page extends FormEntity
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getContentMode ()
-    {
-        return $this->contentMode;
-    }
-
-    /**
-     * @param mixed $contentMode
-     */
-    public function setContentMode ($contentMode)
-    {
-        $this->contentMode = $contentMode;
     }
 
     /**

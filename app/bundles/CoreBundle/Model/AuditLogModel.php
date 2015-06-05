@@ -51,7 +51,7 @@ class AuditLogModel extends CommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user   = $this->factory->getUser();
+        $user   = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->factory->getUser() : null;
         $userId = 0;
         $userName = '';
         if (!$user instanceof User) {
@@ -72,12 +72,13 @@ class AuditLogModel extends CommonModel
      *
      * @param string $object type
      * @param integer $id of the object
+     * @param \DateTime $afterDate
      * @param integer $limit of items
      *
      * @return array of logs
      */
-    public function getLogForObject($object, $id, $limit = 10)
+    public function getLogForObject($object, $id, $afterDate = null, $limit = 10)
     {
-        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit);
+        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit, $afterDate);
     }
 }

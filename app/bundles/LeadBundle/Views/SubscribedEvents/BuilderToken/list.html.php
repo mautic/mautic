@@ -12,11 +12,13 @@ if ($tmpl == 'index') {
 }
 ?>
 <div id="leadEmailTokens">
+    <?php if (count($items)): ?>
     <div class="list-group">
         <?php
-        if (count($items)):
-        foreach ($items as $i):?>
-            <a href="#" class="list-group-item" data-token="{leadfield=<?php echo $i['alias']; ?>}">
+        foreach ($items as $i):
+        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{leadfield=' . $i['alias'] . '}', $i['label']))
+        ?>
+            <a href="#" class="list-group-item" data-token="<?php echo $token; ?>">
                 <span><?php echo $i['label']; ?></span>
             </a>
         <?php endforeach; ?>

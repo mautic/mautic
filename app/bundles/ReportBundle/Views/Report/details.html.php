@@ -115,4 +115,4 @@ if ($tmpl == 'index') {
     <!--/ left section -->
 </div>
 <!--/ end: box layout -->
-<input type="hidden" name="reportId" id="reportId" value="<?php echo $report->getId(); ?>" />
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $report->getId(); ?>" />

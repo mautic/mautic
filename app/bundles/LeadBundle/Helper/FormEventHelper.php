@@ -21,90 +21,31 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 class FormEventHelper
 {
     /**
-     * @param array $post
-     * @param array $server
-     * @param       $fields
+     * @param               $lead
      * @param MauticFactory $factory
-     * @param       $action
-     * @param       $form
+     * @param               $action
+     * @param               $config
+     * @param               $form
      */
-    public static function changePoints (array $post, array $server, $fields, MauticFactory $factory, $action, $form)
+    public static function changePoints ($lead, MauticFactory $factory, $action, $config, $form)
     {
-        $properties = $action->getProperties();
+        $model = $factory->getModel('lead');
 
-        if (isset($fields[$properties['formField']])) {
-            $fieldName = $fields[$properties['formField']]['alias'];
-            if (isset($post[$fieldName])) {
-                $model = $factory->getModel('lead.lead');
-                $em    = $factory->getEntityManager();
-                $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue(
-                    $fieldName,
-                    $post[$fieldName]
-                );
+        //create a new points change event
+        $event = new PointsChangeLog();
+        $event->setType('form');
+        $event->setEventName($form->getId() . ":" . $form->getName());
+        $event->setActionName($action->getName());
+        $event->setIpAddress($factory->getIpAddress());
+        $event->setDateAdded(new \DateTime());
 
-                //check for existing IP address or add one if not exist
-                $ipAddress = $factory->getIpAddress();
+        $event->setDelta($config['points']);
+        $event->setLead($lead);
 
-                //create a new points change event
-                $event = new PointsChangeLog();
-                $event->setType('form');
-                $event->setEventName($form->getId() . ":" . $form->getName());
-                $event->setActionName($action->getName());
-                $event->setIpAddress($ipAddress);
-                $event->setDateAdded(new \DateTime());
+        $lead->addPointsChangeLog($event);
+        $lead->addToPoints($config['points']);
 
-                if (count($leads) === 1) {
-                    //good to go so update the points
-                    $lead = $leads[0];
-                } else {
-                    switch ($properties['matchMode']) {
-                        case 'strict':
-                            //no points change since more than one lead matched
-                            $lead = false;
-                            break;
-                        case 'newest':
-                            //the newest lead is listed first so use it
-                            $lead = $leads[0];
-                            break;
-                        case 'oldest':
-                            //the last lead is the oldest so use it
-                            $lead = end($leads);
-                            break;
-                        case 'all':
-                            $lead = false;
-
-                            foreach ($leads as &$l) {
-                                $event->setDelta($properties['points']);
-                                $event->setLead($l);
-                                $l->addPointsChangeLog($event);
-
-                                $ipAddresses = $l->getIpAddresses();
-                                //add the IP if the lead is not already associated with it
-                                if (!$ipAddresses->contains($ipAddress)) {
-                                    $l->addIpAddress($ipAddress);
-                                }
-                            }
-
-                            $model->saveEntities($leads, false);
-                            break;
-                    }
-                }
-
-                if ($lead) {
-                    $event->setDelta($properties['points']);
-                    $event->setLead($lead);
-                    $lead->addPointsChangeLog($event);
-                    $lead->addToPoints($properties['points']);
-                    $ipAddresses = $lead->getIpAddresses();
-                    //add the IP if the lead is not already associated with it
-                    if (!$ipAddresses->contains($ipAddress)) {
-                        $lead->addIpAddress($ipAddress);
-                    }
-
-                    $model->saveEntity($lead, false);
-                }
-            }
-        }
+        $model->saveEntity($lead, false);
     }
 
     /**
