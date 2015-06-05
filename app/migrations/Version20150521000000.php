@@ -44,6 +44,30 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function postUp(Schema $schema)
     {
+        // Migrate asset download messages to form message
+        $q = $this->connection->createQueryBuilder();
+        $q->select('fa.properties, fa.form_id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_actions', 'fa')
+            ->where(
+                $q->expr()->eq('fa.type', $q->expr()->literal('asset.download'))
+            );
+        $results = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $properties = unserialize($r['properties']);
+            if (is_array($properties) && !empty($properties['message'])) {
+                $this->connection->update(MAUTIC_TABLE_PREFIX.'forms',
+                    array(
+                        'post_action'          => 'message',
+                        'post_action_property' => $properties['message']
+                    ),
+                    array(
+                        'id' => $r['form_id']
+                    )
+                );
+            }
+        }
+
         // Set save_result to true for most form fields
         $q = $this->connection->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'form_fields')
@@ -493,7 +517,6 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
-
         $this->addSql(
             'CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  (email_id), INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  (asset_id), PRIMARY KEY(email_id, asset_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'
         );
