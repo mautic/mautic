@@ -139,6 +139,10 @@ class PublicController extends CommonFormController
                 if (!empty($callbackResponse)) {
                     if ($callbackResponse instanceof RedirectResponse) {
                         $data['redirect'] = $callbackResponse->getTargetUrl();
+                    } elseif ($callbackResponse instanceof Response) {
+                        $data['successMessage'] = $callbackResponse->getContent();
+                    } elseif (is_array($callbackResponse)) {
+                        $data = array_merge($data, $callbackResponse);
                     } else {
                         $data['successMessage'] = $callbackResponse->getContent();
                     }

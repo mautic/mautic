@@ -68,7 +68,7 @@ class FormSubmitHelper
         $url   = $model->generateUrl($asset, true, array('form', $form->getId()));
 
         if ($messengerMode) {
-            return new RedirectResponse($url);
+            return array('download' => $url);
         }
 
         $msg = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(

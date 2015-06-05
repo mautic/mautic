@@ -14,6 +14,9 @@ $view['slots']->set("headerTitle", $email->getName());
 $isVariant    = $email->isVariant(true);
 $showVariants = count($variants['children']);
 $emailType    = $email->getEmailType();
+if (empty($emailType)) {
+    $emailType = 'template';
+}
 $sentCount    = $email->getSentCount();
 
 $edit = ($emailType == 'template' || empty($sentCount)) && $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());

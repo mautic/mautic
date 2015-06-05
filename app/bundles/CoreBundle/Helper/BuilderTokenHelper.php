@@ -249,13 +249,27 @@ class BuilderTokenHelper
             }
         } else {
             if (isset($tokens['visualTokens'])) {
-                $search = $replace = array();
-                foreach ($tokens['visualTokens'] as $token) {
-                    $search[]  = $token;
-                    $replace[] = self::getVisualTokenHtml($token, $tokens['tokens'][$token]);
-                }
+                // Get all the tokens in the content
+                if (preg_match_all('/{(.*?)}/', $content, $matches)) {
+                    $search = $replace = array();
 
-                $content = str_ireplace($search, $replace, $content);
+                    foreach ($matches[0] as $tokenMatch) {
+                        if (strstr($tokenMatch, '|')) {
+                            // This token has been customized
+                            $tokenParts = explode('|', $tokenMatch);
+                            $token = $tokenParts[0] . '}';
+                        } else {
+                            $token = $tokenMatch;
+                        }
+
+                        if (in_array($token, $tokens['visualTokens'])) {
+                            $search[]  = $tokenMatch;
+                            $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
+                        }
+                    }
+
+                    $content = str_ireplace($search, $replace, $content);
+                }
             }
         }
     }
@@ -270,10 +284,10 @@ class BuilderTokenHelper
     static public function getVisualTokenHtml($token, $description, $forPregReplace = false)
     {
         if ($forPregReplace) {
-            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('"><em>**', '/')
-            .'(.*?)'.preg_quote('**</em></strong>', '/');
+            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
+            .'(.*?)'.preg_quote('**</strong>', '/');
         }
 
-        return '<strong contenteditable="false" data-token="'.$token.'"><em>**'.$description.'**</em></strong>';
+        return '<strong contenteditable="false" data-token="'.$token.'">**'.$description.'**</strong>';
     }
 }

@@ -313,14 +313,12 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
             if ($(this).data('visual')) {
                 // Placeholder
                 var tokenContent = document.createElement('strong');
-                var em = document.createElement('em');
-                tokenContent.appendChild(em);
 
                 tokenContent.setAttribute('data-token', $(this).data('token'));
                 tokenContent.setAttribute('contenteditable', 'false');
 
                 var description = document.createTextNode('**' + $(this).data('description') + '**');
-                em.appendChild(description);
+                tokenContent.appendChild(description);
             } else if ($(this).data('link')) {
                 var tokenContent = document.createElement('a');
                 tokenContent.setAttribute('href', $(this).data('token'));
