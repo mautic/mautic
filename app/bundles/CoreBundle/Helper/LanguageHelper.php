@@ -132,7 +132,14 @@ class LanguageHelper
     {
         $overrideFile = $this->factory->getParameter('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {
-            return json_decode(file_get_contents($overrideFile), true);
+            $overrideData = json_decode(file_get_contents($overrideFile), true);
+            if (isset($overrideData['languages'])) {
+                return $overrideData['languages'];
+            } elseif (isset($overrideData['name'])) {
+                return $overrideData;
+            } else {
+                return array();
+            }
         }
 
         // Check if we have a cache file and try to return cached data if so

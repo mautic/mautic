@@ -24,9 +24,9 @@ if ($tmpl == 'index') {
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'email',
-                'orderBy'    => 'e.subject',
-                'text'       => 'mautic.email.subject',
-                'class'      => 'col-email-subject',
+                'orderBy'    => 'e.name',
+                'text'       => 'mautic.core.name',
+                'class'      => 'col-email-name',
                 'default'    => true
             ));
 
@@ -82,7 +82,6 @@ if ($tmpl == 'index') {
                             'abtest'     => (!$hasVariants && $edit && $permissions['email:emails:create']),
                         ),
                         'routeBase'  => 'email',
-                        'nameGetter' => 'getSubject',
                         'customButtons' => array(
                             array(
                                 'attr' => array(
@@ -99,7 +98,7 @@ if ($tmpl == 'index') {
                 <td>
                     <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
                     <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
-                        <?php echo $item->getSubject(); ?>
+                        <?php echo $item->getName(); ?>
                         <?php if ($hasVariants): ?>
                         <span><i class="fa fa-fw fa-sitemap"></i></span>
                         <?php endif; ?>

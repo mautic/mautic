@@ -9,12 +9,11 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\AssetBundle\Helper\BuilderTokenHelper;
-use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
@@ -26,66 +25,92 @@ use Mautic\PageBundle\PageEvents;
 class BuilderSubscriber extends CommonSubscriber
 {
 
+    private $assetToken = '{assetlink=(.*?)}';
+
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    static public function getSubscribedEvents()
     {
         return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
+            EmailEvents::EMAIL_ON_BUILD   => array('onBuilderBuild', 0),
             EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
             EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0),
-            PageEvents::PAGE_ON_BUILD     => array('onPageBuild', 0),
+            PageEvents::PAGE_ON_BUILD     => array('onBuilderBuild', 0),
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0)
         );
     }
 
-    public function onEmailBuild (EmailBuilderEvent $event)
+    /**
+     * @param BuilderEvent $event
+     */
+    public function onBuilderBuild(BuilderEvent $event)
     {
-        $this->addTokens($event);
+        if ($event->tokenSectionsRequested()) {
+            $this->addTokenSections($event);
+        }
+
+        if ($event->tokensRequested($this->assetToken)) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
+
+            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title');
+        }
     }
 
-    public function onPageBuild (PageBuilderEvent $event)
-    {
-        $this->addTokens($event);
-    }
-
-    private function addTokens ($event)
-    {
-        //add email tokens
-        $tokenHelper = new BuilderTokenHelper($this->factory);
-        $event->addTokenSection('asset.emailtokens', 'mautic.asset.assets', $tokenHelper->getTokenContent(), -255);
-    }
-
-    public function onEmailGenerate (EmailSendEvent $event)
+    /**
+     * @param EmailSendEvent $event
+     */
+    public function onEmailGenerate(EmailSendEvent $event)
     {
         $lead   = $event->getLead();
         $leadId = ($lead !== null) ? $lead['id'] : null;
         $email  = $event->getEmail();
-        $tokens = $this->generateTokens($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
+        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
         $event->addTokens($tokens);
     }
 
-    public function onPageDisplay (PageDisplayEvent $event)
+    /**
+     * @param PageDisplayEvent $event
+     */
+    public function onPageDisplay(PageDisplayEvent $event)
     {
         $page   = $event->getPage();
         $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;
-        $tokens = $this->generateTokens($event, $leadId, array('page', $page->getId()));
+        $tokens = $this->generateTokensFromContent($event, $leadId, array('page', $page->getId()));
 
         $content = $event->getContent();
         if (!empty($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
+        $event->setContent($content);
     }
 
-    private function generateTokens ($event, $leadId, $source = array(), $emailId = null)
+    /**
+     * @param $event
+     */
+    private function addTokenSections($event)
+    {
+        //add email tokens
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
+        $event->addTokenSection('asset.emailtokens', 'mautic.asset.assets', $tokenHelper->getTokenContent(), -255);
+    }
+
+    /**
+     * @param       $event
+     * @param       $leadId
+     * @param array $source
+     * @param null  $emailId
+     *
+     * @return array
+     */
+    private function generateTokensFromContent($event, $leadId, $source = array(), $emailId = null)
     {
         $content       = $event->getContent();
-        $pagelinkRegex = '/{assetlink=(.*?)}/';
+        $pagelinkRegex = '/' . $this->assetToken . '/';
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model         = $this->factory->getModel('asset');
-        $clickthrough  = array('source' => $source);
+        $model        = $this->factory->getModel('asset');
+        $clickthrough = array('source' => $source);
 
         if ($leadId !== null) {
             $clickthrough['lead'] = $leadId;

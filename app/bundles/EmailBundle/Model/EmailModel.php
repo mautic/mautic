@@ -58,14 +58,6 @@ class EmailModel extends FormModel
 
     /**
      * {@inheritdoc}
-     */
-    public function getNameGetter ()
-    {
-        return "getSubject";
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @param       $entity
      * @param       $unlock
@@ -390,26 +382,45 @@ class EmailModel extends FormModel
 
 
     /**
-     * Get array of email builder tokens from bundles subscribed EmailEvents::EMAIL_ON_BUILD
+     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
-     * @param null|Email  $email
-     * @param null|string $component null | tokens | abTestWinnerCriteria
+     * @param null|Email   $email
+     * @param array|string $requestedComponents all | tokens | tokenSections | abTestWinnerCriteria
+     * @param null|string  $tokenFilter
      *
-     * @return mixed
+     * @return array
      */
-    public function getBuilderComponents (Email $email = null, $component = null)
+    public function getBuilderComponents (Email $email = null, $requestedComponents = 'all', $tokenFilter = null)
     {
-        static $components;
+        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
+        $components      = array();
+        $event           = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
+        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
 
-        if (empty($components)) {
-            $components = array();
-            $event      = new EmailBuilderEvent($this->translator, $email);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
-            $components['tokens']               = $event->getTokenSections();
-            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+        if (!is_array($requestedComponents)) {
+            $requestedComponents = array($requestedComponents);
         }
 
-        return ($component !== null && isset($components[$component])) ? $components[$component] : $components;
+        foreach ($requestedComponents as $requested) {
+            switch ($requested) {
+                case 'tokens':
+                    $components[$requested] = $event->getTokens();
+                    break;
+                case 'tokenSections':
+                    $components[$requested] = $event->getTokenSections();
+                    break;
+                case 'abTestWinnerCriteria':
+                    $components[$requested] = $event->getAbTestWinnerCriteria();
+                    break;
+                default:
+                    $components['tokens']               = $event->getTokens();
+                    $components['tokenSections']        = $event->getTokenSections();
+                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+                    break;
+            }
+        }
+
+        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
     }
 
     /**
@@ -588,7 +599,7 @@ class EmailModel extends FormModel
      *
      * @param Email $email
      * @param array $lists
-     *
+     * @param int   $limit
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
     public function sendEmailToLists (Email $email, $lists = null, $limit = null)
@@ -892,8 +903,6 @@ class EmailModel extends FormModel
                 $mailer->useMailerBatching();
                 $mailer->setSource($source);
                 $mailer->setBody($customHtml);
-                $mailer->setPlainText($useEmail['entity']->getPlainText());
-                $mailer->setSubject($useEmail['entity']->getSubject());
                 $mailer->setEmail($useEmail['entity']);
             }
 
@@ -1013,9 +1022,27 @@ class EmailModel extends FormModel
             return false;
         }
 
-        foreach ($users as $user) {
-            $idHash = uniqid();
+        $idHash = uniqid();
 
+        $mailer = $this->factory->getMailer();
+        $mailer->setLead($lead);
+        $mailer->setCustomTokens($tokens);
+
+        if ($email->getContentMode() == 'builder') {
+            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                'slots'    => $emailSettings[$emailId]['slots'],
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $emailSettings[$emailId]['template'],
+                'idHash'   => $idHash
+            ));
+        } else {
+            $mailer->setBody($email->getCustomHtml());
+        }
+
+        $mailer->setEmail($email, false);
+
+        foreach ($users as $user) {
             if (!is_array($user)) {
                 $id   = $user;
                 $user = array('id' => $id);
@@ -1032,35 +1059,14 @@ class EmailModel extends FormModel
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            $mailer = $this->factory->getMailer();
-            $mailer->setLead($lead);
-            $mailer->setCustomTokens($tokens);
-
-            if ($email->getContentMode() == 'builder') {
-                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                    'slots'    => $emailSettings[$emailId]['slots'],
-                    'content'  => $email->getContent(),
-                    'email'    => $email,
-                    'template' => $emailSettings[$emailId]['template'],
-                    'idHash'   => $idHash
-                ));
-            } else {
-                $mailer->setBody($email->getCustomHtml());
-            }
-
-            $mailer->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
-            $mailer->setSubject($email->getSubject());
-
-            if ($plaintext = $email->getPlainText()) {
-                $mailer->setPlainText($plaintext);
-            }
-
-            //queue the message
-            $mailer->send(true);
-
-            //save some memory
-            unset($mailer);
+            $mailer->addto($user['email'], $user['firstname'] . ' ' . $user['lastname']);
         }
+
+        //queue the message
+        $mailer->send(true);
+
+        //save some memory
+        unset($mailer);
     }
 
     /**

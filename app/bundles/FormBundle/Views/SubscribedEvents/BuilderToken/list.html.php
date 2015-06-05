@@ -8,34 +8,34 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('MauticLeadBundle:SubscribedEvents\EmailToken:index.html.php');
+    $view->extend('MauticFormBundle:SubscribedEvents\BuilderToken:index.html.php');
 }
 ?>
-<div id="leadEmailTokens">
-    <ul class="list-group">
+<div id="formPageTokens">
+    <div class="list-group ma-5">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="list-group-item" data-token="{leadfield=<?php echo $i['alias']; ?>}">
+            <a href="#" class="list-group-item" data-token="{form=<?php echo $i[0]->getId(); ?>}">
                 <div>
-                    <span><?php echo $i['label']; ?></span>
+                    <span><i class="fa fa-fw fa-list"></i><?php echo $i[0]->getName(); ?></span>
                 </div>
-            </li>
+            </a>
         <?php endforeach; ?>
-    </ul>
+    </div>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"        => count($items),
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_lead_emailtoken_index'),
+        "baseUrl"           => $view['router']->generate('mautic_form_pagetoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
-        'sessionVar'        => 'lead.emailtoken',
+        'sessionVar'        => 'form.pagetoken',
         'ignoreFormExit'    => true,
         'queryString'       => 'tmpl=list',
-        'target'            => '#leadEmailTokens'
+        'target'            => '#formEmailTokens'
     )); ?>
     <?php endif; ?>
 </div>

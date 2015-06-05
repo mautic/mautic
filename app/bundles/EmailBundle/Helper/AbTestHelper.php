@@ -46,8 +46,8 @@ class AbTestHelper
 
                 $parentId = $parent->getId();
                 foreach ($counts as $id => $stats) {
-                    $subject                                                           = ($parentId === $id) ? $parent->getSubject() : $children[$id]->getSubject();
-                    $support['labels'][]                                               = $id . ':' . $subject . ' (' . $stats['readRate'] . '%)';
+                    $name                                                              = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
+                    $support['labels'][]                                               = $name . ' (' . $stats['readRate'] . '%)';
                     $rates[$id]                                                        = $stats['readRate'];
                     $data[$translator->trans('mautic.email.abtest.label.opened')][]    = $stats['readCount'];
                     $data[$translator->trans('mautic.email.abtest.label.sent')][]      = $stats['totalCount'];
@@ -56,7 +56,7 @@ class AbTestHelper
 
                 if (!in_array($parent->getId(), $hasResults)) {
                     //make sure that parent and published children are included
-                    $support['labels'][] = $parent->getId() . ':' . $parent->getSubject() . ' (0%)';
+                    $support['labels'][] = $parent->getName() . ' (0%)';
 
                     $data[$translator->trans('mautic.email.abtest.label.opened')][]    = 0;
                     $data[$translator->trans('mautic.email.abtest.label.sent')][]      = 0;
@@ -66,7 +66,7 @@ class AbTestHelper
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
                             //make sure that parent and published children are included
-                            $support['labels'][]                                               = $c->getId() . ':' . $c->getSubject() . ' (0%)';
+                            $support['labels'][]                                               = $c->getName() . ' (0%)';
                             $data[$translator->trans('mautic.email.abtest.label.opened')][]    = 0;
                             $data[$translator->trans('mautic.email.abtest.label.sent')][]      = 0;
                         }
@@ -152,8 +152,8 @@ class AbTestHelper
 
                     $rates[$id] = $sentCounts[$id] ? round(($count / $sentCounts[$id]) * 100, 2) : 0;
 
-                    $subject             = ($parentId === $id) ? $parent->getSubject() : $children[$id]->getSubject();
-                    $support['labels'][] = $id . ':' . $subject . ' (' . $rates[$id] . '%)';
+                    $name                = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
+                    $support['labels'][] = $name . ' (' . $rates[$id] . '%)';
 
                     $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = $count;
                     $data[$translator->trans('mautic.email.abtest.label.sent')][]              = $sentCounts[$id];
@@ -162,7 +162,7 @@ class AbTestHelper
 
                 if (!in_array($parent->getId(), $hasResults)) {
                     //make sure that parent and published children are included
-                    $support['labels'][] = $parent->getId() . ':' . $parent->getSubject() . ' (0%)';
+                    $support['labels'][] = $parent->getName() . ' (0%)';
 
                     $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = 0;
                     $data[$translator->trans('mautic.email.abtest.label.sent')][]              = 0;
@@ -172,7 +172,7 @@ class AbTestHelper
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
                             //make sure that parent and published children are included
-                            $support['labels'][]                                                       = $c->getId() . ':' . $c->getSubject() . ' (0%)';
+                            $support['labels'][]                                                       = $c->getName() . ' (0%)';
                             $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = 0;
                             $data[$translator->trans('mautic.email.abtest.label.sent')][]              = 0;
                         }

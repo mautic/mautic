@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
-$view['slots']->set("headerTitle", $email->getSubject());
+$view['slots']->set("headerTitle", $email->getName());
 
 $isVariant = $email->isVariant(true);
 
@@ -22,7 +22,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
     ),
     'routeBase'  => 'email',
-    'nameGetter' => 'getSubject',
     'customButtons' => array(
         array(
             'attr' => array(
@@ -52,6 +51,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!-- email detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div><?php echo $email->getSubject(); ?></div>
+                        <div class="text-muted"><?php echo $email->getDescription(); ?></div>
+                    </div>
                     <div class="col-xs-2 text-right">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $email)); ?>
                     </div>
@@ -70,6 +73,30 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></span></td>
                                     <td><?php echo $email->getTemplate(); ?></td>
                                 </tr>
+                                <?php if ($fromName = $email->getFromName()): ?>
+                                <tr>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.from_name'); ?></span></td>
+                                    <td><?php echo $fromName; ?></td>
+                                </tr>
+                                <?php endif; ?>
+                                <?php if ($fromEmail = $email->getFromAddress()): ?>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.from_email'); ?></span></td>
+                                        <td><?php echo $fromEmail; ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if ($replyTo = $email->getReplyToAddress()): ?>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.reply_to_email'); ?></span></td>
+                                        <td><?php echo $replyTo; ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if ($bccAddress = $email->getBccAddress()): ?>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.bcc'); ?></span></td>
+                                        <td><?php echo $bccAddress; ?></td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -167,7 +194,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                                 </div>
                                             <?php endif; ?>
                                             <h5 class="fw-sb text-primary">
-                                                <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getSubject(); ?>
+                                                <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getName(); ?>
                                                     <?php if ($variants['parent']->getId() == $email->getId()) : ?>
                                                         <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                     <?php endif; ?>
@@ -224,13 +251,13 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <div class="col-xs-11">
                                                 <?php if ($isWinner): ?>
                                                     <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.makewinner'); ?>">
-                                                        <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getSubject() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                                        <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getName() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                                                             <i class="fa fa-trophy"></i>
                                                         </a>
                                                     </div>
                                                 <?php endif; ?>
                                                 <h5 class="fw-sb text-primary">
-                                                    <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getSubject(); ?>
+                                                    <a href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getName(); ?>
                                                         <?php if ($variant->getId() == $email->getId()) : ?>
                                                             <span>[<?php echo $view['translator']->trans('mautic.core.current'); ?>]</span>
                                                         <?php endif; ?>

@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -156,6 +157,61 @@ class AjaxController extends CommonAjaxController
 
             $dataArray['progress'] = $progress;
             $dataArray['stats']    = $stats;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Called by parent::getBuilderTokensAction()
+     *
+     * @param $query
+     *
+     * @return array
+     */
+    protected function getBuilderTokens($query)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model  = $this->factory->getModel('email');
+
+        return $model->getBuilderComponents(null, 'tokens', $query);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function generatePlaintTextAction(Request $request)
+    {
+        $dataArray = array();
+        $mode      = $request->request->get('mode');
+        $custom    = $request->request->get('custom');
+        $id        = $request->request->get('id');
+
+        $parser    = new PlainTextHelper(array(
+            'base_url' => $request->getSchemeAndHttpHost() . $request->getBasePath()
+        ));
+
+        if ($mode == 'custom') {
+            $dataArray['text'] = $parser->setHtml($custom)->getText();
+        } else {
+            $session     = $this->factory->getSession();
+            $contentName = 'mautic.emailbuilder.'.$id.'.content';
+
+            $content = $session->get($contentName, array());
+            if (strpos($id, 'new') === false) {
+                $entity          = $this->factory->getModel('email')->getEntity($id);
+                $existingContent = $entity->getContent();
+                $content         = array_merge($existingContent, $content);
+            }
+
+            $parsed = array();
+            foreach ($content as $html) {
+                $parsed[] = $parser->setHtml($html)->getText();
+            }
+
+            $dataArray['text'] = implode("\n\n", $parsed);
         }
 
         return $this->sendJsonResponse($dataArray);

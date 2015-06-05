@@ -144,6 +144,12 @@ class Version20150521000000 extends AbstractMauticMigration
                 )
                 ->execute();
         }
+
+        // Copy subjects as names
+        $q = $this->connection->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'emails')
+            ->set('name', 'subject')
+            ->execute();
     }
 
     /**
@@ -152,6 +158,12 @@ class Version20150521000000 extends AbstractMauticMigration
     public function mysqlUp(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD container_attr VARCHAR(255) DEFAULT NULL, ADD lead_field VARCHAR(255) DEFAULT NULL, ADD save_result TINYINT(1) DEFAULT NULL, CHANGE `label` `label` LONGTEXT NOT NULL, CHANGE default_value default_value LONGTEXT DEFAULT NULL, CHANGE validation_message validation_message LONGTEXT DEFAULT NULL, CHANGE help_message help_message LONGTEXT DEFAULT NULL');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP FOREIGN KEY ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD name VARCHAR(255) DEFAULT NULL, ADD description LONGTEXT DEFAULT NULL, ADD from_address VARCHAR(255) DEFAULT NULL, ADD from_name VARCHAR(255) DEFAULT NULL, ADD reply_to_address VARCHAR(255) DEFAULT NULL, ADD bcc_address VARCHAR(255) DEFAULT NULL, CHANGE subject subject LONGTEXT DEFAULT NULL');
+
     }
 
     /**
@@ -166,6 +178,18 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER default_value TYPE TEXT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER validation_message TYPE TEXT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER help_message TYPE TEXT');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD description TEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_address VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD reply_to_address VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD bcc_address VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER subject TYPE TEXT');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER subject DROP NOT NULL');
     }
 
     /**
@@ -182,5 +206,16 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN validation_message VARCHAR(MAX)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN help_message VARCHAR(MAX)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN properties VARCHAR(MAX)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD name NVARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD description VARCHAR(MAX)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_address NVARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_name NVARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD reply_to_address NVARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD bcc_address NVARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN subject VARCHAR(MAX)');
     }
 }

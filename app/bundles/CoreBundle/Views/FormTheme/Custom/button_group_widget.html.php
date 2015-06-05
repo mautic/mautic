@@ -2,7 +2,7 @@
 //apply attributes to radios
 $attr = $form->vars['attr'];
 ?>
-<div class="btn-group btn-block" data-toggle="buttons">
+<div class="btn-group <?php echo $buttonBlockClass; ?>" data-toggle="buttons">
     <?php foreach ($form as $child): ?>
         <?php $class =
             (!empty($child->vars['checked']) ? ' active' : '') .

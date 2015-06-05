@@ -23,7 +23,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             less: {
-                files: ['<%= mautic.bundleAssets %>/**/*.less'],
+                files: ['<%= mautic.bundleAssets %>/**/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
                 tasks: ['less']
             }
         },
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         // Compiles less files in bundle's Assets/css root and single level directory to CSS
         less: {
             files: {
-                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less'],
+                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
                 expand: true,
                 rename: function (dest, src) {
                     return dest + src.replace('.less', '.css')
