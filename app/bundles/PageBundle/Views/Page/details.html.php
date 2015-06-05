@@ -174,9 +174,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!--/ tabs controls -->
         </div>
 
+        <?php if ($showVariants || $showTranslations): ?>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-
             <?php if ($showVariants): ?>
             <!-- #variants-container -->
             <div class="tab-pane active bdr-w-0" id="variants-container">
@@ -395,6 +395,17 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!--/ #translation-container -->
         </div>
         <!--/ end: tab-content -->
+        <?php elseif ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
+            <div class="pa-md">
+                <div class="text-center" style="height: 100%; width: 100%; background-color: #4e5d9d; opacity: 0.8;">
+                    <h3 style="padding: 30px;">
+                        <a class="create-abtest-link" href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'abtest', 'objectId' => $activePage->getId())); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.page.abtest.create'); ?> <i class="fa fa-angle-right"></i>
+                        </a>
+                    </h3>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
     <!--/ left section -->
 

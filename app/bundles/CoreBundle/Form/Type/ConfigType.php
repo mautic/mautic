@@ -237,7 +237,8 @@ class ConfigType extends AbstractType
                 'class'        => 'form-control',
                 'data-show-on' => $mailerLoginShowConditions,
                 'data-hide-on' => $mailerLoginHideConditions,
-                'tooltip'      => 'mautic.core.config.form.mailer.user.tooltip'
+                'tooltip'      => 'mautic.core.config.form.mailer.user.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -251,7 +252,8 @@ class ConfigType extends AbstractType
                 'preaddon'     => 'fa fa-lock',
                 'data-show-on' => $mailerLoginShowConditions,
                 'data-hide-on' => $mailerLoginHideConditions,
-                'tooltip'      => 'mautic.core.config.form.mailer.password.tooltip'
+                'tooltip'      => 'mautic.core.config.form.mailer.password.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -594,8 +596,9 @@ class ConfigType extends AbstractType
             'label'      => 'mautic.core.config.form.transifex.username',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.config.form.transifex.username.tooltip'
+                'class'        => 'form-control',
+                'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -604,10 +607,11 @@ class ConfigType extends AbstractType
             'label'      => 'mautic.core.config.form.transifex.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'       => 'form-control',
-                'placeholder' => 'mautic.user.user.form.passwordplaceholder',
-                'preaddon'    => 'fa fa-lock',
-                'tooltip'     => 'mautic.core.config.form.transifex.password.tooltip'
+                'class'        => 'form-control',
+                'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
+                'preaddon'     => 'fa fa-lock',
+                'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));

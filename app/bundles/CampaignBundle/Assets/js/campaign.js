@@ -228,10 +228,40 @@ Mautic.launchCampaignEditor = function() {
         // Update the labels on connection/disconnection
         Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
             Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
+
+            info.targetEndpoint.setPaintStyle(
+                {
+                    fillStyle: info.sourceEndpoint.getPaintStyle().fillStyle
+                }
+            );
         });
 
         Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
             Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
+
+            info.targetEndpoint.setPaintStyle(
+                {
+                    fillStyle: "#d5d4d4"
+                }
+            );
+        });
+
+        Mautic.campaignBuilderInstance.bind("connectionMoved", function (info, originalEvent) {
+            Mautic.campaignBuilderUpdateLabel(info.connection.originalTargetId);
+
+            info.originalTargetEndpoint.setPaintStyle(
+                {
+                    fillStyle: "#d5d4d4"
+                }
+            );
+
+            Mautic.campaignBuilderUpdateLabel(info.connection.newTargetId);
+
+            info.newTargetEndpoint.setPaintStyle(
+                {
+                    fillStyle: info.newSourceEndpoint.getPaintStyle().fillStyle
+                }
+            );
         });
 
         var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];

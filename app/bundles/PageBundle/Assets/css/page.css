@@ -7,3 +7,11 @@
 .page-builder .builder-panel .panel-body {
     padding: 5px 0;
 }
+
+.create-abtest-link, .create-abtest-link:hover {
+    color: #fff;
+}
+
+.create-abtest-link:hover {
+    text-decoration: underline;
+}

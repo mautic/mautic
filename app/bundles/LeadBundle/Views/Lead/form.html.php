@@ -15,6 +15,7 @@ $view['slots']->set('headerTitle', $header);
 $view['slots']->set('mauticContent', 'lead');
 
 $groups = array_keys($fields);
+sort($groups);
 ?>
     <!-- start: box layout -->
     <div class="box-layout">
@@ -36,8 +37,9 @@ $groups = array_keys($fields);
 
                                         $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
                                         ?>
-                                        <span class="label label-default"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></span>
-                                        <?php echo $view['translator']->trans('mautic.lead.points'); ?>
+                                        <span class="label label-default"<?php echo $style; ?>>
+                                            <?php echo $view['translator']->transChoice('mautic.lead.points.count', $lead->getPoints(), array('%points%' => $lead->getPoints())); ?>
+                                        </span>
                                     </span>
                                 </p>
                             </div>
