@@ -25,7 +25,7 @@ class PublicController extends CommonFormController
     public function submitAction()
     {
         if ($this->request->getMethod() !== 'POST') {
-           // return $this->accessDenied();
+            return $this->accessDenied();
         }
 
         $post   = $this->request->request->get('mauticform');
