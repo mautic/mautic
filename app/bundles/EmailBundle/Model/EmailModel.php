@@ -69,6 +69,12 @@ class EmailModel extends FormModel
     {
         $now = new \DateTime();
 
+        $type = $entity->getEmailType();
+        if (empty($type)) {
+            // Just in case JS failed
+            $entity->setEmailType('template');
+        }
+
         //set the author for new pages
         if (!$entity->isNew()) {
             //increase the revision

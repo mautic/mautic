@@ -474,7 +474,7 @@ class EmailController extends FormController
                     } else {
                         $entity->setCustomHtml($content);
                     }
-
+                    
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
