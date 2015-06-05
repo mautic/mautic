@@ -538,11 +538,11 @@ class ListModel extends FormModel
     /**
      * Add lead to lists
      *
-     * @param      $lead
-     * @param      $lists
-     * @param bool $manuallyAdded
-     * @param bool $batchProcess
-     * @param int  $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
+     * @param array|Lead        $lead
+     * @param array|LeadList    $lists
+     * @param bool              $manuallyAdded
+     * @param bool              $batchProcess
+     * @param int               $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
      *
      * @throws \Doctrine\ORM\ORMException
      */
