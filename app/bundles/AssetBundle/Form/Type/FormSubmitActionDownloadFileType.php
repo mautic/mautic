@@ -40,15 +40,6 @@ class FormSubmitActionDownloadFileType extends AbstractType
                 'tooltip' => 'mautic.asset.form.submit.assets_descr'
             )
         ));
-
-        $builder->add('message', 'textarea', array(
-            'label'         => 'mautic.asset.form.submit.message',
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control editor-basic',
-                'tooltip' => 'mautic.asset.form.submit.message_descr'
-            )
-        ));
     }
 
     /**

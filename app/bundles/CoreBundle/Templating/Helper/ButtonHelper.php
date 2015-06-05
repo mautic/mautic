@@ -111,6 +111,10 @@ class ButtonHelper extends Helper
                 $c['attr'] = array();
             }
 
+            if (isset($c['btnClass'])) {
+                $c['attr']['class'] = $c['btnClass'];
+            }
+
             if(($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0)) && !isset($c['attr']['class'])) {
                 $c['attr']['class'] = 'btn btn-default';
             }

@@ -5,7 +5,7 @@ mQuery(document).ready( function() {
         var content_id = mQuery(this).attr('id');
         var that       = this;
         CKEDITOR.inline(content_id, {
-            extraPlugins: 'tokens',
+            extraPlugins: 'tokens,sourcedialog',
             toolbar: 'advanced',
             // Inline mode seems to ignore this but leaving anyway
             allowedContent: true,

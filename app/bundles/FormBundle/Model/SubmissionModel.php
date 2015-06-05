@@ -73,6 +73,7 @@ class SubmissionModel extends CommonFormModel
         $results          = array();
         $tokens           = array();
         $leadFieldMatches = array();
+        $validationErrors = array();
 
         foreach ($fields as $f) {
             $id    = $f->getId();
@@ -94,11 +95,7 @@ class SubmissionModel extends CommonFormModel
                 if (!empty($captcha)) {
                     $props = $f->getProperties();
                     //check for a custom message
-                    if (!empty($props['errorMessage'])) {
-                        $errors[] = $props['errorMessage'];
-                    } else {
-                        $errors = array_merge($errors, $captcha);
-                    }
+                    $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
             }
@@ -112,7 +109,9 @@ class SubmissionModel extends CommonFormModel
                     ), 'validators');
                 }
 
-                return array('errors' => array($msg));
+                $validationErrors[$alias] = $msg;
+
+                continue;
             }
 
             //clean and validate the input
@@ -135,19 +134,19 @@ class SubmissionModel extends CommonFormModel
 
                 if (isset($params['valueConstraints']) && is_callable($params['valueConstraints'])) {
                     $customErrors = call_user_func_array($params['valueConstraints'], array($f, $value));
-                    if (is_array($customErrors)) {
-                        $errors = array_merge($errors, $customErrors);
-                    } else {
-                        $errors[] = $customErrors;
+                    if (!empty($customErrors)) {
+                        $validationErrors[$alias] = is_array($customErrors) ? implode('<br />', $customErrors) : $customErrors;
                     }
                 }
 
-            } else {
-                if (!empty($value)) {
-                    $filter = $fieldHelper->getFieldFilter($type);
-                    $value  = InputHelper::_($value, $filter);
+            } elseif (!empty($value)) {
+                $filter = $fieldHelper->getFieldFilter($type);
+                $value  = InputHelper::_($value, $filter);
+
+                $validation = $fieldHelper->validateFieldValue($type, $value);
+                if (!empty($validation)) {
+                    $validationErrors[$alias] = is_array($validation) ? implode('<br />', $validation) : $validation;
                 }
-                $errors = array_merge($errors, $fieldHelper->validateFieldValue($type, $value));
             }
 
             //convert array from checkbox groups and multiple selects
@@ -221,15 +220,15 @@ class SubmissionModel extends CommonFormModel
                     }
                     list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
                     if (!$validated) {
-                        $errors[] = $validatedMessage;
+                        $validationErrors[$alias] = $validatedMessage;
                     }
                 }
             }
         }
 
         //return errors
-        if (!empty($errors)) {
-            return array('errors' => $errors);
+        if (!empty($validationErrors)) {
+            return array('errors' => $validationErrors);
         }
 
         //set the landing page the form was submitted from if applicable

@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,12 +30,12 @@ class AjaxController extends CommonAjaxController
      */
     protected function setBuilderContentAction(Request $request)
     {
-        $dataArray  = array('success' => 0);
-        $entityId   = InputHelper::clean($request->request->get('entity'));
-        $session    = $this->factory->getSession();
+        $dataArray = array('success' => 0);
+        $entityId  = InputHelper::clean($request->request->get('entity'));
+        $session   = $this->factory->getSession();
 
         if (!empty($entityId)) {
-            $sessionVar = 'mautic.emailbuilder.' . $entityId . '.content';
+            $sessionVar = 'mautic.emailbuilder.'.$entityId.'.content';
 
             // Check for an array of slots
             $slots   = InputHelper::_($request->request->get('slots', array(), true), 'html');
@@ -79,13 +80,13 @@ class AjaxController extends CommonAjaxController
             'success' => 0,
             'html'    => ''
         );
-        $type   = InputHelper::clean($request->request->get('abKey'));
-        $emailId = InputHelper::int($request->request->get('emailId'));
+        $type      = InputHelper::clean($request->request->get('abKey'));
+        $emailId   = InputHelper::int($request->request->get('emailId'));
 
         if (!empty($type)) {
             //get the HTML for the form
             /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-            $model   = $this->factory->getModel('email');
+            $model = $this->factory->getModel('email');
 
             $email = $model->getEntity($emailId);
 
@@ -97,21 +98,32 @@ class AjaxController extends CommonAjaxController
                 $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
                 if (!empty($formType)) {
                     $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : array();
-                    $form        = $this->get('form.factory')->create('email_abtest_settings', array(), array('formType' => $formType, 'formTypeOptions' => $formOptions));
-                    $html        = $this->renderView('MauticEmailBundle:AbTest:form.html.php', array(
-                        'form' => $this->setFormTheme($form, 'MauticEmailBundle:AbTest:form.html.php', 'MauticEmailBundle:FormTheme\Email')
-                    ));
+                    $form        = $this->get('form.factory')->create(
+                        'email_abtest_settings',
+                        array(),
+                        array('formType' => $formType, 'formTypeOptions' => $formOptions)
+                    );
+                    $html        = $this->renderView(
+                        'MauticEmailBundle:AbTest:form.html.php',
+                        array(
+                            'form' => $this->setFormTheme($form, 'MauticEmailBundle:AbTest:form.html.php', 'MauticEmailBundle:FormTheme\Email')
+                        )
+                    );
                 }
 
-                $html = str_replace(array(
-                    'email_abtest_settings[',
-                    'email_abtest_settings_',
-                    'email_abtest_settings'
-                ), array(
-                    'emailform[variantSettings][',
-                    'emailform_variantSettings_',
-                    'emailform'
-                ), $html);
+                $html                 = str_replace(
+                    array(
+                        'email_abtest_settings[',
+                        'email_abtest_settings_',
+                        'email_abtest_settings'
+                    ),
+                    array(
+                        'emailform[variantSettings][',
+                        'emailform_variantSettings_',
+                        'emailform'
+                    ),
+                    $html
+                );
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;
             }
@@ -120,6 +132,11 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function sendBatchAction(Request $request)
     {
         $dataArray = array('success' => 0);
@@ -140,8 +157,8 @@ class AjaxController extends CommonAjaxController
                 $session->set('mautic.email.send.active', true);
                 list($batchSentCount, $batchFailedCount, $batchFailedRecipients) = $model->sendEmailToLists($entity, null, $limit);
 
-                $progress[0]     += ($batchSentCount + $batchFailedCount);
-                $stats['sent']   += $batchSentCount;
+                $progress[0] += ($batchSentCount + $batchFailedCount);
+                $stats['sent'] += $batchSentCount;
                 $stats['failed'] += $batchFailedCount;
 
                 foreach ($batchFailedRecipients as $list => $emails) {
@@ -172,9 +189,9 @@ class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model  = $this->factory->getModel('email');
+        $model = $this->factory->getModel('email');
 
-        return $model->getBuilderComponents(null, 'tokens', $query);
+        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
     }
 
     /**
@@ -189,11 +206,16 @@ class AjaxController extends CommonAjaxController
         $custom    = $request->request->get('custom');
         $id        = $request->request->get('id');
 
-        $parser    = new PlainTextHelper(array(
-            'base_url' => $request->getSchemeAndHttpHost() . $request->getBasePath()
-        ));
+        $parser = new PlainTextHelper(
+            array(
+                'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath()
+            )
+        );
 
         if ($mode == 'custom') {
+            // Convert placeholders into raw tokens
+            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
+
             $dataArray['text'] = $parser->setHtml($custom)->getText();
         } else {
             $session     = $this->factory->getSession();
@@ -206,6 +228,9 @@ class AjaxController extends CommonAjaxController
                 $content         = array_merge($existingContent, $content);
             }
 
+            // Convert placeholders into raw tokens
+            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
+
             $parsed = array();
             foreach ($content as $html) {
                 $parsed[] = $parser->setHtml($html)->getText();
@@ -215,5 +240,41 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateStatsChartAction(Request $request)
+    {
+        $emailId   = InputHelper::int($request->request->get('emailId'));
+        $amount    = InputHelper::int($request->request->get('amount'));
+        $unit      = InputHelper::clean($request->request->get('unit'));
+        $dataArray = array('success' => 0);
+
+        $dataArray['stats']   = $this->factory->getModel('email')->getEmailGeneralStats($emailId, $amount, $unit);
+        $dataArray['success'] = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getAttachmentsSizeAction(Request $request)
+    {
+        $assets = $request->get('assets', array(), true);
+        $size   = 0;
+        if ($assets) {
+            /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
+            $assetModel = $this->factory->getModel('asset');
+            $size       = $assetModel->getTotalFilesize($assets);
+        }
+
+        return $this->sendJsonResponse(array('size' => $size));
     }
 }

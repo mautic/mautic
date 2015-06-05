@@ -17,6 +17,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateR
  */
 class TemplateReference extends BaseTemplateReference
 {
+    /**
+     * @var
+     */
+    protected $themeOverride;
 
     /**
      * @var MauticFactory
@@ -34,11 +38,31 @@ class TemplateReference extends BaseTemplateReference
     }
 
     /**
+     * Set a template specific theme override
+     *
+     * @param $theme
+     */
+    public function setThemeOverride($theme)
+    {
+        $this->themeOverride = $theme;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPath()
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
+
+        if (!empty($this->themeOverride)) {
+            try {
+                $theme    = $this->factory->getTheme($this->themeOverride);
+                $themeDir = $theme->getThemePath();
+            } catch (\Exception $e) {}
+        } else {
+            $theme    = $this->factory->getTheme();
+            $themeDir = $theme->getThemePath();
+        }
 
         $fileName = $this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
         $path     = (empty($controller) ? '' : $controller.'/').$fileName;
@@ -50,13 +74,12 @@ class TemplateReference extends BaseTemplateReference
             // Check for a system-wide override
             $themePath      = $this->factory->getSystemPath('themes', true);
             $systemTemplate = $themePath.'/system/'.$this->parameters['bundle'].'/'.$path;
+
             if (file_exists($systemTemplate)) {
                 $template = $systemTemplate;
             } else {
-                $theme = $this->factory->getTheme();
                 //check for an override and load it if there is
-                $themeDir = $theme->getThemePath();
-                if (file_exists($themeDir.'/html/'.$this->parameters['bundle'].'/'.$path)) {
+                if (!empty($themeDir) && file_exists($themeDir.'/html/'.$this->parameters['bundle'].'/'.$path)) {
                     // Theme override
                     $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {

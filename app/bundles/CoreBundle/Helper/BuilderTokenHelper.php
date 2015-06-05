@@ -45,7 +45,7 @@ class BuilderTokenHelper
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
         $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
-        $this->permissionSet =  array(
+        $this->permissionSet = array(
             $this->viewPermissionBase.':viewown',
             $this->viewPermissionBase.':viewother'
         );
@@ -63,7 +63,7 @@ class BuilderTokenHelper
         if (is_array($page)) {
             // Laziness
             $entityArguments = $page;
-            $page            = 1 ;
+            $page            = 1;
         }
 
         //set some permissions
@@ -102,17 +102,20 @@ class BuilderTokenHelper
         $filter          = array('string' => $search);
         $filter['force'] = (isset($entityArguments['filter']['force'])) ? $entityArguments['filter']['force'] : array();
 
-        if (isset($permissions[$this->viewPermissionBase . ':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $filter['force'][] = array('column' => $prefix.'createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $entityArguments['filter'] = $filter;
 
-        $entityArguments = array_merge(array(
-            'start'            => $start,
-            'limit'            => $limit,
-            'orderByDir'       => 'DESC'
-        ), $entityArguments);
+        $entityArguments = array_merge(
+            array(
+                'start'      => $start,
+                'limit'      => $limit,
+                'orderByDir' => 'DESC'
+            ),
+            $entityArguments
+        );
 
         $items = $model->getEntities($entityArguments);
         $count = count($items);
@@ -129,28 +132,37 @@ class BuilderTokenHelper
 
         return $this->factory->getTemplating()->render(
             $this->bundleName.':SubscribedEvents\BuilderToken:list.html.php',
-            array_merge($viewParameters, array(
-                'items'       => $items,
-                'page'        => $page,
-                'limit'       => $limit,
-                'totalCount'  => $count,
-                'tmpl'        => $request->get('tmpl', 'index'),
-                'searchValue' => $search
-            ))
+            array_merge(
+                $viewParameters,
+                array(
+                    'items'       => $items,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'totalCount'  => $count,
+                    'tmpl'        => $request->get('tmpl', 'index'),
+                    'searchValue' => $search
+                )
+            )
         );
     }
 
     /**
-     * @param string              $tokenRegex  Token regex without wrapping regex escape characters.  Use (id) or (.*?) where the ID of the
-     *                                         entity should go. i.e. {pagelink=(id)}
-     * @param string              $filter      String to filter results by
-     * @param string              $labelColumn The column that houses the label
-     * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
+     * @param string              $tokenRegex     Token regex without wrapping regex escape characters.  Use (value) or (.*?) where the ID of the
+     *                                            entity should go. i.e. {pagelink=(value)}
+     * @param string              $filter         String to filter results by
+     * @param string              $labelColumn    The column that houses the label
+     * @param string              $valueColumn    The column that houses the value
+     * @param CompositeExpression $expr           Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
      * @return array|void
      */
-    public function getTokens($tokenRegex, $filter = '', $labelColumn = 'name', CompositeExpression $expr = null)
-    {
+    public function getTokens(
+        $tokenRegex,
+        $filter = '',
+        $labelColumn = 'name',
+        $valueColumn = 'id',
+        CompositeExpression $expr = null
+    ) {
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             $this->permissionSet,
@@ -172,7 +184,7 @@ class BuilderTokenHelper
             $expr = $exprBuilder->andX();
         }
 
-        if (isset($permissions[$this->viewPermissionBase . ':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr->add(
                 $exprBuilder->eq($prefix.'createdBy', $this->factory->getUser()->getId())
             );
@@ -180,21 +192,21 @@ class BuilderTokenHelper
 
         if (!empty($filter)) {
             $expr->add(
-                $exprBuilder->like('LOWER(' . $labelColumn . ')', ':label')
+                $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 
             $parameters = array(
-                'label' => strtolower($filter) . '%'
+                'label' => strtolower($filter).'%'
             );
         } else {
             $parameters = array();
         }
 
-        $items = $repo->getSimpleList($expr, $parameters, $labelColumn);
+        $items = $repo->getSimpleList($expr, $parameters, $labelColumn, $valueColumn);
 
         $tokens = array();
         foreach ($items as $item) {
-            $token          = str_replace(array('(id)', '(.*?)'), $item['id'], $tokenRegex);
+            $token          = str_replace(array('(value)', '(.*?)'), $item['value'], $tokenRegex);
             $tokens[$token] = $item['label'];
         }
 
@@ -209,5 +221,59 @@ class BuilderTokenHelper
     public function setPermissionSet(array $permissions)
     {
         $this->permissionSet = $permissions;
+    }
+
+    /**
+     * @param $content
+     */
+    static public function replaceVisualPlaceholdersWithTokens(&$content)
+    {
+        if (is_array($content)) {
+            foreach ($content as &$slot) {
+                self::replaceVisualPlaceholdersWithTokens($slot);
+            }
+        } else {
+            $content = preg_replace('/'.self::getVisualTokenHtml(null, null, true).'/smi', '$1', $content);
+        }
+    }
+
+    /**
+     * @param $tokens
+     * @param $content
+     */
+    static public function replaceTokensWithVisualPlaceholders($tokens, &$content)
+    {
+        if (is_array($content)) {
+            foreach ($content as &$slot) {
+                self::replaceTokensWithVisualPlaceholders($tokens, $slot);
+            }
+        } else {
+            if (isset($tokens['visualTokens'])) {
+                $search = $replace = array();
+                foreach ($tokens['visualTokens'] as $token) {
+                    $search[]  = $token;
+                    $replace[] = self::getVisualTokenHtml($token, $tokens['tokens'][$token]);
+                }
+
+                $content = str_ireplace($search, $replace, $content);
+            }
+        }
+    }
+
+    /**
+     * @param $token
+     * @param $description
+     * @param $forPregReplace
+     *
+     * @return string
+     */
+    static public function getVisualTokenHtml($token, $description, $forPregReplace = false)
+    {
+        if ($forPregReplace) {
+            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('"><em>**', '/')
+            .'(.*?)'.preg_quote('**</em></strong>', '/');
+        }
+
+        return '<strong contenteditable="false" data-token="'.$token.'"><em>**'.$description.'**</em></strong>';
     }
 }

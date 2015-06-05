@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\CategoryEvents;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CategoryModel
@@ -124,7 +125,7 @@ class CategoryModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(array('Category'));
@@ -144,7 +145,7 @@ class CategoryModel extends FormModel
                 $name = CategoryEvents::CATEGORY_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -156,7 +157,7 @@ class CategoryModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 

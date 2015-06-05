@@ -69,27 +69,28 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the events to the event array
         foreach ($stats as $stat) {
-            // Email Sent
-            if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
+            if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead, true)) {
                 $event->addEvent(array(
-                    'event'           => $eventTypeKeySent,
-                    'eventLabel'      => $eventTypeNameSent,
-                    'timestamp'       => $stat['dateSent'],
-                    'extra'           => array(
-                        'stats' => $stat
+                    'event'     => $eventTypeKeyRead,
+                    'eventLabel' => $eventTypeNameRead,
+                    'timestamp' => $stat['dateRead'],
+                    'extra'     => array(
+                        'stats' => $stat,
+                        'type'  => 'read'
                     ),
                     'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
                 ));
             }
 
             // Email read
-            if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead)) {
+            if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
                 $event->addEvent(array(
-                    'event'     => $eventTypeKeyRead,
-                    'eventLabel' => $eventTypeNameRead,
-                    'timestamp' => $stat['dateRead'],
-                    'extra'     => array(
-                        'stats' => $stat
+                    'event'           => $eventTypeKeySent,
+                    'eventLabel'      => $eventTypeNameSent,
+                    'timestamp'       => $stat['dateSent'],
+                    'extra'           => array(
+                        'stats' => $stat,
+                        'type'  => 'sent'
                     ),
                     'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
                 ));

@@ -160,19 +160,6 @@ class EventModel extends CommonFormModel
             return false;
         }
 
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
-            //let's prevent some unnecessary DB calls
-            $session         = $this->factory->getSession();
-            $triggeredEvents = $session->get('mautic.triggered.campaign.events', array());
-            if (in_array($typeId, $triggeredEvents)) {
-                $logger->debug('CAMPAIGN: '.$typeId.' has already been processed.');
-
-                return false;
-            }
-            $triggeredEvents[] = $typeId;
-            $session->set('mautic.triggered.campaign.events', $triggeredEvents);
-        }
-
         //get the current lead
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');

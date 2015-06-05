@@ -97,22 +97,19 @@ class EmailRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticEmailBundle:Email', 'e', 'e.id')
-            ->leftJoin('e.category', 'c')
-            ->leftJoin('e.lists', 'l');
+            ->from('MauticEmailBundle:Email', 'e', 'e.id');
 
-        $this->buildClauses($q, $args);
+        if (empty($args['iterator_mode'])) {
+            $q->leftJoin('e.category', 'c');
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+            if (!isset($args['email_type']) || $args['email_type'] == 'list') {
+                $q->leftJoin('e.lists', 'l');
+            }
         }
 
-        $results = new Paginator($query);
+        $args['qb'] = $q;
 
-        return $results;
+        return parent::getEntities($args);
     }
 
     /**
@@ -225,7 +222,7 @@ class EmailRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false)
+    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false, $emailType = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
@@ -242,6 +239,12 @@ class EmailRepository extends CommonRepository
 
         if ($topLevelOnly) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
+        }
+
+        if (!empty($emailType)) {
+            $q->andWhere(
+                $q->expr()->eq('e.emailType', $q->expr()->literal($emailType))
+            );
         }
 
         $q->orderBy('e.name');

@@ -671,6 +671,23 @@ class LeadRepository extends CommonRepository
                     $expr = $q->expr()->eq('ll.leadlist_id', 0);
                 }
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ip'):
+                // search by IP
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('lip.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip')
+                    ->join('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'ip', 'lip.ip_id = ip.id')
+                    ->where(
+                        $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
+                    )
+                    ->setParameter($unique, $string);
+                $results = $sq->execute()->fetchAll();
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                $expr = $q->expr()->in('l.id', $leadIds);
+                break;
         }
 
         $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -699,7 +716,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.core.searchcommand.email',
-            'mautic.lead.lead.searchcommand.owner'
+            'mautic.lead.lead.searchcommand.owner',
+            'mautic.core.searchcommand.ip'
         );
     }
 

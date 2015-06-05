@@ -256,7 +256,7 @@ class PlainTextHelper
             $this->convert();
         }
 
-        return $this->text;
+        return trim($this->text);
     }
 
     protected function convert()

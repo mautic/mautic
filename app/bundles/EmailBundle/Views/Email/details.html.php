@@ -11,9 +11,35 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getName());
 
-$isVariant = $email->isVariant(true);
+$isVariant    = $email->isVariant(true);
+$showVariants = count($variants['children']);
+$emailType    = $email->getEmailType();
+$sentCount    = $email->getSentCount();
 
-$edit = $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
+$edit = ($emailType == 'template' || empty($sentCount)) && $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
+
+$customButtons = array();
+
+if ($emailType == 'list') {
+    $customButtons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajax',
+            'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $email->getId())),
+        ),
+        'iconClass' => 'fa fa-send-o',
+        'btnText'   => 'mautic.email.send'
+    );
+}
+
+$customButtons[] = array(
+    'attr' => array(
+        'data-toggle' => 'ajax',
+        'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'example', 'objectId' => $email->getId())),
+    ),
+    'iconClass' => 'fa fa-send',
+    'btnText'   => 'mautic.email.send.example'
+);
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(
@@ -22,24 +48,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
     ),
     'routeBase'  => 'email',
-    'customButtons' => array(
-        array(
-            'attr' => array(
-                'data-toggle' => 'ajax',
-                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $email->getId())),
-            ),
-            'iconClass' => 'fa fa-send-o',
-            'btnText'   => 'mautic.email.send'
-        ),
-        array(
-            'attr' => array(
-                'data-toggle' => 'ajax',
-                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'example', 'objectId' => $email->getId())),
-            ),
-            'iconClass' => 'fa fa-send',
-            'btnText'   => 'mautic.email.send.example'
-        )
-    )
+    'customButtons' => $customButtons
 )));
 ?>
 
@@ -114,41 +123,68 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <!--/ email detail collapseable toggler -->
 
-            <!--
-            some stats: need more input on what type of form data to show.
-            delete if it is not require
-            -->
-            <div class="pa-md">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="panel">
-                            <div class="panel-body box-layout">
-                                <div class="col-xs-4 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-download"></span>
-                                        <?php echo $view['translator']->trans('mautic.email.lead.list.comparison'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-8 va-m" id="legend"></div>
-                            </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
-                                <div>
-                                    <canvas id="list-compare-chart" height="300"></canvas>
-                                </div>
-                            </div>
-                            <div id="list-compare-chart-data" class="hide"><?php echo json_encode($stats); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--/ some stats -->
+           <?php echo $view->render('MauticEmailBundle:Email:' . $emailType . '_graph.html.php',
+               array(
+                   'stats' => $stats,
+                   'email' => $email
+               )
+           ); ?>
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.click_tracks'); ?>
+                    </a>
+                </li>
+                <?php if ($showVariants): ?>
+                <li>
+                    <a href="#variants-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.variants'); ?>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+            <!--/ tabs controls -->
         </div>
 
-        <?php if (count($variants['children'])): ?>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
+            <div class="tab-pane active bdr-w-0" id="clicks-container">
+                <?php if (!empty($trackableLinks)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered click-list">
+                        <thead>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.page.url'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_count'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_unique_count'); ?></td>
+                                <td><?php echo $view['translator']->trans('mautic.email.click_track_id'); ?></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($trackableLinks as $link): ?>
+                            <tr>
+                                <td><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
+                                <td class="text-center"><?php echo $link['hits']; ?></td>
+                                <td class="text-center"><?php echo $link['unique_hits']; ?></td>
+                                <td><?php echo $link['redirect_id']; ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php else: ?>
+                    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array(
+                        'header'  => 'mautic.email.click_tracks.header_none',
+                        'message' => 'mautic.email.click_tracks.none'
+                    )); ?>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($showVariants): ?>
             <!-- #variants-container -->
-            <div class="tab-pane active bdr-w-0" id="variants-container">
+            <div class="tab-pane bdr-w-0" id="variants-container">
                 <!-- header -->
                 <?php if ($variants['parent']->getVariantStartDate() != null): ?>
                     <div class="box-layout mb-lg">
@@ -181,7 +217,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                                     'item'  => $variants['parent'],
                                                     'model' => 'email',
                                                     'size'  => '',
-                                                    'query' => 'size='
+                                                    'query' => 'size=',
+                                                    'disableToggle' => ($emailType == 'list')
                                                 )); ?>
                                             </h3>
                                         </div>
@@ -284,9 +321,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 </ul>
                 <!--/ end: variants list -->
             </div>
-        <!--/ #variants-container -->
+            <!--/ #variants-container -->
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
     <!--/ left section -->
 
@@ -309,33 +346,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 </div>
             </div>
         </div>
-        <!--/ preview URL -->
-
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-            <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
-                echo $stats['datasets'][0]['data'][0] . '/' . $stats['datasets'][0]['data'][3]; ?>)</div>
-            </div>
-            <div class="panel-body pt-xs">
-                <ul class="fa-ul">
-                    <?php
-                    $lists = $email->getLists();
-                    foreach ($lists as $l):
-                    ?>
-                    <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
-                            $stats['datasets'][$l->getId()]['data'][0] . '/' . $stats['datasets'][$l->getId()]['data'][3] : '0/0/0'); ?>)</li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </div>
-
-        <hr class="hr-w-2" style="width:50%">
 
         <!-- activity feed -->
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
-    <input id="itemId" type="hidden" value="<?php echo $email->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $email->getId(); ?>" />
 </div>
 <!--/ end: box layout -->
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
