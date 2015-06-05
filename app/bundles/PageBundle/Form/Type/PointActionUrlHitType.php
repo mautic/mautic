@@ -60,7 +60,7 @@ class PointActionUrlHitType extends AbstractType
 
         $formModifier = function (FormInterface $form, $data) use ($builder) {
 
-            $unit = (isset($data['accumulative_time_unit'])) ? $data['accumulative_time_unit'] : 'i';
+            $unit = (isset($data['accumulative_time_unit'])) ? $data['accumulative_time_unit'] : 'H';
             $form->add('accumulative_time_unit', 'hidden', array(
                 'data' => $unit
             ));
