@@ -99,37 +99,14 @@
         // Reposition events
         <?php
         if (!empty($canvasSettings)):
-        if (!empty($canvasSettings['sources'])):
-        foreach ($canvasSettings['sources'] as $source):
+
+        $sourceFound = false;
+
+        foreach ($canvasSettings['nodes'] as $n):
+
+        if (isset($campaignSources[$n['id']]))
+            $sourceFound = true;
         ?>
-
-        mQuery('#CampaignSource_<?php echo $source['type']; ?>').css({
-            position: 'absolute',
-            left:     '<?php echo $source['positionX']; ?>px',
-            top:      '<?php echo $source['positionY']; ?>px'
-        });
-
-        <?php
-        endforeach;
-        elseif (!empty($campaignSources)):
-        $topOffset = 25;
-
-        foreach ($campaignSources as $type => $source):
-        ?>
-
-        mQuery('#CampaignSource_<?php echo $type; ?>').css({
-            position: 'absolute',
-            left:     '20px',
-            top:      '<?php echo $topOffset; ?>px'
-        });
-        <?php
-        $topOffset += 45;
-        endforeach;
-        endif;
-        ?>
-
-        <?php foreach ($canvasSettings['nodes'] as $n): ?>
-
         mQuery('#CampaignEvent_<?php echo $n['id']; ?>').css({
             position: 'absolute',
             left:     '<?php echo $n['positionX']; ?>px',
@@ -168,8 +145,25 @@
         <?php foreach ($canvasSettings['connections'] as $connection): ?>
 
         Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
-        <?php endforeach; ?>
-        <?php endif; ?>
+        <?php
+        endforeach;
 
+        if (!$sourceFound):
+        $topOffset = 25;
+        foreach ($campaignSources as $type => $source):
+        ?>
+
+        mQuery('#CampaignEvent_<?php echo $type; ?>').css({
+            position: 'absolute',
+            left:     '20px',
+            top:      '<?php echo $topOffset; ?>px'
+        });
+        <?php
+        $topOffset += 45;
+        endforeach;
+        endif;
+
+        endif;
+        ?>
     };
 </script>

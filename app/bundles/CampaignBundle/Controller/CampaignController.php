@@ -492,7 +492,7 @@ class CampaignController extends FormController
                         $model->setLeadSources($entity, $addedSources, $deletedSources);
 
                         $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
-                        $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents);
+                        $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
@@ -696,7 +696,7 @@ class CampaignController extends FormController
                         //set events and connections
                         $connections = $session->get('mautic.campaign.'.$objectId.'.events.canvassettings');
                         if ($connections != null) {
-                            $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents);
+                            $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
 
                             //form is valid so process the data
                             $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());

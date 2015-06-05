@@ -9,7 +9,7 @@
 
 ?>
 <?php if (empty($update)): ?>
-<div id="CampaignSource_<?php echo $sourceType; ?>" class="draggable list-campaign-source list-campaign-leadsource">
+<div id="CampaignEvent_<?php echo $sourceType; ?>" class="draggable list-campaign-source list-campaign-leadsource">
 <?php endif; ?>
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-<?php echo ($sourceType == 'lists') ? 'list': 'pencil-square-o'; ?>"></i><?php echo $names; ?></span></div>
@@ -19,7 +19,7 @@
         <a data-toggle="ajaxmodal" data-target="#CampaignEventModal" href="<?php echo $view['router']->generate('mautic_campaignsource_action', array('objectAction' => 'edit', 'objectId' => $campaignId, 'sourceType' => $sourceType)); ?>" class="btn btn-primary btn-xs btn-edit">
             <i class="fa fa-pencil"></i>
         </a>
-        <a data-toggle="ajax" data-target="CampaignSource_<?php echo $sourceType; ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate('mautic_campaignsource_action', array('objectAction' => 'delete', 'objectId' => $campaignId, 'sourceType' => $sourceType)); ?>"  class="btn btn-delete btn-danger btn-xs">
+        <a data-toggle="ajax" data-target="CampaignEvent_<?php echo $sourceType; ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate('mautic_campaignsource_action', array('objectAction' => 'delete', 'objectId' => $campaignId, 'sourceType' => $sourceType)); ?>"  class="btn btn-delete btn-danger btn-xs">
             <i class="fa fa-times"></i>
         </a>
     </div>

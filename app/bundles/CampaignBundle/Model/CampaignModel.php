@@ -225,9 +225,11 @@ class CampaignModel extends CommonFormModel
                 $source = $connection['sourceId'];
                 $target = $connection['targetId'];
 
-                if (!empty($connection['anchors'])) {
-                    $sourceDecision = $connection['anchors'][0]['endpoint'];
-                    //list($targetDecision, $ignore) = explode(' ', $connection['anchors'][1]);
+                $sourceDecision = (!empty($connection['anchors'])) ? $connection['anchors'][0]['endpoint'] : null;
+
+                if ($sourceDecision == 'leadsource') {
+                    // Lead source connection that does not matter
+                    continue;
                 }
 
                 $relationships[$target] = array(
@@ -287,8 +289,12 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $entity
-     * @param $settings
+     * @param      $entity
+     * @param      $settings
+     * @param bool $persist
+     * @param null $events
+     *
+     * @return mixed
      */
     public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
     {
