@@ -1,4 +1,4 @@
-<div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
+<div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
     <?php if (!isset($header)) $header = 'mautic.core.noresults.header'; ?>
     <h4><?php echo $view['translator']->trans($header); ?></h4>
     <?php if (!isset($message)) $message = 'mautic.core.noresults'; ?>
