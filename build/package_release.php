@@ -14,6 +14,10 @@
 
 $baseDir = __DIR__;
 
+// Check if the version is in a branch or tag
+$args            = getopt('b');
+$versionLocation = (isset($args['b'])) ? ' ' : ' tags/';
+
 // We need the version number so get the app kernel
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/app/AppKernel.php';
@@ -54,7 +58,7 @@ $tags = explode("\n", trim(ob_get_clean()));
 // Get the list of modified files from the initial tag
 // TODO - Hardcode this to the 1.0.0 tag when we're there
 ob_start();
-passthru($systemGit . ' diff tags/' . $tags[0] . ' tags/' . $version . ' --name-status', $fileDiff);
+passthru($systemGit . ' diff tags/' . $tags[0] . $versionLocation . $version . ' --name-status', $fileDiff);
 $fileDiff = explode("\n", trim(ob_get_clean()));
 
 // Only add deleted files to our list; new and modified files will be covered by the archive
