@@ -9,13 +9,12 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\PageBundle\Entity\Redirect;
-use Mautic\PointBundle\Entity\Point;
 
 /**
  * Migrate 1.0.5 to 1.0.6
@@ -44,6 +43,8 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function postUp(Schema $schema)
     {
+        $em = $this->factory->getEntityManager();
+
         // Migrate asset download messages to form message
         $q = $this->connection->createQueryBuilder();
         $q->select('fa.properties, fa.form_id')
@@ -98,7 +99,7 @@ class Version20150521000000 extends AbstractMauticMigration
 
         // Get all the actions that are lead.create
         $q       = $this->connection->createQueryBuilder();
-        $actions = $q->select('a.id, a.properties, a.form_id, f.created_by, f.created_by_user')
+        $actions = $q->select('a.id, a.properties, a.form_id, a.action_order, f.created_by, f.created_by_user')
             ->from(MAUTIC_TABLE_PREFIX.'form_actions', 'a')
             ->join('a', MAUTIC_TABLE_PREFIX.'forms', 'f', 'a.form_id = f.id')
             ->where(
@@ -108,7 +109,7 @@ class Version20150521000000 extends AbstractMauticMigration
             ->fetchAll();
 
         $formFieldMatches = array();
-        $pointEntities    = array();
+        $actionEntities   = array();
         $deleteActions    = array();
         foreach ($actions as $action) {
             try {
@@ -122,20 +123,20 @@ class Version20150521000000 extends AbstractMauticMigration
 
                 if (!empty($properties['points'])) {
                     // Create a new point action
-                    $point = new Point();
-                    $point->setName('Migrated: Form #'.$action['form_id']);
-                    $point->setDescription('<p>Migrated during 1.0.6 upgrade. The Create/Update Lead form submit action is now obsolete.</p>');
-                    $point->setDelta($properties['points']);
-                    $point->setCreatedBy($action['created_by']);
-                    $point->setCreatedByUser($action['created_by_user']);
-                    $point->setType('form.submit');
-                    $point->setProperties(
+                    $formAction = new Action();
+                    $formAction->setType('lead.pointschange');
+                    $formAction->setName('Migrated');
+                    $formAction->setDescription('<p>Migrated during 1.1.0 upgrade. The Create/Update Lead form submit action is now obsolete.</p>');
+                    $formAction->setForm($em->getReference('MauticFormBundle:Form', $action['form_id']));
+                    $formAction->setOrder($action['action_order']);
+                    $formAction->setProperties(
                         array(
-                            'forms' => array($action['form_id'])
+                            'operator' => 'plus',
+                            'points'   => $properties['points']
                         )
                     );
-                    $pointEntities[] = $point;
-                    unset($point);
+                    $actionEntities[] = $formAction;
+                    unset($formAction);
                 }
 
                 $deleteActions[] = $action['id'];
@@ -143,6 +144,11 @@ class Version20150521000000 extends AbstractMauticMigration
             } catch (\Exception $e) {
 
             }
+        }
+
+        if (!empty($actionEntities)) {
+            $this->factory->getModel('point')->getRepository()->saveEntities($actionEntities);
+            $em->clear('MauticFormBundle:Action');
         }
 
         foreach ($formFieldMatches as $leadFieldId => $formFieldIds) {
@@ -157,10 +163,6 @@ class Version20150521000000 extends AbstractMauticMigration
                     $q->expr()->in('id', $formFieldIds)
                 )
                 ->execute();
-        }
-
-        if (!empty($pointEntities)) {
-            $this->factory->getModel('point')->getRepository()->saveEntities($pointEntities);
         }
 
         if (!empty($deleteActions)) {
@@ -205,8 +207,7 @@ class Version20150521000000 extends AbstractMauticMigration
             }
 
             $formRepo->saveEntities($forms);
-
-            $this->factory->getEntityManager()->clear('MauticFormBundle:Form');
+            $em->clear('MauticFormBundle:Form');
         }
 
         // Clear template for custom mode
@@ -242,7 +243,6 @@ class Version20150521000000 extends AbstractMauticMigration
 
         // See which already have URLs created as redirects
         $redirectEntities = array();
-        $em = $this->factory->getEntityManager();
         foreach ($clicks as $click) {
             $redirect = new Redirect();
             $redirect->setDateAdded(new \DateTime());
@@ -471,16 +471,16 @@ class Version20150521000000 extends AbstractMauticMigration
                         )
                     );
                 $q = $this->connection->createQueryBuilder();
-                $q->update(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
-                    ->set('ph.email_id', $listEmail->getId())
-                    ->where('ph.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ph.email_id = ' . $templateId)
+                $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
+                    ->set('email_id', $listEmail->getId())
+                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
                     ->execute();
 
                 // Update download hits
                 $q = $this->connection->createQueryBuilder();
-                $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad')
-                    ->set('ad.email_id', $listEmail->getId())
-                    ->where('ad.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ad.email_id = ' . $templateId)
+                $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
+                    ->set('email_id', $listEmail->getId())
+                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
                     ->execute();
 
                 $q = $this->connection->createQueryBuilder();
@@ -614,8 +614,8 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
 
         $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, PRIMARY KEY(campaign_id, form_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id') . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)'));
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id') . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)'));
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . '  FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
