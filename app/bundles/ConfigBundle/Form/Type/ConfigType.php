@@ -77,7 +77,12 @@ class ConfigType extends AbstractType
             }
         });
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', 'form_buttons',
+            array(
+                'apply_onclick' => 'Mautic.activateBackdrop()',
+                'save_onclick'  => 'Mautic.activateBackdrop()'
+            )
+        );
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

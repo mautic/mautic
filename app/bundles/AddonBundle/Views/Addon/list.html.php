@@ -59,7 +59,8 @@ if ($tmpl == 'index') {
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
                             'item'       => $item,
-                            'model'      => 'addon'
+                            'model'      => 'addon',
+                            'backdrop'   => true
                         )); ?>
                         <?php if ($integrationHelper->getIntegrationCount($item->getBundle())): ?>
                         <a href="<?php echo $view['router']->generate('mautic_addon_integration_index', array("addon" => $item->getId())); ?>" data-toggle="ajax">

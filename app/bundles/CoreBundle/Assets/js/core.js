@@ -856,12 +856,7 @@ var Mautic = {
                         return;
                     }
                     if (response.redirect) {
-                        mQuery('<div />', {
-                            'class': "modal-backdrop fade in"
-                        }).appendTo('body');
-                        setTimeout(function() {
-                            window.location = response.redirect;
-                        }, 50);
+                        Mautic.redirectWithBackdrop(response.redirect);
                     } else if (target || response.target) {
                         if (target) response.target = target;
                         Mautic.processPageContent(response);
@@ -1022,6 +1017,42 @@ var Mautic = {
     },
 
     /**
+     * Displays backdrop with wait message then redirects
+     *
+     * @param url
+     */
+    redirectWithBackdrop: function(url) {
+        Mautic.activateBackdrop();
+        setTimeout(function() {
+            window.location = url;
+        }, 50);
+    },
+
+    /**
+     * Acivates a backdrop
+     */
+    activateBackdrop: function(hideWait) {
+        if (!mQuery('#mautic-backdrop').length) {
+            var container = mQuery('<div />', {
+                id: 'mautic-backdrop'
+            });
+
+            mQuery('<div />', {
+                'class': 'modal-backdrop fade in'
+            }).appendTo(container);
+
+            if (typeof hideWait == 'undefined') {
+                mQuery('<div />', {
+                    "class": 'mautic-pleasewait'
+                }).html(mauticLang.pleaseWait)
+                    .appendTo(container);
+            }
+
+            container.appendTo('body');
+        }
+    },
+
+    /**
      * Posts a form and returns the output.
      * Uses jQuery form plugin so it handles files as well.
      *
@@ -1045,12 +1076,7 @@ var Mautic = {
             showLoadingBar: showLoading,
             success: function (data) {
                 if (data.redirect) {
-                    mQuery('<div />', {
-                        'class': "modal-backdrop fade in"
-                    }).appendTo('body');
-                    setTimeout(function() {
-                        window.location = data.redirect;
-                    }, 50);
+                    Mautic.redirectWithBackdrop(data.redirect);
                 } else {
                     MauticVars.formSubmitInProgress = false;
                     if (!inMain) {
@@ -2031,7 +2057,7 @@ var Mautic = {
      * @param model
      * @param id
      */
-    togglePublishStatus: function (event, el, model, id, extra) {
+    togglePublishStatus: function (event, el, model, id, extra, backdrop) {
         event.preventDefault();
 
         var wasPublished = mQuery(el).hasClass('fa-toggle-on');
@@ -2042,6 +2068,10 @@ var Mautic = {
         mQuery(el).tooltip('destroy');
         //clear the lookup cache
         MauticVars.liveCache = new Array();
+
+        if (backdrop) {
+            Mautic.activateBackdrop();
+        }
 
         if (extra) {
             extra = '&' + extra;
@@ -2054,12 +2084,7 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 if (response.reload) {
-                    mQuery('<div />', {
-                        'class': "modal-backdrop fade in"
-                    }).appendTo('body');
-                    setTimeout(function() {
-                        location.reload();
-                    }, 50);
+                    Mautic.redirectWithBackdrop(window.location);
                 } else if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
