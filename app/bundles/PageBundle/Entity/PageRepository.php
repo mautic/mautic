@@ -61,6 +61,9 @@ class PageRepository extends CommonRepository
             ->where('h.page_id > 0')
             ->setMaxResults($limit);
 
+        $expr = $this->getPublishedByDateExpression($q, 'p');
+        $q->andWhere($expr);
+
         return $q->execute()->fetchAll();
     }
 

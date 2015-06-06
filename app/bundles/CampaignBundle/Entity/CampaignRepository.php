@@ -316,9 +316,10 @@ class CampaignRepository extends CommonRepository
             ->groupBy('c.id, c.name')
             ->setMaxResults($limit);
 
-        $results = $q->execute()->fetchAll();
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $q->where($expr);
 
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -566,7 +567,12 @@ class CampaignRepository extends CommonRepository
     /**
      * Get lead IDs of a campaign
      *
-     * @param $campaignId
+     * @param       $campaignId
+     * @param int   $start
+     * @param bool  $limit
+     * @param array $ignoreLeads
+     *
+     * @return array
      */
     public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $ignoreLeads = array())
     {
