@@ -1343,6 +1343,8 @@ var Mautic = {
             return false;
         }
 
+        mQuery('body').addClass('noscroll');
+
         var method = mQuery(el).attr('data-method');
         if (!method) {
             method = 'GET'
@@ -1381,6 +1383,8 @@ var Mautic = {
 
         //clean slate upon close
         mQuery(target).on('hidden.bs.modal', function () {
+            mQuery('body').removeClass('noscroll');
+
             //unload
             Mautic.onPageUnload(target);
 
@@ -1484,6 +1488,7 @@ var Mautic = {
             }
 
             if (response.closeModal) {
+                mQuery('body').removeClass('noscroll');
                 mQuery(target).modal('hide');
                 Mautic.onPageUnload(target, response);
 
@@ -3495,6 +3500,6 @@ var Mautic = {
 
         Mautic.loadContent(url);
 
-        mQuery('body').css('overflow-y', '');
+        mQuery('body').removeClass('noscroll');
     }
 };
