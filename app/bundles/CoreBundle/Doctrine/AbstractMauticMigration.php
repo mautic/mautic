@@ -27,7 +27,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      *
      * @var array
      */
-    protected $supported = array('mysql', 'postgresql', 'mssql');
+    protected $supported = array('mysql', 'postgresql');
 
     /**
      * Database prefix
@@ -87,11 +87,15 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $this->factory   = $container->get('mautic.factory');
     }
 
+    /**
+     * @param Schema $schema
+     */
     abstract public function mysqlUp(Schema $schema);
 
+    /**
+     * @param Schema $schema
+     */
     abstract public function postgresqlUp(Schema $schema);
-
-    abstract public function mssqlUp(Schema $schema);
 
     /**
      * Finds/creates the local name for constraints and indexes
@@ -99,6 +103,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      * @param $table
      * @param $type
      * @param $suffix
+     *
+     * @return string
      */
     protected function findPropertyName($table, $type, $suffix)
     {
@@ -172,12 +178,11 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate the  name for the property
      *
-     * @param        $table
-     * @param        $type
-     * @param array  $columns
-     * @param string $foreignTable
+     * @param       $table
+     * @param       $type
+     * @param array $columnNames
      *
-     * @return mixed
+     * @return string
      */
     protected function generatePropertyName($table, $type, array $columnNames)
     {
