@@ -61,6 +61,18 @@ class RouteLoader extends Loader
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $collection = $event->getCollection();
 
+        // Force all links to be SSL if the site_url parameter is SSL
+        $siteUrl  = $this->factory->getParameter('site_url');
+        $forceSSL = false;
+        if (!empty($siteUrl)) {
+            $parts    = parse_url($siteUrl);
+            $forceSSL = (!empty($parts['scheme']) && $parts['scheme'] == 'https');
+        }
+
+        if ($forceSSL) {
+            $collection->setSchemes('https');
+        }
+
         // Secured area - Default
         $event = new RouteEvent($this);
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
@@ -75,16 +87,29 @@ class RouteLoader extends Loader
             $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
             $apiCollection = $event->getCollection();
             $apiCollection->addPrefix('/api');
+
+            if ($forceSSL) {
+                $apiCollection->setSchemes('https');
+            }
+
             $collection->addCollection($apiCollection);
         }
 
         $secureCollection->addPrefix('/s');
+        if ($forceSSL) {
+            $secureCollection->setSchemes('https');
+        }
         $collection->addCollection($secureCollection);
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $lastCollection = $event->getCollection();
+
+        if ($forceSSL) {
+            $lastCollection->setSchemes('https');
+        }
+
         $collection->addCollection($lastCollection);
 
         $this->loaded = true;
