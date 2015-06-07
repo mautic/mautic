@@ -13,20 +13,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
     '%name%' => $form->getName()
 )));
 
-$buttons = array(
-    array(
-        'confirm' => array (
-            'message'         => $view['translator']->trans('mautic.form.results.form.confirmbatchdelete'),
-            'confirmText'     => $view['translator']->trans('mautic.core.form.delete'),
-            'confirmAction'   => $view['router']->generate('mautic_form_results_delete', array_merge(array('formId' => $form->getId()))),
-            'confirmCallback' => 'executeBatchAction',
-            'iconClass'       => 'fa fa-trash-o text-danger',
-            'btnText'         => $view['translator']->trans('mautic.core.form.delete'),
-            'tooltip'         => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
-            'precheck'        => 'batchActionPrecheck'
-        )
-    )
-);
+$buttons = array();
 
 $buttons[] = array(
     'attr' => array(
@@ -63,6 +50,18 @@ if (class_exists('PHPExcel')) {
     );
 }
 
+$buttons[] = array(
+    'confirm' => array (
+        'message'         => $view['translator']->trans('mautic.form.results.form.confirmbatchdelete'),
+        'confirmText'     => $view['translator']->trans('mautic.core.form.delete'),
+        'confirmAction'   => $view['router']->generate('mautic_form_results_delete', array_merge(array('formId' => $form->getId()))),
+        'confirmCallback' => 'executeBatchAction',
+        'iconClass'       => 'fa fa-trash-o text-danger',
+        'btnText'         => $view['translator']->trans('mautic.core.form.delete'),
+        'tooltip'         => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
+        'precheck'        => 'batchActionPrecheck'
+    )
+);
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array('customButtons' => $buttons)));
 ?>
 

@@ -180,7 +180,7 @@ class DoctrineStep implements StepInterface
             'mysqli'     => 'MySQLi',
             'pdo_pgsql'  => 'PostgreSQL',
             //'pdo_sqlite' => 'SQLite',
-            'pdo_sqlsrv' => 'SQL Server',
+            //'pdo_sqlsrv' => 'SQL Server',
             //'pdo_oci'    => 'Oracle (PDO)',
             //'pdo_ibm'    => 'IBM DB2 (PDO)',
             //'oci8'       => 'Oracle (native)',

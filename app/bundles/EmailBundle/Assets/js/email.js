@@ -85,7 +85,7 @@ Mautic.emailOnLoad = function (container, response) {
         });
 
         if (mQuery('#emailform_emailType').val() == '') {
-            mQuery('body').css('overflow-y', 'hidden');
+            mQuery('body').addClass('noscroll');
         }
 
         Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
@@ -324,7 +324,7 @@ Mautic.selectEmailType = function(emailType) {
 
     mQuery('#emailform_emailType').val(emailType);
 
-    mQuery('body').css('overflow-y', '');
+    mQuery('body').removeClass('noscroll');
 
     mQuery('.email-type-modal').remove();
     mQuery('.email-type-modal-backdrop').remove();

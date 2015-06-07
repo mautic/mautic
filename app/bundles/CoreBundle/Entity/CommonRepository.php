@@ -13,8 +13,10 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -685,20 +687,27 @@ class CommonRepository extends EntityRepository
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
      * The Expr() sets a :now and :true parameter that must be set in the calling function
      *
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param string                     $alias
-     * @param Expr                       $includeExpr Expression to include in the andX
+     * @param      $q
+     * @param null $alias
+     * @param bool $setNowParameter
+     * @param bool $setTrueParameter
      *
-     * @return \Doctrine\ORM\Query\Expr\AndX
+     * @return mixed
      */
     public function getPublishedByDateExpression($q, $alias = null, $setNowParameter = true, $setTrueParameter = true)
     {
+        $isORM = ($q instanceof QueryBuilder);
+
         if ($alias === null) {
             $alias = $this->getTableAlias();
         }
 
         if ($setNowParameter) {
             $now = new \DateTime();
+            if (!$isORM) {
+                $dtHelper = new DateTimeHelper($now);
+                $now = $dtHelper->toUtcString();
+            }
             $q->setParameter('now', $now);
         }
 
@@ -706,15 +715,25 @@ class CommonRepository extends EntityRepository
             $q->setParameter('true', true, 'boolean');
         }
 
+        if ($isORM) {
+            $pub     = 'isPublished';
+            $pubUp   = 'publishUp';
+            $pubDown = 'publishDown';
+        } else {
+            $pub     = 'is_published';
+            $pubUp   = 'publish_up';
+            $pubDown = 'publish_down';
+        }
+
         $expr = $q->expr()->andX(
-            $q->expr()->eq("$alias.isPublished", ':true'),
+            $q->expr()->eq("$alias.$pub", ':true'),
             $q->expr()->orX(
-                $q->expr()->isNull("$alias.publishUp"),
-                $q->expr()->lte("$alias.publishUp", ':now')
+                $q->expr()->isNull("$alias.$pubUp"),
+                $q->expr()->lte("$alias.$pubUp", ':now')
             ),
             $q->expr()->orX(
-                $q->expr()->isNull("$alias.publishDown"),
-                $q->expr()->gte("$alias.publishDown", ':now')
+                $q->expr()->isNull("$alias.$pubDown"),
+                $q->expr()->gte("$alias.$pubDown", ':now')
             )
         );
 

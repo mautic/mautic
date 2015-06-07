@@ -54,7 +54,7 @@ Mautic.formOnLoad = function (container) {
 
 
     if (mQuery('#mauticform_formType').length && mQuery('#mauticform_formType').val() == '') {
-        mQuery('body').css('overflow-y', 'hidden');
+        mQuery('body').addClass('noscroll');
     }
 
     if (typeof Mautic.formSubmissionChart === 'undefined') {
@@ -229,7 +229,7 @@ Mautic.selectFormType = function(formType) {
 
     mQuery('#mauticform_formType').val(formType);
 
-    mQuery('body').css('overflow-y', '');
+    mQuery('body').removeClass('noscroll');
 
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();

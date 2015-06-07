@@ -509,9 +509,37 @@ class AjaxController extends CommonController
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
         } else {
-            $dataArray['success'] = 1;
-            $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
+            if ($request->get('finalize', false)) {
+                // Go to the finalize step
+                $dataArray['success']        = 1;
+                $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+                $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.finalizing');
+                $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+            } else {
+                // Upgrading from 1.0.5
+
+                return $this->updateFinalizationAction($request);
+            }
         }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Finalize update
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateFinalizationAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        // Here as a just in case it's needed for a future upgrade
+        $dataArray['success'] = 1;
+        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
 
         return $this->sendJsonResponse($dataArray);
     }

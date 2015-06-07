@@ -446,6 +446,11 @@ class EmailController extends FormController
                 false
             );
 
+        if ($updateSelect) {
+            // Force type to template
+            $entity->setEmailType('template');
+        }
+
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
@@ -474,7 +479,7 @@ class EmailController extends FormController
                     } else {
                         $entity->setCustomHtml($content);
                     }
-                    
+
                     //form is valid so process the data
                     $model->saveEntity($entity);
 

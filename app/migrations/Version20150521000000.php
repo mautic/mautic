@@ -9,13 +9,12 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\PageBundle\Entity\Redirect;
-use Mautic\PointBundle\Entity\Point;
 
 /**
  * Migrate 1.0.5 to 1.0.6
@@ -44,6 +43,8 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function postUp(Schema $schema)
     {
+        $em = $this->factory->getEntityManager();
+
         // Migrate asset download messages to form message
         $q = $this->connection->createQueryBuilder();
         $q->select('fa.properties, fa.form_id')
@@ -98,7 +99,7 @@ class Version20150521000000 extends AbstractMauticMigration
 
         // Get all the actions that are lead.create
         $q       = $this->connection->createQueryBuilder();
-        $actions = $q->select('a.id, a.properties, a.form_id, f.created_by, f.created_by_user')
+        $actions = $q->select('a.id, a.properties, a.form_id, a.action_order, f.created_by, f.created_by_user')
             ->from(MAUTIC_TABLE_PREFIX.'form_actions', 'a')
             ->join('a', MAUTIC_TABLE_PREFIX.'forms', 'f', 'a.form_id = f.id')
             ->where(
@@ -108,7 +109,7 @@ class Version20150521000000 extends AbstractMauticMigration
             ->fetchAll();
 
         $formFieldMatches = array();
-        $pointEntities    = array();
+        $actionEntities   = array();
         $deleteActions    = array();
         foreach ($actions as $action) {
             try {
@@ -122,20 +123,20 @@ class Version20150521000000 extends AbstractMauticMigration
 
                 if (!empty($properties['points'])) {
                     // Create a new point action
-                    $point = new Point();
-                    $point->setName('Migrated: Form #'.$action['form_id']);
-                    $point->setDescription('<p>Migrated during 1.0.6 upgrade. The Create/Update Lead form submit action is now obsolete.</p>');
-                    $point->setDelta($properties['points']);
-                    $point->setCreatedBy($action['created_by']);
-                    $point->setCreatedByUser($action['created_by_user']);
-                    $point->setType('form.submit');
-                    $point->setProperties(
+                    $formAction = new Action();
+                    $formAction->setType('lead.pointschange');
+                    $formAction->setName('Migrated');
+                    $formAction->setDescription('<p>Migrated during 1.1.0 upgrade. The Create/Update Lead form submit action is now obsolete.</p>');
+                    $formAction->setForm($em->getReference('MauticFormBundle:Form', $action['form_id']));
+                    $formAction->setOrder($action['action_order']);
+                    $formAction->setProperties(
                         array(
-                            'forms' => array($action['form_id'])
+                            'operator' => 'plus',
+                            'points'   => $properties['points']
                         )
                     );
-                    $pointEntities[] = $point;
-                    unset($point);
+                    $actionEntities[] = $formAction;
+                    unset($formAction);
                 }
 
                 $deleteActions[] = $action['id'];
@@ -143,6 +144,11 @@ class Version20150521000000 extends AbstractMauticMigration
             } catch (\Exception $e) {
 
             }
+        }
+
+        if (!empty($actionEntities)) {
+            $this->factory->getModel('point')->getRepository()->saveEntities($actionEntities);
+            $em->clear('MauticFormBundle:Action');
         }
 
         foreach ($formFieldMatches as $leadFieldId => $formFieldIds) {
@@ -157,10 +163,6 @@ class Version20150521000000 extends AbstractMauticMigration
                     $q->expr()->in('id', $formFieldIds)
                 )
                 ->execute();
-        }
-
-        if (!empty($pointEntities)) {
-            $this->factory->getModel('point')->getRepository()->saveEntities($pointEntities);
         }
 
         if (!empty($deleteActions)) {
@@ -205,8 +207,7 @@ class Version20150521000000 extends AbstractMauticMigration
             }
 
             $formRepo->saveEntities($forms);
-
-            $this->factory->getEntityManager()->clear('MauticFormBundle:Form');
+            $em->clear('MauticFormBundle:Form');
         }
 
         // Clear template for custom mode
@@ -242,7 +243,6 @@ class Version20150521000000 extends AbstractMauticMigration
 
         // See which already have URLs created as redirects
         $redirectEntities = array();
-        $em = $this->factory->getEntityManager();
         foreach ($clicks as $click) {
             $redirect = new Redirect();
             $redirect->setDateAdded(new \DateTime());
@@ -471,16 +471,16 @@ class Version20150521000000 extends AbstractMauticMigration
                         )
                     );
                 $q = $this->connection->createQueryBuilder();
-                $q->update(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
-                    ->set('ph.email_id', $listEmail->getId())
-                    ->where('ph.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ph.email_id = ' . $templateId)
+                $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
+                    ->set('email_id', $listEmail->getId())
+                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
                     ->execute();
 
                 // Update download hits
                 $q = $this->connection->createQueryBuilder();
-                $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad')
-                    ->set('ad.email_id', $listEmail->getId())
-                    ->where('ad.lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND ad.email_id = ' . $templateId)
+                $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
+                    ->set('email_id', $listEmail->getId())
+                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
                     ->execute();
 
                 $q = $this->connection->createQueryBuilder();
@@ -614,94 +614,9 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
 
         $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, PRIMARY KEY(campaign_id, form_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id') . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)'));
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id') . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)'));
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . '  FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function mssqlUp(Schema $schema)
-    {
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, PRIMARY KEY (email_id, asset_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  ON ' . $this->prefix . 'email_assets_xref (email_id)');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . '  FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . '  FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'assets ADD size INT');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD name NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD description VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_address NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_name NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD reply_to_address NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD bcc_address NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD email_type NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN subject VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN template NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN content_mode NVARCHAR(255)');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD copy VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD open_count INT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD last_opened DATETIME2(6)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD open_details VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER email_id INT');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD container_attr NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD lead_field NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD save_result BIT');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER COLUMN template NVARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER COLUMN content_mode NVARCHAR(255)');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type NVARCHAR(255)');
-
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, PRIMARY KEY (campaign_id, form_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id') . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)'));
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id') . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . '  FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id)');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN supported_features VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN api_keys VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings ALTER COLUMN feature_settings VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER COLUMN redirect_uris VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER COLUMN allowed_grant_types VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns ALTER COLUMN canvas_settings VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_events ALTER COLUMN properties VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ALTER COLUMN metadata VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'audit_log ALTER COLUMN details VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'ip_addresses ALTER COLUMN ip_details VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN content VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER COLUMN variant_settings VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER COLUMN tokens VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER COLUMN properties VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN label VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN custom_parameters VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN default_value VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN validation_message VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN help_message VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER COLUMN properties VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'leads ALTER COLUMN internal VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'leads ALTER COLUMN social_cache VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ALTER COLUMN properties VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_lists ALTER COLUMN filters VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ALTER COLUMN browser_languages VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER COLUMN content VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER COLUMN variant_settings VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'points ALTER COLUMN properties VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_trigger_events ALTER COLUMN properties VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'reports ALTER COLUMN columns VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'reports ALTER COLUMN filters VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'reports ALTER COLUMN table_order VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'reports ALTER COLUMN graphs VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'roles ALTER COLUMN readable_permissions VARCHAR(MAX) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER COLUMN preferences VARCHAR(MAX)');
     }
 }
