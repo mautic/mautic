@@ -2527,7 +2527,7 @@ var Mautic = {
             case 8:
                 mQuery.ajax({
                     showLoadingBar: true,
-                    url: mauticAjaxUrl + '?action=core:updateDatabaseMigration',
+                    url: mauticAjaxUrl + '?action=core:updateDatabaseMigration&finalize=1',
                     dataType: 'json',
                     success: function (response) {
                         if (response.redirect) {
