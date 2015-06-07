@@ -41,11 +41,11 @@ class EventRepository extends CommonRepository
 
     /**
      * Get array of published events based on type
+     * @param       $type
+     * @param array $campaigns
+     * @param null  $leadId             If included, only events that have not been triggered by the lead yet will be included
+     * @param bool  $positivePathOnly   If negative, all events including those with a negative path will be returned
      *
-     * @param $type
-     * @param $campaigns
-     * @param $leadId           If included, only events that have not been triggered by the lead yet will be included
-     * @param $positivePathOnly If negative, all events including those with a negative path will be returned
      * @return array
      */
     public function getPublishedByType($type, array $campaigns = null, $leadId = null, $positivePathOnly = true)
@@ -92,7 +92,8 @@ class EventRepository extends CommonRepository
         if ($positivePathOnly) {
             $q->andWhere(
                 $q->expr()->orX(
-                    $q->expr()->neq('e.decisionPath',
+                    $q->expr()->neq(
+                        'e.decisionPath',
                         $q->expr()->literal('no')
                     ),
                     $q->expr()->isNull('e.decisionPath')
@@ -128,7 +129,8 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
-                    $q->expr()->isNull('e.parent')
+                    $q->expr()->isNull('e.parent'),
+                    $q->expr()->eq('e.eventType', $q->expr()->literal('action'))
                 )
             );
 
@@ -170,7 +172,6 @@ class EventRepository extends CommonRepository
     /**
      * Get an array of events that have been triggered by this lead
      *
-     * @param $type
      * @param $leadId
      *
      * @return array
@@ -199,10 +200,11 @@ class EventRepository extends CommonRepository
     /**
      * Get a list of scheduled events
      *
-     * @param mixed $campaignId
-     * @param \DateTime $date   Defaults to events scheduled before now
+     * @param      $campaignId
+     * @param bool $count
+     * @param int  $limit
      *
-     * @return array
+     * @return array|bool
      */
     public function getScheduledEvents($campaignId, $count = false, $limit = 0)
     {
@@ -252,6 +254,8 @@ class EventRepository extends CommonRepository
 
     /**
      * @param $campaignId
+     *
+     * @return array
      */
     public function getCampaignEvents($campaignId)
     {
@@ -269,7 +273,7 @@ class EventRepository extends CommonRepository
         $events = array();
         foreach ($results as $id => $r) {
             $r[0]['parent_id'] = $r[1];
-            $events[$id] = $r[0];
+            $events[$id]       = $r[0];
         }
         unset($results);
 
@@ -280,6 +284,7 @@ class EventRepository extends CommonRepository
      * Get array of events with stats
      *
      * @param array $args
+     *
      * @return array
      */
     public function getEvents($args = array())
@@ -299,7 +304,8 @@ class EventRepository extends CommonRepository
         if (isset($args['positivePathOnly'])) {
             $q->andWhere(
                 $q->expr()->orX(
-                    $q->expr()->neq('e.decisionPath',
+                    $q->expr()->neq(
+                        'e.decisionPath',
                         $q->expr()->literal('no')
                     ),
                     $q->expr()->isNull('e.decisionPath')
@@ -315,6 +321,8 @@ class EventRepository extends CommonRepository
 
     /**
      * @param $campaignId
+     *
+     * @return array
      */
     public function getCampaignActionEvents($campaignId)
     {
@@ -334,9 +342,12 @@ class EventRepository extends CommonRepository
     /**
      * Get the non-action log
      *
-     * @param $events
+     * @param       $campaignId
+     * @param array $leads
+     * @param array $havingEvents
+     * @param array $excludeEvents
      *
-     * @return mixed
+     * @return array
      */
     public function getEventLog($campaignId, $leads = array(), $havingEvents = array(), $excludeEvents = array())
     {
@@ -400,5 +411,19 @@ class EventRepository extends CommonRepository
         unset($results);
 
         return $log;
+    }
+
+    /**
+     * Null event parents in preparation for deleting a campaign
+     *
+     * @param $campaignId
+     */
+    public function nullEventParents($campaignId)
+    {
+        $this->_em->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.'campaign_events',
+            array('parent_id' => null),
+            array('campaign_id' => (int) $campaignId)
+        );
     }
 }

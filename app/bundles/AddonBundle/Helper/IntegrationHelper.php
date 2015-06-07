@@ -316,8 +316,6 @@ class IntegrationHelper
                         $socialCache[$integration]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : array();
                         $socialCache[$integration]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
                         $socialCache[$integration]['lastRefresh'] = $now->toUtcString();
-                    } else {
-                        unset($socialCache[$integration]);
                     }
                 } elseif (isset($socialCache[$integration])) {
                     //integration is now not applicable
@@ -325,7 +323,7 @@ class IntegrationHelper
                 }
             }
 
-            if ($persistLead) {
+            if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
                 $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }

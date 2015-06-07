@@ -97,7 +97,7 @@ class LeadTimelineEvent extends Event
                 $e['timestamp'] = $dt->getDateTime();
                 unset($dt);
             }
-            $dateString = $e['timestamp']->format('Y-m-d H:i:s');
+            $dateString = $e['timestamp']->format('Y-m-d H:i');
             if (!isset($byDate[$dateString])) {
                 $byDate[$dateString] = array();
             }
@@ -110,12 +110,12 @@ class LeadTimelineEvent extends Event
 
         // Sort by certain event actions
         $order = array(
+            'lead.ipadded',
             'page.hit',
-            'asset.download',
             'form.submitted',
+            'asset.download',
             'lead.merge',
             'lead.create',
-            'lead.ipadded',
             'lead.identified'
         );
 
@@ -190,11 +190,12 @@ class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included
      *
-     * @param $eventType
+     * @param      $eventType
+     * @param bool $inclusive
      *
      * @return bool
      */
-    public function isApplicable($eventType)
+    public function isApplicable($eventType, $inclusive = false)
     {
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
@@ -204,6 +205,8 @@ class LeadTimelineEvent extends Event
             if (!in_array($eventType, $this->filters['includeEvents'])) {
                 return false;
             }
+        } elseif ($inclusive) {
+            return false;
         }
 
         return true;

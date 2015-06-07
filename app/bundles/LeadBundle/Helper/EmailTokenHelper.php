@@ -83,7 +83,7 @@ class EmailTokenHelper
             if ($count === 1) {
                 $page = 1;
             } else {
-                $page = (floor($limit / $count)) ?: 1;
+                $page = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.lead.emailtoken.page', $page);
         }

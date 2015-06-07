@@ -18,6 +18,7 @@ mQuery(document).ready(function () {
         var content_id = mQuery(this).attr('id');
         var that = this;
         CKEDITOR.inline(content_id, {
+            extraPlugins: 'tokens,sourcedialog',
             toolbar: 'advanced',
             // Inline mode seems to ignore this but leaving anyway
             allowedContent: true,
@@ -26,6 +27,8 @@ mQuery(document).ready(function () {
             on: {
                 // Remove inserted <p /> tag if empty to allow the CSS3 placeholder to display
                 blur: function( event ) {
+                    mQuery('.token-suggestions').remove();
+
                     var data = event.editor.getData();
                     if (!data) {
                         mQuery(that).html('');
@@ -39,6 +42,9 @@ mQuery(document).ready(function () {
                 }
             }
         });
+
+        mQuery(this).data('token-callback', 'page:getBuilderTokens');
+        mQuery(this).data('token-activator', '{');
     });
 
     mQuery("[data-remove-slide]").change(function () {

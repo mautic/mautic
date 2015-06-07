@@ -11,6 +11,10 @@
     <div class="builder-content">
         <div id="CampaignCanvas">
         <?php
+        foreach ($campaignSources as $source):
+            echo $view->render('MauticCampaignBundle:Source:index.html.php', $source);
+        endforeach;
+
         foreach ($campaignEvents as $event):
             echo $view->render('MauticCampaignBundle:Event:generic.html.php', array('event' => $event, 'campaignId' => $campaignId));
         endforeach;
@@ -23,13 +27,31 @@
         </p>
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>
-        <div class="panel-group margin-sm-top" id="CampaignEventPanel">
+        <div class="panel-group mt-sm" id="CampaignEventPanel">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a href="#CampaignEventOutcomes">
-                            <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
-                        </a>
+                        <?php echo $view['translator']->trans('mautic.campaign.leadsource.header'); ?>
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <a id="campaignLeadSource_forms" data-toggle="ajaxmodal" data-target="#CampaignEventModal" class="<?php if (isset($campaignSources['forms'])) echo 'disabled '; ?>list-group-item list-campaign-leadsource" href="<?php echo $view['router']->generate('mautic_campaignsource_action', array('objectAction' => 'new', 'objectId' => $campaignId, 'sourceType' => 'forms')); ?>">
+                        <div data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.leadsource.forms.tooltip'); ?>">
+                            <span><?php echo $view['translator']->trans('mautic.campaign.leadsource.forms'); ?></span>
+                        </div>
+                    </a>
+                    <a id="campaignLeadSource_lists" data-toggle="ajaxmodal" data-target="#CampaignEventModal" class="<?php if (isset($campaignSources['lists'])) echo 'disabled '; ?>list-group-item list-campaign-leadsource" href="<?php echo $view['router']->generate('mautic_campaignsource_action', array('objectAction' => 'new', 'objectId' => $campaignId, 'sourceType' => 'lists')); ?>">
+                        <div data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.leadsource.lists.tooltip'); ?>">
+                            <span><?php echo $view['translator']->trans('mautic.campaign.leadsource.lists'); ?></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                     </h4>
                 </div>
                 <div class="panel-body">
@@ -45,9 +67,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a href="#CampaignEventLeadActions">
-                            <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
-                        </a>
+                        <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                     </h4>
                 </div>
                 <div class="panel-body">
@@ -77,9 +97,16 @@
 <script>
     Mautic.campaignBuilderReconnectEndpoints = function() {
         // Reposition events
-        <?php if (!empty($canvasSettings)): ?>
-        <?php foreach ($canvasSettings['nodes'] as $n): ?>
+        <?php
+        if (!empty($canvasSettings)):
 
+        $sourceFound = false;
+
+        foreach ($canvasSettings['nodes'] as $n):
+
+        if (isset($campaignSources[$n['id']]))
+            $sourceFound = true;
+        ?>
         mQuery('#CampaignEvent_<?php echo $n['id']; ?>').css({
             position: 'absolute',
             left:     '<?php echo $n['positionX']; ?>px',
@@ -118,8 +145,25 @@
         <?php foreach ($canvasSettings['connections'] as $connection): ?>
 
         Mautic.campaignBuilderInstance.connect({uuids:["<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>", "<?php echo "CampaignEvent_{$connection['targetId']}_{$connection['anchors']['target']}"; ?>"]});
-        <?php endforeach; ?>
-        <?php endif; ?>
+        <?php
+        endforeach;
 
+        if (!$sourceFound):
+        $topOffset = 25;
+        foreach ($campaignSources as $type => $source):
+        ?>
+
+        mQuery('#CampaignEvent_<?php echo $type; ?>').css({
+            position: 'absolute',
+            left:     '20px',
+            top:      '<?php echo $topOffset; ?>px'
+        });
+        <?php
+        $topOffset += 45;
+        endforeach;
+        endif;
+
+        endif;
+        ?>
     };
 </script>

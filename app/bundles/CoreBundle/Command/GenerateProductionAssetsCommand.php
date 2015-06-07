@@ -44,16 +44,26 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $assetHelper = $this->getContainer()->get('mautic.helper.assetgeneration');
+        $container = $this->getContainer();
+        $assetHelper = $container->get('mautic.helper.assetgeneration');
 
+        $factory = $container->get('mautic.factory');
+
+        // Combine and minify bundle assets
         $assetHelper->getAssets(true);
+
+        // Minify Mautic Form SDK
+        file_put_contents(
+            $factory->getSystemPath('assets').'/js/mautic-form.js',
+            \Minify::combine(array($factory->getSystemPath('assets').'/js/mautic-form-src.js'))
+        );
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         // Update successful
-        $output->writeln('<info>' . $translator->trans('mautic.core.command.asset_generate_success') . '</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.command.asset_generate_success').'</info>');
 
         return 0;
     }

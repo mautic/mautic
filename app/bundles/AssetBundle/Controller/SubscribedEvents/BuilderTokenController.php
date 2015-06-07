@@ -9,31 +9,18 @@
 
 namespace Mautic\AssetBundle\Controller\SubscribedEvents;
 
-use Mautic\CoreBundle\Controller\FormController;
-use Mautic\AssetBundle\Helper\BuilderTokenHelper;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
 /**
  * Class BuilderTokenController
  */
-class BuilderTokenController extends FormController
+class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEvents\BuilderTokenController
 {
-    /**
-     * @param int $page
-     *
-     * @return JsonResponse
-     */
-    public function indexAction($page = 1)
+    protected function getViewPermissionBase()
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory);
+        return 'asset:assets';
+    }
 
-        $dataArray = array(
-            'newContent'     => $tokenHelper->getTokenContent($page),
-            'mauticContent'  => 'builder'
-        );
-
-        $response  = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
-        return $response;
+    protected function getModelName()
+    {
+        return 'asset';
     }
 }

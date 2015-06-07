@@ -48,16 +48,21 @@ if (!isset($cancelCallback)) {
     $cancelCallback = "dismissConfirmation";
 }
 
-$attr = "";
+if (!isset($attr)) {
+    $attr = array();
+}
+
 if (isset($confirmCallback)) {
-    $attr .= " data-confirm-callback=\"$confirmCallback\"";
+    $attr[] = "data-confirm-callback=\"$confirmCallback\"";
 }
 if ($cancelText) {
-    $attr .= " data-cancel-text=\"{$view->escape($cancelText, 'js')}\"";
+    $attr[] = "data-cancel-text=\"{$view->escape($cancelText, 'js')}\"";
 }
 if ($cancelCallback) {
-    $attr .= " data-cancel-callback=\"$cancelCallback\"";
+    $attr[] = "data-cancel-callback=\"$cancelCallback\"";
 }
+if (isset($target))
+    $attr[] = "data-target=\"$target\"";
 
 if (!isset($openTag)) {
     $tag = "a";
@@ -81,6 +86,6 @@ if (!isset($precheck)) {
 }
 
 ?>
-<?php echo $wrapOpeningTag; ?><<?php echo $tag; ?><?php echo $buttonType; ?> class="<?php echo $btnClass; ?>" href="<?php echo $confirmAction; ?>" data-toggle="confirmation" data-precheck="<?php echo $precheck; ?>" data-message="<?php echo $view->escape($message); ?>" data-confirm-text="<?php echo $view->escape($confirmText); ?>"<?php echo $attr; ?>>
+<?php echo $wrapOpeningTag; ?><<?php echo $tag; ?><?php echo $buttonType; ?> class="<?php echo $btnClass; ?>" href="<?php echo $confirmAction; ?>" data-toggle="confirmation" data-precheck="<?php echo $precheck; ?>" data-message="<?php echo $view->escape($message); ?>" data-confirm-text="<?php echo $view->escape($confirmText); ?>"<?php echo implode(" " , $attr); ?>>
 <span<?php echo $tooltipAttr; ?>><?php if (isset($iconClass)):?><i class="<?php echo $iconClass; ?>"></i> <?php endif; ?><?php if (isset($btnText)):?><span class="<?php echo $btnTextClass; ?>"><?php echo $btnText; ?></span><?php endif; ?></span>
 </<?php echo $tag; ?>><?php echo $wrapClosingTag; ?>

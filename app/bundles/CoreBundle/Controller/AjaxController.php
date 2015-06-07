@@ -509,9 +509,37 @@ class AjaxController extends CommonController
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
         } else {
-            $dataArray['success'] = 1;
-            $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
+            if ($request->get('finalize', false)) {
+                // Go to the finalize step
+                $dataArray['success']        = 1;
+                $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+                $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.finalizing');
+                $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+            } else {
+                // Upgrading from 1.0.5
+
+                return $this->updateFinalizationAction($request);
+            }
         }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Finalize update
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function updateFinalizationAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $translator = $this->factory->getTranslator();
+
+        // Here as a just in case it's needed for a future upgrade
+        $dataArray['success'] = 1;
+        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -575,6 +603,8 @@ class AjaxController extends CommonController
      * Tests mail transport settings
      *
      * @param Request $request
+     *
+     * @return JsonResponse
      */
     protected function testEmailServerConnectionAction(Request $request)
     {
@@ -639,6 +669,40 @@ class AjaxController extends CommonController
 
                 } catch (\Exception $e) {
                     $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function getBuilderTokensAction(Request $request)
+    {
+        $dataArray = array();
+
+        if (method_exists($this, 'getBuilderTokens')) {
+            $query = $request->get('query');
+            if ($query && $query !== '{' && $query !== '{@') {
+                $tokenList = $this->getBuilderTokens($query);
+
+                $tokens       = (isset($tokenList['tokens'])) ? $tokenList['tokens'] : array();
+                $visualTokens = (isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
+
+                if (!empty($tokens)) {
+                    asort($tokens);
+
+                    $dataArray['html'] = $this->render(
+                        'MauticCoreBundle:Helper:buildertoken_list.html.php',
+                        array(
+                            'tokens' => $tokens,
+                            'visualTokens' => $visualTokens
+                        )
+                    )->getContent();
                 }
             }
         }

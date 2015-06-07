@@ -38,7 +38,7 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Gets asset prefix
      *
-     * @param bool $forceEndingSlash
+     * @param bool $includeEndingSlash
      *
      * @return string
      */
@@ -62,6 +62,7 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string $path
      * @param null   $packageName
      * @param null   $version
+     * @param bool   $absolute
      *
      * @return string
      */
@@ -79,10 +80,20 @@ class AssetsHelper extends CoreAssetsHelper
         $url = parent::getUrl($path, $packageName, $version);
 
         if ($absolute) {
-            $url = $this->factory->getRequest()->getSchemeAndHttpHost() . $url;
+            $url = $this->getBaseUrl() . $url;
         }
 
         return $url;
+    }
+
+    /**
+     * Get base URL
+     *
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->factory->getRequest()->getSchemeAndHttpHost();
     }
 
     /**

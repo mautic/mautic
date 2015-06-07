@@ -423,4 +423,28 @@ class FormEntity extends CommonEntity
     {
         return $this->modifiedByUser;
     }
+
+    /**
+     * @param mixed $createdByUser
+     */
+    public function setCreatedByUser($createdByUser)
+    {
+        $this->createdByUser = $createdByUser;
+    }
+
+    /**
+     * @param mixed $modifiedByUser
+     */
+    public function setModifiedByUser($modifiedByUser)
+    {
+        $this->modifiedByUser = $modifiedByUser;
+    }
+
+    /**
+     * @param mixed $checkedOutByUser
+     */
+    public function setCheckedOutByUser($checkedOutByUser)
+    {
+        $this->checkedOutByUser = $checkedOutByUser;
+    }
 }

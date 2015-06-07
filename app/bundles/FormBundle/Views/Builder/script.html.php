@@ -8,102 +8,43 @@
  */
 
 $fields   = $form->getFields();
-$formName = \Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName());
 ?>
 
 <script type="text/javascript">
-var MauticForm_<?php echo $formName; ?> = {
-    formId: "mauticform_<?php echo $formName; ?>",
-    validateForm: function () {
-        var formValid = true;
 
-        function validateOptions(elOptions) {
-            var optionsValid = false;
-            var i = 0;
-            while (!optionsValid && i < elOptions.length) {
-                if (elOptions[i].checked) optionsValid = true;
-                i++;
-            }
-            return optionsValid;
+    /** This section is only needed once per page if manually copying **/
+    if (typeof MauticSDKLoaded == 'undefined') {
+        var MauticSDKLoaded = true;
+        var head            = document.getElementsByTagName('head')[0];
+        var script          = document.createElement('script');
+        script.type         = 'text/javascript';
+        script.src          = '<?php echo $view['assets']->getUrl('media/js/' . ($app->getEnvironment()  == 'dev' ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true); ?>';
+        script.onload       = function() {
+            MauticSDK.onLoad();
+        };
+        head.appendChild(script);
+        var MauticDomain = '<?php echo $view['assets']->getBaseUrl(); ?>';
+        var MauticLang   = {
+            'submittingMessage': "<?php echo $view['translator']->trans('mautic.form.submission.pleasewait'); ?>"
         }
-
-        function validateEmail(email) {
-            var atpos = email.indexOf("@");
-            var dotpos = email.lastIndexOf(".");
-            var valid = (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) ? false : true;
-            return valid;
-        }
-
-        function markError(containerId, valid) {
-            var elContainer = document.getElementById(containerId);
-            var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
-            elErrorSpan.style.display = (valid) ? 'none' : '';
-        }
-
-        var elForm = document.getElementById(this.formId);
-        <?php foreach ($fields as $f):
-        if ($f->isRequired()):
-        $name = "mauticform[".$f->getAlias()."]";
-        $id   = 'mauticform_' . $f->getAlias();
-        $type = $f->getType();
-        switch ($type):
-        case 'select':
-        case 'country':
-            $properties = $f->getProperties();
-            $multiple   = $properties['multiple'];
-            if ($multiple)
-                $name .= '[]';
-        ?>
-
-        var valid = (elForm.elements["<?php echo $name; ?>"].value != '');
-        <?php
-        break;
-        case 'radiogrp':
-        case 'checkboxgrp':
-            if ($type == 'checkboxgrp') $name .= '[]';
-        ?>
-
-        var elOptions = elForm.elements["<?php echo $name; ?>"];
-        var valid = validateOptions(elOptions);
-        <?php
-        break;
-        case 'email':
-        ?>
-
-        var valid = validateEmail(elForm.elements["<?php echo $name; ?>"].value);
-        <?php
-        break;
-        default:
-        ?>
-
-        var valid = (elForm.elements["<?php echo $name; ?>"].value != '');
-        <?php
-        break;
-        endswitch;
-        ?>
-        markError('<?php echo $id; ?>', valid);
-        if (!valid) formValid = false;
-        <?php
-        endif;
-        endforeach;
-        ?>
-
-        if (formValid) {
-            document.getElementById('mauticform_<?php echo $formName ?>_return').value = document.URL;
-        }
-        return formValid;
-    },
-    checkMessages: function() {
-        var query = {};
-        location.search.substr(1).split("&").forEach(function(item) {query[item.split("=")[0]] = item.split("=")[1]});
-        if (typeof query.mauticError !== 'undefined') {
-            var errorContainer = document.getElementById('mauticform_<?php echo $formName; ?>_error');
-            errorContainer.innerHTML = decodeURIComponent(query.mauticError);
-        } else if (typeof query.mauticMessage !== 'undefined') {
-            var messageContainer = document.getElementById('mauticform_<?php echo $formName; ?>_message');
-            messageContainer.innerHTML = decodeURIComponent(query.mauticMessage);
-        }
+        var MauticFormValidations  = {};
     }
-}
-MauticForm_<?php echo $formName; ?>.checkMessages();
+
+    /** This is needed for each form **/
+    MauticFormValidations.<?php echo $formName; ?> = {
+<?php
+foreach($fields as $f):
+if (!$f->isRequired()) continue;
+$type       = $f->getType();
+$properties = $f->getProperties();
+$name       = $f->getAlias();
+if ((in_array($type, array('select', 'country')) && !empty($properties['multiple'])) || $type == 'checkboxgrp')
+    $name .= '[]';
+?>
+        '<?php echo $f->getAlias(); ?>': {
+            type: '<?php echo $f->getType(); ?>',
+            name: '<?php echo $name; ?>'
+        },
+<?php endforeach; ?>
+    };
 </script>

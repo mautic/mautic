@@ -182,3 +182,7 @@ Mautic Introduction
 	<li><a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]</li>
 	<li><a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]</li>
 </ul>
+
+<h3>Developers</h3>
+<p>We love testing our user interface on as many platforms as possible (even those browsers we prefer to not mention). In order to help us do this we use and recommend BrowserStack.</p>
+<img src="https://www.mautic.org/media/browserstack_small.png" />

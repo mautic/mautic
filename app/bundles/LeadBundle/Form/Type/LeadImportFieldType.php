@@ -43,14 +43,101 @@ class LeadImportFieldType extends AbstractType
                 'label'      => $label,
                 'required'   => false,
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'data'       => $this->getDefaultValue($field, $options['import_fields'])
             ));
         }
+
+        $properties = $builder->create('properties', 'form', array('virtual' => true));
+
+        $properties->add('dateAdded', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.dateAdded',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateAdded', $options['import_fields'])
+        ));
+
+        $properties->add('createdByUser', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.createdByUser',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('createdByUser', $options['import_fields'])
+        ));
+
+        $properties->add('dateModified', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.dateModified',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateModified', $options['import_fields'])
+        ));
+
+        $properties->add('modifiedByUser', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.modifiedByUser',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('modifiedByUser', $options['import_fields'])
+        ));
+
+        $properties->add('lastActive', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.lastActive',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('lastActive', $options['import_fields'])
+        ));
+
+        $properties->add('dateIdentified', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.dateIdentified',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('dateIdentified', $options['import_fields'])
+        ));
+
+        $properties->add('ip', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.ip',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('ip', $options['import_fields'])
+        ));
+
+        $properties->add('points', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.points',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('points', $options['import_fields'])
+        ));
+
+        $properties->add('doNotEmail', 'choice', array(
+            'choices'    => $options['import_fields'],
+            'label'      => 'mautic.lead.import.label.doNotEmail',
+            'required'   => false,
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'data'       => $this->getDefaultValue('doNotEmail', $options['import_fields'])
+        ));
+
+        $builder->add($properties);
 
         $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
             $this->factory->getEntityManager(),
             'MauticUserBundle:User'
         );
+
         $builder->add(
             $builder->create('owner', 'user_list', array(
                 'label'      => 'mautic.lead.lead.field.owner',
@@ -64,10 +151,22 @@ class LeadImportFieldType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
+        $builder->add(
+            $builder->create('list', 'leadlist_choices', array(
+                'label'      => 'mautic.lead.lead.field.list',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control'
+                ),
+                'required'   => false,
+                'multiple'   => false
+            ))
+        );
+
         $builder->add('buttons', 'form_buttons', array(
             'apply_text'   => false,
             'save_text'    => 'mautic.lead.import.start',
-            'save_class'   => 'btn btn-danger',
+            'save_class'   => 'btn btn-primary',
             'save_icon'    => 'fa fa-user-plus',
             'cancel_icon'  => 'fa fa-times'
         ));
@@ -86,7 +185,24 @@ class LeadImportFieldType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
+    public function getName() 
+    {
         return "lead_field_import";
+    }
+
+    /**
+     * @param  string $fieldName
+     * @param  array  $importFields
+     *
+     * @return string
+     */
+    public function getDefaultValue($fieldName, array $importFields)
+    {
+        if (isset($importFields[$fieldName]))
+        {
+            return $importFields[$fieldName];
+        }
+
+        return null;
     }
 }

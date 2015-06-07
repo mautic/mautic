@@ -51,13 +51,13 @@ class EmailRepository extends CommonRepository
     public function checkDoNotEmail($email)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id}')
+        $q->select('partial e.{id, unsubscribed, bounced, comments}')
             ->from('MauticEmailBundle:DoNotEmail', 'e')
             ->where('e.emailAddress = :email')
             ->setParameter('email', $email);
         $results = $q->getQuery()->getArrayResult();
 
-        return (!empty($results)) ? true : false;
+        return (!empty($results)) ? $results[0] : false;
     }
 
     /**
@@ -77,6 +77,16 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Delete DNC row
+     *
+     * @param $id
+     */
+    public function deleteDoNotEmailEntry($id)
+    {
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_donotemail', array('id' => (int) $id));
+    }
+
+    /**
      * Get a list of entities
      *
      * @param array      $args
@@ -87,22 +97,19 @@ class EmailRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticEmailBundle:Email', 'e', 'e.id')
-            ->leftJoin('e.category', 'c')
-            ->leftJoin('e.lists', 'l');
+            ->from('MauticEmailBundle:Email', 'e', 'e.id');
 
-        $this->buildClauses($q, $args);
+        if (empty($args['iterator_mode'])) {
+            $q->leftJoin('e.category', 'c');
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
+            if (!isset($args['email_type']) || $args['email_type'] == 'list') {
+                $q->leftJoin('e.lists', 'l');
+            }
         }
 
-        $results = new Paginator($query);
+        $args['qb'] = $q;
 
-        return $results;
+        return parent::getEntities($args);
     }
 
     /**
@@ -128,19 +135,33 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
+     * @param      $emailId
+     * @param null $listIds
+     * @param bool $countOnly
+     * @param null $limit
+     *
+     * @return array|int
      */
-    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false)
+    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false, $limit = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('dne.lead_id')->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne');
+        $sq->select('dne.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
+            ->where(
+                $sq->expr()->isNotNull('dne.lead_id')
+            );
 
         $sq2 = $this->_em->getConnection()->createQueryBuilder();
         $sq2->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
-            ->where('stat.email_id = el.email_id');
+            ->where(
+                $sq2->expr()->andX(
+                    $sq2->expr()->isNotNull('stat.lead_id'),
+                    $sq2->expr()->eq('stat.email_id', 'el.email_id')
+                )
+            );
 
         if ($countOnly) {
             $q->select('count(l.id) as count');
@@ -162,6 +183,19 @@ class EmailRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->in('ll.leadlist_id', $listIds)
             );
+        }
+
+        // Has an email
+        $q->andWhere(
+            $q->expr()->orX(
+                $q->expr()->isNotNull('l.email'),
+                $q->expr()->neq('l.email', $q->expr()->literal(''))
+            )
+        );
+
+        if (!empty($limit)) {
+            $q->setFirstResult(0)
+                ->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();
@@ -188,13 +222,13 @@ class EmailRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false)
+    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false, $emailType = null)
     {
         $q = $this->createQueryBuilder('e');
-        $q->select('partial e.{id, subject, language}');
+        $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.subject', ':search'))
+            $q->andWhere($q->expr()->like('e.name', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
@@ -207,7 +241,13 @@ class EmailRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
-        $q->orderBy('e.subject');
+        if (!empty($emailType)) {
+            $q->andWhere(
+                $q->expr()->eq('e.emailType', $q->expr()->literal($emailType))
+            );
+        }
+
+        $q->orderBy('e.name');
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
@@ -227,7 +267,11 @@ class EmailRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->like('e.subject',  ":$unique");
+        $expr = $q->expr()->orX(
+            $q->expr()->like('e.name',  ":$unique"),
+            $q->expr()->like('e.subject', ":$unique")
+        );
+
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
@@ -323,7 +367,7 @@ class EmailRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('e.subject', 'ASC')
+            array('e.name', 'ASC')
         );
     }
 

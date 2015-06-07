@@ -62,12 +62,12 @@ foreach ($slots as $slot => $slotConfig) {
             $options['slides'] =  array (
                 array (
                     'order' => 0,
-                    'background-image' => '../../../media/images/mautic_logo_lb200.png',
+                    'background-image' => $view['assets']->getUrl('media/images/mautic_logo_lb200.png'),
                     'captionheader' => 'Caption 1'
                 ),
                 array (
                     'order' => 1,
-                    'background-image' => '../../../media/images/mautic_logo_db200.png',
+                    'background-image' => $view['assets']->getUrl('media/images/mautic_logo_db200.png'),
                     'captionheader' => 'Caption 2'
                 )
             );

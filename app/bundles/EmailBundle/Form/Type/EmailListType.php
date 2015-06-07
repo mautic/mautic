@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -20,22 +21,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EmailListType extends AbstractType
 {
-
-    private $choices = array();
+    private $repo;
+    private $viewOther;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('email:emails:viewother');
-        $choices = $factory->getModel('email')->getRepository()
-            ->getEmailList('', 0, 0, $viewOther, true);
-        foreach ($choices as $email) {
-            $this->choices[$email['language']][$email['id']] = $email['subject'] . " ({$email['id']})";
-        }
-
-        //sort by language
-        ksort($this->choices);
+        $this->viewOther = $factory->getSecurity()->isGranted('email:emails:viewother');
+        $this->repo      = $factory->getModel('email')->getRepository();
     }
 
     /**
@@ -43,22 +37,44 @@ class EmailListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        if ($this->choices) {
-            $resolver->setDefaults(array(
-                'choices'       => $this->choices,
-                'empty_value'   => false,
-                'expanded'      => false,
-                'multiple'      => true,
-                'required'      => false,
-                'empty_value'   => 'mautic.core.form.chooseone'
-            ));
-        } else {
-            $resolver->setDefaults(array(
-                'empty_value'   => 'mautic.email.no.emails.note',
-                'required'      => false,
-                'disabled'      => true
-            ));
-        }
+        $viewOther = $this->viewOther;
+        $repo      = $this->repo;
+
+        $resolver->setDefaults(
+            array(
+                'choices'     => function (Options $options) use ($repo, $viewOther) {
+                    static $choices;
+
+                    if (is_array($choices)) {
+                        return $choices;
+                    }
+
+                    $choices = array();
+
+                    $emails  = $repo->getEmailList('', 0, 0, $viewOther, true, $options['email_type']);
+                    foreach ($emails as $email) {
+                        $choices[$email['language']][$email['id']] = $email['name'];
+                    }
+
+                    //sort by language
+                    ksort($choices);
+
+                    return $choices;
+                },
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'empty_value' => function (Options $options) {
+                    return (empty($options['choices'])) ? 'mautic.email.no.emails.note' : 'mautic.core.form.chooseone';
+                },
+                'email_type'  => 'template',
+                'disabled'    => function (Options $options) {
+                    return (empty($options['choices']));
+                },
+            )
+        );
+
+        $resolver->setOptional(array('email_type'));
     }
 
     /**
@@ -68,6 +84,9 @@ class EmailListType extends AbstractType
         return "email_list";
     }
 
+    /**
+     * @return string
+     */
     public function getParent()
     {
         return 'choice';

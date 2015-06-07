@@ -4035,6 +4035,11 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     top: 0;
   }
 }
+.navbar-form .chosen-container {
+  display: inline-table;
+  vertical-align: middle;
+  min-width: 200px;
+}
 @media (max-width: 767px) {
   .navbar-form .form-group {
     margin-bottom: 5px;
@@ -4706,6 +4711,10 @@ a.thumbnail.active {
   background-color: #4e5d9d;
   border-color: rgba(0, 0, 0, 0.03);
   color: #ffffff;
+}
+.alert-mautic a {
+  color: #ffffff;
+  text-decoration: underline;
 }
 .alert-mautic hr {
   border-top-color: rgba(0, 0, 0, 0.03);
@@ -8066,6 +8075,9 @@ button.close {
   position: relative;
   vertical-align: middle;
 }
+.chosen-container .group-name {
+  margin-right: 2px;
+}
 .chosen-container .chosen-drop {
   background: #ffffff;
   border: 1px solid #d5d5d5;
@@ -8215,9 +8227,6 @@ button.close {
   height: 100%;
   width: 100%;
 }
-.chosen-container-single .chosen-default {
-  color: #a0acb8;
-}
 .chosen-container-single .chosen-search {
   margin: 0;
   padding: 3px 4px;
@@ -8275,7 +8284,6 @@ button.close {
   margin: 0;
   padding: 0;
   white-space: nowrap;
-  width: 100%;
 }
 .chosen-container-multi .chosen-choices .search-field input[type="text"] {
   background: transparent !important;
@@ -8287,10 +8295,6 @@ button.close {
   margin: 0;
   padding: 4px;
   outline: 0;
-  width: 100% !important;
-}
-.chosen-container-multi .chosen-choices .search-field .default {
-  color: #999;
 }
 .chosen-container-multi .chosen-choices .search-choice {
   -webkit-background-clip: padding-box;
@@ -8447,6 +8451,27 @@ button.close {
   background: url("chosen/chosen-sprite.png") no-repeat -28px -20px, #ffffff;
   direction: rtl;
   padding: 4px 5px 4px 20px;
+}
+.input-group .chosen-container:last-child .chosen-single,
+.input-group .chosen-container:last-child .chosen-default,
+.input-group .chosen-container:last-child .chosen-choices {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.input-group .chosen-container:not(:last-child) .chosen-single,
+.input-group .chosen-container:not(:last-child) .chosen-default,
+.input-group .chosen-container:not(:last-child) .chosen-choices {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.form-inline .chosen-container {
+  display: inline-table;
+  vertical-align: middle;
+  min-width: 200px;
+}
+.chosen-container .default,
+.chosen-container .chosen-default {
+  color: #a0acb8 !important;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 2dppx) {
   .chosen-rtl .chosen-search input[type="text"],

@@ -1,9 +1,9 @@
-<div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
-    <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
-    <?php $message = (empty($message)) ? 'mautic.core.noresults' : $message; ?>
+<div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
+    <?php if (!isset($header)) $header = 'mautic.core.noresults.header'; ?>
+    <h4><?php echo $view['translator']->trans($header); ?></h4>
+    <?php if (!isset($message)) $message = 'mautic.core.noresults'; ?>
     <p><?php echo $view['translator']->trans($message); ?></p>
 </div>
-
 
 <?php if (isset($tip)): ?>
     <div class="well well col-md-6 col-md-offset-3">

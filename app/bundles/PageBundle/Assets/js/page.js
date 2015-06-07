@@ -10,6 +10,10 @@ Mautic.pageOnLoad = function (container) {
         Mautic.renderPageReturningVisitsPie();
         Mautic.renderPageTimePie();
     }
+
+    if (mQuery(container + ' #page_template').length) {
+        Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
+    }
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -73,20 +77,6 @@ Mautic.renderPageTimePie = function () {
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
 };
 
-Mautic.togglePageContentMode = function (el) {
-    var builder = (mQuery(el).val() === '0') ? false : true;
-
-    if (builder) {
-        mQuery('#customHtmlContainer').addClass('hide');
-        mQuery('#builderHtmlContainer').removeClass('hide');
-        mQuery('#metaDescriptionContainer').removeClass('hide');
-    } else {
-        mQuery('#customHtmlContainer').removeClass('hide');
-        mQuery('#builderHtmlContainer').addClass('hide');
-        mQuery('#metaDescriptionContainer').addClass('hide');
-    }
-};
-
 Mautic.getPageAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
         mQuery(abKey).closest('.form-group').removeClass('has-error');
@@ -117,7 +107,9 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
                     Mautic.onPageLoad('#page_variantSettings_properties', response);
                 }
             }
-            spinner.remove();
+
+            Mautic.removeLabelLoadingIndicator();
+
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);

@@ -140,6 +140,7 @@ $dbalSettings = array(
     'password' => '%mautic.db_password%',
     'charset'  => 'UTF8',
     'types'    => array(
+        'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
     )
 );

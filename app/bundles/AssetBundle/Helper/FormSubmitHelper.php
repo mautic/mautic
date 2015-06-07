@@ -12,6 +12,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,7 +24,8 @@ class FormSubmitHelper
 {
 
     /**
-     * @param       $action
+     * @param Action        $action
+     * @param MauticFactory $factory
      *
      * @return array
      */
@@ -45,22 +47,35 @@ class FormSubmitHelper
                 'callback' => '\Mautic\AssetBundle\Helper\FormSubmitHelper::downloadFile',
                 'form'     => $form,
                 'asset'    => $asset,
-                'message'  => $properties['message']
+                'message'  => (isset($properties['message'])) ? $properties['message'] : ''
             );
         }
     }
 
-    public static function downloadFile(Form $form, Asset $asset, MauticFactory $factory, $message)
+    /**
+     * @param Form          $form
+     * @param Asset         $asset
+     * @param MauticFactory $factory
+     * @param               $message
+     * @param               $messageMode
+     *
+     * @return RedirectResponse|Response
+     */
+    public static function downloadFile(Form $form, Asset $asset, MauticFactory $factory, $message, $messengerMode)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $factory->getModel('asset');
         $url   = $model->generateUrl($asset, true, array('form', $form->getId()));
-        $msg   = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
+
+        if ($messengerMode) {
+            return array('download' => $url);
+        }
+
+        $msg = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
             '%url%' => $url
         ));
 
-        //@todo - give option to choose a template
-        $content = $factory->getTemplating()->renderResponse('MauticEmailBundle::message.html.php', array(
+        $content = $factory->getTemplating()->renderResponse('MauticCoreBundle::message.html.php', array(
             'message'  => $msg,
             'type'     => 'notice',
             'template' => $factory->getParameter('theme')

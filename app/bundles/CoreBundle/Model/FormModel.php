@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -209,7 +210,6 @@ class FormModel extends CommonModel
         return false;
     }
 
-
     /**
      * Set timestamps and user ids
      *
@@ -221,14 +221,14 @@ class FormModel extends CommonModel
     {
         $user = $this->factory->getUser(true);
         if ($isNew) {
-            if (method_exists($entity, 'setDateAdded')) {
+            if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
                 $entity->setDateAdded(new \DateTime());
             }
 
             if ($user instanceof User) {
-                if (method_exists($entity, 'setCreatedBy')) {
+                if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
                     $entity->setCreatedBy($user);
-                } elseif (method_exists($entity, 'setCreatedByUser')) {
+                } elseif (method_exists($entity, 'setCreatedByUser') && !$entity->getCreatedByUser()) {
                     $entity->setCreatedByUser($user->getName());
                 }
             }
@@ -324,9 +324,9 @@ class FormModel extends CommonModel
      * @param string $action
      * @param object $entity
      * @param bool   $isNew
-     * @param bool   $event
+     * @param Event  $event
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         //...
     }

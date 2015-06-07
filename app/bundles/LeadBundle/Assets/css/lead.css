@@ -1,6 +1,6 @@
 /* LeadBundle */
 
-.col-leadfield-id, .col-leadlist-id {
+.col-leadfield-id, .col-leadlist-id, .col-lead-id {
     width: 75px;
 }
 
@@ -101,4 +101,9 @@ ul.tag-cloud li {
     height: 250px;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.card.highlight {
+    background-color: #faf2cc;
+    border: 3px solid #4e5d9d !important;
 }

@@ -11,11 +11,13 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -38,11 +40,11 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param $post
      * @param $server
-     * @param $form
+     * @param Form $form
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
      */
-    public function saveSubmission(&$post, &$server, &$form)
+    public function saveSubmission($post, $server, Form $form)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
 
@@ -66,11 +68,13 @@ class SubmissionModel extends CommonFormModel
         $referer = InputHelper::url($referer, null, null, array('mauticError', 'mauticMessage'));
         $submission->setReferer($referer);
 
-        $fields     = $form->getFields();
-        $errors     = array();
-        $fieldArray = array();
-        $results    = array();
-        $tokens     = array();
+        $fields           = $form->getFields();
+        $errors           = array();
+        $fieldArray       = array();
+        $results          = array();
+        $tokens           = array();
+        $leadFieldMatches = array();
+        $validationErrors = array();
 
         foreach ($fields as $f) {
             $id    = $f->getId();
@@ -92,11 +96,7 @@ class SubmissionModel extends CommonFormModel
                 if (!empty($captcha)) {
                     $props = $f->getProperties();
                     //check for a custom message
-                    if (!empty($props['errorMessage'])) {
-                        $errors[] = $props['errorMessage'];
-                    } else {
-                        $errors = array_merge($errors, $captcha);
-                    }
+                    $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
             }
@@ -110,7 +110,9 @@ class SubmissionModel extends CommonFormModel
                     ), 'validators');
                 }
 
-                return array('errors' => array($msg));
+                $validationErrors[$alias] = $msg;
+
+                continue;
             }
 
             //clean and validate the input
@@ -133,19 +135,19 @@ class SubmissionModel extends CommonFormModel
 
                 if (isset($params['valueConstraints']) && is_callable($params['valueConstraints'])) {
                     $customErrors = call_user_func_array($params['valueConstraints'], array($f, $value));
-                    if (is_array($customErrors)) {
-                        $errors = array_merge($errors, $customErrors);
-                    } else {
-                        $errors[] = $customErrors;
+                    if (!empty($customErrors)) {
+                        $validationErrors[$alias] = is_array($customErrors) ? implode('<br />', $customErrors) : $customErrors;
                     }
                 }
 
-            } else {
-                if (!empty($value)) {
-                    $filter = $fieldHelper->getFieldFilter($type);
-                    $value  = InputHelper::_($value, $filter);
+            } elseif (!empty($value)) {
+                $filter = $fieldHelper->getFieldFilter($type);
+                $value  = InputHelper::_($value, $filter);
+
+                $validation = $fieldHelper->validateFieldValue($type, $value);
+                if (!empty($validation)) {
+                    $validationErrors[$alias] = is_array($validation) ? implode('<br />', $validation) : $validation;
                 }
-                $errors = array_merge($errors, $fieldHelper->validateFieldValue($type, $value));
             }
 
             //convert array from checkbox groups and multiple selects
@@ -156,15 +158,23 @@ class SubmissionModel extends CommonFormModel
             //save the result
             $results[$alias] = $value;
 
-            $tokens['search'][$alias]  = "{formfield={$alias}}";
-            $tokens['replace'][$alias] = $value;
+            $tokens["{formfield={$alias}}"] = $value;
 
+            //save the result
+            if ($f->getSaveResult() !== false) {
+                $results[$alias] = $value;
+            }
+
+            $leadField = $f->getLeadField();
+            if (!empty($leadField)) {
+                $leadFieldMatches[$leadField] = $value;
+            }
         }
 
         $submission->setResults($results);
 
         //execute submit actions
-        $actions          = $form->getActions();
+        $actions = $form->getActions();
 
         //get post submit actions to make sure it still exists
         $components       = $this->factory->getModel('form')->getCustomComponents();
@@ -211,15 +221,15 @@ class SubmissionModel extends CommonFormModel
                     }
                     list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
                     if (!$validated) {
-                        $errors[] = $validatedMessage;
+                        $validationErrors[$alias] = $validatedMessage;
                     }
                 }
             }
         }
 
         //return errors
-        if (!empty($errors)) {
-            return array('errors' => $errors);
+        if (!empty($validationErrors)) {
+            return array('errors' => $validationErrors);
         }
 
         //set the landing page the form was submitted from if applicable
@@ -236,41 +246,48 @@ class SubmissionModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
-        // Now handle post submission actions
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $this->createLeadFromSubmit($form, $leadFieldMatches);
+        }
 
-            $settings       = $availableActions[$key];
-            $args['action'] = $action;
-            $args['config'] = $action->getProperties();
-
-            // Set the lead each time in case an action updates it
-            $args['lead']   = $leadModel->getCurrentLead();
-
-            $callback       = $settings['callback'];
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
-                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                } else {
-                    $reflection = new \ReflectionMethod(null, $callback);
+        if ($form->isStandalone()) {
+            // Now handle post submission actions
+            foreach ($actions as $action) {
+                $key = $action->getType();
+                if (!isset($availableActions[$key])) {
+                    continue;
                 }
 
-                $pass = array();
-                foreach ($reflection->getParameters() as $param) {
-                    if (isset($args[$param->getName()])) {
-                        $pass[] = $args[$param->getName()];
+                $settings       = $availableActions[$key];
+                $args['action'] = $action;
+                $args['config'] = $action->getProperties();
+
+                // Set the lead each time in case an action updates it
+                $args['lead'] = $leadModel->getCurrentLead();
+
+                $callback = $settings['callback'];
+                if (is_callable($callback)) {
+                    if (is_array($callback)) {
+                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    } elseif (strpos($callback, '::') !== false) {
+                        $parts      = explode('::', $callback);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
-                        $pass[] = null;
+                        $reflection = new \ReflectionMethod(null, $callback);
                     }
+
+                    $pass = array();
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    $returned               = $reflection->invokeArgs($this, $pass);
+                    $args['feedback'][$key] = $returned;
                 }
-                $returned               = $reflection->invokeArgs($this, $pass);
-                $args['feedback'][$key] = $returned;
             }
         }
 
@@ -284,6 +301,20 @@ class SubmissionModel extends CommonFormModel
             $submission->setTrackingId($trackingId);
         }
         $submission->setLead($lead);
+
+        if (!$form->isStandalone()) {
+            // Find and add the lead to the associated campaigns
+
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+            $campaignModel = $this->factory->getModel('campaign');
+
+            $campaigns = $campaignModel->getCampaignsByForm($form);
+            if (!empty($campaigns)) {
+                foreach ($campaigns as $campaign) {
+                    $campaignModel->addLead($campaign, $lead);
+                }
+            }
+        }
 
         //save entity after the form submission events are fired in case a new lead is created
         $this->saveEntity($submission);
@@ -301,6 +332,119 @@ class SubmissionModel extends CommonFormModel
 
         //made it to the end so return false that there was not an error
         return false;
+    }
+
+    /**
+     * Create/update lead from form submit
+     *
+     * @param       $form
+     * @param array $leadFieldMatches
+     *
+     * @return Lead
+     */
+    protected function createLeadFromSubmit($form, array $leadFieldMatches)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model      = $this->factory->getModel('lead');
+        $em         = $this->factory->getEntityManager();
+
+        //set the mapped data
+        $leadFields = $this->factory->getModel('lead.field')->getRepository()->getAliases(null, true, false);
+        $data       = array();
+
+        $inKioskMode = $form->isInKioskMode();
+
+        if (!$inKioskMode) {
+            $lead          = $model->getCurrentLead();
+            $leadId        = $lead->getId();
+            $currentFields = $lead->getFields();
+        } else {
+            $lead = new Lead();
+            $lead->setNewlyCreated(true);
+
+            $leadId = null;
+        }
+
+        $uniqueLeadFields     = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueFieldsWithData = array();
+
+        foreach ($leadFields as $alias) {
+            $data[$alias] = '';
+
+            if (isset($leadFieldMatches[$alias])) {
+                $value        = $leadFieldMatches[$alias];
+                $data[$alias] = $value;
+
+                // make sure the value is actually there and the field is one of our uniques
+                if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
+                    $uniqueFieldsWithData[$alias] = $value;
+                }
+            }
+        }
+
+        //update the lead rather than creating a new one if there is for sure identifier match ($leadId is to exclude lead from getCurrentLead())
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
+        $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
+
+        if (count($leads)) {
+            //merge with current lead if not in kiosk mode
+            $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
+        } elseif (!$inKioskMode) {
+            // Flatten current fields
+            $currentFields = $model->flattenFields($currentFields);
+
+            // Create a new lead if unique identifiers differ from getCurrentLead() and submitted data
+            foreach ($uniqueLeadFields as $alias => $value) {
+                //create a new lead if details differ
+                $currentValue = $currentFields[$alias];
+                if (!empty($currentValue) && strtolower($currentValue) != strtolower($value)) {
+                    //for sure a different lead so create a new one
+                    $lead = new Lead();
+                    $lead->setNewlyCreated(true);
+                    break;
+                }
+            }
+        }
+
+        //check for existing IP address
+        $ipAddress = $this->factory->getIpAddress();
+
+        //no lead was found by a mapped email field so create a new one
+        if ($lead->isNewlyCreated()) {
+            if (!$inKioskMode) {
+                $lead->addIpAddress($ipAddress);
+            }
+
+            // last active time
+            $lead->setLastActive(new \DateTime());
+
+        } elseif (!$inKioskMode) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
+        }
+
+        //set the mapped fields
+        $model->setFieldValues($lead, $data, false);
+
+        if (!empty($event)) {
+            $event->setIpAddress($ipAddress);
+            $lead->addPointsChangeLog($event);
+        }
+
+        //create a new lead
+        $model->saveEntity($lead, false);
+
+        if (!$inKioskMode) {
+            // Set the current lead which will generate tracking cookies
+            $model->setCurrentLead($lead);
+        } else {
+            // Set system current lead which will still allow execution of events without generating tracking cookies
+            $model->setSystemCurrentLead($lead);
+        }
+
+        return $lead;
     }
 
     /**

@@ -10,9 +10,17 @@
 /** @var $exception \Symfony\Component\HttpKernel\Exception\FlattenException */
 /** @var $logger    \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
 
+$message            = $view['slots']->get('message', 'mautic.core.error.generic');
+$previousExceptions = $exception->getAllPrevious();
+
+$exceptionMessage = $exception->getMessage();
+if ($exceptionMessage) {
+    $exceptionMessage = ' - ' . $exceptionMessage;
+}
+
 if (!$app->getRequest()->isXmlHttpRequest()) {
     $view->extend('MauticCoreBundle:Default:slim.html.php');
-    $view['slots']->set('pageTitle', $status_text);
+    $view['slots']->set('pageTitle', $exceptionMessage);
 
     $header = "<strong>$status_code</strong> $status_text";
     $view['slots']->set('headerTitle', $header);
@@ -21,13 +29,6 @@ if (!$app->getRequest()->isXmlHttpRequest()) {
 $img = $view['slots']->get('mautibot', 'wave');
 $src = $view['mautibot']->getImage($img);
 
-$message            = $view['slots']->get('message', 'mautic.core.error.generic');
-$previousExceptions = $exception->getAllPrevious();
-
-$exceptionMessage = $exception->getMessage();
-if ($exceptionMessage) {
-    $exceptionMessage = ' - ' . $exceptionMessage;
-}
 ?>
 
 <div class="pa-20 mautibot-error">

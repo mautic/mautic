@@ -18,6 +18,7 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -202,7 +203,7 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(array('Page'));
@@ -222,7 +223,7 @@ class PageModel extends FormModel
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -236,7 +237,7 @@ class PageModel extends FormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -274,6 +275,12 @@ class PageModel extends FormModel
      */
     public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
+        // If this is a variant, then get the parent's URL
+        $parent = $entity->getVariantParent();
+        if ($parent != null) {
+            $entity = $parent;
+        }
+
         $slug = $this->generateSlug($entity);
 
         return $this->buildUrl('mautic_page_public', array('slug' => $slug), $absolute, $clickthrough);
@@ -570,24 +577,46 @@ class PageModel extends FormModel
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
-     * @param $page
-     * @param $component null | pageTokens | abTestWinnerCriteria
+     * @param null|Page    $page
+     * @param array|string $requestedComponents all | tokens | tokenSections | abTestWinnerCriteria
+     * @param null|string  $tokenFilter
      *
-     * @return mixed
+     * @return array
      */
-    public function getBuilderComponents ($page = null, $component = null)
+    public function getBuilderComponents (Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
-        static $components;
+        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
+        $components      = array();
+        $event           = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
+        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
 
-        if (empty($components)) {
-            $components = array();
-            $event      = new PageBuilderEvent($this->translator, $page);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
-            $components['pageTokens']           = $event->getTokenSections();
-            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+        if (!is_array($requestedComponents)) {
+            $requestedComponents = array($requestedComponents);
         }
 
-        return ($component !== null && isset($components[$component])) ? $components[$component] : $components;
+        foreach ($requestedComponents as $requested) {
+            switch ($requested) {
+                case 'tokens':
+                    $components[$requested] = $event->getTokens();
+                    break;
+                case 'visualTokens':
+                    $components[$requested] = $event->getVisualTokens();
+                    break;
+                case 'tokenSections':
+                    $components[$requested] = $event->getTokenSections();
+                    break;
+                case 'abTestWinnerCriteria':
+                    $components[$requested] = $event->getAbTestWinnerCriteria();
+                    break;
+                default:
+                    $components['tokens']               = $event->getTokens();
+                    $components['tokenSections']        = $event->getTokenSections();
+                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+                    break;
+            }
+        }
+
+        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
     }
 
     /**

@@ -44,16 +44,15 @@ class DefaultController extends CommonController
         $popularAssets        = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
         $popularCampaigns     = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 
-        $openRate = 0;
-
-        if ($sentReadCount['sent_count']) {
-            $openRate = round($sentReadCount['read_count'] / $sentReadCount['sent_count'] * 100);
+        $returnRate = 0;
+        if ($totalVisits = array_sum($newReturningVisitors)) {
+            $returnRate = round($newReturningVisitors['returning'] / $totalVisits * 100);
         }
 
         $clickRate = 0;
 
         if ($sentReadCount['read_count']) {
-            $clickRate = round($clickthroughCount / $sentReadCount['read_count'] * 100);
+            $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
         $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
@@ -71,7 +70,7 @@ class DefaultController extends CommonController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null);
 
         // Get names of log's items
         $router = $this->factory->getRouter();
@@ -113,7 +112,7 @@ class DefaultController extends CommonController
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
                 'clickthroughCount' => $clickthroughCount,
-                'openRate'          => $openRate,
+                'returnRate'        => $returnRate,
                 'clickRate'         => $clickRate,
                 'newReturningVisitors' => $newReturningVisitors,
                 'weekVisitors'      => $weekVisitors,

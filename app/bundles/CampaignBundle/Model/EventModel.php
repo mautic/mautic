@@ -160,19 +160,6 @@ class EventModel extends CommonFormModel
             return false;
         }
 
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
-            //let's prevent some unnecessary DB calls
-            $session         = $this->factory->getSession();
-            $triggeredEvents = $session->get('mautic.triggered.campaign.events', array());
-            if (in_array($typeId, $triggeredEvents)) {
-                $logger->debug('CAMPAIGN: '.$typeId.' has already been processed.');
-
-                return false;
-            }
-            $triggeredEvents[] = $typeId;
-            $session->set('mautic.triggered.campaign.events', $triggeredEvents);
-        }
-
         //get the current lead
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
@@ -336,7 +323,7 @@ class EventModel extends CommonFormModel
                         $response = $this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered);
                         if ($response !== false) {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' successfully executed and logged.');
-                            $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
+                            $log = $this->getLogEntity($child['id'], $child['campaign']['id'], $lead, $ipAddress, $systemTriggered);
 
                             $childrenTriggered = true;
 
@@ -385,7 +372,8 @@ class EventModel extends CommonFormModel
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $campaignId = $campaign->getId();
+        $campaignId   = $campaign->getId();
+        $campaignName = $campaign->getName();
 
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering starting events');
@@ -510,7 +498,10 @@ class EventModel extends CommonFormModel
                     }
 
                     // Set campaign ID
-                    $event['campaign'] = array('id' => $campaignId);
+                    $event['campaign'] = array(
+                        'id'   => $campaignId,
+                        'name' => $campaignName,
+                    );
 
                     $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
 
@@ -621,7 +612,8 @@ class EventModel extends CommonFormModel
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $campaignId = $campaign->getId();
+        $campaignId   = $campaign->getId();
+        $campaignName = $campaign->getName();
 
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering scheduled events');
@@ -719,7 +711,10 @@ class EventModel extends CommonFormModel
                     $event = $campaignEvents[$log['event_id']];
 
                     // Set campaign ID
-                    $event['campaign'] = array('id' => $campaignId);
+                    $event['campaign'] = array(
+                        'id'   => $campaignId,
+                        'name' => $campaignName
+                    );
 
                     if (!isset($eventSettings['action'][$event['type']])) {
                         unset($event);
@@ -820,7 +815,8 @@ class EventModel extends CommonFormModel
         $logger = $this->factory->getLogger();
         $logger->debug('CAMPAIGN: Triggering negative events');
 
-        $campaignId = $campaign->getId();
+        $campaignId   = $campaign->getId();
+        $campaignName = $campaign->getName();
 
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
@@ -993,7 +989,10 @@ class EventModel extends CommonFormModel
                             foreach ($eventTiming as $id => $timing) {
                                 // Set event
                                 $e             = $events[$id];
-                                $e['campaign'] = array('id' => $campaignId);
+                                $e['campaign'] = array(
+                                    'id'   => $campaignId,
+                                    'name' => $campaignName
+                                );
 
                                 // Set lead in case this is triggered by the system
                                 $leadModel->setSystemCurrentLead($l);

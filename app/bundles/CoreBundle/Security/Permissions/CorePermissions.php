@@ -228,7 +228,7 @@ class CorePermissions
      * @param string       $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param User         $userEntity
      *
-     * @return bool
+     * @return mixed
      * @throws \InvalidArgumentException
      */
     public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)

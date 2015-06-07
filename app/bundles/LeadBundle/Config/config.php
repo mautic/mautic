@@ -12,7 +12,7 @@ return array(
         'main' => array(
             'mautic_lead_emailtoken_index' => array(
                 'path'       => '/leads/emailtokens/{page}',
-                'controller' => 'MauticLeadBundle:SubscribedEvents\EmailToken:index'
+                'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index'
             ),
             'mautic_leadlist_index'        => array(
                 'path'       => '/leads/lists/{page}',
@@ -213,15 +213,6 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadlist'
             ),
-            'mautic.form.type.lead.submitaction.createlead'   => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\FormSubmitActionCreateLeadType',
-                'alias' => 'lead_submitaction_createlead'
-            ),
-            'mautic.form.type.lead.submitaction.mappedfields' => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionMappedFieldsType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'lead_submitaction_mappedfields'
-            ),
             'mautic.form.type.lead.submitaction.pointschange' => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
                 'arguments' => 'mautic.factory',
@@ -266,7 +257,12 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_field_import'
-            )
+            ),
+            'mautic.form.type.lead_quickemail'                    => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_quickemail'
+            ),
         ),
         'other'  => array(
             'mautic.validator.leadlistaccess' => array(

@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\EmailBundle\Entity\DoNotEmail;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class Lead
@@ -58,6 +60,11 @@ class Lead extends FormEntity
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
     private $pointsChangeLog;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mautic\EmailBundle\Entity\DoNotEmail", mappedBy="lead", cascade={"persist"}, fetch="EXTRA_LAZY")
+     */
+    private $doNotEmail;
 
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "detach"}, indexBy="ipAddress")
@@ -155,16 +162,18 @@ class Lead extends FormEntity
 
     protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = "get".ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
-                $this->changes['owner'] = array($current->getName() . ' ('. $current->getId().')', $val);
+                $this->changes['owner'] = array($current->getName().' ('.$current->getId().')', $val);
             } elseif (!$current && $val) {
-                $this->changes['owner'] = array($current, $val->getName() . ' ('. $val->getId().')');
+                $this->changes['owner'] = array($current, $val->getName().' ('.$val->getId().')');
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = array($current->getName() . '('. $current->getId().')',
-                    $val->getName() . '('. $val->getId().')');
+                $this->changes['owner'] = array(
+                    $current->getName().'('.$current->getId().')',
+                    $val->getName().'('.$val->getId().')'
+                );
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
@@ -178,7 +187,9 @@ class Lead extends FormEntity
      */
     public function __construct()
     {
-        $this->ipAddresses = new ArrayCollection();
+        $this->ipAddresses     = new ArrayCollection();
+        $this->doNotEmail      = new ArrayCollection();
+        $this->pointsChangeLog = new ArrayCollection();
     }
 
     /**
@@ -193,6 +204,7 @@ class Lead extends FormEntity
      * Set id
      *
      * @param integer $id
+     *
      * @return Lead
      */
     public function setId($id)
@@ -215,10 +227,11 @@ class Lead extends FormEntity
     /**
      * Set owner
      *
-     * @param \Mautic\UserBundle\Entity\User $owner
+     * @param User $owner
+     *
      * @return Lead
      */
-    public function setOwner(\Mautic\UserBundle\Entity\User $owner = null)
+    public function setOwner(User $owner = null)
     {
         $this->isChanged('owner', $owner);
         $this->owner = $owner;
@@ -229,7 +242,7 @@ class Lead extends FormEntity
     /**
      * Get owner
      *
-     * @return \Mautic\UserBundle\Entity\User
+     * @return User
      */
     public function getOwner()
     {
@@ -239,10 +252,11 @@ class Lead extends FormEntity
     /**
      * Add ipAddresses
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddresses
+     * @param IpAddress $ipAddresses
+     *
      * @return Lead
      */
-    public function addIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
+    public function addIpAddress(IpAddress $ipAddresses)
     {
         $ip = $ipAddresses->getIpAddress();
         if (!isset($this->ipAddresses[$ip])) {
@@ -256,9 +270,9 @@ class Lead extends FormEntity
     /**
      * Remove ipAddresses
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddresses
+     * @param IpAddress $ipAddresses
      */
-    public function removeIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
+    public function removeIpAddress(IpAddress $ipAddresses)
     {
         $this->ipAddresses->removeElement($ipAddresses);
     }
@@ -277,17 +291,18 @@ class Lead extends FormEntity
      * Get full name
      *
      * @param bool $lastFirst
+     *
      * @return string
      */
     public function getName($lastFirst = false)
     {
         $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
         $lastName  = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
-        $fullName = "";
+        $fullName  = "";
         if ($lastFirst && !empty($firstName) && !empty($lastName)) {
-            $fullName = $lastName . ", " . $firstName;
+            $fullName = $lastName.", ".$firstName;
         } elseif (!empty($firstName) && !empty($lastName)) {
-            $fullName = $firstName . " " . $lastName;
+            $fullName = $firstName." ".$lastName;
         } elseif (!empty($firstName)) {
             $fullName = $firstName;
         } elseif (!empty($lastName)) {
@@ -301,6 +316,7 @@ class Lead extends FormEntity
      * Get the primary identifier for the lead
      *
      * @param bool $lastFirst
+     *
      * @return string
      */
     public function getPrimaryIdentifier($lastFirst = false)
@@ -342,15 +358,15 @@ class Lead extends FormEntity
         $location = '';
 
         if (!empty($this->fields['core']['city']['value'])) {
-            $location .= $this->fields['core']['city']['value'] . ', ';
+            $location .= $this->fields['core']['city']['value'].', ';
         }
 
         if (!empty($this->fields['core']['state']['value'])) {
-            $location .= $this->fields['core']['state']['value'] . ', ';
+            $location .= $this->fields['core']['state']['value'].', ';
         }
 
         if (!empty($this->fields['core']['country']['value'])) {
-            $location .= $this->fields['core']['country']['value'] . ', ';
+            $location .= $this->fields['core']['country']['value'].', ';
         }
 
         return rtrim($location, ', ');
@@ -371,6 +387,7 @@ class Lead extends FormEntity
      * Set points
      *
      * @param integer $points
+     *
      * @return Lead
      */
     public function setPoints($points)
@@ -394,10 +411,10 @@ class Lead extends FormEntity
     /**
      * Creates a points change entry
      *
-     * @param $type
-     * @param $name
-     * @param $action
-     * @param $pointsDelta
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
      * @param IpAddress $ip
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
@@ -423,10 +440,11 @@ class Lead extends FormEntity
     /**
      * Add pointsChangeLog
      *
-     * @param \Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog
+     * @param PointsChangeLog $pointsChangeLog
+     *
      * @return Lead
      */
-    public function addPointsChangeLog(\Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog)
+    public function addPointsChangeLog(PointsChangeLog $pointsChangeLog)
     {
         $this->pointsChangeLog[] = $pointsChangeLog;
 
@@ -436,9 +454,9 @@ class Lead extends FormEntity
     /**
      * Remove pointsChangeLog
      *
-     * @param \Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog
+     * @param PointsChangeLog $pointsChangeLog
      */
-    public function removePointsChangeLog(\Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog)
+    public function removePointsChangeLog(PointsChangeLog $pointsChangeLog)
     {
         $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
@@ -451,6 +469,34 @@ class Lead extends FormEntity
     public function getPointsChangeLog()
     {
         return $this->pointsChangeLog;
+    }
+
+    /**
+     * @param DoNotEmail $doNotEmail
+     *
+     * @return $this
+     */
+    public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
+    {
+        $this->doNotEmail[] = $doNotEmail;
+
+        return $this;
+    }
+
+    /**
+     * @param DoNotEmail $doNotEmail
+     */
+    public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
+    {
+        $this->doNotEmail->removeElement($doNotEmail);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getDoNotEmail()
+    {
+        return $this->doNotEmail;
     }
 
     /**
@@ -502,6 +548,8 @@ class Lead extends FormEntity
     }
 
     /**
+     * @param bool $ungroup
+     *
      * @return array
      */
     public function getFields($ungroup = false)
@@ -511,16 +559,19 @@ class Lead extends FormEntity
             foreach ($this->fields as $group => $fields) {
                 $return += $fields;
             }
+
             return $return;
         }
+
         return $this->fields;
     }
 
     /**
      * Add an updated field to persist to the DB and to note changes
      *
-     * @param $alias
-     * @param $value
+     * @param        $alias
+     * @param        $value
+     * @param string $oldValue
      */
     public function addUpdatedField($alias, $value, $oldValue = '')
     {
@@ -544,7 +595,7 @@ class Lead extends FormEntity
     /**
      * @return mixed
      */
-    public function getColor ()
+    public function getColor()
     {
         return $this->color;
     }
@@ -552,7 +603,7 @@ class Lead extends FormEntity
     /**
      * @param mixed $color
      */
-    public function setColor ($color)
+    public function setColor($color)
     {
         $this->color = $color;
     }
@@ -560,7 +611,7 @@ class Lead extends FormEntity
     /**
      * @return bool
      */
-    public function isAnonymous ()
+    public function isAnonymous()
     {
         if ($name = $this->getName() || !empty($this->fields['core']['company']['value']) || !empty($this->fields['core']['email']['value'])) {
             return false;
@@ -572,7 +623,7 @@ class Lead extends FormEntity
     /**
      * @return boolean
      */
-    public function isNewlyCreated ()
+    public function isNewlyCreated()
     {
         return $this->newlyCreated;
     }
@@ -580,7 +631,7 @@ class Lead extends FormEntity
     /**
      * @param boolean $newlyCreated
      */
-    public function setNewlyCreated ($newlyCreated)
+    public function setNewlyCreated($newlyCreated)
     {
         $this->newlyCreated = $newlyCreated;
     }
@@ -588,7 +639,7 @@ class Lead extends FormEntity
     /**
      * @return mixed
      */
-    public function getNotes ()
+    public function getNotes()
     {
         return $this->notes;
     }
@@ -614,7 +665,7 @@ class Lead extends FormEntity
     /**
      * @return mixed
      */
-    public function getDateIdentified ()
+    public function getDateIdentified()
     {
         return $this->dateIdentified;
     }
@@ -622,7 +673,7 @@ class Lead extends FormEntity
     /**
      * @param mixed $dateIdentified
      */
-    public function setDateIdentified ($dateIdentified)
+    public function setDateIdentified($dateIdentified)
     {
         $this->dateIdentified = $dateIdentified;
     }
@@ -636,7 +687,7 @@ class Lead extends FormEntity
         if ($this->dateIdentified == null && $this->wasAnonymous) {
             //check the changes to see if the user is now known
             if (!$this->isAnonymous()) {
-                $this->dateIdentified = new \DateTime();
+                $this->dateIdentified            = new \DateTime();
                 $this->changes['dateIdentified'] = array('', $this->dateIdentified);
             }
         }
@@ -645,7 +696,7 @@ class Lead extends FormEntity
     /**
      * @return mixed
      */
-    public function getLastActive ()
+    public function getLastActive()
     {
         return $this->lastActive;
     }
@@ -653,7 +704,7 @@ class Lead extends FormEntity
     /**
      * @param mixed $lastActive
      */
-    public function setLastActive ($lastActive)
+    public function setLastActive($lastActive)
     {
         $this->lastActive = $lastActive;
     }

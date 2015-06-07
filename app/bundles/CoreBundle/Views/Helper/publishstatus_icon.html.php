@@ -33,8 +33,8 @@ switch ($status) {
         break;
 }
 
-$clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-click-event';
+$clickAction = (isset($disableToggle) && $disableToggle === true) ? ' disabled' : ' has-click-event';
 $idClass     = str_replace('.', '-', $model) . '-publish-icon' . $item->getId();
 ?>
 
-<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>');"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>', <?php echo (isset($backdrop)) ? 'true' : 'false'; ?>);"<?php endif; ?>></i>

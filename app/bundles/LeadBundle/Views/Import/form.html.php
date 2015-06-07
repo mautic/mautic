@@ -71,7 +71,10 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
             </div>
             <div class="panel-body">
                 <div class="col-xs-4">
-                    <?php echo $view['form']->widget($form['owner']); ?>
+                    <?php echo $view['form']->row($form['owner']); ?>
+                </div>
+                <div class="col-xs-4">
+                    <?php echo $view['form']->row($form['list']); ?>
                 </div>
             </div>
         </div>
@@ -82,7 +85,29 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
             <div class="panel-body">
                 <?php echo $view['form']->errors($form); ?>
                 <?php $rowCount = 2; ?>
-                <?php foreach ($form->children as $child): ?>
+                <?php foreach ($form->children as $key => $child): ?>
+                    <?php if ($key != 'properties'): ?>
+                        <?php if ($rowCount++ % 3 == 1 ): ?>
+                            <div class="row">
+                        <?php endif; ?>
+                        <div class="col-sm-4">
+                            <?php echo $view['form']->row($child); ?>
+                        </div>
+                        <?php if ($rowCount++ % 3 == 1 ): ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php $rowCount++; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.import.properties'); ?></div>
+            </div>
+            <div class="panel-body">
+                <?php $rowCount = 2; ?>
+                <?php foreach ($form->children['properties'] as $child): ?>
                     <?php if ($rowCount++ % 3 == 1 ): ?>
                         <div class="row">
                     <?php endif; ?>

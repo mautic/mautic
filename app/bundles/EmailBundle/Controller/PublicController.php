@@ -10,7 +10,9 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,8 +22,6 @@ class PublicController extends CommonFormController
 {
     public function indexAction($idHash)
     {
-        //find the email
-        $security = $this->factory->getSecurity();
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');
@@ -29,60 +29,73 @@ class PublicController extends CommonFormController
 
         if (!empty($stat)) {
             $entity   = $stat->getEmail();
-            $statLead = $stat->getLead();
+            $model->hitEmail($stat, $this->request, true);
 
-            //the lead needs to have fields populated
-            $lead = $this->factory->getModel('lead')->getLead($statLead->getId());
+            // Check for stored copy
+            $content = $stat->getCopy();
 
-            $published = $entity->isPublished();
-
-            //make sure the page is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess(
-                    'email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()))
-            ) {
-                throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
-            }
-
-            //all the checks pass so display the content
-            $model->hitEmail($idHash, $this->request, true);
-
-            if ($entity->getContentMode() == 'builder') {
-                $template = $entity->getTemplate();
-                $slots    = $this->factory->getTheme($template)->getSlots('email');
-
-                $response = $this->render('MauticEmailBundle::public.html.php', array(
-                    'inBrowser'       => true,
-                    'googleAnalytics' => $this->factory->getParameter('google_analytics'),
-                    'slots'           => $slots,
-                    'content'         => $entity->getContent(),
-                    'email'           => $entity,
-                    'lead'            => $lead,
-                    'template'        => $template,
-                    'idHash'          => $idHash
-                ));
-
-                //replace tokens
-                $content = $response->getContent();
-            } else {
-                $content   = $entity->getCustomHtml();
-                $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
-
-                // Check for html doc
-                if (strpos($content, '<html>') === false) {
-                    $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
-                } elseif (strpos($content, '<head>') === false) {
-                    $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
-                } elseif (!empty($analytics)) {
-                    $content = str_replace('</head>', $analytics . "\n</head>", $content);
-                }
-            }
-
-            $dispatcher = $this->get('event_dispatcher');
-            if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
+            if (!empty($content)) {
+                // Copy stored in stats
                 $tokens = $stat->getTokens();
-                $event  = new EmailSendEvent($content, $entity, $lead, $idHash, array(), $tokens);
-                $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+                if (!empty($tokens)) {
+                    // Override tracking_pixel so as to not cause a double hit
+                    $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
+
+                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                }
+            } else {
+                // Old way where stats didn't store content
+
+                //the lead needs to have fields populated
+                $statLead = $stat->getLead();
+                $lead     = $this->factory->getModel('lead')->getLead($statLead->getId());
+                $template = $entity->getTemplate();
+                if (!empty($template)) {
+                    $slots = $this->factory->getTheme($template)->getSlots('email');
+
+                    $response = $this->render(
+                        'MauticEmailBundle::public.html.php',
+                        array(
+                            'inBrowser'       => true,
+                            'slots'           => $slots,
+                            'content'         => $entity->getContent(),
+                            'email'           => $entity,
+                            'lead'            => $lead,
+                            'template'        => $template
+                        )
+                    );
+
+                    //replace tokens
+                    $content = $response->getContent();
+                } else {
+                    $content = $entity->getCustomHtml();
+                }
+
+                $tokens = $stat->getTokens();
+
+                // Override tracking_pixel so as to not cause a double hit
+                $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
+
+                $event = new EmailSendEvent(array(
+                    'content' => $content,
+                    'lead'    => $lead,
+                    'email'   => $entity,
+                    'idHash'  => $idHash,
+                    'tokens'  => $tokens
+                ));
+                $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
                 $content = $event->getContent(true);
+            }
+
+            $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
+
+            // Check for html doc
+            if (strpos($content, '<html>') === false) {
+                $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
+            } elseif (strpos($content, '<head>') === false) {
+                $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
+            } elseif (!empty($analytics)) {
+                $content = str_replace('</head>', $analytics."\n</head>", $content);
             }
 
             return new Response($content);
@@ -114,6 +127,10 @@ class PublicController extends CommonFormController
 
     /**
      * @param $idHash
+     *
+     * @return Response
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     public function unsubscribeAction($idHash)
     {
@@ -170,7 +187,7 @@ class PublicController extends CommonFormController
             'message'  => $message,
             'type'     => 'notice',
         );
-        $contentTemplate = 'MauticEmailBundle::message.html.php';
+        $contentTemplate = 'MauticCoreBundle::message.html.php';
 
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
@@ -184,6 +201,10 @@ class PublicController extends CommonFormController
 
     /**
      * @param $idHash
+     *
+     * @return Response
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     public function resubscribeAction($idHash)
     {
@@ -224,12 +245,40 @@ class PublicController extends CommonFormController
             $template = $this->factory->getParameter('theme');
         }
 
-        return $this->render('MauticEmailBundle::message.html.php', array(
+        return $this->render('MauticCoreBundle::message.html.php', array(
             'message'  => $message,
             'type'     => 'notice',
             'email'    => $email,
             'lead'     => $lead,
             'template' => $template
         ));
+    }
+
+    /**
+     * Handles mailer transport webhook post
+     *
+     * @param $transport
+     *
+     * @return Response
+     */
+    public function mailerCallbackAction($transport)
+    {
+        ignore_user_abort(true);
+
+        // Check to see if transport matches currently used transport
+        $currentTransport = $this->factory->getMailer()->getTransport();
+
+        if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
+            $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
+            if (!empty($response['bounces'])) {
+                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                $model = $this->factory->getModel('email');
+                $model->updateBouncedStats($response['bounces']);
+            }
+
+            return new Response('success');
+        }
+
+        throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
     }
 }

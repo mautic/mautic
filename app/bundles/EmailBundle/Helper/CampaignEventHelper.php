@@ -27,20 +27,15 @@ class CampaignEventHelper
     public static function validateEmailTrigger(Email $eventDetails = null, $event)
     {
         if ($eventDetails == null) {
-            return true;
-        }
-
-        //check against selected emails
-        $limitToEmails = $event['properties']['emails'];
-
-        //check to see if the parent event is a "send email" event and that it matches the current email opened
-        if (empty($limitToEmails) && !empty($event['parent']) && $event['parent']['type'] == 'email.send') {
-            return ($eventDetails->getId() === (int) $event['parent']['properties']['email']);
-        } elseif (!empty($limitToEmails) && !in_array($eventDetails->getId(), $limitToEmails)) {
             return false;
         }
 
-        return true;
+        //check to see if the parent event is a "send email" event and that it matches the current email opened
+        if (!empty($event['parent']) && $event['parent']['type'] == 'email.send') {
+            return ($eventDetails->getId() === (int) $event['parent']['properties']['email']);
+        }
+
+        return false;
     }
 
     /**
@@ -77,7 +72,7 @@ class CampaignEventHelper
 
             if ($email != null && $email->isPublished()) {
                 $options   = array('source' => array('campaign', $event['campaign']['id']));
-                $emailSent = $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
+                $emailSent = $emailModel->sendEmail($email, $leadCredentials, $options);
             }
         }
 

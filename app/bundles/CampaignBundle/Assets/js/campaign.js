@@ -29,11 +29,16 @@ Mautic.campaignOnLoad = function (container) {
             appendTo: '#CampaignCanvas',
             zIndex: 8000,
             scroll: false,
-            cursorAt: {top: 15, left: 15}
+            cursorAt: {top: 15, left: 15},
+            drag: function(event, ui) {
+                if (mQuery(this).hasClass('disabled')) {
+                    return false;
+                }
+            }
         });
 
         // set hover and double click functions for the event buttons
-        mQuery('#CampaignCanvas .list-campaign-event').off('.eventbuttons')
+        mQuery('#CampaignCanvas .list-campaign-event, .list-campaign-source').off('.eventbuttons')
             .on('mouseover.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
@@ -156,6 +161,85 @@ Mautic.campaignEventOnLoad = function (container, response) {
     Mautic.campaignBuilderInstance.repaintEverything();
 };
 
+
+/**
+ * Setup the campaign source view
+ *
+ * @param container
+ * @param response
+ */
+Mautic.campaignSourceOnLoad = function (container, response) {
+    //new action created so append it to the form
+    var domEventId = 'CampaignEvent_' + response.sourceType;
+    var eventId = '#' + domEventId;
+
+    if (response.deleted) {
+        //remove the connections
+        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
+
+        //remove the div
+        mQuery(eventId).remove();
+
+        mQuery('#campaignLeadSource_' + response.sourceType).removeClass('disabled');
+    } else if (response.updateHtml) {
+
+        mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
+    } else if (response.sourceHtml) {
+        mQuery('#campaignLeadSource_' + response.sourceType).addClass('disabled');
+
+        var newHtml = response.sourceHtml;
+
+        //append content
+        var x = mQuery('#droppedX').val();
+        var y = mQuery('#droppedY').val();
+
+        mQuery(newHtml).appendTo('#CampaignCanvas');
+
+        mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
+
+        var theAnchor = Mautic.campaignBuilderLeadSourceAnchor;
+        theAnchor[6] = 'leadsource ' + domEventId;
+        Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_leadsource"}, Mautic.campaignBuilderLeadSourceEndpoint);
+
+        Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
+
+        //activate new stuff
+        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
+            event.preventDefault();
+            return Mautic.ajaxifyLink(this, event);
+        });
+
+        //initialize ajax'd modals
+        mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
+        mQuery(eventId).off('.eventbuttons')
+            .on('mouseover.eventbuttons', function() {
+                mQuery(this).find('.campaign-event-buttons').removeClass('hide');
+            })
+            .on('mouseout.eventbuttons', function() {
+                mQuery(this).find('.campaign-event-buttons').addClass('hide');
+            })
+            .on('dblclick.eventbuttons', function(event) {
+                event.preventDefault();
+                mQuery(this).find('.btn-edit').first().click();
+            });
+
+        //initialize tooltipslist-campaign-event
+        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+    }
+
+    Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Update a connectors label
+ *
+ * @param domEventId
+ */
 Mautic.campaignBuilderUpdateLabel = function (domEventId) {
     var theLabel = typeof Mautic.campaignBuilderLabels[domEventId] == 'undefined' ? '' : Mautic.campaignBuilderLabels[domEventId];
     var currentConnections = Mautic.campaignBuilderInstance.select({
@@ -212,6 +296,7 @@ Mautic.updateCampaignEventLinks = function () {
  */
 Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
+    mQuery('body').css('overflow-y', 'hidden');
 
     mQuery('.builder').addClass('builder-active');
     mQuery('.builder').removeClass('hide');
@@ -227,10 +312,40 @@ Mautic.launchCampaignEditor = function() {
         // Update the labels on connection/disconnection
         Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
             Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
+
+            info.targetEndpoint.setPaintStyle(
+                {
+                    fillStyle: info.sourceEndpoint.getPaintStyle().fillStyle
+                }
+            );
         });
 
         Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
             Mautic.campaignBuilderUpdateLabel(info.connection.targetId);
+
+            info.targetEndpoint.setPaintStyle(
+                {
+                    fillStyle: "#d5d4d4"
+                }
+            );
+        });
+
+        Mautic.campaignBuilderInstance.bind("connectionMoved", function (info, originalEvent) {
+            Mautic.campaignBuilderUpdateLabel(info.connection.originalTargetId);
+
+            info.originalTargetEndpoint.setPaintStyle(
+                {
+                    fillStyle: "#d5d4d4"
+                }
+            );
+
+            Mautic.campaignBuilderUpdateLabel(info.connection.newTargetId);
+
+            info.newTargetEndpoint.setPaintStyle(
+                {
+                    fillStyle: info.newSourceEndpoint.getPaintStyle().fillStyle
+                }
+            );
         });
 
         var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
@@ -246,16 +361,39 @@ Mautic.launchCampaignEditor = function() {
             },
             connector: connector,
             connectorOverlays: overlayOptions,
+            maxConnections: -1,
             isTarget: true,
             beforeDrop: function (params) {
                 //ensure that a yes/no isn't looping back to this endpoint
-                var currentConnections = Mautic.campaignBuilderInstance.select({
+                var loopbackConnections = Mautic.campaignBuilderInstance.select({
                     source: params.targetId,
                     target: params.sourceId
                 });
 
-                if (currentConnections.length >= 1) {
+                if (loopbackConnections.length > 0) {
                     return false;
+                }
+
+                //ensure that a top only has one connection at a time unless connected from a source
+                var currentConnections = Mautic.campaignBuilderInstance.select({
+                    target: params.targetId
+                });
+
+                if (!mQuery('#' + params.sourceId).hasClass('list-campaign-leadsource') && currentConnections.length > 0) {
+                    return false;
+                }
+
+                if (currentConnections.length > 0) {
+                    var hasNonSourceConnection = false;
+                    currentConnections.each(function (conn) {
+                        if (!mQuery('#' + conn.sourceId).hasClass('list-campaign-leadsource')) {
+                            hasNonSourceConnection = true;
+                        }
+                    });
+
+                    if (hasNonSourceConnection) {
+                        return false;
+                    }
                 }
 
                 //ensure that the connections are not looping back into the same event
@@ -321,6 +459,22 @@ Mautic.launchCampaignEditor = function() {
             isSource: true,
             connectorStyle: {
                 strokeStyle: "#f86b4f",
+                lineWidth: connectorStyleLineWidth
+            }
+        };
+
+        Mautic.campaignBuilderLeadSourceAnchor = [0.5, 1, 0, 1, 0, 0];
+        Mautic.campaignBuilderLeadSourceEndpoint = {
+            endpoint: endpoint,
+            paintStyle: {
+                fillStyle: "#fdb933"
+            },
+            connector: connector,
+            connectorOverlays: overlayOptions,
+            maxConnections: -1,
+            isSource: true,
+            connectorStyle: {
+                strokeStyle: "#fdb933",
                 lineWidth: connectorStyleLineWidth
             }
         };
@@ -397,8 +551,19 @@ Mautic.launchCampaignEditor = function() {
             }, Mautic.campaignBuilderNoEndpoint);
         });
 
+        mQuery("#CampaignCanvas .list-campaign-leadsource").each(function () {
+            var id = mQuery(this).attr('id');
+            var theAnchor = Mautic.campaignBuilderLeadSourceAnchor;
+            theAnchor[6] = 'leadsource ' + id;
+            Mautic.campaignBuilderInstance.addEndpoint(id, {
+                anchor: theAnchor,
+                uuid: id + "_leadsource"
+            }, Mautic.campaignBuilderLeadSourceEndpoint);
+        });
+
         //enable drag and drop
         Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-event"), Mautic.campaignDragOptions);
+        mQuery('#CampaignCanvas .list-campaign-source').draggable(Mautic.campaignDragOptions);
 
         //activate existing connections
         Mautic.campaignBuilderReconnectEndpoints();
@@ -450,7 +615,14 @@ Mautic.closeCampaignBuilder = function() {
     var nodes       = [];
 
     mQuery("#CampaignCanvas .list-campaign-event").each(function (idx, elem) {
-        var endpoints = jsPlumb.getEndpoints(mQuery(elem).attr('id'));
+        nodes.push({
+            id:        mQuery(elem).attr('id').replace('CampaignEvent_', ''),
+            positionX: parseInt(mQuery(elem).css('left'), 10),
+            positionY: parseInt(mQuery(elem).css('top'), 10)
+        });
+    });
+
+    mQuery("#CampaignCanvas .list-campaign-source").each(function (idx, elem) {
         nodes.push({
             id:        mQuery(elem).attr('id').replace('CampaignEvent_', ''),
             positionX: parseInt(mQuery(elem).css('left'), 10),
@@ -490,13 +662,14 @@ Mautic.closeCampaignBuilder = function() {
         dataType: "json",
         success: function (response) {
             mQuery('#builder-overlay').remove();
-
+            mQuery('body').css('overflow-y', '');
             if (response.success) {
                 mQuery('.builder').addClass('hide');
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
+            mQuery('body').css('overflow-y', '');
         }
     });
 };
@@ -510,6 +683,16 @@ Mautic.submitCampaignEvent = function(e) {
 
     mQuery('form[name="campaignevent"]').submit();
 };
+
+Mautic.submitCampaignSource = function(e) {
+    e.preventDefault();
+
+    mQuery('#campaign_leadsource_droppedX').val(mQuery('#droppedX').val());
+    mQuery('#campaign_leadsource_droppedY').val(mQuery('#droppedY').val());
+
+    mQuery('form[name="campaign_leadsource"]').submit();
+};
+
 
 Mautic.renderCampaignViewsBarChart = function (container) {
     if (!mQuery('#campaign-views-chart').length) {

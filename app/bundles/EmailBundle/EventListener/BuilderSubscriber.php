@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class BuilderSubscriber extends CommonSubscriber
 {
 
+
     /**
      * @return array
      */
@@ -36,63 +37,75 @@ class BuilderSubscriber extends CommonSubscriber
 
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        //add email tokens
-        $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
-        $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
+        if ($event->tokenSectionsRequested()) {
+            //add email tokens
+            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
+            $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
+        }
 
-        //add AB Test Winner Criteria
-        $openRate = array(
-            'group'    => 'mautic.email.abtest.criteria',
-            'label'    => 'mautic.email.abtest.criteria.open',
-            'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
-        );
-        $event->addAbTestWinnerCriteria('email.openrate', $openRate);
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $openRate = array(
+                'group'    => 'mautic.email.stats',
+                'label'    => 'mautic.email.abtest.criteria.open',
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
+            );
+            $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
-        $clickThrough = array(
-            'group'    => 'mautic.email.abtest.criteria',
-            'label'    => 'mautic.email.abtest.criteria.clickthrough',
-            'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
+            $clickThrough = array(
+                'group'    => 'mautic.email.stats',
+                'label'    => 'mautic.email.abtest.criteria.clickthrough',
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
+            );
+            $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
+        }
+
+        $tokens = array(
+            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{unsubscribe_url}'  => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
+            '{webview_url}'      => $this->translator->trans('mautic.email.token.webview_url')
         );
-        $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
+
+        if ($event->tokensRequested(array_keys($tokens))) {
+            unset($tokens['{leadfield}']);
+            $event->addTokens(
+                $event->filterTokens($tokens),
+                true
+            );
+        }
     }
 
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content  = $event->getContent();
-        $idHash   = $event->getIdHash();
+        $idHash  = $event->getIdHash();
         if ($idHash == null) {
             // Generate a bogus idHash to prevent errors for routes that may include it
             $idHash = uniqid();
         }
-        $model    = $this->factory->getModel('email');
-        if (strpos($content, '{unsubscribe_text}') !== false) {
-            $content = str_ireplace('{unsubscribe_text}',
-                $this->translator->trans('mautic.email.unsubscribe.text', array(
+        $model = $this->factory->getModel('email');
+        $event->addToken(
+            '{unsubscribe_text}',
+            $this->translator->trans(
+                'mautic.email.unsubscribe.text',
+                array(
                     '%link%' => $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
-                ))
-            , $content);
-        }
+                )
+            )
+        );
 
-        if (strpos($content, '{unsubscribe_url}') !== false) {
-            $content = str_ireplace('{unsubscribe_url}',
-                $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
-            , $content);
-        }
+        $event->addToken('{unsubscribe_url}', $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)));
 
-        if (strpos($content, '{webview_text}') !== false) {
-            $content = str_ireplace('{webview_text}',
-                $this->translator->trans('mautic.email.webview.text', array(
+        $event->addToken(
+            '{webview_text}',
+            $this->translator->trans(
+                'mautic.email.webview.text',
+                array(
                     '%link%' => $model->buildUrl('mautic_email_webview', array('idHash' => $idHash))
-                ))
-                , $content);
-        }
+                )
+            )
+        );
 
-        if (strpos($content, '{webview_url}') !== false) {
-            $content = str_ireplace('{webview_url}',
-                $model->buildUrl('mautic_email_webview', array('idHash' => $idHash))
-                , $content);
-        }
-
-        $event->setContent($content);
+        $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
     }
 }

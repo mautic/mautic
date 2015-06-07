@@ -9,6 +9,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -58,6 +60,9 @@ class PageRepository extends CommonRepository
             ->groupBy('h.page_id, p.title, h.url')
             ->where('h.page_id > 0')
             ->setMaxResults($limit);
+
+        $expr = $this->getPublishedByDateExpression($q, 'p');
+        $q->andWhere($expr);
 
         return $q->execute()->fetchAll();
     }

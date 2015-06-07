@@ -57,13 +57,18 @@ class AuditLogSubscriber extends CommonSubscriber
                     ),
                     array(
                         'column' => 'e.action',
-                        'expr'   => 'neq',
-                        'value'  => 'update'
+                        'expr'   => 'in',
+                        'value'  => array("create", "identified", "ipadded")
                     ),
                     array(
                         'column' => 'e.objectId',
                         'expr'   => 'eq',
                         'value'  => $lead->getId()
+                    ),
+                    array(
+                        'column' => 'e.dateAdded',
+                        'expr'   => 'gte',
+                        'value'  => $lead->getDateAdded()
                     )
                 )
             )
@@ -74,6 +79,8 @@ class AuditLogSubscriber extends CommonSubscriber
         // Add the entries to the event array
         /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
         $IpAddresses = $lead->getIpAddresses();
+
+        $foundIpAddresses = array();
         foreach ($rows as $row) {
             $action       = $row->getAction();
             $eventTypeKey = 'lead.' . $action;
@@ -95,7 +102,21 @@ class AuditLogSubscriber extends CommonSubscriber
             } elseif (isset($details[1])) {
                 $ipAddress = $details[1];
             } else {
-                $row->getIpAddress();
+                $ipAddress = $row->getIpAddress();
+            }
+
+            // Prevent duplicate IP entries from showing
+            if ($eventTypeKey == 'lead.ipadded') {
+                $ipDate = $row->getDateAdded()->format('Y-m-d H:i');
+
+                if (isset($foundIpAddresses[$ipDate]) && in_array($ipAddress, $foundIpAddresses[$ipDate])) {
+                    continue;
+                }
+
+                if (!isset($foundIpAddresses[$ipDate])) {
+                    $foundIpAddresses[$ipDate] = array();
+                }
+                $foundIpAddresses[$ipDate][] = $ipAddress;
             }
 
             $event->addEvent(array(

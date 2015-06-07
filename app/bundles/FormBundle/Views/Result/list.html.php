@@ -13,9 +13,17 @@ endif;
 $formId = $form->getId();
 ?>
 <div class="table-responsive table-responsive-force">
-    <table class="table table-hover table-striped table-bordered formresult-list">
+    <table class="table table-hover table-striped table-bordered formresult-list" id="formResultTable">
         <thead>
             <tr>
+                <?php
+                if ($canDelete):
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'checkall' => 'true',
+                    'target'   => '#formResultTable'
+                ));
+                endif;
+                ?>
                 <th class="col-formresult-id"></th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -37,7 +45,7 @@ $formId = $form->getId();
                 ));
 
                 $fields = $form->getFields();
-                $fieldCount = 3;
+                $fieldCount = ($canDelete) ? 4 : 3;
                 foreach ($fields as $f):
                     if (in_array($f->getType(), array('button', 'freetext')))
                         continue;
@@ -55,8 +63,25 @@ $formId = $form->getId();
         </thead>
         <tbody>
         <?php if (count($items)): ?>
-        <?php foreach ($items as $item):?>
+        <?php foreach ($items as $item): ?>
+            <?php $item['name'] = $view['translator']->trans('mautic.form.form.results.name', array('%id%' => $item['id'])); ?>
             <tr>
+                <?php if ($canDelete): ?>
+                <td>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
+                        'item'      => $item,
+                        'templateButtons' => array(
+                            'delete'    => $canDelete
+                        ),
+                        'route'   => 'mautic_form_results_delete',
+                        'langVar' => 'form.results',
+                        'query'   => array('formId' => $formId)
+                    ));
+                    ?>
+                </td>
+                <?php endif; ?>
+
                 <td><?php echo $item['id']; ?></td>
                 <td>
                     <?php if (!empty($item['lead']['id'])): ?>

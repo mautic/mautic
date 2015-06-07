@@ -36,12 +36,14 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageBuild (PageBuilderEvent $event)
     {
-        //add AB Test Winner Criteria
-        $assetDownloads = array(
-            'group'    => 'mautic.asset.abtest.criteria',
-            'label'    => 'mautic.asset.abtest.criteria.downloads',
-            'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner'
-        );
-        $event->addAbTestWinnerCriteria('asset.downloads', $assetDownloads);
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $assetDownloads = array(
+                'group'    => 'mautic.asset.abtest.criteria',
+                'label'    => 'mautic.asset.abtest.criteria.downloads',
+                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner'
+            );
+            $event->addAbTestWinnerCriteria('asset.downloads', $assetDownloads);
+        }
     }
 }

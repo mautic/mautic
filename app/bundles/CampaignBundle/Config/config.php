@@ -14,6 +14,10 @@ return array(
                 'path'       => '/campaigns/events/{objectAction}/{objectId}',
                 'controller' => 'MauticCampaignBundle:Event:execute'
             ),
+            'mautic_campaignsource_action'      => array(
+                'path'       => '/campaigns/sources/{objectAction}/{objectId}',
+                'controller' => 'MauticCampaignBundle:Source:execute'
+            ),
             'mautic_campaign_index'       => array(
                 'path'       => '/campaigns/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:index'
@@ -114,7 +118,12 @@ return array(
             'mautic.campaign.type.canvassettings'       => array(
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
                 'alias' => 'campaignevent_canvassettings'
-            )
+            ),
+            'mautic.campaign.type.leadsource'           => array(
+                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'campaign_leadsource'
+            ),
         )
     )
 );

@@ -54,12 +54,26 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
         'searchValue' => $searchValue,
         'searchHelp'  => 'mautic.lead.lead.help.searchcommands',
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
         'routeBase'   => 'lead',
+        'preCustomButtons' => array(
+            array(
+                'attr'      => array(
+                    'class'   => 'btn btn-default btn-sm btn-nospin',
+                    'href'    => 'javascript: void(0)',
+                    'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
+                    'id'      => 'liveModeButton',
+                    'data-toggle' => false,
+                    'data-max-id' => $maxLeadId
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
+                'iconClass' => 'fa fa-bolt'
+            )
+        ),
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
         )

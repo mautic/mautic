@@ -12,7 +12,7 @@ return array(
         'main'   => array(
             'mautic_form_pagetoken_index' => array(
                 'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\PageToken:index'
+                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index'
             ),
             'mautic_formaction_action'    => array(
                 'path'       => '/forms/action/{objectAction}/{objectId}',
@@ -26,6 +26,10 @@ return array(
                 'path'       => '/forms/{page}',
                 'controller' => 'MauticFormBundle:Form:index'
             ),
+            'mautic_form_results'         => array(
+                'path'       => '/forms/results/{objectId}/{page}',
+                'controller' => 'MauticFormBundle:Result:index',
+            ),
             'mautic_form_export'          => array(
                 'path'       => '/forms/results/{objectId}/export/{format}',
                 'controller' => 'MauticFormBundle:Result:export',
@@ -33,9 +37,12 @@ return array(
                     'format' => 'csv'
                 )
             ),
-            'mautic_form_results'         => array(
-                'path'       => '/forms/results/{objectId}/{page}',
-                'controller' => 'MauticFormBundle:Result:index',
+            'mautic_form_results_delete'   => array(
+                'path'       => '/forms/results/{formId}/delete/{objectId}',
+                'controller' => 'MauticFormBundle:Result:delete',
+                'defaults'   => array(
+                    'objectId' => 0
+                )
             ),
             'mautic_form_action'          => array(
                 'path'       => '/forms/{objectAction}/{objectId}',
@@ -144,10 +151,6 @@ return array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldTextType',
                 'alias' => 'formfield_text'
             ),
-            'mautic.form.type.field_propertybutton'      => array(
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldButtonType',
-                'alias' => 'formfield_button'
-            ),
             'mautic.form.type.field_propertyplaceholder' => array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldPlaceholderType',
                 'alias' => 'formfield_placeholder'
@@ -159,6 +162,10 @@ return array(
             'mautic.form.type.field_propertycaptcha'     => array(
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldCaptchaType',
                 'alias' => 'formfield_captcha'
+            ),
+            'mautic.form.type.field_propertygroup'      => array(
+                'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
+                'alias' => 'formfield_group'
             ),
             'mautic.form.type.pointaction_formsubmit'    => array(
                 'class' => 'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',

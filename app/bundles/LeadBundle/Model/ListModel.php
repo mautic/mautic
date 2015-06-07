@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -155,7 +156,7 @@ class ListModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
@@ -175,7 +176,7 @@ class ListModel extends FormModel
                 $name = LeadEvents::LIST_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -187,7 +188,7 @@ class ListModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -537,11 +538,11 @@ class ListModel extends FormModel
     /**
      * Add lead to lists
      *
-     * @param      $lead
-     * @param      $lists
-     * @param bool $manuallyAdded
-     * @param bool $batchProcess
-     * @param int  $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
+     * @param array|Lead        $lead
+     * @param array|LeadList    $lists
+     * @param bool              $manuallyAdded
+     * @param bool              $batchProcess
+     * @param int               $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -595,8 +596,8 @@ class ListModel extends FormModel
 
         $persistLists = array();
 
-        foreach ($lists as $l) {
-            if (!isset($this->leadChangeLists[$l])) {
+        foreach ($lists as $listid) {
+            if (!isset($this->leadChangeLists[$listid])) {
                 // List no longer exists in the DB so continue to the next
                 continue;
             }
@@ -607,14 +608,14 @@ class ListModel extends FormModel
                 $listLead = $this->getListLeadRepository()->findOneBy(
                     array(
                         'lead' => $lead,
-                        'list' => $this->leadChangeLists[$l]
+                        'list' => $this->leadChangeLists[$listid]
                     )
                 );
             } else {
                 $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
                     array(
                         'lead' => $leadId,
-                        'list' => $l
+                        'list' => $listid
                     )
                 );
             }
@@ -633,7 +634,7 @@ class ListModel extends FormModel
                 }
             } else {
                 $listLead = new ListLead();
-                $listLead->setList($this->leadChangeLists[$l]);
+                $listLead->setList($this->leadChangeLists[$listid]);
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded(new \DateTime());
@@ -642,7 +643,7 @@ class ListModel extends FormModel
             }
 
             if (!$batchProcess && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], true);
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listid], true);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
 
                 unset($event);
@@ -653,9 +654,9 @@ class ListModel extends FormModel
             $this->getRepository()->saveEntities($persistLists);
 
             // Detach the entities to save memory
-            foreach ($persistLists as $l) {
-                $this->em->detach($l);
-                unset($l);
+            foreach ($persistLists as $listEntity) {
+                $this->em->detach($listEntity);
+                unset($listEntity);
             }
         }
 
@@ -728,8 +729,8 @@ class ListModel extends FormModel
         }
 
         $persistLists = $deleteLists = array();
-        foreach ($lists as $l) {
-            if (!isset($this->leadChangeLists[$l])) {
+        foreach ($lists as $listid) {
+            if (!isset($this->leadChangeLists[$listid])) {
                 // List no longer exists in the DB so continue to the next
                 continue;
             }
@@ -739,11 +740,11 @@ class ListModel extends FormModel
             $listLead = (!$skipFindOne) ?
                 $this->getListLeadRepository()->findOneBy(array(
                     'lead' => $lead,
-                    'list' => $this->leadChangeLists[$l]
+                    'list' => $this->leadChangeLists[$listid]
                 )) :
                 $this->em->getReference('MauticLeadBundle:ListLead', array(
                     'lead' => $leadId,
-                    'list' => $l
+                    'list' => $listid
                 ));
 
             if ($listLead == null) {
@@ -767,7 +768,7 @@ class ListModel extends FormModel
             unset($listLead);
 
             if (!$batchProcess && $dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $this->leadChangeLists[$l], false);
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listid], false);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
 
                 unset($event);
@@ -778,9 +779,9 @@ class ListModel extends FormModel
             $this->getRepository()->saveEntities($persistLists);
 
             // Detach the entities to save memory
-            foreach ($persistLists as $l) {
-                $this->em->detach($l);
-                unset($l);
+            foreach ($persistLists as $listEntity) {
+                $this->em->detach($listEntity);
+                unset($listEntity);
             }
         }
 

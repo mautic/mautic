@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -62,7 +63,7 @@ class PageController extends FormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['page:pages:viewother']) {
-            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $translator = $this->get('translator');
@@ -90,7 +91,7 @@ class PageController extends FormController
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.page.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_page_index', array('page' => $lastPage));
 
@@ -251,7 +252,7 @@ class PageController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId());
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         // Hit count per day for last 30 days
         $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(30, 'D', array('page_id' => $activePage->getId()));
@@ -298,6 +299,7 @@ class PageController extends FormController
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', array('id' => $objectId), true),
                 'logs'          => $logs,
                 'last30'        => $last30
             ),
@@ -339,8 +341,24 @@ class PageController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $session     = $this->factory->getSession();
                     $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-                    $content = $session->get($contentName, array());
-                    $entity->setContent($content);
+
+                    $template = $entity->getTemplate();
+                    if (!empty($template)) {
+                        $content = $session->get($contentName, array());
+                        $entity->setCustomHtml(null);
+                    } else {
+                        $content = $entity->getCustomHtml();
+                        $entity->setContent(array());
+                    }
+
+                    // Parse visual placeholders into tokens
+                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
+
+                    if (!empty($template)) {
+                        $entity->setContent($content);
+                    } else {
+                        $entity->setCustomHtml($content);
+                    }
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
@@ -390,11 +408,10 @@ class PageController extends FormController
             }
         }
 
-        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'tokens'      => $builderComponents['pageTokens'],
+                'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -469,10 +486,29 @@ class PageController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $contentName     = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-                    $existingContent = $entity->getContent();
-                    $newContent      = $session->get($contentName, array());
-                    $content         = array_merge($existingContent, $newContent);
-                    $entity->setContent($content);
+
+                    $template = $entity->getTemplate();
+                    if (!empty($template)) {
+                        $existingContent = $entity->getContent();
+                        $newContent      = $session->get($contentName, array());
+                        $viewContent     = array_merge($existingContent, $newContent);
+
+                        $entity->setCustomHtml(null);
+                    } else {
+                        $entity->setContent(array());
+
+                        $viewContent = $entity->getCustomHtml();
+                    }
+
+                    // Copy model content then parse from visual to tokens
+                    $modelContent = $viewContent;
+                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($modelContent);
+
+                    if (!empty($template)) {
+                        $entity->setContent($modelContent);
+                    } else {
+                        $entity->setCustomHtml($modelContent);
+                    }
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -520,13 +556,23 @@ class PageController extends FormController
             $parent = $entity->getTranslationParent();
             if ($parent && isset($form['translationParent_lookup']))
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
+
+            // Parse tokens into view data
+            $tokens = $model->getBuilderComponents($entity, array('tokens', 'visualTokens', 'tokenSections'));
+
+            // Set to view content
+            $template = $entity->getTemplate();
+            if (empty($template)) {
+                $content = $entity->getCustomHtml();
+                BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
+                $form['customHtml']->setData($content);
+            }
         }
 
-        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'tokens'      => $builderComponents['pageTokens'],
+                'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -664,7 +710,7 @@ class PageController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
             $model     = $this->factory->getModel('page');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete
@@ -732,7 +778,7 @@ class PageController extends FormController
         } else {
             $isNew    = false;
             $entity = $model->getEntity($objectId);
-            if (!$this->factory->getSecurity()->hasEntityAccess(
+            if ($entity == null || !$this->factory->getSecurity()->hasEntityAccess(
                 'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
             )) {
                 return $this->accessDenied();
@@ -745,6 +791,10 @@ class PageController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', array());
         $content    = $entity->getContent();
+
+        $tokens = $model->getBuilderComponents($entity, array('tokens', 'visualTokens'));
+        BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
+
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
         }

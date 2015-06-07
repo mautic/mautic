@@ -447,7 +447,7 @@ class LeadRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('*');
+        $dq->select('l.*');
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
@@ -671,6 +671,23 @@ class LeadRepository extends CommonRepository
                     $expr = $q->expr()->eq('ll.leadlist_id', 0);
                 }
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ip'):
+                // search by IP
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('lip.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip')
+                    ->join('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'ip', 'lip.ip_id = ip.id')
+                    ->where(
+                        $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
+                    )
+                    ->setParameter($unique, $string);
+                $results = $sq->execute()->fetchAll();
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                $expr = $q->expr()->in('l.id', $leadIds);
+                break;
         }
 
         $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -699,7 +716,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.core.searchcommand.email',
-            'mautic.lead.lead.searchcommand.owner'
+            'mautic.lead.lead.searchcommand.owner',
+            'mautic.core.searchcommand.ip'
         );
     }
 
@@ -747,5 +765,18 @@ class LeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         return (count($result)) ? $result[0] : null;
+    }
+
+    /**
+     * Gets the ID of the latest ID
+     */
+    public function getMaxLeadId()
+    {
+        $result = $this->_em->getConnection()->createQueryBuilder()
+            ->select('max(id) as max_lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->execute()->fetchAll();
+
+        return $result[0]['max_lead_id'];
     }
 }
