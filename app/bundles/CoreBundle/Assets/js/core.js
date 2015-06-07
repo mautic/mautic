@@ -2329,14 +2329,14 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-downloading-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-downloading-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.success) {
                                 mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
-                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status">' + response.nextStepStatus + ' <i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                                 Mautic.processUpdate(container, step + 1, state);
                             } else {
-                                mQuery('td[id=update-step-downloading-status]').append(mQuery('<i />').addClass('pull-right fa fa-warning text-danger'));
+                                mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
                                 mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                                 mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                             }
@@ -2358,11 +2358,11 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-extracting-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-extracting-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.success) {
                                 mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
-                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status">' + response.nextStepStatus + ' <i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                                 Mautic.processUpdate(container, step + 1, state);
                             } else {
                                 mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
@@ -2387,7 +2387,7 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-moving-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.error) {
                                 mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
@@ -2423,7 +2423,7 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-moving-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.error) {
                                 // If an error state, we cannot move on
@@ -2459,7 +2459,7 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-moving-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-moving-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.error) {
                                 // If an error state, we cannot move on
@@ -2470,7 +2470,7 @@ var Mautic = {
                                 mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
 
                                 // If complete then we go into the next step
-                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-cache-status">' + response.nextStepStatus + ' <i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-cache-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                                 Mautic.processUpdate(container, step + 1, response.updateState);
                             } else {
                                 // In this section, the step hasn't completed yet so we repeat it
@@ -2495,7 +2495,7 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
-                            mQuery('td[id=update-step-cache-status]').html(response.stepStatus);
+                            mQuery('td[id=update-step-cache-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                             if (response.error) {
                                 mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
@@ -2507,7 +2507,7 @@ var Mautic = {
                                 mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
 
                                 // If complete then we go into the next step
-                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-database-status">' + response.nextStepStatus + ' <i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-database-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                                 Mautic.processUpdate(container, step + 1, response.updateState);
                             } else {
                                 mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-spinner fa-spin'));
@@ -2533,10 +2533,49 @@ var Mautic = {
                         if (response.redirect) {
                             window.location = response.redirect;
                         } else {
+                            mQuery('td[id=update-step-database-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
+
+                            if (response.error) {
+                                mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+
+                                // If an error state, we cannot move on
+                                mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                                mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
+                            } else if (response.complete) {
+                                mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+
+                                // If complete then we go into the next step
+                                mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-finalization-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                                Mautic.processUpdate(container, step + 1, response.updateState);
+                            } else {
+                                mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-spinner fa-spin'));
+
+                                // In this section, the step hasn't completed yet so we repeat it
+                                Mautic.processUpdate(container, step, response.updateState);
+                            }
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+                break;
+
+            // Finalize update
+            case 9:
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl + '?action=core:updateFinalization',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.redirect) {
+                            window.location = response.redirect;
+                        } else {
                             if (response.success) {
                                 mQuery('div[id=' + container + ']').html('<div class="alert alert-mautic">' + response.message + '</div>');
                             } else {
-                                mQuery('td[id=update-step-database-status]').html(response.stepStatus);
+                                mQuery('td[id=update-step-finalization-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
+                                mQuery('td[id=update-step-finalization-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
                                 mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                                 mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                             }
