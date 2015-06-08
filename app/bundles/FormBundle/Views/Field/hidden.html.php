@@ -18,7 +18,7 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
         'formId'  => $formId
     )) : '';
 
-if ((empty($inForm))):
+if (!empty($inForm)):
 $html = <<<HTML
 <div $containerAttr>$formButtons
     <label class="text-muted">{$field['label']}</label>
