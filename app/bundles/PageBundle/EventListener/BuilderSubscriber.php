@@ -301,6 +301,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected function generateUrlTokens($content, $clickthrough, $emailId = null, Email $email = null, EmailSendEvent $event = null)
     {
+        $tokens = array();
+
         if ($emailId !== null && isset($this->emailTrackedLinks[$emailId])) {
             // Tokenization is supported and the links have already been parsed so rebuild tokens from saved links
 
@@ -318,7 +320,7 @@ class BuilderSubscriber extends CommonSubscriber
                 }
             }
         } else {
-            $trackedLinks = $tokens = $persistEntities = array();
+            $trackedLinks = $persistEntities = array();
 
             $this->generatePageTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email);
 
