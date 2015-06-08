@@ -28,10 +28,10 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
 
-        $post   = $this->request->request->get('mauticform');
+        $post          = $this->request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
-        $server = $this->request->server->all();
-        $return = (isset($post['return'])) ? $post['return'] : false;
+        $server        = $this->request->server->all();
+        $return        = (isset($post['return'])) ? $post['return'] : false;
         if (empty($return)) {
             //try to get it from the HTTP_REFERER
             $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
@@ -44,6 +44,12 @@ class PublicController extends CommonFormController
         }
 
         $translator = $this->get('translator');
+
+        if (!isset($post['formId']) && isset($post['formid'])) {
+            $post['formId'] = $post['formid'];
+        } elseif (isset($post['formId']) && !isset($post['formid'])) {
+            $post['formid'] = $post['formId'];
+        }
 
         //check to ensure there is a formId
         if (!isset($post['formId'])) {
