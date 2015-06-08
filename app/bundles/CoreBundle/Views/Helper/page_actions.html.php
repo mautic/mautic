@@ -24,7 +24,10 @@ if (isset($buttonFormat)) {
     }
 
     if (isset($templateButtons)) {
-        $count += count($templateButtons);
+        foreach ($templateButtons as $templateButton) {
+            if ($templateButton)
+                $count++;
+        }
     }
 
     $buttonGroupTypes = ($count > 4) ? array('button-dropdown') : array('group', 'button-dropdown');
