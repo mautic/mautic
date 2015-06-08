@@ -15,7 +15,7 @@
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
-$args            = getopt('b');
+$args            = getopt('b', array('repackage'));
 $versionLocation = (isset($args['b'])) ? ' ' : ' tags/';
 
 // We need the version number so get the app kernel
@@ -23,93 +23,106 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/app/AppKernel.php';
 $version = AppKernel::MAJOR_VERSION . '.' . AppKernel::MINOR_VERSION . '.' . AppKernel::PATCH_VERSION . AppKernel::EXTRA_VERSION;
 
-// Preparation - Remove previous packages
-echo "Preparing environment\n";
-umask(022);
-chdir(__DIR__);
-system('rm -rf packaging');
+if (!isset($args['repackage'])) {
+    // Preparation - Remove previous packages
+    echo "Preparing environment\n";
+    umask(022);
+    chdir(__DIR__);
 
-// Preparation - Provision packaging space
-mkdir(__DIR__ . '/packaging');
+    system('rm -rf packaging');
 
-// Grab the system git path so we can process git commands
-ob_start();
-passthru('which git', $systemGit);
-$systemGit = trim(ob_get_clean());
+    // Preparation - Provision packaging space
+    mkdir(__DIR__.'/packaging');
 
-// Checkout the version tag into the packaging space
-chdir(dirname(__DIR__));
-system($systemGit . ' archive ' . $version . ' | tar -x -C ' . __DIR__ . '/packaging');
-chdir(__DIR__);
-system('cd ' . __DIR__ . '/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
+    // Grab the system git path so we can process git commands
+    ob_start();
+    passthru('which git', $systemGit);
+    $systemGit = trim(ob_get_clean());
 
-// Generate the bootstrap.php.cache file
-system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
+    // Checkout the version tag into the packaging space
+    chdir(dirname(__DIR__));
+    system($systemGit.' archive '.$version.' | tar -x -C '.__DIR__.'/packaging');
+    chdir(__DIR__);
+    system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
 
-// Common steps
-include_once __DIR__ . '/processfiles.php';
+    // Generate the bootstrap.php.cache file
+    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
 
-// In this step, we'll compile a list of files that may have been deleted so our update script can remove them
-// First, get a list of git tags
-ob_start();
-passthru($systemGit . ' tag -l', $tags);
-$tags = explode("\n", trim(ob_get_clean()));
+    // Common steps
+    include_once __DIR__.'/processfiles.php';
 
-// Get the list of modified files from the initial tag
-// TODO - Hardcode this to the 1.0.0 tag when we're there
-ob_start();
-passthru($systemGit . ' diff tags/' . $tags[0] . $versionLocation . $version . ' --name-status', $fileDiff);
-$fileDiff = explode("\n", trim(ob_get_clean()));
+    // In this step, we'll compile a list of files that may have been deleted so our update script can remove them
+    // First, get a list of git tags
+    ob_start();
+    passthru($systemGit.' tag -l', $tags);
+    $tags = explode("\n", trim(ob_get_clean()));
 
-// Only add deleted files to our list; new and modified files will be covered by the archive
-$deletedFiles  = array();
-$modifiedFiles = array();
+    // Get the list of modified files from the initial tag
+    // TODO - Hardcode this to the 1.0.0 tag when we're there
+    ob_start();
+    passthru($systemGit.' diff tags/'.$tags[0].$versionLocation.$version.' --name-status', $fileDiff);
+    $fileDiff = explode("\n", trim(ob_get_clean()));
 
-// Build an array of paths which we won't ever distro, this is used for the update packages
-$doNotPackage  = array('.gitignore', 'app/phpunit.xml.dist', 'build', 'composer.json', 'composer.lock', 'Gruntfile.js', 'index_dev.php', 'package.json', 'upgrade.php');
+    // Only add deleted files to our list; new and modified files will be covered by the archive
+    $deletedFiles  = array();
+    $modifiedFiles = array();
 
-// Create a flag to check if the vendors changed
-$vendorsChanged = false;
+    // Build an array of paths which we won't ever distro, this is used for the update packages
+    $doNotPackage = array(
+        '.gitignore',
+        'app/phpunit.xml.dist',
+        'build',
+        'composer.json',
+        'composer.lock',
+        'Gruntfile.js',
+        'index_dev.php',
+        'package.json',
+        'upgrade.php'
+    );
 
-foreach ($fileDiff as $file) {
-    $filename = substr($file, 2);
-    $folderPath = explode('/', $filename);
-    $baseFolderName = $folderPath[0];
+    // Create a flag to check if the vendors changed
+    $vendorsChanged = false;
 
-    if (!$vendorsChanged && $filename == 'composer.lock') {
-        $vendorsChanged = true;
+    foreach ($fileDiff as $file) {
+        $filename       = substr($file, 2);
+        $folderPath     = explode('/', $filename);
+        $baseFolderName = $folderPath[0];
+
+        if (!$vendorsChanged && $filename == 'composer.lock') {
+            $vendorsChanged = true;
+        }
+
+        $doNotPackageFile   = in_array($filename, $doNotPackage);
+        $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
+
+        if ($doNotPackageFile || $doNotPackageFolder) {
+            continue;
+        }
+
+        if (substr($file, 0, 1) == 'D') {
+            $deletedFiles[] = $filename;
+        } else {
+            $modifiedFiles[$filename] = true;
+        }
     }
 
-    $doNotPackageFile = in_array($filename, $doNotPackage);
-    $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
+    // Add our update files to the $modifiedFiles array so they get packaged
+    $modifiedFiles['deleted_files.txt'] = true;
+    $modifiedFiles['upgrade.php']       = true;
 
-    if ($doNotPackageFile || $doNotPackageFolder) {
-        continue;
+    // Package the vendor folder if the lock changed
+    if ($vendorsChanged) {
+        $modifiedFiles['vendor/']                 = true;
+        $modifiedFiles['app/bootstrap.php.cache'] = true;
     }
 
-    if (substr($file, 0, 1) == 'D') {
-        $deletedFiles[] = $filename;
-    } else {
-        $modifiedFiles[$filename] = true;
-    }
+    $filePut = array_keys($modifiedFiles);
+    sort($filePut);
+
+    // Write our files arrays into text files
+    file_put_contents(__DIR__.'/packaging/deleted_files.txt', json_encode($deletedFiles));
+    file_put_contents(__DIR__.'/packaging/modified_files.txt', implode("\n", $filePut));
 }
-
-// Add our update files to the $modifiedFiles array so they get packaged
-$modifiedFiles['deleted_files.txt'] = true;
-$modifiedFiles['upgrade.php'] = true;
-
-// Package the vendor folder if the lock changed
-if ($vendorsChanged) {
-    $modifiedFiles['vendor/'] = true;
-    $modifiedFiles['app/bootstrap.php.cache'] = true;
-}
-
-$filePut = array_keys($modifiedFiles);
-sort($filePut);
-
-// Write our files arrays into text files
-file_put_contents(__DIR__ . '/packaging/deleted_files.txt', json_encode($deletedFiles));
-file_put_contents(__DIR__ . '/packaging/modified_files.txt', implode("\n", $filePut));
 
 // Post-processing - ZIP it up
 chdir(__DIR__ . '/packaging');

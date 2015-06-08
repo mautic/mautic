@@ -109,6 +109,8 @@ class EmailSubscriber extends CommonSubscriber
                     } else {
                         $fallback = $fallbackCheck[1];
                     }
+                } else {
+                    $alias = $match;
                 }
 
                 $value             = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;

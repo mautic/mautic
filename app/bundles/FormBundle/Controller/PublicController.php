@@ -158,7 +158,8 @@ class PublicController extends CommonFormController
         } else {
             if (!empty($error)) {
                 if ($return) {
-                    return $this->redirect($return.$query.'mauticError='.rawurlencode($error).'#'.$form->getAlias());
+                    $hash = ($form !== null) ? '#' . strtolower($form->getAlias()) : '';
+                    return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
                 } else {
                     $msg     = $error;
                     $msgType = 'error';
