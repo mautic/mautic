@@ -25,7 +25,7 @@
         var Profiler = {};
 
         //global configuration
-        var config = {devmode: false, debug: true};
+        var config = {devmode: false, debug: false};
 
         Profiler.startTime = function() {
             this._startTime = performance.now();
@@ -112,9 +112,23 @@
             return iframe;
         };
 
+        Form.customCallbackHandler = function(formId, event, data) {
+            if (typeof MauticFormCallback !== 'undefined' &&
+                typeof MauticFormCallback[formId] !== 'undefined' &&
+                typeof MauticFormCallback[formId][event] == 'function'
+            ) {
+                if (typeof data == 'undefined') {
+                    data = null;
+                }
+                MauticFormCallback[formId][event](data);
+            }
+        };
+
         Form.validator = function(formId) {
             var validator = {
                 validateForm: function () {
+                    Form.customCallbackHandler(formId, 'onValidateStart');
+
                     validator.disableSubmitButton();
 
                     // Remove success class if applicable
@@ -189,6 +203,8 @@
                         document.getElementById(elId + '_return').value = document.URL;
                     }
 
+                    Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
+
                     return formValid;
                 },
 
@@ -228,6 +244,8 @@
                 },
 
                 parseFormResponse: function (response) {
+                    Form.customCallbackHandler(formId, 'onResponse', response);
+
                     if (response.download) {
                         // Hit the download in the iframe
                         document.getElementById('mauticiframe_' + formId).src = response.download;
