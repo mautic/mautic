@@ -75,6 +75,13 @@ class EmailModel extends FormModel
             $entity->setEmailType('template');
         }
 
+        // Ensure that list emails are published
+        if ($entity->getEmailType() == 'list') {
+            $entity->setIsPublished(true);
+            $entity->setPublishDown(null);
+            $entity->setPublishUp(null);
+        }
+
         //set the author for new pages
         if (!$entity->isNew()) {
             //increase the revision
@@ -1051,7 +1058,7 @@ class EmailModel extends FormModel
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
 
-        $mailer->useMailerBatching();
+        $mailer->useMailerTokenization();
 
         foreach ($users as $user) {
             $idHash = uniqid();
@@ -1081,7 +1088,7 @@ class EmailModel extends FormModel
             $stat = new Stat();
             $stat->setDateSent(new \DateTime());
             $stat->setEmail($email);
-            $stat->setEmailAddress($user);
+            $stat->setEmailAddress($user['email']);
             $stat->setTrackingHash($idHash);
             if (!empty($source)) {
                 $stat->setSource($source[0]);
