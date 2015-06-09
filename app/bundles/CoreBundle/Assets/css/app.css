@@ -4259,7 +4259,7 @@ lesshat-selector {
 .builder .builder-panel-top {
   position: fixed;
   top: 0;
-  z-index: 10000;
+  z-index: 1030;
   background-color: #d5d4d4;
   padding-top: 10px;
   width: 255px;
