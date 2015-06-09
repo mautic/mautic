@@ -954,6 +954,10 @@ class MailHelper
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
 
+            if (isset($slots[$template])) {
+                $slots = $slots[$template];
+            }
+
             $customHtml = $this->setTemplate('MauticEmailBundle::public.html.php', array(
                 'slots'    => $slots,
                 'content'  => $email->getContent(),
