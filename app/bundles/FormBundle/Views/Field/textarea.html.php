@@ -10,12 +10,13 @@
 echo $view->render(
     'MauticFormBundle:Field:text.html.php',
     array(
-        'field'      => $field,
-        'inForm'     => (isset($inForm)) ? $inForm : false,
-        'type'       => 'text',
-        'inputClass' => 'textarea',
-        'id'         => $id,
-        'deleted'    => (!empty($deleted)) ? true : false,
-        'formId'     => (isset($formId)) ? $formId : 0
+        'field'          => $field,
+        'inForm'         => (isset($inForm)) ? $inForm : false,
+        'type'           => 'textarea',
+        'inputClass'     => 'textarea',
+        'containerClass' => 'text',
+        'id'             => $id,
+        'deleted'        => (!empty($deleted)) ? true : false,
+        'formId'         => (isset($formId)) ? $formId : 0
     )
 );
