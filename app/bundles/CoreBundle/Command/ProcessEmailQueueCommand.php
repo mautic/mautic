@@ -66,6 +66,15 @@ EOT
         $quiet      = $input->getOption('quiet');
         $timeout    = $input->getOption('clear-timeout');
 
+        $factory    = $container->get('mautic.factory');
+        $queueMode  = $factory->getParameter('mailer_spool_type');
+
+        if ($queueMode != 'file') {
+            $output->writeln('Mautic is not set to queue email.');
+
+            return 0;
+        }
+
         if (empty($timeout)) {
             $timeout = $container->getParameter('mautic.mailer_spool_clear_timeout');
         }
