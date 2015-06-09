@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -205,6 +206,8 @@ class LeadApiController extends CommonApiController
      * Obtains a list of lead lists the lead is in
      *
      * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getListsAction($id)
     {
@@ -234,6 +237,8 @@ class LeadApiController extends CommonApiController
      * Obtains a list of campaigns the lead is part of
      *
      * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getCampaignsAction($id)
     {
@@ -282,7 +287,15 @@ class LeadApiController extends CommonApiController
 
             $ipAddress = $this->factory->getIpAddress($ip);
 
-            $entity->addIpAddress($ipAddress);
+            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+                $entity->addIpAddress($ipAddress);
+            }
+        }
+
+        // Check for lastActive date
+        if (isset($parameters['lastActive'])) {
+            $lastActive = new DateTimeHelper($parameters['lastActive']);
+            $entity->setLastActive($lastActive->getDateTime());
         }
 
         //set the custom field values
@@ -296,7 +309,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Remove IpAddress as it'll be handled outsie the form
+     * Remove IpAddress and lastActive as it'll be handled outside the form
      *
      * @param $parameters
      * @param $entity
@@ -306,7 +319,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress']);
+        unset($parameters['ipAddress'], $parameters['lastActive']);
 
         return $parameters;
     }
@@ -314,7 +327,10 @@ class LeadApiController extends CommonApiController
     /**
      * Flatten fields into an 'all' key for dev convenience
      *
-     * @param $entity
+     * @param        $entity
+     * @param string $action
+     *
+     * @return void
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {

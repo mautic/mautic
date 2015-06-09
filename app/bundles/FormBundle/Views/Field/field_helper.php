@@ -64,7 +64,9 @@ if (!empty($inForm)) {
 
 // Container
 $containerAttr         = 'id="mauticform_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
-$defaultContainerClass = 'mauticform-row mauticform-'.$containerType;
+if (!isset($containerClass))
+    $containerClass = $containerType;
+$defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
 $validationMessage     = '';
 if ($field['isRequired']) {
     $defaultContainerClass .= ' mauticform-required';

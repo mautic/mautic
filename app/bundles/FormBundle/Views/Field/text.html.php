@@ -30,8 +30,7 @@ $help = (empty($helpMessage)) ? '' : <<<HTML
                 <span class="mauticform-helpmessage">{$helpMessage}</span>
 HTML;
 
-
-if ($defaultInputClass == 'textarea'):
+if ($containerType == 'textarea'):
 $textInput = <<<HTML
 
                 <textarea $inputAttr>{$field['defaultValue']}</textarea>

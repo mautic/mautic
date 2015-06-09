@@ -406,7 +406,7 @@ class BuilderSubscriber extends CommonSubscriber
      * @param null  $emailId
      * @param Email $email
      *
-     * @deprecated Since version 1.1
+     * @deprecated Since version 1.1; to be removed in 2.0
      */
     protected function generateExternalLinkTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null)
     {
@@ -486,7 +486,7 @@ class BuilderSubscriber extends CommonSubscriber
             unset($foundTokens, $links);
         }
 
-        $this->convertTrackableLinks($event, $persistEntities, $trackedLinks, $email);
+        $this->convertTrackableLinks($event, $persistEntities, $trackedLinks, $tokens, $email);
 
         if (!empty($persistEntities)) {
             $redirectModel->getRepository()->saveEntities($persistEntities);
@@ -508,6 +508,21 @@ class BuilderSubscriber extends CommonSubscriber
 
                     $search[]  = 'https://' . $url;
                     $replace[] = $url;
+
+                    // deprecated support for externallink @todo remove with 2.0
+                    if (strpos($url, '{external') === 0) {
+                        // Add search and replace for standlone links that happen to be in an externallink token
+                        $token = '{trackedlink='.$link->getRedirectId().'}';
+                        $search[]       = $url;
+                        $replace[]      = $token;
+                        $tokens[$token] = $trackedUrl;
+
+                        $search[]       = $link->getUrl();
+                        $replace[]      = $token;
+                        $tokens[$token] = $trackedUrl;
+
+                    }
+
                 } else {
                     $token = '{trackedlink='.$link->getRedirectId().'}';
                     $search[]       = $url;
@@ -534,9 +549,10 @@ class BuilderSubscriber extends CommonSubscriber
      * @param EmailSendEvent $event
      * @param                $persistEntities
      * @param                $trackedLinks
+     * @param                $tokens
      * @param                $email
      */
-    protected function convertTrackableLinks(EmailSendEvent $event, &$persistEntities, &$trackedLinks, Email $email = null)
+    protected function convertTrackableLinks(EmailSendEvent $event, &$persistEntities, &$trackedLinks, $tokens, Email $email = null)
     {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
@@ -568,6 +584,12 @@ class BuilderSubscriber extends CommonSubscriber
                 continue;
             }
 
+            // deprecated support for externallink @todo remove with 2.0
+            if (isset($trackedLinks['{externallink='.$url.'}'])) {
+                // Skip it and assume that the links are already converted via the token
+                continue;
+            }
+
             $foundLinks[$url] = $url;
         }
 
@@ -584,7 +606,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             if (!empty($matches[0])) {
                 foreach ($matches[0] as $url) {
-                    // Remove anything left on at the end; just inc ase
+                    // Remove anything left on at the end; just in case
                     $url = preg_replace('/^\PL+|\PL\z/', '', trim($url));
 
                     // Ensure a valid URL
@@ -594,6 +616,12 @@ class BuilderSubscriber extends CommonSubscriber
 
                     if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false) {
                         // The editor appended an URL token with http
+                        continue;
+                    }
+
+                    // deprecated support for externallink @todo remove with 2.0
+                    if (isset($trackedLinks['{externallink='.$url.'}'])) {
+                        // Skip it and assume that the links are already converted via the token
                         continue;
                     }
 

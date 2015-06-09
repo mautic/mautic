@@ -10,7 +10,7 @@
 <html>
     <head>
         <script type="text/javascript">
-            parent.postMessage("<?php echo $view->escape($response, 'js'); ?>", '<?php echo $view['assets']->getBaseUrl(); ?>');
+            parent.postMessage("<?php echo $view->escape($response, 'js'); ?>", '*');
         </script>
 
         <?php echo $view['analytics']->getCode(); ?>

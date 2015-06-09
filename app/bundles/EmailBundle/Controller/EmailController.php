@@ -98,7 +98,7 @@ class EmailController extends FormController
 
         //retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = array(
-            'options'  => array_flip($this->factory->getInstalledThemes('email')),
+            'options'  => $this->factory->getInstalledThemes('email'),
             'prefix'   => 'theme'
         );
 
