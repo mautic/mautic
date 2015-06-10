@@ -199,7 +199,10 @@ class ResultController extends CommonFormController
     /**
      * Delete a form result
      *
-     * @param $objectId
+     * @param     $formId
+     * @param int $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($formId, $objectId = 0)
     {

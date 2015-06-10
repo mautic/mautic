@@ -280,6 +280,7 @@ class ReportModel extends FormModel
 
         switch ($format) {
             case 'csv':
+
                 $response = new StreamedResponse(function () use ($reportData, $report, $formatter) {
                     $handle = fopen('php://output', 'r+');
                     $header = array();
@@ -292,7 +293,8 @@ class ReportModel extends FormModel
                                 //set the header
                                 $header[] = $k;
                             }
-                            $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
+
+                            $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                         }
 
                         if ($count === 0) {
@@ -347,7 +349,7 @@ class ReportModel extends FormModel
                                     //set the header
                                     $header[] = $k;
                                 }
-                                $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
+                                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                             }
 
                             //write the row
@@ -386,8 +388,9 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering
      *
-     * @param     $entity
-     * @param int $reportPage
+     * @param       $entity
+     * @param       $formFactory
+     * @param array $options
      *
      * @return array
      */
@@ -410,9 +413,9 @@ class ReportModel extends FormModel
         $dataOptions = array(
             //'start'      => $start,
             //'limit'      => $limit,
-            'order'      => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
-            'dispatcher' => $this->factory->getDispatcher(),
-            'columns'    => $columns['columns']
+            'order'       => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
+            'dispatcher'  => $this->factory->getDispatcher(),
+            'columns'     => $columns['columns']
         );
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
@@ -507,12 +510,19 @@ class ReportModel extends FormModel
             }
         }
 
+        // Build a reference for column to data
+        $dataColumns = array();
+        foreach ($columns['columns'] as $dbColumn => $columnData) {
+            $dataColumns[$columnData['label']] = $dbColumn;
+        }
+
         return array(
             'totalResults'    => $totalResults,
             'data'            => $data,
             'graphs'          => $graphs,
             'contentTemplate' => $contentTemplate,
             'columns'         => $columns['columns'],
+            'dataColumns'     => $dataColumns,
             'limit'           => ($paginate) ? $limit : 0
         );
     }
