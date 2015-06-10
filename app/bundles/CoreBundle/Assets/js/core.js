@@ -298,7 +298,7 @@ var Mautic = {
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
-            var link = mQuery(event.target).attr('href');
+            var link = mQuery(this).attr('href');
 
             //initialize download links
             var iframe = mQuery("<iframe/>").attr({
