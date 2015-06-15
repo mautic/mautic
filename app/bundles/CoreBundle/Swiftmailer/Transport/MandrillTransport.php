@@ -159,6 +159,14 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                                 )
                             );
 
+                            // If CC and BCC, remove the ct from URLs to prevent false lead tracking
+                            foreach ($ccMergeVars as &$var) {
+                                if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
+                                    // URL so make sure a ct query is not part of it
+                                    $var['content'] = substr($var['content'], 0, $ctPos);
+                                }
+                            }
+
                             // Send same tokens to each CC
                             if (!empty($cc)) {
                                 foreach ($cc as $ccRcpt) {
