@@ -797,6 +797,14 @@ class CampaignModel extends CommonFormModel
         // Get a list of leads for all lists associated with the campaign
         $lists = $this->getCampaignListIds($campaign->getId());
 
+        if (empty($lists)) {
+            if ($output) {
+                $output->writeln($this->translator->trans('mautic.campaign.rebuild.no_lists'));
+            }
+
+            return 0;
+        }
+
         $batchLimiters = array(
             'dateTime' => $this->factory->getDate()->toUtcString()
         );
