@@ -262,10 +262,10 @@
                 },
 
                 parseFormResponse: function (response) {
-                    Form.customCallbackHandler(formId, 'onResponse', response);
-
                     // If true, a callback handled response parsing
-                    if (!Form.customCallbackHandler(formId, 'onResponseStart', response)) {
+                    if (!Form.customCallbackHandler(formId, 'onResponse', response)) {
+
+                        Form.customCallbackHandler(formId, 'onResponseStart', response);
                         if (response.download) {
                             // Hit the download in the iframe
                             document.getElementById('mauticiframe_' + formId).src = response.download;
@@ -285,7 +285,7 @@
                         } else if (response.errorMessage) {
                             this.setMessage(response.errorMessage, 'error');
                         }
-                        ;
+
                         if (response.success) {
                             if (response.successMessage) {
                                 this.setMessage(response.successMessage, 'message');
@@ -300,11 +300,11 @@
                             // Reset the form
                             this.resetForm();
                         }
+
+                        validator.enableSubmitButton();
+
+                        Form.customCallbackHandler(formId, 'onResponseEnd', response);
                     }
-
-                    validator.enableSubmitButton();
-
-                    Form.customCallbackHandler(formId, 'onResponseEnd', response);
                 },
 
                 setMessage: function (message, type) {
