@@ -192,6 +192,11 @@ class AppKernel extends Kernel
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
         }
 
+        // Check for local bundle inclusion
+        if (file_exists(__DIR__ .'/config/bundles_local.php')) {
+            include __DIR__ . '/config/bundles_local.php';
+        }
+
         return $bundles;
     }
 
@@ -329,7 +334,9 @@ class AppKernel extends Kernel
     /**
      * @param array $params
      *
-     * @return bool|\Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Connection
+     * @throws Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
     private function getDatabaseConnection($params = array())
     {
@@ -426,7 +433,7 @@ class AppKernel extends Kernel
     /**
      * Get local config file
      *
-     * @param $checkExists If true, then return false if the file doesn't exist
+     * @param bool $checkExists If true, then return false if the file doesn't exist
      *
      * @return bool
      */
