@@ -296,9 +296,10 @@ class ReportBuilderEvent extends Event
     }
 
     /**
-     * @param $context
-     * @param $type
-     * @param $name
+     * @param       $context
+     * @param       $type
+     * @param       $graphId
+     * @param array $options
      */
     public function addGraph($context, $type, $graphId, $options = array())
     {
