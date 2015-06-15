@@ -296,8 +296,9 @@ return array(
                 'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => array(
-                    'setUsername'   => array('%mautic.mailer_user%'),
-                    'setPassword'   => array('%mautic.mailer_password%')
+                    'setUsername'      => array('%mautic.mailer_user%'),
+                    'setPassword'      => array('%mautic.mailer_password%'),
+                    'setMauticFactory' => array('mautic.factory')
                 )
             ),
             'mautic.transport.sendgrid'          => array(

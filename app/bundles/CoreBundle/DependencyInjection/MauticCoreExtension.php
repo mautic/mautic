@@ -154,7 +154,28 @@ class MauticCoreExtension extends Extension
                         // Set method calls
                         if (!empty($details['methodCalls'])) {
                             foreach ($details['methodCalls'] as $method => $methodArguments) {
-                                $definition->addMethodCall($method, $methodArguments);
+                                $methodCallArguments = array();
+                                foreach ($methodArguments as $argument) {
+                                    if (is_array($argument) || is_object($argument)) {
+                                        foreach ($argument as $k => &$v) {
+                                            if (strpos($v, '%') === 0) {
+                                                $v = $container->getParameter(substr($v, 1, -1));
+                                            }
+                                        }
+                                        $methodCallArguments[] = $argument;
+                                    } elseif (is_bool($argument) || strpos($argument, '%') === 0 || strpos($argument, '\\') !== false) {
+                                        // Parameter or Class
+                                        $methodCallArguments[] = $argument;
+                                    } elseif (strpos($argument, '"') === 0) {
+                                        // String
+                                        $methodCallArguments[] = substr($argument, 1, -1);
+                                    } else {
+                                        // Reference
+                                        $methodCallArguments[] = new Reference($argument);
+                                    }
+                                }
+
+                                $definition->addMethodCall($method, $methodCallArguments);
                             }
                         }
 
