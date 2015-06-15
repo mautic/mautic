@@ -328,6 +328,38 @@ class GraphHelper
     }
 
     /**
+     * Fills into graph data values where data comes pre-counted. Just creates the necessary arrays
+     *
+     * @param array  $graphData from prepareDownloadsGraphDataBefore
+     * @param array  $items     from database
+     * @param string $unit      php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     * @param string $datasetKey
+     * @param string $dateName  from database
+     * @param string $countName from database
+     *
+     * @return array
+     */
+    public static function mergeLineGraphArray($graphData, $items, $unit, $datasetKey, $dateName, $countName)
+    {
+        $utc = new \DateTimeZone('UTC');
+        foreach ($items as $item) {
+            if (isset($item[$dateName]) && $item[$dateName]) {
+                if (is_string($item[$dateName])) {
+                    // Assume that it is UTC
+                    $item[$dateName] = new \DateTime($item[$dateName], $utc);
+
+                    $oneItem = $item[$dateName]->format(self::getDateLabelFormat($unit));
+
+                    if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
+                        $graphData['datasets'][$datasetKey]['data'][$itemKey] = $item[$countName];
+                    }
+                }
+            }
+        }
+        return $graphData;
+    }
+
+    /**
      * Fills into Pie graph data values from database
      *
      * @param array $data
