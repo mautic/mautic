@@ -242,14 +242,13 @@ class PublicController extends CommonFormController
 
         } else {
             $html = $form->getCachedHtml();
-            $name = $form->getName();
 
             $model->populateValuesWithGetParameters($form, $html);
 
             $viewParams = array(
                 'content'     => $html,
                 'stylesheets' => $customStylesheets,
-                'name'        => $name
+                'name'        => $form->getName()
             );
 
             $template = $form->getTemplate();

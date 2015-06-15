@@ -750,7 +750,17 @@ class FormController extends CommonFormController
         } else {
             $html = $form->getCachedHtml();
         }
+
         $model->populateValuesWithGetParameters($form, $html);
+        $html = $form->getCachedHtml();
+
+        $model->populateValuesWithGetParameters($form, $html);
+
+        $viewParams = array(
+            'content'     => $html,
+            'stylesheets' => array(),
+            'name'        => $form->getName()
+        );
 
         $template = $form->getTemplate();
         if (!empty($template)) {
@@ -760,25 +770,14 @@ class FormController extends CommonFormController
                 if (in_array('form', $config['features'])) {
                     $template = $theme->getTheme();
                 } else {
-                    $templateNotFound = true;
+                    $template = null;
                 }
-            }
-
-            if (empty($templateNotFound)) {
-                $viewParams = array(
-                    'template' => $template,
-                    'content'  => $html,
-                );
-
-                return $this->render('MauticFormBundle::form.html.php', $viewParams);
             }
         }
 
-        $response = new Response();
-        $response->setContent('<html><head><title>' . $form->getName() . '</title></head><body>' . $html . '</body></html>');
-        $response->setStatusCode(Response::HTTP_OK);
-        $response->headers->set('Content-Type', 'text/html');
-        return $response;
+        $viewParams['template'] = $template;
+
+        return $this->render('MauticFormBundle::form.html.php', $viewParams);
     }
 
     /**
