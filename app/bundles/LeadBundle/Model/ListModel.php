@@ -184,7 +184,7 @@ class ListModel extends FormModel
                 $event = new LeadListEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch(LeadEvents::LIST_PRE_SAVE, $event);
+            $this->dispatcher->dispatch($name, $event);
 
             return $event;
         } else {
@@ -289,11 +289,12 @@ class ListModel extends FormModel
     /**
      * Rebuild lead lists
      *
-     * @param LeadList $entity
-     * @param          $limit
-     * @param          $batchsize
+     * @param LeadList        $entity
+     * @param int             $limit
+     * @param bool            $maxLeads
+     * @param OutputInterface $output
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @return int
      */
     public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
     {
