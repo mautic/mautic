@@ -493,7 +493,7 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         if (!empty($trackedLinks)) {
-            $search = $replace = array();
+            $search = $replace = $tokenSearch = $tokenReplace = array();
 
             foreach ($trackedLinks as $url => $link) {
                 $trackedUrl = $redirectModel->generateRedirectUrl($link, $clickthrough);
@@ -503,26 +503,24 @@ class BuilderSubscriber extends CommonSubscriber
                     $tokens[$url] = $trackedUrl;
 
                     // Add search and replace entries to correct editor auto-prepended http:// or https://
-                    $search[]  = 'http://' . $url;
-                    $replace[] = $url;
+                    $tokenSearch[]  = 'http://'.$url;
+                    $tokenReplace[] = $url;
 
-                    $search[]  = 'https://' . $url;
-                    $replace[] = $url;
+                    $tokenSearch[]  = 'https://'.$url;
+                    $tokenReplace[] = $url;
 
                     // deprecated support for externallink @todo remove with 2.0
                     if (strpos($url, '{external') === 0) {
                         // Add search and replace for standlone links that happen to be in an externallink token
-                        $token = '{trackedlink='.$link->getRedirectId().'}';
-                        $search[]       = $url;
-                        $replace[]      = $token;
+                        $token          = '{trackedlink='.$link->getRedirectId().'}';
+                        $tokenSearch[]  = $url;
+                        $tokenReplace[] = $token;
                         $tokens[$token] = $trackedUrl;
 
                         $search[]       = $link->getUrl();
                         $replace[]      = $token;
                         $tokens[$token] = $trackedUrl;
-
                     }
-
                 } else {
                     $token = '{trackedlink='.$link->getRedirectId().'}';
                     $search[]       = $url;
@@ -531,13 +529,30 @@ class BuilderSubscriber extends CommonSubscriber
                 }
             }
 
-            $content = str_ireplace($search, $replace, $content);
-            $event->setContent($content);
+            // Sort to ensure that URLs that share the same base are appropriately replaced
+            arsort($search);
+            $tempReplace = array();
+            foreach ($search as $key => $value) {
+                $tempReplace[$key] = $replace[$key];
+            }
+            $replace = $tempReplace;
 
+            $search  = array_merge($tokenSearch, $search);
+            $replace = array_merge($tokenReplace, $replace);
+
+            // For plain text, just do a search/replace
             if ($plainText = $event->getPlainText()) {
                 $plainText = str_ireplace($search, $replace, $plainText);
                 $event->setPlainText($plainText);
             }
+
+            // For HTML, replace only the links; leaving the link text (if a URL) intact
+            foreach ($search as $key => $value) {
+                $content = preg_replace('/<a(.*?)href=(["\'])' . preg_quote($value, '/') . '\\2(.*?)>/i','<a$1href=$2' . $replace[$key] . '$2$3>',$content);
+            }
+
+            $event->setContent($content);
+
         }
 
         $this->emailTrackedLinks[$emailId] = $trackedLinks;
