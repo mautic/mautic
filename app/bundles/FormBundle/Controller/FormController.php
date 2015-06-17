@@ -603,6 +603,9 @@ class FormController extends CommonFormController
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
+
+            $session->set('mautic.form.'.$objectId.'.fields.leadfields', $usedLeadFields);
+
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
