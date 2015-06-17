@@ -76,4 +76,14 @@ final class CampaignEvents
      * @var string
      */
     const CAMPAIGN_ON_LEADCHANGE  = 'mautic.campaign_on_leadchange';
+
+    /**
+     * The mautic.campaign_on_event_execution event is dispatched when a campaign event is executed
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_EXECUTION = 'mautic.campaign_on_event_execution';
 }

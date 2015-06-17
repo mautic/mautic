@@ -10,8 +10,10 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -364,9 +366,13 @@ class EventModel extends CommonFormModel
     /**
      * Trigger the root level action(s) in campaign(s)
      *
-     * @param $campaign
+     * @param                 $campaign
+     * @param                 $totalEventCount
+     * @param int             $limit
+     * @param bool            $max
+     * @param OutputInterface $output
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @return int
      */
     public function triggerStartingEvents($campaign, &$totalEventCount, $limit = 100, $max = false, OutputInterface $output = null)
     {
@@ -806,7 +812,13 @@ class EventModel extends CommonFormModel
     /**
      * Find and trigger the negative events, i.e. the events with a no decision path
      *
-     * @param null $campaignId
+     * @param                 $campaign
+     * @param int             $totalEventCount
+     * @param int             $limit
+     * @param bool            $max
+     * @param OutputInterface $output
+     *
+     * @return int
      */
     public function triggerNegativeEvents($campaign, $totalEventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
     {
@@ -1131,10 +1143,11 @@ class EventModel extends CommonFormModel
     /**
      * Invoke the event's callback function
      *
-     * @param $event
-     * @param $settings
-     * @param $lead
-     * @param $eventDetails
+     * @param      $event
+     * @param      $settings
+     * @param null $lead
+     * @param null $eventDetails
+     * @param bool $systemTriggered
      *
      * @return bool|mixed
      */
@@ -1169,6 +1182,12 @@ class EventModel extends CommonFormModel
             }
 
             $result = $reflection->invokeArgs($this, $pass);
+
+            if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
+                $event = new CampaignExecutionEvent($args, $result);
+                $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_EXECUTION, $event);
+                unset($event);
+            }
         } else {
             $result = true;
         }
@@ -1182,8 +1201,9 @@ class EventModel extends CommonFormModel
     /**
      * Check to see if the interval between events are appropriate to fire currentEvent
      *
-     * @param $triggeredEvent
-     * @param $action
+     * @param      $action
+     * @param null $parentTriggeredDate
+     * @param bool $allowNegate
      *
      * @return bool
      */

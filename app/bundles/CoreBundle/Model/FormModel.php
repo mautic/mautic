@@ -321,14 +321,18 @@ class FormModel extends CommonModel
     /**
      * Dispatches events for child classes
      *
-     * @param string $action
-     * @param object $entity
-     * @param bool   $isNew
-     * @param Event  $event
+     * @param       $action
+     * @param       $entity
+     * @param bool  $isNew
+     * @param Event $event
+     *
+     * @return Event|null
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         //...
+
+        return $event;
     }
 
     /**
