@@ -1094,11 +1094,15 @@ class CampaignController extends FormController
         $currentSources  = $session->get('mautic.campaign.'.$id.'.leadsources.current', array());
         $modifiedSources = $session->get('mautic.campaign.'.$id.'.leadsources.modified', array());
 
+        if ($currentSources === $modifiedSources) {
+            return array(array(), array(), $currentSources);
+        }
+
         // Deleted sources
         $deletedSources = array();
         foreach ($currentSources as $type => $sources) {
             if (isset($modifiedSources[$type])) {
-                $deletedSources[$type] = array_diff_key($sources, array_flip($modifiedSources[$type]));
+                $deletedSources[$type] = array_diff($sources, $modifiedSources[$type]);
             } else {
                 $deletedSources[$type] = $sources;
             }
@@ -1108,7 +1112,7 @@ class CampaignController extends FormController
         $addedSources = array();
         foreach ($modifiedSources as $type => $sources) {
             if (isset($currentSources[$type])) {
-                $addedSources[$type] = array_diff_key($sources, array_flip($currentSources[$type]));
+                $addedSources[$type] = array_diff($sources, $currentSources[$type]);
             } else {
                 $addedSources[$type] = $sources;
             }
