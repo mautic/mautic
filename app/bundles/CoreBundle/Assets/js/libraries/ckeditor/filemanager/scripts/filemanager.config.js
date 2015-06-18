@@ -9,9 +9,9 @@
         "showFullPath": false,
         "showTitleAttr": false,
         "browseOnly": false,
-        "showConfirmation": true,
+        "showConfirmation": false,
         "showThumbs": true,
-        "generateThumbnails": false,
+        "generateThumbnails": true,
         "searchBox": true,
         "listFiles": true,
         "fileSorting": "default",
@@ -19,9 +19,9 @@
         "dateFormat": "d M Y H:i",
         "serverRoot": true,
         "fileRoot": "/",
-        "relPath": false,
+        "baseUrl": false,
         "logger": false,
-        "capabilities": ["select", "rename", "delete", "replace"],
+        "capabilities": ["select", "download", "rename", "delete", "replace"],
         "plugins": []
     },
     "security": {
@@ -31,6 +31,7 @@
             "uploadPolicy": "DISALLOW_ALL",
             "uploadRestrictions": [
             "jpg",
+            "jpe",
             "jpeg",
             "gif",
             "png",
@@ -82,6 +83,7 @@
     "images": {
         "imagesExt": [
             "jpg",
+            "jpe",
             "jpeg",
             "gif",
             "png",
