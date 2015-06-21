@@ -160,6 +160,7 @@ class FormModel extends CommonFormModel
     /**
      * @param Form $entity
      * @param      $sessionActions
+     * @param      $sessionFields
      */
     public function setActions(Form &$entity, $sessionActions, $sessionFields)
     {
@@ -228,10 +229,30 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Obtains the cached HTML of a form and generates it if missing
+     *
+     * @param Form $form
+     *
+     * @return string
+     */
+    public function getContent(Form $form)
+    {
+        $cachedHtml = $form->getCachedHtml();
+
+        if (empty($cachedHtml)) {
+            $cachedHtml = $this->generateHtml($form);
+        }
+
+        return $cachedHtml;
+    }
+
+    /**
      * Generate the form's html
      *
      * @param Form $entity
      * @param bool $persist
+     *
+     * @return string
      */
     public function generateHtml(Form $entity, $persist = true)
     {
@@ -257,6 +278,8 @@ class FormModel extends CommonFormModel
             //bypass model function as events aren't needed for this
             $this->getRepository()->saveEntity($entity);
         }
+
+        return $html;
     }
 
     /**
@@ -389,7 +412,7 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $form->getCachedHtml();
+        $html = $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
         $search  = array("\n", '"');

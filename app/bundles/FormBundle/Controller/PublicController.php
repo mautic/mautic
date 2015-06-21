@@ -241,7 +241,7 @@ class PublicController extends CommonFormController
             throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
 
         } else {
-            $html = $form->getCachedHtml();
+            $html = $model->getContent($form);
 
             $model->populateValuesWithGetParameters($form, $html);
 

@@ -225,7 +225,8 @@ class FormController extends CommonFormController
                     'submissionsInTime' => $timeStats,
                 ),
                 'activeFormActions' => $activeFormActions,
-                'activeFormFields'  => $activeFormFields
+                'activeFormFields'  => $activeFormFields,
+                'formContent'  => htmlspecialchars($model->getContent($activeForm), ENT_QUOTES, "UTF-8")
             ),
             'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
             'passthroughVars' => array(
@@ -751,11 +752,8 @@ class FormController extends CommonFormController
         ))  {
             $html = '<h1>' . $this->get('translator')->trans('mautic.core.error.accessdenied', array(), 'flashes') . '</h1>';
         } else {
-            $html = $form->getCachedHtml();
+            $html = $model->getContent($form);
         }
-
-        $model->populateValuesWithGetParameters($form, $html);
-        $html = $form->getCachedHtml();
 
         $model->populateValuesWithGetParameters($form, $html);
 

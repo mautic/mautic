@@ -160,9 +160,10 @@ class PublicController extends CommonFormController
             /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
             $unsubscribeForm = $email->getUnsubscribeForm();
 
-            if ($unsubscribeForm != null) {
+            if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                 $formTemplate = $unsubscribeForm->getTemplate();
-                $formContent  = '<div class="mautic-unsubscribeform">' . $unsubscribeForm->getCachedHtml() . '</div>';
+                $formModel    = $this->factory->getModel('form');
+                $formContent  = '<div class="mautic-unsubscribeform">' . $formModel->getContent($unsubscribeForm) . '</div>';
             }
         } else {
             $email = $lead = false;
