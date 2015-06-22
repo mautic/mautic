@@ -126,8 +126,11 @@ class FieldModel extends FormModel
 
         // Get the column type
         switch ($entity->getType()) {
-        case 'number':
+        case 'float':
           $type = 'float';
+          break;
+        case 'number':
+          $type = 'integer';
           break;
         case 'date':
           $type = 'date';
