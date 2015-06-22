@@ -86,7 +86,7 @@ class PageSubscriber extends CommonSubscriber
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $form->getCachedHtml() :
+                    $formHtml = ($form->isPublished()) ? $model->getContent($form) :
                         '<div class="mauticform-error">' .
                         $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
                         '</div>';
