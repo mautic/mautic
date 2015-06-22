@@ -67,9 +67,9 @@ class LeadType extends AbstractType
 
             $imageChoices = array('gravatar' => 'Gravatar');
 
-            //foreach ($options['data']->getSocialCache() as $key => $data) {
-                //$imageChoices[$key] = $key;
-            //}
+            foreach ($options['data']->getSocialCache() as $key => $data) {
+                $imageChoices[$key] = $key;
+            }
 
             $builder->add('preferred_profile_image', 'choice', array(
                 'choices'    => $imageChoices,
