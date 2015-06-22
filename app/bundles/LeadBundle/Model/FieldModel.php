@@ -124,6 +124,27 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
+        // Get the column type
+        switch ($entity->getType()) {
+        case 'number':
+          $type = 'float';
+          break;
+        case 'date':
+          $type = 'date';
+          break;
+        case 'datetime':
+          $type = 'datetime';
+          break;
+        case 'time':
+          $type = 'datetime';
+          break;
+        case 'boolean':
+          $type = 'boolean';
+          break;
+        default:
+          $type = 'text';
+        }
+
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
@@ -134,7 +155,7 @@ class FieldModel extends FormModel
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
                 $leadsSchema->addColumn(array(
                     'name' => $alias,
-                    'type' => 'text',
+                    'type' => $type,
                     'options' => array(
                         'notnull' => false
                     )
