@@ -19,7 +19,7 @@
         "dateFormat": "d M Y H:i",
         "serverRoot": true,
         "fileRoot": false,
-        "relPath": false,
+        "baseUrl": false,
         "logger": false,
         "capabilities": ["select", "download", "rename", "delete", "replace"],
         "plugins": []
@@ -31,6 +31,7 @@
         "uploadPolicy": "DISALLOW_ALL",
         "uploadRestrictions": [
             "jpg",
+            "jpe",
             "jpeg",
             "gif",
             "png",
@@ -82,6 +83,7 @@
     "images": {
         "imagesExt": [
             "jpg",
+            "jpe",
             "jpeg",
             "gif",
             "png",
@@ -137,5 +139,6 @@
         "directory": "_Open.png",
         "default": "default.png"
     },
-    "url": "https://github.com/simogeo/Filemanager"
+    "url": "https://github.com/simogeo/Filemanager",
+    "version": "2.0.0-dev"
 }
