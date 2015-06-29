@@ -636,6 +636,10 @@ class AjaxController extends CommonController
                     break;
             }
 
+            if (method_exists($mailer, 'setMauticFactory')) {
+                $mailer->setMauticFactory($this->factory);
+            }
+
             if (!empty($mailer)) {
                 if (empty($settings['password'])) {
                     $settings['password'] = $this->factory->getParameter('mailer_password');
