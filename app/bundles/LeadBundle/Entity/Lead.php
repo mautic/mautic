@@ -613,7 +613,15 @@ class Lead extends FormEntity
      */
     public function isAnonymous()
     {
-        if ($name = $this->getName() || !empty($this->fields['core']['company']['value']) || !empty($this->fields['core']['email']['value'])) {
+        if (
+        $name = $this->getName() ||
+            !empty($this->updatedFields['firstname']) ||
+            !empty($this->updatedFields['lastname']) ||
+            !empty($this->updatedFields['company']) ||
+            !empty($this->updatedFields['email']) ||
+            !empty($this->fields['core']['company']['value']) ||
+            !empty($this->fields['core']['email']['value'])
+        ) {
             return false;
         } else {
             return true;
