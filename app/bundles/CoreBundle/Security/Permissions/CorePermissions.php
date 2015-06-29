@@ -257,7 +257,6 @@ class CorePermissions
                 array_shift($parts);
             } else {
                 $isAddon = false;
-                $permission = strtolower($permission);
             }
 
             if (count($parts) != 3) {
@@ -329,16 +328,20 @@ class CorePermissions
                 continue;
             }
 
-            $p = strtolower($p);
-
             $parts = explode(':', $p);
+            if ($parts[0] == 'addon' && count($parts) == 4) {
+                $isAddon = true;
+                array_shift($parts);
+            } else {
+                $isAddon = false;
+            }
 
             if (count($parts) != 3) {
-                $result[$permission] = false;
+                $result[$p] = false;
             } else {
                 //check against bundle permissions class
-                $permissionObject    = $this->getPermissionObject($parts[0], false);
-                $result[$permission] = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
+                $permissionObject = $this->getPermissionObject($parts[0], false, $isAddon);
+                $result[$p]       = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
             }
         }
 
