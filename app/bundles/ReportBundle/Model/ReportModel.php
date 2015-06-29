@@ -433,7 +433,7 @@ class ReportModel extends FormModel
                 }
             }
             $query->andWhere($filterExpressions);
-            $query->setParameters($parameters);
+            $query->setParameters($filterParameters);
         }
         $contentTemplate = $reportGenerator->getContentTemplate();
 
