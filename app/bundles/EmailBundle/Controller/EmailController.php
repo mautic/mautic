@@ -1212,7 +1212,7 @@ class EmailController extends FormController
         $lead = $this->factory->getModel('lead')->getRepository()->getRandomLead();
 
         // Send to current user
-        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $lead);
+        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $lead, array(), array(), false);
 
         $this->addFlash('mautic.email.notice.test_sent.success');
 
@@ -1240,7 +1240,7 @@ class EmailController extends FormController
 
         $template = $entity->getTemplate();
         if (!empty($template)) {
-            $slots    = $this->factory->getTheme($template)->getSlots('email');
+            $slots = $this->factory->getTheme($template)->getSlots('email');
 
             $response = $this->render(
                 'MauticEmailBundle::public.html.php',
@@ -1264,12 +1264,15 @@ class EmailController extends FormController
         $tokens = array('{tracking_pixel}' => '');
 
         // Generate and replace tokens
-        $event = new EmailSendEvent(null, array(
-            'content' => $content,
-            'email'   => $entity,
-            'idHash'  => $idHash,
-            'tokens'  => $tokens
-        ));
+        $event = new EmailSendEvent(
+            null, array(
+            'content'      => $content,
+            'email'        => $entity,
+            'idHash'       => $idHash,
+            'tokens'       => $tokens,
+            'internalSend' => true
+        )
+        );
         $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
         $content = $event->getContent();
 
