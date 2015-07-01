@@ -475,8 +475,7 @@ class ConfigType extends AbstractType
                 25  => 'mautic.core.pagination.25',
                 30  => 'mautic.core.pagination.30',
                 50  => 'mautic.core.pagination.50',
-                100 => 'mautic.core.pagination.100',
-                0   => 'mautic.core.pagination.all'
+                100 => 'mautic.core.pagination.100'
             ),
             'expanded'    => false,
             'multiple'    => false,

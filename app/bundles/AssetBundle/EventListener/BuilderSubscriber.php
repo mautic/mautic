@@ -106,18 +106,22 @@ class BuilderSubscriber extends CommonSubscriber
     private function generateTokensFromContent($event, $leadId, $source = array(), $emailId = null)
     {
         $content       = $event->getContent();
-        $pagelinkRegex = '/' . $this->assetToken . '/';
+        $pagelinkRegex = '/'.$this->assetToken.'/';
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model        = $this->factory->getModel('asset');
-        $clickthrough = array('source' => $source);
+        $model = $this->factory->getModel('asset');
 
-        if ($leadId !== null) {
-            $clickthrough['lead'] = $leadId;
-        }
+        $clickthrough = array();
+        if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && !$event->isInternalSend())) {
+            $clickthrough = array('source' => $source);
 
-        if (!empty($emailId)) {
-            $clickthrough['email'] = $emailId;
+            if ($leadId !== null) {
+                $clickthrough['lead'] = $leadId;
+            }
+
+            if (!empty($emailId)) {
+                $clickthrough['email'] = $emailId;
+            }
         }
 
         $tokens = array();

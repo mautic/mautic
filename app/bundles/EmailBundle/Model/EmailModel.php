@@ -326,11 +326,29 @@ class EmailModel extends FormModel
         $readDateTime = $this->factory->getDate();
         $stat->setLastOpened($readDateTime->getDateTime());
 
+        $lead = $stat->getLead();
+        if ($lead !== null) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel = $this->factory->getModel('lead');
+
+            /*
+            // @todo too many webmail clients mask IP address
+            if (!$lead->getIpAddresses()->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+                $leadModel->saveEntity($lead, true);
+            }
+            */
+
+            // Set the lead as current lead
+            $leadModel->setCurrentLead($lead);
+        }
+
         if (!$stat->getIsRead()) {
             $stat->setIsRead(true);
             $stat->setDateRead($readDateTime->getDateTime());
 
-            if ($email) {
+            // Only up counts if associated with both an email and lead
+            if ($email && $lead) {
                 $readCount = $email->getReadCount();
                 $readCount++;
                 $email->setReadCount($readCount);
@@ -356,25 +374,6 @@ class EmailModel extends FormModel
         //check for existing IP
         $ipAddress = $this->factory->getIpAddress();
         $stat->setIpAddress($ipAddress);
-
-        //save the IP to the lead
-        $lead = $stat->getLead();
-
-        if ($lead !== null) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-
-            /*
-            // @todo too many webmail clients mask IP address
-            if (!$lead->getIpAddresses()->contains($ipAddress)) {
-                $lead->addIpAddress($ipAddress);
-                $leadModel->saveEntity($lead, true);
-            }
-            */
-
-            // Set the lead as current lead
-            $leadModel->setCurrentLead($lead);
-        }
 
         if ($email) {
             if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
@@ -842,7 +841,7 @@ class EmailModel extends FormModel
             $sendTo = $leads;
         }
 
-        if ($ignoreDNC) {
+        if (!$ignoreDNC) {
             //get the list of do not contacts
             static $dnc;
             if (!is_array($dnc)) {
@@ -1030,11 +1029,12 @@ class EmailModel extends FormModel
      * @param mixed $lead
      * @param array $tokens
      * @param array $assetAttachments
+     * @param bool  $saveStat
      *
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser ($email, $users, $lead = null, $tokens = array(), $assetAttachments = array())
+    public function sendEmailToUser ($email, $users, $lead = null, $tokens = array(), $assetAttachments = array(), $saveStat = true)
     {
         if (!$emailId = $email->getId()) {
             return false;
@@ -1056,7 +1056,7 @@ class EmailModel extends FormModel
         $mailer = $this->factory->getMailer();
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments);
+        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
 
         $mailer->useMailerTokenization();
 
@@ -1082,22 +1082,23 @@ class EmailModel extends FormModel
 
             $mailer->setTo($user['email'], $user['firstname'] . ' ' . $user['lastname']);
 
-            $mailer->queue();
+            $mailer->queue(true);
 
-            //create a stat
-            $stat = new Stat();
-            $stat->setDateSent(new \DateTime());
-            $stat->setEmail($email);
-            $stat->setEmailAddress($user['email']);
-            $stat->setTrackingHash($idHash);
-            if (!empty($source)) {
-                $stat->setSource($source[0]);
-                $stat->setSourceId($source[1]);
+            if ($saveStat) {
+                //create a stat
+                $stat = new Stat();
+                $stat->setDateSent(new \DateTime());
+                $stat->setEmailAddress($user['email']);
+                $stat->setTrackingHash($idHash);
+                if (!empty($source)) {
+                    $stat->setSource($source[0]);
+                    $stat->setSourceId($source[1]);
+                }
+                $stat->setCopy($mailer->getBody());
+                $stat->setTokens($mailer->getTokens());
+
+                $saveEntities[] = $stat;
             }
-            $stat->setCopy($mailer->getBody());
-            $stat->setTokens($mailer->getTokens());
-
-            $saveEntities[] = $stat;
         }
 
         //flush the message
@@ -1126,7 +1127,9 @@ class EmailModel extends FormModel
         $repo = $this->getRepository();
         if (!$repo->checkDoNotEmail($address)) {
             $dnc = new DoNotEmail();
-            $dnc->setEmail($email);
+            if ($email != null) {
+                $dnc->setEmail($email);
+            }
             $dnc->setLead($lead);
             $dnc->setEmailAddress($address);
             $dnc->setDateAdded(new \DateTime());

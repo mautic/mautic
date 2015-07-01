@@ -884,6 +884,16 @@ class MailHelper
     }
 
     /**
+     * Check if this is not being send directly to the lead
+     *
+     * @return bool
+     */
+    public function isInternalSend()
+    {
+        return $this->internalSend;
+    }
+
+    /**
      * @return array
      */
     public function getSource()

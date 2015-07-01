@@ -38,8 +38,7 @@ $limitOptions = array(
     25  => '25',
     30  => '30',
     50  => '50',
-    100 => '100',
-    0   => 'all'
+    100 => '100'
 );
 
 $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
