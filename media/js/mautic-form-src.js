@@ -196,7 +196,7 @@
                             switch (field.type) {
                                 case 'radiogrp':
                                 case 'checkboxgrp':
-                                    var elOptions = elForm.elements[name];
+                                    var elOptions = elForm.elements[name + '[]'];
                                     var valid = validateOptions(elOptions);
                                     break;
 
