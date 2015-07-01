@@ -63,9 +63,9 @@ class EmailSendEvent extends CommonEvent
     private $tokens = array();
 
     /**
-     * @var array
+     * @var internalSend
      */
-    private $foundTokens = array();
+    private $internalSend = false;
 
     /**
      * @param MailHelper $helper
@@ -102,6 +102,23 @@ class EmailSendEvent extends CommonEvent
         if (isset($args['tokens'])) {
             $this->tokens = $args['tokens'];
         }
+
+        if (isset($args['internalSend'])) {
+            $this->internalSend = $args['internalSend'];
+        } elseif ($helper !== null) {
+            $this->internalSend = $helper->isInternalSend();
+        }
+    }
+
+
+    /**
+     * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking
+     *
+     * @return internalSend
+     */
+    public function isInternalSend()
+    {
+        return $this->internalSend;
     }
 
     /**

@@ -15,10 +15,11 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class FormSubmitHelper
 {
-	/**
-     * @param       $action
-     *
-     * @return array
+    /**
+     * @param               $tokens
+     * @param Action        $action
+     * @param MauticFactory $factory
+     * @param               $feedback
      */
     public static function sendEmail($tokens, Action $action, MauticFactory $factory, $feedback)
     {
