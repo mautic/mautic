@@ -841,7 +841,7 @@ class EmailModel extends FormModel
             $sendTo = $leads;
         }
 
-        if ($ignoreDNC) {
+        if (!$ignoreDNC) {
             //get the list of do not contacts
             static $dnc;
             if (!is_array($dnc)) {
@@ -1127,7 +1127,9 @@ class EmailModel extends FormModel
         $repo = $this->getRepository();
         if (!$repo->checkDoNotEmail($address)) {
             $dnc = new DoNotEmail();
-            $dnc->setEmail($email);
+            if ($email != null) {
+                $dnc->setEmail($email);
+            }
             $dnc->setLead($lead);
             $dnc->setEmailAddress($address);
             $dnc->setDateAdded(new \DateTime());

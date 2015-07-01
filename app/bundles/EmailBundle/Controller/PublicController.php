@@ -135,6 +135,8 @@ class PublicController extends CommonFormController
     public function unsubscribeAction($idHash)
     {
         //find the email
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
@@ -148,22 +150,27 @@ class PublicController extends CommonFormController
             $leadModel = $this->factory->getModel('lead');
             $leadModel->setCurrentLead($lead);
 
-            $template = $email->getTemplate();
-
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
 
-            $message = $translator->trans('mautic.email.unsubscribed.success', array(
-                '%email%'          => $stat->getEmailAddress(),
-                '%resubscribeUrl%' => $this->generateUrl('mautic_email_resubscribe', array('idHash' => $idHash))
-            ));
+            $message = $translator->trans(
+                'mautic.email.unsubscribed.success',
+                array(
+                    '%email%'          => $stat->getEmailAddress(),
+                    '%resubscribeUrl%' => $this->generateUrl('mautic_email_resubscribe', array('idHash' => $idHash))
+                )
+            );
 
-            /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
-            $unsubscribeForm = $email->getUnsubscribeForm();
+            if ($email !== null) {
+                $template = $email->getTemplate();
 
-            if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
-                $formTemplate = $unsubscribeForm->getTemplate();
-                $formModel    = $this->factory->getModel('form');
-                $formContent  = '<div class="mautic-unsubscribeform">' . $formModel->getContent($unsubscribeForm) . '</div>';
+                /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
+                $unsubscribeForm = $email->getUnsubscribeForm();
+
+                if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
+                    $formTemplate = $unsubscribeForm->getTemplate();
+                    $formModel    = $this->factory->getModel('form');
+                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                }
             }
         } else {
             $email = $lead = false;
@@ -223,8 +230,6 @@ class PublicController extends CommonFormController
             $leadModel = $this->factory->getModel('lead');
             $leadModel->setCurrentLead($lead);
 
-            $template = $email->getTemplate();
-
             $model->removeDoNotContact($stat->getEmailAddress());
 
             $message = $translator->trans('mautic.email.resubscribed.success', array(
@@ -235,7 +240,9 @@ class PublicController extends CommonFormController
             $email = $lead = false;
         }
 
-        $theme  = $this->factory->getTheme($template);
+        $template = ($email !== null) ? $email->getTemplate() : $this->factory->getParameter('theme');
+        $theme    = $this->factory->getTheme($template);
+
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
