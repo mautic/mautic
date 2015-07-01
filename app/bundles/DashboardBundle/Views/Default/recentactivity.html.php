@@ -27,8 +27,10 @@
                         <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
                             <?php echo $log['userName']; ?>
                         </a>
-                    <?php else : ?>
+                    <?php elseif ($log['userName']) : ?>
                         <?php echo $log['userName']; ?>
+                    <?php else: ?>
+                        <?php echo $view['translator']->trans('mautic.core.system'); ?>
                     <?php endif; ?>
                     <?php echo $view['translator']->trans('mautic.dashboard.' . $log['action'] . '.past.tense'); ?>
 
