@@ -10,15 +10,6 @@ mQuery.ajaxSetup({
         if (settings.showLoadingBar) {
             mQuery('.loading-bar').addClass('active');
             MauticVars.activeRequests++;
-
-            var currentRequests = MauticVars.activeRequests;
-            MauticVars.loadingBarTimeout = setTimeout(function() {
-                if (MauticVars.activeRequests == currentRequests) {
-                    // Seems to be stuck
-                    MauticVars.activeRequests = 0;
-                    Mautic.stopPageLoadingBar();
-                }
-            }, 20000);
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -38,7 +29,15 @@ mQuery.ajaxSetup({
 
         return true;
     },
+
     cache: false
+});
+
+// Force stop the page loading bar when no more requests are being in progress
+mQuery( document ).ajaxStop(function(event) {
+    // Seems to be stuck
+    MauticVars.activeRequests = 0;
+    Mautic.stopPageLoadingBar();
 });
 
 mQuery( document ).ready(function() {
@@ -2664,15 +2663,15 @@ var Mautic = {
      * @param notifications
      */
     setBrowserNotifications: function (notifications) {
-       mQuery.each(notifications, function (key, notification) {
-          Mautic.browserNotifier.createNotification(
-              notification.title,
-              {
-                  body: notification.message,
-                  icon: notification.icon
-              }
-          );
-       });
+        mQuery.each(notifications, function (key, notification) {
+            Mautic.browserNotifier.createNotification(
+                notification.title,
+                {
+                    body: notification.message,
+                    icon: notification.icon
+                }
+            );
+        });
     },
 
     /**
@@ -2909,14 +2908,14 @@ var Mautic = {
                 source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
             }
         ).on('keypress', function (event) {
-            if ((event.keyCode || event.which) == 13) {
-                mQuery(el).typeahead('close');
-            }
-        }).on('focus', function() {
-            if(mQuery(el).typeahead('val') === '' && !options.minLength) {
-                mQuery(el).data('ttTypeahead').input.trigger('queryChanged', '');
-            }
-        });
+                if ((event.keyCode || event.which) == 13) {
+                    mQuery(el).typeahead('close');
+                }
+            }).on('focus', function() {
+                if(mQuery(el).typeahead('val') === '' && !options.minLength) {
+                    mQuery(el).data('ttTypeahead').input.trigger('queryChanged', '');
+                }
+            });
 
         return theTypeahead;
     },
