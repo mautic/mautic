@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CorePermissions
@@ -227,11 +226,13 @@ class CorePermissions
      * @param array|string $requestedPermission
      * @param string       $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param User         $userEntity
+     * @param bool         $allowUnknown If the permission is not recognized, false will be returned.  Otherwise an
+     *                                     exception will be thrown
      *
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
+    public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null, $allowUnknown = false)
     {
         static $grantedPermissions = array();
 
@@ -273,12 +274,14 @@ class CorePermissions
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-                throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.notfound',
-                    array("%permission%" => $permission))
-                );
-            }
-
-            if ($userEntity == "anon.") {
+                if ($allowUnknown) {
+                    $permissions[$permission] = false;
+                } else {
+                    throw new \InvalidArgumentException($this->getTranslator()->trans('mautic.core.permissions.notfound',
+                        array("%permission%" => $permission))
+                    );
+                }
+            }elseif ($userEntity == "anon.") {
                 //anon user or session timeout
                 $permissions[$permission] = false;
             } elseif ($userEntity->isAdmin()) {
