@@ -129,6 +129,21 @@
         Form.validator = function(formId) {
             var validator = {
                 validateForm: function () {
+                    // Check to see if the iframe exists
+                    if (!document.getElementById('mauticiframe_' + formId) && document.getElementById('mauticform_' + formId + '_messenger')) {
+                        // Likely an editor has stripped out the iframe so let's dynmamically create it
+                        var ifrm = document.createElement("IFRAME");
+                        ifrm.style.display = "none";
+                        ifrm.style.margin = 0;
+                        ifrm.style.padding = 0;
+                        ifrm.style.border = "none";
+                        ifrm.style.width = 0;
+                        ifrm.style.heigh = 0;
+                        ifrm.setAttribute('id', 'mauticiframe_' + formId);
+                        ifrm.setAttribute('name', 'mauticiframe_' + formId);
+                        document.body.appendChild(ifrm);
+                    }
+
                     function validateOptions(elOptions) {
                         var optionsValid = false;
 
