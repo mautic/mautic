@@ -245,9 +245,10 @@ class MailHelper
 
             // Attach assets
             if (!empty($this->assets)) {
+                /** @var \Mautic\AssetBundle\Entity\Asset $asset */
                 foreach ($this->assets as $asset) {
                     $this->attachFile(
-                        $asset->getAbsolutePath(),
+                        $asset->getFilePath(),
                         $asset->getOriginalFileName(),
                         $asset->getMime()
                     );
