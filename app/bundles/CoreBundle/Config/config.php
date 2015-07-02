@@ -189,6 +189,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'formatter'
+            ),
+            'mautic.helper.template.security' => array(
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'security'
             )
         ),
         'other'   => array(

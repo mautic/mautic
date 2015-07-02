@@ -56,6 +56,8 @@ class CommonController extends Controller implements MauticController
 
     /**
      * @param FilterControllerEvent $event
+     *
+     * @return void
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -98,6 +100,8 @@ class CommonController extends Controller implements MauticController
      * refresh
      *
      * @param $url
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delegateRedirect($url)
     {
@@ -456,7 +460,9 @@ class CommonController extends Controller implements MauticController
     /**
      * Renders notification info for ajax
      *
-     * @return string
+     * @param Request $request
+     *
+     * @return array
      */
     protected function getNotificationContent(Request $request = null)
     {
