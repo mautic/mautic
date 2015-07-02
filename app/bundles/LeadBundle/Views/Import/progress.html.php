@@ -30,7 +30,7 @@ $header   = ($complete) ? 'mautic.lead.import.success': 'mautic.lead.import.dono
                 <h4><?php echo $view['translator']->trans('mautic.lead.import.stats', array('%merged%' => $stats['merged'], '%created%' => $stats['created'], '%ignored%' => $stats['ignored'])); ?></h4>
                 <?php endif; ?>
                 <div class="progress mt-md" style="height:50px;">
-                    <div class="progress-bar progress-bar-striped<?php if (!$complete) echo ' active'; ?>" role="progressbar" aria-valuenow="<?php echo $progress[0]; ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress[1]; ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
+                    <div class="progress-bar-import progress-bar progress-bar-striped<?php if (!$complete) echo ' active'; ?>" role="progressbar" aria-valuenow="<?php echo $progress[0]; ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress[1]; ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
                         <span class="sr-only"><?php echo $percent; ?>%</span>
                     </div>
                 </div>
