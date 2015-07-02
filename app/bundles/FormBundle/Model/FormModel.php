@@ -159,6 +159,23 @@ class FormModel extends CommonFormModel
 
     /**
      * @param Form $entity
+     * @param      $sessionFields
+     */
+    public function deleteFields(Form &$entity, $sessionFields)
+    {
+        if (empty($sessionFields)) {
+            return;
+        }
+        $existingFields = $entity->getFields();
+        foreach ($sessionFields as $fieldId) {
+            if (isset($existingFields[$fieldId])) {
+                $entity->removeField($fieldId, $existingFields[$fieldId]);
+            }
+        }
+    }
+
+    /**
+     * @param Form $entity
      * @param      $sessionActions
      * @param      $sessionFields
      */
