@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\CampaignDecisionTriggerEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
@@ -358,6 +359,12 @@ class EventModel extends CommonFormModel
 
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
+        }
+
+        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
+            $event = new CampaignDecisionTriggerEvent($lead, $type, $eventDetails, $events, $persist);
+            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_TRIGGER, $event);
+            unset($event);
         }
 
         return $actionResponses;

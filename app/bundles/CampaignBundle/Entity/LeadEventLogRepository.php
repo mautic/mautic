@@ -37,7 +37,9 @@ class LeadEventLogRepository extends EntityRepository
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
-                    e.type
+                    e.type,
+                    ll.isScheduled,
+                    ll.triggerDate
                     '
             )
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
@@ -57,6 +59,13 @@ class LeadEventLogRepository extends EntityRepository
                 $query->expr()->like('c.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
                 $query->expr()->like('c.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
             ));
+        }
+
+        if (isset($options['scheduledState'])) {
+            $query->andWhere(
+                $query->expr()->eq('ll.isScheduled', ':scheduled')
+            )
+                ->setParameter('scheduled', $options['scheduledState'], 'boolean');
         }
 
         return $query->getQuery()->getArrayResult();

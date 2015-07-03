@@ -466,6 +466,8 @@ class CampaignController extends FormController
         //get event settings
         $eventSettings = $model->getEvents();
 
+        $campaignSources = array();
+
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
@@ -531,7 +533,6 @@ class CampaignController extends FormController
                     $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
                     $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
 
-                    $campaignSources = array();
                     foreach ($currentSources as $type => $sources) {
                         if (!empty($sources)) {
                             $sourceList             = $model->getSourceLists($type);
@@ -862,12 +863,23 @@ class CampaignController extends FormController
             $campaign->setIsPublished(false);
 
             // Clone the campaign's events
+            $parentIds = array();
             foreach ($events as $event) {
                 $campaign->removeEvent($event);
 
                 $clone = clone $event;
                 $clone->setCampaign($campaign);
                 $clone->setTempId($event->getId());
+
+                $parent = $event->getParent();
+                if ($parent) {
+                    $parentIds[$event->getId()] = $parent->getId();
+
+                    // Null it to prevent premature firing for this event just in case
+                    // something hits while the process is wrapping up
+                    $clone->setParent(null);
+                }
+
                 $campaign->addEvent($event->getId(), $clone);
             }
 
@@ -880,18 +892,37 @@ class CampaignController extends FormController
                 $eventIds[$n->getTempId()] = $n->getId();
             }
 
+            // Loop again to update parents
+            $em = $this->factory->getEntityManager();
+            foreach ($newEvents as $n) {
+                $oldId = $n->getTempId();
+                if (isset($parentIds[$oldId])) {
+                    // This event had a parent so change it to the new
+                    $n->setParent(
+                        $em->getReference('MauticCampaignBundle:Event', $eventIds[$parentIds[$oldId]])
+                    );
+                }
+            }
+
             // Update canvas settings with new event ids
             $canvasSettings = $campaign->getCanvasSettings();
             if (isset($canvasSettings['nodes'])) {
                 foreach ($canvasSettings['nodes'] as &$node) {
-                    $node['id'] = $eventIds[$node['id']];
+                    if (isset($eventIds[$node['id']])) {
+                        $node['id'] = $eventIds[$node['id']];
+                    }
                 }
             }
 
             if (isset($canvasSettings['connections'])) {
                 foreach ($canvasSettings['connections'] as &$c) {
-                    $c['sourceId'] = $eventIds[$c['sourceId']];
-                    $c['targetId'] = $eventIds[$c['targetId']];
+                    if (isset($eventIds[$c['sourceId']])) {
+                        $c['sourceId'] = $eventIds[$c['sourceId']];
+                    }
+
+                    if (isset($eventIds[$c['targetId']])) {
+                        $c['targetId'] = $eventIds[$c['targetId']];
+                    }
                 }
             }
 
