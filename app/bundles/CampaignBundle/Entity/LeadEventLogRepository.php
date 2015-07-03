@@ -59,6 +59,13 @@ class LeadEventLogRepository extends EntityRepository
             ));
         }
 
+        if (isset($options['scheduledState'])) {
+            $query->andWhere(
+                $query->expr()->eq('ll.isScheduled', ':scheduled')
+            )
+                ->setParameter('scheduled', $options['scheduledState'], 'boolean');
+        }
+
         return $query->getQuery()->getArrayResult();
     }
 

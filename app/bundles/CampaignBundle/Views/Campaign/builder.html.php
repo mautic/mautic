@@ -117,8 +117,10 @@
         // Recreate jsPlumb connections and labels
         <?php
         $labels = array();
+
         foreach ($canvasSettings['connections'] as $connection):
-            if (isset($labels[$connection['targetId']])) continue;
+            if (isset($labels[$connection['targetId']]) || !isset($campaignEvents[$connection['targetId']]))
+                continue;
 
             $targetEvent = $campaignEvents[$connection['targetId']];
             $labelText   = '';

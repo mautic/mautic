@@ -128,8 +128,10 @@ class Campaign extends FormEntity
      */
     public function __clone()
     {
-        $this->leads  = new ArrayCollection();
+        $this->leads = new ArrayCollection();
         $this->id    = null;
+
+        parent::__clone();
     }
 
     /**
