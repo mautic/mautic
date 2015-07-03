@@ -97,7 +97,8 @@ class EmailSubscriber extends CommonSubscriber
                 }
 
                 $fallbackCheck = explode('|', $match);
-                $fallback      = $urlencode = false;
+                $urlencode     = false;
+                $fallback      = '';
 
                 if (isset($fallbackCheck[1])) {
                     // There is a fallback or to be urlencoded
