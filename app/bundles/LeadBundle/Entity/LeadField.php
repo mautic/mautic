@@ -128,8 +128,11 @@ class LeadField extends FormEntity
      */
     private $properties;
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
+
+        parent::__clone();
     }
 
     /**

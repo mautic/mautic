@@ -104,6 +104,17 @@ class FormEntity extends CommonEntity
     protected $changes = array();
 
     /**
+     * Clear dates on clone
+     */
+    public function __clone()
+    {
+        $this->dateAdded    = null;
+        $this->dateModified = null;
+        $this->checkedOut   = null;
+        $this->isPublished  = false;
+    }
+
+    /**
      * Check publish status with option to check against category, publish up and down dates
      *
      * @param bool $checkPublishStatus

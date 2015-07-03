@@ -264,8 +264,11 @@ class Email extends FormEntity
      */
     private $sessionId;
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
+
+        parent::__clone();
     }
 
     public function __construct()
