@@ -846,6 +846,8 @@ class LeadController extends FormController
      * Add/remove lead from a list
      *
      * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function listAction($objectId)
     {
@@ -887,6 +889,8 @@ class LeadController extends FormController
      * Add/remove lead from a campaign
      *
      * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function campaignAction($objectId)
     {
@@ -924,7 +928,10 @@ class LeadController extends FormController
     }
 
     /**
-     * @param $objectId
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function importAction($objectId = 0, $ignorePost = false)
     {
@@ -954,7 +961,7 @@ class LeadController extends FormController
         }
 
         $progress = $session->get('mautic.lead.import.progress', array(0, 0));
-        $stats    = $session->get('mautic.lead.import.stats', array('merged' => 0, 'created' => 0, 'ignored' => 0));
+        $stats    = $session->get('mautic.lead.import.stats', array('merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => array()));
         $action   = $this->generateUrl('mautic_lead_action', array('objectAction' => 'import'));
 
         switch ($step) {
@@ -998,7 +1005,7 @@ class LeadController extends FormController
 
                 $inProgress = $session->get('mautic.lead.import.inprogress', false);
                 $checks     = $session->get('mautic.lead.import.progresschecks', 1);
-                if (!$inProgress || $checks > 5) {
+                if (true || !$inProgress || $checks > 5) {
                     $session->set('mautic.lead.import.inprogress', true);
                     $session->set('mautic.lead.import.progresschecks', 1);
 
@@ -1032,13 +1039,17 @@ class LeadController extends FormController
                             // Decrease batch count
                             $batchSize--;
 
-                            if (is_array($data) && count($headers) === count($data)) {
+                            if (is_array($data) && $dataCount = count($data)) {
+                                // Ensure the number of headers are equal with data
+                                $headerCount = count($headers);
+                                if ($headerCount !== $dataCount) {
+                                    // Fill in the data with empty string
+                                    $fill = array_fill($dataCount, ($headerCount - $dataCount), '');
+                                    $data = $data + $fill;
+                                }
 
                                 $data = array_combine($headers, $data);
-
-                                if (empty($data)) {
-                                    $stats['ignored']++;
-                                } else {
+                                try {
                                     $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList);
 
                                     if ($merged) {
@@ -1046,7 +1057,13 @@ class LeadController extends FormController
                                     } else {
                                         $stats['created']++;
                                     }
+                                } catch (\Exception $e) {
+                                    // Email validation likely failed
+                                    $stats['ignored']++;
+                                    $stats['failures'][] = $e->getMessage();
                                 }
+                            } else {
+                                $stats['ignored']++;
                             }
                         }
 
@@ -1320,7 +1337,7 @@ class LeadController extends FormController
 
                         $mailer->setSubject($email['subject']);
 
-                        if ($error = $mailer->send(true)) {
+                        if ($mailer->send(true)) {
                             $mailer->createLeadEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
@@ -1337,6 +1354,7 @@ class LeadController extends FormController
                                     '%email%'   => $leadEmail
                                 )
                             );
+                            $valid = false;
                         }
                     } else {
                         $form['body']->addError(
