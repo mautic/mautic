@@ -160,12 +160,22 @@ return array(
             'mautic.form.type.slideshow_slide_config'   => array(
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowSlideConfigType',
                 'alias' => 'slideshow_slide_config'
-            )
+            ),
+            'mautic.form.type.redirect_list' 			=> array(
+				'class' => 'Mautic\PageBundle\Form\Type\RedirectListType',
+				'arguments' => 'mautic.factory',
+				'alias' => 'redirect_list'
+			)
         )
     ),
 
     'parameters' => array(
         'cat_in_page_url'  => false,
-        'google_analytics' => false
+        'google_analytics' => false,
+        
+		'redirect_list_types' => array(
+			'301' => 'mautic.page.form.redirecttype.permanent',
+			'302' => 'mautic.page.form.redirecttype.temporary'
+		)
     )
 );

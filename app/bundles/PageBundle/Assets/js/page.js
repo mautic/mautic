@@ -14,6 +14,15 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
     }
+    
+    if (mQuery(container + ' form[name="page"]').length) {
+        mQuery("*[data-toggle='field-lookup']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            var field  = mQuery(this).attr('id');
+            var options = mQuery(this).attr('data-options');
+            Mautic.activatePageFieldTypeahead(field, target, options);
+        });
+    }
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -117,6 +126,42 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
         },
         complete: function () {
             Mautic.removeLabelLoadingIndicator();
+        }
+    });
+};
+
+Mautic.activatePageFieldTypeahead = function(field, target, options) {
+    if (options) {
+        var keys = values = [];
+        //check to see if there is a key/value split
+        options = options.split('||');
+        if (options.length == 2) {
+            keys = options[1].split('|');
+            values = options[0].split('|');
+        } else {
+            values = options[0].split('|');
+        }
+
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            dataOptions: values,
+            dataOptionKeys: keys,
+            minLength: 0
+        });
+    } else {
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            prefetch: true,
+            remote: true,
+            action: "page:fieldList&field=" + target
+        });
+    }
+    
+    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
+        if (mQuery("#" + field).length && datum["value"]) {
+            mQuery("#" + field).val(datum["value"]);
+        }
+    }).on('typeahead:autocompleted', function (event, datum) {
+        if (mQuery("#" + field).length && datum["value"]) {
+            mQuery("#" + field).val(datum["value"]);
         }
     });
 };
