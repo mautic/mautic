@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -772,16 +773,21 @@ class LeadModel extends FormModel
      * @param      $fields
      * @param      $data
      * @param null $owner
+     * @param null $list
      * @param bool $persist Persist to the database; otherwise return entity
      *
-     * @return Lead
+     * @return bool
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Swift_RfcComplianceException
      */
     public function importLead($fields, $data, $owner = null, $list = null, $persist = true)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
         if ($hasEmail) {
+            // Validate the email
+            MailHelper::validateEmail($data[$fields['email']]);
+
             $leadFound = $this->getRepository()->getLeadByEmail($data[$fields['email']]);
             $lead      = ($leadFound) ? $this->em->getReference('MauticLeadBundle:Lead', $leadFound['id']) : new Lead();
             $merged    = $leadFound;
@@ -892,8 +898,8 @@ class LeadModel extends FormModel
             if ($list !== null) {
                 $this->addToLists($lead, array($list));
             }
-
-            return $merged;
         }
+
+        return $merged;
     }
 }

@@ -840,6 +840,30 @@ class MailHelper
     }
 
     /**
+     * Validates a given address to ensure RFC 2822, 3.6.2 specs
+     *
+     * @param $address
+     *
+     * @throws \Swift_RfcComplianceException
+     */
+    static public function validateEmail($address)
+    {
+        static $grammer;
+
+        if ($grammer === null) {
+            $grammer = new \Swift_Mime_Grammar();
+        }
+
+        if (!preg_match('/^'.$grammer->getDefinition('addr-spec').'$/D',
+            $address)) {
+            throw new \Swift_RfcComplianceException(
+                'Address in mailbox given ['.$address.
+                '] does not comply with RFC 2822, 3.6.2.'
+            );
+        }
+    }
+
+    /**
      * @return null
      */
     public function getIdHash()
