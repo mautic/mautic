@@ -304,7 +304,11 @@ class BuilderSubscriber extends CommonSubscriber
     protected function generateUrlTokens($content, $clickthrough, $emailId = null, Email $email = null, EmailSendEvent $event = null)
     {
         $tokens                    = array();
-        $this->emailIsInternalSend = $event->isInternalSend();
+
+        // check we have a complete event property before trying to use it's methods
+        if ($event !== null) {
+            $this->emailIsInternalSend = $event->isInternalSend();
+        }
 
         if ($emailId !== null && isset($this->emailTrackedLinks[$emailId])) {
             // Tokenization is supported and the links have already been parsed so rebuild tokens from saved links
