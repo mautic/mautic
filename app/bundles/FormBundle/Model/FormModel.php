@@ -357,6 +357,8 @@ class FormModel extends CommonFormModel
     public function generateFieldColumns(Form $form)
     {
         $fields = $form->getFields();
+        $databasePlatform = $this->factory->getDatabase()->getDatabasePlatform();
+        $reservedWords = $databasePlatform->getReservedKeywordsList();
 
         $columns = array(
             array(
@@ -372,7 +374,7 @@ class FormModel extends CommonFormModel
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
                 $columns[] = array(
-                    'name'    => $f->getAlias(),
+                    'name'    => ($reservedWords->isKeyword($f->getAlias()) || is_numeric($f->getAlias())) ? $databasePlatform->quoteIdentifier($f->getAlias()) : $f->getAlias(),
                     'type'    => 'text',
                     'options' => array(
                         'notnull' => false

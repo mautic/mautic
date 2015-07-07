@@ -34,7 +34,17 @@ class SubmissionRepository extends CommonRepository
         $results['form_id']       = $form->getId();
         $tableName                = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
         if (!empty($results)) {
-            $this->_em->getConnection()->insert($tableName, $results);
+            // Make sure the column names are all SQL safe
+            $data = array();
+            $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+            $reservedWords = $databasePlatform->getReservedKeywordsList();
+
+            foreach ($results as $name => $value) {
+                $columnName = ($reservedWords->isKeyword($name) || is_numeric($name)) ? $databasePlatform->quoteIdentifier($name) : $name;
+                $data[$columnName] = $value;
+            }
+
+            $this->_em->getConnection()->insert($tableName, $data);
         }
     }
 
