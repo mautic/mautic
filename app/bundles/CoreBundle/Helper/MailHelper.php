@@ -245,9 +245,10 @@ class MailHelper
 
             // Attach assets
             if (!empty($this->assets)) {
+                /** @var \Mautic\AssetBundle\Entity\Asset $asset */
                 foreach ($this->assets as $asset) {
                     $this->attachFile(
-                        $asset->getAbsolutePath(),
+                        $asset->getFilePath(),
                         $asset->getOriginalFileName(),
                         $asset->getMime()
                     );
@@ -835,6 +836,30 @@ class MailHelper
             $this->message->setFrom($address, $name);
         } catch (\Exception $e) {
             $this->logError($e);
+        }
+    }
+
+    /**
+     * Validates a given address to ensure RFC 2822, 3.6.2 specs
+     *
+     * @param $address
+     *
+     * @throws \Swift_RfcComplianceException
+     */
+    static public function validateEmail($address)
+    {
+        static $grammer;
+
+        if ($grammer === null) {
+            $grammer = new \Swift_Mime_Grammar();
+        }
+
+        if (!preg_match('/^'.$grammer->getDefinition('addr-spec').'$/D',
+            $address)) {
+            throw new \Swift_RfcComplianceException(
+                'Address in mailbox given ['.$address.
+                '] does not comply with RFC 2822, 3.6.2.'
+            );
         }
     }
 

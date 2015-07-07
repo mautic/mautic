@@ -26,7 +26,7 @@ $id       = ($status != 'inprogress') ? 'emailSendProgressComplete' : 'emailSend
                 <h4><?php echo $view['translator']->trans('mautic.email.send.stats', array('%sent%' => $stats['sent'], '%failed%' => $stats['failed'])); ?></h4>
                 <?php endif; ?>
                 <div class="progress mt-md" style="height:50px;">
-                    <div class="progress-bar progress-bar-striped<?php if ($status == 'inprogress') echo ' active'; ?>" role="progressbar" aria-valuenow="<?php echo $progress[0]; ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress[1]; ?>" style="width: <?php echo $percent; ?>%; height: 50px;" data-batchlimit="<?php echo $batchlimit; ?>" data-email="<?php echo $email->getId(); ?>">
+                    <div class="progress-bar-send progress-bar progress-bar-striped<?php if ($status == 'inprogress') echo ' active'; ?>" role="progressbar" aria-valuenow="<?php echo $progress[0]; ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress[1]; ?>" style="width: <?php echo $percent; ?>%; height: 50px;" data-batchlimit="<?php echo $batchlimit; ?>" data-email="<?php echo $email->getId(); ?>">
                         <span class="sr-only"><?php echo $percent; ?>%</span>
                     </div>
                 </div>
