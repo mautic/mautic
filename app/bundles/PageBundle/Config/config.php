@@ -161,11 +161,11 @@ return array(
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowSlideConfigType',
                 'alias' => 'slideshow_slide_config'
             ),
-            'mautic.form.type.redirect_list' 			=> array(
-				'class' => 'Mautic\PageBundle\Form\Type\RedirectListType',
-				'arguments' => 'mautic.factory',
-				'alias' => 'redirect_list'
-			)
+            'mautic.form.type.redirect_list'            => array(
+                'class' => 'Mautic\PageBundle\Form\Type\RedirectListType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'redirect_list'
+            )
         )
     ),
 
@@ -173,9 +173,9 @@ return array(
         'cat_in_page_url'  => false,
         'google_analytics' => false,
         
-		'redirect_list_types' => array(
-			'301' => 'mautic.page.form.redirecttype.permanent',
-			'302' => 'mautic.page.form.redirecttype.temporary'
-		)
+        'redirect_list_types' => array(
+            '301' => 'mautic.page.form.redirecttype.permanent',
+            '302' => 'mautic.page.form.redirecttype.temporary'
+        )
     )
 );

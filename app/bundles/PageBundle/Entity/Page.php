@@ -130,16 +130,16 @@ class Page extends FormEntity
      * @Serializer\Groups({"pageDetails"})
      */
     private $metaDescription;
-	
-	/**
+    
+    /**
      * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"pageDetails"})
      */
-	private $redirectType;
-	
-	/**
+    private $redirectType;
+    
+    /**
      * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -474,52 +474,52 @@ class Page extends FormEntity
     {
         return $this->metaDescription;
     }
-	
-	/**
-	 * Set redirectType
-	 * 
-	 * @param string $redirectType
-	 * 
-	 * @return Page
-	 */
-	public function setRedirectType($redirectType) {
-		$this->isChanged('redirectType', $redirectType);
-		$this->redirectType = $redirectType;
-		
-		return $this;
-	}
-	
-	/**
-	 * Get redirectType
-	 * 
-	 * @return string
-	 */
-	public function getRedirectType() {
-		return $this->redirectType;
-	}
-	
-	/**
-	 * Set redirectUrl
-	 * 
-	 * @param string $redirectUrl
-	 * 
-	 * @return Page
-	 */
-	public function setRedirectUrl($redirectUrl) {
-		$this->isChanged('redirectUrl', $redirectUrl);
-		$this->redirectUrl = $redirectUrl;
-		
-		return $this;
-	}
-	
-	/**
-	 * Get redirectUrl
-	 * 
-	 * @return string
-	 */
-	public function getRedirectUrl(){
-		return $this->redirectUrl;
-	}
+    
+    /**
+     * Set redirectType
+     * 
+     * @param string $redirectType
+     * 
+     * @return Page
+     */
+    public function setRedirectType($redirectType) {
+        $this->isChanged('redirectType', $redirectType);
+        $this->redirectType = $redirectType;
+        
+        return $this;
+    }
+    
+    /**
+     * Get redirectType
+     * 
+     * @return string
+     */
+    public function getRedirectType() {
+        return $this->redirectType;
+    }
+    
+    /**
+     * Set redirectUrl
+     * 
+     * @param string $redirectUrl
+     * 
+     * @return Page
+     */
+    public function setRedirectUrl($redirectUrl) {
+        $this->isChanged('redirectUrl', $redirectUrl);
+        $this->redirectUrl = $redirectUrl;
+        
+        return $this;
+    }
+    
+    /**
+     * Get redirectUrl
+     * 
+     * @return string
+     */
+    public function getRedirectUrl(){
+        return $this->redirectUrl;
+    }
 
     /**
      * Set language

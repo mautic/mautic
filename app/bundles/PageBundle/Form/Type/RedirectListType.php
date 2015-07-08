@@ -15,30 +15,30 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @package Mautic\PageBundle\Form\Type
  */
 class RedirectListType extends AbstractType {
-	
-	private $factory;
-	
-	/**
+    
+    private $factory;
+    
+    /**
      * @param MauticFactory $factory
      */
-	public function __construct(MauticFactory $factory) {
-		$this->factory = $factory;
-	}
-	
-	/**
+    public function __construct(MauticFactory $factory) {
+        $this->factory = $factory;
+    }
+    
+    /**
      * @param OptionsResolverInterface $resolver
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
-		$factory = $this->factory;
+        $factory = $this->factory;
         $resolver->setDefaults(array(
-            'choices' 		=> $factory->getParameter('redirect_list_types'),
+            'choices'       => $factory->getParameter('redirect_list_types'),
             'expanded'      => false,
             'multiple'      => false,
             'label'         => 'mautic.page.form.redirecttype',
             'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
-            'attr'       	=> array(
+            'attr'          => array(
                 'class' => 'form-control'
             ),
             'feature'       => 'all'
@@ -53,12 +53,12 @@ class RedirectListType extends AbstractType {
     public function getName() {
         return "redirect_list";
     }
-	
-	/**
-	 * @return string
-	 */
+    
+    /**
+     * @return string
+     */
     public function getParent() {
         return "choice";
     }
-	
+    
 }
