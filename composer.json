@@ -16,7 +16,7 @@
         "symfony/config": "2.5.*",
         "symfony/console": "2.5.*",
         "symfony/debug": "2.5.*",
-        "symfony/dependency-injection": "2.5.*",
+        "symfony/dependency-injection": "2.6.*",
         "symfony/event-dispatcher": "2.5.*",
         "symfony/finder": "2.3.*",
         "symfony/form": "2.5.*",
