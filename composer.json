@@ -24,7 +24,7 @@
         "symfony/http-kernel": "2.5.*",
         "symfony/intl": "2.5.*",
         "symfony/options-resolver": "2.5.*",
-        "symfony/process": "2.5.*",
+        "symfony/process": "2.6.*",
         "symfony/routing": "2.5.*",
         "symfony/security": "2.5.*",
         "symfony/templating": "2.5.*",
