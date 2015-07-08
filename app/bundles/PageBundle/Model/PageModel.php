@@ -33,7 +33,11 @@ class PageModel extends FormModel
      */
     public function getRepository ()
     {
-        return $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo->setCurrentUser(
+            $this->factory->getUser()
+        );
+        return $repo;
     }
 
     /**
