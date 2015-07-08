@@ -14,7 +14,7 @@
 
         "symfony/class-loader": "2.5.*",
         "symfony/config": "2.5.*",
-        "symfony/console": "2.5.*",
+        "symfony/console": "2.6.*",
         "symfony/debug": "2.5.*",
         "symfony/dependency-injection": "2.5.*",
         "symfony/event-dispatcher": "2.5.*",
