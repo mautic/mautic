@@ -13,7 +13,7 @@
         "php": ">=5.3.7",
 
         "symfony/class-loader": "2.5.*",
-        "symfony/config": "2.5.*",
+        "symfony/config": "2.6.*",
         "symfony/console": "2.5.*",
         "symfony/debug": "2.5.*",
         "symfony/dependency-injection": "2.5.*",
