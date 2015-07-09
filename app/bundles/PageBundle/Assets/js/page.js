@@ -23,6 +23,17 @@ Mautic.pageOnLoad = function (container) {
             Mautic.activatePageFieldTypeahead(field, target, options);
         });
     }
+    
+    //Handle autohide of "Redirect URL" field if "Redirect Type" is none
+    if (mQuery(container + ' select[name="page[redirectType]"]').length) {
+        //Auto-hide on page loading
+        Mautic.autoHideRedirectUrl(container);
+        
+        //Auto-hide on select changing
+        mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
+            Mautic.autoHideRedirectUrl(container);
+        });
+    }
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -164,4 +175,17 @@ Mautic.activatePageFieldTypeahead = function(field, target, options) {
             mQuery("#" + field).val(datum["value"]);
         }
     });
+};
+
+Mautic.autoHideRedirectUrl = function(container) {
+    var select = mQuery(container + ' select[name="page[redirectType]"]');
+    var input = mQuery(container + ' input[name="page[redirectUrl]"]');
+    
+    //If value is none we autohide the "Redirect URL" field and empty it
+    if (select.val() == '') {
+        input.closest('.form-group').hide();
+        input.val('');
+    } else {
+        input.closest('.form-group').show();
+    }
 };
