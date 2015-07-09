@@ -189,7 +189,7 @@ class PageType extends AbstractType
                         'class' => 'form-control',
                         'tooltip' => 'mautic.page.form.redirecttype.help',
                     ),
-                    'empty_value' => 'mautic.core.none'
+                    'empty_value' => 'mautic.page.form.redirecttype.none'
                 )
             );
             
