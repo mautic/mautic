@@ -66,7 +66,7 @@ class FormController extends CommonFormController
 
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
