@@ -73,7 +73,7 @@ class BuilderTokenHelper
         );
 
 
-        if (in_array(false, $permissions)) {
+        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
             return;
         }
 
@@ -169,7 +169,7 @@ class BuilderTokenHelper
             "RETURN_ARRAY"
         );
 
-        if (in_array(false, $permissions)) {
+        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
             return;
         }
 
@@ -186,7 +186,7 @@ class BuilderTokenHelper
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr->add(
-                $exprBuilder->eq($prefix.'createdBy', $this->factory->getUser()->getId())
+                $exprBuilder->eq($prefix.'created_by', $this->factory->getUser()->getId())
             );
         }
 
