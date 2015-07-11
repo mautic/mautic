@@ -488,6 +488,7 @@ class FormController extends CommonFormController
                         $valid = false;
                     } else {
                         $model->setFields($entity, $fields);
+                        $model->deleteFields($entity, $deletedFields);
 
                         //save the form first so that new fields are available to actions
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
