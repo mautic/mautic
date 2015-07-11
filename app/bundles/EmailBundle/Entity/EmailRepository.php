@@ -198,7 +198,9 @@ class EmailRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $q->orderBy('l.id');
+        $q->groupBy('l.id')
+            ->orderBy('l.id');
+
         $results = $q->execute()->fetchAll();
 
         if ($countOnly) {
