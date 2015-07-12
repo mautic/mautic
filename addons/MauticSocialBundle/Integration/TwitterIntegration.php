@@ -76,7 +76,9 @@ class TwitterIntegration extends SocialIntegration
         // Get request token
         $requestToken = $this->getRequestToken();
 
-        $url .= '?oauth_token=' . $requestToken['oauth_token'];
+        if (isset($requestToken['oauth_token'])) {
+            $url .= '?oauth_token='.$requestToken['oauth_token'];
+        }
 
         return $url;
     }
