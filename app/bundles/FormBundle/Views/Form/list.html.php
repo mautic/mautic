@@ -19,9 +19,7 @@ if ($tmpl == 'index')
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'checkall' => 'true',
-                    'target'   => '#formTable',
-                    'tmpl'     => $tmpl,
-                    'target'   => '.' . $tmpl . '-container'
+                    'target'   => '#formTable'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -29,36 +27,28 @@ if ($tmpl == 'index')
                     'orderBy'    => 'f.name',
                     'text'       => 'mautic.core.name',
                     'class'      => 'col-form-name',
-                    'default'    => true,
-                    'tmpl'     => $tmpl,
-                    'target'   => '.' . $tmpl . '-container'
+                    'default'    => true
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'c.title',
                     'text'       => 'mautic.core.category',
-                    'class'      => 'visible-md visible-lg col-form-category',
-                    'tmpl'     => $tmpl,
-                    'target'   => '.' . $tmpl . '-container'
+                    'class'      => 'visible-md visible-lg col-form-category'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'submission_count',
                     'text'       => 'mautic.form.form.results',
-                    'class'      => 'visible-md visible-lg col-form-submissions',
-                    'tmpl'     => $tmpl,
-                    'target'   => '.' . $tmpl . '-container'
+                    'class'      => 'visible-md visible-lg col-form-submissions'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
                     'orderBy'    => 'f.id',
                     'text'       => 'mautic.core.id',
-                    'class'      => 'visible-md visible-lg col-form-id',
-                    'tmpl'     => $tmpl,
-                    'target'   => '.' . $tmpl . '-container'
+                    'class'      => 'visible-md visible-lg col-form-id'
                 ));
                 ?>
             </tr>
