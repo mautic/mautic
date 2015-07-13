@@ -29,11 +29,9 @@ class RoleRepository extends CommonRepository
     {
         $q = $this->createQueryBuilder('r');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        return new Paginator($query);
+        return parent::getEntities($args);
     }
 
     /**
@@ -139,5 +137,13 @@ class RoleRepository extends CommonRepository
         return array(
             array('r.name', 'ASC')
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTableAlias()
+    {
+        return 'r';
     }
 }

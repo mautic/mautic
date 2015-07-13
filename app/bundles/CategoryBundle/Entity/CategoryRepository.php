@@ -32,25 +32,18 @@ class CategoryRepository extends CommonRepository
             ->createQueryBuilder('c')
             ->select('c');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        $results = new Paginator($query);
-
-        return $results;
+        return parent::getEntities($args);
     }
 
     /**
-     * @paran string $bundle
+     * @param        $bundle
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     *
+     * @return array
      */
     public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
     {
@@ -179,6 +172,14 @@ class CategoryRepository extends CommonRepository
         $results = $q->getQuery()->getSingleResult();
 
         return $results['aliascount'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTableAlias()
+    {
+        return 'c';
     }
 
 }
