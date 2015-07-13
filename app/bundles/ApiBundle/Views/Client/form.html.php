@@ -24,4 +24,4 @@ $view['slots']->set("headerTitle", $header);
             <?php echo $view['form']->form($form); ?>
         </div>
     </div>
-</div
+</div>
