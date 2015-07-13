@@ -949,7 +949,15 @@ class EmailModel extends FormModel
             $mailer->setIdHash($idHash);
 
             try {
-                $mailer->addTo($lead['email'], $lead['firstname'] . ' ' . $lead['lastname']);
+                if (!$mailer->addTo($lead['email'], $lead['firstname'] . ' ' . $lead['lastname'])) {
+                    // Clear the errors so it doesn't stop the next send
+                    $mailer->clearErrors();
+
+                    // Bad email so note and continue
+                    $errors[$lead['id']] = $lead['email'];
+
+                    continue;
+                }
             } catch (BatchQueueMaxException $e) {
                 // Queue full so flush then try again
                 $flushQueue(false);
