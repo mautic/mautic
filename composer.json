@@ -30,7 +30,7 @@
         "symfony/templating": "2.5.*",
         "symfony/translation": "2.5.*",
         "symfony/validator": "2.5.*",
-        "symfony/yaml": "2.5.*",
+        "symfony/yaml": "2.6.*",
 
         "symfony/framework-bundle": "2.5.*",
         "symfony/monolog-bundle": "~2.4",
