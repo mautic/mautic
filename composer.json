@@ -29,7 +29,7 @@
         "symfony/security": "2.5.*",
         "symfony/templating": "2.5.*",
         "symfony/translation": "2.5.*",
-        "symfony/validator": "2.5.*",
+        "symfony/validator": "2.6.*",
         "symfony/yaml": "2.5.*",
 
         "symfony/framework-bundle": "2.5.*",

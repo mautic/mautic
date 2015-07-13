@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bb2ff57ac7f1cdfd0b86b4da05c97210",
+    "hash": "5e81bf3f162464056c37148f0b97802f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4159,17 +4159,17 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v2.5.10",
+            "version": "v2.6.10",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Validator.git",
-                "reference": "6c2fecd970d86201acbefafa4ca4bbf7e0279b63"
+                "reference": "fccfab79928e612eedca96dcf3a9e8efd2ee495f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Validator/zipball/6c2fecd970d86201acbefafa4ca4bbf7e0279b63",
-                "reference": "6c2fecd970d86201acbefafa4ca4bbf7e0279b63",
+                "url": "https://api.github.com/repos/symfony/Validator/zipball/fccfab79928e612eedca96dcf3a9e8efd2ee495f",
+                "reference": "fccfab79928e612eedca96dcf3a9e8efd2ee495f",
                 "shasum": ""
             },
             "require": {
@@ -4185,6 +4185,7 @@
                 "symfony/expression-language": "~2.4",
                 "symfony/http-foundation": "~2.1",
                 "symfony/intl": "~2.3",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/property-access": "~2.3",
                 "symfony/yaml": "~2.0,>=2.0.5"
             },
@@ -4202,7 +4203,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -4216,17 +4217,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Validator Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-02-01 15:46:51"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-01 19:58:06"
         },
         {
             "name": "symfony/yaml",
@@ -4479,7 +4480,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/6142762ff5f3d8b8c0918c3866bf6b9111d5fce6",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/e077720f49c50d38a8ff8a4ad04c3108c53e45a8",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },
