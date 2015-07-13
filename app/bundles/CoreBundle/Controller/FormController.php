@@ -336,12 +336,13 @@ class FormController extends CommonController
     /**
      * Individual item's details page
      *
-     * @param     $objectId
-     * @param int $listPage
+     * @param      $objectId
+     * @param null $logObject
+     * @param int  $listPage
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $listPage = 1)
+    protected function viewStandard($objectId, $logObject= null, $listPage = 1)
     {
         $model    = $this->factory->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
@@ -377,8 +378,13 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
+        // Audit log entries
+        $logs = ($logObject) ? $this->factory->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded()) : array();
+
         $delegateArgs = array(
             'viewParameters'  => array(
+                'item'        => $entity,
+                'logs'        => $logs,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => $security->isGranted(
                     array(
@@ -406,10 +412,11 @@ class FormController extends CommonController
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
                 'route'         => $this->generateUrl(
-                    $this->routeBase.'_view',
+                    $this->routeBase.'_action',
                     array(
-                        'objectId' => $entity->getId(),
-                        'listPage' => $listPage
+                        'objectAction' => 'view',
+                        'objectId'     => $entity->getId(),
+                        'listPage'     => $listPage
                     )
                 )
             )
