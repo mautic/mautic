@@ -96,11 +96,12 @@ class FieldModel extends FormModel
         if ($isNew) {
             if (empty($alias)) {
                 $alias = strtolower(InputHelper::alphanum($entity->getName()));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias));
             }
 
-            //make sure alias is not already taken
+            // clean the alias
+            $alias = $this->cleanAlias($alias);
+
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $aliases   = $repo->getAliases($entity->getId());

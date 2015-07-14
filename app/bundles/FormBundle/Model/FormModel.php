@@ -122,7 +122,7 @@ class FormModel extends CommonFormModel
      * @param Form $entity
      * @param      $sessionFields
      */
-    public function setFields(Form &$entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields)
     {
         $order          = 1;
         $existingFields = $entity->getFields();
@@ -161,7 +161,7 @@ class FormModel extends CommonFormModel
      * @param Form $entity
      * @param      $sessionFields
      */
-    public function deleteFields(Form &$entity, $sessionFields)
+    public function deleteFields(Form $entity, $sessionFields)
     {
         if (empty($sessionFields)) {
             return;
@@ -177,9 +177,8 @@ class FormModel extends CommonFormModel
     /**
      * @param Form $entity
      * @param      $sessionActions
-     * @param      $sessionFields
      */
-    public function setActions(Form &$entity, $sessionActions, $sessionFields)
+    public function setActions(Form $entity, $sessionActions)
     {
         $order   = 1;
         $existingActions = $entity->getActions();
@@ -374,8 +373,6 @@ class FormModel extends CommonFormModel
     public function generateFieldColumns(Form $form)
     {
         $fields = $form->getFields();
-        $databasePlatform = $this->factory->getDatabase()->getDatabasePlatform();
-        $reservedWords = $databasePlatform->getReservedKeywordsList();
 
         $columns = array(
             array(
@@ -391,7 +388,7 @@ class FormModel extends CommonFormModel
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
                 $columns[] = array(
-                    'name'    => ($reservedWords->isKeyword($f->getAlias()) || is_numeric($f->getAlias())) ? $databasePlatform->quoteIdentifier($f->getAlias()) : $f->getAlias(),
+                    'name'    => $f->getAlias(),
                     'type'    => 'text',
                     'options' => array(
                         'notnull' => false
