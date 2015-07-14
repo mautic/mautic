@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bb2ff57ac7f1cdfd0b86b4da05c97210",
+    "hash": "ad460ef2ac0a3c3050c79e60fa585871",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3201,29 +3201,30 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.5.10",
+            "version": "v2.6.10",
             "target-dir": "Symfony/Component/HttpFoundation",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation.git",
-                "reference": "89c650efaca9540101004852d232c96672bbb91c"
+                "reference": "b2a6fad1b82f666e42b5f06198fbf04c6f800bfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/89c650efaca9540101004852d232c96672bbb91c",
-                "reference": "89c650efaca9540101004852d232c96672bbb91c",
+                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/b2a6fad1b82f666e42b5f06198fbf04c6f800bfb",
+                "reference": "b2a6fad1b82f666e42b5f06198fbf04c6f800bfb",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "symfony/expression-language": "~2.4"
+                "symfony/expression-language": "~2.4",
+                "symfony/phpunit-bridge": "~2.7"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -3240,17 +3241,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony HttpFoundation Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-02-01 09:36:16"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-09 16:02:48"
         },
         {
             "name": "symfony/http-kernel",
@@ -4479,7 +4480,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/6142762ff5f3d8b8c0918c3866bf6b9111d5fce6",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/e077720f49c50d38a8ff8a4ad04c3108c53e45a8",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },
