@@ -35,12 +35,12 @@ class AuditLogModel extends CommonModel
      */
     public function writeToLog(array $args)
     {
-        $bundle     = (isset($args["bundle"])) ? $args["bundle"] : "";
-        $object     = (isset($args["object"])) ? $args["object"] : "";
-        $objectId   = (isset($args["objectId"])) ? $args["objectId"] : "";
-        $action     = (isset($args["action"])) ? $args["action"] : "";
-        $details    = (isset($args["details"])) ? $args["details"] : "";
-        $ipAddress  = (isset($args["ipAddress"])) ? $args["ipAddress"] : "";
+        $bundle    = (isset($args["bundle"])) ? $args["bundle"] : "";
+        $object    = (isset($args["object"])) ? $args["object"] : "";
+        $objectId  = (isset($args["objectId"])) ? $args["objectId"] : "";
+        $action    = (isset($args["action"])) ? $args["action"] : "";
+        $details   = (isset($args["details"])) ? $args["details"] : "";
+        $ipAddress = (isset($args["ipAddress"])) ? $args["ipAddress"] : "";
 
         $log = new AuditLog();
         $log->setBundle($bundle);
@@ -51,14 +51,14 @@ class AuditLogModel extends CommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user   = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->factory->getUser() : null;
-        $userId = 0;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->factory->getUser() : null;
+        $userId   = 0;
         $userName = '';
         if (!$user instanceof User) {
-            $userId = 0;
+            $userId   = 0;
             $userName = $this->translator->trans('mautic.core.system');
         } elseif ($user->getId()) {
-            $userId = $user->getId();
+            $userId   = $user->getId();
             $userName = $user->getName();
         }
         $log->setUserId($userId);
@@ -70,15 +70,16 @@ class AuditLogModel extends CommonModel
     /**
      * Get the audit log for specific object
      *
-     * @param string $object type
-     * @param integer $id of the object
-     * @param \DateTime $afterDate
-     * @param integer $limit of items
+     * @param      $object
+     * @param      $id
+     * @param null $afterDate
+     * @param int  $limit
+     * @param null $bundle
      *
-     * @return array of logs
+     * @return mixed
      */
-    public function getLogForObject($object, $id, $afterDate = null, $limit = 10)
+    public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {
-        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit, $afterDate);
+        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }
 }
