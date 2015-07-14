@@ -144,6 +144,10 @@ class GraphHelper
 
         $date    = new \DateTime();
         $oneUnit = new \DateInterval('P' . $isTime . '1' . $unit);
+
+        // Start with the next unit
+        $date->add($oneUnit);
+
         $data    = array('labels' => array(), 'datasets' => array());
         $j       = 0;
 
