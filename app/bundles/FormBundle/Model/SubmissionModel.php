@@ -69,7 +69,6 @@ class SubmissionModel extends CommonFormModel
         $submission->setReferer($referer);
 
         $fields           = $form->getFields();
-        $errors           = array();
         $fieldArray       = array();
         $results          = array();
         $tokens           = array();

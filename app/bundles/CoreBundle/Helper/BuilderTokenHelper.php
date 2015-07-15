@@ -250,21 +250,26 @@ class BuilderTokenHelper
         } else {
             if (isset($tokens['visualTokens'])) {
                 // Get all the tokens in the content
+                $replacedTokens = array();
                 if (preg_match_all('/{(.*?)}/', $content, $matches)) {
                     $search = $replace = array();
 
                     foreach ($matches[0] as $tokenMatch) {
-                        if (strstr($tokenMatch, '|')) {
-                            // This token has been customized
-                            $tokenParts = explode('|', $tokenMatch);
-                            $token = $tokenParts[0] . '}';
-                        } else {
-                            $token = $tokenMatch;
-                        }
+                        if (!in_array($tokenMatch, $replacedTokens)) {
+                            $replacedTokens[] = $tokenMatch;
 
-                        if (in_array($token, $tokens['visualTokens'])) {
-                            $search[]  = $tokenMatch;
-                            $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
+                            if (strstr($tokenMatch, '|')) {
+                                // This token has been customized
+                                $tokenParts = explode('|', $tokenMatch);
+                                $token      = $tokenParts[0].'}';
+                            } else {
+                                $token = $tokenMatch;
+                            }
+
+                            if (in_array($token, $tokens['visualTokens'])) {
+                                $search[]  = $tokenMatch;
+                                $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
+                            }
                         }
                     }
 

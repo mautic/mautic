@@ -149,7 +149,7 @@ class PageRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('p.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

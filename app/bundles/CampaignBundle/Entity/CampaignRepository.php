@@ -435,7 +435,7 @@ class CampaignRepository extends CommonRepository
      * @param array $lists
      * @param array $args
      *
-     * @return array|int\
+     * @return array|int
      */
     public function getCampaignOrphanLeads($id, array $lists, $args = array())
     {
@@ -550,8 +550,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.lead_id', 'ASC');
+            ->setParameter('false', false, 'boolean');
 
         if (!empty($ignoreLeads)) {
             $q->andWhere(

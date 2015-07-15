@@ -43,7 +43,7 @@ class CampaignEventHelper
      * @param               $lead
      * @param               $event
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @return bool|mixed
      */
     public static function sendEmailAction(MauticFactory $factory, $lead, $event)
     {
@@ -52,12 +52,10 @@ class CampaignEventHelper
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
 
-            $leadCredentials = array(
-                'id'        => $lead->getId(),
-                'email'     => $fields['core']['email']['value'],
-                'firstname' => $fields['core']['firstname']['value'],
-                'lastname'  => $fields['core']['lastname']['value']
-            );
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel             = $factory->getModel('lead');
+            $leadCredentials       = $leadModel->flattenFields($fields);
+            $leadCredentials['id'] = $lead->getId();
         } else {
             $leadCredentials = $lead;
         }

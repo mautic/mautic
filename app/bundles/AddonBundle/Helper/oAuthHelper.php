@@ -122,7 +122,7 @@ class oAuthHelper
         }
 
         if (!empty($this->settings['append_callback']) && !empty($this->callback)) {
-            $oauth['oauth_callback'] = $this->callback;
+            $oauth['oauth_callback'] = urlencode($this->callback);
         }
 
         return $oauth;
@@ -198,6 +198,8 @@ class oAuthHelper
      * Returns an encoded string according to the RFC3986.
      *
      * @param $string
+     *
+     * @return string
      */
     public function encode ($string)
     {

@@ -320,7 +320,7 @@ class FormController extends CommonController
             'contentTemplate' => $this->templateBase.':list.html.php',
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
-                'mauticContent' => 'form',
+                'mauticContent' => $this->mauticContent,
                 'route'         => $this->generateUrl($this->routeBase.'_index', array('page' => $page))
             )
         );
@@ -336,12 +336,14 @@ class FormController extends CommonController
     /**
      * Individual item's details page
      *
-     * @param     $objectId
-     * @param int $listPage
+     * @param      $objectId
+     * @param null $logObject
+     * @param null $logBundle
+     * @param null $listPage
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $listPage = 1)
+    protected function viewStandard($objectId, $logObject= null, $logBundle =  null, $listPage = null)
     {
         $model    = $this->factory->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
@@ -377,8 +379,26 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
+        // Audit log entries
+        $logs = ($logObject) ? $this->factory->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : array();
+
+        // Generate route
+        $routeVars = array(
+            'objectAction' => 'view',
+            'objectId'     => $entity->getId()
+        );
+        if ($listPage !== null) {
+            $routeVars['listPage'] = $listPage;
+        }
+        $route = $this->generateUrl(
+            $this->routeBase.'_action',
+            $routeVars
+        );
+
         $delegateArgs = array(
             'viewParameters'  => array(
+                'item'        => $entity,
+                'logs'        => $logs,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => $security->isGranted(
                     array(
@@ -405,13 +425,7 @@ class FormController extends CommonController
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl(
-                    $this->routeBase.'_view',
-                    array(
-                        'objectId' => $entity->getId(),
-                        'listPage' => $listPage
-                    )
-                )
+                'route'         => $route
             )
         );
 
@@ -460,6 +474,16 @@ class FormController extends CommonController
                         if (method_exists($this, 'afterSaveEntity')) {
                             $this->afterSaveEntity($entity, $form, 'new');
                         }
+
+                        if (method_exists($this, 'viewAction')) {
+                            $viewParameters = array('objectId' => $entity->getId(), 'objectAction' => 'view');
+                            $returnUrl      = $this->generateUrl($this->routeBase.'_action', $viewParameters);
+                            $template       = $this->templateBase.':view';
+                        } else {
+                            $viewParameters = array('page' => $page);
+                            $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
+                            $template       = $this->templateBase.':index';
+                        }
                     }
                 }
             } else {
@@ -468,8 +492,7 @@ class FormController extends CommonController
                 $template       = $this->templateBase.':index';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-
+            if ($cancelled || ($valid && !$this->isFormApplied($form))) {
                 return $this->postActionRedirect(
                     array(
                         'returnUrl'       => $returnUrl,
@@ -481,6 +504,8 @@ class FormController extends CommonController
                         )
                     )
                 );
+            } elseif ($this->isFormApplied($form)) {
+                return $this->editAction($entity->getId(), true);
             }
         }
 
@@ -531,10 +556,12 @@ class FormController extends CommonController
         //set the return URL
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
 
+        $viewParameters = array('page' => $page);
+        $template       = $this->templateBase.':index';
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
-            'contentTemplate' => $this->templateBase.':index',
+            'viewParameters'  => $viewParameters,
+            'contentTemplate' => $template,
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent
@@ -576,41 +603,40 @@ class FormController extends CommonController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                // Allow inherited class to adjust
-                if (method_exists($this, 'beforeSaveEntity')) {
-                    $valid = $this->beforeSaveEntity($entity, $form, 'new');
-                }
-
-                if ($valid) {
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
+                if ($valid = $this->isFormValid($form)) {
                     // Allow inherited class to adjust
-                    if (method_exists($this, 'afterSaveEntity')) {
-                        $this->afterSaveEntity($entity, $form, 'new');
+                    if (method_exists($this, 'beforeSaveEntity')) {
+                        $valid = $this->beforeSaveEntity($entity, $form, 'new');
                     }
 
-                    $this->addFlash(
-                        'mautic.core.notice.updated',
-                        array(
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => $this->routeBase.'_index',
-                            '%url%'       => $this->generateUrl(
-                                $this->routeBase.'_action',
-                                array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
+                    if ($valid) {
+                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        // Allow inherited class to adjust
+                        if (method_exists($this, 'afterSaveEntity')) {
+                            $this->afterSaveEntity($entity, $form, 'new');
+                        }
+
+                        $this->addFlash(
+                            'mautic.core.notice.updated',
+                            array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => $this->routeBase.'_index',
+                                '%url%'       => $this->generateUrl(
+                                    $this->routeBase.'_action',
+                                    array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $entity->getId()
+                                    )
                                 )
                             )
-                        )
-                    );
-
-                    if ($form->get('buttons')->get('save')->isClicked()) {
-                        $viewParameters = array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
                         );
-                        $returnUrl      = $this->generateUrl($this->routeBase.'_action', $viewParameters);
-                        $template       = $this->templateBase.':view';
+
+                        if (!$this->isFormApplied($form) && method_exists($this, 'viewAction')) {
+                            $viewParameters = array('objectId' => $entity->getId(), 'objectAction' => 'view');
+                            $returnUrl      = $this->generateUrl($this->routeBase.'_action', $viewParameters);
+                            $template       = $this->templateBase.':view';
+                        }
                     }
                 }
             } else {
@@ -622,7 +648,7 @@ class FormController extends CommonController
                 $template       = $this->templateBase.':index';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && !$this->isFormApplied($form))) {
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
@@ -644,7 +670,7 @@ class FormController extends CommonController
                 'entity'  => $entity,
                 'form'  => $form->createView()
             ),
-            'contentTemplate' => $this->templateBase.':index.html.php',
+            'contentTemplate' => $this->templateBase.':form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,

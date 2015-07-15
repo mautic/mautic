@@ -326,9 +326,15 @@ var Mautic = {
             Mautic.activateDateTimeInputs(this, 'time');
         });
 
-        mQuery(container + " input[data-toggle='color']").pickAColor({
-            fadeMenuToggle: false,
-            inlineDropdown: true
+        mQuery(container + " input[data-toggle='color']").each(function() {
+            var pickerOptions = mQuery(this).data('color-options');
+            if (!pickerOptions) {
+                pickerOptions = {
+                    theme: 'bootstrap'
+                };
+            }
+
+            mQuery(this).minicolors(pickerOptions);
         });
 
         mQuery(container + " select").not('.multiselect, .not-chosen').each(function() {
@@ -803,6 +809,10 @@ var Mautic = {
             mQuery('html')
                 .off('fa.sidebar.minimize')
                 .off('fa.sidebar.maximize');
+
+            mQuery(container + " input[data-toggle='color']").each(function() {
+               mQuery(this).minicolors('destroy');
+            });
         }
 
         //run specific unloads

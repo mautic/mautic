@@ -122,7 +122,7 @@ class FormModel extends CommonFormModel
      * @param Form $entity
      * @param      $sessionFields
      */
-    public function setFields(Form &$entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields)
     {
         $order          = 1;
         $existingFields = $entity->getFields();
@@ -159,10 +159,26 @@ class FormModel extends CommonFormModel
 
     /**
      * @param Form $entity
-     * @param      $sessionActions
      * @param      $sessionFields
      */
-    public function setActions(Form &$entity, $sessionActions, $sessionFields)
+    public function deleteFields(Form $entity, $sessionFields)
+    {
+        if (empty($sessionFields)) {
+            return;
+        }
+        $existingFields = $entity->getFields();
+        foreach ($sessionFields as $fieldId) {
+            if (isset($existingFields[$fieldId])) {
+                $entity->removeField($fieldId, $existingFields[$fieldId]);
+            }
+        }
+    }
+
+    /**
+     * @param Form $entity
+     * @param      $sessionActions
+     */
+    public function setActions(Form $entity, $sessionActions)
     {
         $order   = 1;
         $existingActions = $entity->getActions();
