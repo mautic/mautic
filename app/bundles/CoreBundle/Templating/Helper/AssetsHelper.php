@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 /**
@@ -437,7 +436,6 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string $text
      * @param array  $protocols  http/https, ftp, mail, twitter
      * @param array  $attributes
-     * @param string $mode       normal or all
      * @return string
      */
     public function makeLinks($text, $protocols = array('http', 'mail'), array $attributes = array())

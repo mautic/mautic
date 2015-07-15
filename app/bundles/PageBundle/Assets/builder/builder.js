@@ -1,9 +1,8 @@
 mQuery(document).ready(function () {
     mQuery('.dropdown-toggle').dropdown();
     mQuery('[data-toggle="tooltip"]').tooltip();
-    mQuery('input[data-toggle="color"]').pickAColor({
-        fadeMenuToggle: false,
-        inlineDropdown: true
+    mQuery('input[data-toggle="color"]').each(function() {
+        Mautic.activateColorPicker(this);
     });
     mQuery('*[data-toggle="sortablelist"]').sortable({
         placeholder: 'list-group-item ui-placeholder-highlight',
