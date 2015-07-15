@@ -945,6 +945,7 @@ class EmailModel extends FormModel
                 $mailer->setTokens($tokens);
             }
 
+            $this->_unsubscribeHead($mailer, $idHash);
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
@@ -1079,6 +1080,8 @@ class EmailModel extends FormModel
                 $user['firstname'] = $userEntity->getFirstName();
                 $user['lastname']  = $userEntity->getLastName();
             }
+
+            $this->_unsubscribeHead($mailer, $idHash);
 
             $mailer->setTo($user['email'], $user['firstname'] . ' ' . $user['lastname']);
 
