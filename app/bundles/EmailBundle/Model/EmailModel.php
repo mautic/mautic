@@ -887,12 +887,24 @@ class EmailModel extends FormModel
         //how many of this batch should go to which email
         $batchCount = 0;
 
+        $backup = reset($emailSettings);
         foreach ($emailSettings as $eid => &$details) {
             if (isset($details['weight'])) {
-                $details['limit'] = round($count * $details['weight']);
+                $limit = round($count * $details['weight']);
+
+                if (!$limit) {
+                    // Don't send any emails to this one
+                    unset($emailSettings[$eid]);
+                } else {
+                    $details['limit'] = $limit;
+                }
             } else {
                 $details['limit'] = $count;
             }
+        }
+        if (count($emailSettings) == 0) {
+            // Shouldn't happen but a safety catch
+            $emailSettings[$backup['entity']->getId()] = $backup;
         }
 
         //randomize the leads for statistic purposes
