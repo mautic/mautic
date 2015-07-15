@@ -132,9 +132,7 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from
      *
-     * @param ReportGeneratorEvent $event
-     *
-     * @return void
+     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate (ReportGraphEvent $event)
     {

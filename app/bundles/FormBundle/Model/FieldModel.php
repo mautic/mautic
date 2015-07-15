@@ -52,6 +52,8 @@ class FieldModel extends CommonFormModel
     /**
      * Get the fields saved in session
      *
+     * @param $formId
+     *
      * @return array
      */
     public function getSessionFields($formId)
@@ -63,17 +65,14 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param $formId
      * @param $label
+     * @param $aliases
+     *
+     * @return string
      */
     public function generateAlias($label, &$aliases)
     {
-        // Some labels are quite long if a question so cut this short
-        $alias = substr(strtolower(InputHelper::alphanum($label, false, '_')), 0, 25);
-
-        if (substr($alias, -1) == '_') {
-            $alias = substr($alias, 0, -1);
-        }
+        $alias = $this->cleanAlias($label);
 
         //make sure alias is not already taken
         $testAlias = $alias;
