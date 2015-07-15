@@ -150,7 +150,7 @@ class StatRepository extends CommonRepository
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
-                $sq->expr()->gte('e.date_read', $sq->expr()->literal($dt->toUtcString()))
+                $sq->expr()->gte('e.date_sent', $sq->expr()->literal($dt->toUtcString()))
             );
         }
         $sq->groupBy('e.email_id');
