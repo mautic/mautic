@@ -320,7 +320,7 @@ class FormController extends CommonController
             'contentTemplate' => $this->templateBase.':list.html.php',
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
-                'mauticContent' => 'form',
+                'mauticContent' => $this->mauticContent,
                 'route'         => $this->generateUrl($this->routeBase.'_index', array('page' => $page))
             )
         );
@@ -336,12 +336,14 @@ class FormController extends CommonController
     /**
      * Individual item's details page
      *
-     * @param     $objectId
-     * @param int $listPage
+     * @param      $objectId
+     * @param null $logObject
+     * @param null $logBundle
+     * @param null $listPage
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $listPage = 1)
+    protected function viewStandard($objectId, $logObject= null, $logBundle =  null, $listPage = null)
     {
         $model    = $this->factory->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
@@ -377,8 +379,26 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
+        // Audit log entries
+        $logs = ($logObject) ? $this->factory->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : array();
+
+        // Generate route
+        $routeVars = array(
+            'objectAction' => 'view',
+            'objectId'     => $entity->getId()
+        );
+        if ($listPage !== null) {
+            $routeVars['listPage'] = $listPage;
+        }
+        $route = $this->generateUrl(
+            $this->routeBase.'_action',
+            $routeVars
+        );
+
         $delegateArgs = array(
             'viewParameters'  => array(
+                'item'        => $entity,
+                'logs'        => $logs,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => $security->isGranted(
                     array(
@@ -405,13 +425,7 @@ class FormController extends CommonController
             'passthroughVars' => array(
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl(
-                    $this->routeBase.'_view',
-                    array(
-                        'objectId' => $entity->getId(),
-                        'listPage' => $listPage
-                    )
-                )
+                'route'         => $route
             )
         );
 

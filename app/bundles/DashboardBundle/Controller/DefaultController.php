@@ -74,21 +74,28 @@ class DefaultController extends CommonController
 
         // Get names of log's items
         $router = $this->factory->getRouter();
-        foreach ($logs as &$log) {
+        foreach ($logs as $key => &$log) {
             if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
-                $model = $this->factory->getModel($log['bundle'] . '.' . $log['object']);
-                $item = $model->getEntity($log['objectId']);
-                if (method_exists($item, $model->getNameGetter())) {
-                    $log['objectName'] = $item->{$model->getNameGetter()}();
-                } else {
-                    $log['objectName'] = '';
-                }
+                try {
+                    $model = $this->factory->getModel($log['bundle'].'.'.$log['object']);
+                    $item  = $model->getEntity($log['objectId']);
+                    if (method_exists($item, $model->getNameGetter())) {
+                        $log['objectName'] = $item->{$model->getNameGetter()}();
+                    } else {
+                        $log['objectName'] = '';
+                    }
 
-                $routeName = 'mautic_' . $log['bundle'] . '_action';
-                if ($router->getRouteCollection()->get($routeName) !== null) {
-                    $log['route'] = $router->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId']));
-                } else {
-                    $log['route'] = false;
+                    $routeName = 'mautic_'.$log['bundle'].'_action';
+                    if ($router->getRouteCollection()->get($routeName) !== null) {
+                        $log['route'] = $router->generate(
+                            'mautic_'.$log['bundle'].'_action',
+                            array('objectAction' => 'view', 'objectId' => $log['objectId'])
+                        );
+                    } else {
+                        $log['route'] = false;
+                    }
+                } catch (\Exception $e) {
+                    unset($logs[$key]);
                 }
             }
         }
