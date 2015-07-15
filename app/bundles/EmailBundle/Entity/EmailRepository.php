@@ -136,13 +136,14 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param      $emailId
+     * @param null $variantIds
      * @param null $listIds
      * @param bool $countOnly
      * @param null $limit
      *
      * @return array|int
      */
-    public function getEmailPendingLeads($emailId, $listIds = null, $countOnly = false, $limit = null)
+    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -154,27 +155,36 @@ class EmailRepository extends CommonRepository
             );
 
         $sq2 = $this->_em->getConnection()->createQueryBuilder();
+        $sqExpr = $sq2->expr()->andX(
+            $sq2->expr()->isNotNull('stat.lead_id')
+        );
+
+        if ($variantIds) {
+            $variantIds[] = $emailId;
+            $sqExpr->add(
+                $sq->expr()->in('stat.email_id', $variantIds)
+            );
+        } else {
+            $sq->expr()->eq('stat.email_id', $emailId);
+        }
+
         $sq2->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
-            ->where(
-                $sq2->expr()->andX(
-                    $sq2->expr()->isNotNull('stat.lead_id'),
-                    $sq2->expr()->eq('stat.email_id', 'el.email_id')
-                )
-            );
+            ->where($sqExpr);
 
         if ($countOnly) {
             $q->select('count(l.id) as count');
         } else {
-            $q->select('l.*');
+            $q->select('l.*')
+                ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
             ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
 
-        $q->where('el.email_id = ' . (int) $emailId);
-        $q->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()));
-        $q->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq2->getSQL()));
+        $q->where($q->expr()->eq('el.email_id', $emailId))
+            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()))
+            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq2->getSQL()));
 
         if ($listIds != null) {
             if (!is_array($listIds)) {
@@ -198,9 +208,6 @@ class EmailRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $q->groupBy('l.id')
-            ->orderBy('l.id');
-
         $results = $q->execute()->fetchAll();
 
         if ($countOnly) {
@@ -222,6 +229,7 @@ class EmailRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param bool   $topLevelOnly
+     * @param string $emailType
      *
      * @return array
      */

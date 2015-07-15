@@ -630,15 +630,34 @@ class EmailModel extends FormModel
      * Get the number of leads this email will be sent to
      *
      * @param Email $email
-     * @param mixed $listId     Leads for a specific lead list
-     * @param bool  $countOnly  If true, return count otherwise array of leads
-     * @param int   $limit      Max number of leads to retrieve
+     * @param mixed $listId          Leads for a specific lead list
+     * @param bool  $countOnly       If true, return count otherwise array of leads
+     * @param int   $limit           Max number of leads to retrieve
+     * @param bool  $includeVariants If false, emails sent to a variant will not be included
      *
      * @return int|array
      */
-    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null)
+    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $listId, $countOnly, $limit);
+        if ($includeVariants && $email->isVariant(true)) {
+            $children   = $email->getVariantChildren();
+            $variantIds = $children->getKeys();
+
+            $parent     = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $ids[] = $parent->getId();
+            } else {
+                // Remove itself from the array
+                $key = array_search($email->getId(), $variantIds);
+                unset($variantIds[$key]);
+            }
+
+        } else {
+            $variantIds = null;
+        }
+
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
@@ -734,7 +753,6 @@ class EmailModel extends FormModel
             if ($includeVariants) {
                 //get a list of variants for A/B testing
                 $childrenVariant = $email->getVariantChildren();
-
 
                 if (count($childrenVariant)) {
                     $variantWeight = 0;
@@ -923,8 +941,6 @@ class EmailModel extends FormModel
         };
 
         foreach ($sendTo as $lead) {
-            usleep(100);
-
             // Generate content
             if ($useEmail['entity']->getId() !== $contentGenerated) {
                 // Flush the mail queue if applicable
