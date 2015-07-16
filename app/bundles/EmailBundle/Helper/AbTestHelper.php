@@ -17,7 +17,7 @@ class AbTestHelper
      *
      * @param $factory
      * @param $parent
-     * @param $properties
+     * @param $children
      *
      * @return array
      */
@@ -113,7 +113,7 @@ class AbTestHelper
      *
      * @param $factory
      * @param $parent
-     * @param $properties
+     * @param $children
      *
      * @return array
      */
