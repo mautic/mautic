@@ -249,12 +249,13 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateStatsChartAction(Request $request)
     {
-        $emailId   = InputHelper::int($request->request->get('emailId'));
-        $amount    = InputHelper::int($request->request->get('amount'));
-        $unit      = InputHelper::clean($request->request->get('unit'));
-        $dataArray = array('success' => 0);
+        $emailId         = InputHelper::int($request->request->get('emailId'));
+        $includeVariants = InputHelper::boolean($request->request->get('includeVariants', false));
+        $amount          = InputHelper::int($request->request->get('amount'));
+        $unit            = InputHelper::clean($request->request->get('unit'));
+        $dataArray       = array('success' => 0);
 
-        $dataArray['stats']   = $this->factory->getModel('email')->getEmailGeneralStats($emailId, $amount, $unit);
+        $dataArray['stats']   = $this->factory->getModel('email')->getEmailGeneralStats($emailId, $includeVariants, $amount, $unit);
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);

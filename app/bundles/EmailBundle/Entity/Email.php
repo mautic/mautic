@@ -15,6 +15,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -487,9 +488,26 @@ class Email extends FormEntity
     /**
      * @return mixed
      */
-    public function getReadCount ()
+    public function getReadCount ($includeVariants = false)
     {
-        return $this->readCount;
+        $count = $this->readCount;
+
+        if ($includeVariants && $this->isVariant()) {
+            $parent = $this->getVariantParent();
+            if ($parent) {
+                $count   += $parent->getReadCount();
+                $children = $parent->getVariantChildren();
+            } else {
+                $children = $this->getVariantChildren();
+            }
+            foreach ($children as $child) {
+                if ($child->getId() !== $this->id) {
+                    $count += $child->getReadCount();
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -832,11 +850,30 @@ class Email extends FormEntity
     }
 
     /**
+     * @param bool $includeVariants
+     *
      * @return mixed
      */
-    public function getSentCount ()
+    public function getSentCount ($includeVariants = false)
     {
-        return $this->sentCount;
+        $count = $this->sentCount;
+
+        if ($includeVariants && $this->isVariant()) {
+            $parent = $this->getVariantParent();
+            if ($parent) {
+                $count   += $parent->getSentCount();
+                $children = $parent->getVariantChildren();
+            } else {
+                $children = $this->getVariantChildren();
+            }
+            foreach ($children as $child) {
+                if ($child->getId() !== $this->id) {
+                    $count += $child->getSentCount();
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -882,10 +919,10 @@ class Email extends FormEntity
     /**
      * Add list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     * @param LeadList $list
      * @return Email
      */
-    public function addList(\Mautic\LeadBundle\Entity\LeadList $list)
+    public function addList(LeadList $list)
     {
         $this->lists[] = $list;
 
@@ -895,9 +932,9 @@ class Email extends FormEntity
     /**
      * Remove list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     * @param LeadList $list
      */
-    public function removeList(\Mautic\LeadBundle\Entity\LeadList $list)
+    public function removeList(LeadList $list)
     {
         $this->lists->removeElement($list);
     }

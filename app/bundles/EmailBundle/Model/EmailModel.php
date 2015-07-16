@@ -527,11 +527,28 @@ class EmailModel extends FormModel
      * Get a stats for email by list
      *
      * @param Email $entity
+     * @param bool  $includeVariants
      *
      * @return array
      */
-    public function getEmailListStats (Email $entity)
+    public function getEmailListStats (Email $entity, $includeVariants = false)
     {
+        if ($includeVariants && $entity->isVariant()) {
+            $parent = $entity->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children   = $parent->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children   = $entity->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $entity->getId();
+            }
+        } else {
+            $emailIds = array($entity->getId());
+        }
+
         $lists     = $entity->getLists();
         $listCount = count($lists);
 
@@ -547,18 +564,19 @@ class EmailModel extends FormModel
         );
 
         if ($listCount) {
+            /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
             foreach ($lists as $l) {
                 $name = $l->getName();
 
-                $sentCount = $statRepo->getSentCount($entity->getId(), $l->getId());
+                $sentCount = $statRepo->getSentCount($emailIds, $l->getId());
                 $datasets[$combined][0] += $sentCount;
 
-                $readCount = $statRepo->getReadCount($entity->getId(), $l->getId());
+                $readCount = $statRepo->getReadCount($emailIds, $l->getId());
                 $datasets[$combined][1] += $readCount;
 
-                $failedCount = $statRepo->getFailedCount($entity->getId(), $l->getId());
+                $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
                 $datasets[$combined][2] += $failedCount;
 
                 $datasets[$name] = array();
@@ -583,14 +601,36 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param int    $emailId
-     * @param int    $amount
-     * @param string $unit
+     * @param int|Email $email
+     * @param bool      $includeVariants
+     * @param int       $amount
+     * @param string    $unit
      *
      * @return array
      */
-    public function getEmailGeneralStats ($emailId, $amount = 30, $unit = 'D')
+    public function getEmailGeneralStats ($email, $includeVariants = false, $amount = 30, $unit = 'D')
     {
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children   = $parent->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children   = $email->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $email->getId();
+            }
+        } else {
+            $emailIds = array($email->getId());
+        }
+
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
         $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
@@ -602,13 +642,13 @@ class EmailModel extends FormModel
         );
         $fromDate = $graphData['fromDate'];
 
-        $sentData  = $statRepo->getEmailStats($emailId, $fromDate, 'sent');
+        $sentData  = $statRepo->getEmailStats($emailIds, $fromDate, 'sent');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
 
-        $readData  = $statRepo->getEmailStats($emailId, $fromDate, 'read');
+        $readData  = $statRepo->getEmailStats($emailIds, $fromDate, 'read');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
 
-        $failedData  = $statRepo->getEmailStats($emailId, $fromDate, 'failed');
+        $failedData  = $statRepo->getEmailStats($emailIds, $fromDate, 'failed');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $failedData, $unit, 2, 'date', 'data');
 
         return $graphData;
@@ -639,20 +679,22 @@ class EmailModel extends FormModel
      */
     public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
-        if ($includeVariants && $email->isVariant(true)) {
-            $children   = $email->getVariantChildren();
-            $variantIds = $children->getKeys();
-
-            $parent     = $email->getVariantParent();
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
             if ($parent) {
                 // $email is a variant of another
                 $ids[] = $parent->getId();
-            } else {
-                // Remove itself from the array
+
+                $children   = $parent->getVariantChildren();
+                $variantIds = $children->getKeys();
+
+                // Remove $email from the array
                 $key = array_search($email->getId(), $variantIds);
                 unset($variantIds[$key]);
+            } else {
+                $children   = $email->getVariantChildren();
+                $variantIds = $children->getKeys();
             }
-
         } else {
             $variantIds = null;
         }

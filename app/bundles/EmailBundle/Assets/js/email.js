@@ -89,11 +89,9 @@ Mautic.emailOnLoad = function (container, response) {
         }
 
         Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
+    } else if (mQuery(container + ' #list-search').length) {
+        Mautic.activateSearchAutocomplete('list-search', 'email');
     } else {
-        if (mQuery(container + ' #list-search').length) {
-            Mautic.activateSearchAutocomplete('list-search', 'email');
-        }
-
         if (typeof Mautic.listCompareChart === 'undefined') {
             Mautic.renderListCompareChart();
         }
@@ -101,6 +99,33 @@ Mautic.emailOnLoad = function (container, response) {
         if (typeof Mautic.emailStatsLineGraph === 'undefined') {
             Mautic.renderEmailStatsChart();
         }
+
+        Mautic.variantChartData = 'variant';
+        var switchChartData;
+        switchChartData = function() {
+            Mautic.variantChartData = mQuery(this).data('chart');
+
+            // Convert this one to a span
+            mQuery(this).replaceWith(function() {
+                return '<span data-chart="' + Mautic.variantChartData + '">' + mQuery(this).text() + '</span>';
+            });
+
+            // Convert the other to an a tag
+            var opposite = (Mautic.variantChartData == 'variant') ? 'all' : 'variant';
+            mQuery('span[data-chart="' + opposite + '"]').replaceWith(function() {
+                return '<a href="javascript:void(0)" data-chart="' + opposite + '">' + mQuery(this).text() + '</a>';
+            });
+            mQuery('a[data-chart="' + opposite + '"]').on('click', switchChartData);
+
+            var activeButton = mQuery('#time-scopes').parent().find('a').filter(
+                function(index) {
+                    return mQuery.trim(mQuery(this).text()) === mQuery.trim(mQuery('#time-scopes span.button-label').text());
+                }
+            );
+            console.log(mQuery('#time-scopes').parent());
+            activeButton[0].click();
+        };
+        mQuery('a[data-chart]').on('click', switchChartData);
     }
 };
 
@@ -157,8 +182,9 @@ Mautic.renderEmailStatsChart = function (chartData) {
 };
 
 Mautic.updateEmailStatsChart = function(element, amount, unit) {
-    var emailId = Mautic.getEntityId();
-    var query = "amount=" + amount + "&unit=" + unit + "&emailId=" + emailId;
+    var emailId         = Mautic.getEntityId();
+    var includeVariants = (Mautic.variantChartData == 'all');
+    var query           = "amount=" + amount + "&unit=" + unit + "&emailId=" + emailId + "&includeVariants=" + includeVariants;
 
     Mautic.getChartData(element, 'email:updateStatsChart', query, 'renderEmailStatsChart');
 };
