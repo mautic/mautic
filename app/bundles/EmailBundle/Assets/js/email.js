@@ -122,7 +122,6 @@ Mautic.emailOnLoad = function (container, response) {
                     return mQuery.trim(mQuery(this).text()) === mQuery.trim(mQuery('#time-scopes span.button-label').text());
                 }
             );
-            console.log(mQuery('#time-scopes').parent());
             activeButton[0].click();
         };
         mQuery('a[data-chart]').on('click', switchChartData);
