@@ -23,7 +23,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class EmailSubscriber extends CommonSubscriber
 {
 
-    private $leadFieldRegex = '{leadfield=(.*?)}';
+    private static $leadFieldRegex = '{leadfield=(.*?)}';
 
     /**
      * @return array
@@ -37,6 +37,9 @@ class EmailSubscriber extends CommonSubscriber
         );
     }
 
+    /**
+     * @param EmailBuilderEvent $event
+     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
@@ -67,11 +70,14 @@ class EmailSubscriber extends CommonSubscriber
             );
         }
 
-        if ($event->tokensRequested($this->leadFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, $this->leadFieldRegex, 'label', 'alias', true);
+        if ($event->tokensRequested(self::$leadFieldRegex)) {
+            $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);
         }
     }
 
+    /**
+     * @param EmailSendEvent $event
+     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
         if ($this->factory->getSecurity()->isAnonymous()) {
@@ -79,17 +85,38 @@ class EmailSubscriber extends CommonSubscriber
         } //else this is a user previewing so leave lead fields tokens in place
     }
 
+    /**
+     * @param EmailSendEvent $event
+     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $content = $event->getContent();
-        $regex   = '/' . $this->leadFieldRegex . '/';
+        $lead    = $event->getLead();
 
-        $lead = $event->getLead();
+        $tokenList = self::findLeadTokens($content, $lead);
+        if (count($tokenList)) {
+            $event->addTokens($tokenList);
+            unset($tokenList);
+        }
+    }
 
-        preg_match_all($regex, $content, $matches);
-        if (!empty($matches[1])) {
-            $tokenList = array();
-            foreach ($matches[1] as $key => $match) {
+    /**
+     * @param string $content
+     * @param array  $lead
+     * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
+     *                        rather than an array of found matches
+     *
+     * @return array|string
+     */
+    static function findLeadTokens($content, $lead, $replace = false)
+    {
+        // Search for bracket or bracket encoded
+        $regex     = '/({|%7B)leadfield=(.*?)(}|%7D)/';
+        $tokenList = array();
+
+        $foundMatches = preg_match_all($regex, $content, $matches);
+        if ($foundMatches) {
+            foreach ($matches[2] as $key => $match) {
                 $token = $matches[0][$key];
 
                 if (isset($tokenList[$token])) {
@@ -118,8 +145,11 @@ class EmailSubscriber extends CommonSubscriber
                 $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
             }
 
-            $event->addTokens($tokenList);
-            unset($tokenList);
+            if ($replace) {
+                $content = str_replace(array_keys($tokenList), $tokenList, $content);
+            }
         }
+
+        return $replace ? $content : $tokenList;
     }
 }
