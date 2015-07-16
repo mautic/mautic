@@ -342,6 +342,20 @@ class PublicController extends CommonFormController
 
         $this->factory->getModel('page')->hitPage($redirect, $this->request);
 
-        return $this->redirect($redirect->getUrl());
+        $url = $redirect->getUrl();
+
+        // Get query string
+        $query = $this->request->query->all();
+
+        // Unset the clickthrough
+        unset($query['ct']);
+
+        // Tak on anything left to the URL
+        if (count($query)) {
+            $url .= (strpos($url, '?') !== false) ? '&' : '?';
+            $url .= http_build_query($query);
+        }
+
+        return $this->redirect($url);
     }
 }
