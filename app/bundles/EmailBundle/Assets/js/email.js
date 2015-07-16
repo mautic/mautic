@@ -117,12 +117,16 @@ Mautic.emailOnLoad = function (container, response) {
             });
             mQuery('a[data-chart="' + opposite + '"]').on('click', switchChartData);
 
-            var activeButton = mQuery('#time-scopes').parent().find('a').filter(
-                function(index) {
-                    return mQuery.trim(mQuery(this).text()) === mQuery.trim(mQuery('#time-scopes span.button-label').text());
-                }
-            );
-            activeButton[0].click();
+            if (mQuery('#time-scopes').length) {
+                var activeButton = mQuery('#time-scopes').parent().find('a').filter(
+                    function (index) {
+                        return mQuery.trim(mQuery(this).text()) === mQuery.trim(mQuery('#time-scopes span.button-label').text());
+                    }
+                );
+                activeButton[0].click();
+            } else {
+                Mautic.updateListCompareChart();
+            }
         };
         mQuery('a[data-chart]').on('click', switchChartData);
     }
@@ -140,19 +144,36 @@ Mautic.emailOnUnload = function(id) {
     }
 };
 
-Mautic.renderListCompareChart = function () {
+Mautic.renderListCompareChart = function (chartData) {
     if (!mQuery("#list-compare-chart").length) {
         return;
     }
+
+    if (!chartData) {
+        var chartData = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
+    } else if (chartData.stats) {
+        chartData = chartData.stats;
+    }
+
     var options = {
         legendTemplate: "<% for (var i=0; i<datasets.length; i++){%><span class=\"label label-default mr-xs\" style=\"background-color:<%=datasets[i].fillColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></span><%}%>"
     };
-    var data = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
-    Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(data, options);
+
+    Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(chartData, options);
     var legendHolder = document.createElement('div');
     legendHolder.innerHTML = Mautic.listCompareChart.generateLegend();
     mQuery('#legend').html(legendHolder);
     Mautic.listCompareChart.update();
+};
+
+Mautic.updateListCompareChart = function() {
+    var emailId         = Mautic.getEntityId();
+    var includeVariants = (Mautic.variantChartData == 'all');
+    var query           = "emailType=list&emailId=" + emailId + "&includeVariants=" + includeVariants;
+
+    Mautic.ajaxActionRequest('email:updateStatsChart', query, function(response) {
+        Mautic.renderListCompareChart(response);
+    }, true);
 };
 
 Mautic.renderEmailStatsChart = function (chartData) {
@@ -183,7 +204,7 @@ Mautic.renderEmailStatsChart = function (chartData) {
 Mautic.updateEmailStatsChart = function(element, amount, unit) {
     var emailId         = Mautic.getEntityId();
     var includeVariants = (Mautic.variantChartData == 'all');
-    var query           = "amount=" + amount + "&unit=" + unit + "&emailId=" + emailId + "&includeVariants=" + includeVariants;
+    var query           = "emailType=template&amount=" + amount + "&unit=" + unit + "&emailId=" + emailId + "&includeVariants=" + includeVariants;
 
     Mautic.getChartData(element, 'email:updateStatsChart', query, 'renderEmailStatsChart');
 };

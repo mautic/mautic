@@ -526,30 +526,34 @@ class EmailModel extends FormModel
     /**
      * Get a stats for email by list
      *
-     * @param Email $entity
-     * @param bool  $includeVariants
+     * @param Email|int $email
+     * @param bool      $includeVariants
      *
      * @return array
      */
-    public function getEmailListStats (Email $entity, $includeVariants = false)
+    public function getEmailListStats ($email, $includeVariants = false)
     {
-        if ($includeVariants && $entity->isVariant()) {
-            $parent = $entity->getVariantParent();
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
             if ($parent) {
                 // $email is a variant of another
                 $children   = $parent->getVariantChildren();
                 $emailIds   = $children->getKeys();
                 $emailIds[] = $parent->getId();
             } else {
-                $children   = $entity->getVariantChildren();
+                $children   = $email->getVariantChildren();
                 $emailIds   = $children->getKeys();
-                $emailIds[] = $entity->getId();
+                $emailIds[] = $email->getId();
             }
         } else {
-            $emailIds = array($entity->getId());
+            $emailIds = array($email->getId());
         }
 
-        $lists     = $entity->getLists();
+        $lists     = $email->getLists();
         $listCount = count($lists);
 
         $combined = $this->translator->trans('mautic.email.lists.combined');
@@ -940,10 +944,12 @@ class EmailModel extends FormModel
                 } else {
                     $details['limit'] = $limit;
                 }
+                var_dump($limit, $details['weight']);
             } else {
                 $details['limit'] = $count;
             }
         }
+
         if (count($emailSettings) == 0) {
             // Shouldn't happen but a safety catch
             $emailSettings[$backup['entity']->getId()] = $backup;
@@ -1073,7 +1079,7 @@ class EmailModel extends FormModel
             unset($stat);
 
             $batchCount++;
-            if ($batchCount > $useEmail['limit']) {
+            if ($batchCount >= $useEmail['limit']) {
                 unset($useEmail);
 
                 //use the next email
@@ -1095,7 +1101,7 @@ class EmailModel extends FormModel
         }
 
         unset($emailSettings, $options, $tokens, $useEmail, $sendTo);
-
+die();
         return $singleEmail ? (empty($errors)) : $errors;
     }
 
