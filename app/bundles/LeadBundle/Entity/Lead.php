@@ -258,7 +258,6 @@ class Lead extends FormEntity
      */
     public function addIpAddress(IpAddress $ipAddress)
     {
-        die(var_dump($ipAddress->isTrackable()));
         if (!$ipAddress->isTrackable()) {
             return $this;
         }
