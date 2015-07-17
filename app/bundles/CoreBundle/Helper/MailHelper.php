@@ -269,6 +269,13 @@ class MailHelper
                 $this->logger->clear();
             } catch (\Exception $e) {
                 $this->logError($e);
+
+                // Exception encountered when sending so all recipients are considered failures
+                $this->errors['failures'] = array_merge(
+                    array_keys((array) $this->message->getTo()),
+                    array_keys((array) $this->message->getCc()),
+                    array_keys((array) $this->message->getBcc())
+                );
             }
         }
 
@@ -1207,8 +1214,8 @@ class MailHelper
         }
 
         $logDump = $this->logger->dump();
-        if (!empty($logDump)) {
-            $error .= "; $logDump";
+        if (!empty($logDump) && strpos($error, $logDump) === false) {
+            $error .= " Log data: $logDump";
         }
 
         $this->errors[] = $error;
