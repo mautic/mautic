@@ -1100,7 +1100,7 @@ class EmailModel extends FormModel
         }
 
         unset($emailSettings, $options, $tokens, $useEmail, $sendTo);
-die();
+
         return $singleEmail ? (empty($errors)) : $errors;
     }
 
