@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -1337,12 +1338,14 @@ class LeadController extends FormController
 
                         $mailer->setSubject($email['subject']);
 
+                        // Ensure safe emoji for notification
+                        $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true)) {
                             $mailer->createLeadEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(
-                                    '%subject%' => $email['subject'],
+                                    '%subject%' => $subject,
                                     '%email%'   => $leadEmail
                                 )
                             );
@@ -1350,7 +1353,7 @@ class LeadController extends FormController
                             $this->addFlash(
                                 'mautic.lead.email.error.failed',
                                 array(
-                                    '%subject%' => $email['subject'],
+                                    '%subject%' => $subject,
                                     '%email%'   => $leadEmail
                                 )
                             );

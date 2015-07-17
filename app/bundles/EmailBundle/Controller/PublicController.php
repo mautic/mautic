@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
@@ -43,6 +44,8 @@ class PublicController extends CommonFormController
 
                     $content = str_ireplace(array_keys($tokens), $tokens, $content);
                 }
+
+                $content = EmojiHelper::toEmoji($content, 'short');
             } else {
                 // Old way where stats didn't store content
 
@@ -70,6 +73,7 @@ class PublicController extends CommonFormController
                 } else {
                     $content = $entity->getCustomHtml();
                 }
+                $content = EmojiHelper::toEmoji($content, 'short');
 
                 $tokens = $stat->getTokens();
 
