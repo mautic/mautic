@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class Page
  * @ORM\Table(name="pages")
@@ -246,6 +246,14 @@ class Page extends FormEntity
         $metadata->addConstraint(new Callback(array(
             'callback' => 'translationParentValidation'
         )));
+
+        $metadata->addPropertyConstraint('redirectUrl',  new Assert\Url(
+                array(
+                    'message' => 'mautic.core.value.required',
+                    'groups'  => array('redirect')
+                )
+            )
+        );
     }
 
     /**
@@ -265,6 +273,25 @@ class Page extends FormEntity
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array
+     */
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
+        $data   = $form->getData();
+        $groups = array('form');
+
+        $redirect = $data->getRedirectType();
+
+        if ($redirect) {
+            $groups[] = 'redirect';
+        }
+
+        return $groups;
     }
 
     /**

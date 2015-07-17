@@ -70,7 +70,7 @@ class PageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url')));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $variantParent = $options['data']->getVariantParent();
@@ -207,9 +207,9 @@ class PageType extends AbstractType
             $redirectUrl = $options['data']->getRedirectUrl();
             $builder->add(
                 'redirectUrl', 
-                'text', 
+                'url',
                 array(
-                      'required'    => false,
+                      'required'    => true,
                     'label'       => 'mautic.page.form.redirecturl',
                     'label_attr'  => array(
                         'class' => 'control-label'
@@ -314,7 +314,11 @@ class PageType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\PageBundle\Entity\Page'
+            'data_class' => 'Mautic\PageBundle\Entity\Page',
+            'validation_groups' => array(
+                'Mautic\PageBundle\Entity\Page',
+                'determineValidationGroups'
+            )
         ));
     }
 
