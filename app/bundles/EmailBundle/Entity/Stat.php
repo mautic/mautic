@@ -418,7 +418,7 @@ class Stat
     public function setCopy($copy)
     {
         // Ensure it's clean of emoji
-        $copy = EmojiHelper::toHtml($copy);
+        $copy = EmojiHelper::toShort($copy);
 
         $this->copy = $copy;
 

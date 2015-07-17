@@ -44,8 +44,6 @@ class PublicController extends CommonFormController
 
                     $content = str_ireplace(array_keys($tokens), $tokens, $content);
                 }
-
-                $content = EmojiHelper::toEmoji($content, 'short');
             } else {
                 // Old way where stats didn't store content
 
