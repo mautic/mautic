@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -889,6 +890,7 @@ class EmailController extends FormController
      */
     public function builderAction($objectId)
     {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
 
         //permission check
@@ -926,6 +928,9 @@ class EmailController extends FormController
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
         }
+
+        // Replace short codes to emoji
+        $content = EmojiHelper::toEmoji($content, 'short');
 
         return $this->render(
             'MauticEmailBundle::builder.html.php',
@@ -1260,18 +1265,20 @@ class EmailController extends FormController
             $content = $entity->getCustomHtml();
         }
 
+        $content = EmojiHelper::toEmoji($content, 'short');
+
         // Override tracking_pixel
         $tokens = array('{tracking_pixel}' => '');
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
             null, array(
-            'content'      => $content,
-            'email'        => $entity,
-            'idHash'       => $idHash,
-            'tokens'       => $tokens,
-            'internalSend' => true
-        )
+                'content'      => $content,
+                'email'        => $entity,
+                'idHash'       => $idHash,
+                'tokens'       => $tokens,
+                'internalSend' => true
+            )
         );
         $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
         $content = $event->getContent();

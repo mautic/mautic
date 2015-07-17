@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -416,6 +417,9 @@ class Stat
      */
     public function setCopy($copy)
     {
+        // Ensure it's clean of emoji
+        $copy = EmojiHelper::toHtml($copy);
+
         $this->copy = $copy;
 
         return $this;
