@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,11 +25,12 @@ class PublicController extends CommonFormController
 {
 
     /**
-     * @param string $slug
+     * @param         $slug
+     * @param Request $request
      *
-     * @return Response|\Symfony\Component\HttpFoundation\RedirectResponse
-     * @throws AccessDeniedHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return Response
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     public function indexAction($slug, Request $request)
     {
@@ -342,6 +344,28 @@ class PublicController extends CommonFormController
 
         $this->factory->getModel('page')->hitPage($redirect, $this->request);
 
-        return $this->redirect($redirect->getUrl());
+        $url = $redirect->getUrl();
+
+        // Get query string
+        $query = $this->request->query->all();
+
+        // Unset the clickthrough
+        unset($query['ct']);
+
+        // Tak on anything left to the URL
+        if (count($query)) {
+            $url .= (strpos($url, '?') !== false) ? '&' : '?';
+            $url .= http_build_query($query);
+        }
+
+        // Search replace lead fields in the URL
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+        $lead      = $leadModel->getCurrentLead();
+        $fields    = $lead->getFields();
+        $leadArray = $leadModel->flattenFields($fields);
+        $url       = EmailSubscriber::findLeadTokens($url, $leadArray, true);
+
+        return $this->redirect($url);
     }
 }
