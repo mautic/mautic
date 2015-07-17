@@ -68,6 +68,11 @@ class MailHelper
     private $from;
 
     /**
+     * @var string
+     */
+    private $returnPath;
+
+    /**
      * @var array
      */
     private $errors = array();
@@ -180,8 +185,9 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
-        $this->message = $this->getMessageInstance();
+        $this->from       = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
+        $this->returnPath = $factory->getParameter('mailer_return_path');
+        $this->message    = $this->getMessageInstance();
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
@@ -208,6 +214,12 @@ class MailHelper
         $from = $this->message->getFrom();
         if (empty($from)) {
             $this->setFrom($this->from);
+        }
+
+        // Set system return path if applicable
+        $returnPath = $this->message->getReturnPath();
+        if (empty($returnPath) && !empty($this->returnPath)) {
+            $this->message->setReturnPath($this->returnPath);
         }
 
         if (empty($this->errors)) {
@@ -883,6 +895,20 @@ class MailHelper
     {
         try {
             $this->message->setReplyTo($addresses, $name);
+        } catch (\Exception $e) {
+            $this->logError($e);
+        }
+    }
+
+    /**
+     * Set a custom return path
+     *
+     * @param $address
+     */
+    public function setReturnPath($address)
+    {
+        try {
+            $this->message->setReturnPath($address);
         } catch (\Exception $e) {
             $this->logError($e);
         }

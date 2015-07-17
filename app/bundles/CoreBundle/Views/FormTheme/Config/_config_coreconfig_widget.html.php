@@ -64,6 +64,7 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
         </div>
 
         <?php if (isset($fields['mailer_from_name']) || isset($fields['mailer_from_email'])): ?>
