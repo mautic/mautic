@@ -235,7 +235,7 @@ class EmailModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return null|Email
      */
     public function getEntity ($id = null)
     {
