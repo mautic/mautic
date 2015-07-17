@@ -1274,7 +1274,7 @@ class EmailController extends FormController
         )
         );
         $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-        $content = $event->getContent();
+        $content = $event->getContent(true);
 
         return new Response($content);
     }
