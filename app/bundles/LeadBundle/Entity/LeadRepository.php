@@ -132,6 +132,11 @@ class LeadRepository extends CommonRepository
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
             $results = $q->getQuery()->getResult();
+
+            /** @var Lead $lead */
+            foreach ($results as $lead) {
+                $lead->setAvailableSocialFields($this->availableSocialFields);
+            }
         }
 
         return $results;
@@ -176,6 +181,11 @@ class LeadRepository extends CommonRepository
             ->orderBy('l.dateAdded', 'DESC');
 
         $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
 
         return $results;
     }
@@ -250,6 +260,11 @@ class LeadRepository extends CommonRepository
             ->setParameter('ip', $ip)
             ->orderBy('l.dateAdded', 'DESC');
         $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
 
         return $results;
     }
