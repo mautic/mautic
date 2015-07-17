@@ -130,7 +130,7 @@ class Page extends FormEntity
      * @Serializer\Groups({"pageDetails"})
      */
     private $metaDescription;
-    
+
     /**
      * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
      * @Serializer\Expose
@@ -138,7 +138,7 @@ class Page extends FormEntity
      * @Serializer\Groups({"pageDetails"})
      */
     private $redirectType;
-    
+
     /**
      * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
      * @Serializer\Expose
@@ -250,7 +250,7 @@ class Page extends FormEntity
         $metadata->addPropertyConstraint('redirectUrl',  new Assert\Url(
                 array(
                     'message' => 'mautic.core.value.required',
-                    'groups'  => array('redirect')
+                    'groups'  => array('Redirect')
                 )
             )
         );
@@ -283,12 +283,12 @@ class Page extends FormEntity
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
     {
         $data   = $form->getData();
-        $groups = array('form');
+        $groups = array('Page');
 
         $redirect = $data->getRedirectType();
 
         if ($redirect) {
-            $groups[] = 'redirect';
+            $groups[] = 'Redirect';
         }
 
         return $groups;
@@ -501,47 +501,47 @@ class Page extends FormEntity
     {
         return $this->metaDescription;
     }
-    
+
     /**
      * Set redirectType
-     * 
+     *
      * @param string $redirectType
-     * 
+     *
      * @return Page
      */
     public function setRedirectType($redirectType) {
         $this->isChanged('redirectType', $redirectType);
         $this->redirectType = $redirectType;
-        
+
         return $this;
     }
-    
+
     /**
      * Get redirectType
-     * 
+     *
      * @return string
      */
     public function getRedirectType() {
         return $this->redirectType;
     }
-    
+
     /**
      * Set redirectUrl
-     * 
+     *
      * @param string $redirectUrl
-     * 
+     *
      * @return Page
      */
     public function setRedirectUrl($redirectUrl) {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
-        
+
         return $this;
     }
-    
+
     /**
      * Get redirectUrl
-     * 
+     *
      * @return string
      */
     public function getRedirectUrl(){
