@@ -55,12 +55,11 @@ class PointEventHelper
         if ($email != null && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                $leadCredentials = array(
-                    'email'     => $leadFields['core']['email']['value'],
-                    'id'        => $lead->getId(),
-                    'firstname' => $leadFields['core']['firstname']['value'],
-                    'lastname'  => $leadFields['core']['lastname']['value']
-                );
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel             = $factory->getModel('lead');
+                $leadCredentials       = $leadModel->flattenFields($leadFields);
+                $leadCredentials['id'] = $lead->getId();
+
                 $options = array('source' => array('trigger', $event['id']));
                 $model->sendEmail($email, $leadCredentials, $options);
             }

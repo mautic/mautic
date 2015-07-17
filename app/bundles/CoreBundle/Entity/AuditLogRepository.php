@@ -14,18 +14,18 @@ namespace Mautic\CoreBundle\Entity;
  */
 class AuditLogRepository extends CommonRepository
 {
-	/**
+    /**
      * Get array of objects which belongs to the object
      *
-     * @param string    $object
-     * @param integer   $id
-     * @param integer   $limit of items
-     * @param \DateTime $afterDate
+     * @param null $object
+     * @param null $id
+     * @param int  $limit
+     * @param null $afterDate
+     * @param null $bundle
+     *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null)
+    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null, $bundle = null)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -38,6 +38,11 @@ class AuditLogRepository extends CommonRepository
                 ->andWhere('al.objectId = :id')
                 ->setParameter('object', $object)
                 ->setParameter('id', $id);
+        }
+
+        if ($bundle) {
+            $query->andWhere('al.bundle = :bundle')
+                ->setParameter('bundle', $bundle);
         }
 
         // Prevent InnoDB shared IDs

@@ -62,16 +62,24 @@ class BuilderSubscriber extends CommonSubscriber
 
         $tokens = array(
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{unsubscribe_url}'  => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{webview_url}'      => $this->translator->trans('mautic.email.token.webview_url')
+            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text')
         );
 
         if ($event->tokensRequested(array_keys($tokens))) {
-            unset($tokens['{leadfield}']);
             $event->addTokens(
                 $event->filterTokens($tokens),
                 true
+            );
+        }
+
+        // these should not allow visual tokens
+        $tokens = array(
+            '{unsubscribe_url}'  => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{webview_url}'      => $this->translator->trans('mautic.email.token.webview_url')
+        );
+        if ($event->tokensRequested(array_keys($tokens))) {
+            $event->addTokens(
+                $event->filterTokens($tokens)
             );
         }
     }

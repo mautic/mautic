@@ -18,3 +18,4 @@
         </div>
     </div>
 <?php endif; ?>
+<div class="clearfix"></div>

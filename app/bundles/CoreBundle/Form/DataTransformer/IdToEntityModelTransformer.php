@@ -123,7 +123,8 @@ class IdToEntityModelTransformer implements DataTransformerInterface
                         'value'  => $id
                     )
                 )
-            )
+            ),
+            'ignore_paginator' => true
         ));
 
         if (!count($entities)) {

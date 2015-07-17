@@ -54,7 +54,8 @@ class CalendarSubscriber extends CommonSubscriber
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
-            ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'categories', 'c', 'c.id = p.category_id AND c.bundle="page"')
+            ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'categories', 'c', 'c.id = p.category_id AND c.bundle=:bundle')
+            ->setParameter('bundle', 'page')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)

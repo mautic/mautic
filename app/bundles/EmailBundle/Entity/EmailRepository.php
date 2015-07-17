@@ -166,7 +166,8 @@ class EmailRepository extends CommonRepository
         if ($countOnly) {
             $q->select('count(l.id) as count');
         } else {
-            $q->select('l.*');
+            $q->select('l.*')
+                ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')

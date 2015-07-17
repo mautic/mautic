@@ -73,7 +73,7 @@ class BuilderTokenHelper
         );
 
 
-        if (in_array(false, $permissions)) {
+        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
             return;
         }
 
@@ -169,7 +169,7 @@ class BuilderTokenHelper
             "RETURN_ARRAY"
         );
 
-        if (in_array(false, $permissions)) {
+        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
             return;
         }
 
@@ -186,7 +186,7 @@ class BuilderTokenHelper
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr->add(
-                $exprBuilder->eq($prefix.'createdBy', $this->factory->getUser()->getId())
+                $exprBuilder->eq($prefix.'created_by', $this->factory->getUser()->getId())
             );
         }
 
@@ -225,15 +225,47 @@ class BuilderTokenHelper
 
     /**
      * @param $content
+     * @param $encodeTokensInUrls
      */
-    static public function replaceVisualPlaceholdersWithTokens(&$content)
+    static public function replaceVisualPlaceholdersWithTokens(&$content, $encodeTokensInUrls = array('leadfields'))
     {
         if (is_array($content)) {
             foreach ($content as &$slot) {
                 self::replaceVisualPlaceholdersWithTokens($slot);
+                if ($encodeTokensInUrls) {
+                    self::encodeUrlTokens($slot, $encodeTokensInUrls);
+                }
             }
         } else {
             $content = preg_replace('/'.self::getVisualTokenHtml(null, null, true).'/smi', '$1', $content);
+            if ($encodeTokensInUrls) {
+                self::encodeUrlTokens($content, $encodeTokensInUrls);
+            }
+        }
+    }
+
+    /**
+     * Prevent tokens in URLs from being converted to visual tokens by encoding the brackets
+     *
+     * @param string $content
+     * @param array  $tokenKeys
+     */
+    static public function encodeUrlTokens(&$content, array $tokenKeys)
+    {
+        // Special handling for leadfield tokens in URLs
+        $foundMatches = preg_match_all('/<a.*?href=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
+        if ($foundMatches) {
+            foreach ($matches[0] as $link) {
+                // There may be more than one leadfield token in the URL
+                preg_match_all('/{['.implode('|', $tokenKeys).'].*?}/i', $link, $tokens);
+                $newLink = $link;
+                foreach ($tokens as $token) {
+                    // Encode brackets
+                    $encodedToken = str_replace(array('{', '}'), array('%7B', '%7D'), $token);
+                    $newLink      = str_replace($token, $encodedToken, $newLink);
+                }
+                $content = str_replace($link, $newLink, $content);
+            }
         }
     }
 
@@ -250,21 +282,26 @@ class BuilderTokenHelper
         } else {
             if (isset($tokens['visualTokens'])) {
                 // Get all the tokens in the content
+                $replacedTokens = array();
                 if (preg_match_all('/{(.*?)}/', $content, $matches)) {
                     $search = $replace = array();
 
                     foreach ($matches[0] as $tokenMatch) {
-                        if (strstr($tokenMatch, '|')) {
-                            // This token has been customized
-                            $tokenParts = explode('|', $tokenMatch);
-                            $token = $tokenParts[0] . '}';
-                        } else {
-                            $token = $tokenMatch;
-                        }
+                        if (!in_array($tokenMatch, $replacedTokens)) {
+                            $replacedTokens[] = $tokenMatch;
 
-                        if (in_array($token, $tokens['visualTokens'])) {
-                            $search[]  = $tokenMatch;
-                            $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
+                            if (strstr($tokenMatch, '|')) {
+                                // This token has been customized
+                                $tokenParts = explode('|', $tokenMatch);
+                                $token      = $tokenParts[0].'}';
+                            } else {
+                                $token = $tokenMatch;
+                            }
+
+                            if (in_array($token, $tokens['visualTokens'])) {
+                                $search[]  = $tokenMatch;
+                                $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
+                            }
                         }
                     }
 

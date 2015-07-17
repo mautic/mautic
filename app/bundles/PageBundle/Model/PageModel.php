@@ -33,7 +33,11 @@ class PageModel extends FormModel
      */
     public function getRepository ()
     {
-        return $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo->setCurrentUser(
+            $this->factory->getUser()
+        );
+        return $repo;
     }
 
     /**
@@ -393,7 +397,6 @@ class PageModel extends FormModel
                     parse_str($request->server->get('QUERY_STRING'), $query);
 
                     // URL attr 'd' is encoded so let's decode it first.
-
                     $decoded = false;
                     if (isset($query['d'])) {
                         // parse_str auto urldecodes
@@ -401,28 +404,48 @@ class PageModel extends FormModel
                         $decoded = true;
                     }
 
-                    if (isset($query['url'])) {
+                    if (isset($query['page_url'])) {
+                        $pageURL = $query['page_url'];
+                        if (!$decoded) {
+                            $pageURL = urldecode($pageURL);
+                        }
+                    } elseif (isset($query['url'])) {
                         $pageURL = $query['url'];
                         if (!$decoded) {
                             $pageURL = urldecode($pageURL);
                         }
                     }
 
-                    if (isset($query['referrer'])) {
+                    if (isset($query['page_referrer'])) {
+                        if (!$decoded) {
+                            $query['page_referrer'] = urldecode($query['page_referrer']);
+                        }
+                        $hit->setReferer($query['page_referrer']);
+                    } elseif (isset($query['referrer'])) {
                         if (!$decoded) {
                             $query['referrer'] = urldecode($query['referrer']);
                         }
                         $hit->setReferer($query['referrer']);
                     }
 
-                    if (isset($query['language'])) {
+                    if (isset($query['page_language'])) {
+                        if (!$decoded) {
+                            $query['page_language'] = urldecode($query['page_language']);
+                        }
+                        $hit->setPageLanguage($query['page_language']);
+                    } elseif (isset($query['language'])) {
                         if (!$decoded) {
                             $query['language'] = urldecode($query['language']);
                         }
                         $hit->setPageLanguage($query['language']);
                     }
 
-                    if (isset($query['title'])) {
+                    if (isset($query['page_title'])) {
+                        if (!$decoded) {
+                            $query['page_title'] = urldecode($query['page_title']);
+                        }
+                        $hit->setUrlTitle($query['page_title']);
+                    } elseif (isset($query['title'])) {
                         if (!$decoded) {
                             $query['title'] = urldecode($query['title']);
                         }

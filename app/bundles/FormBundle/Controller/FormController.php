@@ -66,7 +66,7 @@ class FormController extends CommonFormController
 
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
@@ -488,6 +488,7 @@ class FormController extends CommonFormController
                         $valid = false;
                     } else {
                         $model->setFields($entity, $fields);
+                        $model->deleteFields($entity, $deletedFields);
 
                         //save the form first so that new fields are available to actions
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());

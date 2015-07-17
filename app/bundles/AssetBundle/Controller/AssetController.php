@@ -267,7 +267,7 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        $maxSize    = $this->factory->getParameter('max_size');
+        $maxSize    =  $model->getMaxUploadSize();
         $extensions = '.' . implode(', .', $this->factory->getParameter('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', array(
@@ -399,7 +399,7 @@ class AssetController extends FormController
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
         $method     = $this->request->getMethod();
-        $maxSize    = $this->factory->getParameter('max_size');
+        $maxSize    = $model->getMaxUploadSize();
         $extensions = '.' . implode(', .', $this->factory->getParameter('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', array(
