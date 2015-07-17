@@ -944,7 +944,6 @@ class EmailModel extends FormModel
                 } else {
                     $details['limit'] = $limit;
                 }
-                var_dump($limit, $details['weight']);
             } else {
                 $details['limit'] = $count;
             }
