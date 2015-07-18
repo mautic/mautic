@@ -64,7 +64,7 @@ return array(
 
     'menu'       => array(
         'main' => array(
-            'priority' => 9,
+            'priority' => 30,
             'items'    => array(
                 'mautic.page.pages' => array(
                     'id'        => 'mautic_page_root',
@@ -172,7 +172,7 @@ return array(
     'parameters' => array(
         'cat_in_page_url'  => false,
         'google_analytics' => false,
-        
+
         'redirect_list_types' => array(
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary'
