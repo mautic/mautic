@@ -145,6 +145,10 @@
                     }
 
                     function validateOptions(elOptions) {
+                        if (typeof elOptions === 'undefined') {
+                            return;
+                        }
+
                         var optionsValid = false;
 
                         if (elOptions.length == undefined) {
@@ -195,8 +199,12 @@
                             var name = 'mauticform[' + field.name + ']';
                             switch (field.type) {
                                 case 'radiogrp':
-                                case 'checkboxgrp':
                                     var elOptions = elForm.elements[name];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+                                    
+                                case 'checkboxgrp':
+                                    var elOptions = elForm.elements[name + '[]'];
                                     var valid = validateOptions(elOptions);
                                     break;
 
