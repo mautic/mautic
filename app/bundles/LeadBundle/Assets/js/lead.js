@@ -91,6 +91,16 @@ Mautic.leadOnLoad = function (container) {
     if (typeof Mautic.leadEngagementChart === 'undefined') {
         Mautic.renderEngagementChart();
     }
+
+    if (mQuery('#lead_preferred_profile_image').length) {
+        mQuery('#lead_preferred_profile_image').on('change', function() {
+            if (mQuery(this).val() == 'custom') {
+                mQuery('#customAvatarContainer').slideDown('fast');
+            } else {
+                mQuery('#customAvatarContainer').slideUp('fast');
+            }
+        })
+    }
 };
 
 Mautic.leadOnUnload = function(id) {

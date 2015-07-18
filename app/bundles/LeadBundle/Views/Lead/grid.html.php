@@ -18,7 +18,8 @@ if ($tmpl == 'index')
             'security'      => $security,
             'currentList'   => $currentList,
             'permissions'   => $permissions,
-            'noContactList' => $noContactList
+            'noContactList' => $noContactList,
+            'avatarPath'    => $avatarPath
         )); ?>
     </div>
     <?php else: ?>
