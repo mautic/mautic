@@ -325,7 +325,7 @@ class AjaxController extends CommonController
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->factory->getHelper('cookie');
-        $cookieHelper->setCookie('mautic_update', 'setup', 300);
+        $cookieHelper->setCookie('mautic_update', 'setupUpdate', 300);
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -352,11 +352,24 @@ class AjaxController extends CommonController
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($package['message'])));
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->deleteCookie('mautic_update');
         } else {
             $dataArray['success']        = 1;
             $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
             $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.extracting.package');
             $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->setCookie('mautic_update', 'downloadPackage', 300);
+
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -411,6 +424,12 @@ class AjaxController extends CommonController
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($error)));
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->delete('mautic_update');
         } else {
             // Extract the archive file now
             $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
@@ -420,6 +439,12 @@ class AjaxController extends CommonController
             $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
             $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
             $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -514,13 +539,20 @@ class AjaxController extends CommonController
         if ($result !== 0) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->deleteCookie('mautic_update');
+
         } else {
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->setCookie('mautic_update', 'schema', 300);
+            $cookieHelper->setCookie('mautic_update', 'schemaMigration', 300);
 
             if ($request->get('finalize', false)) {
                 // Go to the finalize step
