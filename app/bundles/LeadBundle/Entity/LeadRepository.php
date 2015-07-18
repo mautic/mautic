@@ -21,6 +21,21 @@ use Mautic\PointBundle\Model\TriggerModel;
 class LeadRepository extends CommonRepository
 {
     /**
+     * @var array
+     */
+    private $availableSocialFields = array();
+
+    /**
+     * Used by search functions to search social profiles
+     *
+     * @param array $fields
+     */
+    public function setAvailableSocialFields(array $fields)
+    {
+        $this->availableSocialFields = $fields;
+    }
+
+    /**
      * Required to get the color based on a lead's points
      * @var
      */
@@ -117,6 +132,11 @@ class LeadRepository extends CommonRepository
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
             $results = $q->getQuery()->getResult();
+
+            /** @var Lead $lead */
+            foreach ($results as $lead) {
+                $lead->setAvailableSocialFields($this->availableSocialFields);
+            }
         }
 
         return $results;
@@ -125,8 +145,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get a list of lead entities
      *
-     * @param $fields
-     * @param $values
+     * @param      $uniqueFieldsWithData
+     * @param null $leadId
      *
      * @return array
      */
@@ -161,6 +181,11 @@ class LeadRepository extends CommonRepository
             ->orderBy('l.dateAdded', 'DESC');
 
         $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
 
         return $results;
     }
@@ -198,6 +223,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param $email
+     *
+     * @return null
      */
     public function getLeadByEmail($email)
     {
@@ -233,6 +260,11 @@ class LeadRepository extends CommonRepository
             ->setParameter('ip', $ip)
             ->orderBy('l.dateAdded', 'DESC');
         $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
 
         return $results;
     }
@@ -293,6 +325,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param $id
+     *
+     * @return array
      */
     public function getLead($id)
     {
@@ -307,7 +341,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get a list of fields and values
      *
-     * @param $id
+     * @param           $id
+     * @param bool|true $byGroup
      *
      * @return array
      */
@@ -372,6 +407,7 @@ class LeadRepository extends CommonRepository
     public function getEntity($id = 0)
     {
         try {
+            /** @var Lead $entity */
             $entity = $this
                 ->createQueryBuilder('l')
                 ->select('l, u, i')
@@ -392,6 +428,8 @@ class LeadRepository extends CommonRepository
 
             $fieldValues = $this->getFieldValues($id);
             $entity->setFields($fieldValues);
+
+            $entity->setAvailableSocialFields($this->availableSocialFields);
         }
 
         return $entity;
@@ -400,9 +438,9 @@ class LeadRepository extends CommonRepository
     /**
      * Get a list of leads
      *
-     * @param array      $args
-     * @param Translator $translator
-     * @return Paginator
+     * @param array $args
+     *
+     * @return array
      */
     public function getEntities($args = array())
     {
@@ -519,6 +557,7 @@ class LeadRepository extends CommonRepository
 
                 $leadId = $r->getId();
                 $r->setFields($fieldValues[$leadId]);
+                $r->setAvailableSocialFields($this->availableSocialFields);
             }
         } else {
             $results = array();
@@ -575,6 +614,14 @@ class LeadRepository extends CommonRepository
             $q->expr()->$exprFunc('l.country', ":$unique")
         );
 
+        if (!empty($this->availableSocialFields)) {
+            foreach ($this->availableSocialFields as $field) {
+                $expr->add(
+                    $q->expr()->$exprFunc("l.$field", ":$unique")
+                );
+            }
+        }
+
         return array(
             $expr,
             array("$unique" => $string)
@@ -630,6 +677,17 @@ class LeadRepository extends CommonRepository
                         $q->expr()->$nullFunc("l.email")
                     )
                 );
+
+                if (!empty($this->availableSocialFields)) {
+                    foreach ($this->availableSocialFields as $field) {
+                        $expr->add(
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.$field", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.$field")
+                            )
+                        );
+                    }
+                }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):

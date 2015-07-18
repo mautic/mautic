@@ -346,6 +346,8 @@ class IntegrationHelper
     /**
      * @param      $lead
      * @param bool $integration
+     *
+     * @return array
      */
     public function clearIntegrationCache ($lead, $integration = false)
     {
@@ -431,7 +433,9 @@ class IntegrationHelper
             }
         };
 
-        if (isset($fields['core'])) {
+        $groups = array('core', 'social', 'professional', 'personal');
+        $keys   = array_keys($fields);
+        if (count(array_intersect($groups, $keys)) !== 0 && count($keys) <= 4) {
             //fields are group
             foreach ($fields as $group => $groupFields) {
                 $availableFields = array_keys($groupFields);

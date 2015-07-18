@@ -64,7 +64,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div><?php echo $email->getSubject(); ?></div>
+                        <div><?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'); ?></div>
                         <div class="text-muted"><?php echo $email->getDescription(); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">

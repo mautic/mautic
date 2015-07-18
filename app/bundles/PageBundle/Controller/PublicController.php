@@ -46,8 +46,13 @@ class PublicController extends CommonFormController
 
             //make sure the page is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
-                $model->hitPage($entity, $this->request, 401);
-                throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
+                //If the page has a redirect type, handle it
+                if ( $entity->getRedirectType() != null ) {
+                    return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
+                } else {
+                    $model->hitPage($entity, $this->request, 401);
+                    throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
+                }
             }
 
             if ($request->attributes->has('ignore_mismatch')) {

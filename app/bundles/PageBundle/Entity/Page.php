@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class Page
  * @ORM\Table(name="pages")
@@ -132,6 +132,22 @@ class Page extends FormEntity
     private $metaDescription;
 
     /**
+     * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     */
+    private $redirectType;
+
+    /**
+     * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     */
+    private $redirectUrl;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @ORM\JoinColumn(onDelete="SET NULL")
      * @Serializer\Expose
@@ -230,6 +246,14 @@ class Page extends FormEntity
         $metadata->addConstraint(new Callback(array(
             'callback' => 'translationParentValidation'
         )));
+
+        $metadata->addPropertyConstraint('redirectUrl',  new Assert\Url(
+                array(
+                    'message' => 'mautic.core.value.required',
+                    'groups'  => array('Redirect')
+                )
+            )
+        );
     }
 
     /**
@@ -249,6 +273,25 @@ class Page extends FormEntity
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array
+     */
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
+        $data   = $form->getData();
+        $groups = array('Page');
+
+        $redirect = $data->getRedirectType();
+
+        if ($redirect) {
+            $groups[] = 'Redirect';
+        }
+
+        return $groups;
     }
 
     /**
@@ -457,6 +500,52 @@ class Page extends FormEntity
     public function getMetaDescription()
     {
         return $this->metaDescription;
+    }
+
+    /**
+     * Set redirectType
+     *
+     * @param string $redirectType
+     *
+     * @return Page
+     */
+    public function setRedirectType($redirectType) {
+        $this->isChanged('redirectType', $redirectType);
+        $this->redirectType = $redirectType;
+
+        return $this;
+    }
+
+    /**
+     * Get redirectType
+     *
+     * @return string
+     */
+    public function getRedirectType() {
+        return $this->redirectType;
+    }
+
+    /**
+     * Set redirectUrl
+     *
+     * @param string $redirectUrl
+     *
+     * @return Page
+     */
+    public function setRedirectUrl($redirectUrl) {
+        $this->isChanged('redirectUrl', $redirectUrl);
+        $this->redirectUrl = $redirectUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get redirectUrl
+     *
+     * @return string
+     */
+    public function getRedirectUrl(){
+        return $this->redirectUrl;
     }
 
     /**

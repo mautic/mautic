@@ -27,6 +27,12 @@ use Mautic\UserBundle\Entity\User;
  */
 class Lead extends FormEntity
 {
+    /**
+     * Used to determine social identity
+     *
+     * @var array
+     */
+    private $availableSocialFields = array();
 
     /**
      * @ORM\Column(type="integer")
@@ -136,6 +142,7 @@ class Lead extends FormEntity
 
     /**
      * Used by Mautic to populate the fields pulled from the DB
+     *
      * @var array
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -329,6 +336,8 @@ class Lead extends FormEntity
             return $this->fields['core']['email']['value'];
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
+        } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
+            return $socialIdentity;
         } else {
             return 'mautic.lead.lead.anonymous';
         }
@@ -614,18 +623,41 @@ class Lead extends FormEntity
     public function isAnonymous()
     {
         if (
-        $name = $this->getName() ||
-            !empty($this->updatedFields['firstname']) ||
-            !empty($this->updatedFields['lastname']) ||
-            !empty($this->updatedFields['company']) ||
-            !empty($this->updatedFields['email']) ||
-            !empty($this->fields['core']['company']['value']) ||
-            !empty($this->fields['core']['email']['value'])
+        $name = $this->getName()
+            || !empty($this->updatedFields['firstname'])
+            || !empty($this->updatedFields['lastname'])
+            || !empty($this->updatedFields['company'])
+            || !empty($this->updatedFields['email'])
+            || !empty($this->fields['core']['company']['value'])
+            || !empty($this->fields['core']['email']['value'])
+            || $socialIdentity = $this->getFirstSocialIdentity()
         ) {
             return false;
         } else {
             return true;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getFirstSocialIdentity()
+    {
+        if (isset($this->fields['social'])) {
+            foreach ($this->fields['social'] as $social) {
+                if (!empty($social['value'])) {
+                    return $social['value'];
+                }
+            }
+        } elseif (!empty($this->updatedFields)) {
+            foreach ($this->availableSocialFields as $social) {
+                if (!empty($this->updatedFields[$social])) {
+                    return $this->updatedFields[$social];
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -715,5 +747,13 @@ class Lead extends FormEntity
     public function setLastActive($lastActive)
     {
         $this->lastActive = $lastActive;
+    }
+
+    /**
+     * @param array $availableSocialFields
+     */
+    public function setAvailableSocialFields(array $availableSocialFields)
+    {
+        $this->availableSocialFields = $availableSocialFields;
     }
 }

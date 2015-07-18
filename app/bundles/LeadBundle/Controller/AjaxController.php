@@ -420,6 +420,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getEmailTemplateAction(Request $request)
     {
@@ -443,7 +445,7 @@ class AjaxController extends CommonAjaxController
             $mailer->setEmail($email, true, array(), array(), true);
 
             $data['body']    = $mailer->getBody();
-            $data['subject'] = $email->getSubject();
+            $data['subject'] = $mailer->getSubject();
 
             // Parse tokens into view data
             $tokens = $model->getBuilderComponents($email, array('tokens', 'visualTokens'));

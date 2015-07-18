@@ -14,6 +14,26 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
     }
+    
+    if (mQuery(container + ' form[name="page"]').length) {
+        mQuery("*[data-toggle='field-lookup']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            var field  = mQuery(this).attr('id');
+            var options = mQuery(this).attr('data-options');
+            Mautic.activatePageFieldTypeahead(field, target, options);
+        });
+    }
+    
+    //Handle autohide of "Redirect URL" field if "Redirect Type" is none
+    if (mQuery(container + ' select[name="page[redirectType]"]').length) {
+        //Auto-hide on page loading
+        Mautic.autoHideRedirectUrl(container);
+        
+        //Auto-hide on select changing
+        mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
+            Mautic.autoHideRedirectUrl(container);
+        });
+    }
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -119,4 +139,53 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
             Mautic.removeLabelLoadingIndicator();
         }
     });
+};
+
+Mautic.activatePageFieldTypeahead = function(field, target, options) {
+    if (options) {
+        var keys = values = [];
+        //check to see if there is a key/value split
+        options = options.split('||');
+        if (options.length == 2) {
+            keys = options[1].split('|');
+            values = options[0].split('|');
+        } else {
+            values = options[0].split('|');
+        }
+
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            dataOptions: values,
+            dataOptionKeys: keys,
+            minLength: 0
+        });
+    } else {
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+            prefetch: true,
+            remote: true,
+            action: "page:fieldList&field=" + target
+        });
+    }
+    
+    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
+        if (mQuery("#" + field).length && datum["value"]) {
+            mQuery("#" + field).val(datum["value"]);
+        }
+    }).on('typeahead:autocompleted', function (event, datum) {
+        if (mQuery("#" + field).length && datum["value"]) {
+            mQuery("#" + field).val(datum["value"]);
+        }
+    });
+};
+
+Mautic.autoHideRedirectUrl = function(container) {
+    var select = mQuery(container + ' select[name="page[redirectType]"]');
+    var input = mQuery(container + ' input[name="page[redirectUrl]"]');
+    
+    //If value is none we autohide the "Redirect URL" field and empty it
+    if (select.val() == '') {
+        input.closest('.form-group').hide();
+        input.val('');
+    } else {
+        input.closest('.form-group').show();
+    }
 };

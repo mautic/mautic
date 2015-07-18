@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -66,15 +67,18 @@ class EmailType extends AbstractType
             )
         );
 
+        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
-            'subject',
-            'text',
-            array(
-                'label'      => 'mautic.email.subject',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false
-            )
+            $builder->create(
+                'subject',
+                'text',
+                array(
+                    'label'      => 'mautic.email.subject',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array('class' => 'form-control'),
+                    'required'   => false
+                )
+            )->addModelTransformer($emojiTransformer)
         );
 
         $builder->add(
@@ -221,18 +225,20 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            'customHtml',
-            'textarea',
-            array(
-                'label'      => 'mautic.email.form.body',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => false,
-                'attr'       => array(
-                    'class'                => 'form-control editor-fullpage editor-builder-tokens',
-                    'data-token-callback'  => 'email:getBuilderTokens',
-                    'data-token-activator' => '{'
+            $builder->create(
+                'customHtml',
+                'textarea',
+                array(
+                    'label'      => 'mautic.email.form.body',
+                    'label_attr' => array('class' => 'control-label'),
+                    'required'   => false,
+                    'attr'       => array(
+                        'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                        'data-token-callback'  => 'email:getBuilderTokens',
+                        'data-token-activator' => '{'
+                    )
                 )
-            )
+            )->addModelTransformer($emojiTransformer)
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');

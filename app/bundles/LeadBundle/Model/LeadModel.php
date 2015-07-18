@@ -40,11 +40,24 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\LeadBundle\Entity\LeadRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead');
+        static $socialFieldsSet;
+
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+
+        if (!$socialFieldsSet) {
+            $fields = $this->factory->getModel('lead.field')->getGroupFields('social');
+            if (!empty($fields)) {
+                $socialFields = array_keys($fields);
+                $repo->setAvailableSocialFields($socialFields);
+            }
+            $socialFieldsSet = true;
+        }
+
+        return $repo;
     }
 
     /**

@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -478,6 +479,9 @@ class Email extends FormEntity
      */
     public function setContent ($content)
     {
+        // Ensure safe emoji
+        $content = EmojiHelper::toShort($content);
+
         $this->isChanged('content', $content);
         $this->content = $content;
 

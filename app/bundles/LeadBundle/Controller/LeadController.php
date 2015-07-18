@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -548,9 +549,12 @@ class LeadController extends FormController
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param            $objectId
+     * @param bool|false $ignorePost
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -1337,12 +1341,14 @@ class LeadController extends FormController
 
                         $mailer->setSubject($email['subject']);
 
+                        // Ensure safe emoji for notification
+                        $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true)) {
                             $mailer->createLeadEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(
-                                    '%subject%' => $email['subject'],
+                                    '%subject%' => $subject,
                                     '%email%'   => $leadEmail
                                 )
                             );
@@ -1350,7 +1356,7 @@ class LeadController extends FormController
                             $this->addFlash(
                                 'mautic.lead.email.error.failed',
                                 array(
-                                    '%subject%' => $email['subject'],
+                                    '%subject%' => $subject,
                                     '%email%'   => $leadEmail
                                 )
                             );

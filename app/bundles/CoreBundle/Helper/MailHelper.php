@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
  * Class MailHelper
@@ -66,6 +67,11 @@ class MailHelper
      * @var null
      */
     private $from;
+
+    /**
+     * @var string
+     */
+    private $returnPath;
 
     /**
      * @var array
@@ -180,8 +186,9 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from    = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
-        $this->message = $this->getMessageInstance();
+        $this->from       = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
+        $this->returnPath = $factory->getParameter('mailer_return_path');
+        $this->message    = $this->getMessageInstance();
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
@@ -208,6 +215,12 @@ class MailHelper
         $from = $this->message->getFrom();
         if (empty($from)) {
             $this->setFrom($this->from);
+        }
+
+        // Set system return path if applicable
+        $returnPath = $this->message->getReturnPath();
+        if (empty($returnPath) && !empty($this->returnPath)) {
+            $this->message->setReturnPath($this->returnPath);
         }
 
         if (empty($this->errors)) {
@@ -269,6 +282,13 @@ class MailHelper
                 $this->logger->clear();
             } catch (\Exception $e) {
                 $this->logError($e);
+
+                // Exception encountered when sending so all recipients are considered failures
+                $this->errors['failures'] = array_merge(
+                    array_keys((array) $this->message->getTo()),
+                    array_keys((array) $this->message->getCc()),
+                    array_keys((array) $this->message->getBcc())
+                );
             }
         }
 
@@ -889,6 +909,20 @@ class MailHelper
     }
 
     /**
+     * Set a custom return path
+     *
+     * @param $address
+     */
+    public function setReturnPath($address)
+    {
+        try {
+            $this->message->setReturnPath($address);
+        } catch (\Exception $e) {
+            $this->logError($e);
+        }
+    }
+
+    /**
      * Set from address (defaults to system)
      *
      * @param $address
@@ -1017,8 +1051,13 @@ class MailHelper
     {
         $this->email = $email;
 
+        $subject = $email->getSubject();
+
+        // Convert short codes to emoji
+        $subject = EmojiHelper::toEmoji($subject, 'short');
+
         // Set message settings from the email
-        $this->setSubject($email->getSubject());
+        $this->setSubject($subject);
 
         $fromEmail = $email->getFromAddress();
         $fromName  = $email->getFromName();
@@ -1068,6 +1107,11 @@ class MailHelper
             $customHtml = $email->getCustomHtml();
         }
 
+        // Convert short codes to emoji
+        $customHtml = EmojiHelper::toEmoji($customHtml, 'short');
+
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+
         if (empty($assetAttachments)) {
             if ($assets = $email->getAssetAttachments()) {
                 foreach ($assets as $asset) {
@@ -1079,8 +1123,6 @@ class MailHelper
                 $this->attachAsset($asset);
             }
         }
-
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
     }
 
     /**
@@ -1207,8 +1249,8 @@ class MailHelper
         }
 
         $logDump = $this->logger->dump();
-        if (!empty($logDump)) {
-            $error .= "; $logDump";
+        if (!empty($logDump) && strpos($error, $logDump) === false) {
+            $error .= " Log data: $logDump";
         }
 
         $this->errors[] = $error;

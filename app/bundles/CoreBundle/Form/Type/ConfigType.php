@@ -149,6 +149,16 @@ class ConfigType extends AbstractType
             )
         ));
 
+        $builder->add('mailer_return_path', 'text', array(
+            'label'       => 'mautic.core.config.form.mailer.return.path',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.mailer.return.path.tooltip'
+            ),
+            'required'    => false
+        ));
+
         $builder->add('mailer_transport', 'choice', array(
             'choices'     => array(
                 'mail'                      => 'mautic.core.config.mailer_transport.mail',
