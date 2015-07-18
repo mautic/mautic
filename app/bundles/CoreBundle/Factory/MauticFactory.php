@@ -620,6 +620,12 @@ class MauticFactory
                 $repo->saveEntity($ipAddress);
             }
 
+            // Ensure the do not track list is inserted
+            $doNotTrack = $this->getParameter('do_not_track_ips');
+            if (!empty($doNotTrack)) {
+                $ipAddress->setDoNotTrackList($doNotTrack);
+            }
+
             $ipAddresses[$ip] = $ipAddress;
         }
 

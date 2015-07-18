@@ -25,6 +25,13 @@ class IpAddress
 {
 
     /**
+     * Set by factory of configured IPs to not track
+     *
+     * @var array
+     */
+    private $doNotTrack = array();
+
+    /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -276,5 +283,55 @@ class IpAddress
     public function getIpDetails()
     {
         return $this->ipDetails;
+    }
+
+    /**
+     * Set list of IPs to not track
+     *
+     * @param array $ips
+     */
+    public function setDoNotTrackList(array $ips)
+    {
+        $this->doNotTrack = $ips;
+    }
+
+    /**
+     * Get list of IPs to not track
+     *
+     * @return array
+     */
+    public function getDoNotTrackList()
+    {
+        return $this->doNotTrack;
+    }
+
+    /**
+     * Determine if this IP is trackable
+     */
+    public function isTrackable()
+    {
+        if (!empty($this->doNotTrack)) {
+            foreach ($this->doNotTrack as $ip) {
+                if ( strpos( $ip, '/' ) == false ) {
+                    if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                        return false;
+                    }
+                } else {
+                    // has a netmask range
+                    // https://gist.github.com/tott/7684443
+                    list($range, $netmask) = explode('/', $ip, 2);
+                    $range_decimal    = ip2long($range);
+                    $ip_decimal       = ip2long($ip);
+                    $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
+                    $netmask_decimal  = ~$wildcard_decimal;
+
+                    if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }
