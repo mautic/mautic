@@ -845,6 +845,16 @@ switch ($task) {
         break;
 }
 
+// A way to keep the upgrade from failing if the session is lost after
+// the cache is cleared by upgrade.php
+$isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+$cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
+$cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
+$cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
+$cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
+
+setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
+
 // Encode the state for the next request
 $status['updateState'] = base64_encode(json_encode($status['updateState']));
 

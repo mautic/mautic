@@ -47,6 +47,30 @@ class SecurityController extends CommonController
      */
     public function loginAction ()
     {
+        // A way to keep the upgrade from failing if the session is lost after
+        // the cache is cleared by upgrade.php
+        if ($this->request->cookies->has('mautic_update')) {
+            $step = $this->request->cookies->get('mautic_update');
+            if ($step == 'clearCache') {
+                // Run migrations
+                $this->request->query->set('finalize', 1);
+                return $this->forward('MauticCoreBundle:Ajax:updateDatabaseMigration',
+                    array(
+                        'request'  => $this->request
+                    )
+                );
+            } elseif ($step == 'schemaMigration') {
+                // Done so finalize
+                return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
+                    array(
+                        'request'  => $this->request
+                    ));
+            }
+
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->deleteCookie('mautic_update');
+        }
 
         $session = $this->request->getSession();
 
