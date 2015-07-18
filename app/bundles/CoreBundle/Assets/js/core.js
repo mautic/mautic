@@ -1070,6 +1070,15 @@ var Mautic = {
     },
 
     /**
+     * Deactivates backdrop
+     */
+    deactivateBackgroup: function() {
+        if (mQuery('#mautic-backdrop').length) {
+            mQuery('#mautic-backdrop').remove();
+        }
+    },
+
+    /**
      * Posts a form and returns the output.
      * Uses jQuery form plugin so it handles files as well.
      *
@@ -1135,6 +1144,8 @@ var Mautic = {
      */
     processPageContent: function (response) {
         if (response) {
+            Mautic.deactivateBackgroup();
+
             if (!response.target) {
                 response.target = '#app-content';
             }
