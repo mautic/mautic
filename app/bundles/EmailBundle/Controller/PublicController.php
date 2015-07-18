@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PublicController extends CommonFormController
 {
@@ -336,6 +335,9 @@ class PublicController extends CommonFormController
         } else {
             $content = $entity->getCustomHtml();
         }
+
+        // Convert emojis
+        $content = EmojiHelper::toEmoji($content, 'short');
 
         // Override tracking_pixel
         $tokens = array('{tracking_pixel}' => '');
