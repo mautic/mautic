@@ -172,8 +172,6 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getPublicActivity ($identifier, &$socialCache)
     {
-        $emojiHelper = new EmojiHelper();
-
         if ($id = $this->getUserId($identifier, $socialCache)) {
             //due to the way Twitter filters, get more than 10 tweets
             $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
@@ -197,7 +195,7 @@ class TwitterIntegration extends SocialIntegration
                     }
 
                     $tweet = array(
-                        'tweet'       => $emojiHelper->emoji_unified_to_html($d['text']),
+                        'tweet'       => EmojiHelper::toHtml($d['text']),
                         'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                         'coordinates' => $d['coordinates'],
                         'published'   => $d['created_at'],

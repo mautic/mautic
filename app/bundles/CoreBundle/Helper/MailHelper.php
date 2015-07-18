@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
  * Class MailHelper
@@ -1050,8 +1051,13 @@ class MailHelper
     {
         $this->email = $email;
 
+        $subject = $email->getSubject();
+
+        // Convert short codes to emoji
+        $subject = EmojiHelper::toEmoji($subject, 'short');
+
         // Set message settings from the email
-        $this->setSubject($email->getSubject());
+        $this->setSubject($subject);
 
         $fromEmail = $email->getFromAddress();
         $fromName  = $email->getFromName();
@@ -1101,6 +1107,11 @@ class MailHelper
             $customHtml = $email->getCustomHtml();
         }
 
+        // Convert short codes to emoji
+        $customHtml = EmojiHelper::toEmoji($customHtml, 'short');
+
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+
         if (empty($assetAttachments)) {
             if ($assets = $email->getAssetAttachments()) {
                 foreach ($assets as $asset) {
@@ -1112,8 +1123,6 @@ class MailHelper
                 $this->attachAsset($asset);
             }
         }
-
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
     }
 
     /**

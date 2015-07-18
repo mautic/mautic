@@ -9,7 +9,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
