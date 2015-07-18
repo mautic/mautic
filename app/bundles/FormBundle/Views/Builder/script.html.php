@@ -38,7 +38,7 @@ if (!$f->isRequired()) continue;
 $type       = $f->getType();
 $properties = $f->getProperties();
 $name       = $f->getAlias();
-if ((in_array($type, array('select', 'country')) && !empty($properties['multiple'])) || $type == 'checkboxgrp')
+if ((in_array($type, array('select', 'country')) && !empty($properties['multiple'])))
     $name .= '[]';
 ?>
         '<?php echo $f->getAlias(); ?>': {
