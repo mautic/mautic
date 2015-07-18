@@ -278,25 +278,26 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="lead-avatar-panel">
+                <div class="avatar-collapser hr-expand nm">
+                    <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
+                </div>
                 <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>" id="lead-avatar-block">
                     <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
                     <div class="pa-sm">
                         <?php if ($leadActualName && $leadCompany): ?>
-                        <h2 class="text-muted">
-                            <?php echo $leadName; ?>
-                        </h2>
-                        <h4 class="mt-xs text-muted">
-                            <?php echo $leadCompany; ?>
-                        </h4>
+                        <h2>
+                            <div>
+                                <?php echo $leadName; ?>
+                            </div>
+                            <div class="mt-xs span-block small">
+                                <?php echo $leadCompany; ?>
+                            </div>
                         <?php elseif ($leadActualName || $leadCompany): ?>
-                        <h2 class="text-muted">
+                        <h2>
                             <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
                         </h2>
                         <?php endif; ?>
                     </div>
-                </div>
-                <div class="avatar-collapser hr-expand nm">
-                    <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
                 </div>
             </div>
             <div class="mt-sm points-panel text-center">
