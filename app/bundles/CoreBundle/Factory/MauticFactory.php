@@ -388,8 +388,17 @@ class MauticFactory
         } elseif ($name == 'cache' || $name == 'log') {
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
+        } elseif ($name == 'images') {
+            $session  = $this->getSession();
+            $imageDir = $session->get('mautic.imagepath');
+            if (substr($imageDir, -1) === '/') {
+                $imageDir = substr(0, -1, $imageDir);
+            }
+
+            $path = $imageDir;
+
         } elseif (isset($paths[$name])) {
-            $path = $paths[$name];
+                $path = $paths[$name];
         } else {
             throw new \InvalidArgumentException("$name does not exist.");
         }

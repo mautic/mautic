@@ -324,6 +324,36 @@ class Lead extends FormEntity
     }
 
     /**
+     * Get company
+     *
+     * @return string
+     */
+    public function getCompany()
+    {
+        if (!empty($this->fields['core']['company']['value'])) {
+
+            return $this->fields['core']['company']['value'];
+        }
+
+        return '';
+    }
+
+    /**
+     * Get company
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        if (!empty($this->fields['core']['email']['value'])) {
+
+            return $this->fields['core']['email']['value'];
+        }
+
+        return '';
+    }
+
+    /**
      * Get the primary identifier for the lead
      *
      * @param bool $lastFirst

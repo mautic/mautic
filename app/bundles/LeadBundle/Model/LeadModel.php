@@ -213,6 +213,22 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param object $entity
+     */
+    public function deleteEntity($entity)
+    {
+        // Delete custom avatar if one exists
+        $imageDir = $this->factory->getSystemPath('images', true);
+        $avatar   = $imageDir . '/lead_avatars/avatar' . $entity->getId();
+
+        if (file_exists($avatar)) {
+            unlink($avatar);
+        }
+
+        parent::deleteEntity($entity);
+    }
+
+    /**
      * Populates custom field values for updating the lead. Also retrieves social media data
      *
      * @param Lead  $lead
@@ -441,6 +457,8 @@ class LeadModel extends FormModel
      * Returns flat array for single lead
      *
      * @param $leadId
+     *
+     * @return array
      */
     public function getLead($leadId)
     {

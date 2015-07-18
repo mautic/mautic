@@ -16,11 +16,14 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LeadController extends FormController
@@ -379,6 +382,7 @@ class LeadController extends FormController
             array(
                 'viewParameters'  => array(
                     'lead'              => $lead,
+                    'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
@@ -466,6 +470,16 @@ class LeadController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($lead);
 
+                    // Upload avatar if applicable
+                    $image = $form['preferred_profile_image']->getData();
+                    if ($image == 'custom') {
+                        // Check for a file
+                        /** @var UploadedFile $file */
+                        if ($file = $form['custom_avatar']->getData()) {
+                            $this->uploadAvatar($lead);
+                        }
+                    }
+
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
 
                     $this->addFlash(
@@ -529,9 +543,9 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
-                    'fields' => $model->organizeFieldsByGroup($fields)
+                    'form'       => $form->createView(),
+                    'lead'       => $lead,
+                    'fields'     => $model->organizeFieldsByGroup($fields)
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => array(
@@ -638,6 +652,19 @@ class LeadController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
 
+                    // Upload avatar if applicable
+                    $image = $form['preferred_profile_image']->getData();
+                    if ($image == 'custom') {
+                        // Check for a file
+                        /** @var UploadedFile $file */
+                        if ($file = $form['custom_avatar']->getData()) {
+                            $this->uploadAvatar($lead);
+
+                            // Note the avatar update so that it can be forced to update
+                            $this->factory->getSession()->set('mautic.lead.avatar.updated', true);
+                        }
+                    }
+
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
 
                     $this->addFlash(
@@ -685,9 +712,9 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
-                    'fields' => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
+                    'form'       => $form->createView(),
+                    'lead'       => $lead,
+                    'fields'     => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => array(
@@ -704,6 +731,27 @@ class LeadController extends FormController
             )
         );
     }
+
+    /**
+     * Upload an asset
+     *
+     * @param Lead $lead
+     */
+    private function uploadAvatar(Lead $lead)
+    {
+        $file      = $this->request->files->get('lead[custom_avatar]', null, true);
+        $avatarDir = $this->factory->getHelper('template.avatar')->getAvatarPath(true);
+
+        if (!file_exists($avatarDir)) {
+            mkdir($avatarDir);
+        }
+
+        $file->move($avatarDir, 'avatar'.$lead->getId());
+
+        //remove the file from request
+        $this->request->files->remove('lead');
+    }
+
 
     /**
      * Deletes the entity
