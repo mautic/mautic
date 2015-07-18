@@ -15,7 +15,9 @@ $isAnonymous = $lead->isAnonymous();
 
 $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
 
-$leadName = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadActualName = $lead->getName();
+$leadCompany    = $lead->getCompany();
 
 $view['slots']->set('mauticContent', 'lead');
 
@@ -34,10 +36,8 @@ if (!$isAnonymous) {
 
     $avatar = '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="' . $img . '" alt="" /></span>';
 }
-?>
-<?php
 
-$view['slots']->set("headerTitle",
+$view['slots']->set('headerTitle',
        $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
@@ -286,8 +286,30 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- form HTML -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-            <div class="points-panel text-center">
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <div class="lead-avatar-panel">
+                <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>" id="lead-avatar-block">
+                    <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
+                    <div class="pa-sm">
+                        <?php if ($leadActualName && $leadCompany): ?>
+                        <h2 class="text-muted">
+                            <?php echo $leadName; ?>
+                        </h2>
+                        <h4 class="mt-xs text-muted">
+                            <?php echo $leadCompany; ?>
+                        </h4>
+                        <?php elseif ($leadActualName || $leadCompany): ?>
+                        <h2 class="text-muted">
+                            <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
+                        </h2>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="avatar-collapser hr-expand nm">
+                    <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
+                </div>
+            </div>
+            <div class="mt-sm points-panel text-center">
                 <?php
                 $color = $lead->getColor();
                 $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';

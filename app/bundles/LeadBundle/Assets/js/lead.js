@@ -101,6 +101,15 @@ Mautic.leadOnLoad = function (container) {
             }
         })
     }
+
+    if (mQuery('.lead-avatar-panel').length) {
+        mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
+            setTimeout(function() {
+                var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
+                Cookies.set('mautic_lead_avatar_panel', status, {expires: 30});
+            }, 500);
+        });
+    }
 };
 
 Mautic.leadOnUnload = function(id) {

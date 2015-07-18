@@ -378,11 +378,17 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
 
+        // Check if avatar has been updated and force update from browser cache
+        if ($this->factory->getSession()->get('mautic.lead.avatar.updated', false)) {
+            $this->factory->getSession()->remove('mautic.lead.avatar.updated');
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'lead'              => $lead,
                     'avatarPath'        => $this->getAvatarPath(false),
+                    'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
@@ -660,6 +666,9 @@ class LeadController extends FormController
                         /** @var UploadedFile $file */
                         if ($file = $form['custom_avatar']->getData()) {
                             $this->uploadAvatar($lead);
+
+                            // Note the avatar update so that it can be forced to update
+                            $this->factory->getSession()->set('mautic.lead.avatar.updated', true);
                         }
                     }
 
