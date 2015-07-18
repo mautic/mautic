@@ -144,16 +144,20 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get email content
      *
+     * @param $replaceTokens
+     *
      * @return array
      */
-    public function getContent()
+    public function getContent($replaceTokens = false)
     {
         if ($this->helper !== null) {
-            return $this->helper->getBody();
+            $content = $this->helper->getBody();
         } else {
 
-            return $this->content;
+            $content = $this->content;
         }
+
+        return ($replaceTokens) ? str_replace(array_keys($this->getTokens()), $this->getTokens(), $content) : $content;
     }
 
     /**

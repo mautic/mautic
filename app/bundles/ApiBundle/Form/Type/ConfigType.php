@@ -12,6 +12,7 @@ namespace Mautic\ApiBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class ConfigType
@@ -46,6 +47,38 @@ class ConfigType extends AbstractType
                 'tooltip' => 'mautic.api.config.form.api.mode.tooltip'
             ),
             'empty_value' => false
+        ));
+
+        $builder->add('api_oauth2_access_token_lifetime', 'number', array(
+            'label'       => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
+            'attr'        => array(
+                'tooltip' => 'mautic.api.config.form.api.oauth2_access_token_lifetime.tooltip',
+                'class'   => 'form-control',
+                'data-show-on' => '{"config_apiconfig_api_mode":["oauth2"]}',
+            ),
+            'constraints' => array(
+                new NotBlank(
+                    array(
+                        'message' => 'mautic.core.value.required'
+                    )
+                )
+            )
+        ));
+
+        $builder->add('api_oauth2_refresh_token_lifetime', 'number', array(
+            'label'       => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime',
+            'attr'        => array(
+                'tooltip' => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime.tooltip',
+                'class'   => 'form-control',
+                'data-show-on' => '{"config_apiconfig_api_mode":["oauth2"]}',
+            ),
+            'constraints' => array(
+                new NotBlank(
+                    array(
+                        'message' => 'mautic.core.value.required'
+                    )
+                )
+            )
         ));
     }
 

@@ -388,8 +388,17 @@ class MauticFactory
         } elseif ($name == 'cache' || $name == 'log') {
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
+        } elseif ($name == 'images') {
+            $session  = $this->getSession();
+            $imageDir = $session->get('mautic.imagepath');
+            if (substr($imageDir, -1) === '/') {
+                $imageDir = substr(0, -1, $imageDir);
+            }
+
+            $path = $imageDir;
+
         } elseif (isset($paths[$name])) {
-            $path = $paths[$name];
+                $path = $paths[$name];
         } else {
             throw new \InvalidArgumentException("$name does not exist.");
         }
@@ -618,6 +627,12 @@ class MauticFactory
                 $ipAddress = new IpAddress();
                 $ipAddress->setIpAddress($ip, $this->getSystemParameters());
                 $repo->saveEntity($ipAddress);
+            }
+
+            // Ensure the do not track list is inserted
+            $doNotTrack = $this->getParameter('do_not_track_ips');
+            if (!empty($doNotTrack)) {
+                $ipAddress->setDoNotTrackList($doNotTrack);
             }
 
             $ipAddresses[$ip] = $ipAddress;

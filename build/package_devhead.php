@@ -38,4 +38,11 @@ include_once __DIR__ . '/processfiles.php';
 echo "Packaging Mautic\n";
 chdir(__DIR__ . '/packaging');
 
-system('zip -r ../packages/mautic-head.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/mautic-head.zip . > /dev/null');
+
+// Copy over upgrade.php
+system('cp ' . __DIR__ . '/../upgrade.php ' . __DIR__ . '/packaging');
+
+chdir(__DIR__ . '/packaging');
+echo "Packaging Mautic Update Package\n";
+system('zip -r ../packages/mautic-head-update.zip . > /dev/null');

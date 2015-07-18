@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -422,6 +423,19 @@ class ConfigType extends AbstractType
                 ),
                 'required'   => false
             ))->addViewTransformer($arrayStringTransformer)
+        );
+
+        $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+        $builder->add(
+            $builder->create('do_not_track_ips', 'textarea', array(
+                'label'      => 'mautic.core.config.form.do_not_track_ips',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.do_not_track_ips.tooltip'
+                ),
+                'required'   => false
+            ))->addViewTransformer($arrayLinebreakTransformer)
         );
 
         $builder->add('rememberme_key', 'text', array(

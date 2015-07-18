@@ -181,6 +181,10 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
+
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+        </div>
     </div>
 </div>
 <?php endif; ?>

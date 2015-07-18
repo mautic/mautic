@@ -59,6 +59,10 @@ return array(
             'mautic_mailer_transport_callback' => array(
                 'path'         => '/mailer/{transport}/callback',
                 'controller'   => 'MauticEmailBundle:Public:mailerCallback'
+            ),
+            'mautic_email_preview' => array(
+                'path'       => '/email/preview/{objectId}',
+                'controller' => 'MauticEmailBundle:Public:preview'
             )
         )
     ),

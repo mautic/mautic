@@ -257,31 +257,35 @@ class Lead extends FormEntity
     }
 
     /**
-     * Add ipAddresses
+     * Add ipAddress
      *
-     * @param IpAddress $ipAddresses
+     * @param IpAddress $ipAddress
      *
      * @return Lead
      */
-    public function addIpAddress(IpAddress $ipAddresses)
+    public function addIpAddress(IpAddress $ipAddress)
     {
-        $ip = $ipAddresses->getIpAddress();
+        if (!$ipAddress->isTrackable()) {
+            return $this;
+        }
+
+        $ip = $ipAddress->getIpAddress();
         if (!isset($this->ipAddresses[$ip])) {
-            $this->isChanged('ipAddresses', $ipAddresses);
-            $this->ipAddresses[$ip] = $ipAddresses;
+            $this->isChanged('ipAddresses', $ipAddress);
+            $this->ipAddresses[$ip] = $ipAddress;
         }
 
         return $this;
     }
 
     /**
-     * Remove ipAddresses
+     * Remove ipAddress
      *
-     * @param IpAddress $ipAddresses
+     * @param IpAddress $ipAddress
      */
-    public function removeIpAddress(IpAddress $ipAddresses)
+    public function removeIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddresses->removeElement($ipAddresses);
+        $this->ipAddresses->removeElement($ipAddress);
     }
 
     /**
@@ -317,6 +321,36 @@ class Lead extends FormEntity
         }
 
         return $fullName;
+    }
+
+    /**
+     * Get company
+     *
+     * @return string
+     */
+    public function getCompany()
+    {
+        if (!empty($this->fields['core']['company']['value'])) {
+
+            return $this->fields['core']['company']['value'];
+        }
+
+        return '';
+    }
+
+    /**
+     * Get company
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        if (!empty($this->fields['core']['email']['value'])) {
+
+            return $this->fields['core']['email']['value'];
+        }
+
+        return '';
     }
 
     /**
