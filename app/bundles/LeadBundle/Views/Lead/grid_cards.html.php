@@ -18,7 +18,7 @@
             if ($preferred == 'gravatar' || empty($preferred)) :
                 $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250');
             elseif ($preferred == 'custom'):
-                $img = $view['assets']->getUrl($avatarPath . '/avatar'.$item->getId());
+                $img = $view['assets']->getUrl($avatarPath . '/avatar'.$item->getId(), null, null, false, true);
             else:
                 $socialData = $item->getSocialCache();
                 $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);

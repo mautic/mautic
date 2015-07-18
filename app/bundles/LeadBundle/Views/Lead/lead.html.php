@@ -26,7 +26,7 @@ if (!$isAnonymous) {
     if ($preferred == 'gravatar' || empty($preferred))  {
         $img = $view['gravatar']->getImage($fields['core']['email']['value']);
     } elseif ($preferred == 'custom') {
-        $img = $view['assets']->getUrl($avatarPath . '/avatar'.$lead->getId());
+        $img = $view['assets']->getUrl($avatarPath . '/avatar'.$lead->getId(), null, null, false, true);
     } else {
         $socialData = $lead->getSocialCache();
         $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
