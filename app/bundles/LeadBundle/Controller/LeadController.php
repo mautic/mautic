@@ -184,8 +184,7 @@ class LeadController extends FormController
                     'security'      => $this->factory->getSecurity(),
                     'inSingleList'  => $inSingleList,
                     'noContactList' => $emailRepo->getDoNotEmailList(),
-                    'maxLeadId'     => $maxLeadId,
-                    'avatarPath'    => $this->getAvatarPath(false)
+                    'maxLeadId'     => $maxLeadId
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => array(
@@ -378,16 +377,10 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
 
-        // Check if avatar has been updated and force update from browser cache
-        if ($this->factory->getSession()->get('mautic.lead.avatar.updated', false)) {
-            $this->factory->getSession()->remove('mautic.lead.avatar.updated');
-        }
-
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'lead'              => $lead,
-                    'avatarPath'        => $this->getAvatarPath(false),
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'socialProfiles'    => $socialProfiles,
@@ -549,7 +542,6 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'avatarPath' => $this->getAvatarPath(false),
                     'form'       => $form->createView(),
                     'lead'       => $lead,
                     'fields'     => $model->organizeFieldsByGroup($fields)
@@ -719,7 +711,6 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'avatarPath' => $this->getAvatarPath(false),
                     'form'       => $form->createView(),
                     'lead'       => $lead,
                     'fields'     => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
@@ -741,20 +732,6 @@ class LeadController extends FormController
     }
 
     /**
-     * Get avatar path
-     *
-     * @param $absolute
-     *
-     * @return string
-     */
-    private function getAvatarPath($absolute = true)
-    {
-        $imageDir = $this->factory->getSystemPath('images', $absolute);
-
-        return $imageDir.'/lead_avatars';
-    }
-
-    /**
      * Upload an asset
      *
      * @param Lead $lead
@@ -762,7 +739,7 @@ class LeadController extends FormController
     private function uploadAvatar(Lead $lead)
     {
         $file      = $this->request->files->get('lead[custom_avatar]', null, true);
-        $avatarDir = $this->getAvatarPath();
+        $avatarDir = $this->factory->getHelper('template.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
             mkdir($avatarDir);

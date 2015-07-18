@@ -14,15 +14,8 @@
             if (empty($color))
                 $color = 'a0acb8';
 
-            $preferred = $item->getPreferredProfileImage();
-            if ($preferred == 'gravatar' || empty($preferred)) :
-                $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250');
-            elseif ($preferred == 'custom'):
-                $img = $view['assets']->getUrl($avatarPath . '/avatar'.$item->getId(), null, null, false, true);
-            else:
-                $socialData = $item->getSocialCache();
-                $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
-            endif; ?>
+           $img = $view['lead_avatar']->getAvatar($item);
+           ?>
             <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
                 <div data-color="#<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) echo " highlight"; ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
                     <div class="box-layout">

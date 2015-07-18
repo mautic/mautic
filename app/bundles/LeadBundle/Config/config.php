@@ -277,6 +277,13 @@ return array(
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist'
             )
+        ),
+        'helpers' => array(
+            'mautic.helper.template.avatar' => array(
+                'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_avatar'
+            )
         )
     )
 );
