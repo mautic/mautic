@@ -38,7 +38,7 @@ if (!$isAnonymous) {
 <?php
 
 $view['slots']->set("headerTitle",
-       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small">' . $lead->getSecondaryIdentifier() . '</span></div>');
+       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
