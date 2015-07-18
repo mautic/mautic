@@ -87,11 +87,19 @@ $container->setParameter('mautic.bundles', $setBundles);
 $container->setParameter('mautic.addon.bundles', $setAddonBundles);
 unset($setBundles, $setAddonBundles);
 
-
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
 $engines = ($container->getParameter('kernel.environment') == 'dev') ? array('php', 'twig') : array('php');
+
+if (isset($_COOKIE['mautic_session_name'])) {
+    // Attempt to keep from losing sessions if cache is cleared through UI
+    $sessionName = $_COOKIE['mautic_session_name'];
+} else {
+    $paths       = $container->getParameter('mautic.paths');
+    $sessionName = md5($paths['local_config']);
+}
+
 $container->loadFromExtension('framework', array(
     'secret'               => '%mautic.secret_key%',
     'router'               => array(
@@ -120,7 +128,7 @@ $container->loadFromExtension('framework', array(
     'trusted_proxies'      => '%mautic.trusted_proxies%',
     'session'              => array( //handler_id set to null will use default session handler from php.ini
         'handler_id' => null,
-        'name'       => md5(dirname($_SERVER['SCRIPT_NAME'])),
+        'name'       => $sessionName,
     ),
     'fragments'            => null,
     'http_method_override' => true,
