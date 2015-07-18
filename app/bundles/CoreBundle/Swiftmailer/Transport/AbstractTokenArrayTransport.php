@@ -176,6 +176,11 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
             }
         }
 
+        $returnPath = $this->message->getReturnPath();
+        if (!empty($returnPath)) {
+            $message['returnPath'] = $returnPath;
+        }
+
         // Attachments
         $children    = $this->message->getChildren();
         $attachments = array();
