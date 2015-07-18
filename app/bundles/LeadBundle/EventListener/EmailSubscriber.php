@@ -80,9 +80,7 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        if ($this->factory->getSecurity()->isAnonymous()) {
-            $this->onEmailGenerate($event);
-        } //else this is a user previewing so leave lead fields tokens in place
+        $this->onEmailGenerate($event);
     }
 
     /**
