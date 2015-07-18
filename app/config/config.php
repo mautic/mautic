@@ -97,7 +97,8 @@ if (isset($_COOKIE['mautic_session_name'])) {
     $sessionName = $_COOKIE['mautic_session_name'];
 } else {
     $paths       = $container->getParameter('mautic.paths');
-    $sessionName = md5($paths['local_config']);
+    $key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+    $sessionName = md5(md5($paths['local_config']).$key);
 }
 
 $container->loadFromExtension('framework', array(
