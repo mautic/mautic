@@ -357,7 +357,8 @@ class EmailController extends FormController
         }
 
         // Prepare stats for bargraph
-        $stats = ($email->getEmailType() == 'template') ? $model->getEmailGeneralStats($email->getId()) : $model->getEmailListStats($email);
+        $variant = ($parent && $parent === $email);
+        $stats   = ($email->getEmailType() == 'template') ? $model->getEmailGeneralStats($email, $variant) : $model->getEmailListStats($email, $variant);
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());

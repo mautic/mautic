@@ -115,8 +115,8 @@ if (count($items)):
                     <?php if ($type == 'list'): ?>
                     <span class="mt-xs label label-info"><?php echo $view['translator']->trans('mautic.email.stat.leadcount', array('%count%' => $model->getPendingLeads($item, null, true))); ?></span>
                     <?php endif; ?>
-                    <span class="mt-xs label label-warning"><?php echo $view['translator']->trans('mautic.email.stat.sentcount', array('%count%' => $item->getSentCount())); ?></span>
-                    <span class="mt-xs label label-success"><?php echo $view['translator']->trans('mautic.email.stat.readcount', array('%count%' => $item->getReadCount())); ?></span>
+                    <span class="mt-xs label label-warning"><?php echo $view['translator']->trans('mautic.email.stat.sentcount', array('%count%' => $item->getSentCount(true))); ?></span>
+                    <span class="mt-xs label label-success"><?php echo $view['translator']->trans('mautic.email.stat.readcount', array('%count%' => $item->getReadCount(true))); ?></span>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>

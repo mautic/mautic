@@ -128,8 +128,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
            <?php echo $view->render('MauticEmailBundle:Email:' . $emailType . '_graph.html.php',
                array(
-                   'stats' => $stats,
-                   'email' => $email
+                   'stats'        => $stats,
+                   'email'        => $email,
+                   'showVariants' => $showVariants,
+                   'isVariant'    => $isVariant
                )
            ); ?>
 
