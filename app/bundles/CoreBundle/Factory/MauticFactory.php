@@ -389,16 +389,14 @@ class MauticFactory
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
         } elseif ($name == 'images') {
-            $session  = $this->getSession();
-            $imageDir = $session->get('mautic.imagepath');
+            $imageDir = $this->getParameter('image_path');
             if (substr($imageDir, -1) === '/') {
-                $imageDir = substr(0, -1, $imageDir);
+                $imageDir = substr($imageDir, 0, -1);
             }
 
-            $path = $imageDir;
-
+            return ($fullPath)  ? $paths['local_root'] . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
-                $path = $paths[$name];
+            $path = $paths[$name];
         } else {
             throw new \InvalidArgumentException("$name does not exist.");
         }
@@ -654,7 +652,9 @@ class MauticFactory
     /**
      * Get Symfony's logger
      *
-     * @return \Symfony\Bridge\Monolog\Logger
+     * @param bool|false $system
+     *
+     * @return object
      */
     public function getLogger($system = false)
     {
