@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -76,13 +76,8 @@ class MauticFactory
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
 
-            // @deprecated support for addon in 1.1.4; to be removed in 2.0
             if ($parts[0] == 'addon' && $parts[1] != 'addon') {
-                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
                 $namespace = 'MauticAddon';
-                array_shift($parts);
-            } elseif ($parts[0] == 'plugin' && $parts[1] != 'plugin') {
-                $namespace = 'MauticPlugin';
                 array_shift($parts);
             } else {
                 $namespace = 'Mautic';
@@ -93,6 +88,7 @@ class MauticFactory
             }
 
             $modelClass = '\\'.$namespace.'\\'.ucfirst($parts[0]).'Bundle\\Model\\'.ucfirst($parts[1]).'Model';
+
             if (!class_exists($modelClass)) {
                 throw new NotAcceptableHttpException($name." is not an acceptable model name.");
             }
@@ -235,16 +231,7 @@ class MauticFactory
      */
     public function getTranslator()
     {
-        /** @var \Mautic\CoreBundle\Translation\Translator $translator */
-        $translator = $this->container->get('translator');
-
-        if ($translator->getLocale() === null) {
-            $translator->setLocale(
-                $this->getParameter('locale')
-            );
-        }
-
-        return $translator;
+        return $this->container->get('translator');
     }
 
     /**
@@ -395,33 +382,26 @@ class MauticFactory
     {
         $paths = $this->getParameter('paths');
 
-        if ($name == 'currentTheme' || $name == 'current_theme') {
+        if ($name == 'currentTheme') {
             $theme = $this->getParameter('theme');
             $path  = $paths['themes']."/$theme";
         } elseif ($name == 'cache' || $name == 'log') {
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
         } elseif ($name == 'images') {
-            $path = $this->getParameter('image_path');
-            if (substr($path, -1) === '/') {
-                $path = substr($path, 0, -1);
+            $imageDir = $this->getParameter('image_path');
+            if (substr($imageDir, -1) === '/') {
+                $imageDir = substr($imageDir, 0, -1);
             }
+
+            return ($fullPath)  ? $paths['local_root'] . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
-        } elseif (strpos($name, '_root') !== false) {
-            // Assume system root if one is not set specifically
-            $path = $paths['root'];
         } else {
             throw new \InvalidArgumentException("$name does not exist.");
         }
 
-        if ($fullPath) {
-            $rootPath = (!empty($paths[$name . '_root'])) ? $paths[$name . '_root'] : $paths['root'];
-
-            return $rootPath . '/' . $path;
-        }
-
-        return $path;
+        return ($fullPath) ? $paths['root'].'/'.$path : $path;
     }
 
     /**
@@ -606,13 +586,7 @@ class MauticFactory
                 if (strpos($ip, ',') !== false) {
                     // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
                     $ips = explode(',', $ip);
-                    array_walk($ips, create_function('&$val', '$val = trim($val);'));
-
-                    if ($internalIps = $this->getParameter('do_not_track_internal_ips')) {
-                        $ips = array_diff($ips, $internalIps);
-                    }
-
-                    $ip = end($ips);
+                    $ip  = end($ips);
                 }
 
                 return trim($ip);
@@ -646,58 +620,17 @@ class MauticFactory
         if (empty($ipAddress[$ip])) {
             $repo      = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
-            $saveIp    = ($ipAddress === null);
 
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress($ip);
+                $ipAddress->setIpAddress($ip, $this->getSystemParameters());
+                $repo->saveEntity($ipAddress);
             }
 
             // Ensure the do not track list is inserted
-            $doNotTrack  = $this->getParameter('do_not_track_ips', array());
-            $internalIps = $this->getParameter('do_not_track_internal_ips', array());
-            $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
-            $ipAddress->setDoNotTrackList($doNotTrack);
-
-            $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']))  {
-                // Get the IP lookup service
-                if ($ipService = $this->getParameter('ip_lookup_service')) {
-                    // Find the service class
-                    $bundles = $this->getMauticBundles(true);
-
-                    foreach ($bundles as $bundle) {
-                        if (!empty($bundle['config']['ip_lookup_services'][$ipService])) {
-                            $class = $bundle['config']['ip_lookup_services'][$ipService]['class'];
-                            if (substr($class, 0, 1) !== '\\') {
-                                $class = '\\' . $class;
-                            }
-
-                            /** @var \Mautic\CoreBundle\IpLookup\AbstractIpLookup $lookupClass */
-                            $lookupClass = new $class($ip, $this->getParameter('ip_lookup_auth'), $this->getLogger());
-
-                            // Fetch the data
-                            $lookupClass->getData();
-
-                            // Get and set the details
-                            $details = get_object_vars($lookupClass);
-                            $ipAddress->setIpDetails($details);
-
-                            // Save new details
-                            $saveIp = true;
-
-                            unset($lookupClass);
-
-                            break;
-                        }
-                    }
-
-                    unset($bundles);
-                }
-            }
-
-            if ($saveIp) {
-                $repo->saveEntity($ipAddress);
+            $doNotTrack = $this->getParameter('do_not_track_ips');
+            if (!empty($doNotTrack)) {
+                $ipAddress->setDoNotTrackList($doNotTrack);
             }
 
             $ipAddresses[$ip] = $ipAddress;
@@ -721,7 +654,7 @@ class MauticFactory
      *
      * @param bool|false $system
      *
-     * @return \Monolog\Logger
+     * @return object
      */
     public function getLogger($system = false)
     {
@@ -766,29 +699,17 @@ class MauticFactory
     /**
      * Get's an array of details for Mautic core bundles
      *
-     * @param bool|false $includePlugins
-     *
-     * @return array|mixed
+     * @return mixed
      */
-    public function getMauticBundles($includePlugins = false)
+    public function getMauticBundles($includeAddons = false)
     {
         $bundles = $this->container->getParameter('mautic.bundles');
-        if ($includePlugins) {
-            $plugins  = $this->container->getParameter('mautic.plugin.bundles');
-            $bundles = array_merge($bundles, $plugins);
+        if ($includeAddons) {
+            $addons  = $this->container->getParameter('mautic.addon.bundles');
+            $bundles = array_merge($bundles, $addons);
         }
 
         return $bundles;
-    }
-
-    /**
-     * Get's an array of details for enabled Mautic plugins
-     *
-     * @return array
-     */
-    public function getPluginBundles()
-    {
-        return $this->getKernel()->getPluginBundles();
     }
 
     /**
@@ -796,15 +717,15 @@ class MauticFactory
      *
      * @param        $bundleName
      * @param string $configKey
-     * @param bool   $includePlugins
+     * @param bool   $includeAddons
      *
      * @return mixed
      * @throws \Exception
      */
-    public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)
+    public function getBundleConfig($bundleName, $configKey = '', $includeAddons = false)
     {
         // get the configs
-        $configFiles = $this->getMauticBundles($includePlugins);
+        $configFiles = $this->getMauticBundles($includeAddons);
 
         // if no bundle name specified we throw
         if (!$bundleName) {
@@ -831,6 +752,16 @@ class MauticFactory
 
         // we didn't throw so we can send the key value
         return $bundleConfig[$configKey];
+    }
+
+    /**
+     * Get's an array of details for enabled Mautic addons
+     *
+     * @return array
+     */
+    public function getEnabledAddons()
+    {
+        return $this->getKernel()->getAddonBundles();
     }
 
     /**
