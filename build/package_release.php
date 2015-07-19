@@ -15,13 +15,18 @@
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
-$args            = getopt('b', array('repackage'));
+$args            = getopt('b::', array('repackage'));
 $versionLocation = (isset($args['b'])) ? ' ' : ' tags/';
 
 // We need the version number so get the app kernel
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/app/AppKernel.php';
-$version = AppKernel::MAJOR_VERSION . '.' . AppKernel::MINOR_VERSION . '.' . AppKernel::PATCH_VERSION . AppKernel::EXTRA_VERSION;
+
+if (!empty($args['b'])) {
+    $version = $args['b'];
+} else {
+    $version = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
+}
 
 if (!isset($args['repackage'])) {
     // Preparation - Remove previous packages

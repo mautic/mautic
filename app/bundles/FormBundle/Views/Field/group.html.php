@@ -51,13 +51,14 @@ HTML;
 $options = array();
 foreach ($list as $l):
 
-$id      = $field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($l);
-$checked = ($field['defaultValue'] == $l) ? 'checked="checked"' : '';
+$id               = $field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($l);
+$checked          = ($field['defaultValue'] == $l) ? 'checked="checked"' : '';
+$checkboxBrackets = ($type == 'checkbox') ? '[]' : '';
 
 $option  = <<<HTML
 
                     <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>
-                        <input {$inputAttr}{$checked} id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($l)}" />
+                        <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($l)}" />
                         {$view->escape($l)}
                     </label>
 HTML;

@@ -38,7 +38,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 3;
 
     /**
      * Extra version identifier
@@ -63,11 +63,6 @@ class AppKernel extends Kernel
 
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
             define('MAUTIC_INSTALLER', 1);
-        } else {
-            //set the table prefix before boot
-            $localParams = $this->getLocalParams();
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
-            define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
         if (false === $this->booted) {
@@ -106,9 +101,9 @@ class AppKernel extends Kernel
                 error_log($e);
                 throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException(
                     $this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
-                        '%code%' => $e->getCode()
-                    )
-                ));
+                            '%code%' => $e->getCode()
+                        )
+                    ));
             }
         }
 
@@ -192,6 +187,11 @@ class AppKernel extends Kernel
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
         }
 
+        // Check for local bundle inclusion
+        if (file_exists(__DIR__ .'/config/bundles_local.php')) {
+            include __DIR__ . '/config/bundles_local.php';
+        }
+
         return $bundles;
     }
 
@@ -204,6 +204,13 @@ class AppKernel extends Kernel
             return;
         }
 
+        if (!defined('MAUTIC_INSTALLER') && !defined('MAUTIC_TABLE_PREFIX')) {
+            //set the table prefix before boot
+            $localParams = $this->getLocalParams();
+            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            define('MAUTIC_TABLE_PREFIX', $prefix);
+        }
+
         if ($this->loadClassCache) {
             $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
         }
@@ -213,6 +220,13 @@ class AppKernel extends Kernel
 
         // init container
         $this->initializeContainer();
+
+        // If in console, set the table prefix since handle() is not executed
+        if (defined('IN_MAUTIC_CONSOLE') && !defined('MAUTIC_TABLE_PREFIX')) {
+            $localParams = $this->getLocalParams();
+            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            define('MAUTIC_TABLE_PREFIX', $prefix);
+        }
 
         $registeredAddonBundles = $this->container->getParameter('mautic.addon.bundles');
 
@@ -329,9 +343,11 @@ class AppKernel extends Kernel
     /**
      * @param array $params
      *
-     * @return bool|\Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Connection
+     * @throws Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    private function getDatabaseConnection($params = array())
+    public function getDatabaseConnection($params = array())
     {
         if (empty($params)) {
             $params = $this->getLocalParams();
@@ -395,7 +411,7 @@ class AppKernel extends Kernel
      *
      * @return array
      */
-    private function getLocalParams()
+    public function getLocalParams()
     {
         static $localParameters;
 
@@ -426,7 +442,7 @@ class AppKernel extends Kernel
     /**
      * Get local config file
      *
-     * @param $checkExists If true, then return false if the file doesn't exist
+     * @param bool $checkExists If true, then return false if the file doesn't exist
      *
      * @return bool
      */

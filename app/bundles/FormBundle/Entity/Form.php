@@ -157,6 +157,8 @@ class Form extends FormEntity
     public function __clone()
     {
         $this->id = null;
+
+        parent::__clone();
     }
 
     /**
@@ -433,7 +435,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Add fields
+     * Add a field
      *
      * @param       $key
      * @param Field $field
@@ -451,13 +453,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove fields
+     * Remove a field
      *
-     * @param Field $fields
+     * @param       $key
+     * @param Field $field
      */
-    public function removeField(Field $fields)
+    public function removeField($key, Field $field)
     {
-        $this->fields->removeElement($fields);
+        if ($changes = $field->getChanges()) {
+            $this->isChanged('fields', array($key, $changes));
+        }
+        $this->fields->removeElement($field);
     }
 
     /**

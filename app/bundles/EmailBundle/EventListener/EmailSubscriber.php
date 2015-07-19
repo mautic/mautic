@@ -13,6 +13,7 @@ use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\EmailEvents;
 /**
@@ -80,7 +81,6 @@ class EmailSubscriber extends CommonSubscriber
      * Process if an email has failed
      *
      * @param MauticEvents\EmailEvent $event
-     * @param string                  $reason
      */
     public function onEmailFailed(MauticEvents\EmailEvent $event)
     {
@@ -92,7 +92,7 @@ class EmailSubscriber extends CommonSubscriber
 
             if ($stat !== null) {
                 $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.failed', array(
-                    "%subject%" => $message->getSubject()
+                    "%subject%" => EmojiHelper::toShort($message->getSubject())
                 ));
                 $model->setDoNotContact($stat, $reason);
             }
@@ -118,7 +118,7 @@ class EmailSubscriber extends CommonSubscriber
                 if (true || $retries > 3) {
                     //tried too many times so just fail
                     $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.retries', array(
-                        "%subject%" => $message->getSubject()
+                        "%subject%" => EmojiHelper::toShort($message->getSubject())
                     ));
                     $model->setDoNotContact($stat, $reason);
                 } else {

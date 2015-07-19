@@ -81,7 +81,7 @@ class LeadSubscriber extends CommonSubscriber
                     $removeLeads = array();
                     foreach ($leads as $l) {
                         $lists = (isset($leadLists[$l])) ? $leadLists[$l] : array();
-                        if (array_intersect($lists, $campaignLists[$c['id']])) {
+                        if (array_intersect(array_keys($lists), $campaignLists[$c['id']])) {
                             continue;
                         } else {
                             $removeLeads[] = $l;

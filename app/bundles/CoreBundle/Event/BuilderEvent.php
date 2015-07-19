@@ -322,8 +322,13 @@ class BuilderEvent extends Event
         $allowVisualPlaceholder = false,
         $convertToLinks = false
     ) {
+    	$tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
+		if ( $tokens == null ) {
+			$tokens = array();
+		}
+		
         $this->addTokens(
-            $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn),
+        	$tokens,
             $allowVisualPlaceholder,
             $convertToLinks
         );

@@ -59,13 +59,17 @@ return array(
             'mautic_mailer_transport_callback' => array(
                 'path'         => '/mailer/{transport}/callback',
                 'controller'   => 'MauticEmailBundle:Public:mailerCallback'
+            ),
+            'mautic_email_preview' => array(
+                'path'       => '/email/preview/{objectId}',
+                'controller' => 'MauticEmailBundle:Public:preview'
             )
         )
     ),
 
     'menu'     => array(
         'main' => array(
-            'priority' => 6,
+            'priority' => 15,
             'items'    => array(
                 'mautic.email.emails' => array(
                     'id'        => 'mautic_email_root',

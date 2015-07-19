@@ -66,7 +66,7 @@ class FormController extends CommonFormController
 
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
@@ -225,7 +225,8 @@ class FormController extends CommonFormController
                     'submissionsInTime' => $timeStats,
                 ),
                 'activeFormActions' => $activeFormActions,
-                'activeFormFields'  => $activeFormFields
+                'activeFormFields'  => $activeFormFields,
+                'formContent'  => htmlspecialchars($model->getContent($activeForm), ENT_QUOTES, "UTF-8")
             ),
             'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
             'passthroughVars' => array(
@@ -487,6 +488,7 @@ class FormController extends CommonFormController
                         $valid = false;
                     } else {
                         $model->setFields($entity, $fields);
+                        $model->deleteFields($entity, $deletedFields);
 
                         //save the form first so that new fields are available to actions
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -603,6 +605,9 @@ class FormController extends CommonFormController
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
+
+            $session->set('mautic.form.'.$objectId.'.fields.leadfields', $usedLeadFields);
+
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
@@ -748,9 +753,16 @@ class FormController extends CommonFormController
         ))  {
             $html = '<h1>' . $this->get('translator')->trans('mautic.core.error.accessdenied', array(), 'flashes') . '</h1>';
         } else {
-            $html = $form->getCachedHtml();
+            $html = $model->getContent($form);
         }
+
         $model->populateValuesWithGetParameters($form, $html);
+
+        $viewParams = array(
+            'content'     => $html,
+            'stylesheets' => array(),
+            'name'        => $form->getName()
+        );
 
         $template = $form->getTemplate();
         if (!empty($template)) {
@@ -760,25 +772,14 @@ class FormController extends CommonFormController
                 if (in_array('form', $config['features'])) {
                     $template = $theme->getTheme();
                 } else {
-                    $templateNotFound = true;
+                    $template = null;
                 }
-            }
-
-            if (empty($templateNotFound)) {
-                $viewParams = array(
-                    'template' => $template,
-                    'content'  => $html,
-                );
-
-                return $this->render('MauticFormBundle::form.html.php', $viewParams);
             }
         }
 
-        $response = new Response();
-        $response->setContent('<html><head><title>' . $form->getName() . '</title></head><body>' . $html . '</body></html>');
-        $response->setStatusCode(Response::HTTP_OK);
-        $response->headers->set('Content-Type', 'text/html');
-        return $response;
+        $viewParams['template'] = $template;
+
+        return $this->render('MauticFormBundle::form.html.php', $viewParams);
     }
 
     /**

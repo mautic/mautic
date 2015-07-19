@@ -84,7 +84,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 7,
+            'priority' => 20,
             'items'    => array(
                 'mautic.form.forms' => array(
                     'id'        => 'mautic_form_root',

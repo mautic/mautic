@@ -13,6 +13,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.removePlugins = 'flash,forms,iframe';
 
     config.enterMode = CKEDITOR.ENTER_P;
+    config.fillEmptyBlocks = false;
     config.filebrowserImageBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images';
 
     config.toolbar =

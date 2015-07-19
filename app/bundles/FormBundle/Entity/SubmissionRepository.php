@@ -166,7 +166,9 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', $id);
             $results = $q->execute()->fetchAll();
             unset($results[0]['submission_id']);
-            $entity->setResults($results[0]);
+            if (isset($results[0])) {
+                $entity->setResults($results[0]);
+            }
         }
 
         return $entity;

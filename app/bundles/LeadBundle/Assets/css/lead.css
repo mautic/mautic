@@ -107,3 +107,19 @@ ul.tag-cloud li {
     background-color: #faf2cc;
     border: 3px solid #4e5d9d !important;
 }
+
+.lead-avatar-panel {
+    position: relative;
+}
+
+.lead-avatar-panel .avatar-collapser a.arrow {
+    position: absolute;
+    top:0;
+    right: 0px;
+    margin: 0 3px 0 0;
+    padding: 0 10px;
+}
+
+.lead-avatar-panel .img-responsive {
+    min-width: 100%;
+}

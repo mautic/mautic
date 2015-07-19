@@ -122,7 +122,7 @@ class FormModel extends CommonFormModel
      * @param Form $entity
      * @param      $sessionFields
      */
-    public function setFields(Form &$entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields)
     {
         $order          = 1;
         $existingFields = $entity->getFields();
@@ -159,9 +159,26 @@ class FormModel extends CommonFormModel
 
     /**
      * @param Form $entity
+     * @param      $sessionFields
+     */
+    public function deleteFields(Form $entity, $sessionFields)
+    {
+        if (empty($sessionFields)) {
+            return;
+        }
+        $existingFields = $entity->getFields();
+        foreach ($sessionFields as $fieldId) {
+            if (isset($existingFields[$fieldId])) {
+                $entity->removeField($fieldId, $existingFields[$fieldId]);
+            }
+        }
+    }
+
+    /**
+     * @param Form $entity
      * @param      $sessionActions
      */
-    public function setActions(Form &$entity, $sessionActions, $sessionFields)
+    public function setActions(Form $entity, $sessionActions)
     {
         $order   = 1;
         $existingActions = $entity->getActions();
@@ -228,10 +245,30 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Obtains the cached HTML of a form and generates it if missing
+     *
+     * @param Form $form
+     *
+     * @return string
+     */
+    public function getContent(Form $form)
+    {
+        $cachedHtml = $form->getCachedHtml();
+
+        if (empty($cachedHtml)) {
+            $cachedHtml = $this->generateHtml($form);
+        }
+
+        return $cachedHtml;
+    }
+
+    /**
      * Generate the form's html
      *
      * @param Form $entity
      * @param bool $persist
+     *
+     * @return string
      */
     public function generateHtml(Form $entity, $persist = true)
     {
@@ -257,6 +294,8 @@ class FormModel extends CommonFormModel
             //bypass model function as events aren't needed for this
             $this->getRepository()->saveEntity($entity);
         }
+
+        return $html;
     }
 
     /**
@@ -389,7 +428,7 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $form->getCachedHtml();
+        $html = $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
         $search  = array("\n", '"');

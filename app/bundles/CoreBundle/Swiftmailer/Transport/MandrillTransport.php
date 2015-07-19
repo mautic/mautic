@@ -159,6 +159,14 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                                 )
                             );
 
+                            // If CC and BCC, remove the ct from URLs to prevent false lead tracking
+                            foreach ($ccMergeVars as &$var) {
+                                if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
+                                    // URL so make sure a ct query is not part of it
+                                    $var['content'] = substr($var['content'], 0, $ctPos);
+                                }
+                            }
+
                             // Send same tokens to each CC
                             if (!empty($cc)) {
                                 foreach ($cc as $ccRcpt) {
@@ -260,19 +268,36 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      */
     protected function handlePostResponse($response, $info)
     {
-        $response = json_decode($response, true);
+        $parsedResponse = '';
+        $response       = json_decode($response, true);
+
+        if ($response === false) {
+            $parsedResponse = $response;
+        }
 
         $return = array();
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
-                throw new \Swift_TransportException($response['message']);
-            }
-
-            foreach ($response as $stat) {
-                if (in_array($stat['status'], array('rejected', 'invalid'))) {
-                    $return[] = $stat['email'];
+                $parsedResponse = $response['message'];
+                $error          = true;
+            } else {
+                foreach ($response as $stat) {
+                    if (in_array($stat['status'], array('rejected', 'invalid'))) {
+                        $return[]       = $stat['email'];
+                        $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
+                    }
                 }
             }
+        }
+
+        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
+            $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
+        }
+
+        if ($response === false) {
+            $this->throwException('Unexpected response');
+        } elseif (!empty($error)) {
+            $this->throwException('Mandrill error');
         }
 
         return $return;

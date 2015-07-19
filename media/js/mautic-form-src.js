@@ -120,29 +120,35 @@
                 if (typeof data == 'undefined') {
                     data = null;
                 }
-                MauticFormCallback[formId][event](data);
+                return MauticFormCallback[formId][event](data);
             }
+
+            return null;
         };
 
         Form.validator = function(formId) {
             var validator = {
                 validateForm: function () {
-                    Form.customCallbackHandler(formId, 'onValidateStart');
-
-                    validator.disableSubmitButton();
-
-                    // Remove success class if applicable
-                    var formContainer = document.getElementById('mauticform_wrapper_' + formId);
-                    if (formContainer) {
-                        formContainer.className = formContainer.className.replace(" mauticform-post-success", "");
+                    // Check to see if the iframe exists
+                    if (!document.getElementById('mauticiframe_' + formId) && document.getElementById('mauticform_' + formId + '_messenger')) {
+                        // Likely an editor has stripped out the iframe so let's dynmamically create it
+                        var ifrm = document.createElement("IFRAME");
+                        ifrm.style.display = "none";
+                        ifrm.style.margin = 0;
+                        ifrm.style.padding = 0;
+                        ifrm.style.border = "none";
+                        ifrm.style.width = 0;
+                        ifrm.style.heigh = 0;
+                        ifrm.setAttribute('id', 'mauticiframe_' + formId);
+                        ifrm.setAttribute('name', 'mauticiframe_' + formId);
+                        document.body.appendChild(ifrm);
                     }
 
-                    validator.setMessage('', 'message');
-                    validator.setMessage('', 'error');
-
-                    var formValid = true;
-
                     function validateOptions(elOptions) {
+                        if (typeof elOptions === 'undefined') {
+                            return;
+                        }
+
                         var optionsValid = false;
 
                         if (elOptions.length == undefined) {
@@ -166,41 +172,64 @@
                         return valid;
                     }
 
-                    var elId   = 'mauticform_' + formId;
-                    var elForm = document.getElementById(elId);
+                    var formValid = Form.customCallbackHandler(formId, 'onValidate');
 
-                    // Find each required element
-                    for (var fieldKey in MauticFormValidations[formId]) {
-                        var field = MauticFormValidations[formId][fieldKey];
-                        var name  = 'mauticform[' + field.name + ']';
-                        switch (field.type) {
-                            case 'radiogrp':
-                            case 'checkboxgrp':
-                                var elOptions = elForm.elements[name];
-                                var valid = validateOptions(elOptions);
-                                break;
+                    // If true, then a callback handled it
+                    if (formValid === null) {
+                        Form.customCallbackHandler(formId, 'onValidateStart');
 
-                            case 'email':
-                                var valid = validateEmail(elForm.elements[name].value);
-                                break;
+                        validator.disableSubmitButton();
 
-                            default:
-                                var valid = (elForm.elements[name].value != '')
-                                break;
+                        // Remove success class if applicable
+                        var formContainer = document.getElementById('mauticform_wrapper_' + formId);
+                        if (formContainer) {
+                            formContainer.className = formContainer.className.replace(" mauticform-post-success", "");
                         }
 
-                        if (!valid) {
-                            validator.markError('mauticform_' + fieldKey, valid);
-                            formValid = false;
+                        validator.setMessage('', 'message');
+                        validator.setMessage('', 'error');
 
-                            validator.enableSubmitButton();
-                        } else {
-                            validator.clearError('mauticform_' + fieldKey);
+                        var formValid = true;
+                        var elId      = 'mauticform_' + formId;
+                        var elForm    = document.getElementById(elId);
+
+                        // Find each required element
+                        for (var fieldKey in MauticFormValidations[formId]) {
+                            var field = MauticFormValidations[formId][fieldKey];
+                            var name = 'mauticform[' + field.name + ']';
+                            switch (field.type) {
+                                case 'radiogrp':
+                                    var elOptions = elForm.elements[name];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+
+                                case 'checkboxgrp':
+                                    var elOptions = elForm.elements[name + '[]'];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+
+                                case 'email':
+                                    var valid = validateEmail(elForm.elements[name].value);
+                                    break;
+
+                                default:
+                                    var valid = (elForm.elements[name].value != '')
+                                    break;
+                            }
+
+                            if (!valid) {
+                                validator.markError('mauticform_' + fieldKey, valid);
+                                formValid = false;
+
+                                validator.enableSubmitButton();
+                            } else {
+                                validator.clearError('mauticform_' + fieldKey);
+                            }
                         }
-                    }
 
-                    if (formValid) {
-                        document.getElementById(elId + '_return').value = document.URL;
+                        if (formValid) {
+                            document.getElementById(elId + '_return').value = document.URL;
+                        }
                     }
 
                     Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
@@ -209,9 +238,24 @@
                 },
 
                 markError: function(containerId, valid, validationMessage) {
+                    var elErrorSpan = false;
+                    var callbackValidationMessage = validationMessage;
                     var elContainer = document.getElementById(containerId);
                     if (elContainer) {
-                        var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                        elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                        if (typeof validationMessage == 'undefined' && elErrorSpan) {
+                            callbackValidationMessage = elErrorSpan.innerHTML;
+                        }
+                    }
+
+                    var callbackData = {
+                        containerId: containerId,
+                        valid: valid,
+                        validationMessage: callbackValidationMessage
+                    };
+
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onErrorMark', callbackData)) {
                         if (elErrorSpan) {
                             if (typeof validationMessage !== 'undefined') {
                                 elErrorSpan.innerHTML = validationMessage;
@@ -233,86 +277,105 @@
                 },
 
                 clearError: function(containerId) {
-                    var elContainer = document.getElementById(containerId);
-                    if (elContainer) {
-                        var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
-                        if (elErrorSpan) {
-                            elErrorSpan.style.display = 'none';
-                            elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onErrorClear', containerId)) {
+                        var elContainer = document.getElementById(containerId);
+                        if (elContainer) {
+                            var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                            if (elErrorSpan) {
+                                elErrorSpan.style.display = 'none';
+                                elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
+                            }
                         }
                     }
                 },
 
                 parseFormResponse: function (response) {
-                    Form.customCallbackHandler(formId, 'onResponse', response);
+                    // If true, a callback handled response parsing
+                    if (!Form.customCallbackHandler(formId, 'onResponse', response)) {
 
-                    if (response.download) {
-                        // Hit the download in the iframe
-                        document.getElementById('mauticiframe_' + formId).src = response.download;
+                        Form.customCallbackHandler(formId, 'onResponseStart', response);
+                        if (response.download) {
+                            // Hit the download in the iframe
+                            document.getElementById('mauticiframe_' + formId).src = response.download;
 
-                        // Register a callback for a redirect
-                        if (response.redirect) {
-                            setTimeout(function () {
-                                window.location = response.redirect;
-                            }, 2000);
+                            // Register a callback for a redirect
+                            if (response.redirect) {
+                                setTimeout(function () {
+                                    window.location = response.redirect;
+                                }, 2000);
+                            }
+                        } else if (response.redirect) {
+                            window.location = response.redirect;
+                        } else if (response.validationErrors) {
+                            for (var field in response.validationErrors) {
+                                this.markError('mauticform_' + field, false, response.validationErrors[field]);
+                            }
+                        } else if (response.errorMessage) {
+                            this.setMessage(response.errorMessage, 'error');
                         }
-                    } else if (response.redirect) {
-                        window.location = response.redirect;
-                    } else if (response.validationErrors) {
-                        for (var field in response.validationErrors) {
-                            this.markError('mauticform_' + field, false, response.validationErrors[field]);
+
+                        if (response.success) {
+                            if (response.successMessage) {
+                                this.setMessage(response.successMessage, 'message');
+                            }
+
+                            // Add a post success class
+                            var formContainer = document.getElementById('mauticform_wrapper_' + formId);
+                            if (formContainer) {
+                                formContainer.className = formContainer.className + " mauticform-post-success";
+                            }
+
+                            // Reset the form
+                            this.resetForm();
                         }
-                    } else if (response.errorMessage) {
-                        this.setMessage(response.errorMessage, 'error');
+
+                        validator.enableSubmitButton();
+
+                        Form.customCallbackHandler(formId, 'onResponseEnd', response);
                     }
-;
-                    if (response.success) {
-                        if (response.successMessage) {
-                            this.setMessage(response.successMessage, 'message');
-                        }
-
-                        // Add a post success class
-                        var formContainer = document.getElementById('mauticform_wrapper_' + formId);
-                        if (formContainer) {
-                            formContainer.className = formContainer.className + " mauticform-post-success";
-                        }
-
-                        // Reset the form
-                        this.resetForm();
-                    }
-
-                    validator.enableSubmitButton();
                 },
 
                 setMessage: function (message, type) {
-                    var container = document.getElementById('mauticform_' + formId + '_' + type);
-                    if (container) {
-                        container.innerHTML = message;
-                    } else if (message) {
-                        alert(message);
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onMessageSet', {message: message, type: type})) {
+                        var container = document.getElementById('mauticform_' + formId + '_' + type);
+                        if (container) {
+                            container.innerHTML = message;
+                        } else if (message) {
+                            alert(message);
+                        }
                     }
                 },
 
                 resetForm: function () {
+
                     this.clearErrors();
 
                     document.getElementById('mauticform_' + formId).reset();
                 },
 
                 disableSubmitButton: function() {
-                    var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
-                    if(submitButton) {
-                        MauticLang.submitMessage = submitButton.innerHTML;
-                        submitButton.innerHTML   = MauticLang.submittingMessage;
-                        submitButton.disabled    = 'disabled';
+                    // If true, then a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onSubmitButtonDisable')) {
+                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+
+                        if (submitButton) {
+                            MauticLang.submitMessage = submitButton.innerHTML;
+                            submitButton.innerHTML = MauticLang.submittingMessage;
+                            submitButton.disabled = 'disabled';
+                        }
                     }
                 },
 
                 enableSubmitButton: function() {
-                    var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
-                    if(submitButton) {
-                        submitButton.innerHTML = MauticLang.submitMessage;
-                        submitButton.disabled  = '';
+                    // If true, then a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onSubmitButtonEnable')) {
+                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+                        if (submitButton) {
+                            submitButton.innerHTML = MauticLang.submitMessage;
+                            submitButton.disabled = '';
+                        }
                     }
                 }
             };

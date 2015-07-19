@@ -160,7 +160,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
         $info     = curl_getinfo($ch);
 
         if(curl_error($ch)) {
-            throw new \Swift_TransportException("API call to $endpoint failed: " . curl_error($ch));
+            $this->throwException("API call to $endpoint failed: " . curl_error($ch));
         }
 
         curl_close($ch);

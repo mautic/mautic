@@ -24,12 +24,13 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
  */
 class BuilderSubscriber extends CommonSubscriber
 {
-    private $pageTokenRegex     = '{pagelink=(.*?)}';
+    private $pageTokenRegex = '{pagelink=(.*?)}';
     private $externalTokenRegex = '{externallink=(.*?)}';
-    private $trackedTokenRegex  = '{trackedlink=(.*?)}';
-    private $langBarRegex       = '{langbar}';
-    private $shareButtonsRegex  = '{sharebuttons}';
-    private $emailTrackedLinks  = array();
+    private $trackedTokenRegex = '{trackedlink=(.*?)}';
+    private $langBarRegex = '{langbar}';
+    private $shareButtonsRegex = '{sharebuttons}';
+    private $emailTrackedLinks = array();
+    private $emailIsInternalSend = false;
 
     /**
      * {@inheritdoc}
@@ -40,7 +41,6 @@ class BuilderSubscriber extends CommonSubscriber
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
             PageEvents::PAGE_ON_BUILD     => array('onPageBuild', 0),
             EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-
             // Make sure these are last priority in order to catch all links
             EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', -254),
             EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', -254)
@@ -269,21 +269,23 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content = $event->getContent();
-        $source  = $event->getSource();
-        $email   = $event->getEmail();
+        $content      = $event->getContent();
+        $source       = $event->getSource();
+        $email        = $event->getEmail();
+        $clickthrough = array();
 
-        $clickthrough = array(
-            //what entity is sending the email?
-            'source' => $source,
-            //the email being sent to be logged in page hit if applicable
-            'email'  => ($email != null) ? $email->getId() : null
-        );
-        $lead         = $event->getLead();
-        if ($lead !== null) {
-            $clickthrough['lead'] = $lead['id'];
+        if (!$event->isInternalSend()) {
+            $clickthrough = array(
+                //what entity is sending the email?
+                'source' => $source,
+                //the email being sent to be logged in page hit if applicable
+                'email'  => ($email != null) ? $email->getId() : null
+            );
+            $lead         = $event->getLead();
+            if ($lead !== null) {
+                $clickthrough['lead'] = $lead['id'];
+            }
         }
-
 
         $tokens = $this->generateUrlTokens($content, $clickthrough, (($email === null) ? 0 : $email->getId()), $email, $event);
 
@@ -301,7 +303,12 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected function generateUrlTokens($content, $clickthrough, $emailId = null, Email $email = null, EmailSendEvent $event = null)
     {
-        $tokens = array();
+        $tokens                    = array();
+
+        // check we have a complete event property before trying to use it's methods
+        if ($event !== null) {
+            $this->emailIsInternalSend = $event->isInternalSend();
+        }
 
         if ($emailId !== null && isset($this->emailTrackedLinks[$emailId])) {
             // Tokenization is supported and the links have already been parsed so rebuild tokens from saved links
@@ -326,7 +333,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             $this->generateExternalLinkTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email);
 
-            if ($emailId !== null) {
+            if ($emailId !== null && !$this->emailIsInternalSend) {
                 $this->generateTrackedLinkTokens($content, $clickthrough, $tokens, $persistEntities, $trackedLinks, $emailId, $email, $event);
             } elseif (!empty($persistEntities)) {
                 /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -373,7 +380,7 @@ class BuilderSubscriber extends CommonSubscriber
                     continue;
                 }
 
-                if ($emailId !== null) {
+                if (!$this->emailIsInternalSend && $emailId !== null) {
                     // Emails will have clickthroughs tracked separately so just generate the URL
                     if (!in_array($token, $foundTokens) && !in_array($token, $trackedLinks)) {
                         $foundTokens[$token] = $pageModel->generateUrl($page, true);
@@ -408,8 +415,15 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @deprecated Since version 1.1; to be removed in 2.0
      */
-    protected function generateExternalLinkTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null)
-    {
+    protected function generateExternalLinkTokens(
+        $content,
+        $clickthrough,
+        &$tokens,
+        &$persistEntities,
+        &$trackedLinks,
+        $emailId = null,
+        Email $email = null
+    ) {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
@@ -427,18 +441,23 @@ class BuilderSubscriber extends CommonSubscriber
                 $foundTokens[$token] = $match;
             }
 
-            $links = $redirectModel->getRedirectListByUrls($foundTokens, $email);
-            foreach ($links as $token => $link) {
-                if ($emailId !== null) {
-                    if (!isset($trackedLinks[$token])) {
-                        $trackedLinks[$token] = $link;
+            if ($this->emailIsInternalSend) {
+                // Just replace tokens with its own URL
+                $tokens = array_merge($tokens, $foundTokens);
+            } else {
+                $links = $redirectModel->getRedirectListByUrls($foundTokens, $email);
+                foreach ($links as $token => $link) {
+                    if ($emailId !== null) {
+                        if (!isset($trackedLinks[$token])) {
+                            $trackedLinks[$token] = $link;
+                        }
+                    } else {
+                        $tokens[$token] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
                     }
-                } else {
-                    $tokens[$token] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
-                }
 
-                if (!$link->getId() && !isset($persistEntities[$token])) {
-                    $persistEntities[$token] = $link;
+                    if (!$link->getId() && !isset($persistEntities[$token])) {
+                        $persistEntities[$token] = $link;
+                    }
                 }
             }
 
@@ -456,8 +475,16 @@ class BuilderSubscriber extends CommonSubscriber
      * @param Email          $email
      * @param EmailSendEvent $event
      */
-    protected function generateTrackedLinkTokens($content, $clickthrough, &$tokens, &$persistEntities, &$trackedLinks, $emailId = null, Email $email = null, EmailSendEvent $event = null)
-    {
+    protected function generateTrackedLinkTokens(
+        $content,
+        $clickthrough,
+        &$tokens,
+        &$persistEntities,
+        &$trackedLinks,
+        $emailId = null,
+        Email $email = null,
+        EmailSendEvent $event = null
+    ) {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
@@ -493,7 +520,7 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         if (!empty($trackedLinks)) {
-            $search = $replace = array();
+            $search = $replace = $tokenSearch = $tokenReplace = array();
 
             foreach ($trackedLinks as $url => $link) {
                 $trackedUrl = $redirectModel->generateRedirectUrl($link, $clickthrough);
@@ -503,41 +530,56 @@ class BuilderSubscriber extends CommonSubscriber
                     $tokens[$url] = $trackedUrl;
 
                     // Add search and replace entries to correct editor auto-prepended http:// or https://
-                    $search[]  = 'http://' . $url;
-                    $replace[] = $url;
+                    $tokenSearch[]  = 'http://'.$url;
+                    $tokenReplace[] = $url;
 
-                    $search[]  = 'https://' . $url;
-                    $replace[] = $url;
+                    $tokenSearch[]  = 'https://'.$url;
+                    $tokenReplace[] = $url;
 
                     // deprecated support for externallink @todo remove with 2.0
                     if (strpos($url, '{external') === 0) {
                         // Add search and replace for standlone links that happen to be in an externallink token
-                        $token = '{trackedlink='.$link->getRedirectId().'}';
-                        $search[]       = $url;
-                        $replace[]      = $token;
+                        $token          = '{trackedlink='.$link->getRedirectId().'}';
+                        $tokenSearch[]  = $url;
+                        $tokenReplace[] = $token;
                         $tokens[$token] = $trackedUrl;
 
                         $search[]       = $link->getUrl();
                         $replace[]      = $token;
                         $tokens[$token] = $trackedUrl;
-
                     }
-
                 } else {
-                    $token = '{trackedlink='.$link->getRedirectId().'}';
+                    $token          = '{trackedlink='.$link->getRedirectId().'}';
                     $search[]       = $url;
                     $replace[]      = $token;
                     $tokens[$token] = $trackedUrl;
                 }
             }
 
-            $content = str_ireplace($search, $replace, $content);
-            $event->setContent($content);
+            // Sort to ensure that URLs that share the same base are appropriately replaced
+            arsort($search);
+            $tempReplace = array();
+            foreach ($search as $key => $value) {
+                $tempReplace[$key] = $replace[$key];
+            }
+            $replace = $tempReplace;
 
+            $search  = array_merge($tokenSearch, $search);
+            $replace = array_merge($tokenReplace, $replace);
+
+            // For plain text, just do a search/replace
             if ($plainText = $event->getPlainText()) {
                 $plainText = str_ireplace($search, $replace, $plainText);
                 $event->setPlainText($plainText);
             }
+
+            // For HTML, replace only the links; leaving the link text (if a URL) intact
+            foreach ($search as $key => $value) {
+                $content = preg_replace('/<a(.*?)href=(["\'])'.preg_quote($value, '/').'\\2(.*?)>/i', '<a$1href=$2'.$replace[$key].'$2$3>', $content);
+            }
+
+            $event->setContent($content);
+
         }
 
         $this->emailTrackedLinks[$emailId] = $trackedLinks;
@@ -610,7 +652,12 @@ class BuilderSubscriber extends CommonSubscriber
                     $url = preg_replace('/^\PL+|\PL\z/', '', trim($url));
 
                     // Ensure a valid URL
-                    if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks) && !in_array($url, $trackedLinks)) {
+                    if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks)
+                        && !in_array(
+                            $url,
+                            $trackedLinks
+                        )
+                    ) {
                         continue;
                     }
 

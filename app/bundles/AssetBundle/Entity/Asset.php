@@ -206,6 +206,8 @@ class Asset extends FormEntity
     public function __clone()
     {
         $this->id = null;
+
+        parent::__clone();
     }
 
     /**
@@ -1063,9 +1065,19 @@ class Asset extends FormEntity
      */
     public function getFileContents()
     {
-        $path = $this->getStorageLocation() == 'remote' ? $this->getRemotePath() : $this->getAbsolutePath();
+        $path = $this->getFilePath();
 
         return file_get_contents($path);
+    }
+
+    /**
+     * Get the path to the file; a URL if remote or full file path if local
+     *
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return $this->getStorageLocation() == 'remote' ? $this->getRemotePath() : $this->getAbsolutePath();
     }
 
     /**

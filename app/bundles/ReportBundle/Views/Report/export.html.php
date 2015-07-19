@@ -17,14 +17,12 @@ $graphOrder  = $report->getGraphs();
 $startCount  = 1;
 ?>
 <?php if (!empty($graphOrder) && !empty($graphs)): ?>
-    <div class="mt-lg">
-        <div class="row">
-            <div class="pa-md">
-                <?php foreach ($graphOrder as $key): ?>
-                    <?php $details =  $graphs[$key]; ?>
-                    <?php echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'report' => $report)); ?>
-                <?php endforeach; ?>
-            </div>
+    <div class="row">
+        <div class="pa-md">
+            <?php foreach ($graphOrder as $key): ?>
+                <?php $details =  $graphs[$key]; ?>
+                <?php echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'report' => $report)); ?>
+            <?php endforeach; ?>
         </div>
     </div>
 <?php endif; ?>

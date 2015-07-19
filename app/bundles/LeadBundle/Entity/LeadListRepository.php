@@ -310,8 +310,10 @@ class LeadListRepository extends CommonRepository
                     $select = $includeManual ? 'l.id, count(distinct(l.id)) as lead_count' : 'count(distinct(l.id)) as lead_count, max(id) as max_id';
                 } elseif ($idOnly) {
                     $select = 'distinct(l.id)';
+                    $q->orderBy('l.id', 'ASC');
                 } else {
                     $select = 'l.*';
+                    $q->orderBy('l.id', 'ASC');
                 }
 
                 $q->select($select);
@@ -383,8 +385,6 @@ class LeadListRepository extends CommonRepository
 
                 $q->andWhere($expr);
 
-                $q->orderBy('l.id', 'ASC');
-
                 $results = $q->execute()->fetchAll();
 
                 $dynamicLeads = array();
@@ -417,11 +417,13 @@ class LeadListRepository extends CommonRepository
                         ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
                 } elseif ($idOnly) {
                     $q->select('distinct(ll.lead_id) as id')
-                        ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+                        ->orderBy('ll.lead_id', 'ASC');
                 } else {
                     $q->select('l.*')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                        ->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+                        ->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id')
+                        ->orderBy('ll.lead_id', 'ASC');
                 }
 
                 // Filter by list
@@ -478,8 +480,6 @@ class LeadListRepository extends CommonRepository
                 }
 
                 $q->where($expr);
-
-                $q->orderBy('ll.lead_id', 'ASC');
 
                 $results = $q->execute()->fetchAll();
 

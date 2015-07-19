@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -87,7 +88,13 @@ class CommonModel
      */
     public function getRepository()
     {
-        return false;
+        static $commonRepo;
+
+        if ($commonRepo === null) {
+            $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+        }
+
+        return $commonRepo;
     }
 
     /**
@@ -125,6 +132,27 @@ class CommonModel
     }
 
     /**
+     * Get a specific entity
+     *
+     * @param $id
+     *
+     * @return null|object
+     */
+    public function getEntity($id = null)
+    {
+        if (null !== $id) {
+            $repo = $this->getRepository();
+            if (method_exists($repo, 'getEntity')) {
+                return $repo->getEntity($id);
+            }
+
+            return $repo->find($id);
+        }
+
+        return null;
+    }
+
+    /**
      * Encode an array to append to a URL
      *
      * @param $array
@@ -153,6 +181,8 @@ class CommonModel
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
+     *
+     * @return string
      */
     public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
     {
@@ -201,6 +231,8 @@ class CommonModel
 
     /**
      * @param $alias
+     *
+     * @return null|object
      */
     public function getEntityByAlias($alias)
     {

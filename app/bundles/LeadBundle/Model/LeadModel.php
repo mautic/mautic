@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -39,11 +40,24 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\LeadBundle\Entity\LeadRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead');
+        static $socialFieldsSet;
+
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+
+        if (!$socialFieldsSet) {
+            $fields = $this->factory->getModel('lead.field')->getGroupFields('social');
+            if (!empty($fields)) {
+                $socialFields = array_keys($fields);
+                $repo->setAvailableSocialFields($socialFields);
+            }
+            $socialFieldsSet = true;
+        }
+
+        return $repo;
     }
 
     /**
@@ -196,6 +210,22 @@ class LeadModel extends FormModel
         }
 
         parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * @param object $entity
+     */
+    public function deleteEntity($entity)
+    {
+        // Delete custom avatar if one exists
+        $imageDir = $this->factory->getSystemPath('images', true);
+        $avatar   = $imageDir . '/lead_avatars/avatar' . $entity->getId();
+
+        if (file_exists($avatar)) {
+            unlink($avatar);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -408,6 +438,8 @@ class LeadModel extends FormModel
      * Takes leads organized by group and flattens them into just alias => value
      *
      * @param $fields
+     *
+     * @return array
      */
     public function flattenFields($fields)
     {
@@ -421,11 +453,12 @@ class LeadModel extends FormModel
         return $flat;
     }
 
-
     /**
      * Returns flat array for single lead
      *
      * @param $leadId
+     *
+     * @return array
      */
     public function getLead($leadId)
     {
@@ -565,9 +598,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of lists this lead belongs to
      *
-     * @param Lead  $lead
-     * @param bool  $forLists
-     * @param boole $arrayHydration
+     * @param Lead       $lead
+     * @param bool|false $forLists
+     * @param bool|false $arrayHydration
      *
      * @return mixed
      */
@@ -665,6 +698,8 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param Lead $lead2
+     *
+     * @return Lead
      */
     public function mergeLeads(Lead $lead, Lead $lead2)
     {
@@ -734,10 +769,13 @@ class LeadModel extends FormModel
     /**
      * Add a do not contact entry for the lead
      *
-     * @param Lead   $lead
-     * @param string $emailAddress
-     * @param string $reason
-     * @param bool   $persist
+     * @param Lead      $lead
+     * @param string    $emailAddress
+     * @param string    $reason
+     * @param bool|true $persist
+     *
+     * @return DoNotEmail|void
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
     {
@@ -772,16 +810,21 @@ class LeadModel extends FormModel
      * @param      $fields
      * @param      $data
      * @param null $owner
+     * @param null $list
      * @param bool $persist Persist to the database; otherwise return entity
      *
-     * @return Lead
+     * @return bool
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Swift_RfcComplianceException
      */
     public function importLead($fields, $data, $owner = null, $list = null, $persist = true)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
         if ($hasEmail) {
+            // Validate the email
+            MailHelper::validateEmail($data[$fields['email']]);
+
             $leadFound = $this->getRepository()->getLeadByEmail($data[$fields['email']]);
             $lead      = ($leadFound) ? $this->em->getReference('MauticLeadBundle:Lead', $leadFound['id']) : new Lead();
             $merged    = $leadFound;
@@ -892,8 +935,8 @@ class LeadModel extends FormModel
             if ($list !== null) {
                 $this->addToLists($lead, array($list));
             }
-
-            return $merged;
         }
+
+        return $merged;
     }
 }

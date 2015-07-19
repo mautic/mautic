@@ -31,16 +31,9 @@ class ReportRepository extends CommonRepository
             ->createQueryBuilder('r')
             ->select('r');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        return new Paginator($query);
+        return parent::getEntities($args);
     }
 
     /**

@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 /**
@@ -59,14 +58,15 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Set asset url path
      *
-     * @param string $path
-     * @param null   $packageName
-     * @param null   $version
-     * @param bool   $absolute
+     * @param string     $path
+     * @param null       $packageName
+     * @param null       $version
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false)
+    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
         if (strpos($path, 'http') === 0) {
@@ -74,8 +74,10 @@ class AssetsHelper extends CoreAssetsHelper
         }
 
         // otherwise build the complete path
-        $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
-        $path        = $assetPrefix . $path;
+        if (!$ignorePrefix) {
+            $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
+            $path        = $assetPrefix.$path;
+        }
 
         $url = parent::getUrl($path, $packageName, $version);
 
@@ -210,7 +212,7 @@ class AssetsHelper extends CoreAssetsHelper
 
     public function includeScript($assetFilePath)
     {
-        return  '<script type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+        return  '<script async="async" type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /*
@@ -221,7 +223,7 @@ class AssetsHelper extends CoreAssetsHelper
 
     public function includeStylesheet($assetFilePath)
     {
-        return  '<script type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+        return  '<script async="async" type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /**
@@ -434,7 +436,6 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string $text
      * @param array  $protocols  http/https, ftp, mail, twitter
      * @param array  $attributes
-     * @param string $mode       normal or all
      * @return string
      */
     public function makeLinks($text, $protocols = array('http', 'mail'), array $attributes = array())
@@ -464,12 +465,12 @@ class AssetsHelper extends CoreAssetsHelper
                             $link = $match[2] ?: $match[3];
                             return '<' . array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>") . '>';
                         }, $text);
-                    break;
+                        break;
                     case 'mail':
                         $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
                             return '<' . array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>") . '>';
                         }, $text);
-                    break;
+                        break;
                     case 'twitter':
                         $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
                             return '<' . array_push($links, "<a $attr href=\"https://twitter.com/" . ($match[0][0] == '@' ? '' : 'search/%23') . $match[1]  . "\">{$match[0]}</a>") . '>';
@@ -548,7 +549,11 @@ class AssetsHelper extends CoreAssetsHelper
     }
 
     /**
-     * @param $country
+     * @param           $country
+     * @param bool|true $urlOnly
+     * @param string    $class
+     *
+     * @return string
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {

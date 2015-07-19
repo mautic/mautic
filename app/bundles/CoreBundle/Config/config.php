@@ -189,6 +189,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'formatter'
+            ),
+            'mautic.helper.template.security' => array(
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'security'
             )
         ),
         'other'   => array(
@@ -296,8 +301,9 @@ return array(
                 'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => array(
-                    'setUsername'   => array('%mautic.mailer_user%'),
-                    'setPassword'   => array('%mautic.mailer_password%')
+                    'setUsername'      => array('%mautic.mailer_user%'),
+                    'setPassword'      => array('%mautic.mailer_password%'),
+                    'setMauticFactory' => array('mautic.factory')
                 )
             ),
             'mautic.transport.sendgrid'          => array(
@@ -372,6 +378,7 @@ return array(
         'db_path'                      => '',
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
+        'mailer_return_path'           => null,
         'mailer_transport'             => 'mail',
         'mailer_host'                  => '',
         'mailer_port'                  => null,
@@ -414,5 +421,6 @@ return array(
         'cookie_domain'                => '',
         'cookie_secure'                => null,
         'cookie_httponly'              => false,
+        'ignore_ips'                   => null
     )
 );

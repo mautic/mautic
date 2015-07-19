@@ -116,7 +116,7 @@ class ClientModel extends FormModel
                 $event = new ClientEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
+            $this->dispatcher->dispatch($name, $event);
             return $event;
         }
 

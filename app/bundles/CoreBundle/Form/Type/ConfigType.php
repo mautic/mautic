@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -147,6 +148,16 @@ class ConfigType extends AbstractType
                     'message' => 'mautic.core.email.required'
                 ))
             )
+        ));
+
+        $builder->add('mailer_return_path', 'text', array(
+            'label'       => 'mautic.core.config.form.mailer.return.path',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.mailer.return.path.tooltip'
+            ),
+            'required'    => false
         ));
 
         $builder->add('mailer_transport', 'choice', array(
@@ -414,6 +425,19 @@ class ConfigType extends AbstractType
             ))->addViewTransformer($arrayStringTransformer)
         );
 
+        $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+        $builder->add(
+            $builder->create('do_not_track_ips', 'textarea', array(
+                'label'      => 'mautic.core.config.form.do_not_track_ips',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.do_not_track_ips.tooltip'
+                ),
+                'required'   => false
+            ))->addViewTransformer($arrayLinebreakTransformer)
+        );
+
         $builder->add('rememberme_key', 'text', array(
             'label'       => 'mautic.core.config.form.rememberme.key',
             'label_attr'  => array('class' => 'control-label'),
@@ -475,8 +499,7 @@ class ConfigType extends AbstractType
                 25  => 'mautic.core.pagination.25',
                 30  => 'mautic.core.pagination.30',
                 50  => 'mautic.core.pagination.50',
-                100 => 'mautic.core.pagination.100',
-                0   => 'mautic.core.pagination.all'
+                100 => 'mautic.core.pagination.100'
             ),
             'expanded'    => false,
             'multiple'    => false,

@@ -64,7 +64,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div><?php echo $email->getSubject(); ?></div>
+                        <div><?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'); ?></div>
                         <div class="text-muted"><?php echo $email->getDescription(); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">
@@ -128,8 +128,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
            <?php echo $view->render('MauticEmailBundle:Email:' . $emailType . '_graph.html.php',
                array(
-                   'stats' => $stats,
-                   'email' => $email
+                   'stats'        => $stats,
+                   'email'        => $email,
+                   'showVariants' => $showVariants,
+                   'isVariant'    => $isVariant
                )
            ); ?>
 
@@ -342,7 +344,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                            value="<?php echo $previewUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>

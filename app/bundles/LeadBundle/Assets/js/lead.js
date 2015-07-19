@@ -91,6 +91,25 @@ Mautic.leadOnLoad = function (container) {
     if (typeof Mautic.leadEngagementChart === 'undefined') {
         Mautic.renderEngagementChart();
     }
+
+    if (mQuery('#lead_preferred_profile_image').length) {
+        mQuery('#lead_preferred_profile_image').on('change', function() {
+            if (mQuery(this).val() == 'custom') {
+                mQuery('#customAvatarContainer').slideDown('fast');
+            } else {
+                mQuery('#customAvatarContainer').slideUp('fast');
+            }
+        })
+    }
+
+    if (mQuery('.lead-avatar-panel').length) {
+        mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
+            setTimeout(function() {
+                var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
+                Cookies.set('mautic_lead_avatar_panel', status, {expires: 30});
+            }, 500);
+        });
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -555,8 +574,8 @@ Mautic.reloadLeadImportProgress = function() {
             if (response.progress) {
                 if (response.progress[0] > 0) {
                     mQuery('.imported-count').html(response.progress[0]);
-                    mQuery('.progress-bar').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                    mQuery('.progress-bar span.sr-only').html(response.percent + '%');
+                    mQuery('.progress-bar-import').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
+                    mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
         });

@@ -344,7 +344,9 @@ class CampaignRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
         } else {
             $q->select('distinct(ll.lead_id) as id')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+                ->orderBy('ll.lead_id', 'ASC');
+
         }
 
         $expr = $q->expr()->andX();
@@ -408,8 +410,6 @@ class CampaignRepository extends CommonRepository
 
         $q->andWhere('ll.lead_id NOT IN '.sprintf('(%s)', $dq->getSQL()));
 
-        $q->orderBy('ll.lead_id', 'ASC');
-
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
@@ -435,7 +435,7 @@ class CampaignRepository extends CommonRepository
      * @param array $lists
      * @param array $args
      *
-     * @return array|int\
+     * @return array|int
      */
     public function getCampaignOrphanLeads($id, array $lists, $args = array())
     {
@@ -453,7 +453,8 @@ class CampaignRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
         } else {
             $q->select('distinct(cl.lead_id) as id')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+                ->orderBy('cl.lead_id', 'ASC');
         }
 
         $expr = $q->expr()->andX();
@@ -510,8 +511,6 @@ class CampaignRepository extends CommonRepository
 
         $q->andWhere('cl.lead_id NOT IN ' . sprintf('(%s)', $dq->getSQL()));
 
-        $q->orderBy('cl.lead_id', 'ASC');
-
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
@@ -550,8 +549,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.lead_id', 'ASC');
+            ->setParameter('false', false, 'boolean');
 
         if (!empty($ignoreLeads)) {
             $q->andWhere(
