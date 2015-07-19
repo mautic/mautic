@@ -55,7 +55,7 @@ class GravatarHelper extends Helper
     {
         $localDefault     = ($this->devMode) ?
             'https://www.mautic.org/media/images/default_avatar.png' :
-            $this->assetHelper->getUrl($this->imageDir . '/avatar.png', true, null, null, false);
+            $this->assetHelper->getUrl($this->imageDir . '/avatar.png', null, null, true, false);
         $url              = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
         if ($default === null) {
