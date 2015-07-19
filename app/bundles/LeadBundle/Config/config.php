@@ -129,7 +129,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 3,
+            'priority' => 5,
             'items'    => array(
                 'mautic.lead.leads' => array(
                     'id'        => 'menu_lead_parent',

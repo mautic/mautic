@@ -23,7 +23,7 @@ return array(
 
     'menu'   => array(
         'main' => array(
-            'priority' => 2,
+            'priority' => 1,
             'items'    => array(
                 'mautic.calendar.menu.index' => array(
                     'route'     => 'mautic_calendar_index',

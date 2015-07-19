@@ -50,7 +50,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 11,
+            'priority' => 40,
             'items'    => array(
                 'mautic.report.reports' => array(
                     'route'     => 'mautic_report_index',

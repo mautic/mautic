@@ -69,7 +69,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 6,
+            'priority' => 15,
             'items'    => array(
                 'mautic.email.emails' => array(
                     'id'        => 'mautic_email_root',
