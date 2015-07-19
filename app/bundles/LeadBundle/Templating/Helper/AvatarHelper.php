@@ -30,6 +30,8 @@ class AvatarHelper extends Helper
 
     /**
      * @param Lead $lead
+     *
+     * @return mixed
      */
     public function getAvatar(Lead $lead)
     {
@@ -40,7 +42,13 @@ class AvatarHelper extends Helper
         if ($preferred == 'custom' ) {
             if ($fmtime = filemtime($this->getAvatarPath(true) . '/avatar'.$lead->getId())) {
                 // Append file modified time to ensure the latest is used by browser
-                $img = $this->getDefaultAvatar(true);
+                $img = $this->factory->getHelper('template.assets')->getUrl(
+                    $this->getAvatarPath().'/avatar'.$lead->getId() . '?' . $fmtime,
+                    null,
+                    null,
+                    false,
+                    true
+                );
             }
         } elseif (isset($socialData[$preferred]) && !empty($socialData[$preferred]['profile']['profileImage'])) {
             $img = $socialData[$preferred]['profile']['profileImage'];
@@ -80,11 +88,10 @@ class AvatarHelper extends Helper
     public function getDefaultAvatar($absolute = false)
     {
         return $this->factory->getHelper('template.assets')->getUrl(
-            $this->factory->getSystemPath('images').'/avatar.png',
+            $this->factory->getSystemPath('assets').'/images/avatar.png',
             null,
             null,
-            $absolute,
-            true
+            $absolute
         );
     }
 

@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -35,13 +36,18 @@ class GravatarHelper extends Helper
     private $assetHelper;
 
     /**
+     * @var AvatarHelper
+     */
+    private $avatarHelper;
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->devMode     = $factory->getEnvironment() == 'dev';
-        $this->imageDir    = $factory->getSystemPath('images');
-        $this->assetHelper = $factory->getHelper('template.assets');
+        $this->devMode      = $factory->getEnvironment() == 'dev';
+        $this->imageDir     = $factory->getSystemPath('images');
+        $this->assetHelper  = $factory->getHelper('template.assets');
+        $this->avatarHelper = $factory->getHelper('template.avatar');
     }
 
     /**
@@ -55,7 +61,7 @@ class GravatarHelper extends Helper
     {
         $localDefault     = ($this->devMode) ?
             'https://www.mautic.org/media/images/default_avatar.png' :
-            $this->assetHelper->getUrl($this->imageDir . '/avatar.png', null, null, true, false);
+            $this->avatarHelper->getDefaultAvatar(true);
         $url              = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
         if ($default === null) {
