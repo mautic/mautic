@@ -40,13 +40,7 @@ class AvatarHelper extends Helper
         if ($preferred == 'custom' ) {
             if ($fmtime = filemtime($this->getAvatarPath(true) . '/avatar'.$lead->getId())) {
                 // Append file modified time to ensure the latest is used by browser
-                $img = $this->factory->getHelper('template.assets')->getUrl(
-                    $this->getAvatarPath().'/avatar'.$lead->getId() . '?' . $fmtime,
-                    null,
-                    null,
-                    false,
-                    true
-                );
+                $img = $this->getDefaultAvatar(true);
             }
         } elseif (isset($socialData[$preferred]) && !empty($socialData[$preferred]['profile']['profileImage'])) {
             $img = $socialData[$preferred]['profile']['profileImage'];
@@ -57,13 +51,7 @@ class AvatarHelper extends Helper
             if (!empty($leadEmail)) {
                 $img = $this->factory->getHelper('template.gravatar')->getImage($leadEmail);
             } else {
-                $img = $this->factory->getHelper('template.assets')->getUrl(
-                    $this->factory->getSystemPath('images').'/avatar.png',
-                    null,
-                    null,
-                    false,
-                    true
-                );
+                $img = $this->getDefaultAvatar();
             }
         }
 
@@ -82,6 +70,22 @@ class AvatarHelper extends Helper
         $imageDir = $this->factory->getSystemPath('images', $absolute);
 
         return $imageDir.'/lead_avatars';
+    }
+
+    /**
+     * @param bool|false $absolute
+     *
+     * @return mixed
+     */
+    public function getDefaultAvatar($absolute = false)
+    {
+        return $this->factory->getHelper('template.assets')->getUrl(
+            $this->factory->getSystemPath('images').'/avatar.png',
+            null,
+            null,
+            $absolute,
+            true
+        );
     }
 
     /**
