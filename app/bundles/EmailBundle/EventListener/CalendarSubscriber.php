@@ -47,12 +47,13 @@ class CalendarSubscriber extends CommonSubscriber
         $query->select('es.email_id, e.subject AS title, COUNT(es.id) AS quantity, es.date_sent AS start, e.plain_text AS description, cat.color')
             ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
             ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'es.email_id = e.id')
-            ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'categories', 'cat', 'cat.id = e.category_id AND cat.bundle="email"')
+            ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'categories', 'cat', 'cat.id = e.category_id AND cat.bundle=:bundle')
             ->where($query->expr()->andX(
                 $query->expr()->gte('es.date_sent', ':start'),
                 $query->expr()->lte('es.date_sent', ':end')
             ))
             ->groupBy('e.id, es.email_id, e.subject, es.date_sent, e.plain_text, cat.color')
+            ->setParameter('bundle', 'email')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)

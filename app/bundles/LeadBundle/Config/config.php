@@ -129,7 +129,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 3,
+            'priority' => 5,
             'items'    => array(
                 'mautic.lead.leads' => array(
                     'id'        => 'menu_lead_parent',
@@ -276,6 +276,13 @@ return array(
                 'arguments' => 'mautic.factory',
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist'
+            )
+        ),
+        'helpers' => array(
+            'mautic.helper.template.avatar' => array(
+                'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_avatar'
             )
         )
     )

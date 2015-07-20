@@ -19,7 +19,7 @@ $id       = ($status != 'inprogress') ? 'emailSendProgressComplete' : 'emailSend
     <div class="col-sm-offset-3 col-sm-6 text-center">
         <div class="panel panel-<?php echo ($status != 'inprogress') ? 'success' : 'danger'; ?>">
             <div class="panel-heading">
-                <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.email.send.'.$status, array('%subject%' => $email->getSubject())); ?></h4>
+                <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.email.send.'.$status, array('%subject%' => \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'))); ?></h4>
             </div>
             <div class="panel-body">
                 <?php if ($status != 'inprogress'): ?>

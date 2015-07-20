@@ -1070,6 +1070,15 @@ var Mautic = {
     },
 
     /**
+     * Deactivates backdrop
+     */
+    deactivateBackgroup: function() {
+        if (mQuery('#mautic-backdrop').length) {
+            mQuery('#mautic-backdrop').remove();
+        }
+    },
+
+    /**
      * Posts a form and returns the output.
      * Uses jQuery form plugin so it handles files as well.
      *
@@ -1135,6 +1144,8 @@ var Mautic = {
      */
     processPageContent: function (response) {
         if (response) {
+            Mautic.deactivateBackgroup();
+
             if (!response.target) {
                 response.target = '#app-content';
             }
@@ -3451,8 +3462,9 @@ var Mautic = {
      * @param action
      * @param data
      * @param successClosure
+     * @param showLoadingBar
      */
-    ajaxActionRequest: function(action, data, successClosure) {
+    ajaxActionRequest: function(action, data, successClosure, showLoadingBar) {
         if (typeof Mautic.ajaxActionXhr == 'undefined') {
             Mautic.ajaxActionXhr = {};
         } else if (typeof Mautic.ajaxActionXhr[action] != 'undefined') {
@@ -3460,10 +3472,15 @@ var Mautic = {
             Mautic.ajaxActionXhr[action].abort();
         }
 
+        if (typeof showLoadingBar == 'undefined') {
+            showLoadingBar = false;
+        }
+
         Mautic.ajaxActionXhr[action] = mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + action,
             type: 'POST',
             data: data,
+            showLoadingBar: showLoadingBar,
             success: function (response) {
                 if (typeof successClosure == 'function') {
                     successClosure(response);

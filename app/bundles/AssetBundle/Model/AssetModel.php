@@ -372,7 +372,8 @@ class AssetModel extends FormModel
      */
     public function getTotalFilesize($assets)
     {
-        if ($assets instanceof PersistentCollection) {
+        $firstAsset = is_array($assets) ? reset($assets) : false;
+        if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
             $assetIds = array();
             foreach ($assets as $asset) {
                 $assetIds[] = $asset->getId();

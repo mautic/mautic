@@ -378,6 +378,7 @@ return array(
         'db_path'                      => '',
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
+        'mailer_return_path'           => null,
         'mailer_transport'             => 'mail',
         'mailer_host'                  => '',
         'mailer_port'                  => null,
@@ -420,5 +421,6 @@ return array(
         'cookie_domain'                => '',
         'cookie_secure'                => null,
         'cookie_httponly'              => false,
+        'ignore_ips'                   => null
     )
 );

@@ -388,6 +388,13 @@ class MauticFactory
         } elseif ($name == 'cache' || $name == 'log') {
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
+        } elseif ($name == 'images') {
+            $imageDir = $this->getParameter('image_path');
+            if (substr($imageDir, -1) === '/') {
+                $imageDir = substr($imageDir, 0, -1);
+            }
+
+            return ($fullPath)  ? $paths['local_root'] . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } else {
@@ -620,6 +627,12 @@ class MauticFactory
                 $repo->saveEntity($ipAddress);
             }
 
+            // Ensure the do not track list is inserted
+            $doNotTrack = $this->getParameter('do_not_track_ips');
+            if (!empty($doNotTrack)) {
+                $ipAddress->setDoNotTrackList($doNotTrack);
+            }
+
             $ipAddresses[$ip] = $ipAddress;
         }
 
@@ -639,7 +652,9 @@ class MauticFactory
     /**
      * Get Symfony's logger
      *
-     * @return \Symfony\Bridge\Monolog\Logger
+     * @param bool|false $system
+     *
+     * @return object
      */
     public function getLogger($system = false)
     {

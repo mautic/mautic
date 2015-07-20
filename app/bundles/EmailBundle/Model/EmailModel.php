@@ -9,7 +9,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -235,7 +234,7 @@ class EmailModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return null|Email
      */
     public function getEntity ($id = null)
     {
@@ -526,13 +525,34 @@ class EmailModel extends FormModel
     /**
      * Get a stats for email by list
      *
-     * @param Email $entity
+     * @param Email|int $email
+     * @param bool      $includeVariants
      *
      * @return array
      */
-    public function getEmailListStats (Email $entity)
+    public function getEmailListStats ($email, $includeVariants = false)
     {
-        $lists     = $entity->getLists();
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children   = $parent->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children   = $email->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $email->getId();
+            }
+        } else {
+            $emailIds = array($email->getId());
+        }
+
+        $lists     = $email->getLists();
         $listCount = count($lists);
 
         $combined = $this->translator->trans('mautic.email.lists.combined');
@@ -547,18 +567,19 @@ class EmailModel extends FormModel
         );
 
         if ($listCount) {
+            /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
             foreach ($lists as $l) {
                 $name = $l->getName();
 
-                $sentCount = $statRepo->getSentCount($entity->getId(), $l->getId());
+                $sentCount = $statRepo->getSentCount($emailIds, $l->getId());
                 $datasets[$combined][0] += $sentCount;
 
-                $readCount = $statRepo->getReadCount($entity->getId(), $l->getId());
+                $readCount = $statRepo->getReadCount($emailIds, $l->getId());
                 $datasets[$combined][1] += $readCount;
 
-                $failedCount = $statRepo->getFailedCount($entity->getId(), $l->getId());
+                $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
                 $datasets[$combined][2] += $failedCount;
 
                 $datasets[$name] = array();
@@ -583,14 +604,36 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param int    $emailId
-     * @param int    $amount
-     * @param string $unit
+     * @param int|Email $email
+     * @param bool      $includeVariants
+     * @param int       $amount
+     * @param string    $unit
      *
      * @return array
      */
-    public function getEmailGeneralStats ($emailId, $amount = 30, $unit = 'D')
+    public function getEmailGeneralStats ($email, $includeVariants = false, $amount = 30, $unit = 'D')
     {
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children   = $parent->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children   = $email->getVariantChildren();
+                $emailIds   = $children->getKeys();
+                $emailIds[] = $email->getId();
+            }
+        } else {
+            $emailIds = array($email->getId());
+        }
+
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
         $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
@@ -602,13 +645,13 @@ class EmailModel extends FormModel
         );
         $fromDate = $graphData['fromDate'];
 
-        $sentData  = $statRepo->getEmailStats($emailId, $fromDate, 'sent');
+        $sentData  = $statRepo->getEmailStats($emailIds, $fromDate, 'sent');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
 
-        $readData  = $statRepo->getEmailStats($emailId, $fromDate, 'read');
+        $readData  = $statRepo->getEmailStats($emailIds, $fromDate, 'read');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
 
-        $failedData  = $statRepo->getEmailStats($emailId, $fromDate, 'failed');
+        $failedData  = $statRepo->getEmailStats($emailIds, $fromDate, 'failed');
         $graphData = GraphHelper::mergeLineGraphData($graphData, $failedData, $unit, 2, 'date', 'data');
 
         return $graphData;
@@ -630,15 +673,36 @@ class EmailModel extends FormModel
      * Get the number of leads this email will be sent to
      *
      * @param Email $email
-     * @param mixed $listId     Leads for a specific lead list
-     * @param bool  $countOnly  If true, return count otherwise array of leads
-     * @param int   $limit      Max number of leads to retrieve
+     * @param mixed $listId          Leads for a specific lead list
+     * @param bool  $countOnly       If true, return count otherwise array of leads
+     * @param int   $limit           Max number of leads to retrieve
+     * @param bool  $includeVariants If false, emails sent to a variant will not be included
      *
      * @return int|array
      */
-    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null)
+    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $listId, $countOnly, $limit);
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $ids[] = $parent->getId();
+
+                $children   = $parent->getVariantChildren();
+                $variantIds = $children->getKeys();
+
+                // Remove $email from the array
+                $key = array_search($email->getId(), $variantIds);
+                unset($variantIds[$key]);
+            } else {
+                $children   = $email->getVariantChildren();
+                $variantIds = $children->getKeys();
+            }
+        } else {
+            $variantIds = null;
+        }
+
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
@@ -734,7 +798,6 @@ class EmailModel extends FormModel
             if ($includeVariants) {
                 //get a list of variants for A/B testing
                 $childrenVariant = $email->getVariantChildren();
-
 
                 if (count($childrenVariant)) {
                     $variantWeight = 0;
@@ -869,12 +932,25 @@ class EmailModel extends FormModel
         //how many of this batch should go to which email
         $batchCount = 0;
 
+        $backup = reset($emailSettings);
         foreach ($emailSettings as $eid => &$details) {
             if (isset($details['weight'])) {
-                $details['limit'] = round($count * $details['weight']);
+                $limit = round($count * $details['weight']);
+
+                if (!$limit) {
+                    // Don't send any emails to this one
+                    unset($emailSettings[$eid]);
+                } else {
+                    $details['limit'] = $limit;
+                }
             } else {
                 $details['limit'] = $count;
             }
+        }
+
+        if (count($emailSettings) == 0) {
+            // Shouldn't happen but a safety catch
+            $emailSettings[$backup['entity']->getId()] = $backup;
         }
 
         //randomize the leads for statistic purposes
@@ -923,8 +999,6 @@ class EmailModel extends FormModel
         };
 
         foreach ($sendTo as $lead) {
-            usleep(100);
-
             // Generate content
             if ($useEmail['entity']->getId() !== $contentGenerated) {
                 // Flush the mail queue if applicable
@@ -1004,7 +1078,7 @@ class EmailModel extends FormModel
             unset($stat);
 
             $batchCount++;
-            if ($batchCount > $useEmail['limit']) {
+            if ($batchCount >= $useEmail['limit']) {
                 unset($useEmail);
 
                 //use the next email

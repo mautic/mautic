@@ -128,10 +128,9 @@ class UserRepository extends CommonRepository
             ->select('u, r')
             ->leftJoin('u.role', 'r');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-        return new Paginator($query);
+        return parent::getEntities($args);
     }
 
     /**
@@ -341,5 +340,13 @@ class UserRepository extends CommonRepository
             array('u.firstName', 'ASC'),
             array('u.username', 'ASC')
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTableAlias()
+    {
+        return 'u';
     }
 }

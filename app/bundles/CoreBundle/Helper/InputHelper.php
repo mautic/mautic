@@ -56,6 +56,8 @@ class InputHelper
      *
      * @param $name
      * @param $arguments
+     *
+     * @return mixed
      */
     public static function __callStatic($name, $arguments)
     {
@@ -116,9 +118,10 @@ class InputHelper
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32
      *
-     * @param mixed $value
+     * @param            $value
+     * @param bool|false $urldecode
      *
-     * @return mixed
+     * @return mixed|string
      */
     public static function clean($value, $urldecode = false)
     {
@@ -138,7 +141,8 @@ class InputHelper
     /**
      * Strips tags
      *
-     * @param $value
+     * @param            $value
+     * @param bool|false $urldecode
      *
      * @return mixed
      */
@@ -154,9 +158,10 @@ class InputHelper
     /**
      * Strips non-alphanumeric characters
      *
-     * @param string $value
-     * @param bool   $urldecode
-     * @param bool   $convertSpacesToHyphen
+     * @param            $value
+     * @param bool|false $urldecode
+     * @param bool|false $convertSpacesTo
+     * @param array      $allowedCharacters
      *
      * @return string
      */
@@ -183,9 +188,10 @@ class InputHelper
     /**
      * Returns raw value
      *
-     * @param mixed $value
+     * @param            $value
+     * @param bool|false $urldecode
      *
-     * @return mixed
+     * @return string
      */
     public static function raw($value, $urldecode = false)
     {
@@ -235,13 +241,14 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs
      *
-     * @param mixed  $value
-     * @param array  $allowedProtocols
-     * @param string $defaultProtocol
-     * @param array  $removeQuery
-     * @param bool   $ignoreFragment
+     * @param            $value
+     * @param bool|false $urldecode
+     * @param null       $allowedProtocols
+     * @param null       $defaultProtocol
+     * @param array      $removeQuery
+     * @param bool|false $ignoreFragment
      *
-     * @return mixed
+     * @return mixed|string
      */
     public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array(), $ignoreFragment = false)
     {
@@ -301,7 +308,8 @@ class InputHelper
     /**
      * Removes all characters except those allowed in emails
      *
-     * @param $value
+     * @param            $value
+     * @param bool|false $urldecode
      *
      * @return mixed
      */
@@ -319,9 +327,10 @@ class InputHelper
     /**
      * Returns a clean array
      *
-     * @param $value
+     * @param            $value
+     * @param bool|false $urldecode
      *
-     * @return array|string
+     * @return array|mixed|string
      */
     public static function cleanArray($value, $urldecode = false)
     {
@@ -329,6 +338,28 @@ class InputHelper
 
         if (!is_array($value)) {
             $value = array($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Returns clean HTML
+     *
+     * @param $value
+     *
+     * @return mixed|string
+     */
+    public static function html($value)
+    {
+        // Specially handling for doctype
+        $doctypeFound = preg_match("~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i", $value, $doctype);
+
+        $value = self::getFilter()->clean($value, 'html');
+
+        // Was a doctype found?
+        if ($doctypeFound) {
+            $value = "$doctype[0]\n$value";
         }
 
         return $value;

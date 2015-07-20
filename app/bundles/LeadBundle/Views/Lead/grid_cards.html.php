@@ -7,27 +7,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-        <?php foreach ($items as $item): ?>
-            <?php
-                $fields = $item->getFields();
-                $color  = $item->getColor();
-                if (empty($color)) $color = 'a0acb8';
-            ?>
+        <?php
+        foreach ($items as $item):
+            $fields = $item->getFields();
+            $color  = $item->getColor();
+            if (empty($color))
+                $color = 'a0acb8';
+
+           $img = $view['lead_avatar']->getAvatar($item);
+           ?>
             <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
                 <div data-color="#<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) echo " highlight"; ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
                     <div class="box-layout">
                         <div class="col-xs-4 va-m">
                             <div class="panel-body">
                         <span class="img-wrapper img-rounded" style="width:100%">
-                            <?php $preferred = $item->getPreferredProfileImage(); ?>
-                            <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
-                                <?php $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>
-                            <?php else : ?>
-                                <?php $socialData = $item->getSocialCache(); ?>
-                                <?php $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']); ?>
-                            <?php endif; ?>
-                            <img class="img img-responsive"
-                                 src="<?php echo $img; ?>" />
+                            <img class="img img-responsive" src="<?php echo $img; ?>" />
                         </span>
                             </div>
                         </div>

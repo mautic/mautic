@@ -145,6 +145,10 @@
                     }
 
                     function validateOptions(elOptions) {
+                        if (typeof elOptions === 'undefined') {
+                            return;
+                        }
+
                         var optionsValid = false;
 
                         if (elOptions.length == undefined) {
@@ -195,8 +199,12 @@
                             var name = 'mauticform[' + field.name + ']';
                             switch (field.type) {
                                 case 'radiogrp':
-                                case 'checkboxgrp':
                                     var elOptions = elForm.elements[name];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+
+                                case 'checkboxgrp':
+                                    var elOptions = elForm.elements[name + '[]'];
                                     var valid = validateOptions(elOptions);
                                     break;
 
@@ -230,25 +238,31 @@
                 },
 
                 markError: function(containerId, valid, validationMessage) {
+                    var elErrorSpan = false;
+                    var callbackValidationMessage = validationMessage;
+                    var elContainer = document.getElementById(containerId);
+                    if (elContainer) {
+                        elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                        if (typeof validationMessage == 'undefined' && elErrorSpan) {
+                            callbackValidationMessage = elErrorSpan.innerHTML;
+                        }
+                    }
+
                     var callbackData = {
                         containerId: containerId,
                         valid: valid,
-                        validationMessage: validationMessage
+                        validationMessage: callbackValidationMessage
                     };
 
                     // If true, a callback handled it
                     if (!Form.customCallbackHandler(formId, 'onErrorMark', callbackData)) {
-                        var elContainer = document.getElementById(containerId);
-                        if (elContainer) {
-                            var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
-                            if (elErrorSpan) {
-                                if (typeof validationMessage !== 'undefined') {
-                                    elErrorSpan.innerHTML = validationMessage;
-                                }
-
-                                elErrorSpan.style.display = (valid) ? 'none' : '';
-                                elContainer.className = elContainer.className + " mauticform-has-error";
+                        if (elErrorSpan) {
+                            if (typeof validationMessage !== 'undefined') {
+                                elErrorSpan.innerHTML = validationMessage;
                             }
+
+                            elErrorSpan.style.display = (valid) ? 'none' : '';
+                            elContainer.className = elContainer.className + " mauticform-has-error";
                         }
                     }
                 },

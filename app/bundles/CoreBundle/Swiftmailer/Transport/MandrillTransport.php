@@ -268,19 +268,36 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      */
     protected function handlePostResponse($response, $info)
     {
-        $response = json_decode($response, true);
+        $parsedResponse = '';
+        $response       = json_decode($response, true);
+
+        if ($response === false) {
+            $parsedResponse = $response;
+        }
 
         $return = array();
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
-                throw new \Swift_TransportException($response['message']);
-            }
-
-            foreach ($response as $stat) {
-                if (in_array($stat['status'], array('rejected', 'invalid'))) {
-                    $return[] = $stat['email'];
+                $parsedResponse = $response['message'];
+                $error          = true;
+            } else {
+                foreach ($response as $stat) {
+                    if (in_array($stat['status'], array('rejected', 'invalid'))) {
+                        $return[]       = $stat['email'];
+                        $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
+                    }
                 }
             }
+        }
+
+        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
+            $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
+        }
+
+        if ($response === false) {
+            $this->throwException('Unexpected response');
+        } elseif (!empty($error)) {
+            $this->throwException('Mandrill error');
         }
 
         return $return;

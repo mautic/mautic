@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -356,7 +357,8 @@ class EmailController extends FormController
         }
 
         // Prepare stats for bargraph
-        $stats = ($email->getEmailType() == 'template') ? $model->getEmailGeneralStats($email->getId()) : $model->getEmailListStats($email);
+        $variant = ($parent && $parent === $email);
+        $stats   = ($email->getEmailType() == 'template') ? $model->getEmailGeneralStats($email, $variant) : $model->getEmailListStats($email, $variant);
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
@@ -402,11 +404,8 @@ class EmailController extends FormController
                     'abTestResults'  => $abTestResults,
                     'security'       => $security,
                     'previewUrl'     => $this->generateUrl(
-                        'mautic_email_action',
-                        array(
-                            'objectAction' => 'preview',
-                            'objectId'     => $email->getId()
-                        ),
+                        'mautic_email_preview',
+                        array('objectId' => $email->getId()),
                         true
                     )
                 ),
@@ -889,6 +888,7 @@ class EmailController extends FormController
      */
     public function builderAction($objectId)
     {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
 
         //permission check
@@ -926,6 +926,9 @@ class EmailController extends FormController
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
         }
+
+        // Replace short codes to emoji
+        $content = EmojiHelper::toEmoji($content, 'short');
 
         return $this->render(
             'MauticEmailBundle::builder.html.php',
@@ -1220,66 +1223,6 @@ class EmailController extends FormController
     }
 
     /**
-     * Preview email
-     *
-     * @param $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function previewAction($objectId)
-    {
-        $model  = $this->factory->getModel('email');
-        $entity = $model->getEntity($objectId);
-
-        if (!$this->factory->getSecurity()->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy())) {
-            return $this->accessDenied();
-        }
-
-        //bogus ID
-        $idHash = 'xxxxxxxxxxxxxx';
-
-        $template = $entity->getTemplate();
-        if (!empty($template)) {
-            $slots = $this->factory->getTheme($template)->getSlots('email');
-
-            $response = $this->render(
-                'MauticEmailBundle::public.html.php',
-                array(
-                    'inBrowser' => true,
-                    'slots'     => $slots,
-                    'content'   => $entity->getContent(),
-                    'email'     => $entity,
-                    'lead'      => null,
-                    'template'  => $template
-                )
-            );
-
-            //replace tokens
-            $content = $response->getContent();
-        } else {
-            $content = $entity->getCustomHtml();
-        }
-
-        // Override tracking_pixel
-        $tokens = array('{tracking_pixel}' => '');
-
-        // Generate and replace tokens
-        $event = new EmailSendEvent(
-            null, array(
-            'content'      => $content,
-            'email'        => $entity,
-            'idHash'       => $idHash,
-            'tokens'       => $tokens,
-            'internalSend' => true
-        )
-        );
-        $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-        $content = $event->getContent();
-
-        return new Response($content);
-    }
-
-    /**
      * Deletes a group of entities
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -1353,4 +1296,21 @@ class EmailController extends FormController
             )
         );
     }
+
+    /**
+     * Preview email
+     *
+     * @param $objectId
+     *
+     * @deprecated since 1.1.3
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function previewAction($objectId)
+    {
+        return $this->redirect(
+            $this->generateUrl('mautic_email_preview', array('objectId' => $objectId))
+        );
+    }
+
 }

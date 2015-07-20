@@ -55,7 +55,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 4,
+            'priority' => 10,
             'items'    => array(
                 'mautic.campaign.campaigns' => array(
                     'id'        => 'mautic_campaigns_root',

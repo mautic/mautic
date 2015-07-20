@@ -60,4 +60,18 @@ class CookieHelper
             ($httponly == null) ? $this->httponly : $httponly
         );
     }
+
+    /**
+     * Deletes a cookie by expiring it
+     *
+     * @param           $name
+     * @param null      $path
+     * @param null      $domain
+     * @param null      $secure
+     * @param bool|true $httponly
+     */
+    public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = true)
+    {
+        $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+    }
 }

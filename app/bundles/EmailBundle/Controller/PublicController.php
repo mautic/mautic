@@ -10,13 +10,13 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PublicController extends CommonFormController
 {
@@ -70,6 +70,7 @@ class PublicController extends CommonFormController
                 } else {
                     $content = $entity->getCustomHtml();
                 }
+                $content = EmojiHelper::toEmoji($content, 'short');
 
                 $tokens = $stat->getTokens();
 
@@ -288,5 +289,85 @@ class PublicController extends CommonFormController
         }
 
         throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+    }
+
+    /**
+     * Preview email
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function previewAction($objectId)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model  = $this->factory->getModel('email');
+        $entity = $model->getEntity($objectId);
+
+        if (
+            ($this->factory->getSecurity()->isAnonymous() && !$entity->isPublished()) ||
+            (!$this->factory->getSecurity()->isAnonymous() && !$this->factory->getSecurity()->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()))
+        ) {
+            return $this->accessDenied();
+        }
+
+        //bogus ID
+        $idHash = 'xxxxxxxxxxxxxx';
+
+        $template = $entity->getTemplate();
+        if (!empty($template)) {
+            $slots = $this->factory->getTheme($template)->getSlots('email');
+
+            $response = $this->render(
+                'MauticEmailBundle::public.html.php',
+                array(
+                    'inBrowser' => true,
+                    'slots'     => $slots,
+                    'content'   => $entity->getContent(),
+                    'email'     => $entity,
+                    'lead'      => null,
+                    'template'  => $template
+                )
+            );
+
+            //replace tokens
+            $content = $response->getContent();
+        } else {
+            $content = $entity->getCustomHtml();
+        }
+
+        // Convert emojis
+        $content = EmojiHelper::toEmoji($content, 'short');
+
+        // Override tracking_pixel
+        $tokens = array('{tracking_pixel}' => '');
+
+        // Prepare a fake lead
+        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+        $fieldModel   = $this->factory->getModel('lead.field');
+        $fields       = $fieldModel->getFieldList(false, false);
+        array_walk($fields, function(&$field) {
+            $field = "[$field]";
+        });
+        $fields['id'] = 0;
+
+        // Generate and replace tokens
+        $event = new EmailSendEvent(
+            null,
+            array(
+                'content'      => $content,
+                'email'        => $entity,
+                'idHash'       => $idHash,
+                'tokens'       => $tokens,
+                'internalSend' => true,
+                'lead'         => $fields
+            )
+        );
+        $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+
+        $content = $event->getContent(true);
+
+        return new Response($content);
+
     }
 }

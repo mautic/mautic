@@ -40,11 +40,24 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\LeadBundle\Entity\LeadRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead');
+        static $socialFieldsSet;
+
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+
+        if (!$socialFieldsSet) {
+            $fields = $this->factory->getModel('lead.field')->getGroupFields('social');
+            if (!empty($fields)) {
+                $socialFields = array_keys($fields);
+                $repo->setAvailableSocialFields($socialFields);
+            }
+            $socialFieldsSet = true;
+        }
+
+        return $repo;
     }
 
     /**
@@ -197,6 +210,22 @@ class LeadModel extends FormModel
         }
 
         parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * @param object $entity
+     */
+    public function deleteEntity($entity)
+    {
+        // Delete custom avatar if one exists
+        $imageDir = $this->factory->getSystemPath('images', true);
+        $avatar   = $imageDir . '/lead_avatars/avatar' . $entity->getId();
+
+        if (file_exists($avatar)) {
+            unlink($avatar);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -428,6 +457,8 @@ class LeadModel extends FormModel
      * Returns flat array for single lead
      *
      * @param $leadId
+     *
+     * @return array
      */
     public function getLead($leadId)
     {

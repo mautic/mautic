@@ -14,6 +14,25 @@ delete if it is not require
 <div class="pa-md">
     <div class="row">
         <div class="col-sm-12">
+            <?php if ($showVariants): ?>
+            <div class="text-right small">
+                <span>
+                    <?php if ($isVariant): ?>
+                    <span data-chart="variant"><?php echo $view['translator']->trans('mautic.email.variant.graph.variant'); ?></span>
+                    <?php else: ?>
+                    <a data-chart="variant" href="javascript:void(0)"><?php echo $view['translator']->trans('mautic.email.variant.graph.variant'); ?></a>
+                    <?php endif; ?>
+                </span>
+                </span> | </span>
+                <span>
+                    <?php if ($isVariant): ?>
+                    <a data-chart="all" href="javascript:void(0)"><?php echo $view['translator']->trans('mautic.email.variant.graph.all'); ?></a>
+                    <?php else: ?>
+                    <span data-chart="all"><?php echo $view['translator']->trans('mautic.email.variant.graph.all'); ?></span>
+                    <?php endif; ?>
+                </span>
+            </div>
+            <?php endif; ?>
             <div class="panel">
                 <div class="panel-body box-layout">
                     <div class="col-xs-4 va-m">

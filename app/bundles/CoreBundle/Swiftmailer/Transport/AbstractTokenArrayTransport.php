@@ -176,6 +176,11 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
             }
         }
 
+        $returnPath = $this->message->getReturnPath();
+        if (!empty($returnPath)) {
+            $message['returnPath'] = $returnPath;
+        }
+
         // Attachments
         $children    = $this->message->getChildren();
         $attachments = array();
@@ -199,5 +204,26 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     public function setMauticFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * @param \Exception|string $exception
+     *
+     * @throws \Exception
+     */
+    protected function throwException($exception)
+    {
+        if (!$exception instanceof \Exception) {
+            $exception = new \Swift_TransportException($exception);
+        }
+
+        if ($evt = $this->getDispatcher()->createTransportExceptionEvent($this, $exception)) {
+            $this->getDispatcher()->dispatchEvent($evt, 'exceptionThrown');
+            if (!$evt->bubbleCancelled()) {
+                throw $exception;
+            }
+        } else {
+            throw $exception;
+        }
     }
 }
