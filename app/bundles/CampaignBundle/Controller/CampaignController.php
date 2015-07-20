@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -605,17 +606,32 @@ class CampaignController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @param      $objectId
-     * @param bool $ignorePost
+     * @param integer|string $objectId
+     * @param boolean        $ignorePost
+     * @param Campaign       $clonedEntity
+     * @param array          $currentSources
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false, Campaign $clonedEntity = null, array $currentSources = null)
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model = $this->factory->getModel('campaign');
 
-        $entity  = $model->getEntity($objectId);
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+        $model      = $this->factory->getModel('campaign');
+        $formData   = $this->request->request->get('campaign');
+        $sessionId  = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+
+        if ($clonedEntity instanceof Campaign) {
+            $entity = $clonedEntity;
+        } else {
+            $entity = $model->getEntity($objectId);
+
+            // Process submit of cloned campaign
+            if ($entity == null && $objectId == $sessionId) {
+                $entity = $model->getEntity();
+            }
+        }
+
         $session = $this->factory->getSession();
 
         //set the page we came from
@@ -701,6 +717,9 @@ class CampaignController extends FormController
 
                             //form is valid so process the data
                             $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                            // Reset objectId to entity ID (can be session ID in case of cloned entity)
+                            $objectId = $entity->getId();
 
                             //update canvas settings with new event IDs then save
                             $model->setCanvasSettings($entity, $connections);
@@ -793,20 +812,25 @@ class CampaignController extends FormController
 
             $deletedEvents = array();
 
-            //load sources to session
-            $currentSources = $model->getLeadSources($objectId);
+            if (!$currentSources) {
+                //load sources to session
+                $currentSources = $model->getLeadSources($objectId);
+            }
+
             $this->setSessionSources($objectId, $currentSources);
         }
 
         $campaignSources = array();
-        foreach ($currentSources as $type => $sources) {
-            if (!empty($sources)) {
-                $sourceList             = $model->getSourceLists($type);
-                $campaignSources[$type] = array(
-                    'sourceType' => $type,
-                    'campaignId' => $objectId,
-                    'names'      => implode(', ', array_intersect_key($sourceList, $sources))
-                );
+        if (isset($currentSources) && is_array($currentSources)) {
+            foreach ($currentSources as $type => $sources) {
+                if (!empty($sources)) {
+                    $sourceList             = $model->getSourceLists($type);
+                    $campaignSources[$type] = array(
+                        'sourceType' => $type,
+                        'campaignId' => $objectId,
+                        'names'      => implode(', ', array_intersect_key($sourceList, $sources))
+                    );
+                }
             }
         }
 
@@ -846,20 +870,26 @@ class CampaignController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('campaign');
-        $entity = $model->getEntity($objectId);
+        $model    = $this->factory->getModel('campaign');
+        $campaign = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        // Generate temporary ID
+        $tempId = sha1(uniqid(mt_rand(), true));
+
+        // load sources to session
+        $currentSources = $model->getLeadSources($objectId);
+
+        if ($campaign != null) {
             if (!$this->factory->getSecurity()->isGranted('campaign:campaigns:create')) {
                 return $this->accessDenied();
             }
 
             // Get the events that need to be duplicated as well
-            $events = $entity->getEvents();
+            $events = $campaign->getEvents();
 
             // Clone the campaign
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
-            $campaign = clone $entity;
+            $campaign = clone $campaign;
             $campaign->setIsPublished(false);
 
             // Clone the campaign's events
@@ -882,9 +912,6 @@ class CampaignController extends FormController
 
                 $campaign->addEvent($event->getId(), $clone);
             }
-
-            $model->saveEntity($campaign);
-            $objectId = $campaign->getId();
 
             $newEvents = $campaign->getEvents();
             $eventIds  = array();
@@ -927,10 +954,9 @@ class CampaignController extends FormController
             }
 
             $campaign->setCanvasSettings($canvasSettings);
-            $model->saveEntity($campaign);
         }
 
-        return $this->editAction($objectId, true);
+        return $this->editAction($tempId, true, $campaign, $currentSources);
     }
 
     /**
