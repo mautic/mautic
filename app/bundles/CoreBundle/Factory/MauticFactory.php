@@ -394,7 +394,8 @@ class MauticFactory
                 $imageDir = substr($imageDir, 0, -1);
             }
 
-            return ($fullPath)  ? $paths['local_root'] . '/' . $imageDir : $imageDir;
+            $root = (isset($paths['local_root'])) ? $paths['local_root'] : $paths['root'];
+            return ($fullPath)  ? $root  . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } else {
