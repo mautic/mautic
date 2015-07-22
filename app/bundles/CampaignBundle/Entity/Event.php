@@ -167,6 +167,16 @@ class Event
     }
 
     /**
+     * Clean up after clone
+     */
+    public function __clone()
+    {
+        $this->id       = null;
+        $this->tempId   = null;
+        $this->campaign = null;
+    }
+
+    /**
      * @param string $prop
      * @param mixed  $val
      *
