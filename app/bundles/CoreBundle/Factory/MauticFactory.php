@@ -394,7 +394,9 @@ class MauticFactory
                 $imageDir = substr($imageDir, 0, -1);
             }
 
+            // Use local root if set if different than the system's root (for symlinked scenarios)
             $root = (isset($paths['local_root'])) ? $paths['local_root'] : $paths['root'];
+
             return ($fullPath)  ? $root  . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
