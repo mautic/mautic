@@ -98,6 +98,13 @@ class Report extends FormEntity
      */
     private $graphs = array();
 
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
     /**
      * @param ClassMetadata $metadata
      */
