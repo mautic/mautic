@@ -106,6 +106,13 @@ class Trigger extends FormEntity
      */
     private $events;
 
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
     /**
      * Constructor
      */
