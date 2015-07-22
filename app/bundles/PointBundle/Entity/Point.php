@@ -105,6 +105,13 @@ class Point extends FormEntity
      **/
     private $category;
 
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
     public function __construct()
     {
         $this->log = new ArrayCollection();
