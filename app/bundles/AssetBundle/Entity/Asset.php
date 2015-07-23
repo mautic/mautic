@@ -203,6 +203,13 @@ class Asset extends FormEntity
      */
     private $size;
 
+    /**
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"assetDetails"})
+     */
+    private $downloadUrl;
+
     public function __clone()
     {
         $this->id = null;
@@ -1293,5 +1300,25 @@ class Asset extends FormEntity
         }
 
         return number_format($size) . " bytes";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDownloadUrl()
+    {
+        return $this->downloadUrl;
+    }
+
+    /**
+     * @param mixed $downloadUrl
+     *
+     * @return Asset
+     */
+    public function setDownloadUrl($downloadUrl)
+    {
+        $this->downloadUrl = $downloadUrl;
+
+        return $this;
     }
 }
