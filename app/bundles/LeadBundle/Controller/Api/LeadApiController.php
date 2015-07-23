@@ -154,6 +154,8 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead
      *
+     * @param $id
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getNotesAction($id)
@@ -219,6 +221,15 @@ class LeadApiController extends CommonApiController
 
             $lists = $this->model->getLists($entity, true, true);
 
+            foreach ($lists as &$l) {
+                unset($l['leads'][0]['leadlist_id']);
+                unset($l['leads'][0]['lead_id']);
+
+                $l = array_merge($l, $l['leads'][0]);
+
+                unset($l['leads']);
+            }
+
             $view = $this->view(
                 array(
                     'total' => count($lists),
@@ -253,7 +264,17 @@ class LeadApiController extends CommonApiController
             $campaigns = $campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
-                unset($c['lists']);
+                if (!empty($c['lists'])) {
+                    $c['listMembership'] = array_keys($c['lists']);
+                    unset($c['lists']);
+                }
+
+                unset($c['leads'][0]['campaign_id']);
+                unset($c['leads'][0]['lead_id']);
+
+                $c = array_merge($c, $c['leads'][0]);
+
+                unset($c['leads']);
             }
 
             $view = $this->view(

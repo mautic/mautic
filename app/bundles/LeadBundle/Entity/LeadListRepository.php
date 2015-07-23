@@ -126,7 +126,7 @@ class LeadListRepository extends CommonRepository
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
             if ($forList) {
-                $q->select('partial l.{id, alias, name}, partial il.{lead, list}');
+                $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
             } else {
                 $q->select('l, partial lead.{id}');
             }
@@ -158,7 +158,7 @@ class LeadListRepository extends CommonRepository
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
             if ($forList) {
-                $q->select('partial l.{id, alias, name}');
+                $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
             } else {
                 $q->select('l');
             }
