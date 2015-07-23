@@ -9,7 +9,6 @@
 
 namespace MauticAddon\MauticSocialBundle\Integration;
 
-use Mautic\AddonBundle\Entity\Integration;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
