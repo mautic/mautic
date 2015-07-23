@@ -30,7 +30,7 @@ foreach ($fields as $f):
         $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
     endif;
 
-    echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias()));
+    echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $formName));
 endforeach;
 ?>
 

@@ -15,6 +15,7 @@ echo $view->render(
         'list'    => \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames(),
         'id'      => $id,
         'deleted' => (!empty($deleted)) ? true : false,
-        'formId'  => (isset($formId)) ? $formId : 0
+        'formId'  => (isset($formId)) ? $formId : 0,
+        'formName'  => (isset($formName)) ? $formName : ''
     )
 );

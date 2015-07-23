@@ -17,6 +17,7 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
         'deleted'        => false,
         'id'             => $id,
         'formId'         => $formId,
+        'formName'       => $formName,
         'disallowDelete' => true)
     ) : '';
 

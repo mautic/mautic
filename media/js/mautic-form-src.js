@@ -218,12 +218,12 @@
                             }
 
                             if (!valid) {
-                                validator.markError('mauticform_' + fieldKey, valid);
+                                validator.markError('mauticform_' + formId + '_' + fieldKey, valid);
                                 formValid = false;
 
                                 validator.enableSubmitButton();
                             } else {
-                                validator.clearError('mauticform_' + fieldKey);
+                                validator.clearError('mauticform_' + formId + '_' + fieldKey);
                             }
                         }
 
