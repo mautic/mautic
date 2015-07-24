@@ -71,6 +71,12 @@ class FormFieldHelper
                 'precision' => array()
             )
         ),
+        'float'   => array(
+            'properties' => array(
+                'roundmode' => array(),
+                'precision' => array()
+            )
+        ),
         'tel'      => array(
             'properties' => array()
         ),
