@@ -56,6 +56,16 @@ Mautic\PageBundle\Entity\Page:
             since_version: 1.0
             groups: [pageDetails]
 
+        redirectType:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
+        redirectUrl:
+            expose: true
+            since_version: 1.0
+            groups: [pageDetails]
+
         category:
             expose: true
             since_version: 1.0

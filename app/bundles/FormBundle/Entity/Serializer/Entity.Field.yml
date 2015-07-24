@@ -65,3 +65,18 @@ Mautic\FormBundle\Entity\Field:
            expose: true
            since_version: 1.0
            groups: [formDetails]
+
+        containerAttributes:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        leadField:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]
+
+        saveResult:
+            expose: true
+            since_version: 1.0
+            groups: [formDetails]

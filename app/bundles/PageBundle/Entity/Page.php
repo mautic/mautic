@@ -41,7 +41,6 @@ class Page extends FormEntity
     private $alias;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
     private $template;
@@ -57,7 +56,7 @@ class Page extends FormEntity
     private $customHtml;
 
     /**
-     * @ORM\Column(name="content", type="array", nullable=true)
+     * @var array
      */
     private $content = array();
 
@@ -97,27 +96,16 @@ class Page extends FormEntity
     private $metaDescription;
 
     /**
-     * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $redirectType;
 
     /**
-     * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $redirectUrl;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -191,7 +179,7 @@ class Page extends FormEntity
 
         $builder->addField('alias', 'string');
 
-        $builder->addField('template', 'string');
+        $builder->addNullableField('template', 'string');
 
         $builder->createField('language', 'string')
             ->columnName('lang')
@@ -220,9 +208,21 @@ class Page extends FormEntity
 
         $builder->addField('revision', 'integer');
 
-        $builder->createField('metaDescription', 'text')
+        $builder->createField('metaDescription', 'string')
             ->columnName('meta_description')
             ->nullable()
+            ->build();
+
+        $builder->createField('redirectType', 'string')
+            ->columnName('redirect_type')
+            ->nullable()
+            ->length(100)
+            ->build();
+
+        $builder->createField('redirectUrl', 'string')
+            ->columnName('redirect_url')
+            ->nullable()
+            ->length(100)
             ->build();
 
         $builder->addCategory();
@@ -280,11 +280,6 @@ class Page extends FormEntity
                 )
             )
         );
-    }
-
-    public function __clone ()
-    {
-        $this->id = null;
     }
 
     /**

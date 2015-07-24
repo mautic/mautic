@@ -77,11 +77,6 @@ class Asset extends FormEntity
     private $maxSize;
 
     /**
-     * Holds file type (file extension)
-     */
-    private $fileType;
-
-    /**
      * Temporary location when asset file is beeing updated.
      * We need to keep the old file till we are sure the new
      * one is stored correctly.
@@ -151,6 +146,11 @@ class Asset extends FormEntity
     private $mime;
 
     /**
+     * @var int
+     */
+    private $size;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -208,16 +208,15 @@ class Asset extends FormEntity
         $builder->createField('mime', 'string')
             ->nullable()
             ->build();
+
+        $builder->createField('size', 'integer')
+            ->nullable()
+            ->build();
     }
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * Clone magic function
      */
-    private $size;
-
     public function __clone()
     {
         $this->id = null;

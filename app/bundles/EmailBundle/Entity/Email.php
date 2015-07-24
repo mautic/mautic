@@ -35,65 +35,42 @@ class Email extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
      * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var string
      */
     private $subject;
 
     /**
-     * @ORM\Column(type="string", name="from_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      * @var string
      */
     private $fromAddress;
 
     /**
-     * @ORM\Column(type="string", name="from_name", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $fromName;
 
     /**
-     * @ORM\Column(type="string", name="reply_to_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $replyToAddress;
 
     /**
-     * @ORM\Column(type="string", name="bcc_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $bccAddress;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $template;
 
@@ -118,8 +95,7 @@ class Email extends FormEntity
     private $customHtml;
 
     /**
-     * @ORM\Column(name="email_type", type="string", nullable=true)
-     * @var string
+     * @var
      */
     private $emailType;
 
@@ -159,10 +135,6 @@ class Email extends FormEntity
     private $lists;
 
     /**
-     * @ORM\OneToMany(targetEntity="Stat", mappedBy="email", cascade={"persist"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
      * @var ArrayCollection
      */
     private $stats;
@@ -203,11 +175,7 @@ class Email extends FormEntity
     private $unsubscribeForm;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\AssetBundle\Entity\Asset", indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="email_assets_xref",
-     *   joinColumns={@ORM\JoinColumn(name="email_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="asset_id", referencedColumnName="id")}
-     * )
+     * @var ArrayCollection
      */
     private $assetAttachments;
 
@@ -260,11 +228,35 @@ class Email extends FormEntity
         $builder->setTable('emails')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository');
 
-        $builder->addId();
+        $builder->addIdColumns();
 
-        $builder->addField('subject', 'string');
+        $builder->createField('subject', 'text')
+            ->nullable()
+            ->build();
 
-        $builder->addField('template', 'string');
+        $builder->createField('fromAddress', 'string')
+            ->columnName('from_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('fromName', 'string')
+            ->columnName('from_name')
+            ->nullable()
+            ->build();
+
+        $builder->createField('replyToAddress', 'string')
+            ->columnName('reply_to_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('bccAddress', 'string')
+            ->columnName('bcc_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('template', 'string')
+            ->nullable()
+            ->build();
 
         $builder->createField('language', 'string')
             ->columnName('lang')
@@ -284,8 +276,9 @@ class Email extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('contentMode', 'string')
-            ->columnName('content_mode')
+        $builder->createField('emailType', 'text')
+            ->columnName('email_type')
+            ->nullable()
             ->build();
 
         $builder->addPublishDates();
@@ -313,7 +306,7 @@ class Email extends FormEntity
         $builder->createOneToMany('stats', 'Stat')
             ->setIndexBy('id')
             ->mappedBy('email')
-            ->cascadeAll()
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 
@@ -349,7 +342,12 @@ class Email extends FormEntity
             ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
             ->build();
 
-
+        $builder->createManyToMany('assetAttachments', 'Mautic\AssetBundle\Entity\Asset')
+            ->setJoinTable('email_assets_xref')
+            ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**

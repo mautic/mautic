@@ -96,8 +96,6 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      * @var ArrayCollection
      */
     private $submissions;
@@ -108,7 +106,7 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
-     * @ORM\Column(type="string", nullable=true, name="form_type")
+     * @var string
      */
     private $formType;
 
@@ -192,9 +190,10 @@ class Form extends FormEntity
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(array('dateSubmitted' => 'DESC'))
             ->mappedBy('form')
-            ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->addNullableField('formType', 'string', 'form_type');
     }
 
     /**
@@ -459,15 +458,6 @@ class Form extends FormEntity
     public function getPublishDown ()
     {
         return $this->publishDown;
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->fields  = new ArrayCollection();
-        $this->actions = new ArrayCollection();
     }
 
     /**

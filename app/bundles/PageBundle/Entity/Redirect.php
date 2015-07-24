@@ -48,6 +48,11 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
+     * @var Email
+     */
+    private $email;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -71,13 +76,11 @@ class Redirect extends FormEntity
         $builder->createField('uniqueHits', 'integer')
             ->columnName('unique_hits')
             ->build();
-    }
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     */
-    private $email;
+        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+    }
 
     /**
      * @return integer

@@ -55,8 +55,6 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
-     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", fetch="EXTRA_LAZY")
-     *
      * @var ArrayCollection
      */
     private $leads;
@@ -92,7 +90,6 @@ class LeadList extends FormEntity
         $builder->createOneToMany('leads', 'ListLead')
             ->setIndexBy('id')
             ->mappedBy('list')
-            ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
     }

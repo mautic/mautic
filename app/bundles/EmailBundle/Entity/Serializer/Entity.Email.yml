@@ -6,10 +6,35 @@ Mautic\EmailBundle\Entity\Email:
             since_version: 1.0
             groups: [emailDetails, emailList]
 
+        name:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails, emailList]
+
         subject:
             expose: true
             since_version: 1.0
             groups: [emailDetails, emailList]
+
+        fromAddress:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        fromName:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        replyToAddress:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
+
+        bccAddress:
+            expose: true
+            since_version: 1.0
+            groups: [emailDetails]
 
         language:
             expose: true
@@ -77,3 +102,8 @@ Mautic\EmailBundle\Entity\Email:
             expose: true
             since_version: 1.0
             groups: [emailDetails]
+
+        assetAttachments:
+            expose: true
+            since_version: 1.0
+            groups: [assetList]

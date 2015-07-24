@@ -30,9 +30,6 @@ class Stat
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
-     **/
      * @var Email
      */
     private $email;
@@ -108,24 +105,24 @@ class Stat
     private $tokens = array();
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
      */
     private $copy;
 
     /**
-     * @ORM\Column(type="integer", name="open_count", nullable=true)
+     * @var int
      */
     private $openCount;
 
     /**
-     * @ORM\Column(type="datetime", name="last_opened", nullable=true)
+     * @var \DateTime
      */
     private $lastOpened;
 
     /**
-     * @ORM\Column(type="array", name="open_details", nullable=true)
+     * @var array
      */
-    private $openDetails;
+    private $openDetails = array();
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -141,7 +138,7 @@ class Stat
 
         $builder->createManyToOne('email', 'Email')
             ->inversedBy('stats')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addLead(true, 'SET NULL');
@@ -199,6 +196,14 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('copy', 'text');
+
+        $builder->addNullableField('openCount', 'integer', 'open_count');
+
+        $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
+
+        $builder->addNullableField('openDetails', 'array', 'open_details');
     }
 
     /**

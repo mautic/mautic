@@ -38,13 +38,8 @@ class DoNotEmail
     private $emailAddress;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="doNotEmail")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     * @var \Mautic\CampaignBundle\Entity\LeadRepository
-     **/
+     * @var Lead
+     */
     private $lead;
 
     /**
@@ -87,7 +82,7 @@ class DoNotEmail
             ->columnName('address')
             ->build();
 
-        $builder->addLead(true);
+        $builder->addLead(true, 'CASCADE', false, 'doNotEmail');
 
         $builder->addDateAdded();
 

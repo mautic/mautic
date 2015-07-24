@@ -165,6 +165,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
 
     /**
      * Added dateAdded column
+     *
+     * @param bool|false $nullable
      */
     public function addDateAdded($nullable = false)
     {
@@ -181,9 +183,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     /**
      * Add a lead column
      *
-     * @param bool   $nullable
-     * @param string $onDelete
-     * @param bool   $isPrimaryKey
+     * @param bool|false $nullable
+     * @param string     $onDelete
+     * @param bool|false $isPrimaryKey
+     * @param null       $inversedBy
      */
     public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
     {
@@ -204,6 +207,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
 
     /**
      * Adds IP address
+     *
+     * @param bool|false $nullable
      */
     public function addIpAddress($nullable = false)
     {
@@ -212,5 +217,44 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->cascadeMerge()
             ->addJoinColumn('ip_id', 'id', $nullable)
             ->build();
+    }
+
+    /**
+     * Add a nullable field
+     *
+     * @param        $name
+     * @param string $type
+     * @param null   $columnName
+     */
+    public function addNullableField($name, $type = 'string', $columnName = null)
+    {
+        $field = $this->createField($name, $type)
+            ->nullable();
+
+        if ($columnName !== null) {
+            $field->columnName($columnName);
+        }
+
+        $field->build();
+    }
+
+    /**
+     * Add a field with a custom column name
+     *
+     * @param            $name
+     * @param            $type
+     * @param            $columnName
+     * @param bool|false $nullable
+     */
+    public function addNamedField($name, $type, $columnName, $nullable = false)
+    {
+        $field = $this->createField($name, $type)
+            ->columnName($columnName);
+
+        if ($nullable) {
+            $field->nullable();
+        }
+
+        $field->build();
     }
 }

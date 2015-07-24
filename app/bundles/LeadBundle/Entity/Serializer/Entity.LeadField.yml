@@ -41,6 +41,11 @@ Mautic\LeadBundle\Entity\LeadField:
             since_version: 1.0
             groups: [leadFieldDetails]
 
+        isUniqueIdentifier:
+            expose: true
+            since_version: 1.0
+            groups: [leadFieldDetails]
+
         order:
             expose: true
             since_version: 1.0

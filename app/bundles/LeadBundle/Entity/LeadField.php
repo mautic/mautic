@@ -85,15 +85,11 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @ORM\Column(name="is_unique_identifer", type="boolean", nullable=true)
+     * @var bool
      */
     private $isUniqueIdentifer = false;
 
     /**
-     * @ORM\Column(name="field_order", type="integer", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      * @var int
      */
     private $order = 0;
@@ -164,6 +160,8 @@ class LeadField extends FormEntity
             ->columnName('is_publicly_updatable')
             ->build();
 
+        $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
+
         $builder->createField('order', 'integer')
             ->columnName('field_order')
             ->nullable()
@@ -172,7 +170,6 @@ class LeadField extends FormEntity
         $builder->createField('properties', 'array')
             ->nullable()
             ->build();
-
     }
 
     /**
@@ -188,14 +185,6 @@ class LeadField extends FormEntity
             'fields'  => array('alias'),
             'message' => 'mautic.lead.field.alias.unique'
         )));
-    }
-
-    /**
-     * Clone
-     */
-    public function __clone ()
-    {
-        $this->id = null;
     }
 
     /**

@@ -52,19 +52,11 @@ class Lead extends FormEntity
     private $pointsChangeLog;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\EmailBundle\Entity\DoNotEmail", mappedBy="lead", cascade={"persist"}, fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $doNotEmail;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "detach"}, indexBy="ipAddress")
-     * @ORM\JoinTable(name="lead_ips_xref",
-     *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
-     * )
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
      * @var ArrayCollection
      */
     private $ipAddresses;
@@ -111,8 +103,6 @@ class Lead extends FormEntity
     private $dateIdentified;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", orphanRemoval=true, fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateAdded" = "DESC"})
      * @var ArrayCollection
      */
     private $notes;
@@ -173,6 +163,12 @@ class Lead extends FormEntity
             ->fetchExtraLazy()
             ->build();
 
+        $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+            ->mappedBy('lead')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
+
         $builder->createManyToMany('ipAddresses', 'Mautic\CoreBundle\Entity\IpAddress')
             ->setJoinTable('lead_ips_xref')
             ->addInverseJoinColumn('ip_id', 'id', false)
@@ -180,7 +176,7 @@ class Lead extends FormEntity
             ->setIndexBy('ipAddress')
             ->cascadeMerge()
             ->cascadePersist()
-            ->fetchExtraLazy()
+            ->cascadeDetach()
             ->build();
 
         $builder->createField('lastActive', 'datetime')
@@ -206,7 +202,6 @@ class Lead extends FormEntity
             ->orphanRemoval()
             ->setOrderBy(array('dateAdded' => 'DESC'))
             ->mappedBy('lead')
-            ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
 

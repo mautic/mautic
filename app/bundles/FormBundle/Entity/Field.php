@@ -26,10 +26,6 @@ class Field
     private $id;
 
     /**
-     * @ORM\Column(type="text")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $label;
@@ -60,10 +56,6 @@ class Field
     private $customParameters = array();
 
     /**
-     * @ORM\Column(name="default_value", type="text",  nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $defaultValue;
@@ -74,19 +66,11 @@ class Field
     private $isRequired = false;
 
     /**
-     * @ORM\Column(name="validation_message", type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $validationMessage;
 
     /**
-     * @ORM\Column(name="help_message", type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $helpMessage;
@@ -117,20 +101,17 @@ class Field
     private $inputAttributes;
 
     /**
-     * @ORM\Column(name="container_attr", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $containerAttributes;
 
     /**
-     * @ORM\Column(name="lead_field", type="string", nullable=true)
+     * @var string
      */
     private $leadField;
 
     /**
-     * @ORM\Column(name="save_result", type="boolean", nullable=true)
+     * @var bool
      */
     private $saveResult = true;
 
@@ -156,7 +137,7 @@ class Field
 
         $builder->addId();
 
-        $builder->addField('label', 'string');
+        $builder->addField('label', 'text');
 
         $builder->createField('showLabel', 'boolean')
             ->columnName('show_label')
@@ -176,7 +157,7 @@ class Field
             ->nullable()
             ->build();
 
-        $builder->createField('defaultValue', 'string')
+        $builder->createField('defaultValue', 'text')
             ->columnName('default_value')
             ->nullable()
             ->build();
@@ -185,12 +166,12 @@ class Field
             ->columnName('is_required')
             ->build();
 
-        $builder->createField('validationMessage', 'string')
+        $builder->createField('validationMessage', 'text')
             ->columnName('validation_message')
             ->nullable()
             ->build();
 
-        $builder->createField('helpMessage', 'string')
+        $builder->createField('helpMessage', 'text')
             ->columnName('help_message')
             ->nullable()
             ->build();
@@ -209,16 +190,17 @@ class Field
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('labelAttributes', 'string')
-            ->columnName('label_attr')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('labelAttributes', 'string', 'label_attr');
 
-        $builder->createField('inputAttributes', 'string')
-            ->columnName('input_attr')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('inputAttributes', 'string', 'input_attr');
+
+        $builder->addNullableField('containerAttributes', 'string', 'container_attr');
+
+        $builder->addNullableField('leadField', 'string', 'lead_field');
+
+        $builder->addNullableField('saveResult', 'boolean', 'save_result');
     }
+
 
     /**
      * @param $prop

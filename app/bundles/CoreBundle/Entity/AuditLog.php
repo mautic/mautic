@@ -114,7 +114,7 @@ class AuditLog
 
         $builder->createField('ipAddress', 'string')
             ->columnName('ip_address')
-            ->length(15)
+            ->length(45)
             ->build();
     }
 

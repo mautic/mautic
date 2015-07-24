@@ -63,7 +63,7 @@ class Campaign extends FormEntity
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $leads;
 
@@ -73,14 +73,12 @@ class Campaign extends FormEntity
     private $lists;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\FormBundle\Entity\Form", fetch="EXTRA_LAZY", indexBy="id")
-     * @ORM\JoinTable(name="campaign_form_xref")
-     * @ORM\JoinColumn(name="form_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
-     **/
+     * @var ArrayCollection
+     */
     private $forms;
 
     /**
-     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
+     * @var array
      */
     private $canvasSettings = array();
 
@@ -133,13 +131,20 @@ class Campaign extends FormEntity
         $builder->createOneToMany('leads', 'Lead')
             ->setIndexBy('id')
             ->mappedBy('campaign')
-            ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
             ->setJoinTable('campaign_leadlist_xref')
             ->setIndexBy('id')
+            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->createManyToMany('forms', 'Mautic\FormBundle\Entity\Form')
+            ->setJoinTable('campaign_form_xref')
+            ->setIndexBy('id')
+            ->addInverseJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
             ->build();
 

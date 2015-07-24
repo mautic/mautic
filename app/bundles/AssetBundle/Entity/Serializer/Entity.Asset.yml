@@ -65,3 +65,8 @@ Mautic\AssetBundle\Entity\Asset:
             expose: true
             since_version: 1.0
             groups: [assetDetails]
+
+        size:
+            expose: true
+            since_version: 1.0
+            groups: [assetDetails]

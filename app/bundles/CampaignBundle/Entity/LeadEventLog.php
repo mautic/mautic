@@ -61,6 +61,16 @@ class LeadEventLog
     private $systemTriggered = false;
 
     /**
+     * @var array
+     */
+    private $metadata = array();
+
+    /**
+     * @var bool
+     */
+    private $nonActionPathTaken = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -101,17 +111,13 @@ class LeadEventLog
         $builder->createField('systemTriggered', 'boolean')
             ->columnName('system_triggered')
             ->build();
+
+        $builder->createField('metadata', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
     }
-
-    /**
-     * @ORM\Column(type="array", nullable=true)
-     */
-    private $metadata = array();
-
-    /**
-     * @ORM\Column(name="non_action_path_taken", type="boolean", nullable=true)
-     */
-    private $nonActionPathTaken = false;
 
     /**
      * @return \DateTime
