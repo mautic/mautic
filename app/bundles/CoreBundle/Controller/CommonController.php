@@ -347,7 +347,7 @@ class CommonController extends Controller implements MauticController
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         // Append the URL so that the log is more useful
-        $message .= ' (' . $this->request->getRequestUri() . ')';
+        $message .= ': ' . $this->request->getRequestUri();
 
         return new NotFoundHttpException($message, $previous);
     }
