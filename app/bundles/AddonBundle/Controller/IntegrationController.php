@@ -118,7 +118,8 @@ class IntegrationController extends FormController
 
         // Verify that the requested integration exists
         if (empty($integrationObject)) {
-            throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
+
+            $this->notFound();
         }
 
         $leadFields = $this->factory->getModel('addon')->getLeadFields();

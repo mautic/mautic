@@ -315,41 +315,47 @@ class CommonController extends Controller implements MauticController
      * Generates access denied message
      *
      * @param bool   $batch Flag if a batch action is being performed
-     * @param string $msg   Message to display to the user
+     * @param string $msg   Message that is logged
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.error.accessdenied')
+    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
     {
         $anonymous = $this->factory->getSecurity()->isAnonymous();
 
         if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException($this->get('translator')->trans($msg, array(), 'flashes'));
+            throw new AccessDeniedHttpException(
+                $this->factory->getTranslator()->trans($msg,
+                    array(
+                        '%url%' => $this->request->getRequestUri()
+                    )
+                )
+            );
         }
 
         if ($batch) {
             return array(
                 'type' => 'error',
-                'msg'  => $msg
+                'msg'  => $this->factory->getTranslator()->trans('mautic.core.error.accessdenied', array(), 'flashes')
             );
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Generate 404 not found message
      *
-     * @param string          $message
-     * @param \Exception|null $previous
-     *
-     * @return NotFoundHttpException
+     * @param string $msg Message to log
      */
-    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    public function notFound($msg = 'mautic.core.url.error.404')
     {
-        // Append the URL so that the log is more useful
-        $message .= ': ' . $this->request->getRequestUri();
-
-        return new NotFoundHttpException($message, $previous);
+        throw new NotFoundHttpException(
+            $this->factory->getTranslator()->trans($msg,
+                array(
+                    '%url%' => $this->request->getRequestUri()
+                )
+            )
+        );
     }
 
     /**
