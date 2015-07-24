@@ -80,6 +80,16 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
         $this->addonHelper = $factory->getHelper('addon');
+
+        $this->init();
+    }
+
+    /**
+     * Post __construct setup so that inheriting classes don't have to pass all the arguments
+     */
+    protected function init()
+    {
+
     }
 
     /**
@@ -94,7 +104,6 @@ class CommonSubscriber implements EventSubscriberInterface
      * Find and add menu items
      *
      * @param MauticEvents\MenuEvent $event
-     * @param string                 $name
      *
      * @return void
      */
@@ -198,7 +207,6 @@ class CommonSubscriber implements EventSubscriberInterface
      * Get routing from bundles and add to Routing event
      *
      * @param MauticEvents\RouteEvent $event
-     * @param string                  $name
      *
      * @return void
      */

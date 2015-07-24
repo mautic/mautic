@@ -29,7 +29,6 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class CoreSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */

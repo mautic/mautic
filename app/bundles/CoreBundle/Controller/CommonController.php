@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Templating\DelegatingEngine;
 
 /**
@@ -336,6 +337,22 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param string          $message
+     * @param \Exception|null $previous
+     *
+     * @return NotFoundHttpException
+     */
+    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    {
+        // Append the URL so that the log is more useful
+        $message .= ' (' . $this->request->getRequestUri() . ')';
+
+        return new NotFoundHttpException($message, $previous);
+    }
+
+    /**
      * Returns a json encoded access denied error for modal windows
      *
      * @param string $msg
@@ -491,11 +508,12 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param      $message
-     * @param null $type
-     * @param bool $isRead
-     * @param null $header
-     * @param null $iconClass
+     * @param                $message
+     * @param null           $type
+     * @param bool|true      $isRead
+     * @param null           $header
+     * @param null           $iconClass
+     * @param \DateTime|null $datetime
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
