@@ -26,6 +26,10 @@ class Field
     private $id;
 
     /**
+     * @ORM\Column(type="text")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $label;
@@ -56,6 +60,10 @@ class Field
     private $customParameters = array();
 
     /**
+     * @ORM\Column(name="default_value", type="text",  nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $defaultValue;
@@ -66,11 +74,19 @@ class Field
     private $isRequired = false;
 
     /**
+     * @ORM\Column(name="validation_message", type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $validationMessage;
 
     /**
+     * @ORM\Column(name="help_message", type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      * @var string
      */
     private $helpMessage;
@@ -99,6 +115,24 @@ class Field
      * @var string
      */
     private $inputAttributes;
+
+    /**
+     * @ORM\Column(name="container_attr", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
+     */
+    private $containerAttributes;
+
+    /**
+     * @ORM\Column(name="lead_field", type="string", nullable=true)
+     */
+    private $leadField;
+
+    /**
+     * @ORM\Column(name="save_result", type="boolean", nullable=true)
+     */
+    private $saveResult = true;
 
     /**
      * @var array
@@ -502,6 +536,26 @@ class Field
     }
 
     /**
+     * @return mixed
+     */
+    public function getContainerAttributes()
+    {
+        return $this->containerAttributes;
+    }
+
+    /**
+     * @param $containerAttributes
+     *
+     * @return $this
+     */
+    public function setContainerAttributes($containerAttributes)
+    {
+        $this->containerAttributes = $containerAttributes;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function convertToArray ()
@@ -641,5 +695,37 @@ class Field
     public function setSessionId ($sessionId)
     {
         $this->sessionId = $sessionId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLeadField()
+    {
+        return $this->leadField;
+    }
+
+    /**
+     * @param mixed $leadField
+     */
+    public function setLeadField($leadField)
+    {
+        $this->leadField = $leadField;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSaveResult()
+    {
+        return $this->saveResult;
+    }
+
+    /**
+     * @param mixed $saveResult
+     */
+    public function setSaveResult($saveResult)
+    {
+        $this->saveResult = $saveResult;
     }
 }

@@ -29,7 +29,7 @@ class LeadListType extends AbstractType
      * @param MauticFactory       $factory
      */
     public function __construct(MauticFactory $factory) {
-        $this->model = $factory->getModel('lead.list');;
+        $this->model = $factory->getModel('lead.list');
     }
 
     /**
@@ -50,7 +50,8 @@ class LeadListType extends AbstractType
 
                 return $choices;
             },
-            'global_only' => false
+            'global_only' => false,
+            'required'    => false
         ));
     }
 

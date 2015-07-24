@@ -44,16 +44,15 @@ class DefaultController extends CommonController
         $popularAssets        = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
         $popularCampaigns     = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 
-        $openRate = 0;
-
-        if ($sentReadCount['sent_count']) {
-            $openRate = round($sentReadCount['read_count'] / $sentReadCount['sent_count'] * 100);
+        $returnRate = 0;
+        if ($totalVisits = array_sum($newReturningVisitors)) {
+            $returnRate = round($newReturningVisitors['returning'] / $totalVisits * 100);
         }
 
         $clickRate = 0;
 
         if ($sentReadCount['read_count']) {
-            $clickRate = round($clickthroughCount / $sentReadCount['read_count'] * 100);
+            $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
         $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
@@ -71,25 +70,32 @@ class DefaultController extends CommonController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null);
 
         // Get names of log's items
         $router = $this->factory->getRouter();
-        foreach ($logs as &$log) {
+        foreach ($logs as $key => &$log) {
             if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
-                $model = $this->factory->getModel($log['bundle'] . '.' . $log['object']);
-                $item = $model->getEntity($log['objectId']);
-                if (method_exists($item, $model->getNameGetter())) {
-                    $log['objectName'] = $item->{$model->getNameGetter()}();
-                } else {
-                    $log['objectName'] = '';
-                }
+                try {
+                    $model = $this->factory->getModel($log['bundle'].'.'.$log['object']);
+                    $item  = $model->getEntity($log['objectId']);
+                    if (method_exists($item, $model->getNameGetter())) {
+                        $log['objectName'] = $item->{$model->getNameGetter()}();
+                    } else {
+                        $log['objectName'] = '';
+                    }
 
-                $routeName = 'mautic_' . $log['bundle'] . '_action';
-                if ($router->getRouteCollection()->get($routeName) !== null) {
-                    $log['route'] = $router->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId']));
-                } else {
-                    $log['route'] = false;
+                    $routeName = 'mautic_'.$log['bundle'].'_action';
+                    if ($router->getRouteCollection()->get($routeName) !== null) {
+                        $log['route'] = $router->generate(
+                            'mautic_'.$log['bundle'].'_action',
+                            array('objectAction' => 'view', 'objectId' => $log['objectId'])
+                        );
+                    } else {
+                        $log['route'] = false;
+                    }
+                } catch (\Exception $e) {
+                    unset($logs[$key]);
                 }
             }
         }
@@ -113,7 +119,7 @@ class DefaultController extends CommonController
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
                 'clickthroughCount' => $clickthroughCount,
-                'openRate'          => $openRate,
+                'returnRate'        => $returnRate,
                 'clickRate'         => $clickRate,
                 'newReturningVisitors' => $newReturningVisitors,
                 'weekVisitors'      => $weekVisitors,

@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -88,7 +89,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(array('Report'));
@@ -108,7 +109,7 @@ class ReportModel extends FormModel
                 $name = ReportEvents::REPORT_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -121,7 +122,7 @@ class ReportModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -279,6 +280,7 @@ class ReportModel extends FormModel
 
         switch ($format) {
             case 'csv':
+
                 $response = new StreamedResponse(function () use ($reportData, $report, $formatter) {
                     $handle = fopen('php://output', 'r+');
                     $header = array();
@@ -291,7 +293,8 @@ class ReportModel extends FormModel
                                 //set the header
                                 $header[] = $k;
                             }
-                            $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
+
+                            $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                         }
 
                         if ($count === 0) {
@@ -346,7 +349,7 @@ class ReportModel extends FormModel
                                     //set the header
                                     $header[] = $k;
                                 }
-                                $row[] = $formatter->_($v, $reportData['columns'][$k]['type'], true);
+                                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                             }
 
                             //write the row
@@ -385,8 +388,9 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering
      *
-     * @param     $entity
-     * @param int $reportPage
+     * @param       $entity
+     * @param       $formFactory
+     * @param array $options
      *
      * @return array
      */
@@ -409,9 +413,9 @@ class ReportModel extends FormModel
         $dataOptions = array(
             //'start'      => $start,
             //'limit'      => $limit,
-            'order'      => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
-            'dispatcher' => $this->factory->getDispatcher(),
-            'columns'    => $columns['columns']
+            'order'       => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
+            'dispatcher'  => $this->factory->getDispatcher(),
+            'columns'     => $columns['columns']
         );
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
@@ -429,7 +433,7 @@ class ReportModel extends FormModel
                 }
             }
             $query->andWhere($filterExpressions);
-            $query->setParameters($parameters);
+            $query->setParameters($filterParameters);
         }
         $contentTemplate = $reportGenerator->getContentTemplate();
 
@@ -506,12 +510,19 @@ class ReportModel extends FormModel
             }
         }
 
+        // Build a reference for column to data
+        $dataColumns = array();
+        foreach ($columns['columns'] as $dbColumn => $columnData) {
+            $dataColumns[$columnData['label']] = $dbColumn;
+        }
+
         return array(
             'totalResults'    => $totalResults,
             'data'            => $data,
             'graphs'          => $graphs,
             'contentTemplate' => $contentTemplate,
             'columns'         => $columns['columns'],
+            'dataColumns'     => $dataColumns,
             'limit'           => ($paginate) ? $limit : 0
         );
     }

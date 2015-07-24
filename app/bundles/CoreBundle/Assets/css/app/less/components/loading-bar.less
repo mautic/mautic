@@ -26,21 +26,21 @@
     height: 2px;
     background-color: @brand-primary;
   }
-  &:after {
-    left: 50%;
-    width: 10%;
-    .lh-animation(after-anim 2.5s infinite linear);
-  }
-  &:before {
-    left: 0%;
-    width: 0%;
-    .lh-animation(before-anim 2.5s infinite linear);
-  }
-
   // active state
   &.active {
     opacity: 1;
     .lh-transition(opacity 0.3s ease);
+
+    &:after {
+      left: 50%;
+      width: 10%;
+      .lh-animation(after-anim 2.5s infinite linear);
+    }
+    &:before {
+      left: 0%;
+      width: 0%;
+      .lh-animation(before-anim 2.5s infinite linear);
+    }
   }
 }
 

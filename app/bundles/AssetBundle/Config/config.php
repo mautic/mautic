@@ -50,7 +50,7 @@ return array(
 
     'menu' => array(
         'main' => array(
-            'priority' => 10,
+            'priority' => 35,
             'items'    => array(
                 'mautic.asset.assets' => array(
                     'id'        => 'mautic_asset_root',

@@ -184,7 +184,13 @@ class IntegrationHelper
     {
         if (!is_array($addon)) {
             $addons = $this->factory->getParameter('addon.bundles');
-            $addon  = $addons[$addon];
+            if (array_key_exists($addon, $addons)) {
+                $addon = $addons[$addon];
+            } else {
+                // It doesn't exist so return 0
+
+                return 0;
+            }
         }
 
         if (is_dir($addon['directory'] . '/Integration')) {
@@ -277,6 +283,8 @@ class IntegrationHelper
 
             //check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, array('public_profile', 'public_activity'));
+
+            /* @var \MauticAddon\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -292,11 +300,11 @@ class IntegrationHelper
                     //clear the cache
                     unset($profile['profile'], $profile['activity']);
 
-                    if (in_array('public_profile', $features)) {
+                    if (in_array('public_profile', $features) && $sn->isAuthorized()) {
                         $sn->getUserData($identifierField, $profile);
                     }
 
-                    if (in_array('public_activity', $features)) {
+                    if (in_array('public_activity', $features) && $sn->isAuthorized()) {
                         $sn->getPublicActivity($identifierField, $profile);
                     }
 
@@ -308,8 +316,6 @@ class IntegrationHelper
                         $socialCache[$integration]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : array();
                         $socialCache[$integration]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
                         $socialCache[$integration]['lastRefresh'] = $now->toUtcString();
-                    } else {
-                        unset($socialCache[$integration]);
                     }
                 } elseif (isset($socialCache[$integration])) {
                     //integration is now not applicable
@@ -317,7 +323,7 @@ class IntegrationHelper
                 }
             }
 
-            if ($persistLead) {
+            if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
                 $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
@@ -340,6 +346,8 @@ class IntegrationHelper
     /**
      * @param      $lead
      * @param bool $integration
+     *
+     * @return array
      */
     public function clearIntegrationCache ($lead, $integration = false)
     {
@@ -425,7 +433,9 @@ class IntegrationHelper
             }
         };
 
-        if (isset($fields['core'])) {
+        $groups = array('core', 'social', 'professional', 'personal');
+        $keys   = array_keys($fields);
+        if (count(array_intersect($groups, $keys)) !== 0 && count($keys) <= 4) {
             //fields are group
             foreach ($fields as $group => $groupFields) {
                 $availableFields = array_keys($groupFields);

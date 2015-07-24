@@ -35,12 +35,18 @@ class LeadEventLogRepository extends EntityRepository
                     e.name AS event_name,
                     e.description AS event_description,
                     c.name AS campaign_name,
-                    c.description AS campaign_description')
+                    c.description AS campaign_description,
+                    ll.metadata,
+                    e.type,
+                    ll.isScheduled,
+                    ll.triggerDate
+                    '
+            )
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
             ->where('ll.lead = ' . (int) $leadId)
             ->andWhere('e.eventType = :eventType')
-            ->setParameter('eventType', 'trigger');
+            ->setParameter('eventType', 'action');
 
         if (!empty($options['ipIds'])) {
             $query->orWhere('ll.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
@@ -53,6 +59,13 @@ class LeadEventLogRepository extends EntityRepository
                 $query->expr()->like('c.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
                 $query->expr()->like('c.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
             ));
+        }
+
+        if (isset($options['scheduledState'])) {
+            $query->andWhere(
+                $query->expr()->eq('ll.isScheduled', ':scheduled')
+            )
+                ->setParameter('scheduled', $options['scheduledState'], 'boolean');
         }
 
         return $query->getQuery()->getArrayResult();
@@ -97,7 +110,7 @@ class LeadEventLogRepository extends EntityRepository
 
         if (isset($options['scheduled'])) {
             $query->andWhere('ll.isScheduled = :scheduled')
-                ->setParameter('scheduled', $options['scheduled']);
+                ->setParameter('scheduled', $options['scheduled'], 'boolean');
         }
 
         if (isset($options['eventType'])) {
@@ -127,72 +140,49 @@ class LeadEventLogRepository extends EntityRepository
     }
 
     /**
-     * @param int        $campaignId
-     * @param null       $eventId
-     * @param null|array $leadIds
+     * @param      $campaignId
+     * @param      $leadIds
+     * @param bool $excludeScheduled
+     *
+     * @return array
      */
-    public function getCampaignLog($campaignId, $eventId = null, $leadIds = null)
+    public function getCampaignLogCounts($campaignId, $leadIds, $excludeScheduled = false)
     {
-        $q = $this->_em->createQueryBuilder()
-            ->select('o, partial l.{id}, partial e.{id}')
-            ->from('MauticCampaignBundle:LeadEventLog', 'o');
-
-        $q->leftJoin('o.lead', 'l')
-            ->leftJoin('o.event', 'e')
-            ->leftJoin('e.campaign', 'c');
-
-        $expr = $q->expr()->andX(
-            $q->expr()->eq('c.id', ':campaign')
-        );
-
-        if (!empty($eventId)) {
-            $expr->add(
-                $q->expr()->eq('e.id', ':event')
-            );
-            $q->setParameter('event', $eventId);
-        }
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('o.event_id, count(o.lead_id) as lead_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
         if (empty($leadIds)) {
-            $sq = $this->_em->getConnection()->createQueryBuilder()
-                ->select('lead_id')
-                ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-                ->where('campaign_id = ' . (int) $campaignId);
-            $leads = $sq->execute()->fetchAll();
-
-            $limitByLeads = array();
-            foreach ($leads as $l) {
-                $limitByLeads[] = $l['lead_id'];
-            }
-        } else {
-            if (!is_array($leadIds)) {
-                $limitByLeads = array($leadIds);
-            } else {
-                $limitByLeads = $leadIds;
-            }
+            // Just force nothing
+            $leadIds = array(0);
         }
 
-        $expr->add(
-            $q->expr()->in('l.id', ':leads')
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('o.campaign_id', (int) $campaignId),
+            $q->expr()->in('o.lead_id', $leadIds),
+            $q->expr()->orX(
+                $q->expr()->isNull('o.non_action_path_taken'),
+                $q->expr()->eq('o.non_action_path_taken', ':false')
+            )
         );
-        $q->setParameter('leads', $limitByLeads);
+
+        if ($excludeScheduled) {
+            $expr->add(
+                $q->expr()->eq('o.is_scheduled', ':false')
+            );
+        }
 
         $q->where($expr)
-            ->setParameter('campaign', $campaignId);
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('o.event_id');
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
         $return = array();
 
-        if (!empty($leadIds)) {
-            //group by lead id then event id
-            foreach ($results as $l) {
-                $return[$l['lead']['id']][$l['event']['id']][] = $l;
-            }
-        } else {
-            //group by event id
-            foreach ($results as $l) {
-                $return[$l['event']['id']][] = $l;
-            }
+        //group by event id
+        foreach ($results as $l) {
+            $return[$l['event_id']] = $l['lead_count'];
         }
 
         return $return;
@@ -220,10 +210,35 @@ class LeadEventLogRepository extends EntityRepository
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
+        // First check to ensure the $toLead doesn't already exist
+        $results = $this->_em->getConnection()->createQueryBuilder()
+            ->select('cl.event_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
+            ->where('cl.lead_id = '.$toLeadId)
+            ->execute()
+            ->fetchAll();
+        $exists = array();
+        foreach ($results as $r) {
+            $exists[] = $r['event_id'];
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log')
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
-            ->execute();
+            ->where('lead_id = '.(int) $fromLeadId);
+
+        if (!empty($exists)) {
+            $q->andWhere(
+                $q->expr()->notIn('event_id', $exists)
+            )->execute();
+
+            // Delete remaining leads as the new lead already belongs
+            $this->_em->getConnection()->createQueryBuilder()
+                ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+                ->where('lead_id = '.(int) $fromLeadId)
+                ->execute();
+        } else {
+            $q->execute();
+        }
     }
 }

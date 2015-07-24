@@ -7,14 +7,41 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$buttonGroupTypes = array('group', 'button-dropdown');
+if (isset($buttonFormat)) {
+    $buttonGroupTypes = array($buttonFormat);
+} else {
+    $count = 0;
+    // Get a count of buttons
+    if (isset($preCustomButtons)) {
+        $count += count($preCustomButtons);
+    }
+
+    //Build post template custom buttons
+    if (isset($customButtons)) {
+        $count += count($customButtons);
+    } elseif (isset($postCustomButtons)) {
+        $count += count($postCustomButtons);
+    }
+
+    if (isset($templateButtons)) {
+        foreach ($templateButtons as $templateButton) {
+            if ($templateButton)
+                $count++;
+        }
+    }
+
+    $buttonGroupTypes = ($count > 4) ? array('button-dropdown') : array('group', 'button-dropdown');
+}
+
+$forceVisible = (count($buttonGroupTypes) === 1);
+
 foreach ($buttonGroupTypes as $groupType) {
     $buttonCount = 0;
     if ($groupType == 'group') {
-        echo '<div class="btn-group hidden-xs hidden-sm">';
+        echo '<div class="std-toolbar btn-group' . ((!$forceVisible) ? ' hidden-xs hidden-sm' : '') .'">';
         $dropdownOpenHtml = '';
     } else {
-        echo '<div class="btn-group hidden-md hidden-lg">';
+        echo '<div class="dropdown-toolbar btn-group' . ((!$forceVisible) ? ' hidden-md hidden-lg' : '') . '">';
         $dropdownOpenHtml  = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
         $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">' . "\n";
     }

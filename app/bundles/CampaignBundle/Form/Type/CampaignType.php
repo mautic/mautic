@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -111,27 +110,6 @@ class CampaignType extends AbstractType
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
-
-        //add lead lists
-        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-            $this->em,
-            'MauticLeadBundle:LeadList',
-            'id',
-            true
-        );
-        $builder->add(
-            $builder->create('lists', 'leadlist_choices', array(
-                'label'      => 'mautic.campaign.form.list',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control'
-                ),
-                'multiple' => true,
-                'expanded' => false,
-                'global_only' => true
-            ))
-                ->addModelTransformer($transformer)
-        );
 
         $builder->add('buttons', 'form_buttons', array(
             'pre_extra_buttons' => array(

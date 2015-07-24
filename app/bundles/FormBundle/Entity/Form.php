@@ -96,6 +96,8 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
+     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      * @var ArrayCollection
      */
     private $submissions;
@@ -106,11 +108,18 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
+     * @ORM\Column(type="string", nullable=true, name="form_type")
+     */
+    private $formType;
+
+    /**
      * @return void
      */
     public function __clone ()
     {
         $this->id = null;
+
+        parent::__clone();
     }
 
     /**
@@ -453,7 +462,16 @@ class Form extends FormEntity
     }
 
     /**
-     * Add fields
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fields  = new ArrayCollection();
+        $this->actions = new ArrayCollection();
+    }
+
+    /**
+     * Add a field
      *
      * @param       $key
      * @param Field $field
@@ -471,13 +489,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove fields
+     * Remove a field
      *
-     * @param Field $fields
+     * @param       $key
+     * @param Field $field
      */
-    public function removeField (Field $fields)
+    public function removeField($key, Field $field)
     {
-        $this->fields->removeElement($fields);
+        if ($changes = $field->getChanges()) {
+            $this->isChanged('fields', array($key, $changes));
+        }
+        $this->fields->removeElement($field);
     }
 
     /**
@@ -578,6 +600,14 @@ class Form extends FormEntity
     }
 
     /**
+     * Removes all actions
+     */
+    public function clearActions()
+    {
+        $this->actions = new ArrayCollection();
+    }
+
+    /**
      * Get actions
      *
      * @return \Doctrine\Common\Collections\Collection
@@ -641,5 +671,33 @@ class Form extends FormEntity
     public function isInKioskMode()
     {
         return $this->getInKioskMode();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFormType()
+    {
+        return $this->formType;
+    }
+
+    /**
+     * @param mixed $formType
+     *
+     * @return Form
+     */
+    public function setFormType($formType)
+    {
+        $this->formType = $formType;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStandalone()
+    {
+        return ($this->formType != 'campaign');
     }
 }

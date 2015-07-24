@@ -112,7 +112,7 @@ $view['assets']->addStyleDeclaration($css);
 				</a>
 			</li>
 			<li role="presentation">
-				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot ?>" onclick="SlideshowManager.preloadFileManager();">
+				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot ?>">
 					<i class="fa fa-bars"></i> Edit Slides
 				</a>
 			</li>
@@ -188,7 +188,7 @@ $view['assets']->addStyleDeclaration($css);
 								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>
 							</div>
 							<div class="col-md-3">
-								<button type="button" onclick="SlideshowManager.toggleFileManager();" class="btn button-default file-manager-toggle">
+								<button type="button" onclick="SlideshowManager.BrowseServer('slides:<?php echo $key; ?>:background-image');" class="btn button-default file-manager-toggle">
 									<i class="fa fa-folder-open-o"></i> File Manager
 								</button>
 							</div>

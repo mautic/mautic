@@ -148,30 +148,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Count leads for a specific campaign
-     *
-     * @param      $campaignId
-     * @return int
-     */
-    public function countLeads($campaignId)
-    {
-        $q = $this->createQueryBuilder('cl')
-            ->select('count(cl.lead) as thecount');
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('cl.campaign', ':campaign'),
-                $q->expr()->eq('cl.manuallyRemoved', ':false')
-            )
-        )
-            ->setParameter('campaign', $campaignId)
-            ->setParameter('false', false, 'boolean');
-
-        $result = $q->getQuery()->getSingleResult();
-
-        return (int) $result['thecount'];
-    }
-
-    /**
      * Fetch Lead stats for some period of time.
      *
      * @param integer $quantity of units
@@ -187,46 +163,39 @@ class LeadRepository extends CommonRepository
         $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
-        $q = $this->createQueryBuilder('cl');
-        $q->select('cl.dateAdded');
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('cl.date_added')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
+
+        $utc = new \DateTimeZone('UTC');
+        $graphData['fromDate']->setTimezone($utc);
 
         $q->andwhere(
             $q->expr()->andX(
-                $q->expr()->gte('cl.dateAdded', ':date'),
-                $q->expr()->eq('cl.manuallyRemoved', ':false')
+                $q->expr()->gte('cl.date_added', ':date'),
+                $q->expr()->eq('cl.manually_removed', ':false')
             )
         )
-            ->setParameter('date', $graphData['fromDate'])
+            ->setParameter('date', $graphData['fromDate']->format('Y-m-d H:i:s'))
             ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.dateAdded', 'ASC');
+            ->orderBy('cl.date_added', 'ASC');
 
         if (isset($options['campaign_id'])) {
-            $q->andwhere($q->expr()->gte('cl.campaign', ':campaignId'))
-                ->setParameter('campaignId', $options['campaign_id']);
+            $q->andwhere($q->expr()->gte('cl.campaign_id', (int) $options['campaign_id']));
         }
 
-        $leads = $q->getQuery()->getArrayResult();
-
+        $leads = $q->execute()->fetchAll();
         $total = false;
 
         if (isset($options['total']) && $options['total']) {
             // Count total until date
-            $q2 = $this->createQueryBuilder('cl');
-            $q2->select('count(cl.lead) as total');
+            $q->select('count(cl.lead_id) as total');
 
-            $q2->andwhere(
-                $q->expr()->andX(
-                    $q->expr()->eq('cl.manuallyRemoved', ':false'),
-                    $q->expr()->lt('cl.dateAdded', ':date'))
-                )
-                ->setParameter('false', false, 'boolean')
-                ->setParameter('date', $graphData['fromDate']);
-
-            $total = $q2->getQuery()->getSingleResult();
-            $total = (int) $total['total'];
+            $total = $q->execute()->fetchAll();
+            $total = (int) $total[0]['total'];
         }
 
-        return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'dateAdded', null, false, $total);
+        return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'date_added', null, false, $total);
     }
 
 

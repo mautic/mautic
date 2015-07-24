@@ -49,11 +49,20 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activeAsset)); ?>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
-                                <td><?php echo (!is_null($activeAsset->getFileSize())) ? $activeAsset->getFileSize() . ' kB' : ''; ?></td>
+                                <td><?php echo $activeAsset->getSize(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
                                 <td><?php echo $assetDownloadUrl; ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.filename.original'); ?></span></td>
+                                <td><?php echo $activeAsset->getOriginalFilename(); ?></td>
+                            </tr>
+                            <tr>
+                                <?php $location = $activeAsset->getStorageLocation(); ?>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.filename.' . $location); ?></span></td>
+                                <td><?php echo ($location == 'local') ? $activeAsset->getPath() : $activeAsset->getRemotePath(); ?></td>
                             </tr>
                             </tbody>
                         </table>
@@ -90,39 +99,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
                                 </div>
                                 <div class="col-xs-4 va-m">
-                                    <div class="dropdown pull-right">
-                                        <button id="time-scopes" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                            <span class="button-label"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?></span>
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="time-scopes">
-                                            <li role="presentation">
-                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;" role="menuitem" tabindex="-1">
-                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.hourly'); ?>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#" class="bg-primary" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;" role="menuitem" tabindex="-1">
-                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;" role="menuitem" tabindex="-1">
-                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.weekly'); ?>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'M');return false;" role="menuitem" tabindex="-1">
-                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.monthly'); ?>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 10, 'Y');return false;" role="menuitem" tabindex="-1">
-                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.yearly'); ?>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateDownloadChart')); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
@@ -157,7 +134,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <div class="input-group">
                 <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $assetDownloadUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default" onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
+                    <button class="btn btn-default btn-nospin" onclick="window.location = '<?php echo $assetDownloadUrl; ?>';">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>
@@ -172,6 +149,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
-    <input id="itemId" type="hidden" value="<?php echo $activeAsset->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $activeAsset->getId(); ?>" />
 </div>
 <!--/ end: box layout -->

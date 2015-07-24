@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController extends CommonFormController
 {
-    private $supportedEventTypes = array('decision', 'systemaction', 'action');
+    private $supportedEventTypes = array('decision', 'action');
 
     /**
      * Generates new form and processes post data
@@ -109,8 +109,10 @@ class EventController extends CommonFormController
             }
 
             $viewParams['form']        = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);;
-            $header                    = $event['settings']['label'];
-            $viewParams['eventHeader'] = $this->get('translator')->trans($header);
+            $viewParams['eventHeader'] = $this->get('translator')->trans($event['settings']['label']);
+            $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
+                $event['settings']['description']
+            ) : '';
         }
 
         $passthroughVars = array(
@@ -239,14 +241,16 @@ class EventController extends CommonFormController
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
-                $closeModal                = false;
-                $formThemes                = array('MauticCampaignBundle:FormTheme\Event');
+                $closeModal = false;
+                $formThemes = array('MauticCampaignBundle:FormTheme\Event');
                 if (isset($event['settings']['formTheme'])) {
                     $formThemes[] = $event['settings']['formTheme'];
                 }
-                $viewParams['form']        = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);;
-                $header                    = $event['settings']['label'];
-                $viewParams['eventHeader'] = $this->get('translator')->trans($header);
+                $viewParams['form'] = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);;
+                $viewParams['eventHeader'] = $this->get('translator')->trans($event['settings']['label']);
+                $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
+                    $event['settings']['description']
+                ) : '';
             }
 
             $passthroughVars = array(

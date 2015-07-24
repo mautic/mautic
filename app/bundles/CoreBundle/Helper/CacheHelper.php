@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * Class CacheHelper
@@ -64,7 +65,8 @@ class CacheHelper
         $input       = new ArgvInput($args);
         $application = new Application($this->factory->getKernel());
         $application->setAutoExit(false);
-        $application->run($input);
+        $output      = new NullOutput();
+        $application->run($input, $output);
 
         if (ob_get_length() > 0) {
             ob_end_clean();

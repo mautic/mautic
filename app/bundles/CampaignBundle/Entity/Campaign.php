@@ -13,6 +13,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -61,7 +63,7 @@ class Campaign extends FormEntity
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", fetch="EXTRA_LAZY")
      */
     private $leads;
 
@@ -71,7 +73,14 @@ class Campaign extends FormEntity
     private $lists;
 
     /**
-     * @var array
+     * @ORM\ManyToMany(targetEntity="Mautic\FormBundle\Entity\Form", fetch="EXTRA_LAZY", indexBy="id")
+     * @ORM\JoinTable(name="campaign_form_xref")
+     * @ORM\JoinColumn(name="form_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     **/
+    private $forms;
+
+    /**
+     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
      */
     private $canvasSettings = array();
 
@@ -83,6 +92,18 @@ class Campaign extends FormEntity
         $this->events = new ArrayCollection();
         $this->leads  = new ArrayCollection();
         $this->lists  = new ArrayCollection();
+        $this->forms  = new ArrayCollection();
+    }
+
+    /**
+     *
+     */
+    public function __clone()
+    {
+        $this->leads = new ArrayCollection();
+        $this->id    = null;
+
+        parent::__clone();
     }
 
     /**
@@ -135,14 +156,6 @@ class Campaign extends FormEntity
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
-        )));
-
-        $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
-            'message' => 'mautic.lead.lists.required'
-        )));
-
-        $metadata->addPropertyConstraint('lists', new Assert\NotBlank(array(
-            'message' => 'mautic.lead.lists.required'
         )));
     }
 
@@ -394,11 +407,10 @@ class Campaign extends FormEntity
     /**
      * Add list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
-     *
+     * @param LeadList $list
      * @return Campaign
      */
-    public function addList (\Mautic\LeadBundle\Entity\LeadList $list)
+    public function addList(LeadList $list)
     {
         $this->lists[] = $list;
 
@@ -410,12 +422,47 @@ class Campaign extends FormEntity
     /**
      * Remove list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     * @param LeadList $list
      */
-    public function removeList (\Mautic\LeadBundle\Entity\LeadList $list)
+    public function removeList(LeadList $list)
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
         $this->lists->removeElement($list);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getForms()
+    {
+        return $this->forms;
+    }
+
+    /**
+     * Add form
+     *
+     * @param Form $form
+     *
+     * @return Campaign
+     */
+    public function addForm(Form $form)
+    {
+        $this->forms[] = $form;
+
+        $this->changes['forms']['added'][$form->getId()] = $form->getName();
+
+        return $this;
+    }
+
+    /**
+     * Remove form
+     *
+     * @param Form $form
+     */
+    public function removeForm(Form $form)
+    {
+        $this->changes['forms']['removed'][$form->getId()] = $form->getName();
+        $this->forms->removeElement($form);
     }
 
     /**

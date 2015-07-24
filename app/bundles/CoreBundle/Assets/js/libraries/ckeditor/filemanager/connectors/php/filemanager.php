@@ -25,125 +25,121 @@ require_once('filemanager.class.php');
 $response = '';
 
 if(!auth()) {
-  $fm->error($fm->lang('AUTHORIZATION_REQUIRED'));
+    $fm->error($fm->lang('AUTHORIZATION_REQUIRED'));
 }
 
 if(!isset($_GET)) {
-  $fm->error($fm->lang('INVALID_ACTION'));
+    $fm->error($fm->lang('INVALID_ACTION'));
 } else {
 
-  if(isset($_GET['mode']) && $_GET['mode']!='') {
+    if(isset($_GET['mode']) && $_GET['mode']!='') {
 
-    switch($_GET['mode']) {
+        switch($_GET['mode']) {
 
-      default:
+            default:
 
-        $fm->error($fm->lang('MODE_ERROR'));
-        break;
+                $fm->error($fm->lang('MODE_ERROR'));
+                break;
 
-      case 'getinfo':
+            case 'getinfo':
 
-        if($fm->getvar('path')) {
-          $response = $fm->getinfo();
+                if($fm->getvar('path')) {
+                    $response = $fm->getinfo();
+                }
+                break;
+
+            case 'getfolder':
+
+                if($fm->getvar('path')) {
+                    $response = $fm->getfolder();
+                }
+                break;
+
+            case 'rename':
+
+                if($fm->getvar('old') && $fm->getvar('new')) {
+                    $response = $fm->rename();
+                }
+                break;
+
+            case 'move':
+                // allow "../"
+                if($fm->getvar('old') && $fm->getvar('new') && $fm->getvar('root')) {
+                    $response = $fm->move();
+                }
+                break;
+
+            case 'editfile':
+
+                if($fm->getvar('path')) {
+                    $response = $fm->editfile();
+                }
+                break;
+
+            case 'delete':
+
+                if($fm->getvar('path')) {
+                    $response = $fm->delete();
+                }
+                break;
+
+            case 'addfolder':
+
+                if($fm->getvar('path') && $fm->getvar('name')) {
+                    $response = $fm->addfolder();
+                }
+                break;
+
+            case 'download':
+                if($fm->getvar('path')) {
+                    $fm->download();
+                }
+                break;
+
+            case 'preview':
+                if($fm->getvar('path')) {
+                    if(isset($_GET['thumbnail'])) {
+                        $thumbnail = true;
+                    } else {
+                        $thumbnail = false;
+                    }
+                    $fm->preview($thumbnail);
+                }
+                break;
         }
-        break;
 
-      case 'getfolder':
+    } else if(isset($_POST['mode']) && $_POST['mode']!='') {
 
-        if($fm->getvar('path')) {
-          $response = $fm->getfolder();
+        switch($_POST['mode']) {
+
+            default:
+
+                $fm->error($fm->lang('MODE_ERROR'));
+                break;
+
+            case 'add':
+
+                if($fm->postvar('currentpath')) {
+                    $fm->add();
+                }
+                break;
+
+            case 'replace':
+
+                if($fm->postvar('newfilepath')) {
+                    $fm->replace();
+                }
+                break;
+
+            case 'savefile':
+
+                if($fm->postvar('content', false) && $fm->postvar('path')) {
+                    $response = $fm->savefile();
+                }
+                break;
         }
-        break;
 
-      case 'rename':
-
-        if($fm->getvar('old') && $fm->getvar('new')) {
-          $response = $fm->rename();
-        }
-        break;
-
-      case 'move':
-        // allow "../"
-        if($fm->getvar('old') && $fm->getvar('new') && $fm->getvar('root')) {
-          $response = $fm->move();
-        }
-        break;
-
-      case 'editfile':
-
-        if($fm->getvar('path')) {
-        	$response = $fm->editfile();
-        }
-        break;
-
-      case 'delete':
-
-        if($fm->getvar('path')) {
-          $response = $fm->delete();
-        }
-        break;
-
-      case 'addfolder':
-
-        if($fm->getvar('path') && $fm->getvar('name')) {
-          $response = $fm->addfolder();
-        }
-        break;
-
-      case 'download':
-        if($fm->getvar('path')) {
-          $fm->download();
-        }
-        break;
-
-      case 'preview':
-        if($fm->getvar('path')) {
-        	if(isset($_GET['thumbnail'])) {
-        		$thumbnail = true;
-        	} else {
-        		$thumbnail = false;
-        	}
-          $fm->preview($thumbnail);
-        }
-        break;
-
-      case 'maxuploadfilesize':
-        $fm->getMaxUploadFileSize();
-        break;
     }
-
-  } else if(isset($_POST['mode']) && $_POST['mode']!='') {
-
-    switch($_POST['mode']) {
-
-      default:
-
-        $fm->error($fm->lang('MODE_ERROR'));
-        break;
-
-      case 'add':
-
-        if($fm->postvar('currentpath')) {
-          $fm->add();
-        }
-        break;
-
-    	case 'replace':
-
-	    	if($fm->postvar('newfilepath')) {
-	    		$fm->replace();
-	    	}
-	    	break;
-
-	    case 'savefile':
-
-	    	if($fm->postvar('content', false) && $fm->postvar('path')) {
-	    		$response = $fm->savefile();
-	    	}
-	    	break;
-    }
-
-  }
 }
 
 echo json_encode($response);

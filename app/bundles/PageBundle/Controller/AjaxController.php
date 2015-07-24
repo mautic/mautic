@@ -136,4 +136,20 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Called by parent::getBuilderTokensAction()
+     *
+     * @param $query
+     *
+     * @return array
+     */
+    protected function getBuilderTokens($query)
+    {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model  = $this->factory->getModel('page');
+
+        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
+    }
+
 }

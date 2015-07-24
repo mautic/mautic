@@ -10,7 +10,7 @@
 // NOTE - The contents of this view will replace the 'update-panel' <div> of MauticCoreBundle:update:index.html.php
 ?>
 
-<div class="col-sm-offset-3 col-sm-6">
+<div class="col-sm-offset-2 col-sm-8">
     <div id="main-update-panel" class="panel panel-default">
         <div class="panel-heading">
             <h2 class="panel-title">
@@ -28,7 +28,7 @@
                 <tbody>
                 <tr>
                     <td><?php echo $view['translator']->trans('mautic.core.update.step.downloading.package'); ?></td>
-                    <td id="update-step-downloading-status"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?> <i class="pull-right fa fa-spinner fa-spin"></i></td>
+                    <td id="update-step-downloading-status"><span class="hidden-xs"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?></span><i class="pull-right fa fa-spinner fa-spin"></i></td>
                 </tr>
                 </tbody>
             </table>

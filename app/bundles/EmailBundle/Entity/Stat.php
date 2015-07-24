@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -29,6 +30,9 @@ class Stat
     private $id;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     **/
      * @var Email
      */
     private $email;
@@ -102,6 +106,26 @@ class Stat
      * @var array
      */
     private $tokens = array();
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $copy;
+
+    /**
+     * @ORM\Column(type="integer", name="open_count", nullable=true)
+     */
+    private $openCount;
+
+    /**
+     * @ORM\Column(type="datetime", name="last_opened", nullable=true)
+     */
+    private $lastOpened;
+
+    /**
+     * @ORM\Column(type="array", name="open_details", nullable=true)
+     */
+    private $openDetails;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -220,7 +244,7 @@ class Stat
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email)
+    public function setEmail (Email $email = null)
     {
         $this->email = $email;
     }
@@ -284,7 +308,7 @@ class Stat
     /**
      * @param mixed $lead
      */
-    public function setLead (Lead $lead)
+    public function setLead (Lead $lead = null)
     {
         $this->lead = $lead;
     }
@@ -447,5 +471,111 @@ class Stat
     public function setTokens ($tokens)
     {
         $this->tokens = $tokens;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCopy()
+    {
+        return $this->copy;
+    }
+
+    /**
+     * @param mixed $copy
+     *
+     * @return Stat
+     */
+    public function setCopy($copy)
+    {
+        // Ensure it's clean of emoji
+        $copy = EmojiHelper::toShort($copy);
+
+        $this->copy = $copy;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOpenCount()
+    {
+        return $this->openCount;
+    }
+
+    /**
+     * @param mixed $openCount
+     *
+     * @return Stat
+     */
+    public function setOpenCount($openCount)
+    {
+        $this->openCount = $openCount;
+
+        return $this;
+    }
+
+    /**
+     * @param $details
+     */
+    public function addOpenDetails($details)
+    {
+        $this->openDetails[] = $details;
+
+        $this->openCount++;
+    }
+
+    /**
+     * Up the sent count
+     *
+     * @return Stat
+     */
+    public function upOpenCount()
+    {
+        $count = (int) $this->openCount + 1;
+        $this->openCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastOpened()
+    {
+        return $this->lastOpened;
+    }
+
+    /**
+     * @param mixed $lastOpened
+     *
+     * @return Stat
+     */
+    public function setLastOpened($lastOpened)
+    {
+        $this->lastOpened = $lastOpened;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOpenDetails()
+    {
+        return $this->openDetails;
+    }
+
+    /**
+     * @param mixed $openDetails
+     *
+     * @return Stat
+     */
+    public function setOpenDetails($openDetails)
+    {
+        $this->openDetails = $openDetails;
+
+        return $this;
     }
 }

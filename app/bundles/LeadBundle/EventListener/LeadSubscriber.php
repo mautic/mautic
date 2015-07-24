@@ -70,21 +70,6 @@ class LeadSubscriber extends CommonSubscriber
                 );
                 $this->factory->getModel('core.auditLog')->writeToLog($log);
 
-                //trigger the points change event
-                if (!$lead->imported && isset($details["points"])) {
-                    if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
-                        $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
-                        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
-                    }
-                }
-
-                //regenerate the lists leads if there are changes AND the lead wasn't created by getCurrentLead
-                if (!$lead->imported && !$lead->isNewlyCreated()) {
-                    /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-                    $model = $this->factory->getModel('lead');
-                    $model->regenerateLeadLists($lead);
-                }
-
                 if (isset($details['dateIdentified'])) {
                     //log the day lead was identified
                     $log = array(
@@ -92,7 +77,7 @@ class LeadSubscriber extends CommonSubscriber
                         "object"    => "lead",
                         "objectId"  => $lead->getId(),
                         "action"    => "identified",
-                        "details"   => $details,
+                        "details"   => array(),
                         "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
@@ -114,6 +99,14 @@ class LeadSubscriber extends CommonSubscriber
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
+                }
+
+                //trigger the points change event
+                if (!$lead->imported && isset($details["points"]) && (int) $details["points"][1] > 0) {
+                    if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
+                        $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
+                        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
+                    }
                 }
             }
         }

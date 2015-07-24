@@ -12,6 +12,7 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class Redirect
@@ -73,6 +74,12 @@ class Redirect extends FormEntity
     }
 
     /**
+     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $email;
+
+    /**
      * @return integer
      */
     public function getId()
@@ -91,8 +98,11 @@ class Redirect extends FormEntity
     /**
      * @param string $redirectId
      */
-    public function setRedirectId($redirectId)
+    public function setRedirectId($redirectId = null)
     {
+        if ($redirectId === null) {
+            $redirectId = substr(hash('sha1', uniqid(mt_rand())), 0, 25);
+        }
         $this->redirectId = $redirectId;
     }
 
@@ -158,5 +168,25 @@ class Redirect extends FormEntity
     public function getUniqueHits()
     {
         return $this->uniqueHits;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return Redirect
+     */
+    public function setEmail(Email $email = null)
+    {
+        $this->email = $email;
+
+        return $this;
     }
 }

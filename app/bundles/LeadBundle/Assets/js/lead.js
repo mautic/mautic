@@ -1,9 +1,5 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    Mousetrap.bind('shift+l', function(e) {
-        mQuery('#menu_lead_parent_child > li:first > a').click();
-    });
-
     Mousetrap.bind('a', function(e) {
         if(mQuery('#lead-quick-add').length) {
             mQuery('#lead-quick-add').modal();
@@ -95,11 +91,34 @@ Mautic.leadOnLoad = function (container) {
     if (typeof Mautic.leadEngagementChart === 'undefined') {
         Mautic.renderEngagementChart();
     }
+
+    if (mQuery('#lead_preferred_profile_image').length) {
+        mQuery('#lead_preferred_profile_image').on('change', function() {
+            if (mQuery(this).val() == 'custom') {
+                mQuery('#customAvatarContainer').slideDown('fast');
+            } else {
+                mQuery('#customAvatarContainer').slideUp('fast');
+            }
+        })
+    }
+
+    if (mQuery('.lead-avatar-panel').length) {
+        mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
+            setTimeout(function() {
+                var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
+                Cookies.set('mautic_lead_avatar_panel', status, {expires: 30});
+            }, 500);
+        });
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.leadEngagementChart;
+    }
+
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
     }
 };
 
@@ -555,8 +574,8 @@ Mautic.reloadLeadImportProgress = function() {
             if (response.progress) {
                 if (response.progress[0] > 0) {
                     mQuery('.imported-count').html(response.progress[0]);
-                    mQuery('.progress-bar').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                    mQuery('.progress-bar span.sr-only').html(response.percent + '%');
+                    mQuery('.progress-bar-import').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
+                    mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
         });
@@ -575,4 +594,92 @@ Mautic.reloadLeadImportProgress = function() {
             }
         });
     }
+};
+
+Mautic.removeBounceStatus = function (el, dncId) {
+    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+        mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
+    });
+};
+
+Mautic.toggleLiveLeadListUpdate = function () {
+    if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
+        Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
+        mQuery('#liveModeButton').addClass('btn-primary');
+    } else {
+        Mautic.clearModeratedInterval('leadListLiveUpdate');
+        mQuery('#liveModeButton').removeClass('btn-primary');
+    }
+};
+
+Mautic.updateLeadList = function () {
+    var maxLeadId = mQuery('#liveModeButton').data('max-id');
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "get",
+        data: "action=lead:getNewLeads&maxId=" + maxLeadId,
+        dataType: "json",
+        success: function (response) {
+            if (response.leads) {
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tbody').prepend(response.leads);
+                } else {
+                    var items = mQuery(response.leads);
+                    mQuery('.shuffle-grid').prepend(items);
+                    mQuery('.shuffle-grid').shuffle('appended', items);
+                    mQuery('.shuffle-grid').shuffle('update');
+
+                    mQuery('#liveModeButton').data('max-id', response.maxId);
+                }
+            }
+
+            if (typeof IdleTimer != 'undefined' && !IdleTimer.isIdle()) {
+                // Remove highlighted classes
+                if (response.indexMode == 'list') {
+                    mQuery('#leadTable tr.warning').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('warning', 1000)
+                        }, 5000);
+                    });
+                } else {
+                    mQuery('.shuffle-grid .highlight').each(function() {
+                        var that = this;
+                        setTimeout(function() {
+                            mQuery(that).removeClass('highlight', 1000, function() {
+                                mQuery(that).css('border-top-color', mQuery(that).data('color'));
+                            })
+                        }, 5000);
+                    });
+                }
+            }
+
+            if (response.maxId) {
+                mQuery('#liveModeButton').data('max-id', response.maxId);
+            }
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+
+            Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
+        }
+    });
+};
+
+/**
+ * Obtains the HTML for an email
+ *
+ * @param el
+ */
+Mautic.getLeadEmailContent = function (el) {
+    Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
+    Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
+        CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
+        mQuery('#lead_quickemail_subject').val(response.subject);
+        Mautic.removeLabelLoadingIndicator();
+    });
 };

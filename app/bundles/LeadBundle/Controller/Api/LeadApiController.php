@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -42,13 +43,24 @@ class LeadApiController extends CommonApiController
         // Check for an email to see if the lead already exists
         $parameters = $this->request->request->all();
 
-        if (array_key_exists('email', $parameters)) {
-            $lead = $this->model->getRepository()->getLeadByEmail($parameters['email']);
+        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueLeadFieldData = array();
 
-            if (!empty($lead)) {
-                // Lead found so edit rather than create a new one
+        foreach ($parameters as $k => $v) {
+            if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
+                $uniqueLeadFieldData[$k] = $v;
+            }
+        }
 
-                return parent::editEntityAction($lead['id']);
+        if (count($uniqueLeadFieldData)) {
+            if (count($uniqueLeadFieldData)) {
+                $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
+
+                if (!empty($existingLeads)) {
+                    // Lead found so edit rather than create a new one
+
+                    return parent::editEntityAction($existingLeads[0]->getId());
+                }
             }
         }
 
@@ -194,6 +206,8 @@ class LeadApiController extends CommonApiController
      * Obtains a list of lead lists the lead is in
      *
      * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getListsAction($id)
     {
@@ -203,7 +217,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $lists = $this->model->getLists($entity, true);
+            $lists = $this->model->getLists($entity, true, true);
 
             $view = $this->view(
                 array(
@@ -223,6 +237,8 @@ class LeadApiController extends CommonApiController
      * Obtains a list of campaigns the lead is part of
      *
      * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getCampaignsAction($id)
     {
@@ -271,7 +287,15 @@ class LeadApiController extends CommonApiController
 
             $ipAddress = $this->factory->getIpAddress($ip);
 
-            $entity->addIpAddress($ipAddress);
+            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+                $entity->addIpAddress($ipAddress);
+            }
+        }
+
+        // Check for lastActive date
+        if (isset($parameters['lastActive'])) {
+            $lastActive = new DateTimeHelper($parameters['lastActive']);
+            $entity->setLastActive($lastActive->getDateTime());
         }
 
         //set the custom field values
@@ -285,7 +309,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Remove IpAddress as it'll be handled outsie the form
+     * Remove IpAddress and lastActive as it'll be handled outside the form
      *
      * @param $parameters
      * @param $entity
@@ -295,7 +319,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress']);
+        unset($parameters['ipAddress'], $parameters['lastActive']);
 
         return $parameters;
     }
@@ -303,7 +327,10 @@ class LeadApiController extends CommonApiController
     /**
      * Flatten fields into an 'all' key for dev convenience
      *
-     * @param $entity
+     * @param        $entity
+     * @param string $action
+     *
+     * @return void
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {

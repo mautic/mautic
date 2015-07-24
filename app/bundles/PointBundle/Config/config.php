@@ -53,7 +53,7 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 8,
+            'priority' => 25,
             'items'    => array(
                 'mautic.points.menu.root' => array(
                     'id'        => 'mautic_points_root',

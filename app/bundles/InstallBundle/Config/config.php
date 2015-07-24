@@ -14,6 +14,10 @@ return array(
                 'path'       => '/installer',
                 'controller' => 'MauticInstallBundle:Install:step'
             ),
+            'mautic_installer_remove_slash'  => array(
+                'path'       => '/installer/',
+                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash'
+            ),
             'mautic_installer_step'  => array(
                 'path'       => '/installer/step/{index}',
                 'controller' => 'MauticInstallBundle:Install:step'

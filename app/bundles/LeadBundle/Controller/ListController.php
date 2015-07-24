@@ -36,7 +36,7 @@ class ListController extends FormController
         ), 'RETURN_ARRAY');
 
         //Lists can be managed by anyone who has access to leads
-        if (!$permissions['lead:leads:viewown'] || !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 
@@ -73,7 +73,7 @@ class ListController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
+                $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.leadlist.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
@@ -374,7 +374,7 @@ class ListController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             $model     = $this->factory->getModel('lead.list');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete

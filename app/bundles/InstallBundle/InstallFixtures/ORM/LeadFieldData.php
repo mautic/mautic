@@ -82,6 +82,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $type = 'tel';
             } elseif ($name == 'email') {
                 $type = 'email';
+                $entity->setIsUniqueIdentifer(true);
             } else {
                 $type = 'text';
             }

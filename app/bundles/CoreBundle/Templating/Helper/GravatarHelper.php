@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -22,14 +23,31 @@ class GravatarHelper extends Helper
     /**
      * @var bool
      */
-    private static $devMode;
+    private $devMode;
 
+    /**
+     * @var
+     */
+    private $imageDir;
+
+    /**
+     * @var AssetsHelper
+     */
+    private $assetHelper;
+
+    /**
+     * @var AvatarHelper
+     */
+    private $avatarHelper;
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        self::$devMode = $factory->getEnvironment() == 'dev';
+        $this->devMode      = $factory->getEnvironment() == 'dev';
+        $this->imageDir     = $factory->getSystemPath('images');
+        $this->assetHelper  = $factory->getHelper('template.assets');
+        $this->avatarHelper = $factory->getHelper('template.avatar');
     }
 
     /**
@@ -41,17 +59,17 @@ class GravatarHelper extends Helper
      */
     public function getImage($email, $size = '250', $default = null)
     {
-        $localDefault     = 'https://www.mautic.org/media/images/default_avatar.png';
+        $localDefault     = ($this->devMode) ?
+            'https://www.mautic.org/media/images/default_avatar.png' :
+            $this->avatarHelper->getDefaultAvatar(true);
         $url              = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
-        if ($default !== false && !self::$devMode) {
-            if ($default === null) {
-                $default = $localDefault;
-            }
-
-            $default = (strpos($default, '.') !== false && strpos($default, 'http') !== 0) ? UrlHelper::rel2abs($default) : $default;
-            $url    .= '&d=' . urlencode($default);
+        if ($default === null) {
+            $default = $localDefault;
         }
+
+        $default = (strpos($default, '.') !== false && strpos($default, 'http') !== 0) ? UrlHelper::rel2abs($default) : $default;
+        $url    .= '&d=' . urlencode($default);
 
         return $url;
     }

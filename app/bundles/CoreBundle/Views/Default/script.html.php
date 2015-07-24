@@ -18,7 +18,8 @@
     var mauticLang        = {
         chosenChooseOne: '<?php echo $view['translator']->trans('mautic.core.form.chooseone'); ?>',
         chosenChooseMore: '<?php echo $view['translator']->trans('mautic.core.form.choosemultiple'); ?>',
-        chosenNoResults: '<?php echo $view['translator']->trans('mautic.core.form.nomatches'); ?>'
+        chosenNoResults: '<?php echo $view['translator']->trans('mautic.core.form.nomatches'); ?>',
+        pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>'
     };
 </script>
 <?php $view['assets']->outputSystemScripts(); ?>

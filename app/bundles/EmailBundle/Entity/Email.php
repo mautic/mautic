@@ -12,8 +12,12 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -31,12 +35,65 @@ class Email extends FormEntity
     private $id;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails", "emailList"})
      * @var string
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $subject;
 
     /**
+     * @ORM\Column(type="string", name="from_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
      * @var string
+     */
+    private $fromAddress;
+
+    /**
+     * @ORM\Column(type="string", name="from_name", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $fromName;
+
+    /**
+     * @ORM\Column(type="string", name="reply_to_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $replyToAddress;
+
+    /**
+     * @ORM\Column(type="string", name="bcc_address", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     */
+    private $bccAddress;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
      */
     private $template;
 
@@ -61,9 +118,10 @@ class Email extends FormEntity
     private $customHtml;
 
     /**
+     * @ORM\Column(name="email_type", type="string", nullable=true)
      * @var string
      */
-    private $contentMode = 'custom';
+    private $emailType;
 
     /**
      * @var \DateTime
@@ -101,6 +159,10 @@ class Email extends FormEntity
     private $lists;
 
     /**
+     * @ORM\OneToMany(targetEntity="Stat", mappedBy="email", cascade={"persist"}, indexBy="id", fetch="EXTRA_LAZY")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
      * @var ArrayCollection
      */
     private $stats;
@@ -141,21 +203,51 @@ class Email extends FormEntity
     private $unsubscribeForm;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Mautic\AssetBundle\Entity\Asset", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="email_assets_xref",
+     *   joinColumns={@ORM\JoinColumn(name="email_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="asset_id", referencedColumnName="id")}
+     * )
+     */
+    private $assetAttachments;
+
+    /**
      * Used to identify the page for the builder
      *
      * @var
      */
     private $sessionId;
 
-    public function __clone ()
+    public function __clone()
     {
         $this->id = null;
+
+        parent::__clone();
     }
 
     public function __construct ()
     {
-        $this->lists = new ArrayCollection();
+        $this->lists            = new ArrayCollection();
+        $this->stats            = new ArrayCollection();
+        $this->variantChildren  = new ArrayCollection();
+        $this->assetAttachments = new ArrayCollection();
+    }
+
+    /**
+     *
+     */
+    public function clearStats()
+    {
         $this->stats = new ArrayCollection();
+    }
+
+    /**
+     *
+     */
+    public function clearVariants()
+    {
+        $this->variantChildren = new ArrayCollection();
+        $this->variantParent   = null;
     }
 
     /**
@@ -265,9 +357,75 @@ class Email extends FormEntity
      */
     public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('subject', new NotBlank(array(
-            'message' => 'mautic.email.subject.notblank'
-        )));
+        $metadata->addPropertyConstraint(
+            'name',
+            new NotBlank(
+                array(
+                    'message' => 'mautic.core.name.required',
+                    'groups'  => array('General')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'fromAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'replyToAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bccAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                array(
+                    'message' => 'mautic.core.email.required',
+                    'groups'  => array('General')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'lists',
+            new LeadListAccess(
+                array(
+                    'message' => 'mautic.lead.lists.required',
+                    'groups'  => array('List')
+                )
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'lists',
+            new NotBlank(
+                array(
+                    'message' => 'mautic.lead.lists.required',
+                    'groups'  => array('List')
+                )
+            )
+        );
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array
+     */
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
+        return ($form->getData()->getEmailType() == 'list') ? array('General', 'List') : array('General');
     }
 
     /**
@@ -291,6 +449,46 @@ class Email extends FormEntity
     }
 
     /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     *
+     * @return Email
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
@@ -309,12 +507,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $category
+     * @param $category
+     *
+     * @return $this
      */
     public function setCategory ($category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
+
+        return $this;
     }
 
     /**
@@ -326,28 +528,56 @@ class Email extends FormEntity
     }
 
     /**
-     * @param array $content
+     * @param $content
+     *
+     * @return $this
      */
     public function setContent ($content)
     {
+        // Ensure safe emoji
+        $content = EmojiHelper::toShort($content);
+
         $this->isChanged('content', $content);
         $this->content = $content;
+
+        return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getReadCount ()
+    public function getReadCount ($includeVariants = false)
     {
-        return $this->readCount;
+        $count = $this->readCount;
+
+        if ($includeVariants && $this->isVariant()) {
+            $parent = $this->getVariantParent();
+            if ($parent) {
+                $count   += $parent->getReadCount();
+                $children = $parent->getVariantChildren();
+            } else {
+                $children = $this->getVariantChildren();
+            }
+            foreach ($children as $child) {
+                if ($child->getId() !== $this->id) {
+                    $count += $child->getReadCount();
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**
-     * @param mixed $readCount
+     * @param $readCount
+     *
+     * @return $this
      */
     public function setReadCount ($readCount)
     {
         $this->readCount = $readCount;
+
+        return $this;
     }
 
     /**
@@ -359,12 +589,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $language
+     * @param $language
+     *
+     * @return $this
      */
     public function setLanguage ($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+
+        return $this;
     }
 
     /**
@@ -376,11 +610,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $revision
+     * @param $revision
+     *
+     * @return $this
      */
     public function setRevision ($revision)
     {
         $this->revision = $revision;
+
+        return $this;
     }
 
     /**
@@ -392,11 +630,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $sessionId
+     * @param $sessionId
+     *
+     * @return $this
      */
     public function setSessionId ($sessionId)
     {
         $this->sessionId = $sessionId;
+
+        return $this;
     }
 
     /**
@@ -408,12 +650,96 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $subject
+     * @param $subject
+     *
+     * @return $this
      */
     public function setSubject ($subject)
     {
         $this->isChanged('subject', $subject);
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromAddress()
+    {
+        return $this->fromAddress;
+    }
+
+    /**
+     * @param mixed $fromAddress
+     *
+     * @return Email
+     */
+    public function setFromAddress($fromAddress)
+    {
+        $this->fromAddress = $fromAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromName()
+    {
+        return $this->fromName;
+    }
+
+    /**
+     * @param mixed $fromName
+     *
+     * @return Email
+     */
+    public function setFromName($fromName)
+    {
+        $this->fromName = $fromName;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReplyToAddress()
+    {
+        return $this->replyToAddress;
+    }
+
+    /**
+     * @param mixed $replyToAddress
+     *
+     * @return Email
+     */
+    public function setReplyToAddress($replyToAddress)
+    {
+        $this->replyToAddress = $replyToAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBccAddress()
+    {
+        return $this->bccAddress;
+    }
+
+    /**
+     * @param mixed $bccAddress
+     *
+     * @return Email
+     */
+    public function setBccAddress($bccAddress)
+    {
+        $this->bccAddress = $bccAddress;
+
+        return $this;
     }
 
     /**
@@ -425,12 +751,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $template
+     * @param $template
+     *
+     * @return $this
      */
     public function setTemplate ($template)
     {
         $this->isChanged('template', $template);
         $this->template = $template;
+
+        return $this;
     }
 
     /**
@@ -526,12 +856,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantStartDate
+     * @param $variantStartDate
+     *
+     * @return $this
      */
     public function setVariantStartDate ($variantStartDate)
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;
+
+        return $this;
     }
 
     /**
@@ -543,12 +877,16 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $publishDown
+     * @param $publishDown
+     *
+     * @return $this
      */
     public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
+
+        return $this;
     }
 
     /**
@@ -560,28 +898,55 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $publishUp
+     * @param $publishUp
+     *
+     * @return $this
      */
     public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
+
+        return $this;
     }
 
     /**
+     * @param bool $includeVariants
+     *
      * @return mixed
      */
-    public function getSentCount ()
+    public function getSentCount ($includeVariants = false)
     {
-        return $this->sentCount;
+        $count = $this->sentCount;
+
+        if ($includeVariants && $this->isVariant()) {
+            $parent = $this->getVariantParent();
+            if ($parent) {
+                $count   += $parent->getSentCount();
+                $children = $parent->getVariantChildren();
+            } else {
+                $children = $this->getVariantChildren();
+            }
+            foreach ($children as $child) {
+                if ($child->getId() !== $this->id) {
+                    $count += $child->getSentCount();
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**
-     * @param mixed $sentCount
+     * @param $sentCount
+     *
+     * @return $this
      */
     public function setSentCount ($sentCount)
     {
         $this->sentCount = $sentCount;
+
+        return $this;
     }
 
     /**
@@ -593,11 +958,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantSentCount
+     * @param $variantSentCount
+     *
+     * @return $this
      */
     public function setVariantSentCount ($variantSentCount)
     {
         $this->variantSentCount = $variantSentCount;
+
+        return $this;
     }
 
     /**
@@ -611,11 +980,10 @@ class Email extends FormEntity
     /**
      * Add list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
-     *
+     * @param LeadList $list
      * @return Email
      */
-    public function addList (\Mautic\LeadBundle\Entity\LeadList $list)
+    public function addList(LeadList $list)
     {
         $this->lists[] = $list;
 
@@ -625,9 +993,9 @@ class Email extends FormEntity
     /**
      * Remove list
      *
-     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     * @param LeadList $list
      */
-    public function removeList (\Mautic\LeadBundle\Entity\LeadList $list)
+    public function removeList(LeadList $list)
     {
         $this->lists->removeElement($list);
     }
@@ -641,11 +1009,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $plainText
+     * @param $plainText
+     *
+     * @return $this
      */
     public function setPlainText ($plainText)
     {
         $this->plainText = $plainText;
+
+        return $this;
     }
 
     /**
@@ -681,19 +1053,25 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $variantReadCount
+     * @param $variantReadCount
+     *
+     * @return $this
      */
     public function setVariantReadCount ($variantReadCount)
     {
         $this->variantReadCount = $variantReadCount;
+
+        return $this;
     }
 
     /**
+     * @param bool $isChild True to return if the email is a variant of a parent
+     *
      * @return bool
      */
-    public function isVariant ($parentOnly = false)
+    public function isVariant($isChild = false)
     {
-        if ($parentOnly) {
+        if ($isChild) {
             return ($this->variantParent === null) ? false : true;
         } else {
             return (!empty($this->variantParent) || count($this->variantChildren)) ? true : false;
@@ -717,27 +1095,15 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $customHtml
+     * @param $customHtml
+     *
+     * @return $this
      */
     public function setCustomHtml ($customHtml)
     {
         $this->customHtml = $customHtml;
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getContentMode ()
-    {
-        return $this->contentMode;
-    }
-
-    /**
-     * @param mixed $contentMode
-     */
-    public function setContentMode ($contentMode)
-    {
-        $this->contentMode = $contentMode;
+        return $this;
     }
 
     /**
@@ -749,10 +1115,70 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $unsubscribeForm
+     * @param Form $unsubscribeForm
+     *
+     * @return $this
      */
     public function setUnsubscribeForm (Form $unsubscribeForm)
     {
         $this->unsubscribeForm = $unsubscribeForm;
+
+        return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailType()
+    {
+        return $this->emailType;
+    }
+
+    /**
+     * @param mixed $emailType
+     *
+     * @return Email
+     */
+    public function setEmailType($emailType)
+    {
+        $this->emailType = $emailType;
+
+        return $this;
+    }
+
+
+    /**
+     * Add asset
+     *
+     * @param Asset  $asset
+     *
+     * @return Email
+     */
+    public function addAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments[] = $asset;
+
+        return $this;
+    }
+
+    /**
+     * Remove asset
+     *
+     * @param Asset $asset
+     */
+    public function removeAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments->removeElement($asset);
+    }
+
+    /**
+     * Get assetAttachments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAssetAttachments()
+    {
+        return $this->assetAttachments;
+    }
+
 }

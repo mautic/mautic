@@ -14,7 +14,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 
 /**
  * Class CampaignSubscriber
@@ -31,7 +30,6 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            EmailEvents::EMAIL_ON_SEND        => array('onEmailSend', 0),
             EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0)
         );
     }
@@ -44,14 +42,7 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = array(
             'label'           => 'mautic.email.campaign.event.open',
             'description'     => 'mautic.email.campaign.event.open_descr',
-            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger'),
-            'formType'        => 'emailopen_list',
-            'formTypeOptions' => array('list_options' => array(
-                'attr' => array(
-                    'data-placeholder' => $this->translator->trans('mautic.email.campaign.event.open.default'),
-                    'tooltip'          => 'mautic.email.campaign.event.open.default_tooltip'
-                )
-            )),
+            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger')
         );
         $event->addLeadDecision('email.open', $trigger);
 
@@ -64,17 +55,6 @@ class CampaignSubscriber extends CommonSubscriber
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
         );
         $event->addAction('email.send', $action);
-    }
-
-    /**
-     * Trigger campaign event for sending of an email
-     *
-     * @param EmailSendEvent $event
-     */
-    public function onEmailSend(EmailSendEvent $event)
-    {
-        $email = $event->getEmail();
-        $this->factory->getModel('campaign')->triggerEvent('email.send', $email);
     }
 
     /**

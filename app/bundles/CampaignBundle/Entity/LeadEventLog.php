@@ -104,6 +104,16 @@ class LeadEventLog
     }
 
     /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $metadata = array();
+
+    /**
+     * @ORM\Column(name="non_action_path_taken", type="boolean", nullable=true)
+     */
+    private $nonActionPathTaken = false;
+
+    /**
      * @return \DateTime
      */
     public function getDateTriggered ()
@@ -229,5 +239,42 @@ class LeadEventLog
     public function setSystemTriggered ($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNonActionPathTaken()
+    {
+        return $this->nonActionPathTaken;
+    }
+
+    /**
+     * @param mixed $nonActionPathTaken
+     */
+    public function setNonActionPathTaken($nonActionPathTaken)
+    {
+        $this->nonActionPathTaken = $nonActionPathTaken;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param mixed $metatdata
+     */
+    public function setMetadata($metadata)
+    {
+        if (!is_array($metadata)) {
+            // Assumed output for timeline
+            $metadata = array('timeline' => $metadata);
+        }
+
+        $this->metadata = $metadata;
     }
 }

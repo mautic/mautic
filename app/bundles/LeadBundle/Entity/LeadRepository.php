@@ -21,6 +21,21 @@ use Mautic\PointBundle\Model\TriggerModel;
 class LeadRepository extends CommonRepository
 {
     /**
+     * @var array
+     */
+    private $availableSocialFields = array();
+
+    /**
+     * Used by search functions to search social profiles
+     *
+     * @param array $fields
+     */
+    public function setAvailableSocialFields(array $fields)
+    {
+        $this->availableSocialFields = $fields;
+    }
+
+    /**
      * Required to get the color based on a lead's points
      * @var
      */
@@ -117,13 +132,99 @@ class LeadRepository extends CommonRepository
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
             $results = $q->getQuery()->getResult();
+
+            /** @var Lead $lead */
+            foreach ($results as $lead) {
+                $lead->setAvailableSocialFields($this->availableSocialFields);
+            }
         }
 
         return $results;
     }
 
     /**
+     * Get a list of lead entities
+     *
+     * @param      $uniqueFieldsWithData
+     * @param null $leadId
+     *
+     * @return array
+     */
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    {
+        // get the list of IDs
+        $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
+
+        // init to empty array
+        $results = array();
+
+        // if we didn't get anything return empty
+        if (!count(($idList))) {
+            return $results;
+        }
+
+        $ids = array();
+
+        // we know we have at least one
+        foreach ($idList as $r) {
+            $ids[] = $r['id'];
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->select('l')
+            ->from('MauticLeadBundle:Lead', 'l');
+
+        $q->where(
+            $q->expr()->in('l.id', ':ids')
+        )
+            ->setParameter('ids', $ids)
+            ->orderBy('l.dateAdded', 'DESC');
+
+        $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
+
+        return $results;
+    }
+
+    /*
+     * Get list of lead Ids by unique field data.
+     *
+     * @param $uniqueFieldsWithData is an array of columns & values to filter by
+     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     *
+     * @return array
+     */
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        // loop through the fields and
+        foreach($uniqueFieldsWithData as $col => $val) {
+            $q->orWhere("l.$col = :" . $col)
+                ->setParameter($col, $val);
+        }
+
+        // if we have a lead ID lets use it
+        if (!empty($leadId)) {
+            // make sure that its not the id we already have
+            $q->andWhere("l.id != " . $leadId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * @param $email
+     *
+     * @return null
      */
     public function getLeadByEmail($email)
     {
@@ -159,6 +260,11 @@ class LeadRepository extends CommonRepository
             ->setParameter('ip', $ip)
             ->orderBy('l.dateAdded', 'DESC');
         $results = $q->getQuery()->getResult();
+
+        /** @var Lead $lead */
+        foreach ($results as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+        }
 
         return $results;
     }
@@ -219,6 +325,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param $id
+     *
+     * @return array
      */
     public function getLead($id)
     {
@@ -233,7 +341,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get a list of fields and values
      *
-     * @param $id
+     * @param           $id
+     * @param bool|true $byGroup
      *
      * @return array
      */
@@ -298,6 +407,7 @@ class LeadRepository extends CommonRepository
     public function getEntity($id = 0)
     {
         try {
+            /** @var Lead $entity */
             $entity = $this
                 ->createQueryBuilder('l')
                 ->select('l, u, i')
@@ -318,6 +428,8 @@ class LeadRepository extends CommonRepository
 
             $fieldValues = $this->getFieldValues($id);
             $entity->setFields($fieldValues);
+
+            $entity->setAvailableSocialFields($this->availableSocialFields);
         }
 
         return $entity;
@@ -326,9 +438,9 @@ class LeadRepository extends CommonRepository
     /**
      * Get a list of leads
      *
-     * @param array      $args
-     * @param Translator $translator
-     * @return Paginator
+     * @param array $args
+     *
+     * @return array
      */
     public function getEntities($args = array())
     {
@@ -344,6 +456,8 @@ class LeadRepository extends CommonRepository
         foreach ($results as $r) {
             $fields[$r['alias']] = $r;
         }
+
+        unset($results);
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
@@ -371,7 +485,7 @@ class LeadRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('*');
+        $dq->select('l.*');
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
@@ -396,6 +510,7 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
+        unset($results, $fields);
 
         //get an array of IDs for ORM query
         $ids = array_keys($fieldValues);
@@ -416,9 +531,9 @@ class LeadRepository extends CommonRepository
             $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
 
             //ORM - generates lead entities
-            $q = $this
-                ->createQueryBuilder('l');
+            $q = $this->_em->createQueryBuilder();
             $q->select('l, u, i,' . $order)
+                ->from('MauticLeadBundle:Lead', 'l', 'l.id')
                 ->leftJoin('l.ipAddresses', 'i')
                 ->leftJoin('l.owner', 'u');
 
@@ -428,7 +543,11 @@ class LeadRepository extends CommonRepository
             )->setParameter('leadIds', $ids);
 
             $q->orderBy('ORD', 'ASC');
-            $results   = $q->getQuery()->getResult();
+
+            $results = $q->getQuery()
+                ->useQueryCache(false)
+                ->useResultCache(false)
+                ->getResult();
 
             //assign fields
             foreach ($results as $r) {
@@ -438,7 +557,10 @@ class LeadRepository extends CommonRepository
 
                 $leadId = $r->getId();
                 $r->setFields($fieldValues[$leadId]);
+                $r->setAvailableSocialFields($this->availableSocialFields);
             }
+        } else {
+            $results = array();
         }
 
         return (!empty($args['withTotalCount'])) ?
@@ -472,19 +594,32 @@ class LeadRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->orX(
-            $q->expr()->like('l.firstname', ":$unique"),
-            $q->expr()->like('l.lastname', ":$unique"),
-            $q->expr()->like('l.email', ":$unique"),
-            $q->expr()->like('l.company', ":$unique"),
-            $q->expr()->like('l.city', ":$unique"),
-            $q->expr()->like('l.state', ":$unique"),
-            $q->expr()->like('l.zipcode', ":$unique"),
-            $q->expr()->like('l.country', ":$unique")
+        if ($filter->not) {
+            $xFunc    = 'andX';
+            $exprFunc = 'notLike';
+        } else {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+
+        }
+
+        $expr = $q->expr()->$xFunc(
+            $q->expr()->$exprFunc('l.firstname', ":$unique"),
+            $q->expr()->$exprFunc('l.lastname', ":$unique"),
+            $q->expr()->$exprFunc('l.email', ":$unique"),
+            $q->expr()->$exprFunc('l.company', ":$unique"),
+            $q->expr()->$exprFunc('l.city', ":$unique"),
+            $q->expr()->$exprFunc('l.state', ":$unique"),
+            $q->expr()->$exprFunc('l.zipcode', ":$unique"),
+            $q->expr()->$exprFunc('l.country', ":$unique")
         );
 
-        if ($filter->not) {
-            $q->expr()->not($expr);
+        if (!empty($this->availableSocialFields)) {
+            foreach ($this->availableSocialFields as $field) {
+                $expr->add(
+                    $q->expr()->$exprFunc("l.$field", ":$unique")
+                );
+            }
         }
 
         return array(
@@ -542,6 +677,17 @@ class LeadRepository extends CommonRepository
                         $q->expr()->$nullFunc("l.email")
                     )
                 );
+
+                if (!empty($this->availableSocialFields)) {
+                    foreach ($this->availableSocialFields as $field) {
+                        $expr->add(
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.$field", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.$field")
+                            )
+                        );
+                    }
+                }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
@@ -583,6 +729,23 @@ class LeadRepository extends CommonRepository
                     $expr = $q->expr()->eq('ll.leadlist_id', 0);
                 }
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ip'):
+                // search by IP
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('lip.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip')
+                    ->join('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'ip', 'lip.ip_id = ip.id')
+                    ->where(
+                        $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
+                    )
+                    ->setParameter($unique, $string);
+                $results = $sq->execute()->fetchAll();
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                $expr = $q->expr()->in('l.id', $leadIds);
+                break;
         }
 
         $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -611,7 +774,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.core.searchcommand.email',
-            'mautic.lead.lead.searchcommand.owner'
+            'mautic.lead.lead.searchcommand.owner',
+            'mautic.core.searchcommand.ip'
         );
     }
 
@@ -659,5 +823,18 @@ class LeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         return (count($result)) ? $result[0] : null;
+    }
+
+    /**
+     * Gets the ID of the latest ID
+     */
+    public function getMaxLeadId()
+    {
+        $result = $this->_em->getConnection()->createQueryBuilder()
+            ->select('max(id) as max_lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->execute()->fetchAll();
+
+        return $result[0]['max_lead_id'];
     }
 }

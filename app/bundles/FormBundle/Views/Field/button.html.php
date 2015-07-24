@@ -6,27 +6,27 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$inputAttr = $field['inputAttributes'];
+$defaultInputClass = 'button';
+$containerType = 'button-wrapper';
+include __DIR__ . '/field_helper.php';
 
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform-button"';
+$buttonType = (isset($properties['type'])) ? $properties['type'] : 'submit';
 
-$properties = $field['properties'];
+$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
+    array(
+        'deleted'        => false,
+        'id'             => $id,
+        'formId'         => $formId,
+        'disallowDelete' => true)
+    ) : '';
 
-if (!empty($inForm))
-    $inputAttr .= 'disabled="disabled"';
 
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
-?>
 
-<div class="mauticform-row mauticform-button<?php echo $containerClass; ?>" id="mauticform_<?php echo $id; ?>">
-    <?php
-    if (!empty($inForm))
-        echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id,
-            'formId'  => $formId
-        ));
-    ?>
-    <button type="<?php echo $properties['type']; ?>" name="mauticform[<?php echo $field['alias']; ?>]" <?php echo $inputAttr; ?> value="1"><?php echo $field['label']; ?></button>
-</div>
+$html = <<<HTML
+
+            <div $containerAttr>$formButtons
+                <button type="$buttonType" name="mauticform[{$field['alias']}]" $inputAttr value="1">{$field['label']}</button>
+            </div>
+HTML;
+
+echo $html;

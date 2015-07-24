@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -83,19 +84,64 @@ class LeadTimelineEvent extends Event
      *
      * @return array Events sorted by timestamp with most recent event first
      */
-    public function getEvents()
+    public function getEvents($returnGrouped = false)
     {
         $events = $this->events;
 
-        usort($events, function($a, $b) {
-            if ($a['timestamp'] == $b['timestamp']) {
-                return 0;
+        $byDate = array();
+
+        // Group by date
+        foreach ($events as $e) {
+            if (!$e['timestamp'] instanceof \DateTime) {
+                $dt = new DateTimeHelper($e['timestamp'], 'Y-m-d H:i:s', 'UTC');
+                $e['timestamp'] = $dt->getDateTime();
+                unset($dt);
+            }
+            $dateString = $e['timestamp']->format('Y-m-d H:i');
+            if (!isset($byDate[$dateString])) {
+                $byDate[$dateString] = array();
             }
 
-            return ($a['timestamp'] > $b['timestamp']) ? -1 : 1;
-        });
+            $byDate[$dateString][] = $e;
+        }
 
-        return $events;
+        // Sort by date
+        krsort($byDate);
+
+        // Sort by certain event actions
+        $order = array(
+            'lead.ipadded',
+            'page.hit',
+            'form.submitted',
+            'asset.download',
+            'lead.merge',
+            'lead.create',
+            'lead.identified'
+        );
+
+        $events = array();
+        foreach ($byDate as $date => $dateEvents) {
+            usort(
+                $dateEvents,
+                function ($a, $b) use ($order) {
+                    if (!in_array($a['event'], $order) || !in_array($b['event'], $order)) {
+                        // No specific order so push to the end
+
+                        return 1;
+                    }
+
+                    $pos_a = array_search($a['event'], $order);
+                    $pos_b = array_search($b['event'], $order);
+
+                    return $pos_a - $pos_b;
+                }
+            );
+
+            $byDate[$date] = $dateEvents;
+            $events = array_merge($events, array_reverse($dateEvents));
+        }
+
+        return ($returnGrouped) ? $byDate : $events;
     }
 
     /**
@@ -144,11 +190,12 @@ class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included
      *
-     * @param $eventType
+     * @param      $eventType
+     * @param bool $inclusive
      *
      * @return bool
      */
-    public function isApplicable($eventType)
+    public function isApplicable($eventType, $inclusive = false)
     {
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
@@ -158,6 +205,8 @@ class LeadTimelineEvent extends Event
             if (!in_array($eventType, $this->filters['includeEvents'])) {
                 return false;
             }
+        } elseif ($inclusive) {
+            return false;
         }
 
         return true;

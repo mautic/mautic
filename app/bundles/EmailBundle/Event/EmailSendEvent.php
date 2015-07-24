@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
@@ -21,11 +22,25 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
  */
 class EmailSendEvent extends CommonEvent
 {
+    /**
+     * @var MailHelper
+     */
+    private $helper;
 
     /**
-     * @var array
+     * @var string
      */
-    private $content;
+    private $content = '';
+
+    /**
+     * @var string
+     */
+    private $plainText = '';
+
+    /**
+     * @var string
+     */
+    private $subject = '';
 
     /**
      * @var string
@@ -45,23 +60,75 @@ class EmailSendEvent extends CommonEvent
     /**
      * @var array
      */
-    private $tokens;
+    private $tokens = array();
 
     /**
-     * @param string $content
-     * @param Email  $email
-     * @param Lead   $lead
-     * @param string $idHash
-     * @param array  $source
+     * @var internalSend
      */
-    public function __construct($content, Email $email = null, $lead = null, $idHash = '', $source = array(), $tokens = array())
+    private $internalSend = false;
+
+    /**
+     * @param MailHelper $helper
+     * @param array      $args
+     */
+    public function __construct(MailHelper $helper = null, $args = array())
     {
-        $this->content = $content;
-        $this->entity  = $email;
-        $this->idHash  = $idHash;
-        $this->lead    = $lead;
-        $this->source  = $source;
-        $this->tokens  = $tokens;
+        $this->helper = $helper;
+
+        if (isset($args['content'])) {
+            $this->content = $args['content'];
+        }
+
+        if (isset($args['plainText'])) {
+            $this->plainText = $args['plainText'];
+        }
+
+        if (isset($args['subject'])) {
+            $this->subject = $args['subject'];
+        }
+
+        if (isset($args['idHash'])) {
+            $this->idHash = $args['idHash'];
+        }
+
+        if (isset($args['lead'])) {
+            $this->lead = $args['lead'];
+        }
+
+        if (isset($args['source'])) {
+            $this->source = $args['source'];
+        }
+
+        if (isset($args['tokens'])) {
+            $this->tokens = $args['tokens'];
+        }
+
+        if (isset($args['internalSend'])) {
+            $this->internalSend = $args['internalSend'];
+        } elseif ($helper !== null) {
+            $this->internalSend = $helper->isInternalSend();
+        }
+    }
+
+
+    /**
+     * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking
+     *
+     * @return internalSend
+     */
+    public function isInternalSend()
+    {
+        return $this->internalSend;
+    }
+
+    /**
+     * Return if the transport and mailer is in batch mode (tokenized emails)
+     *
+     * @return bool
+     */
+    public function inTokenizationMode()
+    {
+        return ($this->helper !== null) ? $this->helper->inTokenizationMode() : false;
     }
 
     /**
@@ -71,17 +138,40 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return $this->entity;
+        return ($this->helper !== null) ? $this->helper->getEmail() : null;
     }
 
     /**
-     * Sets the Email entity
+     * Get email content
      *
-     * @param Email $email
+     * @param $replaceTokens
+     *
+     * @return array
      */
-    public function setEmail(Email $email)
+    public function getContent($replaceTokens = false)
     {
-        $this->entity = $email;
+        if ($this->helper !== null) {
+            $content = $this->helper->getBody();
+        } else {
+
+            $content = $this->content;
+        }
+
+        return ($replaceTokens) ? str_replace(array_keys($this->getTokens()), $this->getTokens(), $content) : $content;
+    }
+
+    /**
+     * Set email content
+     *
+     * @param $content
+     */
+    public function setContent($content)
+    {
+        if ($this->helper !== null) {
+            $this->helper->setBody($content);
+        } else {
+            $this->content = $content;
+        }
     }
 
     /**
@@ -89,23 +179,37 @@ class EmailSendEvent extends CommonEvent
      *
      * @return array
      */
-    public function getContent($finalContent = false)
+    public function getPlainText()
     {
-        if ($finalContent && !empty($this->tokens)) {
-            // Parse custom tokens
-            $this->content = str_ireplace($this->tokens['search'], $this->tokens['replace'], $this->content);
+        if ($this->helper !== null) {
+
+            return $this->helper->getPlainText();
+        } else {
+
+            return $this->plainText;
         }
-        return $this->content;
     }
 
     /**
-     * Set email content
-     *
-     * @param string $content
+     * @param $content
      */
-    public function setContent($content)
+    public function setPlainText($content)
     {
-        $this->content = $content;
+        if ($this->helper !== null) {
+            $this->helper->setPlainText($content);
+        } else {
+            $this->plainText = $content;
+        }
+    }
+
+    /**
+     * Get the MailHelper object
+     *
+     * @return MailHelper
+     */
+    public function getHelper()
+    {
+        return $this->helper;
     }
 
     /**
@@ -113,7 +217,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return $this->lead;
+        return ($this->helper !== null) ? $this->helper->getLead() : $this->lead;
     }
 
     /**
@@ -121,7 +225,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getIdHash()
     {
-        return $this->idHash;
+        return ($this->helper !== null) ? $this->helper->getIdHash() : $this->idHash;
     }
 
     /**
@@ -129,6 +233,33 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSource()
     {
-        return $this->source;
+        return ($this->helper !== null) ? $this->helper->getSource() : $this->source;
+    }
+
+    /**
+     * @param array $tokens
+     */
+    public function addTokens(array $tokens)
+    {
+        $this->tokens = array_merge($this->tokens, $tokens);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function addToken($key, $value)
+    {
+        $this->tokens[$key] = $value;
+    }
+
+    /**
+     * Get token array
+     *
+     * @return array
+     */
+    public function getTokens()
+    {
+        return $this->tokens;
     }
 }

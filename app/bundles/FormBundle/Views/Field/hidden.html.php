@@ -7,26 +7,29 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$inputAttr = 'id="mauticform_input_' . $field['alias'] . '" name="mauticform['. $field['alias'] .']" value="' . $field['defaultValue'] . '" ' . $field['inputAttributes'];
-if (strpos($inputAttr, 'class') === false)
-    $inputAttr .= ' class="mauticform_input"';
+$defaultInputClass = $containerType = 'hidden';
 
-if (!empty($inForm))
-    $inputAttr .= ' disabled="disabled"';
+include __DIR__.'/field_helper.php';
 
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
-?>
+$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
+    array(
+        'deleted' => (!empty($deleted)) ? $deleted : false,
+        'id'      => $id,
+        'formId'  => $formId
+    )) : '';
 
-<div class="mauticform-row mauticform-hidden mauticform-row-<?php echo $field['alias'].$containerClass; ?>" id="mauticform_<?php echo $id; ?>">
-    <?php
-    if (!empty($inForm)):
-        echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id,
-            'formId'  => $formId
-        ));
-    ?>
-        <label class="text-muted"><?php echo $field['label']; ?></label>
-    <?php endif; ?>
-    <input <?php echo $inputAttr; ?> type="hidden" />
+if (!empty($inForm)):
+$html = <<<HTML
+<div $containerAttr>$formButtons
+    <label class="text-muted">{$field['label']}</label>
 </div>
+HTML;
+
+else:
+$html = <<<HTML
+
+                <input $inputAttr type="hidden" />
+HTML;
+endif;
+
+echo $html;

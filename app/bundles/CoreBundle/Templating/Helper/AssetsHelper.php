@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 /**
@@ -38,7 +37,7 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Gets asset prefix
      *
-     * @param bool $forceEndingSlash
+     * @param bool $includeEndingSlash
      *
      * @return string
      */
@@ -59,18 +58,44 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Set asset url path
      *
-     * @param string $path
-     * @param null   $packageName
-     * @param null   $version
+     * @param string     $path
+     * @param null       $packageName
+     * @param null       $version
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null)
+    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
-        $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
-        $path        = $assetPrefix . $path;
+        // if we have http in the url it is absolute and we can just return it
+        if (strpos($path, 'http') === 0) {
+            return $path;
+        }
 
-        return parent::getUrl($path, $packageName, $version);
+        // otherwise build the complete path
+        if (!$ignorePrefix) {
+            $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
+            $path        = $assetPrefix.$path;
+        }
+
+        $url = parent::getUrl($path, $packageName, $version);
+
+        if ($absolute) {
+            $url = $this->getBaseUrl() . $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Get base URL
+     *
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->factory->getRequest()->getSchemeAndHttpHost();
     }
 
     /**
@@ -177,6 +202,28 @@ class AssetsHelper extends CoreAssetsHelper
                 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js'
             ));
         }
+    }
+
+    /*
+     * Loads an addon script
+     *
+     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
+     */
+
+    public function includeScript($assetFilePath)
+    {
+        return  '<script async="async" type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+    }
+
+    /*
+     * Include stylesheet
+     *
+     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
+     */
+
+    public function includeStylesheet($assetFilePath)
+    {
+        return  '<script async="async" type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /**
@@ -389,7 +436,6 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string $text
      * @param array  $protocols  http/https, ftp, mail, twitter
      * @param array  $attributes
-     * @param string $mode       normal or all
      * @return string
      */
     public function makeLinks($text, $protocols = array('http', 'mail'), array $attributes = array())
@@ -419,12 +465,12 @@ class AssetsHelper extends CoreAssetsHelper
                             $link = $match[2] ?: $match[3];
                             return '<' . array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>") . '>';
                         }, $text);
-                    break;
+                        break;
                     case 'mail':
                         $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
                             return '<' . array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>") . '>';
                         }, $text);
-                    break;
+                        break;
                     case 'twitter':
                         $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
                             return '<' . array_push($links, "<a $attr href=\"https://twitter.com/" . ($match[0][0] == '@' ? '' : 'search/%23') . $match[1]  . "\">{$match[0]}</a>") . '>';
@@ -503,7 +549,11 @@ class AssetsHelper extends CoreAssetsHelper
     }
 
     /**
-     * @param $country
+     * @param           $country
+     * @param bool|true $urlOnly
+     * @param string    $class
+     *
+     * @return string
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {

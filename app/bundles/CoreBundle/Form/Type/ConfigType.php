@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -149,6 +150,16 @@ class ConfigType extends AbstractType
             )
         ));
 
+        $builder->add('mailer_return_path', 'text', array(
+            'label'       => 'mautic.core.config.form.mailer.return.path',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.mailer.return.path.tooltip'
+            ),
+            'required'    => false
+        ));
+
         $builder->add('mailer_transport', 'choice', array(
             'choices'     => array(
                 'mail'                      => 'mautic.core.config.mailer_transport.mail',
@@ -237,7 +248,8 @@ class ConfigType extends AbstractType
                 'class'        => 'form-control',
                 'data-show-on' => $mailerLoginShowConditions,
                 'data-hide-on' => $mailerLoginHideConditions,
-                'tooltip'      => 'mautic.core.config.form.mailer.user.tooltip'
+                'tooltip'      => 'mautic.core.config.form.mailer.user.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -251,7 +263,8 @@ class ConfigType extends AbstractType
                 'preaddon'     => 'fa fa-lock',
                 'data-show-on' => $mailerLoginShowConditions,
                 'data-hide-on' => $mailerLoginHideConditions,
-                'tooltip'      => 'mautic.core.config.form.mailer.password.tooltip'
+                'tooltip'      => 'mautic.core.config.form.mailer.password.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -268,7 +281,7 @@ class ConfigType extends AbstractType
                 'data-show-on' => $smtpServiceShowConditions,
                 'tooltip'      => 'mautic.core.config.form.mailer.encryption.tooltip'
             ),
-            'empty_value' => false
+            'empty_value' => 'mautic.core.config.mailer_encryption.none'
         ));
 
         $builder->add('mailer_test_connection_button', 'standalone_button', array(
@@ -412,6 +425,19 @@ class ConfigType extends AbstractType
             ))->addViewTransformer($arrayStringTransformer)
         );
 
+        $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+        $builder->add(
+            $builder->create('do_not_track_ips', 'textarea', array(
+                'label'      => 'mautic.core.config.form.do_not_track_ips',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.do_not_track_ips.tooltip'
+                ),
+                'required'   => false
+            ))->addViewTransformer($arrayLinebreakTransformer)
+        );
+
         $builder->add('rememberme_key', 'text', array(
             'label'       => 'mautic.core.config.form.rememberme.key',
             'label_attr'  => array('class' => 'control-label'),
@@ -473,8 +499,7 @@ class ConfigType extends AbstractType
                 25  => 'mautic.core.pagination.25',
                 30  => 'mautic.core.pagination.30',
                 50  => 'mautic.core.pagination.50',
-                100 => 'mautic.core.pagination.100',
-                0   => 'mautic.core.pagination.all'
+                100 => 'mautic.core.pagination.100'
             ),
             'expanded'    => false,
             'multiple'    => false,
@@ -594,8 +619,9 @@ class ConfigType extends AbstractType
             'label'      => 'mautic.core.config.form.transifex.username',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.config.form.transifex.username.tooltip'
+                'class'        => 'form-control',
+                'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));
@@ -604,10 +630,11 @@ class ConfigType extends AbstractType
             'label'      => 'mautic.core.config.form.transifex.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'       => 'form-control',
-                'placeholder' => 'mautic.user.user.form.passwordplaceholder',
-                'preaddon'    => 'fa fa-lock',
-                'tooltip'     => 'mautic.core.config.form.transifex.password.tooltip'
+                'class'        => 'form-control',
+                'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
+                'preaddon'     => 'fa fa-lock',
+                'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
+                'autocomplete' => 'off'
             ),
             'required'   => false
         ));

@@ -6,31 +6,34 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$labelAttr = $field['labelAttributes'];
-$inputAttr = $field['inputAttributes'];
 
-if (strpos($labelAttr, 'class') === false)
-    $labelAttr .= ' class="mauticform-label"';
+$defaultInputClass = $containerType = 'freetext';
+include __DIR__.'/field_helper.php';
 
-$properties = $field['properties'];
-$text       = $view->escape($properties['text']);
+$text = html_entity_decode($properties['text']);
 
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
-?>
+$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
+    array(
+        'deleted' => (!empty($deleted)) ? $deleted : false,
+        'id'      => $id,
+        'formId'  => $formId
+    )) : '';
 
-<div class="mauticform-row mauticform-freetext mauticform-row-<?php echo $field['alias'].$containerClass; ?>" id="mauticform_<?php echo $id; ?>">
-    <?php
-    if (!empty($inForm))
-        echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id,
-            'formId'  => $formId
-        ));
-    ?>
-    <?php if ($field['showLabel']): ?>
-    <h3 <?php echo $labelAttr; ?> id="mauticform_label_<?php echo $field['alias'] ?>" for="mauticform_input_<?php echo $field['alias'] ?>"><?php echo $view->escape($field['label']); ?></h3>
-    <?php endif; ?>
-    <div <?php echo $inputAttr; ?> id="mauticform_input_<?php echo $field['alias'] ?>">
-        <?php echo html_entity_decode($text); ?>
-    </div>
-</div>
+$label = (!$field['showLabel']) ? '' :
+<<<HTML
+
+                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input_{$field['alias']}">{$view->escape($field['label'])}</h3>
+HTML;
+
+
+$html = <<<HTML
+
+            <div $containerAttr>{$formButtons}{$label}
+                <div $inputAttr id="mauticform_input_{$field['alias']}">
+                    $text
+                </div>
+            </div>
+
+HTML;
+
+echo $html;

@@ -80,7 +80,7 @@ endif;
                     ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <img class="img img-responsive img-thumbnail" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
+                    <img class="img img-responsive img-thumbnail w-44" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
                     <div><?php echo $item->getName(true); ?></div>
@@ -88,7 +88,7 @@ endif;
                 </td>
                 <td><?php echo $item->getUsername(); ?></td>
                 <td class="visible-md visible-lg">
-                    <a href="mailto: <?echo $item->getEmail(); ?>"><?php echo $item->getEmail(); ?></a>
+                    <a href="mailto: <?php echo $item->getEmail(); ?>"><?php echo $item->getEmail(); ?></a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getRole()->getName(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

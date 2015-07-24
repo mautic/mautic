@@ -9,6 +9,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -28,16 +30,9 @@ class PageRepository extends CommonRepository
             ->select('p')
             ->leftJoin('p.category', 'c');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        return new Paginator($query);
+        return parent::getEntities($args);
     }
 
     /**
@@ -58,6 +53,9 @@ class PageRepository extends CommonRepository
             ->groupBy('h.page_id, p.title, h.url')
             ->where('h.page_id > 0')
             ->setMaxResults($limit);
+
+        $expr = $this->getPublishedByDateExpression($q, 'p');
+        $q->andWhere($expr);
 
         return $q->execute()->fetchAll();
     }
@@ -144,7 +142,7 @@ class PageRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('p.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

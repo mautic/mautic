@@ -134,6 +134,17 @@ class FormEntity extends CommonEntity
     }
 
     /**
+     * Clear dates on clone
+     */
+    public function __clone()
+    {
+        $this->dateAdded    = null;
+        $this->dateModified = null;
+        $this->checkedOut   = null;
+        $this->isPublished  = false;
+    }
+
+    /**
      * Check publish status with option to check against category, publish up and down dates
      *
      * @param bool $checkPublishStatus
@@ -452,5 +463,29 @@ class FormEntity extends CommonEntity
     public function getModifiedByUser()
     {
         return $this->modifiedByUser;
+    }
+
+    /**
+     * @param mixed $createdByUser
+     */
+    public function setCreatedByUser($createdByUser)
+    {
+        $this->createdByUser = $createdByUser;
+    }
+
+    /**
+     * @param mixed $modifiedByUser
+     */
+    public function setModifiedByUser($modifiedByUser)
+    {
+        $this->modifiedByUser = $modifiedByUser;
+    }
+
+    /**
+     * @param mixed $checkedOutByUser
+     */
+    public function setCheckedOutByUser($checkedOutByUser)
+    {
+        $this->checkedOutByUser = $checkedOutByUser;
     }
 }

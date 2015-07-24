@@ -55,13 +55,21 @@ return array(
             'mautic_email_resubscribe' => array(
                 'path'       => '/email/resubscribe/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:resubscribe'
+            ),
+            'mautic_mailer_transport_callback' => array(
+                'path'         => '/mailer/{transport}/callback',
+                'controller'   => 'MauticEmailBundle:Public:mailerCallback'
+            ),
+            'mautic_email_preview' => array(
+                'path'       => '/email/preview/{objectId}',
+                'controller' => 'MauticEmailBundle:Public:preview'
             )
         )
     ),
 
     'menu'     => array(
         'main' => array(
-            'priority' => 6,
+            'priority' => 15,
             'items'    => array(
                 'mautic.email.emails' => array(
                     'id'        => 'mautic_email_root',
@@ -142,6 +150,10 @@ return array(
             'mautic.email.type.email_abtest_settings'     => array(
                 'class' => 'Mautic\EmailBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'email_abtest_settings'
+            ),
+            'mautic.email.type.batch_send'     => array(
+                'class' => 'Mautic\EmailBundle\Form\Type\BatchSendType',
+                'alias' => 'batch_send'
             )
         ),
         'other'  => array(

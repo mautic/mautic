@@ -93,6 +93,8 @@ class Category extends FormEntity
     public function __clone ()
     {
         $this->id = null;
+
+        parent::__clone();
     }
 
     /**

@@ -154,16 +154,6 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the array key for the auth token
-     *
-     * @return string
-     */
-    public function getAuthTokenKey ()
-    {
-        return 'access_token';
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @param string $data

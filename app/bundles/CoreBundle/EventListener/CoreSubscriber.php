@@ -83,6 +83,14 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $request->setLocale($locale);
+
+        // Set a cookie with session name for CKEditor's filemanager
+        $sessionName = $request->cookies->get('mautic_session_name');
+        if ($sessionName != session_name()) {
+            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            $cookieHelper = $this->factory->getHelper('cookie');
+            $cookieHelper->setCookie('mautic_session_name', session_name(), null);
+        }
     }
 
     /**
@@ -107,11 +115,6 @@ class CoreSubscriber extends CommonSubscriber
             //set a session var for filemanager to know someone is logged in
             $session->set('mautic.user', $user->getId());
 
-            //set a cookie with session name for filemanager; if there are symfony clashes, set cookie_path in local.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->setCookie('mautic_session_name', session_name(), null);
-
             //mark the user as last logged in
             $user = $this->factory->getUser();
             if ($user instanceof User) {
@@ -133,6 +136,7 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //set a couple variables used by Ckeditor's filemanager
+        $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
         $session->set('mautic.basepath', $event->getRequest()->getBasePath());
         $session->set('mautic.imagepath', $this->factory->getParameter('image_path'));
     }

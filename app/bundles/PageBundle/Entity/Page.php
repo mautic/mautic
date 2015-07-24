@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class Page
  *
@@ -41,6 +41,7 @@ class Page extends FormEntity
     private $alias;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
     private $template;
@@ -56,12 +57,7 @@ class Page extends FormEntity
     private $customHtml;
 
     /**
-     * @var string
-     */
-    private $contentMode = 'builder';
-
-    /**
-     * @var array
+     * @ORM\Column(name="content", type="array", nullable=true)
      */
     private $content = array();
 
@@ -101,6 +97,27 @@ class Page extends FormEntity
     private $metaDescription;
 
     /**
+     * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     */
+    private $redirectType;
+
+    /**
+     * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     */
+    private $redirectUrl;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails", "pageList"})
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -142,6 +159,13 @@ class Page extends FormEntity
      */
     private $sessionId;
 
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
     /**
      * Constructor
      */
@@ -176,10 +200,6 @@ class Page extends FormEntity
         $builder->createField('customHtml', 'text')
             ->columnName('custom_html')
             ->nullable()
-            ->build();
-
-        $builder->createField('contentMode', 'string')
-            ->columnName('content_mode')
             ->build();
 
         $builder->createField('content', 'array')
@@ -252,6 +272,14 @@ class Page extends FormEntity
         $metadata->addConstraint(new Callback(array(
             'callback' => 'translationParentValidation'
         )));
+
+        $metadata->addPropertyConstraint('redirectUrl',  new Assert\Url(
+                array(
+                    'message' => 'mautic.core.value.required',
+                    'groups'  => array('Redirect')
+                )
+            )
+        );
     }
 
     public function __clone ()
@@ -276,6 +304,25 @@ class Page extends FormEntity
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array
+     */
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
+        $data   = $form->getData();
+        $groups = array('Page');
+
+        $redirect = $data->getRedirectType();
+
+        if ($redirect) {
+            $groups[] = 'Redirect';
+        }
+
+        return $groups;
     }
 
     /**
@@ -484,6 +531,52 @@ class Page extends FormEntity
     public function getMetaDescription ()
     {
         return $this->metaDescription;
+    }
+
+    /**
+     * Set redirectType
+     *
+     * @param string $redirectType
+     *
+     * @return Page
+     */
+    public function setRedirectType($redirectType) {
+        $this->isChanged('redirectType', $redirectType);
+        $this->redirectType = $redirectType;
+
+        return $this;
+    }
+
+    /**
+     * Get redirectType
+     *
+     * @return string
+     */
+    public function getRedirectType() {
+        return $this->redirectType;
+    }
+
+    /**
+     * Set redirectUrl
+     *
+     * @param string $redirectUrl
+     *
+     * @return Page
+     */
+    public function setRedirectUrl($redirectUrl) {
+        $this->isChanged('redirectUrl', $redirectUrl);
+        $this->redirectUrl = $redirectUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get redirectUrl
+     *
+     * @return string
+     */
+    public function getRedirectUrl(){
+        return $this->redirectUrl;
     }
 
     /**
@@ -821,22 +914,6 @@ class Page extends FormEntity
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getContentMode ()
-    {
-        return $this->contentMode;
-    }
-
-    /**
-     * @param mixed $contentMode
-     */
-    public function setContentMode ($contentMode)
-    {
-        $this->contentMode = $contentMode;
     }
 
     /**

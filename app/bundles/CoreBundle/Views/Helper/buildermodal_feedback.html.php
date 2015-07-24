@@ -22,7 +22,7 @@ echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
 BODY
 ,
     'footer' => <<<FOOTER
-<button class="btn btn-default" data-dismiss="modal" type="button">{$view['translator']->trans('mautic.core.form.cancel')}</button></span>
-<button class="btn btn-primary" onclick="Mautic.insertBuilderFeedback();" type="button">{$view['translator']->trans('mautic.core.form.insert')}</button></span>'
+<button class="btn btn-default" data-dismiss="modal" type="button">{$view['translator']->trans('mautic.core.form.cancel')}</button>
+<button class="btn btn-primary" onclick="Mautic.insertBuilderFeedback();" type="button">{$view['translator']->trans('mautic.core.form.insert')}</button>
 FOOTER
 ));
