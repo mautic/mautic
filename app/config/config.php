@@ -164,7 +164,7 @@ $container->loadFromExtension('framework', array(
     'form'                 => null,
     'csrf_protection'      => true,
     'validation'           => array(
-        'enable_annotations' => true
+        'enable_annotations' => false
     ),
     'templating'           => array(
         'engines' => $engines,
