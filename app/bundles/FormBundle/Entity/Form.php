@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -223,24 +224,6 @@ class Form extends FormEntity
     }
 
     /**
-     * @param $prop
-     * @param $val
-     *
-     * @return void
-     */
-    protected function isChanged ($prop, $val)
-    {
-        $getter  = "get" . ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'actions' || $prop == 'fields') {
-            //changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
-        }
-    }
-
-    /**
      * @param \Symfony\Component\Form\Form $form
      *
      * @return array
@@ -260,6 +243,57 @@ class Form extends FormEntity
         }
 
         return $groups;
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('form')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'category'
+                )
+            )
+            ->addProperties(
+                array(
+                    'description',
+                    'cachedHtml',
+                    'publishUp',
+                    'publishDown',
+                    'fields',
+                    'actions',
+                    'template',
+                    'submissionCount',
+                    'inKioskMode',
+                    'formType'
+                )
+            )
+            ->build();
+    }
+
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
+    protected function isChanged ($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($prop == 'actions' || $prop == 'fields') {
+            //changes are already computed so just add them
+            $this->changes[$prop][$val[0]] = $val[1];
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
     }
 
     /**

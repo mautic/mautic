@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
@@ -130,6 +131,28 @@ class FormEntity extends CommonEntity
         $builder->createField('checkedOutByUser', 'string')
             ->columnName('checked_out_by_user')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('publish')
+            ->addProperties(
+                array(
+                    'isPublished',
+                    'dateAdded',
+                    'createdBy',
+                    'createdByUser',
+                    'dateModified',
+                    'modifiedBy',
+                    'modifiedByUser'
+                )
+            )
             ->build();
     }
 

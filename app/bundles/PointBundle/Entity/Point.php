@@ -11,6 +11,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,7 +44,6 @@ class Point extends FormEntity
      * @var string
      */
     private $type;
-
 
     /**
      * @var \DateTime
@@ -127,6 +127,35 @@ class Point extends FormEntity
         $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
             'message' => 'mautic.point.type.notblank'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('point')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'category',
+                    'type',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'publishUp',
+                    'publishDown',
+                    'delta',
+                    'properties'
+                )
+            )
+            ->build();
     }
 
     /**

@@ -1,2 +1,0 @@
-Mautic\EmailBundle\Entity\Stat:
-    exclusion_policy: ALL

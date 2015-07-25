@@ -24,13 +24,11 @@ $buildBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$
                 'mapping'   => true,
                 'is_bundle' => true
             );
-        }
 
-        // Set serializer mapping
-        if (file_exists($directory.'/Entity/Serializer')) {
+            // Set API metadata
             $serializerMappings[$bundle] = array(
-                'namespace_prefix' => $baseNamespace,
-                'path'             => "@$bundle/Entity/Serializer"
+                'namespace_prefix' => $baseNamespace . '\\Entity',
+                'path'             => "@$bundle/Entity"
             );
         }
 
@@ -69,6 +67,16 @@ $buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMapping
             foreach ($finder as $file) {
                 // Just check first file for the loadMetadata function
                 $reflectionClass = new \ReflectionClass($namespace . '\\Entity\\' . basename($file->getFilename(), '.php'));
+
+                // Register API metadata
+                if ($reflectionClass->hasMethod('loadApiMetadata')) {
+                    $serializerMappings[$bundle] = array(
+                        'namespace_prefix' => $baseNamespace . '\\Entity',
+                        'path'             => "@$bundle/Entity"
+                    );
+                }
+
+                // Register entities
                 if ($reflectionClass->hasMethod('loadMetadata')) {
                     $ormMappings[$bundle] = array(
                         'dir'       => 'Entity',
@@ -83,14 +91,6 @@ $buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMapping
                     break;
                 }
             }
-        }
-
-        // Set serializer mapping
-        if (file_exists($directory.'/Entity/Serializer')) {
-            $serializerMappings[$bundle] = array(
-                'namespace_prefix' => $baseNamespace,
-                'path'             => "@$bundle/Entity/Serializer"
-            );
         }
 
         return array(
@@ -318,6 +318,7 @@ if ($container->getParameter('mautic.api_enabled')) {
             'lower_case' => false
         ),
         'metadata'       => array(
+            'cache'          => 'none',
             'auto_detection' => false,
             'directories'    => $serializerMappings
         )

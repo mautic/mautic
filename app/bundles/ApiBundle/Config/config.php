@@ -145,6 +145,7 @@ return array(
             'bazinga.oauth.event_listener.request.class'              => 'Mautic\ApiBundle\EventListener\OAuth1\OAuthRequestListener',
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
             'jms_serializer.metadata.annotation_driver.class'         => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
+            'jms_serializer.metadata.php_driver.class'                => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
 
             'mautic.validator.oauthcallback' => array(
                 'class'     => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',

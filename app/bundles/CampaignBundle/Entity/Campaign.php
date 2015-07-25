@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
@@ -162,6 +163,39 @@ class Campaign extends FormEntity
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('asset')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'category',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'language',
+                    'publishUp',
+                    'publishDown',
+                    'downloadCount',
+                    'uniqueDownloadCount',
+                    'revision',
+                    'extension',
+                    'mime',
+                    'size'
+                )
+            )
+            ->build();
     }
 
     /**

@@ -1,2 +1,0 @@
-Mautic\CampaignBundle\Entity\Lead:
-    exclusion_policy: ALL

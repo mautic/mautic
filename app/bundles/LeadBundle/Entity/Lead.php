@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -208,6 +209,35 @@ class Lead extends FormEntity
         $builder->createField('preferredProfileImage', 'string')
             ->columnName('preferred_profile_image')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('lead')
+            ->setRoot('lead')
+            ->addListProperties(
+                array(
+                    'id',
+                    'points',
+                    'color',
+                    'fields',
+                )
+            )
+            ->addProperties(
+                array(
+                    'lastActive',
+                    'owner',
+                    'ipAddresses',
+                    'dateIdentified',
+                    'preferredProfileImage'
+                )
+            )
             ->build();
     }
 

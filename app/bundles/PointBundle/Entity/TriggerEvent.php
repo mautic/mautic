@@ -11,6 +11,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -110,6 +111,27 @@ class TriggerEvent
             ->build();
 
 
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('trigger')
+            ->addProperties(
+                array(
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'order',
+                    'properties'
+                )
+            )
+            ->build();
     }
 
     /**

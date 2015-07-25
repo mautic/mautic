@@ -10,6 +10,7 @@
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -85,6 +86,26 @@ class Category extends FormEntity
         $metadata->addPropertyConstraint('title', new NotBlank(array(
             'message' => 'mautic.core.title.required'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('category')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'description',
+                    'color'
+                )
+            )
+            ->build();
     }
 
     /**

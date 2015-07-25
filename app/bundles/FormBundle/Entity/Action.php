@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -86,6 +87,27 @@ class Action
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('form')
+            ->addProperties(
+                array(
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'order',
+                    'properties'
+                )
+            )
             ->build();
     }
 

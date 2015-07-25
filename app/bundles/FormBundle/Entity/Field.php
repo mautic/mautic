@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -201,6 +202,36 @@ class Field
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
     }
 
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('form')
+            ->addProperties(
+                array(
+                    'id',
+                    'label',
+                    'showLabel',
+                    'alias',
+                    'type',
+                    'defaultValue',
+                    'isRequired',
+                    'validationMessage',
+                    'helpMessage',
+                    'order',
+                    'properties',
+                    'labelAttributes',
+                    'inputAttributes',
+                    'containerAttributes',
+                    'leadField',
+                    'saveResult'
+                )
+            )
+            ->build();
+    }
 
     /**
      * @param $prop

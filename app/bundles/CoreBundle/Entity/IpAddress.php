@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Joomla\Http\HttpFactory;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -63,6 +64,24 @@ class IpAddress
         $builder->createField('ipDetails', 'array')
             ->columnName('ip_details')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->addProperties(
+                array(
+                    'id',
+                    'ipAddress',
+                    'ipDetails'
+                )
+            )
+            ->addGroup('ipAddress')
             ->build();
     }
 

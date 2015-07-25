@@ -10,6 +10,7 @@
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -111,6 +112,32 @@ class Report extends FormEntity
         $metadata->addPropertyConstraint('name', new NotBlank(array(
             'message' => 'mautic.core.name.required'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('report')
+            ->addListProperties(
+                'id',
+                'name',
+                'description',
+                'system'
+            )
+            ->addProperties(
+                array(
+                    'source',
+                    'columns',
+                    'filters',
+                    'tableOrder',
+                    'graphs'
+                )
+            )
+            ->build();
     }
 
     /**

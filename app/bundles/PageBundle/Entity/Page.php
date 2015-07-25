@@ -10,8 +10,10 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -306,7 +308,7 @@ class Page extends FormEntity
      *
      * @return array
      */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(Form $form)
     {
         $data   = $form->getData();
         $groups = array('Page');
@@ -318,6 +320,49 @@ class Page extends FormEntity
         }
 
         return $groups;
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('page')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'category',
+                )
+            )
+            ->addProperties(
+                array(
+                    'language',
+                    'publishUp',
+                    'publishDown',
+                    'hits',
+                    'uniqueHits',
+                    'variantHits',
+                    'revision',
+                    'metaDescription',
+                    'redirectType',
+                    'redirectUrl',
+                    'variantSettings',
+                    'variantStartDate',
+                    'variantParent',
+                    'variantChildren',
+                    'translationParent',
+                    'translationChildren'
+                )
+            )
+            ->setMaxDepth('variantParent', 1)
+            ->setMaxDepth('variantChildren', 1)
+            ->setMaxDepth('translationParent', 1)
+            ->setMaxDepth('translationChildren', 1)
+            ->build();
     }
 
     /**

@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -112,6 +113,25 @@ class Role extends FormEntity
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.core.name.required')
         ));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('role')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'description',
+                    'isAdmin'
+                )
+            )
+            ->build();
     }
 
     /**

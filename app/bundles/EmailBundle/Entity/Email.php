@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -424,6 +425,49 @@ class Email extends FormEntity
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
     {
         return ($form->getData()->getEmailType() == 'list') ? array('General', 'List') : array('General');
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('email')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'subject',
+                    'language',
+                    'category',
+
+                )
+            )
+            ->addProperties(
+                array(
+                    'fromAddress',
+                    'fromName',
+                    'replyToAddress',
+                    'bccAddress',
+                    'publishUp',
+                    'publishDown',
+                    'readCount',
+                    'readInBrowser',
+                    'sentCount',
+                    'revision',
+                    'assetAttachments',
+                    'variantStartDate',
+                    'variantSentCount',
+                    'variantReadCount',
+                    'variantParent',
+                    'variantChildren'
+                )
+            )
+            ->setMaxDepth('variantParent', 1)
+            ->setMaxDepth('variantChildren', 1)
+            ->build();
     }
 
     /**

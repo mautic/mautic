@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -185,6 +186,36 @@ class LeadField extends FormEntity
             'fields'  => array('alias'),
             'message' => 'mautic.lead.field.alias.unique'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('leadField')
+            ->addListProperties(
+                array(
+                    'id',
+                    'label',
+                    'alias',
+                    'type',
+                    'group',
+                    'order'
+                )
+            )
+            ->addProperties(
+                array(
+                    'defaultValue',
+                    'isRequired',
+                    'isPubliclyUpdatable',
+                    'isUniqueIdentifier',
+                    'properties'
+                )
+            )
+            ->build();
     }
 
     /**

@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -293,6 +294,37 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         }
 
         return $groups;
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('user')
+            ->addListProperties(
+                array(
+                    'id',
+                    'username',
+                    'firstName',
+                    'lastName'
+                )
+            )
+            ->addProperties(
+                array(
+                    'email',
+                    'position',
+                    'role',
+                    'timezone',
+                    'locale',
+                    'lastLogin',
+                    'lastActive',
+                    'onlineStatus'
+                )
+            )
+            ->build();
     }
 
     /**

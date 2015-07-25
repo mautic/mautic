@@ -10,6 +10,8 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\ApiBundle\Serializer\Driver\PhpDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -211,6 +213,39 @@ class Asset extends FormEntity
 
         $builder->createField('size', 'integer')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('asset')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'category',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'language',
+                    'publishUp',
+                    'publishDown',
+                    'downloadCount',
+                    'uniqueDownloadCount',
+                    'revision',
+                    'extension',
+                    'mime',
+                    'size'
+                )
+            )
             ->build();
     }
 

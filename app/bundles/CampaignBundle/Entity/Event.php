@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -201,6 +202,36 @@ class Event
             ->build();
 
 
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaign')
+            ->addProperties(
+                array(
+                    'id',
+                    'name',
+                    'description',
+                    'types',
+                    'eventType',
+                    'order',
+                    'properties',
+                    'triggerDate',
+                    'triggerInterval',
+                    'triggerIntervalUnit',
+                    'triggerMode',
+                    'children',
+                    'parent',
+                    'decisionPath'
+                )
+            )
+            ->setMaxDepth(1, 'parent')
+            ->build();
     }
 
     /**

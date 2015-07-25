@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
@@ -107,6 +108,31 @@ class LeadList extends FormEntity
             'field'   => 'alias',
             'message' => 'mautic.lead.list.alias.unique'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('leadList')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'filters',
+                    'isGlobal'
+                )
+            )
+            ->build();
     }
 
     /**
