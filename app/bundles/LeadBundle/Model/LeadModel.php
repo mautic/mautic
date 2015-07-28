@@ -774,7 +774,7 @@ class LeadModel extends FormModel
      * @param string    $reason
      * @param bool|true $persist
      *
-     * @return DoNotEmail|void
+     * @return DoNotEmail|bool
      * @throws \Doctrine\DBAL\DBALException
      */
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
@@ -784,9 +784,10 @@ class LeadModel extends FormModel
             $emailAddress = $fields['core']['email']['value'];
 
             if (empty($emailAddress)) {
-                return;
+                return false;
             }
         }
+
         $em   = $this->factory->getEntityManager();
         $repo = $em->getRepository('MauticEmailBundle:Email');
         if (!$repo->checkDoNotEmail($emailAddress)) {
@@ -800,10 +801,13 @@ class LeadModel extends FormModel
             if ($persist) {
                 $repo->saveEntity($dnc);
             } else {
+                $lead->addDoNotEmailEntry($dnc);
 
                 return $dnc;
             }
         }
+
+        return false;
     }
 
     /**
@@ -910,8 +914,8 @@ class LeadModel extends FormModel
                 $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
-                $dnc = $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
-                $lead->addDoNotEmailEntry($dnc);
+
+                $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
             }
         }
         unset($fields['doNotEmail']);
