@@ -51,7 +51,7 @@ class AccessToken implements AccessTokenInterface
     protected $secret;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="bigint", nullable=true)
      */
     protected $expiresAt;
 

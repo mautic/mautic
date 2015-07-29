@@ -46,7 +46,7 @@ class RefreshToken extends BaseRefreshToken
     protected $token;
 
     /**
-     * @ORM\Column(type="integer", name="expires_at", nullable=true)
+     * @ORM\Column(type="bigint", name="expires_at", nullable=true)
      */
     protected $expiresAt;
 

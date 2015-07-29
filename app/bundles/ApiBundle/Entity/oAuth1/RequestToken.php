@@ -51,7 +51,7 @@ class RequestToken implements RequestTokenInterface
     protected $secret;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     protected $expiresAt;
 
