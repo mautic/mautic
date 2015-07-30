@@ -50,7 +50,15 @@ switch ($type) {
                         <a class="btn btn-default btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id)); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
                     <?php endif; ?>
                      <?php if ($permissions['delete']): ?>
-                         <a class="btn btn-default btn-xs" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete'), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_leadnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>', ''], '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"><i class="fa fa-trash text-danger"></i></a>
+                         <a class="btn btn-default btn-xs"
+                            data-toggle="confirmation"
+                            href="<?php echo $view['router']->generate('mautic_leadnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>"
+                            data-message="<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete')); ?>"
+                            data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>"
+                            data-confirm-callback="executeAction"
+                            data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
+                             <i class="fa fa-trash text-danger"></i>
+                         </a>
                      <?php endif; ?>
                 </div>
                 <?php echo $text; ?>

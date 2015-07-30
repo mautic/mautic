@@ -1587,8 +1587,10 @@ var Mautic = {
             var cancelButton = mQuery('<button type="button" />')
                 .addClass("btn btn-primary")
                 .click(function () {
-                    if (typeof Mautic[cancelCallback] === "function") {
+                    if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
                         window["Mautic"][cancelCallback].apply('window', []);
+                    } else {
+                        Mautic.dismissConfirmation();
                     }
                 })
                 .html(cancelText);

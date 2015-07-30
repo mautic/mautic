@@ -42,7 +42,7 @@ class LeadNote extends FormEntity
     private $lead;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
