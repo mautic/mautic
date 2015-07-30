@@ -98,7 +98,6 @@ class EmailRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from('MauticEmailBundle:Email', 'e', 'e.id');
-
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 

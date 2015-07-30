@@ -13,9 +13,28 @@ mQuery(document).ready(function () {
     });
 
     CKEDITOR.disableAutoInline = true;
+
     mQuery("div[contenteditable='true']").each(function (index) {
         var content_id = mQuery(this).attr('id');
         var that = this;
+
+        var editorEvents = Mautic.getGlobalEditorEvents();
+        // Remove inserted <p /> tag if empty to allow the CSS3 placeholder to display
+        editorEvents['blur'] = function( event ) {
+            mQuery('.token-suggestions').remove();
+
+            var data = event.editor.getData();
+            if (!data) {
+                mQuery(that).html('');
+            }
+        };
+        editorEvents['instanceReady'] = function( event ) {
+            var data = event.editor.getData();
+            if (!data) {
+                mQuery(that).html('');
+            }
+        };
+
         CKEDITOR.inline(content_id, {
             extraPlugins: 'tokens,sourcedialog',
             toolbar: 'advanced',
@@ -23,23 +42,7 @@ mQuery(document).ready(function () {
             allowedContent: true,
             // Allow any attributes and prevent conversion of height/width attributes to styles
             extraAllowedContent: '*{*}; img[height,width]; table[height,width]',
-            on: {
-                // Remove inserted <p /> tag if empty to allow the CSS3 placeholder to display
-                blur: function( event ) {
-                    mQuery('.token-suggestions').remove();
-
-                    var data = event.editor.getData();
-                    if (!data) {
-                        mQuery(that).html('');
-                    }
-                },
-                instanceReady: function( event ) {
-                    var data = event.editor.getData();
-                    if (!data) {
-                        mQuery(that).html('');
-                    }
-                }
-            }
+            on: editorEvents
         });
 
         mQuery(this).data('token-callback', 'page:getBuilderTokens');
@@ -169,9 +172,9 @@ SlideshowManager.BrowseServer = function(obj)
 {
     SlideshowManager.urlobj = obj;
     SlideshowManager.OpenServerBrowser(
-    mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images',
-    screen.width * 0.7,
-    screen.height * 0.7 ) ;
+        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=images',
+        screen.width * 0.7,
+        screen.height * 0.7 ) ;
 }
 
 SlideshowManager.OpenServerBrowser = function( url, width, height )

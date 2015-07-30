@@ -54,6 +54,13 @@ mQuery( document ).ready(function() {
             statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
+
+    // Prevent backspace from activating browser back
+    mQuery(document).on('keydown', function (e) {
+        if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
+            e.preventDefault();
+        }
+    });
 });
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
@@ -460,7 +467,6 @@ var Mautic = {
             }
         }
 
-        //activate editors
         mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
@@ -494,6 +500,8 @@ var Mautic = {
                             settings.extraPlugins = 'tokens';
                         }
                     }
+
+                    settings.on = Mautic.getGlobalEditorEvents();
 
                     mQuery(this).ckeditor(settings);
                 });
@@ -675,7 +683,6 @@ var Mautic = {
                         }
                     });
 
-
                 var selectOrder = mQuery(el).data('order');
                 if (selectOrder && selectOrder.length > 1) {
                     this.deselect_all();
@@ -775,6 +782,54 @@ var Mautic = {
         mQuery('#globalSearchContainer').removeClass('active');
         mQuery('#globalSearchDropdown').removeClass('open');
         mQuery('body').off('click.globalsearch');
+    },
+
+    /**
+     *
+     * Global CKEditor events
+     *
+     * @returns {{contentDom: Function}}
+     */
+    getGlobalEditorEvents: function() {
+
+        return {
+            contentDom: function (event) {
+                var editable = event.editor.editable();
+
+                var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
+                var tokens = mQuery(doc).find('*[data-token]');
+
+                tokens.each(function (i) {
+                    mQuery(this).off('dblclick').on('dblclick', function (e) {
+                        console.log(e);
+                        var selEl = new CKEDITOR.dom.element(e.target);
+                        var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
+                        rangeObjForSelection.selectNodeContents(selEl);
+                        event.editor.getSelection().selectRanges([rangeObjForSelection]);
+
+                        // Remove contenteditable=false to make it deletable
+                        mQuery(e.target).prop('contenteditable', true);
+                    });
+                });
+
+                CKEDITOR.instances[event.editor.name].on('key', function (e) {
+                    var key = e.data.keyCode;
+                    if (key !== 8) {
+                        var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+                        tokens.each(function (i) {
+                            mQuery(this).prop('contenteditable', false);
+                        });
+                    }
+                });
+
+                editable.attachListener(editable, 'click', function (e) {
+                    var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+                    tokens.each(function (i) {
+                        mQuery(this).prop('contenteditable', false);
+                    });
+                });
+            }
+        }
     },
 
     /**
@@ -1379,8 +1434,9 @@ var Mautic = {
         }
 
         var header = mQuery(el).attr('data-header');
+        var footer = mQuery(el).attr('data-footer');
 
-        Mautic.loadAjaxModal(target, route, method, header);
+        Mautic.loadAjaxModal(target, route, method, header, footer);
     },
 
     /**
@@ -1389,8 +1445,9 @@ var Mautic = {
      * @param route
      * @param method
      * @param header
+     * @param footer
      */
-    loadAjaxModal: function (target, route, method, header) {
+    loadAjaxModal: function (target, route, method, header, footer) {
 
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
@@ -1402,10 +1459,18 @@ var Mautic = {
             }
         }
 
+        if (footer == 'false') {
+            mQuery(target + " .modal-footer").addClass('hide');
+        }
+
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
             if (header) {
                 mQuery(target + " .modal-title").html(header);
+            }
+
+            if (footer && footer != 'false') {
+                mQuery(target + " .modal-footer").html(header);
             }
         });
 
@@ -1475,6 +1540,7 @@ var Mautic = {
                 //add footer buttons
                 mQuery('<div class="modal-form-buttons" />').appendTo(target + " .modal-footer");
             }
+            mQuery(target + " .modal-footer").removeClass('hide');
         }
     },
 
