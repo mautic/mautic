@@ -30,7 +30,7 @@ class Integration extends CommonEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="plugin", inversedBy="integrations")
+     * @ORM\ManyToOne(targetEntity="Plugin", inversedBy="integrations")
      * @ORM\JoinColumn(name="plugin_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     private $plugin;
@@ -71,96 +71,120 @@ class Integration extends CommonEntity
     /**
      * @return mixed
      */
-    public function getApiKeys ()
+    public function getPlugin()
     {
-        return $this->apiKeys;
+        return $this->plugin;
     }
 
     /**
-     * @param mixed $apiKeys
+     * @param mixed $plugin
+     *
+     * @return Integration
      */
-    public function setApiKeys (array $apiKeys)
+    public function setPlugin($plugin)
     {
-        $this->apiKeys = $apiKeys;
-    }
+        $this->plugin = $plugin;
 
-    /**
-     * @return mixed
-     */
-    public function getIsPublished ()
-    {
-        return $this->isPublished;
-    }
-
-    /**
-     * @param mixed $isPublished
-     */
-    public function setIsPublished ($isPublished)
-    {
-        $this->isPublished = $isPublished;
+        return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getFeatureSettings ()
-    {
-        return $this->featureSettings;
-    }
-
-    /**
-     * @param mixed $featureSettings
-     */
-    public function setFeatureSettings (array $featureSettings)
-    {
-        $this->featureSettings = $featureSettings;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
      * @param mixed $name
+     *
+     * @return Integration
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getSupportedFeatures ()
+    public function getIsPublished()
+    {
+        return $this->isPublished;
+    }
+
+    /**
+     * @param mixed $isPublished
+     *
+     * @return Integration
+     */
+    public function setIsPublished($isPublished)
+    {
+        $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSupportedFeatures()
     {
         return $this->supportedFeatures;
     }
 
     /**
      * @param mixed $supportedFeatures
+     *
+     * @return Integration
      */
-    public function setSupportedFeatures ($supportedFeatures)
+    public function setSupportedFeatures($supportedFeatures)
     {
         $this->supportedFeatures = $supportedFeatures;
+
+        return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getPlugin ()
+    public function getApiKeys()
     {
-        return $this->addon;
+        return $this->apiKeys;
     }
 
     /**
-     * @param Plugin $plugin
+     * @param mixed $apiKeys
+     *
+     * @return Integration
      */
-    public function setPlugin (Plugin $plugin)
+    public function setApiKeys($apiKeys)
     {
-        $this->plugin = $plugin;
+        $this->apiKeys = $apiKeys;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFeatureSettings()
+    {
+        return $this->featureSettings;
+    }
+
+    /**
+     * @param mixed $featureSettings
+     *
+     * @return Integration
+     */
+    public function setFeatureSettings($featureSettings)
+    {
+        $this->featureSettings = $featureSettings;
+
+        return $this;
     }
 }

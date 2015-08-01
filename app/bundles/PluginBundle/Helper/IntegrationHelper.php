@@ -38,126 +38,189 @@ class IntegrationHelper
     /**
      * Get a list of integration helper classes
      *
-     * @param array|string $services
+     * @param array|string $specificIntegrations
      * @param array        $withFeatures
      * @param bool         $alphabetical
      * @param null|int     $pluginFilter
      *
      * @return mixed
      */
-    public function getIntegrationObjects ($services = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null)
+    public function getIntegrationObjects ($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null)
     {
-        static $integrations, $available;
+        static $integrations = array(), $available = array(), $byFeatureList = array(), $byPlugin = array();
 
-        if (empty($integrations)) {
+        // Build the service classes
+        if (empty($available)) {
             $em = $this->factory->getEntityManager();
 
-            $available = $integrations = array();
+            $available = array();
+
+            // Get currently installed integrations
+            $integrationSettings = $this->getIntegrationSettings();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
-            $plugins = $this->factory->getEnabledAddons();
+            $plugins = $this->factory->getPluginBundles();
 
-            // Quickly figure out which plugins are enabled so we only process those
-            /** @var \Mautic\PluginBundle\Entity\PluginRepository $pluginRepo */
-            $pluginRepo     = $em->getRepository('MauticPluginBundle:Plugin');
-            $pluginStatuses = $pluginRepo->getBundleStatus(true);
+            // Get a list of already installed integrations
+            $pluginModel      = $this->factory->getModel('plugin');
+            $integrationRepo  = $em->getRepository('MauticPluginBundle:Integration');
+            //get a list of plugins for filter
+            $installedPlugins = $pluginModel->getEntities(
+                array(
+                    'hydration_mode' => 'hydrate_array',
+                    'index'          => 'bundle'
+                )
+            );
+
+            $newIntegrations  = array();
 
             // Scan the plugins for integration classes
             foreach ($plugins as $plugin) {
-                if (is_dir($plugin['directory'] . '/Integration')) {
-                    $finder = new Finder();
-                    $finder->files()->name('*Integration.php')->in($plugin['directory'] . '/Integration')->ignoreDotFiles(true);
-
-                    if ($alphabetical) {
-                        $finder->sortByName();
-                    }
-
-                    $id = $pluginStatuses[$plugin['bundle']]['id'];
-                    foreach ($finder as $file) {
-                        $available[] = array(
-                            'addon'       => $em->getReference('MauticPluginBundle:Plugin', $id),
-                            'integration' => substr($file->getBaseName(), 0, -15),
-                            'namespace'   => str_replace('MauticPlugin', '', $plugin['bundle'])
-                        );
-                    }
-                }
-            }
-
-            $integrationSettings = $this->getIntegrationSettings();
-
-            // Get all the addon integrations
-            foreach ($available as $id => $a) {
-                if ($pluginFilter && $a['plugin']->getId() != $pluginFilter) {
+                // Do not list the integration if the bundle has not been "installed"
+                if (!isset($installedPlugins[$plugin['bundle']])) {
                     continue;
                 }
-                if (!isset($integrations[$a['integration']])) {
-                    $class           = "\\MauticPlugin\\" . $a['namespace'] . "\\Integration\\" . $a['integration'] . "Integration";
-                    $reflectionClass = new \ReflectionClass($class);
-                    if ($reflectionClass->isInstantiable()) {
-                        $integrations[$a['integration']] = new $class($this->factory);
-                        if (!isset($integrationSettings[$a['integration']])) {
-                            $integrationSettings[$a['integration']] = new Integration();
-                            $integrationSettings[$a['integration']]->setName($a['integration']);
+
+                if (is_dir($plugin['directory'].'/Integration')) {
+                    $finder = new Finder();
+                    $finder->files()->name('*Integration.php')->in($plugin['directory'].'/Integration')->ignoreDotFiles(true);
+
+                    $id              = $installedPlugins[$plugin['bundle']]['id'];
+                    $byPlugin[$id]   = array();
+                    $pluginReference = $em->getReference('MauticPluginBundle:Plugin', $id);
+                    $pluginNamespace = str_replace('MauticPlugin', '', $plugin['bundle']);
+
+                    foreach ($finder as $file) {
+                        $integrationName = substr($file->getBaseName(), 0, -15);
+
+                        if (!isset($integrationSettings[$integrationName])) {
+                            $newIntegration = new Integration();
+                            $newIntegration->setName($integrationName)
+                                ->setPlugin($pluginReference);
+                            $integrationSettings[$integrationName] = $newIntegration;
+
+                            // Initiate the class in order to get the features supported
+                            $class = "\\MauticPlugin\\" . $pluginNamespace . "\\Integration\\" . $integrationName . "Integration";
+                            $reflectionClass = new \ReflectionClass($class);
+                            if ($reflectionClass->isInstantiable()) {
+                                $integrations[$integrationName] = new $class($this->factory);
+
+                                $features = $integrations[$integrationName]->getSupportedFeatures();
+                                $newIntegration->setSupportedFeatures($features);
+
+                                // Go ahead and stash it since it's built already
+                                $integrations[$integrationName]->setIntegrationSettings($newIntegration);
+
+                                $newIntegrations[] = $newIntegration;
+
+                                unset($newIntegration);
+                            } else {
+                                // Something is bad so ignore
+                                continue;
+                            }
                         }
-                        $integrationSettings[$a['integration']]->setPlugin($a['plugin']);
 
-                        $integrations[$a['integration']]->setIntegrationSettings($integrationSettings[$a['integration']]);
+                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        $settings = $integrationSettings[$integrationName];
+                        $available[$integrationName]  = array(
+                            'integration' => $integrationName,
+                            'settings'    => $settings,
+                            'namespace'   => $pluginNamespace
+                        );
+
+                        // Sort by feature and plugin for later
+                        $features = $settings->getSupportedFeatures();
+                        foreach ($features as $feature) {
+                            if (!isset($byFeatureList[$feature])) {
+                                $byFeatureList[$feature] = array();
+                            }
+                            $byFeatureList[$feature][] = $integrationName;
+                        }
+                        $byPlugin[$id][] = $integrationName;
+                    }
+
+                    // Save newly found integrations
+                    if (!empty($newIntegrations)) {
+                        $integrationRepo->saveEntities($newIntegrations);
+                        unset($newIntegrations);
                     }
                 }
-            }
-
-            if (empty($alphabetical)) {
-                // Sort by priority
-                uasort($integrations, function ($a, $b) {
-                    $aP = (int)$a->getPriority();
-                    $bP = (int)$b->getPriority();
-
-                    if ($aP === $bP) {
-                        return 0;
-                    }
-
-                    return ($aP < $bP) ? -1 : 1;
-                });
             }
         }
 
-        if (!empty($services)) {
-            if (!is_array($services) && isset($integrations[$services])) {
-                return array($services => $integrations[$services]);
-            } elseif (is_array($services)) {
-                $specific = array();
-                foreach ($services as $s) {
-                    if (isset($integrations[$s])) {
-                        $specific[$s] = $integrations[$s];
-                    }
-                }
-
-                return $specific;
-            } else {
-                throw new MethodNotAllowedHttpException(array_keys($available));
-            }
-        } elseif (!empty($withFeatures)) {
-            if (!is_array($withFeatures)) {
-                $withFeatures = array($withFeatures);
-            }
-
-            $specific = array();
-            foreach ($integrations as $n => $d) {
-                $settings = $d->getIntegrationSettings();
-                $features = $settings->getSupportedFeatures();
-
-                foreach ($withFeatures as $f) {
-                    if (in_array($f, $features)) {
-                        $specific[$n] = $d;
-                        break;
-                    }
-                }
-            }
-
-            return $specific;
+        // Ensure appropriate formats
+        if ($specificIntegrations !== null && !is_array($specificIntegrations)) {
+            $specificIntegrations = array($specificIntegrations);
         }
 
-        return $integrations;
+        if ($withFeatures !== null && !is_array($withFeatures)) {
+            $withFeatures = array($withFeatures);
+        }
+
+        // Build the integrations wanted
+        if (!empty($pluginFilter)) {
+            // Filter by plugin
+            $filteredIntegrations = $byPlugin[$pluginFilter];
+        } elseif (!empty($specificIntegrations)) {
+            // Filter by specific integrations
+            $filteredIntegrations = $specificIntegrations;
+        } else {
+            // All services by default
+            $filteredIntegrations = array_keys($available);
+        }
+
+        // Filter by features
+        if (!empty($withFeatures)) {
+            $integrationsWithFeatures = array();
+            foreach ($withFeatures as $feature) {
+                $integrationsWithFeatures = $integrationsWithFeatures + $byFeatureList[$feature];
+            }
+
+            $filteredIntegrations = array_intersect($filteredIntegrations, $integrationsWithFeatures);
+        }
+
+        $returnServices = array();
+
+        // Build the classes if not already
+        foreach ($filteredIntegrations as $integrationName) {
+            if (!isset($integrations[$integrationName])) {
+                $integration = $available[$integrationName];
+                $class           = "\\MauticPlugin\\" . $integration['namespace'] . "\\Integration\\" . $integrationName . "Integration";
+                $reflectionClass = new \ReflectionClass($class);
+                if ($reflectionClass->isInstantiable()) {
+                    $integrations[$integrationName] = new $class($this->factory);
+                    $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+                } else {
+                    $integrations[$integrationName] = false;
+                }
+            }
+
+            $returnServices[$integrationName] = $integrations[$integrationName];
+        }
+
+        if (empty($alphabetical)) {
+            // Sort by priority
+            uasort($returnServices, function ($a, $b) {
+                $aP = (int)$a->getPriority();
+                $bP = (int)$b->getPriority();
+
+                if ($aP === $bP) {
+                    return 0;
+                }
+
+                return ($aP < $bP) ? -1 : 1;
+            });
+        } else {
+            // Sort by display name
+            uasort($returnServices, function ($a, $b) {
+                $aName = (int)$a->getDisplayName();
+                $bName = (int)$b->getDisplayName();
+
+                return strcasecmp($aName, $bName);
+            });
+        }
+
+        return $returnServices;
     }
 
     /**

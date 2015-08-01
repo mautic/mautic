@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
- * Class AddonPermissions
+ * Class PluginPermissions
  */
-class AddonPermissions extends AbstractPermissions
+class PluginPermissions extends AbstractPermissions
 {
 
     /**

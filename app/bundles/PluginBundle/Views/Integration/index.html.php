@@ -10,7 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'integration');
 
-$header = $view['translator']->trans('mautic.plugin.manage.integrations');
+$header = $view['translator']->trans('mautic.plugin.manage.plugins');
 if ($pluginFilter) {
     $filterValue = $pluginFilter['id'];
     $header     .= ' - ' . $pluginFilter['name'];
@@ -18,6 +18,20 @@ if ($pluginFilter) {
     $filterValue = '';
 }
 $view['slots']->set('headerTitle', $header);
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'customButtons' => array(
+        array(
+            'attr'      => array(
+                'data-toggle' => 'ajax',
+                'href'        => $view['router']->generate('mautic_plugin_reload')
+            ),
+            'btnText'   => $view["translator"]->trans('mautic.plugin.reload.plugins'),
+            'iconClass' => 'fa fa-cubes',
+            'tooltip'   => 'mautic.plugin.reload.plugins.tooltip'
+        )
+    )
+)));
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

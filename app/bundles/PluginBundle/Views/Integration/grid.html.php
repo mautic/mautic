@@ -13,14 +13,12 @@ if ($tmpl == 'index')
 <div class="pa-md bg-auto">
     <div class="row shuffle-integrations">
             <?php foreach ($items as $item): ?>
-                <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration addon<?php echo $item['plugin']; ?> integration-<?php echo $item['name']; ?>">
+                <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration plugin<?php echo $item['plugin']; ?> integration-<?php echo $item['name']; ?> <?php if (!$item['enabled']) echo  'integration-disabled'; ?>">
                     <div class="panel ovf-h pa-10">
-                        <a href="<?php echo $view['router']->generate('mautic_plugin_edit', array('name' => $item['name'])); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>">
+                        <a href="<?php echo $view['router']->generate('mautic_plugin_config', array('name' => $item['name'])); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>">
                             <p><img class="img img-responsive" src="<?php echo $view['assets']->getUrl($item['icon']); ?>" /></p>
                             <h5 class="mt-20">
                                 <span class="ellipsis" data-toggle="tooltip" title="<?php echo $plugins[$item['plugin']]['name'] . ' - ' . $item['display']; ?>"><?php echo $item['display']; ?>
-                                    <?php $class = (!$item['enabled']) ? ' hide' : '';?>
-                                    <i class="fa fa-2x fa-check text-success<?php echo $class; ?>" style="position: absolute; top: -10px; right: -5px;"></i>
                                 </span>
                             </h5>
                         </a>

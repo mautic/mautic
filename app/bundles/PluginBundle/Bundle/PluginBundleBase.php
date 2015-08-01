@@ -9,6 +9,7 @@
 
 namespace Mautic\PluginBundle\Bundle;
 
+use Mautic\PluginBundle\Entity\Addon;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -23,9 +24,12 @@ abstract class PluginBundleBase extends Bundle
      *
      * @param MauticFactory $factory
      */
-    static public function onInstall(MauticFactory $factory)
+    static public function onPluginInstall(MauticFactory $factory)
     {
-
+        // BC support; @deprecated 1.1.4; to be removed in 2.0
+        if (method_exists(get_called_class(), 'onInstall')) {
+            self::onInstall($factory);
+        }
     }
 
     /**
@@ -34,7 +38,32 @@ abstract class PluginBundleBase extends Bundle
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      */
-    static public function onUpdate(Plugin $plugin, MauticFactory $factory)
+    static public function onPluginUpdate(Plugin $plugin, MauticFactory $factory)
+    {
+        // BC support; @deprecated 1.1.4; to be removed in 2.0
+        if (method_exists(get_called_class(), 'onUpdate')) {
+            // Create a bogus Addon
+            $addon = new Addon();
+            $addon->setAuthor($plugin->getAuthor())
+                ->setBundle($plugin->getBundle())
+                ->setDescription($plugin->getDescription())
+                ->setId($plugin->getId())
+                ->setIntegrations($plugin->getIntegrations())
+                ->setIsMissing($plugin->getIsMissing())
+                ->setName($plugin->getName())
+                ->setVersion($plugin->getVersion());
+
+            self::onUpdate($addon, $factory);
+        }
+    }
+
+    /**
+     * Not used yet :-)
+     *
+     * @param Plugin        $plugin
+     * @param MauticFactory $factory
+     */
+    static public function onPluginUninstall(Plugin $plugin, MauticFactory $factory)
     {
 
     }

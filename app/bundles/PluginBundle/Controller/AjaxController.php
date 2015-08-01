@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
     protected function setIntegrationFilterAction (Request $request)
     {
         $session     = $this->factory->getSession();
-        $pluginFilter = InputHelper::int($this->request->get('addon'));
+        $pluginFilter = InputHelper::int($this->request->get('plugin'));
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         return $this->sendJsonResponse(array('success' => 1));

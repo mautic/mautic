@@ -63,7 +63,7 @@ class CorePermissions
      */
     protected function getPluginBundles()
     {
-        return $this->factory->getEnabledAddons();
+        return $this->factory->getPluginBundles();
     }
 
     /**
@@ -253,7 +253,8 @@ class CorePermissions
 
             $parts = explode(':', $permission);
 
-            if ($parts[0] == 'addon' && count($parts) == 4) {
+            // addon @deprecated 1.1.4; will be removed in 2.0
+            if (($parts[0] == 'addon' ||$parts[0] == 'plugin') && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -332,7 +333,8 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            if ($parts[0] == 'addon' && count($parts) == 4) {
+            // addon @deprecated 1.1.4; will be removed in 2.0
+            if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {

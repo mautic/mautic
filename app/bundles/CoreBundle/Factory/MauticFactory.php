@@ -76,7 +76,11 @@ class MauticFactory
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
 
-            if ($parts[0] == 'addon' && $parts[1] != 'addon') {
+            // @deprecated support for addon in 1.1.4; to be removed in 2.0
+            if (
+                ($parts[0] == 'addon' && $parts[1] != 'addon') ||
+                ($parts[0] == 'plugin' && $parts[1] != 'plugin'))
+            {
                 $namespace = 'MauticPlugin';
                 array_shift($parts);
             } else {
@@ -715,6 +719,16 @@ class MauticFactory
     }
 
     /**
+     * Get's an array of details for enabled Mautic plugins
+     *
+     * @return array
+     */
+    public function getPluginBundles()
+    {
+        return $this->getKernel()->getPluginBundles();
+    }
+
+    /**
      * Gets an array of a specific bundle's config settings
      *
      * @param        $bundleName
@@ -754,16 +768,6 @@ class MauticFactory
 
         // we didn't throw so we can send the key value
         return $bundleConfig[$configKey];
-    }
-
-    /**
-     * Get's an array of details for enabled Mautic plugins
-     *
-     * @return array
-     */
-    public function getEnabledAddons()
-    {
-        return $this->getKernel()->getPluginBundles();
     }
 
     /**

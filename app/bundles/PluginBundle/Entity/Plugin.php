@@ -41,11 +41,6 @@ class Plugin extends CommonEntity
     private $description;
 
     /**
-     * @ORM\Column(name="is_enabled", type="boolean")
-     */
-    private $isEnabled = true;
-
-    /**
      * @ORM\Column(name="is_missing", type="boolean")
      */
     private $isMissing = false;
@@ -66,7 +61,7 @@ class Plugin extends CommonEntity
     private $author;
 
     /**
-     * @ORM\OneToMany(targetEntity="Integration", mappedBy="addon", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Integration", mappedBy="plugin", indexBy="id", fetch="EXTRA_LAZY")
      */
     private $integrations;
 
@@ -118,30 +113,6 @@ class Plugin extends CommonEntity
     }
 
     /**
-     * Set isEnabled
-     *
-     * @param boolean $isEnabled
-     *
-     * @return Addon
-     */
-    public function setIsEnabled($isEnabled)
-    {
-        $this->isEnabled = $isEnabled;
-
-        return $this;
-    }
-
-    /**
-     * Get isEnabled
-     *
-     * @return boolean
-     */
-    public function getIsEnabled()
-    {
-        return $this->isEnabled;
-    }
-
-    /**
      * Set bundle
      *
      * @param string $bundle
@@ -161,16 +132,6 @@ class Plugin extends CommonEntity
     public function getBundle()
     {
         return $this->bundle;
-    }
-
-    /**
-     * Check the publish status of an entity based on publish up and down datetimes
-     *
-     * @return string published|unpublished
-     */
-    public function getPublishStatus()
-    {
-        return $this->getIsEnabled() ? 'published' : 'unpublished';
     }
 
     /**

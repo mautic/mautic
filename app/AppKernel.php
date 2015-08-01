@@ -147,13 +147,7 @@ class AppKernel extends Kernel
             $class    = '\\Mautic' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
                 $bundleInstance = new $class();
-                if (method_exists($bundleInstance, 'isEnabled')) {
-                    if ($bundleInstance->isEnabled()) {
-                        $bundles[] = $bundleInstance;
-                    }
-                } else {
-                    $bundles[] = $bundleInstance;
-                }
+                $bundles[]      = $bundleInstance;
             }
         }
 
@@ -230,67 +224,12 @@ class AppKernel extends Kernel
 
         $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
 
-        $pluginBundles = array();
         foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\PluginBundle\Bundle\PluginBundleBase) {
-                //boot after it's been check to see if it's enabled
-                $pluginBundles[$name] = $bundle;
-
-                //set the container for the addon helper
-                $bundle->setContainer($this->container);
-            } else {
-                $bundle->setContainer($this->container);
-                $bundle->boot();
-            }
+            $bundle->setContainer($this->container);
+            $bundle->boot();
         }
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $this->container->get('mautic.factory');
-
-        $dispatcher = $factory->getDispatcher();
-
-        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled then deal with them accordingly
-        foreach ($pluginBundles as $name => $bundle) {
-            if (!$bundle->isEnabled()) {
-                unset($this->bundles[$name]);
-                unset($this->bundleMap[$name]);
-
-                // remove listeners as well
-                if (isset($registeredPluginBundles[$name]['config']['services'])) {
-                    foreach ($registeredPluginBundles[$name]['config']['services'] as $serviceGroup => $services) {
-                        foreach ($services as $serviceName => $details) {
-                            if ($serviceGroup == 'events') {
-                                $details['tag'] = 'kernel.event_subscriber';
-                            }
-
-                            if (isset($details['tag'])) {
-                                if ($details['tag'] == 'kernel.event_subscriber') {
-                                    $service = $this->container->get($serviceName);
-                                    $dispatcher->removeSubscriber($service);
-                                } elseif ($details['tag'] == 'kernel.event_listener') {
-                                    $service = $this->container->get($serviceName);
-                                    $dispatcher->removeListener($details['tagArguments']['event'], $service);
-                                }
-                            } elseif (isset($details['tags'])) {
-                                foreach ($details['tags'] as $k => $tag) {
-                                    if ($tag == 'kernel.event_listener') {
-                                        $service = $this->container->get($serviceName);
-                                        $dispatcher->removeListener($details['tagArguments'][$k]['event'], $service);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                unset($registeredPluginBundles[$name]);
-            } else {
-                // boot the bundle
-                $bundle->boot();
-            }
-        }
-
-        $this->addonBundles = $registeredPluginBundles;
+        $this->pluginBundles = $registeredPluginBundles;
 
         $this->booted = true;
     }
@@ -302,7 +241,7 @@ class AppKernel extends Kernel
      */
     public function getPluginBundles()
     {
-        return $this->addonBundles;
+        return $this->pluginBundles;
     }
 
     /**

@@ -48,9 +48,8 @@ class IntegrationsListType extends AbstractType
 
         foreach ($integrationObjects as $name => $object) {
             $settings  = $object->getIntegrationSettings();
-            $plugin     = $settings->getPlugin();
 
-            if ($plugin->isEnabled() && $settings->isPublished()) {
+            if ($settings->isPublished()) {
                 if (!isset($integrations[$settings->getPlugin()->getName()])) {
                     $integrations[$settings->getPlugin()->getName()] = array();
                 }

@@ -43,11 +43,11 @@ Mautic.refreshIntegrationForm = function() {
 
 Mautic.integrationOnLoad = function(container, response) {
     if (response && response.name) {
-        var integration = '.integration-' + response.name + ' .fa-check';
+        var integration = '.integration-' + response.name;
         if (response.enabled) {
-            mQuery(integration).removeClass('hide');
+            mQuery(integration).removeClass('integration-disabled');
         } else {
-            mQuery(integration).addClass('hide');
+            mQuery(integration).addClass('integration-disabled');
         }
     } else {
         Mautic.filterIntegrations();
@@ -61,7 +61,7 @@ Mautic.filterIntegrations = function(update) {
         mQuery.ajax({
             url: mauticAjaxUrl,
             type: "POST",
-            data: "action=addon:setIntegrationFilter&addon=" + filter
+            data: "action=plugin:setIntegrationFilter&plugin=" + filter
         });
     }
 
@@ -73,7 +73,7 @@ Mautic.filterIntegrations = function(update) {
         setTimeout(function () {
             grid.shuffle('shuffle', function($el, shuffle) {
                 if (filter) {
-                    return $el.hasClass('addon' + filter);
+                    return $el.hasClass('plugin' + filter);
                 } else {
                     return true;
                 }
@@ -102,7 +102,7 @@ Mautic.getIntegrationLeadFields = function (integration, el, settings) {
 
     mQuery('#leadFieldsContainer').html('');
 
-    Mautic.ajaxActionRequest('addon:getIntegrationLeadFields', data,
+    Mautic.ajaxActionRequest('plugin:getIntegrationLeadFields', data,
         function(response) {
             if (response.success) {
                 mQuery('#leadFieldsContainer').replaceWith(response.html);
@@ -133,7 +133,7 @@ Mautic.getIntegrationConfig = function (el, settings) {
 
     mQuery('.integration-config-container').html('');
 
-    Mautic.ajaxActionRequest('addon:getIntegrationConfig', data,
+    Mautic.ajaxActionRequest('plugin:getIntegrationConfig', data,
         function (response) {
             if (response.success) {
                 mQuery('.integration-config-container').html(response.html);

@@ -68,8 +68,8 @@ class AjaxController extends CommonController
                 $parts = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin = false;
-
-                if ($parts[0] == 'addon' && count($parts) == 3) {
+                // addon @deprecated 1.1.4; will be removed in 2.0
+                if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 3) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
                     $isPlugin = true;

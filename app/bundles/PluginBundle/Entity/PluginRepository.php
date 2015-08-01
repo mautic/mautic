@@ -36,58 +36,16 @@ class PluginRepository extends CommonRepository
     }
 
     /**
-     * @return array
-     */
-    public function getInstalled()
-    {
-        $i = $this->getTableAlias();
-        $q = $this->_em->createQueryBuilder();
-        $q->select($i);
-        $q->from('MauticPluginBundle:Plugin', $i, "$i.bundle");
-
-        $results = $q->getQuery()->getResult();
-
-        return $results;
-    }
-
-    /**
-     * Retrieves the enabled status of all addon bundles
-     *
-     * @param $withId
-     *
-     * @return array
-     */
-    public function getBundleStatus($withId = false)
-    {
-        $q = $this->createQueryBuilder($this->getTableAlias());
-
-        if ($withId) {
-            $q->select('i.bundle AS bundle, i.isEnabled AS enabled, i.id');
-        } else {
-            $q->select('i.bundle AS bundle, i.isEnabled AS enabled');
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-
-        $return = array();
-
-        foreach ($results as $result) {
-            $return[$result['bundle']] = ($withId) ? $result : $result['enabled'];
-        }
-
-        return $return;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getEntities($args = array())
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
-            ->from('MauticPluginBundle:Plugin', $this->getTableAlias(), $this->getTableAlias() . '.id');
+            ->from('MauticPluginBundle:Plugin', $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias() . '.' . $args['index'] : $this->getTableAlias() . '.id');
 
         $args['qb'] = $q;
+        $args['ignore_paginator'] = true;
 
         return parent::getEntities($args);
     }
@@ -98,7 +56,7 @@ class PluginRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('i.title', 'ASC')
+            array('p.name', 'ASC')
         );
     }
 
@@ -107,6 +65,6 @@ class PluginRepository extends CommonRepository
      */
     public function getTableAlias()
     {
-        return 'i';
+        return 'p';
     }
 }

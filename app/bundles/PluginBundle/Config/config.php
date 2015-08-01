@@ -30,6 +30,10 @@ return array(
             'mautic_plugin_config'    => array(
                 'path'       => '/plugins/config/{name}',
                 'controller' => 'MauticPluginBundle:Plugin:config'
+            ),
+            'mautic_plugin_reload'    => array(
+                'path'       => '/plugins/reload',
+                'controller' => 'MauticPluginBundle:Plugin:reload'
             )
         )
     ),
