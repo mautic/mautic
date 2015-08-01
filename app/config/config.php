@@ -27,10 +27,10 @@ $buildBundles = function($namespace, $bundle) use ($container) {
     return false;
 };
 
-// Note MauticAddon bundles so they can be applied as needed
-$buildAddonBundles = function($namespace, $bundle) use ($container) {
-    if (strpos($namespace, 'MauticAddon\\') !== false) {
-        $directory = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
+// Note MauticPlugin bundles so they can be applied as needed
+$buildPluginBundles = function($namespace, $bundle) use ($container) {
+    if (strpos($namespace, 'MauticPlugin\\') !== false) {
+        $directory = dirname($container->getParameter('kernel.root_dir')) . '/plugins/' . $bundle;
 
         // Check for a single config file
         if (file_exists($directory.'/Config/config.php')) {
@@ -46,7 +46,7 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
             "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
             "symfonyBundleName" => $bundle,
             "bundleClass"       => $namespace,
-            "relative"          => 'addons/' . $bundle,
+            "relative"          => 'plugins/' . $bundle,
             "directory"         => $directory,
             "config"            => $config
         );
@@ -62,20 +62,20 @@ $mauticBundles  = array_filter(
 );
 unset($buildBundles);
 
-$addonBundles  = array_filter(
-    array_map($buildAddonBundles, $symfonyBundles, array_keys($symfonyBundles)),
+$pluginBundles  = array_filter(
+    array_map($buildPluginBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
-unset($buildAddonBundles, $buildBundles);
+unset($buildPluginBundles, $buildBundles);
 
 $setBundles = array();
 
 foreach ($mauticBundles as $bundle) {
     $setBundles[$bundle['symfonyBundleName']] = $bundle;
 }
-$setAddonBundles = array();
-foreach ($addonBundles as $bundle) {
-    $setAddonBundles[$bundle['symfonyBundleName']] = $bundle;
+$setPluginBundles = array();
+foreach ($pluginBundles as $bundle) {
+    $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
 }
 
 // Make Core the first in the list
@@ -84,8 +84,8 @@ unset($setBundles['MauticCoreBundle']);
 $setBundles = array_merge(array('MauticCoreBundle' => $coreBundle), $setBundles);
 
 $container->setParameter('mautic.bundles', $setBundles);
-$container->setParameter('mautic.addon.bundles', $setAddonBundles);
-unset($setBundles, $setAddonBundles);
+$container->setParameter('mautic.plugin.bundles', $setPluginBundles);
+unset($setBundles, $setPluginBundles);
 
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');

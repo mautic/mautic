@@ -53,7 +53,7 @@ class AppKernel extends Kernel
     /**
      * @var array
      */
-    private $addonBundles  = array();
+    private $pluginBundles  = array();
 
     /**
      * {@inheritdoc}
@@ -158,7 +158,7 @@ class AppKernel extends Kernel
         }
 
         //dynamically register Mautic Addon Bundles
-        $searchPath = dirname(__DIR__) . '/addons';
+        $searchPath = dirname(__DIR__) . '/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -169,7 +169,7 @@ class AppKernel extends Kernel
         foreach ($finder as $file) {
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
-            $class    = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
+            $class    = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
                 $bundles[] = new $class();
             }
@@ -228,13 +228,13 @@ class AppKernel extends Kernel
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
-        $registeredAddonBundles = $this->container->getParameter('mautic.addon.bundles');
+        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
 
-        $addonBundles = array();
+        $pluginBundles = array();
         foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
+            if ($bundle instanceof \Mautic\PluginBundle\Bundle\PluginBundleBase) {
                 //boot after it's been check to see if it's enabled
-                $addonBundles[$name] = $bundle;
+                $pluginBundles[$name] = $bundle;
 
                 //set the container for the addon helper
                 $bundle->setContainer($this->container);
@@ -250,14 +250,14 @@ class AppKernel extends Kernel
         $dispatcher = $factory->getDispatcher();
 
         // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled then deal with them accordingly
-        foreach ($addonBundles as $name => $bundle) {
+        foreach ($pluginBundles as $name => $bundle) {
             if (!$bundle->isEnabled()) {
                 unset($this->bundles[$name]);
                 unset($this->bundleMap[$name]);
 
                 // remove listeners as well
-                if (isset($registeredAddonBundles[$name]['config']['services'])) {
-                    foreach ($registeredAddonBundles[$name]['config']['services'] as $serviceGroup => $services) {
+                if (isset($registeredPluginBundles[$name]['config']['services'])) {
+                    foreach ($registeredPluginBundles[$name]['config']['services'] as $serviceGroup => $services) {
                         foreach ($services as $serviceName => $details) {
                             if ($serviceGroup == 'events') {
                                 $details['tag'] = 'kernel.event_subscriber';
@@ -283,14 +283,14 @@ class AppKernel extends Kernel
                     }
                 }
 
-                unset($registeredAddonBundles[$name]);
+                unset($registeredPluginBundles[$name]);
             } else {
                 // boot the bundle
                 $bundle->boot();
             }
         }
 
-        $this->addonBundles = $registeredAddonBundles;
+        $this->addonBundles = $registeredPluginBundles;
 
         $this->booted = true;
     }
@@ -300,7 +300,7 @@ class AppKernel extends Kernel
      *
      * @return array
      */
-    public function getAddonBundles()
+    public function getPluginBundles()
     {
         return $this->addonBundles;
     }

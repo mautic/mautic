@@ -69,7 +69,7 @@ class TemplateReference extends BaseTemplateReference
 
         if (!empty($this->parameters['bundle'])) {
             $bundleRoot = $this->factory->getSystemPath('bundles', true);
-            $addonRoot  = $this->factory->getSystemPath('addons', true);
+            $pluginRoot  = $this->factory->getSystemPath('plugins', true);
 
             // Check for a system-wide override
             $themePath      = $this->factory->getSystemPath('themes', true);
@@ -87,7 +87,7 @@ class TemplateReference extends BaseTemplateReference
 
                     if ((!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path))
                         || file_exists(
-                            $addonRoot.'/'.$this->parameters['bundle'].'/Views/'.$path
+                            $pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path
                         )
                     ) {
                         // Mautic core template

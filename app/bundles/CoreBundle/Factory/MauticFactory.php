@@ -77,7 +77,7 @@ class MauticFactory
             $parts = explode('.', $name);
 
             if ($parts[0] == 'addon' && $parts[1] != 'addon') {
-                $namespace = 'MauticAddon';
+                $namespace = 'MauticPlugin';
                 array_shift($parts);
             } else {
                 $namespace = 'Mautic';
@@ -699,14 +699,16 @@ class MauticFactory
     /**
      * Get's an array of details for Mautic core bundles
      *
-     * @return mixed
+     * @param bool|false $includePlugins
+     *
+     * @return array|mixed
      */
-    public function getMauticBundles($includeAddons = false)
+    public function getMauticBundles($includePlugins = false)
     {
         $bundles = $this->container->getParameter('mautic.bundles');
-        if ($includeAddons) {
-            $addons  = $this->container->getParameter('mautic.addon.bundles');
-            $bundles = array_merge($bundles, $addons);
+        if ($includePlugins) {
+            $plugins  = $this->container->getParameter('mautic.plugin.bundles');
+            $bundles = array_merge($bundles, $plugins);
         }
 
         return $bundles;
@@ -717,15 +719,15 @@ class MauticFactory
      *
      * @param        $bundleName
      * @param string $configKey
-     * @param bool   $includeAddons
+     * @param bool   $includePlugins
      *
      * @return mixed
      * @throws \Exception
      */
-    public function getBundleConfig($bundleName, $configKey = '', $includeAddons = false)
+    public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)
     {
         // get the configs
-        $configFiles = $this->getMauticBundles($includeAddons);
+        $configFiles = $this->getMauticBundles($includePlugins);
 
         // if no bundle name specified we throw
         if (!$bundleName) {
@@ -755,13 +757,13 @@ class MauticFactory
     }
 
     /**
-     * Get's an array of details for enabled Mautic addons
+     * Get's an array of details for enabled Mautic plugins
      *
      * @return array
      */
     public function getEnabledAddons()
     {
-        return $this->getKernel()->getAddonBundles();
+        return $this->getKernel()->getPluginBundles();
     }
 
     /**

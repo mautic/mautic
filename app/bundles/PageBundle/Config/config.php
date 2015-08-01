@@ -56,7 +56,7 @@ return array(
                 'path'       => '/{slug}',
                 'controller' => 'MauticPageBundle:Public:index',
                 'requirements' => array(
-                    'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|addons/)).+'
+                    'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+'
                 )
             ),
         )

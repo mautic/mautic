@@ -62,9 +62,9 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
-     * @var \Mautic\AddonBundle\Helper\AddonHelper
+     * @var \Mautic\PluginBundle\Helper\AddonHelper
      */
-    protected $addonHelper;
+    protected $pluginHelper;
 
     /**
      * @param MauticFactory $factory

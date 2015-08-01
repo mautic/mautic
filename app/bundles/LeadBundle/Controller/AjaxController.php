@@ -9,7 +9,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\AddonBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -99,7 +99,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $fields            = $lead->getFields();
-                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
                 $integrationHelper = $this->factory->getHelper('integration');
                 $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields, true, $network);
                 $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
@@ -151,7 +151,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $dataArray['success'] = 1;
-                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $helper */
+                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
                 $socialProfiles = $helper->clearIntegrationCache($lead, $network);
                 $socialCount    = count($socialProfiles);

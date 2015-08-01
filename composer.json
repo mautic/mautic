@@ -6,7 +6,7 @@
     "autoload": {
         "psr-4": {
             "Mautic\\": "app/bundles/",
-            "MauticAddon\\": "addons/"
+            "MauticPlugin\\": "plugins/"
         }
     },
     "require": {

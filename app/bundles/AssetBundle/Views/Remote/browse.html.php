@@ -24,7 +24,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.remo
                     <div class="pt-md pr-md pb-md">
                         <ul class="list-group list-group-tabs">
                             <?php $step = 1; ?>
-                            <?php /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integration */ ?>
+                            <?php /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */ ?>
                             <?php foreach ($integrations as $integration): ?>
                                 <li class="list-group-item<?php if ($step === 1) echo " active"; ?>" id="tab<?php echo $integration->getName(); ?>">
                                     <a href="#" class="steps" onclick="Mautic.updateRemoteBrowser('<?php echo $integration->getName(); ?>');">

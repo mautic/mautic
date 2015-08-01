@@ -43,8 +43,8 @@ class CacheHelper
         $this->clearSessionItems();
 
         // Force a refresh of enabled addon bundles so they are picked up by the events
-        $addonHelper = $this->factory->getHelper('addon');
-        $addonHelper->buildAddonCache();
+        $pluginHelper = $this->factory->getHelper('addon');
+        $pluginHelper->buildAddonCache();
 
         ini_set('memory_limit', '128M');
 

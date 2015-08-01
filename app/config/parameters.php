@@ -9,10 +9,10 @@
 
 //load default parameters from bundle files
 $core    = $container->getParameter('mautic.bundles');
-$addons  = $container->getParameter('mautic.addon.bundles');
+$plugins  = $container->getParameter('mautic.plugin.bundles');
 
-$bundles = array_merge($core, $addons);
-unset($core, $addons);
+$bundles = array_merge($core, $plugins);
+unset($core, $plugins);
 
 $mauticParams = array();
 
