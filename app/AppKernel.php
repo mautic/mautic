@@ -148,10 +148,12 @@ class AppKernel extends Kernel
             if (class_exists($class)) {
                 $bundleInstance = new $class();
                 $bundles[]      = $bundleInstance;
+
+                unset($bundleInstance);
             }
         }
 
-        //dynamically register Mautic Addon Bundles
+        //dynamically register Mautic Plugin Bundles
         $searchPath = dirname(__DIR__) . '/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
@@ -163,9 +165,24 @@ class AppKernel extends Kernel
         foreach ($finder as $file) {
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
-            $class    = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
-            if (class_exists($class)) {
-                $bundles[] = new $class();
+
+            // @deprecated 1.1.4; bc support for MauticAddon namespace; to be removed in 2.0
+            $class  = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
+            try {
+                $exists = class_exists($class);
+            } catch (\RuntimeException $e) {
+                $class    = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
+                $exists = class_exists($class, false);
+            }
+
+            if ($exists) {
+                $plugin = new $class();
+
+                if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    $bundles[] = $plugin;
+                }
+
+                unset($plugin);
             }
         }
 

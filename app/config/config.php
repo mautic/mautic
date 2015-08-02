@@ -13,7 +13,7 @@ $buildBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
-            "isAddon"           => false,
+            "isPlugin"          => false,
             "base"              => str_replace('Bundle', '', $bundleBase),
             "bundle"            => $bundleBase,
             "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
@@ -29,7 +29,8 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 
 // Note MauticPlugin bundles so they can be applied as needed
 $buildPluginBundles = function($namespace, $bundle) use ($container) {
-    if (strpos($namespace, 'MauticPlugin\\') !== false) {
+    // @depracated support for MauticAddon; to be removed in 2.0
+    if (strpos($namespace, 'MauticPlugin\\') !== false || strpos($namespace, 'MauticAddon\\') !== false) {
         $directory = dirname($container->getParameter('kernel.root_dir')) . '/plugins/' . $bundle;
 
         // Check for a single config file
@@ -40,7 +41,7 @@ $buildPluginBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
-            "isAddon"           => true,
+            "isPlugin"          => true,
             "base"              => str_replace('Bundle', '', $bundle),
             "bundle"            => $bundle,
             "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),

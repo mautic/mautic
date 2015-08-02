@@ -254,7 +254,8 @@ class PluginController extends FormController
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
             $namespace = $meta->fullyQualifiedClassName('');
-            if (strpos($namespace, 'MauticPlugin') !== false) {
+            // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+            if (strpos($namespace, 'MauticAddon') !== false || strpos($namespace, 'MauticPlugin') !== false) {
                 $bundleName = str_replace('\Entity\\', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = array();

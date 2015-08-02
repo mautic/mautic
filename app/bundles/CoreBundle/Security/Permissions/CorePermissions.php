@@ -130,10 +130,19 @@ class CorePermissions
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
+                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+                $base      = $pluginBundle ? 'MauticAddon' : 'Mautic';
                 $bundle    = ucfirst($bundle);
-                $base      = $pluginBundle ? 'MauticPlugin' : 'Mautic';
                 $className = "{$base}\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
-                if (class_exists($className)) {
+
+                try {
+                    $exists = class_exists($className);
+                } catch (\RuntimeException $e) {
+                    $className = "MauticPlugin\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
+                    $exists = class_exists($className, false);
+                }
+
+                if ($exists) {
                     $classes[$bundle] = new $className($this->getParams());
                 } elseif ($throwException) {
                     throw new \InvalidArgumentException("$className not found!");

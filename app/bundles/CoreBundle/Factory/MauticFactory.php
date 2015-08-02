@@ -81,7 +81,8 @@ class MauticFactory
                 ($parts[0] == 'addon' && $parts[1] != 'addon') ||
                 ($parts[0] == 'plugin' && $parts[1] != 'plugin'))
             {
-                $namespace = 'MauticPlugin';
+                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+                $namespace = 'MauticAddon';
                 array_shift($parts);
             } else {
                 $namespace = 'Mautic';
@@ -93,7 +94,14 @@ class MauticFactory
 
             $modelClass = '\\'.$namespace.'\\'.ucfirst($parts[0]).'Bundle\\Model\\'.ucfirst($parts[1]).'Model';
 
-            if (!class_exists($modelClass)) {
+            try {
+                $exists = class_exists($modelClass);
+            } catch (\RuntimeException $e) {
+                $modelClass = '\\MauticPlugin\\'.ucfirst($parts[0]).'Bundle\\Model\\'.ucfirst($parts[1]).'Model';
+                $exists     = class_exists($modelClass);
+            }
+
+            if (!$exists) {
                 throw new NotAcceptableHttpException($name." is not an acceptable model name.");
             }
 
