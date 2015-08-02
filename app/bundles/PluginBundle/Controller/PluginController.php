@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Class PluginController
@@ -487,5 +488,19 @@ class PluginController extends FormController
                 )
             )
         );
+    }
+
+    /**
+     * BC support addon to plugin conversion
+     *
+     * @deprecated 1.1.4 to be removed in 2.0
+     *
+     * @param $wildcard
+     *
+     * @return RedirectResponse
+     */
+    public function addonRedirectAction($wildcard)
+    {
+        return new RedirectResponse($this->request->getBaseUrl() . '/plugins' . $wildcard);
     }
 }

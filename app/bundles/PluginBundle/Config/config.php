@@ -39,6 +39,15 @@ return array(
                 'path'       => '/plugins/reload',
                 'controller' => 'MauticPluginBundle:Plugin:reload'
             )
+        ),
+        'public' => array(
+            'mautic_addon_bc_redirect' => array(
+                'path' => '/addons{wildcard}',
+                'controller' => 'MauticPluginBundle:Plugin:addonRedirect',
+                'requirements' => array(
+                    'wildcard' => '.+'
+                )
+            )
         )
     ),
 
