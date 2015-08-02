@@ -13,15 +13,15 @@ $buildBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
-            "isPlugin"          => false,
-            "base"              => str_replace('Bundle', '', $bundleBase),
-            "bundle"            => $bundleBase,
-            "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
-            "symfonyBundleName" => $bundle,
-            "bundleClass"       => $namespace,
-            "relative"          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
-            "directory"         => $directory,
-            "config"            => $config
+            'isPlugin'          => false,
+            'base'              => str_replace('Bundle', '', $bundleBase),
+            'bundle'            => $bundleBase,
+            'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            'symfonyBundleName' => $bundle,
+            'bundleClass'       => $namespace,
+            'relative'          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
+            'directory'         => $directory,
+            'config'            => $config
         );
     }
     return false;
@@ -29,7 +29,7 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 
 // Note MauticPlugin bundles so they can be applied as needed
 $buildPluginBundles = function($namespace, $bundle) use ($container) {
-    // @depracated support for MauticAddon; to be removed in 2.0
+    // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
     if (strpos($namespace, 'MauticPlugin\\') !== false || strpos($namespace, 'MauticAddon\\') !== false) {
         $directory = dirname($container->getParameter('kernel.root_dir')) . '/plugins/' . $bundle;
 
@@ -41,15 +41,15 @@ $buildPluginBundles = function($namespace, $bundle) use ($container) {
         }
 
         return array(
-            "isPlugin"          => true,
-            "base"              => str_replace('Bundle', '', $bundle),
-            "bundle"            => $bundle,
-            "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
-            "symfonyBundleName" => $bundle,
-            "bundleClass"       => $namespace,
-            "relative"          => 'plugins/' . $bundle,
-            "directory"         => $directory,
-            "config"            => $config
+            'isPlugin'          => true,
+            'base'              => str_replace('Bundle', '', $bundle),
+            'bundle'            => $bundle,
+            'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            'symfonyBundleName' => $bundle,
+            'bundleClass'       => $namespace,
+            'relative'          => 'plugins/' . $bundle,
+            'directory'         => $directory,
+            'config'            => $config
         );
     }
     return false;
