@@ -12,8 +12,14 @@ $hasFields     = (isset($form['featureSettings']) && count($form['featureSetting
 $fieldHtml     = (!empty($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields'], array('integration' => $integration)) : '';
 
 $fieldTabClass = ($hasFields) ? '' : ' hide';
+$description   = $integration->getDescription();
 ?>
 
+<?php if (!empty($description)): ?>
+<div class="alert alert-info">
+    <?php echo $description; ?>
+</div>
+<?php endif; ?>
 <ul class="nav nav-tabs pr-md pl-md">
     <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
     <?php if ($hasFeatures): ?>

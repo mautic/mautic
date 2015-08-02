@@ -83,6 +83,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Returns a description shown in the config form
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return '';
+    }
+
+    /**
      * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
      * (will call $this->authenticationTypeCallback)
      *
