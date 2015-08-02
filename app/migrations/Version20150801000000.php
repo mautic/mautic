@@ -45,7 +45,7 @@ class Version20150801000000 extends AbstractMauticMigration
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings CHANGE addon_id plugin_id int(11) DEFAULT NULL');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . '  FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . '  FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE');
     }
 
     public function postgresqlUp(Schema $schema)
