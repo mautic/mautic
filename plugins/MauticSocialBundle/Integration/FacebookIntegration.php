@@ -14,7 +14,6 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
  */
 class FacebookIntegration extends SocialIntegration
 {
-
     /**
      * Used in getUserData to prevent a double user search call with getUserId
      *
@@ -46,7 +45,6 @@ class FacebookIntegration extends SocialIntegration
     public function getSupportedFeatures()
     {
         return array(
-            'public_profile',
             'share_button'
         );
     }
@@ -171,6 +169,9 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getAvailableLeadFields($settings = array())
     {
+        // Until lead profile support is restored
+        return array();
+
         return array(
             'first_name' => array('type' => 'string'),
             'last_name'  => array('type' => 'string'),
