@@ -534,13 +534,23 @@ class IntegrationHelper
     public function getIconPath ($integration)
     {
         $systemPath  = $this->factory->getSystemPath('root');
-        $genericIcon = 'app/bundles/PluginBundle/Assets/img/generic.png';
-        $name        = $integration->getIntegrationSettings()->getName();
+        $bundlePath  = $this->factory->getSystemPath('bundles');
+        $pluginPath  = $this->factory->getSystemPath('plugins');
+        $genericIcon = $bundlePath . '/PluginBundle/Assets/img/generic.png';
 
-        // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
-        $className = get_class($integration);
-        $exploded  = explode('\\', $className);
-        $icon      = 'plugins/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.png';
+        if (is_array($integration)) {
+            // A bundle so check for an icon
+            $icon = $pluginPath.'/'.$integration['bundle'].'/Assets/img/icon.png';
+        } elseif ($integration instanceof Plugin) {
+            // A bundle so check for an icon
+            $icon = $pluginPath.'/'.$integration->getBundle().'/Assets/img/icon.png';
+        } else {
+            // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
+            $name      = $integration->getIntegrationSettings()->getName();
+            $className = get_class($integration);
+            $exploded  = explode('\\', $className);
+            $icon      = $pluginPath.'/'.$exploded[1].'/Assets/img/'.strtolower($name).'.png';
+        }
 
         if (file_exists($systemPath . '/' . $icon)) {
             return $icon;

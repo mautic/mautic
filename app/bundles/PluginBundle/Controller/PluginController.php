@@ -11,6 +11,7 @@ namespace Mautic\PluginBundle\Controller;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -29,7 +30,15 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel  = $this->factory->getModel('plugin');
+        $pluginModel = $this->factory->getModel('plugin');
+
+        // List of plugins for filter and to show as a single integration
+        $plugins = $pluginModel->getEntities(
+            array(
+                'hydration_mode' => 'hydrate_array'
+            )
+        );
+
         $session      = $this->factory->getSession();
         $pluginFilter = $this->request->get('plugin', $session->get('mautic.integrations.filter', ''));
 
@@ -38,31 +47,44 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-        $integrations       = array();
+        $integrations       = $foundPlugins = array();
 
         foreach ($integrationObjects as $name => $object) {
             $settings            = $object->getIntegrationSettings();
             $integrations[$name] = array(
-                'name'    => $object->getName(),
-                'display' => $object->getDisplayName(),
-                'icon'    => $integrationHelper->getIconPath($object),
-                'enabled' => $settings->isPublished(),
-                'plugin'  => $settings->getPlugin()->getId()
+                'name'     => $object->getName(),
+                'display'  => $object->getDisplayName(),
+                'icon'     => $integrationHelper->getIconPath($object),
+                'enabled'  => $settings->isPublished(),
+                'plugin'   => $settings->getPlugin()->getId(),
+                'isBundle' => false
+            );
+
+            $foundPlugins[$settings->getPlugin()->getId()] = true;
+        }
+
+        $nonIntegrationPlugins = array_diff_key($plugins, $foundPlugins);
+        foreach ($nonIntegrationPlugins as $plugin) {
+            $integrations[$plugin['name']] = array(
+                'name'        => $plugin['bundle'],
+                'display'     => $plugin['name'],
+                'icon'        => $integrationHelper->getIconPath($plugin),
+                'enabled'     => true,
+                'plugin'      => $plugin['id'],
+                'description' => $plugin['description'],
+                'isBundle'    => true
             );
         }
 
         //sort by name
-        ksort($integrations);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-
-        //get a list of plugins for filter
-        $plugins = $pluginModel->getEntities(
-            array(
-                'hydration_mode' => 'hydrate_array'
-            )
+        uksort(
+            $integrations,
+            function ($a, $b) {
+                return strnatcasecmp($a, $b);
+            }
         );
 
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         if (!empty($pluginFilter)) {
             foreach ($plugins as $plugin) {
@@ -217,6 +239,49 @@ class PluginController extends FormController
                     'integration' => $integrationObject
                 ),
                 'contentTemplate' => $template,
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_plugin_index',
+                    'mauticContent' => 'integration',
+                    'route'         => false
+                )
+            )
+        );
+    }
+
+    /**
+     * @param $name
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function infoAction($name)
+    {
+        if (!$this->factory->getSecurity()->isGranted('plugin:plugins:manage')) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
+        $pluginModel = $this->factory->getModel('plugin');
+
+        $bundle = $pluginModel->getRepository()->findOneBy(
+            array(
+                'bundle' => InputHelper::clean($name)
+            )
+        );
+
+        if (!$bundle) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper  = $this->factory->getHelper('integration');
+
+        return $this->delegateView(
+            array(
+                'viewParameters'  => array(
+                    'bundle' => $bundle,
+                    'icon'   => $integrationHelper->getIconPath($bundle),
+                ),
+                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',

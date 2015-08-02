@@ -1,82 +1,59 @@
 <?php
+include __DIR__ . '/paths_helper.php';
+
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container) {
-    if (strpos($namespace, 'Mautic\\') !== false) {
+$buildBundles = function($namespace, $bundle) use ($container, $paths, $root) {
+    $isPlugin = $isMautic = false;
+
+    // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+    if (strpos($namespace, 'MauticPlugin\\') !== false || strpos($namespace, 'MauticAddon\\') !== false) {
+        $isPlugin   = true;
+        $bundleBase = $bundle;
+        $relative   = $paths['plugins'] . '/' . $bundleBase;
+    } elseif (strpos($namespace, 'Mautic\\') !== false) {
+        $isMautic   = true;
         $bundleBase = str_replace('Mautic', '', $bundle);
-        $directory  = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
+        $relative   = $paths['bundles'] . '/' . $bundleBase;
+    }
+
+    if ($isMautic || $isPlugin) {
+        $directory  = $paths['root'].'/'.$relative;
 
         // Check for a single config file
-        if (file_exists($directory.'/Config/config.php')) {
-            $config = include $directory.'/Config/config.php';
-        } else {
-            $config = array();
-        }
+        $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
 
         return array(
-            'isPlugin'          => false,
+            'isPlugin'          => $isPlugin,
             'base'              => str_replace('Bundle', '', $bundleBase),
             'bundle'            => $bundleBase,
             'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
             'symfonyBundleName' => $bundle,
             'bundleClass'       => $namespace,
-            'relative'          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
+            'relative'          => $relative,
             'directory'         => $directory,
             'config'            => $config
         );
     }
+
     return false;
 };
 
-// Note MauticPlugin bundles so they can be applied as needed
-$buildPluginBundles = function($namespace, $bundle) use ($container) {
-    // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-    if (strpos($namespace, 'MauticPlugin\\') !== false || strpos($namespace, 'MauticAddon\\') !== false) {
-        $directory = dirname($container->getParameter('kernel.root_dir')) . '/plugins/' . $bundle;
-
-        // Check for a single config file
-        if (file_exists($directory.'/Config/config.php')) {
-            $config = include $directory.'/Config/config.php';
-        } else {
-            $config = array();
-        }
-
-        return array(
-            'isPlugin'          => true,
-            'base'              => str_replace('Bundle', '', $bundle),
-            'bundle'            => $bundle,
-            'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
-            'symfonyBundleName' => $bundle,
-            'bundleClass'       => $namespace,
-            'relative'          => 'plugins/' . $bundle,
-            'directory'         => $directory,
-            'config'            => $config
-        );
-    }
-    return false;
-};
-
+// Seperate out Mautic's bundles from other Symfony bundles
 $symfonyBundles = $container->getParameter('kernel.bundles');
-
 $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
 unset($buildBundles);
 
-$pluginBundles  = array_filter(
-    array_map($buildPluginBundles, $symfonyBundles, array_keys($symfonyBundles)),
-    function ($v) { return (!empty($v)); }
-);
-unset($buildPluginBundles, $buildBundles);
-
-$setBundles = array();
-
+// Sort Mautic's bundles into Core and Plugins
+$setBundles = $setPluginBundles = array();
 foreach ($mauticBundles as $bundle) {
-    $setBundles[$bundle['symfonyBundleName']] = $bundle;
-}
-$setPluginBundles = array();
-foreach ($pluginBundles as $bundle) {
-    $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
+    if ($bundle['isPlugin']) {
+        $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
+    } else {
+        $setBundles[$bundle['symfonyBundleName']] = $bundle;
+    }
 }
 
 // Make Core the first in the list
@@ -88,17 +65,19 @@ $container->setParameter('mautic.bundles', $setBundles);
 $container->setParameter('mautic.plugin.bundles', $setPluginBundles);
 unset($setBundles, $setPluginBundles);
 
+// Load parameters
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
+// Set template engines
 $engines = ($container->getParameter('kernel.environment') == 'dev') ? array('php', 'twig') : array('php');
 
+// Generate session name
 if (isset($_COOKIE['mautic_session_name'])) {
     // Attempt to keep from losing sessions if cache is cleared through UI
     $sessionName = $_COOKIE['mautic_session_name'];
 } else {
-    $paths       = $container->getParameter('mautic.paths');
-    $key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+    $key = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
     $sessionName = md5(md5($paths['local_config']).$key);
 }
 
