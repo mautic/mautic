@@ -5,11 +5,15 @@ include __DIR__ . '/paths_helper.php';
 $buildBundles = function($namespace, $bundle) use ($container, $paths, $root) {
     $isPlugin = $isMautic = false;
 
-    // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-    if (strpos($namespace, 'MauticPlugin\\') !== false || strpos($namespace, 'MauticAddon\\') !== false) {
+    if (strpos($namespace, 'MauticPlugin\\') !== false) {
         $isPlugin   = true;
         $bundleBase = $bundle;
-        $relative   = $paths['plugins'] . '/' . $bundleBase;
+        $relative   = $paths['plugins'].'/'.$bundleBase;
+    } elseif (strpos($namespace, 'MauticAddon\\') !== false) {
+        // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+        $isPlugin   = true;
+        $bundleBase = $bundle;
+        $relative   = 'addons/'.$bundleBase;
     } elseif (strpos($namespace, 'Mautic\\') !== false) {
         $isMautic   = true;
         $bundleBase = str_replace('Mautic', '', $bundle);

@@ -166,16 +166,8 @@ class AppKernel extends Kernel
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
-            // @deprecated 1.1.4; bc support for MauticAddon namespace; to be removed in 2.0
-            $class  = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
-            try {
-                $exists = class_exists($class);
-            } catch (\RuntimeException $e) {
-                $class    = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
-                $exists = class_exists($class, false);
-            }
-
-            if ($exists) {
+            $class = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
+            if (class_exists($class)) {
                 $plugin = new $class();
 
                 if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
@@ -183,6 +175,31 @@ class AppKernel extends Kernel
                 }
 
                 unset($plugin);
+            }
+        }
+
+        // @deprecated 1.1.4; bc support for MauticAddon namespace; to be removed in 2.0
+        $searchPath = dirname(__DIR__) . '/addons';
+        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder->files()
+            ->followLinks()
+            ->depth('1')
+            ->in($searchPath)
+            ->name('*Bundle.php');
+
+        foreach ($finder as $file) {
+            $dirname  = basename($file->getRelativePath());
+            $filename = substr($file->getFilename(), 0, -4);
+
+            $class = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
+            if (class_exists($class)) {
+                $addon = new $class();
+
+                if ($addon instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    $bundles[] = $addon;
+                }
+
+                unset($addon);
             }
         }
 

@@ -96,7 +96,6 @@ class CorePermissions
                     continue;
                 } //do not include this file
 
-                //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
                 $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
@@ -104,7 +103,6 @@ class CorePermissions
             }
 
             foreach ($this->getPluginBundles() as $bundle) {
-                //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
                 $object = $this->getPermissionObject($bundle['base'], false, true);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
@@ -130,24 +128,30 @@ class CorePermissions
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
-                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-                $base      = $pluginBundle ? 'MauticAddon' : 'Mautic';
-                $bundle    = ucfirst($bundle);
-                $className = "{$base}\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
+                $bundle       = ucfirst($bundle);
+                $checkBundles = ($pluginBundle) ? $this->getPluginBundles() : $this->getBundles();
+                $bundleName   = $bundle . 'Bundle';
 
-                try {
-                    $exists = class_exists($className);
-                } catch (\RuntimeException $e) {
-                    $className = "MauticPlugin\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
-                    $exists = class_exists($className, false);
+                if (!$pluginBundle) {
+                    // Core bundle
+                    $bundleName = 'Mautic' . $bundleName;
+                }
+
+                if (array_key_exists($bundleName, $checkBundles)) {
+                    $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\{$bundle}Permissions";
+                    $exists    = class_exists($className);
+                } else {
+                    $exists = false;
                 }
 
                 if ($exists) {
                     $classes[$bundle] = new $className($this->getParams());
-                } elseif ($throwException) {
-                    throw new \InvalidArgumentException("$className not found!");
                 } else {
-                    $classes[$bundle] = false;
+                    if ($throwException) {
+                        throw new \InvalidArgumentException("Permission class not found for {$bundle}Bundle!");
+                    } else {
+                        $classes[$bundle] = false;
+                    }
                 }
             }
 

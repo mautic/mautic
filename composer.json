@@ -5,10 +5,10 @@
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
+            "Mautic\\AddonBundle\\Bundle\\":"app/bundles/PluginBundle/Bundle/BC",
             "Mautic\\": "app/bundles/",
-            "MauticAddon\\":"plugins/",
             "MauticPlugin\\": "plugins/",
-            "Mautic\\AddonBundle\\":"app/bundles/PluginBundle"
+            "MauticAddon\\": "addons/"
         }
     },
     "require": {

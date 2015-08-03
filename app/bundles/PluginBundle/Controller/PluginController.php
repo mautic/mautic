@@ -274,7 +274,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
+        $integrationHelper = $this->factory->getHelper('integration');
 
         return $this->delegateView(
             array(
@@ -320,8 +320,8 @@ class PluginController extends FormController
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
             $namespace = $meta->fullyQualifiedClassName('');
-            // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-            if (strpos($namespace, 'MauticAddon') !== false || strpos($namespace, 'MauticPlugin') !== false) {
+
+            if (strpos($namespace, 'MauticPlugin') !== false) {
                 $bundleName = str_replace('\Entity\\', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = array();
@@ -385,8 +385,8 @@ class PluginController extends FormController
                         $updated++;
 
                         //call the update callback
-                        $callback          = $plugins[$bundle]['bundleClass'];
-                        $metadata          = (isset($pluginMetadata[$plugins[$bundle]['namespace']]))
+                        $callback        = $plugins[$bundle]['bundleClass'];
+                        $metadata        = (isset($pluginMetadata[$plugins[$bundle]['namespace']]))
                             ? $pluginMetadata[$plugins[$bundle]['namespace']] : null;
                         $installedSchema = (isset($pluginInstalledSchemas[$plugins[$bundle]['namespace']]))
                             ? $pluginInstalledSchemas[$plugins[$bundle]['namespace']] : null;
@@ -488,19 +488,5 @@ class PluginController extends FormController
                 )
             )
         );
-    }
-
-    /**
-     * BC support addon to plugin conversion
-     *
-     * @deprecated 1.1.4 to be removed in 2.0
-     *
-     * @param $wildcard
-     *
-     * @return RedirectResponse
-     */
-    public function addonRedirectAction($wildcard)
-    {
-        return new RedirectResponse($this->request->getBaseUrl() . '/plugins' . $wildcard);
     }
 }
