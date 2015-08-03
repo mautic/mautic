@@ -130,7 +130,7 @@
             var validator = {
                 validateForm: function () {
                     // Check to see if the iframe exists
-                    if (!document.getElementById('mauticiframe_' + formId) && document.getElementById('mauticform_' + formId + '_messenger')) {
+                    if (!document.getElementById('mauticiframe_' + formId)) {
                         // Likely an editor has stripped out the iframe so let's dynmamically create it
                         var ifrm = document.createElement("IFRAME");
                         ifrm.style.display = "none";
@@ -142,6 +142,16 @@
                         ifrm.setAttribute('id', 'mauticiframe_' + formId);
                         ifrm.setAttribute('name', 'mauticiframe_' + formId);
                         document.body.appendChild(ifrm);
+                    }
+
+                    if (!document.getElementById('mauticform_' + formId + '_messenger')) {
+                        var messengerInput = document.createElement("INPUT");
+                        messengerInput.type = "hidden";
+                        messengerInput.setAttribute("name", "mauticform[messenger]");
+                        messengerInput.setAttribute("id", "mauticform_" + formId + "_messenger");
+                        messengerInput.value = 1;
+
+                        document.getElementById("mauticform_" + formId).appendChild(messengerInput);
                     }
 
                     function validateOptions(elOptions) {
@@ -291,6 +301,12 @@
                 },
 
                 parseFormResponse: function (response) {
+                    // Reset the iframe so that back doesn't repost for some browsers
+                    var ifrm = document.getElementById('mauticiframe_' + formId);
+                    if (ifrm) {
+                        ifrm.src = 'about:blank';
+                    }
+
                     // If true, a callback handled response parsing
                     if (!Form.customCallbackHandler(formId, 'onResponse', response)) {
 

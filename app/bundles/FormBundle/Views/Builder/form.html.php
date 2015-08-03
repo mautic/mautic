@@ -38,9 +38,7 @@ endforeach;
             <input type="hidden" name="mauticform[formId]" id="mauticform_<?php echo $formName ?>_id" value="<?php echo $form->getId(); ?>" />
             <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
             <input type="hidden" name="mauticform[formName]" id="mauticform_<?php echo $formName ?>_name" value="<?php echo $formName; ?>" />
-            <input type="hidden" name="mauticform[messenger]" id="mauticform_<?php echo $formName ?>_messenger" value="1" />
 
         </div>
     </form>
-    <iframe name="mauticiframe_<?php echo $formName; ?>" id="mauticiframe_<?php echo $formName; ?>" style="display: none; margin: 0; padding: 0; border: none; width: 0; height: 0"></iframe>
 </div>
