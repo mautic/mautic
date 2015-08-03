@@ -215,7 +215,7 @@ class FieldController extends CommonFormController
             // Only show the lead fields not already used
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());
             $testLeadFields = array_flip($usedLeadFields);
-            $currentLeadField = $formField['leadField'];
+            $currentLeadField = (isset($formField['leadField'])) ? $formField['leadField'] : null;
             if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
                 unset($testLeadFields[$currentLeadField]);
             }
