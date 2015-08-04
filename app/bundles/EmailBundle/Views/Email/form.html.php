@@ -29,6 +29,34 @@ $emailType = $form['emailType']->vars['data'];
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
+
+$customButtons = array();
+if ($emailType == 'list') {
+    $customButtons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajax',
+            'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId'
+ => $email->getId())),
+        ),
+        'iconClass' => 'fa fa-send-o',
+        'btnText'   => 'mautic.email.send'
+    );
+}
+$customButtons[] = array(
+    'attr' => array(
+        'data-toggle' => 'ajax',
+        'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'example', 'objectId'
+=> $email->getId())),
+    ),
+    'iconClass' => 'fa fa-send',
+    'btnText'   => 'mautic.email.send.example'
+);
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'       => $email,
+    'routeBase'  => 'email',
+    'customButtons' => $customButtons
+)));
+
 ?>
 
 
