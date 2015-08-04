@@ -98,6 +98,8 @@ class WebhookType extends AbstractType
             )
         );
 
+        $builder->add('buttons', 'form_buttons');
+
         // if we have a network type value add in the form
         /*
         if (! empty($options['eventList'])) {

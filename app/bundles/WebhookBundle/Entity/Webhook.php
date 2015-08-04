@@ -96,10 +96,6 @@ class Webhook extends FormEntity
             'message' => 'mautic.core.title.required'
         )));
 
-        $metadata->addConstraint(new Callback(array(
-            'callback' => 'translationParentValidation'
-        )));
-
         $metadata->addPropertyConstraint('webhookUrl',  new Assert\Url(
                 array(
                     'message' => 'mautic.core.value.required',
@@ -142,7 +138,7 @@ class Webhook extends FormEntity
      *
      * @param string $title
      *
-     * @return Page
+     * @return Webhook
      */
     public function setTitle($title)
     {
@@ -195,7 +191,7 @@ class Webhook extends FormEntity
      * @return Webhook
      */
     public function setWebhookUrl($webhookUrl) {
-        $this->isChanged('webhook', $webhookUrl);
+        $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
 
         return $this;
@@ -215,7 +211,7 @@ class Webhook extends FormEntity
      *
      * @param \Mautic\CategoryBundle\Entity\Category $category
      *
-     * @return Page
+     * @return Webhook
      */
     public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
     {

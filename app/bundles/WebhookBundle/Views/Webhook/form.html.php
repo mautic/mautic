@@ -9,6 +9,14 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'webhook');
+
+$header = ($webhook->getId()) ?
+    $view['translator']->trans('mautic.webhook.webhook.header.edit',
+        array('%name%' => $view['translator']->trans($webhook->getTitle()))) :
+    $view['translator']->trans('mautic.webhook.webhook.header.new');
+
+$view['slots']->set("headerTitle", $header);
+
 ?>
 
 <?php echo $view['form']->start($form); ?>

@@ -190,7 +190,7 @@ class WebhookController extends FormController
                     'contentTemplate' => 'MauticWebhookBundle:Webhook:index',
                     'passthroughVars' => array(
                         'activeLink'    => 'mautic_webhook_index',
-                        'mauticContent' => 'page'
+                        'mauticContent' => 'webhook'
                     )
                 ));
             }
@@ -200,14 +200,13 @@ class WebhookController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
-                'activePage'  => $entity,
+                'webhook'     => $entity,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'activeForm'  => $entity,
             ),
             'contentTemplate' => 'MauticWebhookBundle:Webhook:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_webhook_index',
-                'mauticContent' => 'page',
+                'mauticContent' => 'webhook',
                 'route'         => $this->generateUrl('mautic_webhook_action', array(
                     'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
                     'objectId'     => $entity->getId())
