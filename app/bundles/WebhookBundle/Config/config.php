@@ -43,11 +43,6 @@ return array(
     ),
 
     'services' => array(
-        'events' => array(
-            'mautic.form.leadbundle.subscriber'     => array(
-                'class' => 'Mautic\FormBundle\EventListener\LeadSubscriber'
-            ),
-        ),
         'forms'  => array(
             'mautic.form.type.webhook'                      => array(
                 'class'     => 'Mautic\WebhookBundle\Form\Type\WebhookType',
