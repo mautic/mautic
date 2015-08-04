@@ -22,14 +22,14 @@ class WebhookController extends FormController
     public function __construct()
     {
         $this->setStandardParameters(
-            'webhook.webhook',
-            'webhook:webhooks',
-            'mautic_webhook',
-            'mautic_webhook',
-            'mautic.webhook',
-            'MauticWebhookBundle:Webhook',
-            'mautic_webhook',
-            'mauticWebhook'
+            'webhook.webhook', // model name
+            'webhook:webhooks', // permission base
+            'mautic_webhook', // route base
+            'mautic_webhook', // session base
+            'mautic.webhook', // lang string base
+            'MauticWebhookBundle:Webhook', // template base
+            'mautic_webhook', // activeLink
+            'mauticWebhook' // mauticContent
         );
     }
 
