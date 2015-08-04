@@ -9,6 +9,8 @@
 
 if (isset($buttonFormat)) {
     $buttonGroupTypes = array($buttonFormat);
+    $dropdownShowHideClasses = '';
+    $groupShowHideClasses = '';
 } else {
     $count = 0;
     // Get a count of buttons
@@ -30,18 +32,40 @@ if (isset($buttonFormat)) {
         }
     }
 
-    $buttonGroupTypes = ($count > 5) ? array('button-dropdown') : array('group', 'button-dropdown');
+    // Assuming we can fit:
+    // - 8 buttons on a lg screen,
+    // - 4 buttons on a md screen,
+    // - 2 buttons on a sm screen,
+    // - 1 button on an xs screen
+    if($count > 8) {
+        $buttonGroupTypes = array('button-dropdown');
+        $dropdownShowHideClasses = '';
+        $groupShowHideClasses = 'hidden-xs hidden-sm hidden-md hidden-lg';
+    } else {
+        $buttonGroupTypes = array('group', 'button-dropdown');
+        if ($count > 4) {
+            $dropdownShowHideClasses = 'hidden-lg';
+            $groupShowHideClasses = 'hidden-xs hidden-sm hidden-md';
+        } else if($count > 2) {
+            $dropdownShowHideClasses = 'hidden-md hidden-lg';
+            $groupShowHideClasses = 'hidden-xs hidden-sm';
+        } else if($count > 1) {
+            $dropdownShowHideClasses = 'hidden-sm hidden-md hidden-lg';
+            $groupShowHideClasses = 'hidden-xs';
+        } else {
+            $dropdownShowHideClasses = 'hidden-xs hidden-sm hidden-md hidden-lg';
+            $groupShowHideClasses = '';
+        }
+    }
 }
-
-$forceVisible = (count($buttonGroupTypes) === 1);
 
 foreach ($buttonGroupTypes as $groupType) {
     $buttonCount = 0;
     if ($groupType == 'group') {
-        echo '<div class="std-toolbar btn-group' . ((!$forceVisible) ? ' hidden-xs hidden-sm' : '') .'">';
+        echo '<div class="std-toolbar btn-group ' . $groupShowHideClasses .'">';
         $dropdownOpenHtml = '';
     } else {
-        echo '<div class="dropdown-toolbar btn-group' . ((!$forceVisible) ? ' hidden-md hidden-lg' : '') . '">';
+        echo '<div class="dropdown-toolbar btn-group ' . $dropdownShowHideClasses . '">';
         $dropdownOpenHtml  = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>' . "\n";
         $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">' . "\n";
     }
