@@ -88,15 +88,21 @@ class WebhookType extends AbstractType
             )
         );
 
-        $builder->add(
-            'events',
-            'choice',
-            array(
+        $events = $options['events'];
+
+        $builder->add('eventList', 'collection',  array(
+                'type'       => 'entity',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'options' => array(
+                    'class' => 'MauticWebhookBundle:Event',
+                    'choices' => $events,
+                    'multiple' => true,
+                    'expanded' => true
+                ),
                 'label'      => 'mautic.webhook.form.webhook_url',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'required'   => true,
-                //'data'       => $options['events'],
             )
         );
 
@@ -118,6 +124,8 @@ class WebhookType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\WebhookBundle\Entity\Webhook',
         ));
+
+        $resolver->setOptional(array('events'));
     }
 
     /**

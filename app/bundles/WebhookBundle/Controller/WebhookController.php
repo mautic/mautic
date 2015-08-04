@@ -63,25 +63,7 @@ class WebhookController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        //$delegateArgs = parent::editStandard($objectId, $ignorePost);
-
-        $model  = $this->factory->getModel($this->modelName);
-        $entity = $model->getEntity($objectId);
-        $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $events = $model->getEvents();
-
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, array(
-            // pass through the types and the selected default type
-            'events'   => $events
-        ));
-
-        if (isset($deleteArgs['viewParameters'])) {
-            if (isset($deleteArgs['viewParameters'])) {
-                $delegateArgs['viewParameters']['form'] = $form->createView();
-            }
-        }
-
-        return $delegateArgs;
+        return parent::editStandard($objectId, $ignorePost);
     }
 
     /**
@@ -130,30 +112,4 @@ class WebhookController extends FormController
         return parent::batchDeleteStandard();
     }
 
-    /**
-     * @param $args
-     * @param $view
-     */
-    /* public function customizeViewArguments($args, $view)
-    {
-        if ($view == 'new' || $view == 'edit') {
-            // @todo Remove for download version
-
-            /** @var \Mautic\AllydeBundle\Helper\HostedHelper $hostedHelper
-            $hostedHelper = $this->factory->getHelper('allyde.hosted');
-            $params       = $hostedHelper->getParams();
-            $args['viewParameters']['instance'] = $params['hosted_instance'];
-        } elseif ($view == 'view') {
-            /** @var \MauticAddon\MpowerFocusBundle\Entity\Focus $item
-            $item = $args['viewParameters']['item'];
-
-            /** @var \MauticAddon\MpowerFocusBundle\Model\FocusModel $model
-            $model = $this->factory->getModel('addon.mpowerFocus.focus');
-            $stats = $model->getStats($item);
-
-            $args['viewParameters']['stats'] = $stats;
-        }
-
-        return $args;
-    }*/
 }

@@ -9,6 +9,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
@@ -71,6 +72,14 @@ class Webhook extends FormEntity
      * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Event", mappedBy="webhook", cascade={"persist", "remove"})
      */
     private $events;
+
+    /*
+     * Constructor
+     */
+
+    public function __construct() {
+        $this->events  = new ArrayCollection();
+    }
 
     /**
      * @param ClassMetadata $metadata
@@ -234,5 +243,17 @@ class Webhook extends FormEntity
         foreach ($events as $event) {
             $event->setWebhook($this);
         }
+    }
+
+    public function addEvent(Event $event)
+    {
+        $this->events[] = $event;
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event)
+    {
+        $this->events->removeElement($event);
     }
 }

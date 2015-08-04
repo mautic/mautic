@@ -43,6 +43,8 @@ class WebhookModel extends FormModel
             $params['action']  = $action;
         }
 
+        $params['events'] = $this->getEvents();
+
         return $formFactory->create('webhook', $entity, $params);
     }
 
@@ -84,9 +86,6 @@ class WebhookModel extends FormModel
             $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
             $events = $event->getEvents();
         }
-
-        var_dump($events);
-        exit();
 
         return $events;
     }
