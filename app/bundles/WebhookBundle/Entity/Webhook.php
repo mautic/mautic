@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+use Mautic\WebhookBundle\Entity\Event;
 
 /**
  * Class Webhook
@@ -65,6 +66,11 @@ class Webhook extends FormEntity
      * @Serializer\Groups({"webhookDetails", "webhookList"})
      **/
     private $category;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Event", mappedBy="webhook", cascade={"persist", "remove"})
+     */
+    private $events;
 
     /**
      * @param ClassMetadata $metadata
@@ -208,5 +214,25 @@ class Webhook extends FormEntity
     public function getCategory()
     {
         return $this->category;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEvents()
+    {
+        return $this->events;
+    }
+
+    /**
+     * @param mixed $events
+     */
+    public function setEvents($events)
+    {
+        $this->events = $events;
+        /**  @var \Mautic\WebhookBundle\Entity\Event $event */
+        foreach ($events as $event) {
+            $event->setWebhook($this);
+        }
     }
 }

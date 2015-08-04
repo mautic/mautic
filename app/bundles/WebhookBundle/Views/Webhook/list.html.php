@@ -59,14 +59,13 @@ if ($tmpl == 'index')
                                         'delete'    => $view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteother'], $item->getCreatedBy()),
                                     ),
                                     'routeBase'  => 'webhook',
-                                    'langVar'    => 'webhook.webhook'
                                 ));
                             ?>
                         </td>
                         <td>
                             <div>
-                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'webhook.webhook')); ?>
-                                <a href="<?php echo $view['router']->generate('mautic_webhook_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>"" data-toggle="ajax">
+                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'webhook')); ?>
+                                <a data-toggle="ajax" href="<?php echo $view['router']->generate('mautic_webhook_action', array('objectId' => $item->getId(), 'objectAction' => 'view')); ?>">
                                     <?php echo $item->getName(); ?>
                                 </a>
                                 <?php if ($description = $item->getDescription()): ?>

@@ -63,7 +63,25 @@ class WebhookController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        //$delegateArgs = parent::editStandard($objectId, $ignorePost);
+
+        $model  = $this->factory->getModel($this->modelName);
+        $entity = $model->getEntity($objectId);
+        $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $events = $model->getEvents();
+
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array(
+            // pass through the types and the selected default type
+            'events'   => $events
+        ));
+
+        if (isset($deleteArgs['viewParameters'])) {
+            if (isset($deleteArgs['viewParameters'])) {
+                $delegateArgs['viewParameters']['form'] = $form->createView();
+            }
+        }
+
+        return $delegateArgs;
     }
 
     /**

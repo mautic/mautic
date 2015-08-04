@@ -88,6 +88,18 @@ class WebhookType extends AbstractType
             )
         );
 
+        $builder->add(
+            'events',
+            'choice',
+            array(
+                'label'      => 'mautic.webhook.form.webhook_url',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => true,
+                //'data'       => $options['events'],
+            )
+        );
+
         $builder->add('buttons', 'form_buttons');
 
         //add category

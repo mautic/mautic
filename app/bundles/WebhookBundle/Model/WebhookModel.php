@@ -12,6 +12,9 @@ namespace Mautic\WebhookBundle\Model;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Webhook;
+use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Event as Events;
+use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -63,5 +66,28 @@ class WebhookModel extends FormModel
     public function getRepository ()
     {
         return $this->em->getRepository('MauticWebhookBundle:Webhook');
+    }
+
+    /**
+     * Gets array of custom events from bundles subscribed MauticWehbhookBundle::WEBHOOK_ON_BUILD
+     *
+     * @return mixed
+     */
+    public function getEvents ()
+    {
+        static $events;
+
+        if (empty($events)) {
+            //build them
+            $events = array();
+            $event  = new Events\WebhookBuilderEvent($this->translator);
+            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
+            $events = $event->getEvents();
+        }
+
+        var_dump($events);
+        exit();
+
+        return $events;
     }
 }
