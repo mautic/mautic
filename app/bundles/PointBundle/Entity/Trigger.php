@@ -81,7 +81,7 @@ class Trigger extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"triggerDetails"})
      */
-    private $color;
+    private $color = 'a0acb8';
 
     /**
      * @ORM\Column(name="trigger_existing_leads", type="boolean")
