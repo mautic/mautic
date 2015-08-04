@@ -30,7 +30,7 @@ if (isset($buttonFormat)) {
         }
     }
 
-    $buttonGroupTypes = ($count > 4) ? array('button-dropdown') : array('group', 'button-dropdown');
+    $buttonGroupTypes = ($count > 5) ? array('button-dropdown') : array('group', 'button-dropdown');
 }
 
 $forceVisible = (count($buttonGroupTypes) === 1);
