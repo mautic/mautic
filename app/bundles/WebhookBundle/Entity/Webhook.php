@@ -37,12 +37,12 @@ class Webhook extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string")
+     * @ORM\Column(name="name", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"webhookDetails", "webhookList"})
      */
-    private $title;
+    private $name;
 
     /**
      * @ORM\Column(name="description", type="text", nullable=true)
@@ -67,33 +67,12 @@ class Webhook extends FormEntity
     private $category;
 
     /**
-     *  @ORM\Column(name="events", type="array", nullable=true)
-     */
-    private $events;
-
-    /**
-     * @return mixed
-     */
-    public function getEvents()
-    {
-        return $this->events;
-    }
-
-    /**
-     * @param mixed $events
-     */
-    public function setEvents($events)
-    {
-        $this->events = $events;
-    }
-
-    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.core.title.required'
+        $metadata->addPropertyConstraint('name', new NotBlank(array(
+            'message' => 'mautic.core.name.required'
         )));
 
         $metadata->addPropertyConstraint('webhookUrl',  new Assert\Url(
@@ -134,28 +113,28 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set title
+     * Set name
      *
-     * @param string $title
+     * @param string $name
      *
      * @return Webhook
      */
-    public function setTitle($title)
+    public function setName($name)
     {
-        $this->isChanged('title', $title);
-        $this->title = $title;
+        $this->isChanged('name', $name);
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get title
+     * Get name
      *
      * @return string
      */
-    public function getTitle()
+    public function getName()
     {
-        return $this->title;
+        return $this->name;
     }
 
     /**

@@ -64,19 +64,4 @@ class WebhookModel extends FormModel
     {
         return $this->em->getRepository('MauticWebhookBundle:Webhook');
     }
-
-    /**
-     * @todo write method to get all our events
-     *
-     * @return array
-     */
-    public function getAvailableEvents()
-    {
-        $events = array(
-            'option_1' => 'option 1',
-            'option_2' => 'option 2',
-        );
-
-        return $events;
-    }
 }

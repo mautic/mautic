@@ -55,10 +55,10 @@ class WebhookType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'title',
+            'name',
             'text',
             array(
-                'label'      => 'mautic.core.title',
+                'label'      => 'mautic.core.name',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => true
@@ -88,32 +88,7 @@ class WebhookType extends AbstractType
             )
         );
 
-        $builder->add('events', 'choice', array(
-                'label'      => 'mautic.webhook.form.webhook_url',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => true,
-                'choices'     => $options['availableEvents'], // passed from the controller
-                'empty_value' => 'mautic.core.form.chooseone'
-            )
-        );
-
         $builder->add('buttons', 'form_buttons');
-
-        // if we have a network type value add in the form
-        /*
-        if (! empty($options['eventList'])) {
-
-            // get the values from the entity function
-            $events = $options['data']->getEvents();
-
-            $builder->add('events', $options['eventList'],
-                array (
-                    'label' => false,
-                    'data'  => $events
-                )
-            );
-        }*/
 
         //add category
         $builder->add('category', 'category', array(
@@ -131,13 +106,6 @@ class WebhookType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\WebhookBundle\Entity\Webhook',
         ));
-
-        // allow network types to be sent through - list
-        $resolver->setOptional(array('availableEvents'));
-
-        // allow the specific network type - single
-        // $resolver->setOptional(array('availableEvents'));
-        // $resolver->setOptional(array('selectedEvents'));
     }
 
     /**

@@ -9,15 +9,16 @@
 
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'page');
-/** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
-$view['slots']->set("headerTitle", $webhook->getTitle());
+$view['slots']->set('mauticContent', 'mauticWebhook');
+
+/** @var \Mautic\WebhookBundle\Entity\Webhook $item */
+$view['slots']->set("headerTitle", $item->getName());
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'            => $webhook,
+    'item'            => $item,
     'templateButtons' => array(
-        'edit'   => $security->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $webhook->getCreatedBy()),
-        'clone'  => $security->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $webhook->getCreatedBy()),
+        'edit'   => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
+        'clone'  => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
         'delete' => $permissions['webhook:webhooks:create'],
     ),
     'routeBase' => 'webhook'
@@ -33,10 +34,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-muted"><?php echo $webhook->getDescription(); ?></div>
+                        <div class="text-muted"><?php echo $item->getDescription(); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $webhook)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $item)); ?>
                     </div>
                 </div>
             </div>
@@ -54,9 +55,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="panel-body pt-xs">
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                           value="<?php echo $webhook->getWebhookUrl(); ?>" />
+                           value="<?php echo $item->getWebhookUrl(); ?>" />
                     <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $webhook->getWebhookUrl(); ?>', '_blank');">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $item->getWebhookUrl(); ?>', '_blank');">
                             <i class="fa fa-external-link"></i>
                         </button>
                     </span>

@@ -8,11 +8,11 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'webhook');
+$view['slots']->set('mauticContent', 'mauticWebhook');
 
-$header = ($webhook->getId()) ?
+$header = ($entity->getId()) ?
     $view['translator']->trans('mautic.webhook.webhook.header.edit',
-        array('%name%' => $view['translator']->trans($webhook->getTitle()))) :
+        array('%name%' => $view['translator']->trans($entity->getName()))) :
     $view['translator']->trans('mautic.webhook.webhook.header.new');
 
 $view['slots']->set("headerTitle", $header);
@@ -27,11 +27,10 @@ $view['slots']->set("headerTitle", $header);
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-6">
-                    <?php echo $view['form']->row($form['title']); ?>
+                    <?php echo $view['form']->row($form['name']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
                     <?php echo $view['form']->row($form['webhook_url']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
-                    <?php echo $view['form']->row($form['events']); ?>
                 </div>
             </div>
         </div>

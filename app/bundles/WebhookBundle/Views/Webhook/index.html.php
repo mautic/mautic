@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'webhook');
+$view['slots']->set('mauticContent', 'mauticWebhook');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.webhook.webhooks'));
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
