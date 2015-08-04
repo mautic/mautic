@@ -93,7 +93,7 @@ class WebhookType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => true,
-                'choices'     => $options['eventList'], // passed from the controller
+                'choices'     => $options['availableEvents'], // passed from the controller
                 'empty_value' => 'mautic.core.form.chooseone'
             )
         );
@@ -133,10 +133,11 @@ class WebhookType extends AbstractType
         ));
 
         // allow network types to be sent through - list
-        $resolver->setRequired(array('eventList'));
+        $resolver->setOptional(array('availableEvents'));
 
         // allow the specific network type - single
-        //$resolver->setOptional(array('event'));
+        // $resolver->setOptional(array('availableEvents'));
+        // $resolver->setOptional(array('selectedEvents'));
     }
 
     /**

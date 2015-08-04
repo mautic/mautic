@@ -10,9 +10,9 @@
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation;
 
 /**
  * Class WebhookController
@@ -147,7 +147,7 @@ class WebhookController extends FormController
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array(
-            'eventList' => $availableEvents
+            'availableEvents' => $availableEvents
         ));
 
         ///Check for a submitted form and process it
@@ -166,6 +166,9 @@ class WebhookController extends FormController
                             'objectId'     => $entity->getId()
                         ))
                     ));
+
+                    // update the audit log
+                    $this->updateAuditLog($entity, 'create');
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = array(
@@ -213,5 +216,228 @@ class WebhookController extends FormController
                 )
             )
         ));
+    }
+
+    /**
+     * Generates an edit form and processes post data
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction ($objectId)
+    {
+        $action  = $this->generateUrl('mautic_webhook_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+
+        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
+        $model   = $this->factory->getModel('webhook.webhook');
+
+        $entity  = $model->getEntity($objectId);
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
+
+        // Set the page we came from
+        $page   = $session->get('mautic.webhook.page', 1);
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_webhook_index', array('page' => $page));
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'WebhookBundle:Webhook:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_webhook_index',
+                'mauticContent' => 'webhook'
+            )
+        );
+
+        //not found
+        if ($entity === null) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes' => array(
+                        array(
+                            'type'    => 'error',
+                            'msg'     => 'mautic.webhook.webhook.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    )
+                ))
+            );
+        }
+
+        // get the list of types from the model
+        $availableEvents  = $model->getAvailableEvents();
+
+        // get the network type from the request on submit. helpful for validation error
+        // rebuilds structure of the form when it gets updated on submit
+        $selectedEvents = ($this->request->getMethod() == 'POST') ? $this->request->request->get('webhook[events]', '', true) : $entity->getEvents();
+
+        // build the form
+        $form  = $model->createForm($entity, $this->get('form.factory'), $action, array(
+            // pass through the types and the selected default type
+            'availableEvents'   => $availableEvents,
+            // 'selectedEvents'    => $selectedEvents
+        ));
+
+        $cancelled = $this->isFormCancelled($form);
+
+        ///Check for a submitted form and process it
+        if ($this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    // update the audit log
+                    $this->updateAuditLog($entity, 'update');
+
+                    $this->addFlash(
+                        'mautic.core.notice.updated',
+                        array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_email_index',
+                            '%url%'       => $this->generateUrl(
+                                'mautic_webhook_action',
+                                array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $entity->getId()
+                                )
+                            )
+                        ),
+                        'warning'
+                    );
+                }
+            } else {
+                $model->unlockEntity($entity);
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                $viewParameters = array(
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId()
+                );
+
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'returnUrl'       => $this->generateUrl('mautic_webhook_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'WebhookBundle:Webhook:view'
+                    ))
+                );
+            }
+        } else {
+            //lock the entity
+            $model->lockEntity($entity);
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'entity'         => $entity,
+                'form'           => $form->createView(),
+            ),
+            'contentTemplate' => 'WebhookBundle:Webhook:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_webhook_index',
+                'mauticContent' => 'webhook',
+                'route'         => $this->generateUrl('mautic_webhook_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            )
+        ));
+    }
+
+    /**
+     * Shows a webhook record
+     *
+     * @param int $objectId Webhook ID
+     * @param int $webhookPage
+     *
+     * @return HttpFoundation\JsonResponse|HttpFoundation\Response
+     */
+    public function viewAction ($objectId)
+    {
+        /* @type \Mautic\WebhookBundle\Model\WebhookModel $model */
+        $model    = $this->factory->getModel('webhook');
+        $entity   = $model->getEntity($objectId);
+        $security = $this->factory->getSecurity();
+        $page     = $this->factory->getSession()->get('mautic.webhook.page', 1);
+
+        if ($entity === null) {
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $this->generateUrl('mautic_webhook_index', array('page' => $page)),
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticWebhookBundle:Webhook:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_webhook_index',
+                    'mauticContent' => 'webhook'
+                ),
+                'flashes'         => array(
+                    array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.webhook.webhook.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    )
+                )
+            ));
+        } elseif (!$security->hasEntityAccess('webhook:webhooks:viewown', 'webhook:webhooks:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
+        // Set filters
+        if ($this->request->getMethod() == 'POST') {
+            $this->setListFilters();
+        }
+
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('webhook', $entity->getId(), $entity->getDateAdded());
+
+        return $this->delegateView(array(
+            'viewParameters'   => array(
+                'webhook'      => $entity,
+                'page'         => $page,
+                'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'security'     => $security,
+                'logs'          => $logs,
+                'permissions'  => $security->isGranted(array(
+                    'webhook:webhooks:viewown',
+                    'webhook:webhooks:viewother',
+                    'webhook:webhooks:create',
+                    'webhook:webhooks:editown',
+                    'webhook:webhooks:editother',
+                    'webhook:webhooks:deleteown',
+                    'webhook:webhooks:deleteother'
+                ), "RETURN_ARRAY"),
+            ),
+            'contentTemplate' => 'MauticWebhookBundle:Webhook:details.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_webhook_index',
+                'mauticContent' => 'webhook',
+                'route'         => $this->generateUrl('mautic_webhook_action', array(
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId(),
+                    'page'         => $page,
+                )),
+            )
+        ));
+    }
+
+    /*
+    * Update the audit log
+    */
+    public function updateAuditLog(\Mautic\WebhookBundle\Entity\Webhook $webhook, $action)
+    {
+        $log = array(
+            "bundle"     => "WebhookBundle",
+            "object"     => "webhook",
+            "objectId"   => $webhook->getId(),
+            "action"     => $action,
+            "details"    => array('name' => $webhook->getTitle()),
+            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+        );
+
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 }

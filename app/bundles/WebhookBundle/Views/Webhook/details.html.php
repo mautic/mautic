@@ -7,6 +7,67 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $activePage->getTitle());
+/** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
+$view['slots']->set("headerTitle", $webhook->getTitle());
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'            => $webhook,
+    'templateButtons' => array(
+        'edit'   => $security->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $webhook->getCreatedBy()),
+        'clone'  => $security->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $webhook->getCreatedBy()),
+        'delete' => $permissions['webhook:webhooks:create'],
+    ),
+    'routeBase' => 'webhook'
+)));
+?>
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- page detail header -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-muted"><?php echo $webhook->getDescription(); ?></div>
+                    </div>
+                    <div class="col-xs-2 text-right">
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $webhook)); ?>
+                    </div>
+                </div>
+            </div>
+            <!--/ page detail header -->
+        </div>
+    </div>
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        <!-- preview URL -->
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.webhook.webhook_url'); ?></div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                           value="<?php echo $webhook->getWebhookUrl(); ?>" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $webhook->getWebhookUrl(); ?>', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+
+            <hr class="hr-w-2" style="width:50%">
+
+            <!-- recent activity -->
+            <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
+        </div>
+    </div>
+    <!--/ right section -->
+</div>
