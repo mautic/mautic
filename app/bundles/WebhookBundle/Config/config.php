@@ -49,6 +49,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'webhook'
             ),
+        ),
+        'events' => array(
+            'mautic.webhook.lead.subscriber'                => array(
+                'class' => 'Mautic\WebhookBundle\EventListener\LeadSubscriber'
+            ),
         )
     )
 );
