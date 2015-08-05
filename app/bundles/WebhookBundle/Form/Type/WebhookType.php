@@ -10,15 +10,11 @@
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
+use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 
 
 /**
@@ -90,21 +86,23 @@ class WebhookType extends AbstractType
 
         $events = $options['events'];
 
-        $builder->add('eventList', 'collection',  array(
-                'type'       => 'entity',
-                'allow_add' => true,
-                'allow_delete' => true,
-                'options' => array(
-                    'class' => 'MauticWebhookBundle:Event',
-                    'choices' => $events,
-                    'multiple' => true,
-                    'expanded' => true
-                ),
+        $choices = array();
+        foreach ($events as $type => $event)
+        {
+            $choices[$type] = $event['label'];
+        }
+
+        $builder->add('events', 'choice',  array(
+                'choices' => $choices,
+                'multiple' => true,
+                'expanded' => true,
                 'label'      => 'mautic.webhook.form.webhook_url',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'attr'       => array('class' => ''),
             )
         );
+
+        $builder->get('events')->addModelTransformer(new EventsToArrayTransformer($options['data']));
 
         $builder->add('buttons', 'form_buttons');
 

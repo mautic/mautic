@@ -31,6 +31,7 @@ $view['slots']->set("headerTitle", $header);
                     <?php echo $view['form']->row($form['description']); ?>
                     <?php echo $view['form']->row($form['webhook_url']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
+                    <?php echo $view['form']->row($form['events']); ?>
                 </div>
             </div>
         </div>

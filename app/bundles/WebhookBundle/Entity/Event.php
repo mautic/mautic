@@ -24,7 +24,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
  * @ORM\Table(name="webhook_events")
  * @ORM\Entity(repositoryClass="Mautic\WebhookBundle\Entity\EventRepository")
  */
-class Event extends CommonRepository
+class Event
 {
     /**
      * @ORM\Column(type="integer")
@@ -35,6 +35,7 @@ class Event extends CommonRepository
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\WebhookBundle\Entity\Webhook", inversedBy="events")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $webhook;
 

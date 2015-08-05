@@ -69,7 +69,7 @@ class Webhook extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Event", mappedBy="webhook", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Event", mappedBy="webhook", indexBy="event_type", cascade={"persist"})
      */
     private $events;
 
