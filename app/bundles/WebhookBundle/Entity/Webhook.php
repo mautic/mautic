@@ -73,12 +73,17 @@ class Webhook extends FormEntity
      */
     private $events;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\WebhookQueue", mappedBy="webhook", cascade={"persist"})
+     */
+    private $queues;
+
     /*
      * Constructor
      */
-
     public function __construct() {
         $this->events  = new ArrayCollection();
+        $this->queues = new ArrayCollection();
     }
 
     /**
@@ -255,5 +260,29 @@ class Webhook extends FormEntity
     public function removeEvent(Event $event)
     {
         $this->events->removeElement($event);
+    }
+
+    /**
+     * @param mixed $events
+     */
+    public function addQueues($queues)
+    {
+        $this->queues = $queues;
+        /**  @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
+        foreach ($queues as $queue) {
+            $queue->setWebhook($this);
+        }
+    }
+
+    public function addQueue(WebhookQueue $queue)
+    {
+        $this->queues[] = $queue;
+
+        return $this;
+    }
+
+    public function removeQueue(WebhookQueue $queue)
+    {
+        $this->queues->removeElement($queue);
     }
 }
