@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\Event;
+use Joomla\Http\Http;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -109,50 +110,80 @@ class WebhookModel extends FormModel
      * @param $webhooks array
      * @param $returnQueueEntities bool
      *
-     * @return array
+     * @return
      */
-    public function QueueWebhooks($webhooks, $returnQueueEntities = false)
+    public function QueueWebhooks($webhooks, $payload, $immediatelyExecuteWebhooks = false)
     {
         if (! count($webhooks)) {
             return;
         }
 
-        $queueIds = array();
         $queueList = array();
 
         /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
         foreach ($webhooks as $webhook)
         {
-            $queueEntity = $this->queueWebhook($webhook);
+            $queueEntity = $this->queueWebhook($webhook, $payload);
             $queueList[] = $queueEntity;
 
-            // if we need to return the queues back to whatever called this record the id
-            if ($returnQueueEntities) {
-                $queueIds[] = $queueEntity->getId();
-            }
+            // add the queuelist and save everything
+            $webhook->addQueues($queueList);
+            $this->saveEntity($webhook);
         }
 
-        // add the queuelist and save everything
-        $webhook->addQueues($queueList);
-        $this->saveEntity($webhook);
+        if ($immediatelyExecuteWebhooks) {
+            $this->processWebhooks($webhooks);
+        }
 
-        // this will either be a blank array or an array of Ids.
-        return $queueIds;
+        return;
     }
 
     /*
      * Creates a WebhookQueue entity, sets the date and returns the created entity
      *
      * @param  $webhook Webhook
+     * @param  $payload json_encoded array as the payload
      *
      * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook)
+    public function queueWebhook(Webhook $webhook, $payload)
     {
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
         $queue->setDateAdded(new \DateTime);
+        $queue->setPayload($payload);
 
         return $queue;
+    }
+
+    /*
+     * Execute a list of webhooks to their specified endpoints
+     */
+    public function processWebhooks($webhooks)
+    {
+        $http = new Http();
+        /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
+        foreach ($webhooks as $webhook)
+        {
+            $payload = ($this->getWebhookPayload($webhook));
+            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
+
+        }
+    }
+
+    /*
+     *
+     */
+    public function getWebhookPayload($webhook)
+    {
+        $queues = $webhook->getQueues();
+
+        $payload = array();
+
+        foreach ($queues as $queue) {
+            $payload[] = json_decode($queue->getPayload());
+        }
+
+        return $payload;
     }
 }
