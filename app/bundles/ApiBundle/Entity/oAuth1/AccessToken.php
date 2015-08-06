@@ -80,7 +80,7 @@ class AccessToken implements AccessTokenInterface
 
         $builder->addField('secret', 'string');
 
-        $builder->createField('expiresAt', 'integer')
+        $builder->createField('expiresAt', 'bigint')
             ->columnName('expires_at')
             ->nullable()
             ->build();
