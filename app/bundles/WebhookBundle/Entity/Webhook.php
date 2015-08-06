@@ -74,16 +74,22 @@ class Webhook extends FormEntity
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\WebhookQueue", mappedBy="webhook", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\WebhookQueue", mappedBy="webhook", cascade={"persist"}, fetch="EXTRA_LAZY")
      */
     private $queues;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Log", mappedBy="webhook", cascade={"persist"})
+     */
+    private $logs;
 
     /*
      * Constructor
      */
     public function __construct() {
         $this->events  = new ArrayCollection();
-        $this->queues = new ArrayCollection();
+        $this->queues  = new ArrayCollection();
+        $this->logs    = new ArrayCollection();
     }
 
     /**
@@ -289,5 +295,37 @@ class Webhook extends FormEntity
     public function removeQueue(WebhookQueue $queue)
     {
         $this->queues->removeElement($queue);
+    }
+
+    /*
+     * Get log entities
+     */
+    public function getLogs()
+    {
+        return $this->logs;
+    }
+
+    /**
+     * @param mixed $events
+     */
+    public function addLogs($logs)
+    {
+        $this->logs = $logs;
+        /**  @var \Mautic\WebhookBundle\Entity\Log $log */
+        foreach ($logs as $log) {
+            $log->setWebhook($this);
+        }
+    }
+
+    public function addLog(Log $log)
+    {
+        $this->logs[] = $log;
+
+        return $this;
+    }
+
+    public function removeLog(Log $log)
+    {
+        $this->logs->removeElement($log);
     }
 }
