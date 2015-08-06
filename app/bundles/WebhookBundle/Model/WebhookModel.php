@@ -11,9 +11,11 @@ namespace Mautic\WebhookBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\Event;
 use Joomla\Http\Http;
+use Joomla\Http\Response;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -94,7 +96,11 @@ class WebhookModel extends FormModel
     }
 
     /*
+     * Get a list of webhooks by matching events
      *
+     * @param $types array of event type constant
+     *
+     * @return array
      */
     public function getWebhooksByEventTypes(array $types)
     {
@@ -167,8 +173,31 @@ class WebhookModel extends FormModel
         {
             $payload = ($this->getWebhookPayload($webhook));
             $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
-
+            $this->addLog($webhook, $response);
         }
+    }
+
+    /*
+     * Add a log for the webhook response and save it
+     */
+    public function addLog(Webhook $webhook, Response $response)
+    {
+        $log = new Log();
+
+        $log->setWebhook($webhook);
+        $log->setStatusCode($response->code);
+        $log->setDateAdded(new \DateTime());
+        $webhook->addLog($log);
+
+        $this->saveEntity($webhook);
+    }
+
+    /*
+     * Get Qeueue Repository
+     */
+    public function getQueueRepository()
+    {
+        return $this->em->getRepository('MauticWebhookBundle:WebhookQueue');
     }
 
     /*
@@ -176,14 +205,53 @@ class WebhookModel extends FormModel
      */
     public function getWebhookPayload($webhook)
     {
-        $queues = $webhook->getQueues();
+        $queues = $this->getWebhookQueues($webhook);
 
         $payload = array();
 
+        /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queues as $queue) {
             $payload[] = json_decode($queue->getPayload());
         }
 
         return $payload;
+    }
+
+    /*
+     * Get the queues and order by date so we get events in chronological order
+     *
+     * @return array
+     */
+    public function getWebhookQueues(Webhook $webhook, $start = 0, $limit = 1000)
+    {
+        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $queueRepo */
+        $queueRepo = $this->getQueueRepository();
+
+        $queues = $queueRepo->getEntities(
+            array(
+                'iterator_mode' => true,
+                'start' => $start,
+                'limit' => $limit,
+                'orderBy' => 'e.dateAdded', // e is the default prefix unless you define getTableAlias in your repo class,
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => 'IDENTITY(e.webhook)',
+                            'expr'   => 'eq',
+                            'value'  => $webhook->getId()
+                        )
+                    )
+                )
+	        )
+        );
+
+        $queueList = array();
+
+        // hydrates the returned list of queues
+        while (($q = $queues->next()) !== false) {
+            $queueList =  $q;
+        }
+
+        return $queueList;
     }
 }
