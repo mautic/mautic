@@ -11,80 +11,88 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class LeadList
- * @ORM\Table(name="lead_lists")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadListRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\LeadBundle\Entity
  */
 class LeadList extends FormEntity
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
-     */
-    private $alias;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails", "leadListList"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails"})
+     * @var string
      */
-    private $filters;
+    private $alias;
 
     /**
-     * @ORM\Column(name="is_global", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadListDetails"})
+     * @var array
+     */
+    private $filters = array();
+
+    /**
+     * @var bool
      */
     private $isGlobal = true;
 
     /**
-     * @ORM\OneToMany(targetEntity="ListLead", mappedBy="list", indexBy="id", fetch="EXTRA_LAZY")
-     *
      * @var ArrayCollection
      */
     private $leads;
 
+    /**
+     * Construct
+     */
     public function __construct()
     {
         $this->leads = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_lists')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadListRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addField('alias', 'string');
+
+        $builder->addField('filters', 'array');
+
+        $builder->createField('isGlobal', 'boolean')
+            ->columnName('is_global')
+            ->build();
+
+        $builder->createOneToMany('leads', 'ListLead')
+            ->setIndexBy('id')
+            ->mappedBy('list')
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -100,6 +108,31 @@ class LeadList extends FormEntity
             'field'   => 'alias',
             'message' => 'mautic.lead.list.alias.unique'
         )));
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('leadList')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'filters',
+                    'isGlobal'
+                )
+            )
+            ->build();
     }
 
     /**

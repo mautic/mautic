@@ -10,51 +10,77 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class Redirect
- * @ORM\Table(name="page_redirects")
- * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\RedirectRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\PageBundle\Entity
  */
 class Redirect extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="redirect_id", type="string", length=25)
+     * @var string
      */
     private $redirectId;
 
     /**
-     * @ORM\Column(type="text")
+     * @var
      */
     private $url;
 
     /**
-     * @ORM\Column(name="hits", type="integer")
+     * @var int
      */
     private $hits = 0;
 
     /**
-     * @ORM\Column(name="unique_hits", type="integer")
+     * @var int
      */
     private $uniqueHits = 0;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @var Email
      */
     private $email;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('page_redirects')
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
+
+        $builder->addId();
+
+        $builder->createField('redirectId', 'string')
+            ->columnName('redirect_id')
+            ->length(25)
+            ->build();
+
+        $builder->addField('url', 'text');
+
+        $builder->addField('hits', 'integer');
+
+        $builder->createField('uniqueHits', 'integer')
+            ->columnName('unique_hits')
+            ->build();
+
+        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+    }
 
     /**
      * @return integer

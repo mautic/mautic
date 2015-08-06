@@ -9,8 +9,7 @@
 
 namespace MauticAddon\MauticSocialBundle\Integration;
 
-use Mautic\AddonBundle\Entity\Integration;
-use Mautic\AddonBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
  * Class TwitterIntegration
