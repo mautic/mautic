@@ -135,6 +135,9 @@ class WebhookModel extends FormModel
             // add the queuelist and save everything
             $webhook->addQueues($queueList);
             $this->saveEntity($webhook);
+
+            // reset to empty array
+            $queueList = array();
         }
 
         if ($immediatelyExecuteWebhooks) {
