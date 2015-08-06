@@ -262,6 +262,11 @@ class Webhook extends FormEntity
         $this->events->removeElement($event);
     }
 
+    public function getQueues()
+    {
+        return $this->queues;
+    }
+
     /**
      * @param mixed $events
      */
