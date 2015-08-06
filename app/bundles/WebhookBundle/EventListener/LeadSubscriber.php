@@ -43,10 +43,13 @@ class LeadSubscriber extends WebhookSubscriberBase
      */
     public function onLeadEvent($event)
     {
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = ($event->getLead());
+
+        $payload = json_encode($lead->convertToArray());
+
         $types = array('webhook.lead.new');
         $webhooks = $this->getWebhooksByTypes($types);
-        $this->webhookModel->QueueWebhooks($webhooks);
-        echo 'lead event executed';
-        exit();
+        $this->webhookModel->QueueWebhooks($webhooks, $payload, true);
     }
 }
