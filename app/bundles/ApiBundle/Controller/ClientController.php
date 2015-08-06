@@ -40,6 +40,8 @@ class ClientController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.client.orderby', 'c.name');
         $orderByDir = $this->factory->getSession()->get('mautic.client.orderbydir', 'ASC');
         $filter     = $this->request->get('search', $this->factory->getSession()->get('mautic.client.filter', ''));
+        $api_mode = $this->factory->getRequest()->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
+        $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
         $this->factory->getSession()->set('mautic.client.filter', $filter);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -80,13 +82,33 @@ class ClientController extends FormController
             'delete' => $this->factory->getSecurity()->isGranted('api:clients:deleteother'),
         );
 
+        // filters
+        $filters = array();
+
+        // api options
+        $apiOptions = array();
+//        if ($this->factory->getParameter('api_oauth1', false)) {
+            $apiOptions['oauth1'] = 'OAuth 1';
+//        }
+//        if ($this->factory->getParameter('api_oauth2', false)) {
+            $apiOptions['oauth2'] = 'OAuth 2';
+//        }
+
+//        if (count($apiOptions) == 2) {
+            $filters['api_mode'] = array(
+                'values' => array($api_mode),
+                'options'=> $apiOptions
+            );
+//        }
+
         $parameters = array(
             'items'       => $clients,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
-            'searchValue' => $filter
+            'searchValue' => $filter,
+            'filters'     => $filters
         );
 
         return $this->delegateView(array(
@@ -167,6 +189,8 @@ class ClientController extends FormController
         if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
+        $api_mode   = $this->request->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
+        $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model = $this->factory->getModel('api.client');
@@ -180,6 +204,8 @@ class ClientController extends FormController
         //get the user form factory
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'new'));
         $form   = $model->createForm($client, $this->get('form.factory'), $action);
+        // remove api_mode field
+        $form->remove('api_mode');
 
         //remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
@@ -187,6 +213,17 @@ class ClientController extends FormController
         $form->remove('publicId');
         $form->remove('consumerKey');
         $form->remove('consumerSecret');
+
+        // filters
+        $filters = array();
+        // api options
+        $apiOptions = array();
+        $apiOptions['oauth1'] = 'OAuth 1';
+        $apiOptions['oauth2'] = 'OAuth 2';
+        $filters['api_mode'] = array(
+            'values' => array($api_mode),
+            'options'=> $apiOptions
+        );
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -222,7 +259,10 @@ class ClientController extends FormController
         }
 
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $form->createView()),
+            'viewParameters'  => array(
+                'form' => $form->createView(),
+                'filters' => $filters
+            ),
             'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_client_new',
@@ -279,6 +319,9 @@ class ClientController extends FormController
 
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($client, $this->get('form.factory'), $action);
+
+        // remove api_mode field
+        $form->remove('api_mode');
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {

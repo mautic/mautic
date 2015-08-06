@@ -50,7 +50,7 @@ class ClientType extends AbstractType
     {
         $this->translator = $factory->getTranslator();
         $this->validator  = $factory->getValidator();
-        $this->apiMode    = $factory->getParameter('api_mode');
+        $this->apiMode    = $factory->getRequest()->get('api_mode', $factory->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
     }
 
     /**
@@ -70,7 +70,6 @@ class ClientType extends AbstractType
                 'attr'       => array('class' => 'form-control')
             )
         );
-
 
         if ($this->apiMode == 'oauth2') {
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();
