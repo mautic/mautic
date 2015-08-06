@@ -43,6 +43,48 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <!--/ page detail header -->
         </div>
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-12">
+                    <?php $hookLog = $item->getLogs(); ?>
+                    <?php if (! count($hookLog)): ?>
+                        <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
+                            <h4>
+                                <?php echo $view['translator']->trans('mautic.webhook.no.logs'); ?>
+                            </h4>
+                            <pp>
+                                <?php echo $view['translator']->trans('mautic.webhook.no.logs_desc'); ?>
+                            </pp>
+                        </div>
+                    <?php else: ?>
+                        <table class="table table-responsive table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <?php echo $view['translator']->trans('mautic.core.id'); ?>
+                                    </th>
+                                    <th>
+                                        <?php echo $view['translator']->trans('mautic.webhook.status'); ?>
+                                    </th>
+                                    <th>
+                                        <?php echo $view['translator']->trans('mautic.core.date.added'); ?>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($hookLog as $log): ?>
+                                    <tr>
+                                        <td><?php echo $log->getId(); ?></td>
+                                        <td><?php echo $log->getStatusCode(); ?></td>
+                                        <td><?php echo $view['date']->toFull($log->getDateAdded()); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- right section -->
