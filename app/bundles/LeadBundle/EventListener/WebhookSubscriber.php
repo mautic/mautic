@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\WebhookBundle\WebhookEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class WebhookSubscriber
@@ -37,11 +38,40 @@ class WebhookSubscriber extends CommonSubscriber
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
-        $eventType = array(
+        // add checkbox to the webhook form for new leads
+        $newLead     = array(
             'label'       => 'mautic.lead.webhook.event.lead.new',
             'description' => 'mautic.lead.webhook.event.lead.new_desc',
         );
 
-        $event->addEvent('webhook.lead.new', $eventType);
+        // add it to the list
+        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '.new', $newLead);
+
+        // checkbox for lead updates
+        $updatedLead = array(
+            'label'       => 'mautic.lead.webhook.event.lead.update',
+            'description' => 'mautic.lead.webhook.event.lead.update_desc',
+        );
+
+        // add it to the list
+        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '.update', $updatedLead);
+
+        // add a checkbox for points
+        $leadPoints = array(
+            'label'       => 'mautic.lead.webhook.event.lead.points',
+            'description' => 'mautic.lead.webhook.event.lead.points_desc',
+        );
+
+        // add the points
+        $event->addEvent(LeadEvents::LEAD_POINTS_CHANGE, $leadPoints);
+
+        // lead deleted checkbox label & desc
+        $leadDeleted = array(
+            'label'       => 'mautic.lead.webhook.event.lead.deleted',
+            'description' => 'mautic.lead.webhook.event.lead.deleted_desc',
+        );
+
+        // add the deleted checkbox
+        $event->addEvent(LeadEvents::LEAD_POST_DELETE, $leadDeleted);
     }
 }
