@@ -20,38 +20,26 @@ class UserStep implements StepInterface
 {
     /**
      * User's first name
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $firstname;
 
     /**
      * User's last name
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $lastname;
 
     /**
      * User's e-mail address
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
-     * @Assert\Email(message = "mautic.core.email.required")
      */
     public $email;
 
     /**
      * User's username
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
      */
     public $username;
 
     /**
      * User's password
-     *
-     * @Assert\NotBlank(message = "mautic.core.value.required")
-     * @Assert\Length(min = 6, minMessage = "mautic.install.password.minlength")
      */
     public $password;
 

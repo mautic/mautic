@@ -10,74 +10,120 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class AuditLog
  *
- * @ORM\Table(name="audit_log")
- * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\AuditLogRepository")
+ * @package Mautic\CoreBundle\Entity
  */
 class AuditLog
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     protected $id;
 
     /**
-     * @ORM\Column(name="user_id", type="integer")
+     * @var int
      */
     protected $userId;
 
     /**
-     * @ORM\Column(name="user_name", type="string", length=255)
+     * @var string
      */
     protected $userName;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     protected $bundle;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     protected $object;
 
     /**
-     * @ORM\Column(name="object_id", type="integer")
+     * @var int
      */
     protected $objectId;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     protected $action;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
      */
-    protected $details;
+    protected $details = array();
 
     /**
-     * @ORM\Column(name="date_added", type="datetime")
+     * @var \DateTime
      */
     protected $dateAdded;
 
     /**
-     * @ORM\Column(name="ip_address", type="string", length=15)
+     * @var string
      */
     protected $ipAddress;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('audit_log')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository');
+
+        $builder->addId();
+
+        $builder->createField('userId', 'integer')
+            ->columnName('user_id')
+            ->build();
+
+        $builder->createField('userName', 'string')
+            ->columnName('user_name')
+            ->build();
+
+        $builder->createField('bundle', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('object', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('objectId', 'integer')
+            ->columnName('object_id')
+            ->build();
+
+        $builder->createField('action', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('details', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->addDateAdded();
+
+        $builder->createField('ipAddress', 'string')
+            ->columnName('ip_address')
+            ->length(45)
+            ->build();
+    }
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -89,7 +135,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setUserId($userId)
+    public function setUserId ($userId)
     {
         $this->userId = $userId;
 
@@ -101,7 +147,7 @@ class AuditLog
      *
      * @return integer
      */
-    public function getUserId()
+    public function getUserId ()
     {
         return $this->userId;
     }
@@ -113,7 +159,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setObject($object)
+    public function setObject ($object)
     {
         $this->object = $object;
 
@@ -125,7 +171,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getObject()
+    public function getObject ()
     {
         return $this->object;
     }
@@ -137,7 +183,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setObjectId($objectId)
+    public function setObjectId ($objectId)
     {
         $this->objectId = $objectId;
 
@@ -149,7 +195,7 @@ class AuditLog
      *
      * @return integer
      */
-    public function getObjectId()
+    public function getObjectId ()
     {
         return $this->objectId;
     }
@@ -161,7 +207,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setAction($action)
+    public function setAction ($action)
     {
         $this->action = $action;
 
@@ -173,7 +219,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getAction()
+    public function getAction ()
     {
         return $this->action;
     }
@@ -185,7 +231,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setDetails($details)
+    public function setDetails ($details)
     {
         $this->details = $details;
 
@@ -197,7 +243,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getDetails()
+    public function getDetails ()
     {
         return $this->details;
     }
@@ -209,7 +255,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded ($dateAdded)
     {
         $this->dateAdded = $dateAdded;
 
@@ -221,7 +267,7 @@ class AuditLog
      *
      * @return \DateTime
      */
-    public function getDateAdded()
+    public function getDateAdded ()
     {
         return $this->dateAdded;
     }
@@ -233,7 +279,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress ($ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -245,7 +291,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getIpAddress()
+    public function getIpAddress ()
     {
         return $this->ipAddress;
     }
@@ -257,7 +303,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setBundle($bundle)
+    public function setBundle ($bundle)
     {
         $this->bundle = $bundle;
 
@@ -269,7 +315,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getBundle()
+    public function getBundle ()
     {
         return $this->bundle;
     }
@@ -281,7 +327,7 @@ class AuditLog
      *
      * @return AuditLog
      */
-    public function setUserName($userName)
+    public function setUserName ($userName)
     {
         $this->userName = $userName;
 
@@ -293,7 +339,7 @@ class AuditLog
      *
      * @return string
      */
-    public function getUserName()
+    public function getUserName ()
     {
         return $this->userName;
     }

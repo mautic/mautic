@@ -10,59 +10,87 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class PointsChangeLog
- * @ORM\Table(name="lead_points_change_log")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\PointsChangeLogRepository")
+ *
+ * @package Mautic\LeadBundle\Entity
  */
 class PointsChangeLog
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Lead", inversedBy="pointsChangeLog")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false)
+     * @var Lead
      */
     private $lead;
 
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
-     * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
+     * @var \Mautic\CoreBundle\Entity\IpAddress
      */
     private $ipAddress;
 
     /**
-     * @ORM\Column(type="text", length=50)
+     * @var string
      */
     private $type;
 
     /**
-     * @ORM\Column(name="event_name", type="text", length=255)
+     * @var string
      */
     private $eventName;
 
     /**
-     * @ORM\Column(name="action_name", type="text", length=255)
+     * @var string
      */
     private $actionName;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $delta;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime")
+     * @var \DateTime
      */
     private $dateAdded;
 
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_points_change_log')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository');
+
+        $builder->addId();
+
+        $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
+
+        $builder->addIpAddress();
+
+        $builder->createField('type', 'text')
+            ->length(50)
+            ->build();
+
+        $builder->createField('eventName', 'string')
+            ->columnName('event_name')
+            ->build();
+
+        $builder->createField('actionName', 'string')
+            ->columnName('action_name')
+            ->build();
+
+        $builder->addField('delta', 'integer');
+
+        $builder->addDateAdded();
+    }
 
     /**
      * Get id

@@ -1,9 +1,12 @@
 <?php
+$ormMappings = $serializerMappings = array();
+
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container) {
+$buildBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
     if (strpos($namespace, 'Mautic\\') !== false) {
-        $bundleBase = str_replace('Mautic', '', $bundle);
-        $directory  = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
+        $bundleBase    = str_replace('Mautic', '', $bundle);
+        $directory     = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
+        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
 
         // Check for a single config file
         if (file_exists($directory.'/Config/config.php')) {
@@ -12,11 +15,28 @@ $buildBundles = function($namespace, $bundle) use ($container) {
             $config = array();
         }
 
+        // Set ORM mapping to staticphp for core entities
+        if (file_exists($directory.'/Entity')) {
+            $ormMappings[$bundle] = array(
+                'dir'       => 'Entity',
+                'type'      => 'staticphp',
+                'prefix'    => $baseNamespace . '\\Entity',
+                'mapping'   => true,
+                'is_bundle' => true
+            );
+
+            // Set API metadata
+            $serializerMappings[$bundle] = array(
+                'namespace_prefix' => $baseNamespace . '\\Entity',
+                'path'             => "@$bundle/Entity"
+            );
+        }
+
         return array(
             "isAddon"           => false,
             "base"              => str_replace('Bundle', '', $bundleBase),
             "bundle"            => $bundleBase,
-            "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            "namespace"         => $baseNamespace,
             "symfonyBundleName" => $bundle,
             "bundleClass"       => $namespace,
             "relative"          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
@@ -28,9 +48,10 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 };
 
 // Note MauticAddon bundles so they can be applied as needed
-$buildAddonBundles = function($namespace, $bundle) use ($container) {
+$buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
     if (strpos($namespace, 'MauticAddon\\') !== false) {
-        $directory = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
+        $directory     = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
+        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
 
         // Check for a single config file
         if (file_exists($directory.'/Config/config.php')) {
@@ -39,11 +60,44 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
             $config = array();
         }
 
+        // Check for staticphp mapping
+        if (file_exists($directory.'/Entity')) {
+            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->notName('*Repository.php');
+
+            foreach ($finder as $file) {
+                // Just check first file for the loadMetadata function
+                $reflectionClass = new \ReflectionClass($namespace . '\\Entity\\' . basename($file->getFilename(), '.php'));
+
+                // Register API metadata
+                if ($reflectionClass->hasMethod('loadApiMetadata')) {
+                    $serializerMappings[$bundle] = array(
+                        'namespace_prefix' => $baseNamespace . '\\Entity',
+                        'path'             => "@$bundle/Entity"
+                    );
+                }
+
+                // Register entities
+                if ($reflectionClass->hasMethod('loadMetadata')) {
+                    $ormMappings[$bundle] = array(
+                        'dir'       => 'Entity',
+                        'type'      => 'staticphp',
+                        'prefix'    => $baseNamespace . '\\Entity',
+                        'mapping'   => true,
+                        'is_bundle' => true
+                    );
+                } else {
+                    // Use Symfony's auto mapping
+
+                    break;
+                }
+            }
+        }
+
         return array(
             "isAddon"           => true,
             "base"              => str_replace('Bundle', '', $bundle),
             "bundle"            => $bundle,
-            "namespace"         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            "namespace"         => $baseNamespace,
             "symfonyBundleName" => $bundle,
             "bundleClass"       => $namespace,
             "relative"          => 'addons/' . $bundle,
@@ -110,7 +164,7 @@ $container->loadFromExtension('framework', array(
     'form'                 => null,
     'csrf_protection'      => true,
     'validation'           => array(
-        'enable_annotations' => true
+        'enable_annotations' => false
     ),
     'templating'           => array(
         'engines' => $engines,
@@ -164,7 +218,8 @@ $container->loadFromExtension('doctrine', array(
     'dbal' => $dbalSettings,
     'orm'  => array(
         'auto_generate_proxy_classes' => '%kernel.debug%',
-        'auto_mapping'                => true
+        'auto_mapping'                => true,
+        'mappings'                    => $ormMappings
     )
 ));
 
@@ -254,13 +309,18 @@ if ($container->getParameter('mautic.api_enabled')) {
     $container->loadFromExtension('jms_serializer', array(
         'handlers' => array(
             'datetime' => array(
-                'default_format' => 'c',
+                'default_format'   => 'c',
                 'default_timezone' => 'UTC'
             )
         ),
         'property_naming' => array(
             'separator'  => '',
             'lower_case' => false
+        ),
+        'metadata'       => array(
+            'cache'          => 'none',
+            'auto_detection' => false,
+            'directories'    => $serializerMappings
         )
     ));
 

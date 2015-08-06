@@ -10,45 +10,69 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Lead
- * @ORM\Table(name="campaign_leads")
- * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\LeadRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\CampaignBundle\Entity
  */
 class Lead
 {
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="leads")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var Campaign
+     */
     private $campaign;
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     private $lead;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime")
+     * @var \DateTime
      **/
     private $dateAdded;
 
     /**
-     * @ORM\Column(name="manually_removed", type="boolean")
+     * @var bool
      */
     private $manuallyRemoved = false;
 
     /**
-     * @ORM\Column(name="manually_added", type="boolean")
+     * @var bool
      */
     private $manuallyAdded = false;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('campaign_leads')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository');
+
+        $builder->createManyToOne('campaign', 'Campaign')
+            ->isPrimaryKey()
+            ->inversedBy('leads')
+            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addLead(false, 'CASCADE', true);
+
+        $builder->addDateAdded();
+
+        $builder->createField('manuallyRemoved', 'boolean')
+            ->columnName('manually_removed')
+            ->build();
+
+        $builder->createField('manuallyAdded', 'boolean')
+            ->columnName('manually_added')
+            ->build();
+    }
 
     /**
      * @return \DateTime
@@ -117,7 +141,7 @@ class Lead
     /**
      * @return bool
      */
-    public function wasManuallyRemoved()
+    public function wasManuallyRemoved ()
     {
         return $this->manuallyRemoved;
     }
@@ -141,7 +165,7 @@ class Lead
     /**
      * @return bool
      */
-    public function wasManuallyAdded()
+    public function wasManuallyAdded ()
     {
         return $this->manuallyAdded;
     }
