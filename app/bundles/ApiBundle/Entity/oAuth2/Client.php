@@ -9,60 +9,62 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * @ORM\Table(name="oauth2_clients")
- * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\oAuth2\ClientRepository")
+ * Class Client
+ *
+ * @package Mautic\ApiBundle\Entity\oAuth2
  */
 class Client extends BaseClient
 {
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="text", length=50, nullable=true)
+     * @var string
      */
     protected $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="oauth2_user_client_xref")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var ArrayCollection
      */
     protected $users;
 
     /**
-     * @ORM\Column(type="string", name="random_id")
+     * @var string
      */
     protected $randomId;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $secret;
 
     /**
-     * @ORM\Column(type="array", name="redirect_uris")
+     * @var array
      */
     protected $redirectUris = array();
 
     /**
-     * @ORM\Column(type="array", name="allowed_grant_types")
+     * @var array
      */
     protected $allowedGrantTypes;
 
-    public function __construct()
+    /**
+     *  Construct
+     */
+    public function __construct ()
     {
         parent::__construct();
 
@@ -70,12 +72,48 @@ class Client extends BaseClient
             OAuth2::GRANT_TYPE_AUTH_CODE,
             OAuth2::GRANT_TYPE_REFRESH_TOKEN,
         );
+
+        $this->users = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('oauth2_clients')
+            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth2\ClientRepository');
+
+        $builder->addIdColumns('name', false);
+
+        $builder->createManyToMany('users', 'Mautic\UserBundle\Entity\User')
+            ->setJoinTable('oauth2_user_client_xref')
+            ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('randomId', 'string')
+            ->columnName('random_id')
+            ->build();
+
+        $builder->addField('secret', 'string');
+
+        $builder->createField('redirectUris', 'array')
+            ->columnName('redirect_uris')
+            ->build();
+
+        $builder->createField('allowedGrantTypes', 'array')
+            ->columnName('allowed_grant_types')
+            ->build();
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.core.name.required')
@@ -97,7 +135,7 @@ class Client extends BaseClient
      *
      * @return void
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -109,7 +147,7 @@ class Client extends BaseClient
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges ()
     {
         return $this->changes;
     }
@@ -119,7 +157,7 @@ class Client extends BaseClient
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -131,7 +169,7 @@ class Client extends BaseClient
      *
      * @return Client
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
 
@@ -145,7 +183,7 @@ class Client extends BaseClient
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -153,7 +191,7 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      */
-    public function setRedirectUris(array $redirectUris)
+    public function setRedirectUris (array $redirectUris)
     {
         $this->isChanged('redirectUris', $redirectUris);
 
@@ -167,7 +205,7 @@ class Client extends BaseClient
      *
      * @return Client
      */
-    public function addAuthCode(AuthCode $authCodes)
+    public function addAuthCode (AuthCode $authCodes)
     {
         $this->authCodes[] = $authCodes;
 
@@ -179,7 +217,7 @@ class Client extends BaseClient
      *
      * @param AuthCode $authCodes
      */
-    public function removeAuthCode(AuthCode $authCodes)
+    public function removeAuthCode (AuthCode $authCodes)
     {
         $this->authCodes->removeElement($authCodes);
     }
@@ -189,7 +227,7 @@ class Client extends BaseClient
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getAuthCodes()
+    public function getAuthCodes ()
     {
         return $this->authCodes;
     }
@@ -201,7 +239,7 @@ class Client extends BaseClient
      *
      * @return bool
      */
-    public function isAuthorizedClient(User $user)
+    public function isAuthorizedClient (User $user)
     {
         $users = $this->getUsers();
 
@@ -215,7 +253,7 @@ class Client extends BaseClient
      *
      * @return Client
      */
-    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    public function addUser (\Mautic\UserBundle\Entity\User $users)
     {
         $this->users[] = $users;
 
@@ -227,7 +265,7 @@ class Client extends BaseClient
      *
      * @param \Mautic\UserBundle\Entity\User $users
      */
-    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    public function removeUser (\Mautic\UserBundle\Entity\User $users)
     {
         $this->users->removeElement($users);
     }
@@ -237,7 +275,7 @@ class Client extends BaseClient
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUsers()
+    public function getUsers ()
     {
         return $this->users;
     }
