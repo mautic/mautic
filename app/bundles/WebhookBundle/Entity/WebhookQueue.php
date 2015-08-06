@@ -37,6 +37,11 @@ class WebhookQueue
     private $dateAdded;
 
     /**
+     * @ORM\Column(name="payload", type="text")
+     **/
+    private $payload;
+
+    /**
      * Get id
      *
      * @return integer
@@ -77,6 +82,23 @@ class WebhookQueue
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPayload()
+    {
+        return $this->payload;
+    }
+
+    /**
+     * @param mixed $payload
+     */
+    public function setPayload($payload)
+    {
+        $this->payload = $payload;
         return $this;
     }
 }
