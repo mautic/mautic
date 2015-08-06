@@ -28,7 +28,7 @@ class CommonEvent extends Event
     protected $entity;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $isNew = true;
 

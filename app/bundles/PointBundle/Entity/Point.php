@@ -11,109 +11,114 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Point
- * @ORM\Table(name="points")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\PointRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\PointBundle\Entity
  */
 class Point extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
+     * @var string
+     */
+    private $type;
+
+    /**
+     * @var \DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
+     * @var \DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\Column(name="delta", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
+     * @var int
      */
     private $delta = 0;
 
     /**
-     * @ORM\Column(type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails"})
+     * @var array
      */
     private $properties = array();
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadPointLog", mappedBy="point", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @var ArrayCollection
      */
     private $log;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pointDetails", "pointList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
-    public function __construct()
+    /**
+     * Construct
+     */
+    public function __construct ()
     {
         $this->log = new ArrayCollection();
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('points')
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->addPublishDates();
+
+        $builder->addField('delta', 'integer');
+
+        $builder->addField('properties', 'array');
+
+        $builder->createOneToMany('log', 'LeadPointLog')
+            ->mappedBy('point')
+            ->cascadePersist()
+            ->cascadeRemove()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->addCategory();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
@@ -125,11 +130,40 @@ class Point extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('point')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'category',
+                    'type',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'publishUp',
+                    'publishDown',
+                    'delta',
+                    'properties'
+                )
+            )
+            ->build();
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -141,7 +175,7 @@ class Point extends FormEntity
      *
      * @return Action
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -155,7 +189,7 @@ class Point extends FormEntity
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -167,7 +201,7 @@ class Point extends FormEntity
      *
      * @return Action
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -180,7 +214,7 @@ class Point extends FormEntity
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -188,7 +222,7 @@ class Point extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -200,7 +234,7 @@ class Point extends FormEntity
      *
      * @return Action
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -213,7 +247,7 @@ class Point extends FormEntity
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -225,7 +259,7 @@ class Point extends FormEntity
      *
      * @return Action
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -238,7 +272,7 @@ class Point extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -250,7 +284,7 @@ class Point extends FormEntity
      *
      * @return Log
      */
-    public function addLog(LeadPointLog $log)
+    public function addLog (LeadPointLog $log)
     {
         $this->log[] = $log;
 
@@ -262,7 +296,7 @@ class Point extends FormEntity
      *
      * @param LeadPointLog $log
      */
-    public function removeLog(LeadPointLog $log)
+    public function removeLog (LeadPointLog $log)
     {
         $this->log->removeElement($log);
     }
@@ -272,7 +306,7 @@ class Point extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog()
+    public function getLog ()
     {
         return $this->log;
     }
@@ -284,7 +318,7 @@ class Point extends FormEntity
      *
      * @return Point
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -297,7 +331,7 @@ class Point extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishUp()
+    public function getPublishUp ()
     {
         return $this->publishUp;
     }
@@ -309,7 +343,7 @@ class Point extends FormEntity
      *
      * @return Point
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -322,7 +356,7 @@ class Point extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishDown()
+    public function getPublishDown ()
     {
         return $this->publishDown;
     }
@@ -330,7 +364,7 @@ class Point extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory()
+    public function getCategory ()
     {
         return $this->category;
     }
@@ -338,7 +372,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory ($category)
     {
         $this->category = $category;
     }
@@ -356,6 +390,6 @@ class Point extends FormEntity
      */
     public function setDelta ($delta)
     {
-        $this->delta = (int) $delta;
+        $this->delta = (int)$delta;
     }
 }

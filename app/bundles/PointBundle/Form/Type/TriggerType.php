@@ -86,6 +86,7 @@ class TriggerType extends AbstractType
                 'data-toggle' => 'color',
                 'tooltip'     => 'mautic.point.trigger.form.color_descr'
             ),
+            'empty_value' => 'a0acb8',
             'required'   => false
         ));
 

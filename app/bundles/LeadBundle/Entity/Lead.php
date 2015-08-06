@@ -10,20 +10,18 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
 
 /**
  * Class Lead
- * @ORM\Table(name="leads")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadRepository")
- * @ORM\HasLifecycleCallbacks
- * @Serializer\XmlRoot("lead")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\LeadBundle\Entity
  */
 class Lead extends FormEntity
 {
@@ -35,70 +33,47 @@ class Lead extends FormEntity
     private $availableSocialFields = array();
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
+     * @var \Mautic\UserBundle\Entity\User
      */
     private $owner;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
+     * @var int
      */
     private $points = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="PointsChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateAdded" = "DESC"})
+     * @var ArrayCollection
      */
     private $pointsChangeLog;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\EmailBundle\Entity\DoNotEmail", mappedBy="lead", cascade={"persist"}, fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $doNotEmail;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "detach"}, indexBy="ipAddress")
-     * @ORM\JoinTable(name="lead_ips_xref",
-     *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
-     * )
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
+     * @var ArrayCollection
      */
     private $ipAddresses;
 
     /**
-     * @ORM\Column(type="datetime", name="last_active", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
+     * @var \DateTime
      */
     private $lastActive;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
      */
     private $internal = array();
 
     /**
-     * @ORM\Column(type="array", name="social_cache", nullable=true)
+     * @var array
      */
     private $socialCache = array();
 
@@ -112,10 +87,7 @@ class Lead extends FormEntity
     /**
      * Used to populate trigger color
      *
-     * @var
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
+     * @var string
      */
     private $color;
 
@@ -127,16 +99,12 @@ class Lead extends FormEntity
     private $newlyCreated = false;
 
     /**
-     * @ORM\Column(name="date_identified", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails"})
+     * @var \DateTime
      */
     private $dateIdentified;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", orphanRemoval=true, fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateAdded" = "DESC"})
+     * @var ArrayCollection
      */
     private $notes;
 
@@ -144,17 +112,11 @@ class Lead extends FormEntity
      * Used by Mautic to populate the fields pulled from the DB
      *
      * @var array
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     protected $fields = array();
 
     /**
-     * @ORM\Column(name="preferred_profile_image",type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @var string
      */
     private $preferredProfileImage;
 
@@ -165,8 +127,123 @@ class Lead extends FormEntity
      */
     private $wasAnonymous = null;
 
+    /**
+     * @var bool
+     */
     public $imported = false;
 
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('leads')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
+            ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
+            ->addLifecycleEvent('checkDateIdentified', 'prePersist');
+
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
+            ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createField('points', 'integer')
+            ->build();
+
+        $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+            ->mappedBy('lead')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToMany('ipAddresses', 'Mautic\CoreBundle\Entity\IpAddress')
+            ->setJoinTable('lead_ips_xref')
+            ->addInverseJoinColumn('ip_id', 'id', false)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->setIndexBy('ipAddress')
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
+
+        $builder->createField('lastActive', 'datetime')
+            ->columnName('last_active')
+            ->nullable()
+            ->build();
+
+        $builder->createField('internal', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('socialCache', 'array')
+            ->columnName('social_cache')
+            ->nullable()
+            ->build();
+
+        $builder->createField('dateIdentified', 'datetime')
+            ->columnName('date_identified')
+            ->nullable()
+            ->build();
+
+        $builder->createOneToMany('notes', 'LeadNote')
+            ->orphanRemoval()
+            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->mappedBy('lead')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('preferredProfileImage', 'string')
+            ->columnName('preferred_profile_image')
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('lead')
+            ->setRoot('lead')
+            ->addListProperties(
+                array(
+                    'id',
+                    'points',
+                    'color',
+                    'fields',
+                )
+            )
+            ->addProperties(
+                array(
+                    'lastActive',
+                    'owner',
+                    'ipAddresses',
+                    'dateIdentified',
+                    'preferredProfileImage'
+                )
+            )
+            ->build();
+    }
+
+    /**
+     * Constructor
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get".ucfirst($prop);
@@ -202,7 +279,7 @@ class Lead extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -214,7 +291,7 @@ class Lead extends FormEntity
      *
      * @return Lead
      */
-    public function setId($id)
+    public function setId ($id)
     {
         $this->id = $id;
 
@@ -226,7 +303,7 @@ class Lead extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -251,7 +328,7 @@ class Lead extends FormEntity
      *
      * @return User
      */
-    public function getOwner()
+    public function getOwner ()
     {
         return $this->owner;
     }
@@ -293,7 +370,7 @@ class Lead extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getIpAddresses()
+    public function getIpAddresses ()
     {
         return $this->ipAddresses;
     }
@@ -305,7 +382,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getName($lastFirst = false)
+    public function getName ($lastFirst = false)
     {
         $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
         $lastName  = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
@@ -360,7 +437,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getPrimaryIdentifier($lastFirst = false)
+    public function getPrimaryIdentifier ($lastFirst = false)
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
@@ -382,7 +459,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getSecondaryIdentifier()
+    public function getSecondaryIdentifier ()
     {
         if (!empty($this->fields['core']['company']['value'])) {
             return $this->fields['core']['company']['value'];
@@ -396,7 +473,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getLocation()
+    public function getLocation ()
     {
         $location = '';
 
@@ -420,7 +497,7 @@ class Lead extends FormEntity
      *
      * @param $points
      */
-    public function addToPoints($points)
+    public function addToPoints ($points)
     {
         $newPoints = $this->points + $points;
         $this->setPoints($newPoints);
@@ -433,7 +510,7 @@ class Lead extends FormEntity
      *
      * @return Lead
      */
-    public function setPoints($points)
+    public function setPoints ($points)
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -446,7 +523,7 @@ class Lead extends FormEntity
      *
      * @return integer
      */
-    public function getPoints()
+    public function getPoints ()
     {
         return $this->points;
     }
@@ -460,7 +537,7 @@ class Lead extends FormEntity
      * @param           $pointsDelta
      * @param IpAddress $ip
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
+    public function addPointsChangeLogEntry ($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
         if ($pointsDelta <= 0) {
             // No need to record this
@@ -509,7 +586,7 @@ class Lead extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPointsChangeLog()
+    public function getPointsChangeLog ()
     {
         return $this->pointsChangeLog;
     }
@@ -547,7 +624,7 @@ class Lead extends FormEntity
      *
      * @param $internal
      */
-    public function setInternal($internal)
+    public function setInternal ($internal)
     {
         $this->internal = $internal;
     }
@@ -557,7 +634,7 @@ class Lead extends FormEntity
      *
      * @return mixed
      */
-    public function getInternal()
+    public function getInternal ()
     {
         return $this->internal;
     }
@@ -567,7 +644,7 @@ class Lead extends FormEntity
      *
      * @param $cache
      */
-    public function setSocialCache($cache)
+    public function setSocialCache ($cache)
     {
         $this->socialCache = $cache;
     }
@@ -577,7 +654,7 @@ class Lead extends FormEntity
      *
      * @return mixed
      */
-    public function getSocialCache()
+    public function getSocialCache ()
     {
         return $this->socialCache;
     }
@@ -585,7 +662,7 @@ class Lead extends FormEntity
     /**
      * @param $fields
      */
-    public function setFields($fields)
+    public function setFields ($fields)
     {
         $this->fields = $fields;
     }
@@ -595,7 +672,7 @@ class Lead extends FormEntity
      *
      * @return array
      */
-    public function getFields($ungroup = false)
+    public function getFields ($ungroup = false)
     {
         if ($ungroup && isset($this->fields['core'])) {
             $return = array();
@@ -616,7 +693,7 @@ class Lead extends FormEntity
      * @param        $value
      * @param string $oldValue
      */
-    public function addUpdatedField($alias, $value, $oldValue = '')
+    public function addUpdatedField ($alias, $value, $oldValue = '')
     {
         if ($this->wasAnonymous == null) {
             $this->wasAnonymous = $this->isAnonymous();
@@ -630,7 +707,7 @@ class Lead extends FormEntity
      *
      * @return array
      */
-    public function getUpdatedFields()
+    public function getUpdatedFields ()
     {
         return $this->updatedFields;
     }
@@ -723,7 +800,7 @@ class Lead extends FormEntity
      *
      * @return void
      */
-    public function setPreferredProfileImage($source)
+    public function setPreferredProfileImage ($source)
     {
         $this->preferredProfileImage = $source;
     }
@@ -731,7 +808,7 @@ class Lead extends FormEntity
     /**
      * @return string
      */
-    public function getPreferredProfileImage()
+    public function getPreferredProfileImage ()
     {
         return $this->preferredProfileImage;
     }
@@ -753,10 +830,9 @@ class Lead extends FormEntity
     }
 
     /**
-     * @ORM\PreUpdate
-     * @ORM\PrePersist
+     * Set date identified
      */
-    public function checkDateIdentified()
+    public function checkDateIdentified ()
     {
         if ($this->dateIdentified == null && $this->wasAnonymous) {
             //check the changes to see if the user is now known
