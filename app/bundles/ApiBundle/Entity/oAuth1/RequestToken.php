@@ -84,7 +84,7 @@ class RequestToken implements RequestTokenInterface
 
         $builder->addField('secret', 'string');
 
-        $builder->createField('expiresAt', 'integer')
+        $builder->createField('expiresAt', 'bigint')
             ->columnName('expires_at')
             ->build();
 

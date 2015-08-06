@@ -79,7 +79,7 @@ class RefreshToken extends BaseRefreshToken
             ->unique()
             ->build();
 
-        $builder->createField('expiresAt', 'integer')
+        $builder->createField('expiresAt', 'bigint')
             ->columnName('expires_at')
             ->nullable()
             ->build();

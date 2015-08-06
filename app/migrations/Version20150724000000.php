@@ -40,9 +40,14 @@ class Version20150724000000 extends AbstractMauticMigration
     public function mysqlUp(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers CHANGE consumerKey consumer_key VARCHAR(255) NOT NULL, CHANGE consumerSecret consumer_secret VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE user_id user_id INT NOT NULL, CHANGE expiresat expires_at INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE expiresat expires_at INT NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE user_id user_id INT NOT NULL, CHANGE expiresat expires_at BIGINT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE expiresat expires_at BIGINT NOT NULL');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients CHANGE name name VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_accesstokens CHANGE expires_at expires_at BIGINT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_refreshtokens CHANGE expires_at expires_at BIGINT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_authcodes CHANGE expires_at expires_at BIGINT DEFAULT NULL');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_events CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP FOREIGN KEY ' . $this->findPropertyName('campaign_lead_event_log', 'fk', '696C06D6'));
@@ -106,8 +111,16 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens RENAME COLUMN expiresat TO expires_at');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ALTER consumer_id SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens RENAME COLUMN expiresat TO expires_at');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ALTER expires_at TYPE BIGINT');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ALTER expires_at TYPE BIGINT');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_accesstokens ALTER expires_at TYPE BIGINT');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_refreshtokens ALTER expires_at TYPE BIGINT');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_authcodes ALTER expires_at TYPE BIGINT');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER name TYPE VARCHAR(255)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER name SET NOT NULL');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns ALTER name SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns ALTER name TYPE VARCHAR(255)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_events ALTER name SET NOT NULL');

@@ -84,7 +84,7 @@ class AuthCode extends BaseAuthCode
             ->unique()
             ->build();
 
-        $builder->createField('expiresAt', 'integer')
+        $builder->createField('expiresAt', 'bigint')
             ->columnName('expires_at')
             ->nullable()
             ->build();
