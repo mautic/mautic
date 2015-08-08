@@ -126,9 +126,17 @@
             return null;
         };
 
-        Form.validator = function(formId) {
-            var validator = {
-                validateForm: function () {
+        Form.prepareForms = function() {
+            var forms = document.getElementsByTagName('form');
+            for (var i = 0, n = forms.length; i < n; i++) {
+                var formId = forms[i].getAttribute('data-mautic-form');
+                if (formId !== null) {
+                    forms[i].onsubmit = function(event) {
+                        event.preventDefault();
+
+                        Core.validateForm(formId, true);
+                    }
+
                     // Check to see if the iframe exists
                     if (!document.getElementById('mauticiframe_' + formId)) {
                         // Likely an editor has stripped out the iframe so let's dynmamically create it
@@ -139,21 +147,29 @@
                         ifrm.style.border = "none";
                         ifrm.style.width = 0;
                         ifrm.style.heigh = 0;
-                        ifrm.setAttribute('id', 'mauticiframe_' + formId);
+                        ifrm.setAttribute( 'id', 'mauticiframe_' + formId);
                         ifrm.setAttribute('name', 'mauticiframe_' + formId);
                         document.body.appendChild(ifrm);
+
+                        forms[i].target = 'mauticiframe_' + formId;
                     }
 
                     if (!document.getElementById('mauticform_' + formId + '_messenger')) {
-                        var messengerInput = document.createElement("INPUT");
-                        messengerInput.type = "hidden";
-                        messengerInput.setAttribute("name", "mauticform[messenger]");
-                        messengerInput.setAttribute("id", "mauticform_" + formId + "_messenger");
+                        var messengerInput = document.createElement('INPUT');
+                        messengerInput.type = 'hidden';
+                        messengerInput.setAttribute('name', 'mauticform[messenger]');
+                        messengerInput.setAttribute('id', 'mauticform_' + formId + '_messenger');
                         messengerInput.value = 1;
 
-                        document.getElementById("mauticform_" + formId).appendChild(messengerInput);
+                        forms[i].appendChild(messengerInput);
                     }
+                }
+            }
+        };
 
+        Form.validator = function(formId) {
+            var validator = {
+                validateForm: function (submitForm) {
                     function validateOptions(elOptions) {
                         if (typeof elOptions === 'undefined') {
                             return;
@@ -243,6 +259,10 @@
                     }
 
                     Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
+
+                    if (formValid && submitForm) {
+                        elForm.submit();
+                    }
 
                     return formValid;
                 },
@@ -422,9 +442,16 @@
             return Form.validator(formId);
         };
 
-        Core.validateForm = function(formId) {
-            return Core.getValidator(formId).validateForm();
+        Core.validateForm = function(formId, submit) {
+            if (typeof submit == 'undefined') {
+                submit = false;
+            }
+            return Core.getValidator(formId).validateForm(submit);
         };
+
+        Core.prepareForm = function(formId) {
+            return Form.prepareForm(formId);
+        }
 
         Modal.loadStyle = function() {
             if (typeof(config.modal_css) != 'undefined' && parseInt(config.modal_css) != 'Nan' && config.modal_css == 0) {
@@ -569,6 +596,7 @@
         };
 
         Core.onLoad = function() {
+            Form.prepareForms();
             Form.registerFormMessenger();
         };
 
