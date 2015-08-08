@@ -11,50 +11,76 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Permission
- * @ORM\Table(name="permissions", uniqueConstraints={@ORM\UniqueConstraint(name="unique_perm", columns={"bundle", "name", "role_id"})})
- * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\PermissionRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\UserBundle\Entity
  */
 class Permission
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     protected $bundle;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="permissions")
-     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
+     * @var Role
      */
     protected $role;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     protected $bitwise;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('permissions')
+            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
+            ->addUniqueConstraint(array('bundle', 'name', 'role_id'), 'unique_perm');
+
+        $builder->addId();
+
+        $builder->createField('bundle', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('name', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createManyToOne('role', 'Role')
+            ->inversedBy('permissions')
+            ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addField('bitwise', 'integer');
+    }
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -66,7 +92,7 @@ class Permission
      *
      * @return Permission
      */
-    public function setBundle($bundle)
+    public function setBundle ($bundle)
     {
         $this->bundle = $bundle;
 
@@ -78,7 +104,7 @@ class Permission
      *
      * @return string
      */
-    public function getBundle()
+    public function getBundle ()
     {
         return $this->bundle;
     }
@@ -90,7 +116,7 @@ class Permission
      *
      * @return Permission
      */
-    public function setBitwise($bitwise)
+    public function setBitwise ($bitwise)
     {
         $this->bitwise = $bitwise;
 
@@ -102,7 +128,7 @@ class Permission
      *
      * @return integer
      */
-    public function getBitwise()
+    public function getBitwise ()
     {
         return $this->bitwise;
     }
@@ -114,7 +140,7 @@ class Permission
      *
      * @return Permission
      */
-    public function setRole(Role $role = null)
+    public function setRole (Role $role = null)
     {
         $this->role = $role;
 
@@ -126,7 +152,7 @@ class Permission
      *
      * @return Role
      */
-    public function getRole()
+    public function getRole ()
     {
         return $this->role;
     }
@@ -138,7 +164,7 @@ class Permission
      *
      * @return Permission
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->name = $name;
 
@@ -150,7 +176,7 @@ class Permission
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }

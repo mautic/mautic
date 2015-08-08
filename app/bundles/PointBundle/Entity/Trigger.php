@@ -11,120 +11,158 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Trigger
- * @ORM\Table(name="point_triggers")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\TriggerRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\PointBundle\Entity
  */
 class Trigger extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
+     * @var \DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
+     * @var \DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\Column(name="points", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
+     * @var int
      */
     private $points = 0;
 
     /**
-     * @ORM\Column(name="color", type="string", length=7)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
+     * @var string
      */
     private $color;
 
     /**
-     * @ORM\Column(name="trigger_existing_leads", type="boolean")
+     * @var bool
      */
     private $triggerExistingLeads = false;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails", "triggerList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="TriggerEvent", mappedBy="trigger", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"order" = "ASC"})
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"triggerDetails"})
+     * @var ArrayCollection
      */
     private $events;
 
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct ()
     {
         $this->events = new ArrayCollection();
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('point_triggers')
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addPublishDates();
+
+        $builder->addField('points', 'integer');
+
+        $builder->createField('color', 'string')
+            ->length(7)
+            ->build();
+
+        $builder->createField('triggerExistingLeads', 'boolean')
+            ->columnName('trigger_existing_leads')
+            ->build();
+
+        $builder->addCategory();
+
+        $builder->createOneToMany('events', 'TriggerEvent')
+            ->setIndexBy('id')
+            ->setOrderBy(array('order' => 'ASC'))
+            ->mappedBy('trigger')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
         )));
     }
 
-    protected function isChanged($prop, $val)
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('trigger')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'category',
+                    'type',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'publishUp',
+                    'publishDown',
+                    'points',
+                    'color',
+                    'events'
+                )
+            )
+            ->build();
+    }
+
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     */
+    protected function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -141,7 +179,7 @@ class Trigger extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -153,7 +191,7 @@ class Trigger extends FormEntity
      *
      * @return Trigger
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -166,7 +204,7 @@ class Trigger extends FormEntity
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -178,7 +216,7 @@ class Trigger extends FormEntity
      *
      * @return Trigger
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -191,7 +229,7 @@ class Trigger extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -204,7 +242,7 @@ class Trigger extends FormEntity
      *
      * @return Point
      */
-    public function addTriggerEvent($key, TriggerEvent $event)
+    public function addTriggerEvent ($key, TriggerEvent $event)
     {
         if ($changes = $event->getChanges()) {
             $this->isChanged('events', array($key, $changes));
@@ -219,7 +257,7 @@ class Trigger extends FormEntity
      *
      * @param TriggerEvent $event
      */
-    public function removeTriggerEvent(TriggerEvent $event)
+    public function removeTriggerEvent (TriggerEvent $event)
     {
         $this->events->removeElement($event);
     }
@@ -229,7 +267,7 @@ class Trigger extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getEvents()
+    public function getEvents ()
     {
         return $this->events;
     }
@@ -241,7 +279,7 @@ class Trigger extends FormEntity
      *
      * @return Point
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -254,7 +292,7 @@ class Trigger extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishUp()
+    public function getPublishUp ()
     {
         return $this->publishUp;
     }
@@ -266,7 +304,7 @@ class Trigger extends FormEntity
      *
      * @return Point
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -279,7 +317,7 @@ class Trigger extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishDown()
+    public function getPublishDown ()
     {
         return $this->publishDown;
     }
@@ -287,7 +325,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getPoints()
+    public function getPoints ()
     {
         return $this->points;
     }
@@ -295,7 +333,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $points
      */
-    public function setPoints($points)
+    public function setPoints ($points)
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -304,7 +342,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getColor()
+    public function getColor ()
     {
         return $this->color;
     }
@@ -312,7 +350,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $color
      */
-    public function setColor($color)
+    public function setColor ($color)
     {
         $this->color = $color;
     }
@@ -320,7 +358,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getTriggerExistingLeads()
+    public function getTriggerExistingLeads ()
     {
         return $this->triggerExistingLeads;
     }
@@ -328,7 +366,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $triggerExistingLeads
      */
-    public function setTriggerExistingLeads($triggerExistingLeads)
+    public function setTriggerExistingLeads ($triggerExistingLeads)
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }
@@ -336,7 +374,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory()
+    public function getCategory ()
     {
         return $this->category;
     }
@@ -344,7 +382,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory ($category)
     {
         $this->category = $category;
     }

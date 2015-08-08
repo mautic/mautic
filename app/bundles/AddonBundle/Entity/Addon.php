@@ -11,76 +11,109 @@ namespace Mautic\AddonBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Addon
- * @ORM\Table(name="addons", uniqueConstraints={@ORM\UniqueConstraint(name="unique_bundle", columns={"bundle"})})
- * @ORM\Entity(repositoryClass="Mautic\AddonBundle\Entity\AddonRepository")
- * @Serializer\ExclusionPolicy("all")
  */
 class Addon extends CommonEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="name", type="string")
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(name="is_enabled", type="boolean")
+     * @var bool
      */
     private $isEnabled = true;
 
     /**
-     * @ORM\Column(name="is_missing", type="boolean")
+     * @var bool
      */
     private $isMissing = false;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     private $bundle;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $version;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $author;
 
-
-
     /**
-     * @ORM\OneToMany(targetEntity="Integration", mappedBy="addon", indexBy="id", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $integrations;
 
-    public function __construct()
+    public function __construct ()
     {
-        $this->integrations  = new ArrayCollection();
+        $this->integrations = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('addons')
+            ->setCustomRepositoryClass('Mautic\AddonBundle\Entity\AddonRepository')
+            ->addUniqueConstraint(array('bundle'), 'unique_bundle');
+
+        $builder->addIdColumns();
+
+        $builder->createField('isEnabled', 'boolean')
+            ->columnName('is_enabled')
+            ->build();
+
+        $builder->createField('isMissing', 'boolean')
+            ->columnName('is_missing')
+            ->build();
+
+        $builder->createField('bundle', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('version', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('author', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createOneToMany('integrations', 'Integration')
+            ->setIndexBy('id')
+            ->mappedBy('addon')
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
      * @return void
      */
-    public function __clone()
+    public function __clone ()
     {
         $this->id = null;
     }
@@ -90,7 +123,7 @@ class Addon extends CommonEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -102,7 +135,7 @@ class Addon extends CommonEntity
      *
      * @return Addon
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->name = $name;
 
@@ -114,7 +147,7 @@ class Addon extends CommonEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -126,7 +159,7 @@ class Addon extends CommonEntity
      *
      * @return Addon
      */
-    public function setIsEnabled($isEnabled)
+    public function setIsEnabled ($isEnabled)
     {
         $this->isEnabled = $isEnabled;
 
@@ -138,7 +171,7 @@ class Addon extends CommonEntity
      *
      * @return boolean
      */
-    public function getIsEnabled()
+    public function getIsEnabled ()
     {
         return $this->isEnabled;
     }
@@ -150,7 +183,7 @@ class Addon extends CommonEntity
      *
      * @return Addon
      */
-    public function setBundle($bundle)
+    public function setBundle ($bundle)
     {
         $this->bundle = $bundle;
     }
@@ -160,7 +193,7 @@ class Addon extends CommonEntity
      *
      * @return string
      */
-    public function getBundle()
+    public function getBundle ()
     {
         return $this->bundle;
     }
@@ -170,7 +203,7 @@ class Addon extends CommonEntity
      *
      * @return string published|unpublished
      */
-    public function getPublishStatus()
+    public function getPublishStatus ()
     {
         return $this->getIsEnabled() ? 'published' : 'unpublished';
     }

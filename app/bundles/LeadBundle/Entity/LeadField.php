@@ -10,121 +10,93 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class LeadField
- * @ORM\Table(name="lead_fields")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadFieldRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\LeadBundle\Entity
  */
 class LeadField extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
+     * @var string
      */
     private $label;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
+     * @var string
      */
     private $alias;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"}))
+     * @var string
      */
     private $type;
 
     /**
-     * @ORM\Column(type="string", name="field_group", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
+     * @var string
      */
     private $group;
 
     /**
-     * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
+     * @var string
      */
     private $defaultValue;
 
     /**
-     * @ORM\Column(name="is_required", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
+     * @var bool
      */
     private $isRequired = false;
 
     /**
-     * @ORM\Column(name="is_fixed", type="boolean")
+     * @var bool
      */
     private $isFixed = false;
 
     /**
-     * @ORM\Column(name="is_visible", type="boolean")
+     * @var bool
      */
     private $isVisible = true;
 
     /**
-     * @ORM\Column(name="is_short_visible", type="boolean")
+     * @var bool
      */
     private $isShortVisible = true;
 
     /**
-     * @ORM\Column(name="is_listable", type="boolean")
+     * @var bool
      */
     private $isListable = true;
 
     /**
-     * @ORM\Column(name="is_publicly_updatable", type="boolean")
+     * @var bool
      */
     private $isPubliclyUpdatable = false;
 
     /**
-     * @ORM\Column(name="is_unique_identifer", type="boolean", nullable=true)
+     * @var bool
      */
     private $isUniqueIdentifer = false;
 
     /**
-     * @ORM\Column(name="field_order", type="integer", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
+     * @var int
      */
     private $order = 0;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadFieldDetails"})
+     * @var array
      */
     private $properties;
 
@@ -136,9 +108,75 @@ class LeadField extends FormEntity
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_fields')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository');
+
+        $builder->addId();
+
+        $builder->addField('label', 'string');
+
+        $builder->addField('alias', 'string');
+
+        $builder->createField('type', 'string')
+            ->length(50)
+            ->build();
+
+        $builder->createField('group', 'string')
+            ->columnName('field_group')
+            ->nullable()
+            ->build();
+
+        $builder->createField('defaultValue', 'string')
+            ->columnName('default_value')
+            ->nullable()
+            ->build();
+
+        $builder->createField('isRequired', 'boolean')
+            ->columnName('is_required')
+            ->build();
+
+        $builder->createField('isFixed', 'boolean')
+            ->columnName('is_fixed')
+            ->build();
+
+        $builder->createField('isVisible', 'boolean')
+            ->columnName('is_visible')
+            ->build();
+
+        $builder->createField('isShortVisible', 'boolean')
+            ->columnName('is_short_visible')
+            ->build();
+
+        $builder->createField('isListable', 'boolean')
+            ->columnName('is_listable')
+            ->build();
+
+        $builder->createField('isPubliclyUpdatable', 'boolean')
+            ->columnName('is_publicly_updatable')
+            ->build();
+
+        $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
+
+        $builder->createField('order', 'integer')
+            ->columnName('field_order')
+            ->nullable()
+            ->build();
+
+        $builder->createField('properties', 'array')
+            ->nullable()
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
             array('message' => 'mautic.lead.field.label.notblank')
@@ -151,11 +189,41 @@ class LeadField extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('leadField')
+            ->addListProperties(
+                array(
+                    'id',
+                    'label',
+                    'alias',
+                    'type',
+                    'group',
+                    'order'
+                )
+            )
+            ->addProperties(
+                array(
+                    'defaultValue',
+                    'isRequired',
+                    'isPubliclyUpdatable',
+                    'isUniqueIdentifier',
+                    'properties'
+                )
+            )
+            ->build();
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -164,9 +232,10 @@ class LeadField extends FormEntity
      * Set label
      *
      * @param string $label
+     *
      * @return LeadField
      */
-    public function setLabel($label)
+    public function setLabel ($label)
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -179,7 +248,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel ()
     {
         return $this->label;
     }
@@ -189,11 +258,13 @@ class LeadField extends FormEntity
      * Proxy function to setLabel()
      *
      * @param string $label
+     *
      * @return LeadField
      */
-    public function setName($label)
+    public function setName ($label)
     {
         $this->isChanged('label', $label);
+
         return $this->setLabel($label);
     }
 
@@ -202,7 +273,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->getLabel();
     }
@@ -211,9 +282,10 @@ class LeadField extends FormEntity
      * Set type
      *
      * @param string $type
+     *
      * @return LeadField
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -226,7 +298,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -235,9 +307,10 @@ class LeadField extends FormEntity
      * Set defaultValue
      *
      * @param string $defaultValue
+     *
      * @return LeadField
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue ($defaultValue)
     {
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
@@ -250,7 +323,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getDefaultValue()
+    public function getDefaultValue ()
     {
         return $this->defaultValue;
     }
@@ -259,9 +332,10 @@ class LeadField extends FormEntity
      * Set isRequired
      *
      * @param boolean $isRequired
+     *
      * @return LeadField
      */
-    public function setIsRequired($isRequired)
+    public function setIsRequired ($isRequired)
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -274,7 +348,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function getIsRequired()
+    public function getIsRequired ()
     {
         return $this->isRequired;
     }
@@ -284,7 +358,7 @@ class LeadField extends FormEntity
      *
      * @return bool
      */
-    public function isRequired()
+    public function isRequired ()
     {
         return $this->getIsRequired();
     }
@@ -293,9 +367,10 @@ class LeadField extends FormEntity
      * Set isFixed
      *
      * @param boolean $isFixed
+     *
      * @return LeadField
      */
-    public function setIsFixed($isFixed)
+    public function setIsFixed ($isFixed)
     {
         $this->isFixed = $isFixed;
 
@@ -307,7 +382,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function getIsFixed()
+    public function getIsFixed ()
     {
         return $this->isFixed;
     }
@@ -317,7 +392,7 @@ class LeadField extends FormEntity
      *
      * @return bool
      */
-    public function isFixed()
+    public function isFixed ()
     {
         return $this->getIsFixed();
     }
@@ -326,9 +401,10 @@ class LeadField extends FormEntity
      * Set properties
      *
      * @param string $properties
+     *
      * @return LeadField
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -341,7 +417,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -350,9 +426,10 @@ class LeadField extends FormEntity
      * Set order
      *
      * @param integer $order
+     *
      * @return LeadField
      */
-    public function setOrder($order)
+    public function setOrder ($order)
     {
         $this->isChanged('order', $order);
         $this->order = $order;
@@ -365,7 +442,7 @@ class LeadField extends FormEntity
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrder ()
     {
         return $this->order;
     }
@@ -374,9 +451,10 @@ class LeadField extends FormEntity
      * Set isVisible
      *
      * @param boolean $isVisible
+     *
      * @return LeadField
      */
-    public function setIsVisible($isVisible)
+    public function setIsVisible ($isVisible)
     {
         $this->isChanged('isVisible', $isVisible);
         $this->isVisible = $isVisible;
@@ -389,7 +467,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function getIsVisible()
+    public function getIsVisible ()
     {
         return $this->isVisible;
     }
@@ -399,7 +477,7 @@ class LeadField extends FormEntity
      *
      * @return bool
      */
-    public function isVisible()
+    public function isVisible ()
     {
         return $this->getIsVisible();
     }
@@ -408,9 +486,10 @@ class LeadField extends FormEntity
      * Set isShortVisible
      *
      * @param boolean $isShortVisible
+     *
      * @return LeadField
      */
-    public function setIsShortVisible($isShortVisible)
+    public function setIsShortVisible ($isShortVisible)
     {
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
@@ -423,7 +502,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function getIsShortVisible()
+    public function getIsShortVisible ()
     {
         return $this->isShortVisible;
     }
@@ -433,7 +512,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function isShortVisible()
+    public function isShortVisible ()
     {
         return $this->getIsShortVisible();
     }
@@ -466,9 +545,10 @@ class LeadField extends FormEntity
      * Set alias
      *
      * @param string $alias
+     *
      * @return LeadField
      */
-    public function setAlias($alias)
+    public function setAlias ($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -481,7 +561,7 @@ class LeadField extends FormEntity
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias ()
     {
         return $this->alias;
     }
@@ -490,9 +570,10 @@ class LeadField extends FormEntity
      * Set isListable
      *
      * @param boolean $isListable
+     *
      * @return LeadField
      */
-    public function setIsListable($isListable)
+    public function setIsListable ($isListable)
     {
         $this->isChanged('isListable', $isListable);
         $this->isListable = $isListable;
@@ -505,7 +586,7 @@ class LeadField extends FormEntity
      *
      * @return boolean
      */
-    public function getIsListable()
+    public function getIsListable ()
     {
         return $this->isListable;
     }
@@ -515,7 +596,7 @@ class LeadField extends FormEntity
      *
      * @return bool
      */
-    public function isListable()
+    public function isListable ()
     {
         return $this->getIsListable();
     }
@@ -549,6 +630,6 @@ class LeadField extends FormEntity
      */
     public function setIsPubliclyUpdatable ($isPubliclyUpdatable)
     {
-        $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;
+        $this->isPubliclyUpdatable = (bool)$isPubliclyUpdatable;
     }
 }

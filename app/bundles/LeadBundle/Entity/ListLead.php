@@ -10,45 +10,69 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class Lead
- * @ORM\Table(name="lead_lists_leads")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\ListLeadRepository")
- * @Serializer\ExclusionPolicy("all")
+ * Class ListLead
+ *
+ * @package Mautic\LeadBundle\Entity
  */
 class ListLead
 {
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="LeadList", inversedBy="leads")
-     * @ORM\JoinColumn(name="leadlist_id", onDelete="CASCADE")
+     * @var LeadList
      **/
     private $list;
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Lead")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var Lead
+     */
     private $lead;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime")
-     **/
+     * @var \DateTime
+     */
     private $dateAdded;
 
     /**
-     * @ORM\Column(name="manually_removed", type="boolean")
+     * @var bool
      */
     private $manuallyRemoved = false;
 
     /**
-     * @ORM\Column(name="manually_added", type="boolean")
+     * @var bool
      */
     private $manuallyAdded = false;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('lead_lists_leads')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\ListLeadRepository');
+
+        $builder->createManyToOne('list', 'LeadList')
+            ->isPrimaryKey()
+            ->inversedBy('leads')
+            ->addJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addLead(false, 'CASCADE', true);
+
+        $builder->addDateAdded();
+
+        $builder->createField('manuallyRemoved', 'boolean')
+            ->columnName('manually_removed')
+            ->build();
+
+        $builder->createField('manuallyAdded', 'boolean')
+            ->columnName('manually_added')
+            ->build();
+    }
 
     /**
      * @return \DateTime

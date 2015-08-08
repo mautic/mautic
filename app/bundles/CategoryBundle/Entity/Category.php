@@ -10,71 +10,78 @@
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Category
- * @ORM\Table(name="categories")
- * @ORM\Entity(repositoryClass="Mautic\CategoryBundle\Entity\CategoryRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\CategoryBundle\Entity
  */
 class Category extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
+     * @var string
      */
     private $title;
 
     /**
-     * @ORM\Column(name="alias", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails", "categoryList"})
-     */
-    private $alias;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(name="color", type="string", nullable=true, length=7)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"categoryDetails"})
+     * @var string
+     */
+    private $alias;
+
+    /**
+     * @var string
      */
     private $color;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string
      */
     private $bundle;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('categories')
+            ->setCustomRepositoryClass('Mautic\CategoryBundle\Entity\CategoryRepository');
+
+        $builder->addIdColumns('title');
+
+        $builder->addField('alias', 'string');
+
+        $builder->createField('color', 'string')
+            ->nullable()
+            ->length(7)
+            ->build();
+
+        $builder->createField('bundle', 'string')
+            ->length(50)
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank(array(
             'message' => 'mautic.core.title.required'
@@ -82,9 +89,29 @@ class Category extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('category')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'description',
+                    'color'
+                )
+            )
+            ->build();
+    }
+
+    /**
      * @return void
      */
-    public function __clone()
+    public function __clone ()
     {
         $this->id = null;
 
@@ -96,7 +123,7 @@ class Category extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -108,7 +135,7 @@ class Category extends FormEntity
      *
      * @return Category
      */
-    public function setTitle($title)
+    public function setTitle ($title)
     {
         $this->title = $title;
 
@@ -120,7 +147,7 @@ class Category extends FormEntity
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle ()
     {
         return $this->title;
     }
@@ -132,7 +159,7 @@ class Category extends FormEntity
      *
      * @return Category
      */
-    public function setAlias($alias)
+    public function setAlias ($alias)
     {
         $this->alias = $alias;
 
@@ -144,7 +171,7 @@ class Category extends FormEntity
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias ()
     {
         return $this->alias;
     }
@@ -156,7 +183,7 @@ class Category extends FormEntity
      *
      * @return Category
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->description = $description;
 
@@ -168,7 +195,7 @@ class Category extends FormEntity
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription ()
     {
         return $this->description;
     }
@@ -180,7 +207,7 @@ class Category extends FormEntity
      *
      * @return Category
      */
-    public function setColor($color)
+    public function setColor ($color)
     {
         $this->color = $color;
     }
@@ -190,7 +217,7 @@ class Category extends FormEntity
      *
      * @return string
      */
-    public function getColor()
+    public function getColor ()
     {
         return $this->color;
     }
@@ -202,7 +229,7 @@ class Category extends FormEntity
      *
      * @return Category
      */
-    public function setBundle($bundle)
+    public function setBundle ($bundle)
     {
         $this->bundle = $bundle;
     }
@@ -212,7 +239,7 @@ class Category extends FormEntity
      *
      * @return string
      */
-    public function getBundle()
+    public function getBundle ()
     {
         return $this->bundle;
     }
