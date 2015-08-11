@@ -6,46 +6,60 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\WebhookBundle\Entity;
-
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
- * Class Webhook
- * @ORM\Table(name="webhook_logs")
- * @ORM\Entity(repositoryClass="Mautic\WebhookBundle\Entity\LogRepository")
- * @Serializer\ExclusionPolicy("all")
+ * Class Log
+ *
+ * @package Mautic\WebhookBundle\Entity
  */
 class Log
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\WebhookBundle\Entity\Webhook", inversedBy="logs")
-     * @ORM\JoinColumn(onDelete="SET NULL")
+     * @var Webhook
      */
     private $webhook;
-
     /**
-     * @ORM\Column(name="statusCode", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"webhookDetails", "webhookList"})
+     * @var string
      */
     private $statusCode;
-
     /**
-     * @ORM\Column(name="date_added", type="datetime")
-     **/
+     * @var \DateTime
+     */
     private $dateAdded;
-
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+        $builder->setTable('webhook_logs')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LogRepository');
+        // id columns
+        $builder->addId();
+        // M:1 for webhook
+        $builder->createManyToOne('webhook', 'Webhook')
+            ->inversedBy('logs')
+            ->addJoinColumn('webhook_id', 'id', false, false)
+            ->build();
+        // status code
+        $builder->createField('statusCode', 'string')
+            ->columnName('status_code')
+            ->length(50)
+            ->build();
+        // date added
+        $builder->createField('dateAdded', 'datetime')
+            ->columnName('date_added')
+            ->nullable()
+            ->build();
+    }
     /**
      * @return mixed
      */
@@ -53,7 +67,6 @@ class Log
     {
         return $this->id;
     }
-
     /**
      * @param mixed $id
      */
@@ -62,7 +75,6 @@ class Log
         $this->id = $id;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -70,7 +82,6 @@ class Log
     {
         return $this->webhook;
     }
-
     /**
      * @param mixed $webhook
      */
@@ -79,7 +90,6 @@ class Log
         $this->webhook = $webhook;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -87,7 +97,6 @@ class Log
     {
         return $this->statusCode;
     }
-
     /**
      * @param mixed $statusCode
      */
@@ -96,7 +105,6 @@ class Log
         $this->statusCode = $statusCode;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -104,7 +112,6 @@ class Log
     {
         return $this->dateAdded;
     }
-
     /**
      * @param mixed $dateAdded
      */

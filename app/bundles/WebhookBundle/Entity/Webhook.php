@@ -6,83 +6,55 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\WebhookBundle\Entity;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\WebhookBundle\Entity\Event;
-
 /**
  * Class Webhook
- * @ORM\Table(name="webhooks")
- * @ORM\Entity(repositoryClass="Mautic\WebhookBundle\Entity\WebhookRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\WebhookBundle\Entity
  */
 class Webhook extends FormEntity
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"webhookDetails", "webhookList"})
+     * @var int
      */
     private $id;
-
     /**
-     * @ORM\Column(name="name", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"webhookDetails", "webhookList"})
+     * @var string
      */
     private $name;
-
     /**
-     * @ORM\Column(name="description", type="text", nullable=true)
+     * @var string
      */
     private $description;
-
     /**
-     * @ORM\Column(name="webhook_url", type="string", nullable=true, length=255)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"webhookDetails"})
+     * @var string
      */
     private $webhookUrl;
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"webhookDetails", "webhookList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
-
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Event", mappedBy="webhook", indexBy="event_type", cascade={"persist"}, orphanRemoval=true)
+     * @var ArrayCollection
      */
     private $events;
-
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\WebhookQueue", mappedBy="webhook", cascade={"persist"}, fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     private $queues;
-
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\Log", mappedBy="webhook", cascade={"persist"})
+     * @var ArrayCollection
      */
     private $logs;
-
     /*
      * Constructor
      */
@@ -91,7 +63,42 @@ class Webhook extends FormEntity
         $this->queues  = new ArrayCollection();
         $this->logs    = new ArrayCollection();
     }
-
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+        $builder->setTable('webhooks')
+            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookRepository');
+        // id columns
+        $builder->addIdColumns();
+        // categories
+        $builder->addCategory();
+        // 1:M for events
+        $builder->createOneToMany('events', 'Event')
+            ->orphanRemoval()
+            ->setIndexBy('event_type')
+            ->mappedBy('webhook')
+            ->cascadePersist()
+            ->build();
+        // 1:M for queues
+        $builder->createOneToMany('queues', 'WebhookQueue')
+            ->mappedBy('webhook')
+            ->fetchExtraLazy()
+            ->cascadePersist()
+            ->build();
+        // 1:M for logs
+        $builder->createOneToMany('logs', 'Log')
+            ->mappedBy('webhook')
+            ->cascadePersist()
+            ->build();
+        // status code
+        $builder->createField('webhookUrl', 'string')
+            ->columnName('webhook_url')
+            ->length(255)
+            ->build();
+    }
     /**
      * @param ClassMetadata $metadata
      */
@@ -100,7 +107,6 @@ class Webhook extends FormEntity
         $metadata->addPropertyConstraint('name', new NotBlank(array(
             'message' => 'mautic.core.name.required'
         )));
-
         $metadata->addPropertyConstraint('webhookUrl',  new Assert\Url(
                 array(
                     'message' => 'mautic.core.value.required',
@@ -109,7 +115,6 @@ class Webhook extends FormEntity
             )
         );
     }
-
     /**
      * @param \Symfony\Component\Form\Form $form
      *
@@ -119,13 +124,10 @@ class Webhook extends FormEntity
     {
         $data   = $form->getData();
         $groups = array('Webhook');
-
         $webhookUrl = $data->getWebhookUrl();
-
         if ($webhookUrl) {
             $groups[] = 'webhookUrl';
         }
-
         return $groups;
     }
     /**
@@ -137,7 +139,6 @@ class Webhook extends FormEntity
     {
         return $this->id;
     }
-
     /**
      * Set name
      *
@@ -149,10 +150,8 @@ class Webhook extends FormEntity
     {
         $this->isChanged('name', $name);
         $this->name = $name;
-
         return $this;
     }
-
     /**
      * Get name
      *
@@ -162,7 +161,6 @@ class Webhook extends FormEntity
     {
         return $this->name;
     }
-
     /**
      * Set description
      *
@@ -174,10 +172,8 @@ class Webhook extends FormEntity
     {
         $this->isChanged('description', $description);
         $this->description = $description;
-
         return $this;
     }
-
     /**
      * Get description
      *
@@ -187,7 +183,6 @@ class Webhook extends FormEntity
     {
         return $this->description;
     }
-
     /**
      * Set webhookUrl
      *
@@ -198,10 +193,8 @@ class Webhook extends FormEntity
     public function setWebhookUrl($webhookUrl) {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
-
         return $this;
     }
-
     /**
      * Get webhookUrl
      *
@@ -210,7 +203,6 @@ class Webhook extends FormEntity
     public function getWebhookUrl() {
         return $this->webhookUrl;
     }
-
     /**
      * Set category
      *
@@ -222,10 +214,8 @@ class Webhook extends FormEntity
     {
         $this->isChanged('category', $category);
         $this->category = $category;
-
         return $this;
     }
-
     /**
      * Get category
      *
@@ -235,7 +225,6 @@ class Webhook extends FormEntity
     {
         return $this->category;
     }
-
     /**
      * @return mixed
      */
@@ -243,7 +232,6 @@ class Webhook extends FormEntity
     {
         return $this->events;
     }
-
     /**
      * @param mixed $events
      */
@@ -255,24 +243,19 @@ class Webhook extends FormEntity
             $event->setWebhook($this);
         }
     }
-
     public function addEvent(Event $event)
     {
         $this->events[] = $event;
-
         return $this;
     }
-
     public function removeEvent(Event $event)
     {
         $this->events->removeElement($event);
     }
-
     public function getQueues()
     {
         return $this->queues;
     }
-
     /**
      * @param mixed $events
      */
@@ -284,19 +267,15 @@ class Webhook extends FormEntity
             $queue->setWebhook($this);
         }
     }
-
     public function addQueue(WebhookQueue $queue)
     {
         $this->queues[] = $queue;
-
         return $this;
     }
-
     public function removeQueue(WebhookQueue $queue)
     {
         $this->queues->removeElement($queue);
     }
-
     /*
      * Get log entities
      */
@@ -304,7 +283,6 @@ class Webhook extends FormEntity
     {
         return $this->logs;
     }
-
     /**
      * @param mixed $events
      */
@@ -316,14 +294,11 @@ class Webhook extends FormEntity
             $log->setWebhook($this);
         }
     }
-
     public function addLog(Log $log)
     {
         $this->logs[] = $log;
-
         return $this;
     }
-
     public function removeLog(Log $log)
     {
         $this->logs->removeElement($log);

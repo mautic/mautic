@@ -8,44 +8,64 @@
  */
 
 namespace Mautic\WebhookBundle\Entity;
-
 use Doctrine\ORM\Mapping as ORM;
-
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 /**
- * @ORM\Entity
- * @ORM\Table(name="webhook_queue")
- * @ORM\Entity(repositoryClass="Mautic\WebhookBundle\Entity\WebhookQueueRepository")
+ * Class WebhookQueue
+ *
+ * @package Mautic\WebhookQueue\Entity
  */
 class WebhookQueue
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\WebhookBundle\Entity\Webhook", inversedBy="queue")
-     * @ORM\JoinColumn(onDelete="SET NULL")
+     * @var Webhook
      */
     private $webhook;
-
     /**
-     * @ORM\Column(name="date_added", type="datetime")
-     **/
+     * @var \DateTime
+     */
     private $dateAdded;
-
     /**
-     * @ORM\Column(name="payload", type="text")
-     **/
+     * @var string
+     */
     private $payload;
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\WebhookBundle\Entity\Event", inversedBy="queue")
+     * @var Event
      **/
     private $event;
-
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+        $builder->setTable('webhook_queue')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\WebhookQueueRepository');
+        $builder->addId();
+        // M:1 for webhook
+        $builder->createManyToOne('webhook', 'Webhook')
+            ->inversedBy('queue')
+            ->addJoinColumn('webhook_id', 'id', false, false)
+            ->build();
+        // date added
+        $builder->createField('dateAdded', 'datetime')
+            ->columnName('date_added')
+            ->nullable()
+            ->build();
+        // payload
+        $builder->createField('payload', 'text')
+            ->columnName('payload')
+            ->build();
+        // M:1 for event
+        $builder->createManyToOne('event', 'Event')
+            ->inversedBy('queue')
+            ->addJoinColumn('event_id', 'id', false, false)
+            ->build();
+    }
     /**
      * Get id
      *
@@ -55,7 +75,6 @@ class WebhookQueue
     {
         return $this->id;
     }
-
     /**
      * @return mixed
      */
@@ -63,7 +82,6 @@ class WebhookQueue
     {
         return $this->webhook;
     }
-
     /**
      * @param mixed $webhook
      */
@@ -72,7 +90,6 @@ class WebhookQueue
         $this->webhook = $webhook;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -80,7 +97,6 @@ class WebhookQueue
     {
         return $this->dateAdded;
     }
-
     /**
      * @param mixed $dateAdded
      */
@@ -89,7 +105,6 @@ class WebhookQueue
         $this->dateAdded = $dateAdded;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -97,7 +112,6 @@ class WebhookQueue
     {
         return $this->payload;
     }
-
     /**
      * @param mixed $payload
      */
@@ -106,7 +120,6 @@ class WebhookQueue
         $this->payload = $payload;
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -114,7 +127,6 @@ class WebhookQueue
     {
         return $this->event;
     }
-
     /**
      * @param mixed $event
      */
