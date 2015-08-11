@@ -23,36 +23,28 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
     }
 
     if ($isMautic || $isPlugin) {
-        $directory  = $paths['root'].'/'.$relative;
+        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
+        $directory     = $paths['root'].'/'.$relative;
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
 
-
-        // Set ORM mapping to staticphp for core entities
-        if (file_exists($directory.'/Entity')) {
-            $ormMappings[$bundle] = array(
-                'dir'       => 'Entity',
-                'type'      => 'staticphp',
-                'prefix'    => $baseNamespace . '\\Entity',
-                'mapping'   => true,
-                'is_bundle' => true
-            );
-
-            // Set API metadata
-            $serializerMappings[$bundle] = array(
-                'namespace_prefix' => $baseNamespace . '\\Entity',
-                'path'             => "@$bundle/Entity"
-            );
-        }
-
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->notName('*Repository.php');
+            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
 
             foreach ($finder as $file) {
+                // @deprecated 1.1.4; to be removed in 2.0; BC support for Addon
+                if (strpos($baseNamespace, 'PluginBundle') !== false && $file->getFilename() == 'Addon.php') {
+                    // Do not include this class as it's used for BC support
+                    continue;
+                }
+
+                // Check to see if entities are organized by subfolder
+                $subFolder = $file->getRelativePath();
+
                 // Just check first file for the loadMetadata function
-                $reflectionClass = new \ReflectionClass($namespace . '\\Entity\\' . basename($file->getFilename(), '.php'));
+                $reflectionClass = new \ReflectionClass('\\' . $baseNamespace  . '\\Entity\\' . (!empty($subFolder) ? $subFolder . '\\': '') . basename($file->getFilename(), '.php'));
 
                 // Register API metadata
                 if ($reflectionClass->hasMethod('loadApiMetadata')) {
@@ -77,13 +69,14 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
                     break;
                 }
             }
+
         }
 
         return array(
             'isPlugin'          => $isPlugin,
             'base'              => str_replace('Bundle', '', $bundleBase),
             'bundle'            => $bundleBase,
-            'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
+            'namespace'         => $baseNamespace,
             'symfonyBundleName' => $bundle,
             'bundleClass'       => $namespace,
             'relative'          => $relative,
