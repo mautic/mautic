@@ -102,9 +102,9 @@ class WebhookModel extends FormModel
      *
      * @return array
      */
-    public function getWebhooksByEventTypes(array $types)
+    public function getEventWebooksByType($type)
     {
-        $results = $this->getRepository()->getEntitiesByEventTypes($types);
+        $results = $this->getEventRepository()->getEntitiesByEventType($type);
         return $results;
     }
 
@@ -118,22 +118,24 @@ class WebhookModel extends FormModel
      *
      * @return
      */
-    public function QueueWebhooks($webhooks, $payload, $immediatelyExecuteWebhooks = false)
+    public function QueueWebhooks($webhookEvents, $payload, $immediatelyExecuteWebhooks = false)
     {
-        if (! count($webhooks)) {
+        if (! count($webhookEvents) || ! is_array($webhookEvents) ) {
             return;
         }
 
-        $queueList = array();
+        $queueList   = array();
+        $webhookList = array();
 
-        /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
-        foreach ($webhooks as $webhook)
+        /** @var \Mautic\WebhookBundle\Entity\Event $event */
+        foreach ($webhookEvents as $event)
         {
-            $queueEntity = $this->queueWebhook($webhook, $payload);
-            $queueList[] = $queueEntity;
+            $webhook = $event->getWebhook();
+            $webhookList[] = $webhook;
+
+            $webhook->addQueue($this->queueWebhook($webhook, $event->getId(), $payload));
 
             // add the queuelist and save everything
-            $webhook->addQueues($queueList);
             $this->saveEntity($webhook);
 
             // reset to empty array
@@ -141,7 +143,7 @@ class WebhookModel extends FormModel
         }
 
         if ($immediatelyExecuteWebhooks) {
-            $this->processWebhooks($webhooks);
+            $this->processWebhooks($webhookList);
         }
 
         return;
@@ -151,16 +153,19 @@ class WebhookModel extends FormModel
      * Creates a WebhookQueue entity, sets the date and returns the created entity
      *
      * @param  $webhook Webhook
+     * @param  $eventId  the id of th event that added this queue
      * @param  $payload json_encoded array as the payload
      *
      * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $payload)
+    public function queueWebhook(Webhook $webhook, $event, $payload)
     {
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
         $queue->setDateAdded(new \DateTime);
+        $queue->setEvent($event);
         $queue->setPayload($payload);
+
 
         return $queue;
     }
@@ -204,19 +209,59 @@ class WebhookModel extends FormModel
     }
 
     /*
+    * Get Event Repository
+    */
+    public function getEventRepository()
+    {
+        return $this->em->getRepository('MauticWebhookBundle:Event');
+    }
+
+    /*
      *
      */
     public function getWebhookPayload($webhook)
     {
-        $queues = $this->getWebhookQueues($webhook);
 
+        $queuesArray = $this->getWebhookQueues($webhook);
         $payload = array();
+        //var_dump($queues);
 
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
-        foreach ($queues as $queue) {
-            $payload[] = json_decode($queue->getPayload());
-        }
+        foreach ($queuesArray as $queues) {
+            foreach ($queues as $queue) {
 
+                $type = $queue->getEventType();
+                /*
+                if (!isset($payload[$type])) {
+                    $payload[$type] = array();
+                }
+
+                $payload[$type][] = $queue->getPayload();
+                */
+            }
+        }
+        exit();
+
+         /*
+         $payload = array();
+            $queues =$model-> getWebhookQueues($webhook);
+            while (iterator_count($queues)) {
+                while (($q = $queues->next()) !== false) {
+                    $pl   = $q[0];
+                    $type = $pl->getEventType();
+                    if (!isset($payload[$type])) {
+                        $payload[$type] = array();
+                    }
+
+                    $payload[$type][] = $pl->getPayload();
+                }
+
+                $queues =$model-> getWebhookQueues($webhook);
+            }
+        */
+
+
+        exit();
         return $payload;
     }
 
@@ -248,13 +293,6 @@ class WebhookModel extends FormModel
 	        )
         );
 
-        $queueList = array();
-
-        // hydrates the returned list of queues
-        while (($q = $queues->next()) !== false) {
-            $queueList =  $q;
-        }
-
-        return $queueList;
+        return $queues;
     }
 }

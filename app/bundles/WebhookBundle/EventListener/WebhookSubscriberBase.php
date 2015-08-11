@@ -40,11 +40,11 @@ class WebhookSubscriberBase extends CommonSubscriber
     /*
      *
      */
-    public function getWebhooksByTypes($types)
+    public function getEventWebooksByType($type)
     {
-        $webhooks = $this->webhookModel->getWebhooksByEventTypes($types);
+        $eventWebhooks = $this->webhookModel->getEventWebooksByType($type);
 
-        return $webhooks;
+        return $eventWebhooks;
     }
 
 

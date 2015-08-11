@@ -42,6 +42,11 @@ class WebhookQueue
     private $payload;
 
     /**
+     * @ORM\Column(name="event_id", type="integer")
+     **/
+    private $event;
+
+    /**
      * Get id
      *
      * @return integer
@@ -99,6 +104,23 @@ class WebhookQueue
     public function setPayload($payload)
     {
         $this->payload = $payload;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
+    /**
+     * @param mixed $event
+     */
+    public function setEvent($event)
+    {
+        $this->event = $event;
         return $this;
     }
 }
