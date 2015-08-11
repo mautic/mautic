@@ -133,7 +133,7 @@ class WebhookModel extends FormModel
             $webhook = $event->getWebhook();
             $webhookList[] = $webhook;
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event->getId(), $payload));
+            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload));
 
             // add the queuelist and save everything
             $this->saveEntity($webhook);
@@ -221,28 +221,27 @@ class WebhookModel extends FormModel
      */
     public function getWebhookPayload($webhook)
     {
-
         $queuesArray = $this->getWebhookQueues($webhook);
         $payload = array();
-        //var_dump($queues);
 
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
 
-                $type = $queue->getEventType();
-                /*
+                /** @var \Mautic\WebhookBundle\Entity\Event $event */
+                $event = $queue->getEvent();
+                $type  = $event->getEventType();
+
+                // create new array level for each unique event type
                 if (!isset($payload[$type])) {
                     $payload[$type] = array();
                 }
 
                 $payload[$type][] = $queue->getPayload();
-                */
             }
         }
-        exit();
 
-         /*
+         /* @todo use this later
          $payload = array();
             $queues =$model-> getWebhookQueues($webhook);
             while (iterator_count($queues)) {
@@ -260,8 +259,6 @@ class WebhookModel extends FormModel
             }
         */
 
-
-        exit();
         return $payload;
     }
 

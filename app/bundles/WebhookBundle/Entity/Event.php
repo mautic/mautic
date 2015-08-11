@@ -9,6 +9,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -39,12 +40,22 @@ class Event
     private $webhook;
 
     /**
+     * @ORM\OneToMany(targetEntity="Mautic\WebhookBundle\Entity\WebhookQueue", mappedBy="event")
+     */
+    private $queues;
+
+    /**
      * @ORM\Column(name="event_type", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"webhookDetails", "webhookList"})
      */
     private $event_type;
+
+    public function __construct()
+    {
+        $this->queues  = new ArrayCollection();
+    }
 
     /**
      * @return mixed

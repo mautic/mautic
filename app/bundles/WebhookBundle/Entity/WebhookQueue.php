@@ -42,7 +42,7 @@ class WebhookQueue
     private $payload;
 
     /**
-     * @ORM\Column(name="event_id", type="integer")
+     * @ORM\ManyToOne(targetEntity="Mautic\WebhookBundle\Entity\Event", inversedBy="queue")
      **/
     private $event;
 
