@@ -64,6 +64,8 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
+        </div>
+        <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
         </div>
 
@@ -123,6 +125,44 @@ $template = '<div class="col-md-6">{content}</div>';
     </div>
 </div>
 <?php endif; ?>
+
+
+<?php if (isset($fields['monitored_email_host'])): ?>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.monitored_email'); ?></h3>
+        </div>
+        <div class="panel-body">
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_host', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_port', '<div class="col-md-3">{content}</div>'); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_ssl', '<div class="col-md-3">{content}</div>'); ?>
+        </div>
+
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_user', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_password', $template); ?>
+        </div>
+
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_bounce_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'monitored_email_bounce_processed_path', $template); ?>
+        </div>
+         <div class="row">
+            <?php if (isset($fields['monitored_email_test_connection_button'])): ?>
+                <div class="col-sm-6 pt-lg mt-3" id="monitoredEmailTestButtonContainer'>
+                    <div class="button_container">
+                        <?php echo $view['form']->widget($fields['monitored_email_test_connection_button']); ?>
+                        <span class="fa fa-spinner fa-spin hide"></span>
+                    </div>
+                    <div class="col-md-9 help-block"></div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 
 <?php if (count(array_intersect($fieldKeys, array('cookie_path')))): ?>
 <div class="panel panel-primary">

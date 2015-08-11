@@ -659,7 +659,7 @@ class AjaxController extends CommonController
      */
     protected function testEmailServerConnectionAction(Request $request)
     {
-        $dataArray = array('success' => 0, 'error' => '');
+        $dataArray = array('success' => 0, 'message' => '');
 
         if ($this->factory->getUser()->isAdmin()) {
             $settings = $request->request->all();
@@ -725,6 +725,36 @@ class AjaxController extends CommonController
                 } catch (\Exception $e) {
                     $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
                 }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Tests monitored email connection settings
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function testMonitoredEmailServerConnection(Request $request)
+    {
+        $dataArray = array('success' => 0, 'message' => '');
+
+        if ($this->factory->getUser()->isAdmin()) {
+            $settings = $request->request->all();
+
+            /** @var \Mautic\CoreBundle\Helper\ImapHelper $helper */
+            $helper = $this->factory->getHelper('imap');
+            $helper->setConnectionSettings($settings);
+
+            try {
+                $helper->connect();
+                $dataArray['success'] = 1;
+                $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+            } catch (\Exception $e) {
+                $dataArray['message'] = $e->getMessage();
             }
         }
 

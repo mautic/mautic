@@ -101,7 +101,8 @@ EOT
                     }
 
                     //rename the file so no other process tries to find it
-                    $tmpFilename = $failedFile . '.finalretry';
+                    $tmpFilename = str_replace(array('.finalretry','.sending','.tryagain'), '', $failedFile);
+                    $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));

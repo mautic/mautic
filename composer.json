@@ -65,7 +65,9 @@
         "phpoffice/phpexcel": "1.8.0",
         "joomla/http": "~1.1",
         "joomla/filter": "~1.1",
-        "mrclay/minify": "2.2.0"
+        "mrclay/minify": "2.2.0",
+        "php-imap/php-imap": "~2.0",
+        "php-mime-mail-parser/php-mime-mail-parser": "2.1.0"
     },
     "require-dev": {
         "symfony/twig-bundle": "2.5.*",
