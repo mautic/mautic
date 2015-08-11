@@ -1162,8 +1162,6 @@ class EmailModel extends FormModel
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            $this->_unsubscribeHead($mailer, $idHash);
-
             $mailer->setTo($user['email'], $user['firstname'] . ' ' . $user['lastname']);
 
             $mailer->queue(true);

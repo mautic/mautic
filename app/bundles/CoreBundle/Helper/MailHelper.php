@@ -427,9 +427,13 @@ class MailHelper
      */
     private function addUnsubscribeHeader()
     {
-        if (isset($this->idHash) && !$this->message->getHeaders()->has('List-Unsubscribe')) {
+        if (isset($this->idHash)) {
             $unsubscribeLink = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
-            $this->message->getHeaders()->addTextHeader('List-Unsubscribe', "<$unsubscribeLink>");
+            if (!$this->message->getHeaders()->has('List-Unsubscribe')) {
+                $this->message->getHeaders()->addTextHeader('List-Unsubscribe', "<$unsubscribeLink>");
+            } else {
+                $this->message->getHeaders()->get('List-Unsubscribe')->setValue("<$unsubscribeLink>");
+            }
         }
     }
 
