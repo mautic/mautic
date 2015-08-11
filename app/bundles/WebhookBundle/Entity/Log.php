@@ -41,7 +41,7 @@ class Log
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LogRepository');
+            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\LogRepository');
         // id columns
         $builder->addId();
         // M:1 for webhook

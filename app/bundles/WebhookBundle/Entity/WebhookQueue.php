@@ -8,6 +8,7 @@
  */
 
 namespace Mautic\WebhookBundle\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 /**
@@ -44,7 +45,7 @@ class WebhookQueue
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_queue')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\WebhookQueueRepository');
+            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookQueueRepository');
         $builder->addId();
         // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
