@@ -10,16 +10,14 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Joomla\Http\HttpFactory;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class IpAddress
  *
- * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\IpAddressRepository")
- * @ORM\Table(name="ip_addresses")
- * @ORM\HasLifecycleCallbacks
- * @Serializer\ExclusionPolicy("all")
+ * @package Mautic\CoreBundle\Entity
  */
 class IpAddress
 {
@@ -32,27 +30,60 @@ class IpAddress
     private $doNotTrack = array();
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="ip_address", type="text", length=15)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
+     * @var string
      */
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="ip_details", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
+     * @var array
      */
     private $ipDetails;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('ip_addresses')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository');
+
+        $builder->addId();
+
+        $builder->createField('ipAddress', 'string')
+            ->columnName('ip_address')
+            ->length(45)
+            ->build();
+
+        $builder->createField('ipDetails', 'array')
+            ->columnName('ip_details')
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->addProperties(
+                array(
+                    'id',
+                    'ipAddress',
+                    'ipDetails'
+                )
+            )
+            ->addGroup('ipAddress')
+            ->build();
+    }
 
     /**
      * Get id

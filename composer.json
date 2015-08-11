@@ -43,7 +43,6 @@
         "symfony/monolog-bridge": "2.5.*",
 
         "sensio/distribution-bundle": "~2.3",
-        "sensio/framework-extra-bundle": "~3.0",
 
         "doctrine/orm": "~2.3,<2.5",
         "doctrine/dbal": "2.4.*",

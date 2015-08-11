@@ -10,22 +10,17 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Integration
- * @ORM\Table(name="plugin_integration_settings")
- * @ORM\Entity(repositoryClass="Mautic\PluginBundle\Entity\IntegrationRepository")
- * @Serializer\ExclusionPolicy("all")
  */
 class Integration extends CommonEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
@@ -36,29 +31,70 @@ class Integration extends CommonEntity
     private $plugin;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="boolean", name="is_published")
+     * @var bool
      */
     private $isPublished = false;
 
     /**
-     * @ORM\Column(type="array", name="supported_features", nullable=true)
+     * @var array
      */
     private $supportedFeatures = array();
 
     /**
-     * @ORM\Column(type="array", name="api_keys")
+     * @var array
      */
     private $apiKeys = array();
 
     /**
-     * @ORM\Column(type="array", name="feature_settings", nullable=true)
+     * @var array
      */
     private $featureSettings = array();
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('plugin_integration_settings')
+            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
+
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createManyToOne('plugin', 'Plugin')
+            ->inversedBy('integrations')
+            ->addJoinColumn('plugin_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->addField('name', 'string');
+
+        $builder->createField('isPublished', 'boolean')
+            ->columnName('is_published')
+            ->build();
+
+        $builder->createField('supportedFeatures', 'array')
+            ->columnName('supported_features')
+            ->nullable()
+            ->build();
+
+        $builder->createField('apiKeys', 'array')
+            ->columnName('api_keys')
+            ->build();
+
+        $builder->createField('featureSettings', 'array')
+            ->columnName('feature_settings')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * @return mixed

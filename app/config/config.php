@@ -1,8 +1,10 @@
 <?php
 include __DIR__ . '/paths_helper.php';
 
+$ormMappings = $serializerMappings = array();
+
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container, $paths, $root) {
+$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings) {
     $isPlugin = $isMautic = false;
 
     if (strpos($namespace, 'MauticPlugin\\') !== false) {
@@ -25,6 +27,57 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root) {
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
+
+
+        // Set ORM mapping to staticphp for core entities
+        if (file_exists($directory.'/Entity')) {
+            $ormMappings[$bundle] = array(
+                'dir'       => 'Entity',
+                'type'      => 'staticphp',
+                'prefix'    => $baseNamespace . '\\Entity',
+                'mapping'   => true,
+                'is_bundle' => true
+            );
+
+            // Set API metadata
+            $serializerMappings[$bundle] = array(
+                'namespace_prefix' => $baseNamespace . '\\Entity',
+                'path'             => "@$bundle/Entity"
+            );
+        }
+
+        // Check for staticphp mapping
+        if (file_exists($directory.'/Entity')) {
+            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->notName('*Repository.php');
+
+            foreach ($finder as $file) {
+                // Just check first file for the loadMetadata function
+                $reflectionClass = new \ReflectionClass($namespace . '\\Entity\\' . basename($file->getFilename(), '.php'));
+
+                // Register API metadata
+                if ($reflectionClass->hasMethod('loadApiMetadata')) {
+                    $serializerMappings[$bundle] = array(
+                        'namespace_prefix' => $baseNamespace . '\\Entity',
+                        'path'             => "@$bundle/Entity"
+                    );
+                }
+
+                // Register entities
+                if ($reflectionClass->hasMethod('loadMetadata')) {
+                    $ormMappings[$bundle] = array(
+                        'dir'       => 'Entity',
+                        'type'      => 'staticphp',
+                        'prefix'    => $baseNamespace . '\\Entity',
+                        'mapping'   => true,
+                        'is_bundle' => true
+                    );
+                } else {
+                    // Use Symfony's auto mapping
+
+                    break;
+                }
+            }
+        }
 
         return array(
             'isPlugin'          => $isPlugin,
@@ -94,7 +147,7 @@ $container->loadFromExtension('framework', array(
     'form'                 => null,
     'csrf_protection'      => true,
     'validation'           => array(
-        'enable_annotations' => true
+        'enable_annotations' => false
     ),
     'templating'           => array(
         'engines' => $engines,
@@ -148,7 +201,8 @@ $container->loadFromExtension('doctrine', array(
     'dbal' => $dbalSettings,
     'orm'  => array(
         'auto_generate_proxy_classes' => '%kernel.debug%',
-        'auto_mapping'                => true
+        'auto_mapping'                => true,
+        'mappings'                    => $ormMappings
     )
 ));
 
@@ -238,13 +292,18 @@ if ($container->getParameter('mautic.api_enabled')) {
     $container->loadFromExtension('jms_serializer', array(
         'handlers' => array(
             'datetime' => array(
-                'default_format' => 'c',
+                'default_format'   => 'c',
                 'default_timezone' => 'UTC'
             )
         ),
         'property_naming' => array(
             'separator'  => '',
             'lower_case' => false
+        ),
+        'metadata'       => array(
+            'cache'          => 'none',
+            'auto_detection' => false,
+            'directories'    => $serializerMappings
         )
     ));
 
