@@ -99,14 +99,16 @@ abstract class PluginBundleBase extends Bundle
             self::onUpdate($addon, $factory);
         }
 
-        self::updatePluginSchema($metadata, $installedSchema, $factory);
+        // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
+        //self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
 
     /**
      * Update plugin schema based on Doctrine metadata
      *
      * WARNING - this is not recommended as Doctrine does not guarantee results. There is a risk
-     * that Doctrine will generate an incorrect query leading to lost data.
+     * that Doctrine will generate an incorrect query leading to lost data. If using this method,
+     * be sure to thoroughly test the queries Doctrine generates
      *
      * It is preferred to check for MySql or PostgreSQL and execute appropriate raw queries to upgrade
      * from the current version installed to the new version's schema.
