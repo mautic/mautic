@@ -1019,7 +1019,6 @@ class EmailModel extends FormModel
                 $mailer->setTokens($tokens);
             }
 
-            $this->_unsubscribeHead($mailer, $idHash);
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 

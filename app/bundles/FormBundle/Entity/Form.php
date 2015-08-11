@@ -97,7 +97,7 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true, name="render_style")
+     * @var bool
      */
     private $renderStyle = false;
 
@@ -196,7 +196,7 @@ class Form extends FormEntity
             ->build();
 
         $builder->createField('renderStyle', 'boolean')
-            ->columnName('renderStyle')
+            ->columnName('render_style')
             ->nullable()
             ->build();
 
