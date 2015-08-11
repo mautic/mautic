@@ -1030,7 +1030,7 @@ class LeadController extends FormController
             case 2:
                 // Match fields
 
-                /** @var \Mautic\LeadBundle\Model\FieldModel $addonModel */
+                /** @var \Mautic\LeadBundle\Model\FieldModel $pluginModel */
                 $fieldModel = $this->factory->getModel('lead.field');
 
                 $leadFields   = $fieldModel->getFieldList(false, false);

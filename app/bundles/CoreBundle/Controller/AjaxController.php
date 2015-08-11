@@ -67,12 +67,12 @@ class AjaxController extends CommonController
                 //call the specified bundle's ajax action
                 $parts = explode(":", $action);
                 $namespace = 'Mautic';
-                $isAddon = false;
-
-                if ($parts[0] == 'addon' && count($parts) == 3) {
-                    $namespace = 'MauticAddon';
+                $isPlugin = false;
+                // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
+                if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
+                    $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
                     array_shift($parts);
-                    $isAddon = true;
+                    $isPlugin = true;
                 }
 
                 if (count($parts) == 2) {
@@ -80,7 +80,7 @@ class AjaxController extends CommonController
                     $action     = $parts[1];
 
                     if (class_exists($namespace . '\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
-                        if (!$isAddon) {
+                        if (!$isPlugin) {
                             $bundle = 'Mautic' . $bundle;
                         }
                         return $this->forward("{$bundle}Bundle:Ajax:executeAjax", array(

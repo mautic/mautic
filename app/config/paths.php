@@ -12,7 +12,7 @@ $paths = array(
     'themes'       => 'themes',
     'assets'       => 'media',
     'asset_prefix' => '',
-    'addons'       => 'addons',
+    'plugins'       => 'plugins',
     'translations' => 'translations',
     'local_config' => '%kernel.root_dir%/config/local.php',
 );
