@@ -35,20 +35,6 @@ class ConfigType extends AbstractType
             )
         ));
 
-        $builder->add('api_mode', 'choice', array(
-            'choices'  => array(
-                'oauth1' => 'mautic.api.config.oauth1',
-                'oauth2' => 'mautic.api.config.oauth2'
-            ),
-            'label'    => 'mautic.api.config.form.api.mode',
-            'required' => false,
-            'attr'     => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.api.config.form.api.mode.tooltip'
-            ),
-            'empty_value' => false
-        ));
-
         $builder->add('api_oauth2_access_token_lifetime', 'number', array(
             'label'       => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
             'attr'        => array(

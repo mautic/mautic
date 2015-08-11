@@ -97,7 +97,6 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
-<<<<<<< HEAD
      * @ORM\Column(type="boolean", nullable=true, name="render_style")
      */
     private $renderStyle = false;
@@ -105,9 +104,7 @@ class Form extends FormEntity
     /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
-=======
      * @var ArrayCollection
->>>>>>> upstream/staging
      */
     private $submissions;
 
@@ -198,6 +195,11 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->createField('renderStyle', 'boolean')
+            ->columnName('renderStyle')
+            ->nullable()
+            ->build();
+
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(array('dateSubmitted' => 'DESC'))
             ->mappedBy('form')
@@ -282,6 +284,7 @@ class Form extends FormEntity
                     'template',
                     'submissionCount',
                     'inKioskMode',
+                    'renderStyle',
                     'formType'
                 )
             )
