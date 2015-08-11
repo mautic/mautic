@@ -9,6 +9,7 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use JMS\Serializer\Serializer;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriberBase;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Doctrine\ORM\NoResultException;
@@ -16,6 +17,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
+use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
+
 
 /**
  * Class LeadSubscriber
@@ -24,6 +27,21 @@ use Mautic\LeadBundle\Event\PointsChangeEvent;
  */
 class LeadSubscriber extends WebhookSubscriberBase
 {
+
+    protected $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+
+    public function __construct(MauticFactory $factory)
+    {
+        parent::__construct($factory);
+        // initialize
+        $this->initialize(
+            'lead.lead',
+            'Mautic\LeadBundle\Entity\Lead',
+            'lead',
+            'leads'
+        );
+    }
+
     /**
      * @return array
      */
@@ -45,11 +63,14 @@ class LeadSubscriber extends WebhookSubscriberBase
      */
     public function onLeadNewUpdate(LeadEvent $event)
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
-        $lead  = $event->getLead();
+        $entity = $this->model->getEntity($event->getLead()->getId());
+
+        $payload = $this->serializeData($entity);
+
+        /* $lead  = $this->model->getLead($event->getLead()->getId());
 
         // get the lead payload
-        $payload = json_encode(($lead->convertToArray()));
+        $payload = json_encode($lead);
 
         // get the leads
         if ($event->isNew()) {
@@ -63,6 +84,7 @@ class LeadSubscriber extends WebhookSubscriberBase
             $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.update');
             $this->webhookModel->QueueWebhooks($webhookEvents, $payload, true);
         }
+        */
     }
 
     /*
