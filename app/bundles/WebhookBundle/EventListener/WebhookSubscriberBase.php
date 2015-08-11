@@ -33,14 +33,6 @@ class WebhookSubscriberBase extends CommonSubscriber
         $this->webhookModel = $this->factory->getModel('webhook.webhook');
     }
 
-    public function initialize($model, $entityClass, $entityNameOne, $entityNameMulti)
-    {
-        $this->model            = $this->factory->getModel($model);
-        $this->entityClass      = $entityClass;
-        $this->entityNameOne    = $entityNameOne;
-        $this->entityNameMulti  = $entityNameMulti;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -58,14 +50,15 @@ class WebhookSubscriberBase extends CommonSubscriber
         return $eventWebhooks;
     }
 
+    /*
+     *
+     */
     public function serializeData($entity)
     {
         $context = SerializationContext::create();
         if (!empty($this->serializerGroups)) {
             $context->setGroups($this->serializerGroups);
         }
-
-        $serializer = $this->factory->getSerializer();
 
         //Only include FormEntity properties for the top level entity and not the associated entities
         $context->addExclusionStrategy(
@@ -75,19 +68,10 @@ class WebhookSubscriberBase extends CommonSubscriber
 
         //include null values
         $context->setSerializeNull(true);
-        $context->setVersion('1.0');
 
-        $object = new \stdClass();
-        $object->hello = 'world';
+        // serialize the data and send it as a payload
+        $payload = $this->serializer->serialize($entity, 'json', $context);
 
-        $content = $serializer->serialize($object, 'json');
-
-        var_dump($serializer);
-        var_dump($content);
-        var_dump($entity);
-        var_dump($context);
-        exit();
-
-        return $content;
+        return $payload;
     }
 }

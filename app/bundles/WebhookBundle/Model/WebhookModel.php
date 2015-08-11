@@ -237,7 +237,8 @@ class WebhookModel extends FormModel
                     $payload[$type] = array();
                 }
 
-                $payload[$type][] = $queue->getPayload();
+                // its important to decode the payload form the DB as we re-encode it with the
+                $payload[$type][] = json_decode($queue->getPayload());
             }
         }
 

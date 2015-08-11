@@ -27,20 +27,8 @@ use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
  */
 class LeadSubscriber extends WebhookSubscriberBase
 {
-
+    // the groups for leads
     protected $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
-
-    public function __construct(MauticFactory $factory)
-    {
-        parent::__construct($factory);
-        // initialize
-        $this->initialize(
-            'lead.lead',
-            'Mautic\LeadBundle\Entity\Lead',
-            'lead',
-            'leads'
-        );
-    }
 
     /**
      * @return array
@@ -63,14 +51,10 @@ class LeadSubscriber extends WebhookSubscriberBase
      */
     public function onLeadNewUpdate(LeadEvent $event)
     {
-        $entity = $this->model->getEntity($event->getLead()->getId());
+        $entity = $event->getLead();
 
+        // serializer gives us json
         $payload = $this->serializeData($entity);
-
-        /* $lead  = $this->model->getLead($event->getLead()->getId());
-
-        // get the lead payload
-        $payload = json_encode($lead);
 
         // get the leads
         if ($event->isNew()) {
@@ -84,7 +68,6 @@ class LeadSubscriber extends WebhookSubscriberBase
             $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.update');
             $this->webhookModel->QueueWebhooks($webhookEvents, $payload, true);
         }
-        */
     }
 
     /*
