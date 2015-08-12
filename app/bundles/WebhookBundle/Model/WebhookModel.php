@@ -9,7 +9,6 @@
 
 namespace Mautic\WebhookBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
@@ -19,8 +18,9 @@ use Joomla\Http\Response;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\WebhookEvents;
-use OpenCloud\Common\Exceptions\DatabaseCreateError;
+Use Mautic\WebhookBundle\Event\WebhookEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
 /**
  * Class ReportModel
@@ -292,5 +292,50 @@ class WebhookModel extends FormModel
         );
 
         return $queues;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null)
+    {
+        if (!$entity instanceof Webhook) {
+            throw new MethodNotAllowedHttpException(array('Webhook'), 'Entity must be of class Webhook()');
+        }
+
+        switch ($action) {
+            case "pre_save":
+                $name = WebhookEvents::WEBHOOK_PRE_SAVE;
+                break;
+            case "post_save":
+                $name = WebhookEvents::WEBHOOK_POST_SAVE;
+                break;
+            case "pre_delete":
+                $name = WebhookEvents::WEBHOOK_PRE_DELETE;
+                break;
+            case "post_delete":
+                $name = WebhookEvents::WEBHOOK_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new WebhookEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }
