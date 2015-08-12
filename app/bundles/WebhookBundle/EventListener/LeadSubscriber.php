@@ -77,17 +77,19 @@ class LeadSubscriber extends WebhookSubscriberBase
     public function onLeadPointChange(PointsChangeEvent $event)
     {
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
-        $lead                 = $event->getLead();
-        $leadArray            = $lead->convertToArray();
-        $points['old_points'] = $event->getOldPoints();
-        $points['new_points'] = $event->getNewPoints();
+        $lead = $event->getLead();
 
-        // build the payload
-        $payload = json_encode(array_merge($leadArray, $points));
+        $payload = array(
+            'lead' => json_decode($this->serializeData($lead)),
+            'points' => array(
+                'old_points' => $event->getOldPoints(),
+                'new_points' => $event->getNewPoints()
+            )
+        );
 
         $types    = array(LeadEvents::LEAD_POINTS_CHANGE);
-        $webhooks = $this->getWebhooksByTypes($types);
-        $this->webhookModel->QueueWebhooks($webhooks, $payload, true);
+        $webhooks = $this->getEventWebooksByType($types);
+        $this->webhookModel->QueueWebhooks($webhooks, json_encode($payload), true);
     }
 
     /*
