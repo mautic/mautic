@@ -177,6 +177,8 @@ class WebhookModel extends FormModel
 
     /*
      * Execute a list of webhooks to their specified endpoints
+     *
+     * @param array $webhooks
      */
     public function processWebhooks($webhooks)
     {
@@ -222,7 +224,11 @@ class WebhookModel extends FormModel
     }
 
     /*
+     * Get the payload from the webhook
      *
+     * @param Webhook $webhook
+     *
+     * @return array
      */
     public function getWebhookPayload($webhook)
     {
