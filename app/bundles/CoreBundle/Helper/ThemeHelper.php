@@ -37,12 +37,12 @@ class ThemeHelper
      * @param $theme
      * @param $newName
      *
-     * @throws FileNotFoundException    When originFile doesn't exist
-     * @throws IOException              When copy fails
+     * @throws MauticException\FileExistsException
+     * @throws MauticException\FileNotFoundException
      */
     public function copy($theme, $newName)
     {
-        $root      = $this->factory->getSystemPath('root') . '/';
+        $root      = $this->factory->getSystemPath('themes_root') . '/';
         $themes    = $this->factory->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -67,11 +67,12 @@ class ThemeHelper
      * @param $theme
      * @param $newName
      *
-     * @throws IOException              When move fails
+     * @throws FileN
+     * @throws MauticException\FileExistsException
      */
     public function rename ($theme, $newName)
     {
-        $root      = $this->factory->getSystemPath('root') . '/';
+        $root      = $this->factory->getSystemPath('themes_root') . '/';
         $themes    = $this->factory->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -94,10 +95,12 @@ class ThemeHelper
 
     /**
      * @param $theme
+     *
+     * @throws MauticException\FileNotFoundException
      */
     public function delete($theme)
     {
-        $root      = $this->factory->getSystemPath('root') . '/';
+        $root      = $this->factory->getSystemPath('themes_root') . '/';
         $themes    = $this->factory->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -110,7 +113,8 @@ class ThemeHelper
     }
 
     /**
-     * @param $theme
+     * @param $themePath
+     * @param $newName
      */
     private function updateConfig($themePath, $newName)
     {
@@ -145,7 +149,7 @@ class ThemeHelper
     }
 
     /**
-     * Renders parameters as a string.
+     * @param $config
      *
      * @return string
      */
@@ -183,7 +187,10 @@ class ThemeHelper
     }
 
     /**
-     * @param $array
+     * @param            $array
+     * @param bool|false $addClosingComma
+     *
+     * @return string
      */
     protected function renderArray($array, $addClosingComma = false)
     {
