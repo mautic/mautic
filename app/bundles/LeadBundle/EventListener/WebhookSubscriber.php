@@ -72,6 +72,6 @@ class WebhookSubscriber extends CommonSubscriber
         );
 
         // add the deleted checkbox
-        $event->addEvent(LeadEvents::LEAD_POST_DELETE, $leadDeleted);
+        $event->addEvent(LeadEvents::LEAD_PRE_DELETE, $leadDeleted);
     }
 }

@@ -38,7 +38,7 @@ class LeadSubscriber extends WebhookSubscriberBase
         return array(
             LeadEvents::LEAD_POST_SAVE            => array('onLeadNewUpdate', 0),
             LeadEvents::LEAD_POINTS_CHANGE        => array('onLeadPointChange', 0),
-            LeadEvents::LEAD_POST_DELETE          => array('onLeadDelete', 0),
+            LeadEvents::LEAD_PRE_DELETE           => array('onLeadDelete', 0),
             //LeadEvents::LEAD_LIST_BATCH_CHANGE  => array('onLeadEvent', 0),
             //LeadEvents::LEAD_POST_MERGE         => array('onLeadEvent', 0),
             //LeadEvents::LEAD_IDENTIFIED         => array('onLeadEvent', 0),
@@ -95,8 +95,15 @@ class LeadSubscriber extends WebhookSubscriberBase
     /*
      * Delete lead event
      */
-    public function onLeadDelete($event)
+    public function onLeadDelete(LeadEvent $event)
     {
-        // content
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = $event->getLead();
+
+        $payload  = array('id' => $lead->getId());
+
+        $types    = array(LeadEvents::LEAD_PRE_DELETE);
+        $webhooks = $this->getEventWebooksByType($types);
+        $this->webhookModel->QueueWebhooks($webhooks, json_encode($payload), true);
     }
 }
