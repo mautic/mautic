@@ -54,40 +54,14 @@ final class WebhookEvents
     const WEBHOOK_POST_DELETE   = 'mautic.webhook_post_delete';
 
     /**
-    * The mautic.webhook_queue_pre_save event is thrown right before a form is persisted.
+    * The mautic.webhook_queue_on_add event is thrown as the queue entity is created, before it is persisted to the database
     *
     * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.
     *
     * @var string
     */
-    const WEBHOOK_QUEUE_PRE_SAVE   = 'mautic.webhook_queue_pre_save';
+    const WEBHOOK_QUEUE_ON_ADD  = 'mautic.webhook_queue_on_add';
 
-    /**
-     * The mautic.webhook_queue_post_save event is thrown right after a form is persisted.
-     *
-     * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.
-     *
-     * @var string
-     */
-    const WEBHOOK_QUEUE_POST_SAVE   = 'mautic.webhook_queue_post_save';
-
-    /**
-     * The mautic.webhook_queue_pre_delete event is thrown before a form is deleted.
-     *
-     * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.
-     *
-     * @var string
-     */
-    const WEBHOOK_QUEUE_PRE_DELETE   = 'mautic.webhook_queue_pre_delete';
-
-    /**
-     * The mautic.webhook_queue_post_delete event is thrown after a form is deleted.
-     *
-     * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.
-     *
-     * @var string
-     */
-    const WEBHOOK_QUEUE_POST_DELETE   = 'mautic.webhook_queue_post_delete';
 
     /**
      * The mautic.webhook_pre_execute event is thrown right before a webhook URL is executed.
