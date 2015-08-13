@@ -37,7 +37,9 @@ class FormSubscriber extends WebhookSubscriberBase
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
-        //var_dump($event);
-        //exit();
+        $types    = array(LeadEvents::LEAD_POINTS_CHANGE);
+
+        var_dump($event);
+        exit();
     }
 }

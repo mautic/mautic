@@ -52,10 +52,7 @@ class LeadSubscriber extends WebhookSubscriberBase
 
         $entity = $event->getLead();
 
-        $now = new \DateTime;
-
         $payload = array(
-            'timestamp' => $now,
             'lead'      => $entity,
         );
 
@@ -84,10 +81,7 @@ class LeadSubscriber extends WebhookSubscriberBase
 
         $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
 
-        $now = new \DateTime;
-
         $payload = array(
-            'timestamp' => $now,
             'lead'      => $lead,
             'points' => array(
                 'old_points' => $event->getOldPoints(),
@@ -109,10 +103,8 @@ class LeadSubscriber extends WebhookSubscriberBase
         $lead = $event->getLead();
 
         $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
-        $now = new \DateTime;
 
         $payload = array(
-            'timestamp' => $now,
             'lead'      => $lead,
         );
 

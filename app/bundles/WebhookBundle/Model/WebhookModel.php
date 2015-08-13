@@ -255,7 +255,8 @@ class WebhookModel extends FormModel
                     $payload[$type] = array();
                 }
 
-                $queuePayload = json_decode($queue->getPayload());
+                $queuePayload = json_decode($queue->getPayload(), true);
+                $queuePayload['timestamp'] = $queue->getDateAdded()->format('c');
 
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
