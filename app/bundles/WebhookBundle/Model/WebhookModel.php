@@ -12,7 +12,6 @@ namespace Mautic\WebhookBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Mautic\WebhookBundle\Entity\Event;
 use Joomla\Http\Http;
 use Joomla\Http\Response;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -21,6 +20,7 @@ use Mautic\WebhookBundle\WebhookEvents;
 Use Mautic\WebhookBundle\Event\WebhookEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use JMS\Serializer\SerializationContext;
 
 /**
  * Class ReportModel
@@ -113,12 +113,14 @@ class WebhookModel extends FormModel
      *
      * Optionally returns an array of all the queue IDs created so they can be immediately executed.
      *
-     * @param $webhooks array
+     * @param $webhooks array of Webhook
+     * @param $payload  Entity
+     * @param $serializationGroups groups for the serializer
      * @param $returnQueueEntities bool
      *
      * @return
      */
-    public function QueueWebhooks($webhookEvents, $payload, $immediatelyExecuteWebhooks = false)
+    public function QueueWebhooks($webhookEvents, $payload, $keyName = 'entity', $serializationGroups = array(), $immediatelyExecuteWebhooks = false)
     {
         if (! count($webhookEvents) || ! is_array($webhookEvents) ) {
             return;
@@ -133,7 +135,7 @@ class WebhookModel extends FormModel
             $webhook = $event->getWebhook();
             $webhookList[] = $webhook;
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload));
+            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $keyName, $serializationGroups));
 
             // add the queuelist and save everything
             $this->saveEntity($webhook);
@@ -153,18 +155,28 @@ class WebhookModel extends FormModel
      * Creates a WebhookQueue entity, sets the date and returns the created entity
      *
      * @param  $webhook Webhook
-     * @param  $eventId  the id of th event that added this queue
-     * @param  $payload json_encoded array as the payload
+     * @param  $eventId the id of th event that added this queue
+     * @param  $payload Entity object
+     * @param  $serializationGroups if the entity has some groups for serialization add them here.
      *
      * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload)
+    public function queueWebhook(Webhook $webhook, $event, $payload, $keyName = 'entity', $serializationGroups = array())
     {
+        $now = new \DateTime;
+
+        $array = array(
+            'timestamp' => $now,
+            $keyName => $payload,
+        );
+
+        $serializedPayload = $this->serializeData($array, $serializationGroups);
+
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
-        $queue->setDateAdded(new \DateTime);
+        $queue->setDateAdded($now);
         $queue->setEvent($event);
-        $queue->setPayload($payload);
+        $queue->setPayload($serializedPayload);
 
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
@@ -249,11 +261,6 @@ class WebhookModel extends FormModel
                 }
 
                 $queuePayload = json_decode($queue->getPayload());
-
-                if (is_object($queuePayload)) {
-                    // add the timestamp to the payload
-                    $queuePayload->timestamp = $queue->getDateAdded();
-                }
 
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
@@ -355,5 +362,30 @@ class WebhookModel extends FormModel
         } else {
             return null;
         }
+    }
+
+    /*
+     * Serialize Data
+     */
+    public function serializeData($payload, $groups = array())
+    {
+        $context = SerializationContext::create();
+        if (!empty($groups)) {
+            $context->setGroups($groups);
+        }
+
+        //Only include FormEntity properties for the top level entity and not the associated entities
+        $context->addExclusionStrategy(
+        // Can Use this; just adding full namespace to show
+            new \Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy()
+        );
+
+        //include null values
+        $context->setSerializeNull(true);
+
+        // serialize the data and send it as a payload
+        $payload = $this->factory->getSerializer()->serialize($payload, 'json', $context);
+
+        return $payload;
     }
 }
