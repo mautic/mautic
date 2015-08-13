@@ -37,9 +37,17 @@ class FormSubscriber extends WebhookSubscriberBase
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
-        $types    = array(LeadEvents::LEAD_POINTS_CHANGE);
+        $types    = array(FormEvents::FORM_ON_SUBMIT);
 
-        var_dump($event);
-        exit();
+        $groups = array('submissionDetails', 'ipAddress', 'leadList', 'pageList', 'formList');
+
+        $form = $event->getSubmission();
+
+        $payload = array(
+            'submission'  => $form,
+        );
+
+        $webhooks = $this->getEventWebooksByType($types);
+        $this->webhookModel->QueueWebhooks($webhooks, $payload, $groups, true);
     }
 }

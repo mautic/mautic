@@ -120,7 +120,7 @@ class WebhookModel extends FormModel
      *
      * @return
      */
-    public function QueueWebhooks($webhookEvents, $payload, $serializationGroups = array(), $immediatelyExecuteWebhooks = false)
+    public function QueueWebhooks($webhookEvents, $payload, array $serializationGroups = array(), $immediatelyExecuteWebhooks = false)
     {
         if (! count($webhookEvents) || ! is_array($webhookEvents) ) {
             return;
@@ -161,15 +161,13 @@ class WebhookModel extends FormModel
      *
      * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload, $serializationGroups = array())
+    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = array())
     {
-        $now = new \DateTime;
-
         $serializedPayload = $this->serializeData($payload, $serializationGroups);
 
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
-        $queue->setDateAdded($now);
+        $queue->setDateAdded(new \DateTime());
         $queue->setEvent($event);
         $queue->setPayload($serializedPayload);
 
