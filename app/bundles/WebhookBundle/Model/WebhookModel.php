@@ -120,7 +120,7 @@ class WebhookModel extends FormModel
      *
      * @return
      */
-    public function QueueWebhooks($webhookEvents, $payload, $keyName = 'entity', $serializationGroups = array(), $immediatelyExecuteWebhooks = false)
+    public function QueueWebhooks($webhookEvents, $payload, $serializationGroups = array(), $immediatelyExecuteWebhooks = false)
     {
         if (! count($webhookEvents) || ! is_array($webhookEvents) ) {
             return;
@@ -135,7 +135,7 @@ class WebhookModel extends FormModel
             $webhook = $event->getWebhook();
             $webhookList[] = $webhook;
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $keyName, $serializationGroups));
+            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
 
             // add the queuelist and save everything
             $this->saveEntity($webhook);
@@ -161,16 +161,11 @@ class WebhookModel extends FormModel
      *
      * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload, $keyName = 'entity', $serializationGroups = array())
+    public function queueWebhook(Webhook $webhook, $event, $payload, $serializationGroups = array())
     {
         $now = new \DateTime;
 
-        $array = array(
-            'timestamp' => $now,
-            $keyName => $payload,
-        );
-
-        $serializedPayload = $this->serializeData($array, $serializationGroups);
+        $serializedPayload = $this->serializeData($payload, $serializationGroups);
 
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);

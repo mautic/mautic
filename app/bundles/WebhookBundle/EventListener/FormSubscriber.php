@@ -13,11 +13,12 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Event\SubmissionEvent;
 
 /**
  * Class FormSubscriber
  */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber extends WebhookSubscriberBase
 {
     /**
      * {@inheritdoc}
@@ -27,5 +28,16 @@ class FormSubscriber extends CommonSubscriber
         return array(
             FormEvents::FORM_ON_SUBMIT   => array('onFormSubmit', 0),
         );
+    }
+
+    /*
+     * Form submit event
+     *
+     * @param SubmissionEvent $event
+     */
+    public function onFormSubmit(SubmissionEvent $event)
+    {
+        //var_dump($event);
+        //exit();
     }
 }

@@ -35,7 +35,7 @@ class LeadSubscriber extends WebhookSubscriberBase
         return array(
             LeadEvents::LEAD_POST_SAVE            => array('onLeadNewUpdate', 0),
             LeadEvents::LEAD_POINTS_CHANGE        => array('onLeadPointChange', 0),
-            LeadEvents::LEAD_PRE_DELETE           => array('onLeadDelete', 0),
+            LeadEvents::LEAD_POST_DELETE          => array('onLeadDelete', 0),
             //LeadEvents::LEAD_LIST_BATCH_CHANGE  => array('onLeadEvent', 0),
             //LeadEvents::LEAD_POST_MERGE         => array('onLeadEvent', 0),
             //LeadEvents::LEAD_IDENTIFIED         => array('onLeadEvent', 0),
@@ -52,17 +52,24 @@ class LeadSubscriber extends WebhookSubscriberBase
 
         $entity = $event->getLead();
 
+        $now = new \DateTime;
+
+        $payload = array(
+            'timestamp' => $now,
+            'lead'      => $entity,
+        );
+
         // get the leads
         if ($event->isNew()) {
             // get our new lead webhook events first
             $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.new');
-            $this->webhookModel->QueueWebhooks($webhookEvents, $entity, 'lead', $serializerGroups, true);
+            $this->webhookModel->QueueWebhooks($webhookEvents, $payload, $serializerGroups, true);
         }
 
         // now deal with webhooks for the update event
         if (! $event->isNew()) {
             $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.update');
-            $this->webhookModel->QueueWebhooks($webhookEvents, $entity, 'leads', $serializerGroups, true);
+            $this->webhookModel->QueueWebhooks($webhookEvents, $payload, $serializerGroups, true);
         }
     }
 
@@ -75,8 +82,13 @@ class LeadSubscriber extends WebhookSubscriberBase
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $event->getLead();
 
+        $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+
+        $now = new \DateTime;
+
         $payload = array(
-            'lead' => json_decode($this->serializeData($lead)),
+            'timestamp' => $now,
+            'lead'      => $lead,
             'points' => array(
                 'old_points' => $event->getOldPoints(),
                 'new_points' => $event->getNewPoints()
@@ -85,7 +97,7 @@ class LeadSubscriber extends WebhookSubscriberBase
 
         $types    = array(LeadEvents::LEAD_POINTS_CHANGE);
         $webhooks = $this->getEventWebooksByType($types);
-        $this->webhookModel->QueueWebhooks($webhooks, json_encode($payload), true);
+        $this->webhookModel->QueueWebhooks($webhooks, $payload, $serializerGroups, true);
     }
 
     /*
@@ -96,10 +108,16 @@ class LeadSubscriber extends WebhookSubscriberBase
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $event->getLead();
 
-        $payload  = array('id' => $lead->getId());
+        $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+        $now = new \DateTime;
 
-        $types    = array(LeadEvents::LEAD_PRE_DELETE);
+        $payload = array(
+            'timestamp' => $now,
+            'lead'      => $lead,
+        );
+
+        $types    = array(LeadEvents::LEAD_POST_DELETE);
         $webhooks = $this->getEventWebooksByType($types);
-        $this->webhookModel->QueueWebhooks($webhooks, json_encode($payload), true);
+        $this->webhookModel->QueueWebhooks($webhooks, $payload, $serializerGroups, true);
     }
 }
