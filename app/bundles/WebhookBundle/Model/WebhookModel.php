@@ -144,7 +144,9 @@ class WebhookModel extends FormModel
             $queueList = array();
         }
 
-        if ($immediatelyExecuteWebhooks) {
+        $queueMode = $this->factory->getParameter('queue_mode');
+
+        if ($queueMode == 'immediate_process') {
             $this->processWebhooks($webhookList);
         }
 
