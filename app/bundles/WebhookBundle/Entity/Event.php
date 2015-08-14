@@ -51,8 +51,8 @@ class Event
         $builder->addId();
         // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('queue')
-            ->addJoinColumn('webhook_id', 'id', false, false)
+            ->inversedBy('events')
+            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         // 1:M for queues
         $builder->createOneToMany('queues', 'WebhookQueue')

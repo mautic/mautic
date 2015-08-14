@@ -49,8 +49,8 @@ class WebhookQueue
         $builder->addId();
         // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('queue')
-            ->addJoinColumn('webhook_id', 'id', false, false)
+            ->inversedBy('queues')
+            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         // date added
         $builder->createField('dateAdded', 'datetime')
@@ -63,8 +63,8 @@ class WebhookQueue
             ->build();
         // M:1 for event
         $builder->createManyToOne('event', 'Event')
-            ->inversedBy('queue')
-            ->addJoinColumn('event_id', 'id', false, false)
+            ->inversedBy('queues')
+            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
     }
     /**

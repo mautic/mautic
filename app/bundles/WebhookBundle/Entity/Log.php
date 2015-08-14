@@ -47,7 +47,7 @@ class Log
         // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
             ->inversedBy('logs')
-            ->addJoinColumn('webhook_id', 'id', false, false)
+            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         // status code
         $builder->createField('statusCode', 'string')
