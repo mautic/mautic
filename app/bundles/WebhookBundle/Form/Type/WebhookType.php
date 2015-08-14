@@ -96,7 +96,7 @@ class WebhookType extends AbstractType
                 'choices' => $choices,
                 'multiple' => true,
                 'expanded' => true,
-                'label'      => 'mautic.webhook.form.webhook_url',
+                'label'      => 'mautic.webhook.form.webhook.events',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => ''),
             )

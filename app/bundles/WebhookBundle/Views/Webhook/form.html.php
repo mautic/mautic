@@ -28,17 +28,20 @@ $view['slots']->set("headerTitle", $header);
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
-                    <?php echo $view['form']->row($form['description']); ?>
                     <?php echo $view['form']->row($form['webhook_url']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
+                </div>
+                <div class="col-md-6">
                     <?php echo $view['form']->row($form['events']); ?>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
-        <?php echo $view['form']->row($form['category']); ?>
-        <?php echo $view['form']->row($form['isPublished']); ?>
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['category']); ?>
+            <?php echo $view['form']->row($form['isPublished']); ?>
+        </div>
     </div>
 </div>
 <?php echo $view['form']->end($form); ?>
