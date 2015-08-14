@@ -84,8 +84,7 @@ class LeadController extends FormController
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
-        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-        if ($indexMode != 'list') {
+        if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
         }
