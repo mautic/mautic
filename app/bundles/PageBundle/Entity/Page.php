@@ -358,10 +358,10 @@ class Page extends FormEntity
                     'translationChildren'
                 )
             )
-            ->setMaxDepth('variantParent', 1)
-            ->setMaxDepth('variantChildren', 1)
-            ->setMaxDepth('translationParent', 1)
-            ->setMaxDepth('translationChildren', 1)
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
+            ->setMaxDepth(1, 'translationParent')
+            ->setMaxDepth(1, 'translationChildren')
             ->build();
     }
 
