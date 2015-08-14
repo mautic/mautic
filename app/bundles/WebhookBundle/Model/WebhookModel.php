@@ -30,9 +30,19 @@ use Mautic\CoreBundle\Factory\MauticFactory;
  */
 class WebhookModel extends FormModel
 {
-    protected $webhookStart = 0;
-    protected $webhookLimit = 1000;
+    protected $webhookStart;
+    protected $webhookLimit;
     protected $webhookQueueIdList = array();
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        parent::__construct($factory);
+        $this->webhookStart = $factory->getParameter('webhook_start');
+        $this->webhookLimit = $factory->getParameter('webhook_limit');
+    }
 
     /**
      * {@inheritdoc}
@@ -196,11 +206,9 @@ class WebhookModel extends FormModel
      */
     public function processWebhooks($webhooks)
     {
-        $http = new Http();
-
         foreach ($webhooks as $webhook)
         {
-            $this->processWebhook($webhook, $http);
+            $this->processWebhook($webhook);
         }
     }
 
@@ -210,8 +218,14 @@ class WebhookModel extends FormModel
      * @param Webhook $webhook
      * @var   Http    $http
      */
-    public function processWebhook(Webhook $webhook, $http)
+    public function processWebhook(Webhook $webhook)
     {
+        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
+        $webhookQueueRepo = $this->getQueueRepository();
+
+        // instantiate new http class
+        $http = new Http();
+
         // get the webhook payload
         $payload = ($this->getWebhookPayload($webhook));
 
@@ -223,21 +237,26 @@ class WebhookModel extends FormModel
             /** @var \Joomla\Http\Http $http */
             $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
             $this->addLog($webhook, $response);
+            // throw an error exception if we don't get a 200 back
             if ($response->code != 200) {
                 throw new \ErrorException($webhook->getWebhookUrl() . ' returned ' . $response->code);
             }
         } catch (\Exception $e) {
+            // log any errors but allow the script to keep running
             $log->addError($e->getMessage());
         }
 
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-        $webhookQueueRepo = $this->getQueueRepository();
-
         // delete all the queued items we just processed
         $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
-
+        $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
         // reset the array to blank so none of the IDs are repeated
         $this->webhookQueueIdList = array();
+
+        // if there are still items in the queue after processing we re-process
+        // WARNING: this is recursive
+        if ($queueCount > 0) {
+            $this->processWebhook($webhook);
+        }
     }
 
     /*
