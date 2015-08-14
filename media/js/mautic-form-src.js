@@ -131,45 +131,57 @@
             for (var i = 0, n = forms.length; i < n; i++) {
                 var formId = forms[i].getAttribute('data-mautic-form');
                 if (formId !== null) {
-                    forms[i].onsubmit = function(event) {
-                        event.preventDefault();
-
-                        Core.validateForm(formId, true);
-                    }
-
-                    // Check to see if the iframe exists
-                    if (!document.getElementById('mauticiframe_' + formId)) {
-                        // Likely an editor has stripped out the iframe so let's dynmamically create it
-                        var ifrm = document.createElement("IFRAME");
-                        ifrm.style.display = "none";
-                        ifrm.style.margin = 0;
-                        ifrm.style.padding = 0;
-                        ifrm.style.border = "none";
-                        ifrm.style.width = 0;
-                        ifrm.style.heigh = 0;
-                        ifrm.setAttribute( 'id', 'mauticiframe_' + formId);
-                        ifrm.setAttribute('name', 'mauticiframe_' + formId);
-                        document.body.appendChild(ifrm);
-
-                        forms[i].target = 'mauticiframe_' + formId;
-                    }
-
-                    if (!document.getElementById('mauticform_' + formId + '_messenger')) {
-                        var messengerInput = document.createElement('INPUT');
-                        messengerInput.type = 'hidden';
-                        messengerInput.setAttribute('name', 'mauticform[messenger]');
-                        messengerInput.setAttribute('id', 'mauticform_' + formId + '_messenger');
-                        messengerInput.value = 1;
-
-                        forms[i].appendChild(messengerInput);
-                    }
+                    Form.prepareMessengerForm(formId);
                 }
+            }
+        };
+
+        Form.prepareMessengerForm = function(formId) {
+            var theForm = document.getElementById('mauticform_' + formId);
+
+            // Check for an onsubmit attribute
+            if (!theForm.getAttribute('onsubmit')) {
+                theForm.onsubmit = function (event) {
+                    event.preventDefault();
+
+                    Core.validateForm(formId, true);
+                }
+            }
+
+            // Check to see if the iframe exists
+            if (!document.getElementById('mauticiframe_' + formId)) {
+                // Likely an editor has stripped out the iframe so let's dynamically create it
+                var ifrm = document.createElement("IFRAME");
+                ifrm.style.display = "none";
+                ifrm.style.margin = 0;
+                ifrm.style.padding = 0;
+                ifrm.style.border = "none";
+                ifrm.style.width = 0;
+                ifrm.style.heigh = 0;
+                ifrm.setAttribute( 'id', 'mauticiframe_' + formId);
+                ifrm.setAttribute('name', 'mauticiframe_' + formId);
+                document.body.appendChild(ifrm);
+
+                theForm.target = 'mauticiframe_' + formId;
+            }
+
+            if (!document.getElementById('mauticform_' + formId + '_messenger')) {
+                var messengerInput = document.createElement('INPUT');
+                messengerInput.type = 'hidden';
+                messengerInput.setAttribute('name', 'mauticform[messenger]');
+                messengerInput.setAttribute('id', 'mauticform_' + formId + '_messenger');
+                messengerInput.value = 1;
+
+                theForm.appendChild(messengerInput);
             }
         };
 
         Form.validator = function(formId) {
             var validator = {
                 validateForm: function (submitForm) {
+                    if (!submitForm) {
+                        Form.prepareMessengerForm(formId);
+                    }
                     function validateOptions(elOptions) {
                         if (typeof elOptions === 'undefined') {
                             return;
