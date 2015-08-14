@@ -165,9 +165,6 @@ class WebhookModel extends FormModel
     {
         $serializedPayload = $this->serializeData($payload, $serializationGroups);
 
-        var_dump($serializedPayload);
-        exit();
-
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
         $queue->setDateAdded(new \DateTime());

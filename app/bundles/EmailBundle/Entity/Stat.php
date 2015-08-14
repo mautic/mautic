@@ -217,6 +217,19 @@ class Stat
             ->addProperties(
                 array(
                     'id',
+                    'emailAddress',
+                    'ipAddress',
+                    'dateSent',
+                    'isRead',
+                    'isFailed',
+                    'dateRead',
+                    'retryCount',
+                    'source',
+                    'openCount',
+                    'lastOpened',
+                    'sourceId',
+                    'trackingHash',
+                    'viewedInBrowser',
                     'lead',
                     'email'
                 )

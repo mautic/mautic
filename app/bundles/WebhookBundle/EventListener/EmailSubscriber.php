@@ -33,11 +33,9 @@ class EmailSubscriber extends WebhookSubscriberBase
 
         $groups = array('statDetails', 'leadList', 'emailDetails');
         $stat = ($event->getStat());
-        $lead = $stat->getLead();
-        $email = $event->getEmail();
 
         $payload = array(
-            'email_open'  => $stat,
+            'stat'  => $stat,
         );
 
         $webhooks = $this->getEventWebooksByType($types);
