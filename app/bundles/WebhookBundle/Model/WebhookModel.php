@@ -18,15 +18,21 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\WebhookEvents;
 Use Mautic\WebhookBundle\Event\WebhookEvent;
+use Monolog\Logger;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use JMS\Serializer\SerializationContext;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class ReportModel
  */
 class WebhookModel extends FormModel
 {
+    protected $webhookStart = 0;
+    protected $webhookLimit = 1000;
+
     /**
      * {@inheritdoc}
      *
@@ -190,12 +196,38 @@ class WebhookModel extends FormModel
     public function processWebhooks($webhooks)
     {
         $http = new Http();
-        /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
+
+
         foreach ($webhooks as $webhook)
         {
-            $payload = ($this->getWebhookPayload($webhook));
+            $this->processWebhook($webhook, $http);
+        }
+    }
+
+    /*
+     * Execute a single webhook post
+     *
+     * @param Webhook $webhook
+     * @var   Http    $http
+     */
+    public function processWebhook(Webhook $webhook, $http)
+    {
+        // get the webhook payload
+        $payload = ($this->getWebhookPayload($webhook));
+
+        /** @var Logger $log */
+        $log = $this->factory->getLogger();
+
+        /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
+        try {
+            /** @var \Joomla\Http\Http $http */
             $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
             $this->addLog($webhook, $response);
+            if ($response->code != 200) {
+                throw new \ErrorException($webhook->getWebhookUrl() . ' returned ' . $response->code);
+            }
+        } catch (\Exception $e) {
+            $log->addError($e->getMessage());
         }
     }
 
@@ -263,24 +295,6 @@ class WebhookModel extends FormModel
             }
         }
 
-         /* @todo use this later
-         $payload = array();
-            $queues =$model-> getWebhookQueues($webhook);
-            while (iterator_count($queues)) {
-                while (($q = $queues->next()) !== false) {
-                    $pl   = $q[0];
-                    $type = $pl->getEventType();
-                    if (!isset($payload[$type])) {
-                        $payload[$type] = array();
-                    }
-
-                    $payload[$type][] = $pl->getPayload();
-                }
-
-                $queues =$model-> getWebhookQueues($webhook);
-            }
-        */
-
         return $payload;
     }
 
@@ -289,7 +303,7 @@ class WebhookModel extends FormModel
      *
      * @return array
      */
-    public function getWebhookQueues(Webhook $webhook, $start = 0, $limit = 1000)
+    public function getWebhookQueues(Webhook $webhook)
     {
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
@@ -297,8 +311,8 @@ class WebhookModel extends FormModel
         $queues = $queueRepo->getEntities(
             array(
                 'iterator_mode' => true,
-                'start' => $start,
-                'limit' => $limit,
+                'start' => $this->webhookStart,
+                'limit' => $this->webhookLimit,
                 'orderBy' => 'e.dateAdded', // e is the default prefix unless you define getTableAlias in your repo class,
                 'filter' => array(
                     'force' => array(

@@ -73,5 +73,7 @@ return array(
         )
     ),
 
-    'parameters' => array()
+    'parameters' => array(
+        'webhook_limit' => 1000,
+    )
 );
