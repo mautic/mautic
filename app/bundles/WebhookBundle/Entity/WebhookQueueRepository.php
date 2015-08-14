@@ -13,5 +13,13 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class WebhookQueueRepository extends CommonRepository
 {
-
+    public function deleteQueuesById(array $idList)
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->delete(MAUTIC_TABLE_PREFIX . 'webhook_queue')
+            ->where(
+                $qb->expr()->in('id', $idList)
+            )
+            ->execute();
+    }
 }

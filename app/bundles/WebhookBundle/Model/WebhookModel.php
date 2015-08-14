@@ -32,6 +32,7 @@ class WebhookModel extends FormModel
 {
     protected $webhookStart = 0;
     protected $webhookLimit = 1000;
+    protected $webhookQueueIdList = array();
 
     /**
      * {@inheritdoc}
@@ -197,7 +198,6 @@ class WebhookModel extends FormModel
     {
         $http = new Http();
 
-
         foreach ($webhooks as $webhook)
         {
             $this->processWebhook($webhook, $http);
@@ -229,6 +229,15 @@ class WebhookModel extends FormModel
         } catch (\Exception $e) {
             $log->addError($e->getMessage());
         }
+
+        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
+        $webhookQueueRepo = $this->getQueueRepository();
+
+        // delete all the queued items we just processed
+        $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
+
+        // reset the array to blank so none of the IDs are repeated
+        $this->webhookQueueIdList = array();
     }
 
     /*
@@ -248,6 +257,8 @@ class WebhookModel extends FormModel
 
     /*
      * Get Qeueue Repository
+     *
+     * @return WebhookQueueRepository
      */
     public function getQueueRepository()
     {
@@ -292,6 +303,9 @@ class WebhookModel extends FormModel
 
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
+
+                $this->webhookQueueIdList[] = $queue->getId();
+                $this->em->clear($queue);
             }
         }
 
