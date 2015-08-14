@@ -49,6 +49,10 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'webhook'
             ),
+            'mautic.form.type.webhookconfig'  => array(
+                'class' => 'Mautic\WebhookBundle\Form\Type\ConfigType',
+                'alias' => 'webhookconfig'
+            )
         ),
         'events' => array(
             'mautic.webhook.lead.subscriber'                => array(
@@ -63,6 +67,11 @@ return array(
             'mautic.webhook.page.hit.subscriber'                => array(
                 'class' => 'Mautic\WebhookBundle\EventListener\PageSubscriber'
             ),
+            'mautic.webhook.config.subscriber' => array(
+                'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber'
+            ),
         )
-    )
+    ),
+
+    'parameters' => array()
 );
