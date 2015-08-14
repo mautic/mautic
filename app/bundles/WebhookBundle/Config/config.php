@@ -60,6 +60,9 @@ return array(
             'mautic.webhook.email.subscriber'                => array(
                 'class' => 'Mautic\WebhookBundle\EventListener\EmailSubscriber'
             ),
+            'mautic.webhook.page.hit.subscriber'                => array(
+                'class' => 'Mautic\WebhookBundle\EventListener\PageSubscriber'
+            ),
         )
     )
 );
