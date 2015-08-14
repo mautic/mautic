@@ -454,7 +454,6 @@ class Email extends FormEntity
                     'publishUp',
                     'publishDown',
                     'readCount',
-                    'readInBrowser',
                     'sentCount',
                     'revision',
                     'assetAttachments',

@@ -57,6 +57,9 @@ return array(
             'mautic.webhook.form.subscriber'                => array(
                 'class' => 'Mautic\WebhookBundle\EventListener\FormSubscriber'
             ),
+            'mautic.webhook.email.subscriber'                => array(
+                'class' => 'Mautic\WebhookBundle\EventListener\EmailSubscriber'
+            ),
         )
     )
 );
