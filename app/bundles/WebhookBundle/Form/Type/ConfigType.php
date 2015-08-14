@@ -30,7 +30,7 @@ class ConfigType extends AbstractType
         $builder->add('queue_mode', 'choice', array(
             'choices'  => array(
                 'immediate_process' => 'mautic.webhook.config.immediate_process',
-                'cron_process' => 'mautic.webhook.config.cron_process'
+                'command_process'   => 'mautic.webhook.config.cron_process'
             ),
             'label'    => 'mautic.webhook.config.form.queue.mode',
             'attr'     => array(
