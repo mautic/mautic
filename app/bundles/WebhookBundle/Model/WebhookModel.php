@@ -264,6 +264,7 @@ class WebhookModel extends FormModel
      */
     public function addLog(Webhook $webhook, Response $response)
     {
+        $this->getLogRepository()->removeOldLogs($webhook->getId());
         $log = new Log();
 
         $log->setWebhook($webhook);
@@ -290,6 +291,13 @@ class WebhookModel extends FormModel
     public function getEventRepository()
     {
         return $this->em->getRepository('MauticWebhookBundle:Event');
+    }
+
+    public function getLogRepository()
+    {
+        $logRepo = $this->em->getRepository('MauticWebhookBundle:Log');
+        $logRepo->setFactory($this->factory);
+        return $logRepo;
     }
 
     /*

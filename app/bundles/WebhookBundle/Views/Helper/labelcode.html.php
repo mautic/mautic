@@ -9,10 +9,12 @@
 
 if ($code == '200'): ?>
     <span class="label label-success">
-         <?php echo $view['translator']->trans('mautic.webhook.label.success', array('%code%' => $code)); ?>
+         <?php echo $code; ?>
     </span>
+    <?php echo $view['translator']->trans('mautic.webhook.label.success'); ?>
 <?php else: ?>
     <span class="label label-warning">
-         <?php echo $view['translator']->trans('mautic.webhook.label.warning', array('%code%' => $code)); ?>
+         <?php echo $code; ?>
     </span>
+    <?php echo $view['translator']->trans('mautic.webhook.label.warning'); ?>
 <?php endif; ?>
