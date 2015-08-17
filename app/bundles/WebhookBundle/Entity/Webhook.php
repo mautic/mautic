@@ -237,20 +237,28 @@ class Webhook extends FormEntity
      */
     public function setEvents($events)
     {
+        $this->isChanged('events', $events);
         $this->events = $events;
         /**  @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($events as $event) {
             $event->setWebhook($this);
         }
+        return $this;
     }
     public function addEvent(Event $event)
     {
+        $this->isChanged('events', $event);
         $this->events[] = $event;
+
         return $this;
     }
+
     public function removeEvent(Event $event)
     {
+       $this->isChanged('events', $event);
         $this->events->removeElement($event);
+
+        return $this;
     }
     public function getQueues()
     {
@@ -261,20 +269,28 @@ class Webhook extends FormEntity
      */
     public function addQueues($queues)
     {
+        $this->isChanged('queues', $queues);
         $this->queues = $queues;
         /**  @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queues as $queue) {
             $queue->setWebhook($this);
         }
+
+        return $this;
     }
     public function addQueue(WebhookQueue $queue)
     {
+        $this->isChanged('queues', $queue);
         $this->queues[] = $queue;
+
         return $this;
     }
     public function removeQueue(WebhookQueue $queue)
     {
+        $this->isChanged('queues', $queue);
         $this->queues->removeElement($queue);
+
+        return $this;
     }
     /*
      * Get log entities
@@ -288,19 +304,46 @@ class Webhook extends FormEntity
      */
     public function addLogs($logs)
     {
+        $this->isChanged('logs', $logs);
         $this->logs = $logs;
         /**  @var \Mautic\WebhookBundle\Entity\Log $log */
         foreach ($logs as $log) {
             $log->setWebhook($this);
         }
+
+        return $this;
     }
     public function addLog(Log $log)
     {
+        $this->isChanged('logs', $log);
         $this->logs[] = $log;
+
         return $this;
     }
     public function removeLog(Log $log)
     {
+        $this->isChanged('logs', $log);
         $this->logs->removeElement($log);
+
+        return $this;
+    }
+
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     */
+    protected function isChanged($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($prop == 'category' || $prop == 'events' || $prop == 'logs' || $prop == 'queues') {
+            $currentId = ($current) ? $current->getId() : '';
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
+                $this->changes[$prop] = array($currentId, $newId);
+            }
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
     }
 }
