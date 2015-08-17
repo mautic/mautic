@@ -20,6 +20,10 @@ class WebhookQueueRepository extends CommonRepository
      */
     public function deleteQueuesById(array $idList)
     {
+        // don't process the list if there are no items in it
+        if (!count($idList)) {
+            return;
+        }
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX . 'webhook_queue')
             ->where(
@@ -30,9 +34,17 @@ class WebhookQueueRepository extends CommonRepository
 
     /*
      * Gets a count of the webhook queues filtered by the webhook id
+     *
+     * @param $id int (for Webhooks)
+     *
+     * @return int
      */
     public function getQueueCountByWebhookId($id)
     {
+        // if no idea was sent (the hook was deleted) then return a count of 0
+        if (! $id) {
+            return 0;
+        }
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $count = $qb->select('count(id) as webhook_count')
                  ->from(MAUTIC_TABLE_PREFIX . 'webhook_queue', $this->getTableAlias())
