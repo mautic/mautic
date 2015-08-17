@@ -75,7 +75,7 @@ class WebhookController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'webhook', 'mautic.webhook');
+        return parent::viewStandard($objectId, 'webhook', 'webhook');
     }
 
     /**
