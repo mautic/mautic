@@ -75,7 +75,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <?php foreach ($hookLog as $log): ?>
                                     <tr>
                                         <td><?php echo $log->getId(); ?></td>
-                                        <td><?php echo $log->getStatusCode(); ?></td>
+                                        <td><?php
+                                            echo $view->render('MauticWebhookBundle:Helper:labelcode.html.php', array(
+                                                'code' => $log->getStatusCode(),
+                                            ));
+                                            ?>
+                                        </td>
                                         <td><?php echo $view['date']->toFull($log->getDateAdded()); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
