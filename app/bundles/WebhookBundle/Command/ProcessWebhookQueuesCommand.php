@@ -58,7 +58,25 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
         $model = $this->factory->getModel('webhook.webhook');
 
-        $webhooks = $model->getEntities();
+        // make sure we only get published webhook entities
+        $webhooks = $model->getEntities(
+            array(
+                'filter' => array(
+                  'force' => array(
+                    array(
+                        'column' => 'e.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => 1
+                    )
+                )
+              )
+            )
+        );
+
+        if (!count ($webhooks)) {
+            $output->writeln('<error>No published webhooks found. Try again later.</error>');
+            return;
+        }
 
         $output->writeLn('<info>Processing Webhooks</info>');
 
