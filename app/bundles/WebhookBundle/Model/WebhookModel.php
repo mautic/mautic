@@ -431,4 +431,12 @@ class WebhookModel extends FormModel
 
         return $payload;
     }
+
+    /**
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'webhook:webhooks';
+    }
 }
