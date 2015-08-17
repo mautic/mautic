@@ -108,7 +108,7 @@ class WebhookType extends AbstractType
 
         //add category
         $builder->add('category', 'category', array(
-            'bundle' => 'addon:WebhookBundle'
+            'bundle' => 'Webhook'
         ));
 
         $builder->add('isPublished', 'yesno_button_group');
