@@ -22,21 +22,13 @@ return array(
     ),
 
     'menu'     => array(
-        'main' => array(
-            'priority' => 50,
+        'admin' => array(
             'items'    => array(
                 'mautic.webhook.webhooks' => array(
                     'id'        => 'mautic_webhook_root',
                     'iconClass' => 'fa-exchange',
                     'access'    => array('webhook:webhooks:viewown', 'webhook:webhooks:viewother'),
-                    'children'  => array(
-                        'mautic.webhook.webhook.menu.index' => array(
-                            'route' => 'mautic_webhook_index'
-                        ),
-                        'mautic.category.menu.index'  => array(
-                            'bundle' => 'webhook'
-                        )
-                    )
+                    'route' => 'mautic_webhook_index'
                 )
             )
         )
