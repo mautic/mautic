@@ -70,6 +70,9 @@ return array(
             'mautic.webhook.config.subscriber' => array(
                 'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber'
             ),
+            'mautic.webhook.audit.subscriber' => array(
+                'class' => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber'
+            ),
         )
     ),
 
