@@ -115,7 +115,7 @@ class WebhookModel extends FormModel
     /*
      * Get a list of webhooks by matching events
      *
-     * @param $types array of event type constant
+     * @param $types string of event type
      *
      * @return array
      */

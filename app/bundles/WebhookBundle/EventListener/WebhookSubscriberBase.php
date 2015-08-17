@@ -37,7 +37,11 @@ class WebhookSubscriberBase extends CommonSubscriber
     }
 
     /*
+     * Look up list of webhooks using the event type as an identifer
      *
+     * @param $type string
+     *
+     * @return array
      */
     public function getEventWebooksByType($type)
     {
