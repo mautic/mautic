@@ -30,6 +30,10 @@ class EventRepository extends CommonRepository
             $q->expr()->eq($alias . '.event_type', ':type')
         )->setParameter('type', $type);
 
+        // only find published webhooks
+        $q->andWhere($q->expr()->eq('u.isPublished', ':published'))
+            ->setParameter('published', 1);
+
         return $q->getQuery()->getResult();
     }
 }
