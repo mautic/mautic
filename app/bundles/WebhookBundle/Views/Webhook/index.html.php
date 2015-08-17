@@ -24,7 +24,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'searchValue' => $searchValue,
         'searchHelp'  => 'mautic.page.help.searchcommands',
         'action'      => $currentRoute,
-        'routeBase'   => 'page',
+        'routeBase'   => 'webhook',
         'templateButtons' => array(
             'delete' => $permissions['webhook:webhooks:deleteown'] || $permissions['webhook:webhooks:deleteother']
         )

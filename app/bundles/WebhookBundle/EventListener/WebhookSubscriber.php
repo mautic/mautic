@@ -63,7 +63,7 @@ class WebhookSubscriber extends CommonSubscriber
         $log = array(
             "bundle"     => "webhook",
             "object"     => "webhook",
-            "objectId"   => $event->deletedId,
+            "objectId"   => $event->getWebhook()->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $webhook->getName()),
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
