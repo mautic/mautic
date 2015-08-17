@@ -52,9 +52,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             <h4>
                                 <?php echo $view['translator']->trans('mautic.webhook.no.logs'); ?>
                             </h4>
-                            <pp>
+                            <p>
                                 <?php echo $view['translator']->trans('mautic.webhook.no.logs_desc'); ?>
-                            </pp>
+                            </p>
                         </div>
                     <?php else: ?>
                         <table class="table table-responsive table-striped">
@@ -86,6 +86,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <div class="alert alert-info col-md-6 col-md-offset-3 mt-md">
+                            <h4>
+                                <?php echo $view['translator']->trans('mautic.webhook.webhook.logs.title'); ?>
+                            </h4>
+                            <p>
+                                <?php echo $view['translator']->trans('mautic.webhook.webhook.logs.desc'); ?>
+                            </p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
