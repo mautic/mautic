@@ -7,8 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Message;
-
+namespace Mautic\EmailBundle\Swiftmailer\Message;
 
 class MauticMessage extends \Swift_Message
 {
@@ -34,6 +33,7 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
+     * @param       $email
      * @param array $metadata
      */
     public function addMetadata($email, array $metadata)

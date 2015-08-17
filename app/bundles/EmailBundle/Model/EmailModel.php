@@ -434,7 +434,7 @@ class EmailModel extends FormModel
     /**
      * @param $idHash
      *
-     * @return mixed
+     * @return Stat
      */
     public function getEmailStatus ($idHash)
     {

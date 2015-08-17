@@ -147,6 +147,8 @@ class ThemeHelper
     /**
      * Renders parameters as a string.
      *
+     * @param $config
+     *
      * @return string
      */
     public function renderConfig($config)
@@ -183,34 +185,36 @@ class ThemeHelper
     }
 
     /**
-     * @param $array
+     * @param     $array
+     * @param int $level
+     *
+     * @return string
      */
-    protected function renderArray($array, $addClosingComma = false)
+    protected function renderArray($array, $level = 1)
     {
-        $string = "array(";
-        $first = true;
-        foreach ($array as $key => $value)
-        {
-            if (!$first) {
-                $string .= ',';
-            }
+        $string = "array(\n";
 
+        $count = $counter = count($array);
+        foreach ($array as $key => $value) {
             if (is_string($key)) {
+                if ($counter === $count) {
+                    $string .= str_repeat("\t", $level + 1);
+                }
                 $string .= '"'.$key.'" => ';
             }
 
             if (is_array($value)) {
-                $string .= $this->renderArray($value, true);
+                $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= $value;
+                $string .= '"'.addslashes($value).'"';
             }
-            $first = false;
-        }
-        $string .= ")";
 
-        if ($addClosingComma) {
-            $string .= ',';
+            $counter--;
+            if ($counter > 0) {
+                $string .= ", \n" . str_repeat("\t", $level + 1);
+            }
         }
+        $string .= "\n" . str_repeat("\t", $level) . ")";
 
         return $string;
     }

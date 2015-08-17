@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractTokenHttpTransport

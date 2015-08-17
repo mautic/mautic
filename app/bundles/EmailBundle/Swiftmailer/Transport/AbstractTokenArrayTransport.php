@@ -7,11 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\MailHelper;
-use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractTokenArrayTransport
@@ -75,15 +75,11 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     }
 
     /**
-     * @return \Swift_Events_SimpleEventDispatcher
+     * @param MauticFactory $factory
      */
-    protected function getDispatcher()
+    public function setMauticFactory(MauticFactory $factory)
     {
-        if ($this->dispatcher == null) {
-            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
-        }
-
-        return $this->dispatcher;
+        $this->factory = $factory;
     }
 
     /**
@@ -101,6 +97,18 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     public function getMetadata()
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : array();
+    }
+
+    /**
+     * @return \Swift_Events_SimpleEventDispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher == null) {
+            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
+        }
+
+        return $this->dispatcher;
     }
 
     /**
@@ -196,14 +204,6 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
         $message['attachments'] = $attachments;
 
         return $message;
-    }
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setMauticFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
     }
 
     /**

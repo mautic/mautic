@@ -7,19 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 /**
- * Class AmazonTransport
+ * Class PostmarkTransport
  */
-class AmazonTransport extends \Swift_SmtpTransport
+class PostmarkTransport extends \Swift_SmtpTransport
 {
     /**
      * {@inheritdoc}
      */
     public function __construct($host = 'localhost', $port = 25, $security = null)
     {
-        parent::__construct('email-smtp.us-east-1.amazonaws.com', 587, 'tls');
+        parent::__construct('smtp.postmarkapp.com', 587, 'tls');
 
         $this->setAuthMode('login');
     }

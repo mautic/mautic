@@ -282,47 +282,6 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
                 'arguments' => 'mautic.factory'
             ),
-            'mautic.helper.imap'                 => array(
-                'class'     => 'Mautic\CoreBundle\Helper\ImapHelper',
-                'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.bounce'               => array(
-                'class' => 'Mautic\CoreBundle\Helper\BounceHelper'
-            ),
-            // Mailers
-            'mautic.transport.amazon'            => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.mandrill'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername'      => array('%mautic.mailer_user%'),
-                    'setPassword'      => array('%mautic.mailer_password%'),
-                    'setMauticFactory' => array('mautic.factory')
-                )
-            ),
-            'mautic.transport.sendgrid'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.postmark'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
             // Menu
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
@@ -375,22 +334,6 @@ return array(
         'db_password'                    => '',
         'db_table_prefix'                => '',
         'db_path'                        => '',
-        'mailer_from_name'               => 'Mautic',
-        'mailer_from_email'              => 'email@yoursite.com',
-        'mailer_return_path'             => null,
-        'mailer_transport'               => 'mail',
-        'mailer_host'                    => '',
-        'mailer_port'                    => null,
-        'mailer_user'                    => null,
-        'mailer_password'                => null,
-        'mailer_encryption'              => null, //tls or ssl,
-        'mailer_auth_mode'               => null, //plain, login or cram-md5
-        'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'              => '%kernel.root_dir%/spool',
-        'mailer_spool_msg_limit'         => null,
-        'mailer_spool_time_limit'        => null,
-        'mailer_spool_recover_timeout'   => 900,
-        'mailer_spool_clear_timeout'     => 1800,
         'locale'                         => 'en_US',
         'secret_key'                     => '',
         'trusted_hosts'                  => null,
@@ -421,12 +364,5 @@ return array(
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
         'ignore_ips'                     => null,
-        'monitored_email_host'           => null,
-        'monitored_email_port'           => null,
-        'monitored_email_ssl'            => null,
-        'monitored_email_user'           => null,
-        'monitored_email_password'       => null,
-        'monitored_email_path'           => null,
-        'monitored_email_processed_path' => null,
     )
 );

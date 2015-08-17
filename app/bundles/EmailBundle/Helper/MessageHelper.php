@@ -6,7 +6,7 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
- * Modified from:
+ * Bounce parsing modified from:
  * .---------------------------------------------------------------------------.
  * |  Software: PHPMailer-BMH (Bounce Mail Handler)                            |
  * |   Version: 5.0.0rc1                                                       |
@@ -23,109 +23,118 @@
  * | FITNESS FOR A PARTICULAR PURPOSE.                                         |
  * .---------------------------------------------------------------------------.
  */
-namespace Mautic\CoreBundle\Helper;
+
+namespace Mautic\EmailBundle\Helper;
+
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\MonitoredEmail\Message;
 
 /**
- * Class BounceHelper
+ * Class MessageHelper
  */
-class BounceHelper
+class MessageHelper
 {
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
 
-    public function parseMessage($message)
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $db;
+
+    /**
+     * @var \Monolog\Logger
+     */
+    protected $logger;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
     {
+        $this->factory = $factory;
+        $this->db      = $factory->getDatabase();
+        $this->logger  = $this->factory->getLogger();
 
-        $spamBounce   = false;
-        $bounceParser = new BounceParser();
-        $parser       = new Parser();
-        $message      = file_get_contents("php://stdin");
-        $parser->setText($message);
+    }
 
-        $to = $parser->getHeader('to');
-        if (preg_match('/(.*?)<\s*(.*[^\s])\s*>/', $to, $matches)) {
-            $to = $matches[2];
-        }
+    /**
+     * @param Message    $message
+     * @param bool|false $allowBounce
+     * @param bool|false $allowUnsubscribe
+     *
+     * @return bool
+     */
+    public function analyzeMessage(Message $message, $allowBounce = false, $allowUnsubscribe = false)
+    {
+        $dtHelper = new DateTimeHelper();
 
-        $log->addDebug('Bounce address '.$to);
+        // Assume is an unsubscribe
+        $isUnsubscribe = $allowUnsubscribe;
+        $isBounce      = false;
+        $toEmail       = reset($message->to);
 
-        // Let's parse the to address to get the instance information
-        list($name, $domain) = explode('@', $to);
-
-        $unsubscribeEmail = (strpos($name, 'unsubscribe_') === 0);
-        $bounceEmail      = (strpos($name, 'bounce_') === 0);
-
-        if (!$spamBounce) {
-            $nameParts = explode('_', $name);
-
-            // Remove bounce
-            array_shift($nameParts);
-
-            if (count($nameParts) == 2) {
-                // This is an instance and stat hash
-                $instance = $nameParts[0];
-                $hashId   = $nameParts[1];
-            } else {
-                // Just an instance and thus not associated with a stat
-                $instance = $nameParts[0];
-                $hashId   = null;
+        // Check for bounce emails via + notation if applicable
+        foreach ($message->to as $to => $name) {
+            if (strpos($to, '+bounce') !== false) {
+                $isBounce      = true;
+                $isUnsubscribe = false;
+                $toEmail       = $to;
+                break;
+            } elseif (strpos($to, '+unsubscribe')) {
+                $isBounce      = false;
+                $isUnsubscribe = true;
+                $toEmail       = $to;
+                break;
             }
         }
 
-        $log->addDebug('Instance  = '.$instance);
-        $log->addDebug('HashId = '.$hashId);
+        $this->logger->debug("Analyzing message to {$message->toString}");
 
-        // Assuming this is on a mautic.com setup
-        if (!file_exists('/var/www/hosted/'.$instance)) {
-            $log->addError('The instance, '.$instance.', was not found ('.$to.')');
-
-            return 0;
+        // Parse the to email if applicable
+        if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
+            if (strstr('_', $parts[1])) {
+                // Has an ID hash so use it to find the lead
+                list($ignore, $hashId) = explode('_', $parts[1]);
+            }
         }
 
-        $text = $parser->getMessageBody();
+        $messageDetails = array();
 
-        $bounceResult = array();
+        if ($allowBounce) {
+            if (!empty($message->dsnReport)) {
+                // Parse the bounce
+                $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+                $dsnReport  = $message->dsnReport;
 
-        if ($bounceEmail) {
-            // Parse the bounce
-            $dsnReport = '';
-            foreach ($parser->parts as $part) {
-                if ($part['content-type'] == 'message/delivery-status') {
-                    $start     = $part['starting-pos-body'];
-                    $end       = $part['ending-pos-body'];
-                    $dsnReport = substr($parser->data, $start, $end - $start);
-                }
-            }
-
-            if (!empty($dsnPart)) {
-                $log->addDebug('Delivery report found in message.');
+                $this->logger->addDebug('Delivery report found in message.');
 
                 // Try parsing the report
-                $bounceResult = $bounceParser->parseDsn($text, $dsnReport, $debugMode);
+                $messageDetails = $this->parseDsn($dsnMessage, $dsnReport);
             }
 
-            if (empty($bounceResult['email'])) {
-                $log->addDebug('Parsing the body.');
+            if (empty($messageDetails['email']) || $messageDetails['rule_cat'] == 'unrecognized') {
+                $this->logger->debug('Bounce email or reason not found so attempting to parse the body.');
 
                 // Let's try parsing through the body parser
-                $bounceResult = $bounceParser->parseBody($text, $dsnReport, $debugMode);
+                $messageDetails = $this->parseBody($message->textPlain);
             }
 
-            $log->addDebug(print_r($bounceResult, true));
+            if (!$isBounce && !empty($messageDetails['email'])) {
+                // Bounce was found in message content
+                $isBounce      = true;
+                $isUnsubscribe = false;
+            }
         }
 
-        // Setup the local instance
-        if (!$this->setupConfig('/var/www/hosted/'.$instance.'/public_html')) {
-            $log->addError('The instance, '.$instance.', could not be initiated ('.$to.')');
+        $this->logger->debug(print_r($messageDetails, true));
 
-            return 0;
-        }
-
-        // Setup the database
-        try {
-            $this->setupDatabaseConnection();
-        } catch (\Exception $e) {
-            $log->addError('Database connection failed: '.$e->getMessage().' ('.$to.')');
-
-            return 0;
+        if (!$isBounce && !$isUnsubscribe) {
+            $this->logger->debug('No reason found to process.');
+            return false;
         }
 
         // Search for the lead
@@ -144,110 +153,126 @@ class BounceHelper
             $results = $q->execute()->fetchAll();
 
             if (count($results)) {
-                $stat    = $results[0];
-                $leadId  = $stat['lead_id'];
-                $emailId = $stat['email_id'];
+                $stat      = $results[0];
+                $leadId    = $stat['lead_id'];
+                $leadEmail = $stat['address'];
+                $emailId   = $stat['email_id'];
 
-                $log->addDebug('Stat found with ID# '.$stat['id']);
+                $this->logger->debug('Stat found with ID# '.$stat['id']);
             }
+            unset($results);
         }
 
-        if (!$leadId && (!empty($bounceResult['email']) || $unsubscribeEmail)) {
-            // Email was deleted and thus the stat or the hash is corrupted or for whatever reason, the stat entry couldn't be found OR an unsubcribe
-            // So let's try searching by email
+        if (!$leadId) {
+            if ($isBounce) {
+                if (!empty($messageDetails['email'])) {
+                    $leadEmail = $messageDetails['email'];
+                } else {
+                    // Email not found for the bounce so abort
+                    $this->logger->error('BOUNCE ERROR: A lead could be found from the bounce email. From: ' . $message->fromAddress . '; To: ' . $message->toString . '; Subject: ' . $message->subject);
 
-            if ($unsubscribeEmail) {
-                // Use the from email
-                $leadEmail = $parser->getHeader('from');
-                if (preg_match('/(.*?)<\s*(.*[^\s])\s*>/', $leadEmail, $matches)) {
-                    $leadEmail = $matches[2];
+                    return false;
                 }
-                $log->addDebug('Unsubscribe email: ' . $leadEmail);
-
-                $bounceResult = array(
-                    'remove' => true,
-                    'email'  => $leadEmail
-                );
             } else {
-                $leadEmail = $bounceResult['email'];
+                $leadEmail = $message->fromAddress;
+                $this->logger->debug('From address used: ' . $leadEmail);
             }
+
+            // Search by first part and domain of email to find cases like me+mautic@domain.com
+            list($email, $domain) = explode('@', strtolower($leadEmail));
+            $email                = $email . '%';
+            $domain               = '%@' . $domain;
 
             $q = $this->db->createQueryBuilder();
-            $q->select('l.id')
+            $q->select('l.id, l.email')
                 ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                 ->where(
-                    $q->expr()->eq('LOWER(l.email)', ':email')
+                    $q->expr()->orX(
+                        $q->expr()->eq('LOWER(l.email)', ':leademail'),
+                        $q->expr()->andX(
+                            $q->expr()->like('LOWER(l.email)', ':email'),
+                            $q->expr()->like('LOWER(l.email)', ':domain')
+                        )
+                    )
                 )
-                ->setParameter('email', strtolower($leadEmail));
-            $leadId = $q->execute()->fetchColumn();
+                ->setParameter('leademail', strtolower($leadEmail))
+                ->setParameter('email', strtolower($email))
+                ->setParameter('domain', strtolower($domain));
+            $foundLeads = $q->execute()->fetchAll();
+;
+            foreach ($foundLeads as $lead) {
+                if (strtolower($lead['email']) == strtolower($leadEmail)) {
+                    // Exact match
+                    $leadId = $lead['id'];
 
-            if (!$leadId) {
-                // To prevent SQL error with foreign constraints
-                $leadId = null;
-            }
+                    break;
+                } elseif (strpos($lead['email'], '+') === false) {
+                    // Not a plus style email so not a match
 
-            $log->addDebug('Lead ID found: ' . $leadId);
-
-        } elseif ($leadId && empty($bounceResult['email'])) {
-            // Spam bounce or couldn't find the bounce reason so let's get the lead's email
-            $q = $this->db->createQueryBuilder();
-            $q->select('l.id')
-                ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                ->where(
-                    $q->expr()->eq('l.id', ':id')
-                )
-                ->setParameter('id', (int) $leadId);
-            $leadEmail = $q->execute()->fetchColumn();
-
-            if ($leadEmail) {
-                $bounceResult = array(
-                    'remove' => true,
-                    'email'  => $leadEmail
-                );
-            } else {
-                // Can't do much else so abort
-                $log->addDebug('Email could not be found based on bounce address.');
-
-                return 0;
-            }
-        }
-
-        $dtHelper = new DateTimeHelper();
-        if ($bounceEmail) {
-            // Lead found so let's update Mautic
-            $log->addDebug('Logging bounce');
-
-            if ($stat) {
-                // Update the stat with some details
-                $openDetails = unserialize($stat['open_details']);
-                if (!is_array($openDetails)) {
-                    $openDetails = array();
+                    break;
                 }
 
-                $openDetails['bounces'][] = array(
-                    'datetime' => $dtHelper->toUtcString(),
-                    'reason'   => $bounceResult['rule_cat'],
-                    'code'     => $bounceResult['rule_no'],
-                    'type'     => ($bounceResult['bounce_type'] === false) ? 'unknown' : $bounceResult['bounce_type']
-                );
+                if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $lead['email'], $parts)) {
+                    $email = $parts[1] . '@' . $parts[3];
 
-                $this->db->update(
-                    MAUTIC_TABLE_PREFIX.'email_stats',
-                    array(
-                        'open_details' => serialize($openDetails),
-                        'retry_count'  => $stat['retry_count']++,
-                        'is_failed'    => ($bounceResult['remove'] || $stat['retry_count'] == 5) ? 1 : 0
-                    ),
-                    array('id' => $stat['id'])
-                );
+                    if (strtolower($email) == strtolower($leadEmail)) {
+                        $this->logger->debug('Lead found through + alias: '. $lead['email']);
 
-                $log->addDebug('Stat updated');
+                        $leadId    = $lead['id'];
+                        $leadEmail = $lead['email'];
+                    }
+                }
             }
+
+            $this->logger->debug('Lead ID: ' . ($leadId ? $leadId : 'not found'));
         }
 
-        // Is this a hard bounce?
-        if ($bounceResult['remove'] || ($stat && $stat['retry_count'] >= 5)) {
-            $log->addDebug('Adding DNC entry for ' . $bounceResult['email']);
+        if (!$leadId) {
+            // A lead still could not be found
+
+            return false;
+        }
+
+        // Set message details for unsubscribe requests
+        if ($isUnsubscribe) {
+            $messageDetails = array(
+                'remove'   => true,
+                'email'    => $leadEmail,
+                'rule_cat' => 'unsubscribed',
+                'rule_no'  => '0000'
+            );
+        }
+
+        if ($isBounce && $stat) {
+            // Update the stat with some details
+            $openDetails = unserialize($stat['open_details']);
+            if (!is_array($openDetails)) {
+                $openDetails = array();
+            }
+
+            $openDetails['bounces'][] = array(
+                'datetime' => $dtHelper->toUtcString(),
+                'reason'   => $messageDetails['rule_cat'],
+                'code'     => $messageDetails['rule_no'],
+                'type'     => ($messageDetails['bounce_type'] === false) ? 'unknown' : $messageDetails['bounce_type']
+            );
+
+            $this->db->update(
+                MAUTIC_TABLE_PREFIX.'email_stats',
+                array(
+                    'open_details' => serialize($openDetails),
+                    'retry_count'  => $stat['retry_count']++,
+                    'is_failed'    => ($messageDetails['remove'] || $stat['retry_count'] == 5) ? 1 : 0
+                ),
+                array('id' => $stat['id'])
+            );
+
+            $this->logger->debug('Stat updated');
+        }
+
+        // Is this a hard bounce or AN unsubscribe?
+        if ($messageDetails['remove'] || ($stat && $stat['retry_count'] >= 5)) {
+            $this->logger->debug('Adding DNC entry for ' . $leadEmail);
 
             // Check for an existing DNC entry
             $q = $this->db->createQueryBuilder();
@@ -256,18 +281,18 @@ class BounceHelper
                 ->where(
                     $q->expr()->eq('LOWER(d.address)', ':email')
                 )
-                ->setParameter('email', strtolower($bounceResult['email']));
+                ->setParameter('email', strtolower($leadEmail));
 
             try {
                 $exists = $q->execute()->fetchColumn();
             } catch (\Exception $e) {
-                $log->addError($e->getMessage());
+                $this->logger->error($e->getMessage());
             }
 
             if (!empty($exists)) {
-                $log->addDebug('A DNC entry already exists for '.$bounceResult['email'].' ('.$to.')');
+                $this->logger->debug('A DNC entry already exists for '.$leadEmail);
             } else {
-                $log->addDebug('Existing not found so creating a new one.');
+                $this->logger->debug('Existing not found so creating a new one.');
                 // Create a DNC entry
                 try {
                     $this->db->insert(
@@ -275,25 +300,21 @@ class BounceHelper
                         array(
                             'email_id'     => $emailId,
                             'lead_id'      => $leadId,
-                            'address'      => $bounceResult['email'],
+                            'address'      => $leadEmail,
                             'date_added'   => $dtHelper->toUtcString(),
-                            'bounced'      => ($unsubscribeEmail) ? 0 : 1,
-                            'unsubscribed' => ($unsubscribeEmail) ? 1 : 0,
-                            'comments'     => ($bounceEmail) ? $this->getTranslator()->trans('mautic.allyde.bounce.reason.'.$bounceResult['rule_cat'])
-                                .' ('.$bounceResult['rule_no']
-                                .')' : 'Manually unsubscribed'
+                            'bounced'      => ($isUnsubscribe) ? 0 : 1,
+                            'unsubscribed' => ($isUnsubscribe) ? 1 : 0,
+                            'comments'     => $this->factory->getTranslator()->trans('mautic.email.bounce.reason.'.$messageDetails['rule_cat'])
                         )
                     );
 
                 } catch (\Exception $e) {
-                    $log->addError($e->getMessage());
+                    $this->logger->error($e->getMessage());
                 }
             }
         }
 
-        $log->addDebug(print_r($bounceResult, true));
-        $log->addDebug('Done with ' . $to);
-
+        $this->logger->debug(print_r($messageDetails, true));
     }
 
     /**

@@ -11,7 +11,6 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;

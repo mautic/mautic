@@ -283,4 +283,126 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse(array('size' => $size));
     }
+
+    /**
+     * Tests monitored email connection settings
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function testMonitoredEmailServerConnectionAction(Request $request)
+    {
+        $dataArray = array('success' => 0, 'message' => '');
+
+        if ($this->factory->getUser()->isAdmin()) {
+            $settings = $request->request->all();
+
+            if (empty($settings['password'])) {
+                $settings['password'] = $this->factory->getParameter('monitored_email_password');
+            }
+
+            /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $helper */
+            $helper = $this->factory->getHelper('mailbox');
+
+            try {
+                $helper->setMailboxSettings($settings, false);
+                $folders = $helper->getListingFolders('');
+                if (!empty($folders)) {
+                    $dataArray['folders'] = '';
+                    foreach ($folders as $folder) {
+                        $dataArray['folders'] .= "<option value=\"$folder\">$folder</option>\n";
+                    }
+                }
+                $dataArray['success'] = 1;
+                $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+            } catch (\Exception $e) {
+                $dataArray['message'] = $e->getMessage();
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Tests mail transport settings
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function testEmailServerConnectionAction(Request $request)
+    {
+        $dataArray = array('success' => 0, 'message' => '');
+
+        if ($this->factory->getUser()->isAdmin()) {
+            $settings = $request->request->all();
+
+            $transport = $settings['transport'];
+
+            switch($transport) {
+                case 'mautic.transport.mandrill':
+                    $mailer = new MandrillTransport();
+                    break;
+                case 'mautic.transport.sendgrid':
+                    $mailer = new SendgridTransport();
+                    break;
+                case 'mautic.transport.amazon':
+                    $mailer = new AmazonTransport();
+                    break;
+                case 'mautic.transport.postmark':
+                    $mailer = new PostmarkTransport();
+                    break;
+                case 'gmail':
+                    $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
+                    break;
+                case 'smtp':
+                    $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
+                    break;
+            }
+
+            if (method_exists($mailer, 'setMauticFactory')) {
+                $mailer->setMauticFactory($this->factory);
+            }
+
+            if (!empty($mailer)) {
+                if (empty($settings['password'])) {
+                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                }
+                $mailer->setUsername($settings['user']);
+                $mailer->setPassword($settings['password']);
+
+                $logger = new \Swift_Plugins_Loggers_ArrayLogger();
+                $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
+
+                try {
+                    $mailer->start();
+                    $translator = $this->factory->getTranslator();
+
+                    if ($settings['send_test'] == 'true') {
+                        $message = new \Swift_Message(
+                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.subject'),
+                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
+                        );
+
+                        $user = $this->factory->getUser();
+
+                        $message->setFrom(array($settings['from_email'] => $settings['from_name']));
+                        $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
+
+                        $mailer->send($message);
+                    }
+
+                    $dataArray['success'] = 1;
+                    $dataArray['message'] = $translator->trans('mautic.core.success');
+
+                } catch (\Exception $e) {
+                    $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
 }

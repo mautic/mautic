@@ -10,10 +10,9 @@
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 /**
  * Class EmailSendEvent
