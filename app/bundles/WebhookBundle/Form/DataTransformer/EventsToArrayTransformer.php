@@ -57,7 +57,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
         $removed = array_diff($eventTypes, $submittedArray);
         if ($removed) {
             foreach ($removed as $type) {
-                $events->removeElement($events[$type]);
+                $this->webhook->removeEvent($events[$type]);
             }
         }
 
@@ -67,11 +67,12 @@ class EventsToArrayTransformer implements DataTransformerInterface
             foreach ($added as $type) {
                 // Create a new entity
                 $event = new Event();
-                $event->setWebhook($this->webhook)
-                    ->setEventType($type);
+                $event->setWebhook($this->webhook)->setEventType($type);
                 $events[] = $event;
             }
         }
+
+        $this->webhook->setEvents($events);
 
         return $events;
     }

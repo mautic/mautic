@@ -55,6 +55,8 @@ class Webhook extends FormEntity
      * @var ArrayCollection
      */
     private $logs;
+
+    private $removedEvents = array();
     /*
      * Constructor
      */
@@ -255,7 +257,8 @@ class Webhook extends FormEntity
 
     public function removeEvent(Event $event)
     {
-       $this->isChanged('events', $event);
+        $this->isChanged('events', $event);
+        $this->removedEvents[] = $event;
         $this->events->removeElement($event);
 
         return $this;
@@ -336,12 +339,14 @@ class Webhook extends FormEntity
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category' || $prop == 'events' || $prop == 'logs' || $prop == 'queues') {
+        if ($prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = array($currentId, $newId);
             }
+        } elseif ($prop == 'events') {
+            $this->changes[$prop] = array();
         } elseif ($current != $val) {
             $this->changes[$prop] = array($current, $val);
         }
