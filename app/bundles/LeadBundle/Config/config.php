@@ -263,6 +263,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_quickemail'
             ),
+            'mautic.form.type.lead_tags'                    => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
+                'alias'     => 'lead_tags',
+                'arguments' => 'mautic.factory'
+            )
         ),
         'other'  => array(
             'mautic.validator.leadlistaccess' => array(

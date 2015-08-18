@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
@@ -451,6 +452,78 @@ class AjaxController extends CommonAjaxController
             $tokens = $model->getBuilderComponents($email, array('tokens', 'visualTokens'));
 
             BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
+        }
+
+        return $this->sendJsonResponse($data);
+    }
+
+    protected function updateLeadTagsAction(Request $request)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel   = $this->factory->getModel('lead');
+        $post        = $request->request->get('lead_tags', array(), true);
+        $lead        = $leadModel->getEntity((int) $post['id']);
+        $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : array();
+        $data        = array('success' => 0);
+
+        if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            $currentTags = $lead->getTags();
+
+            $leadModified = $tagsDeleted = false;
+
+            foreach ($currentTags as $tagName => $tag) {
+                if (!in_array($tag->getId(), $updatedTags)) {
+                    // Tag has been removed
+                    $lead->removeTag($tag);
+                    $leadModified = $tagsDeleted = true;
+                } else {
+                    // Remove tag so that what's left are new tags
+                    $key = array_search($tag->getId(), $updatedTags);
+                    unset($updatedTags[$key]);
+                }
+            }
+
+            if (!empty($updatedTags)) {
+                foreach($updatedTags as $tag) {
+                    if (is_numeric($tag)) {
+                        // Existing tag being added to this lead
+                        $lead->addTag(
+                            $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
+                        );
+                    } else {
+                        // New tag
+                        $newTag = new Tag();
+                        $newTag->setTag(strtolower($tag));
+                        $lead->addTag($newTag);
+                    }
+                }
+                $leadModified = true;
+            }
+
+            if ($leadModified) {
+                $leadModel->saveEntity($lead);
+
+                // Delete orphaned tags
+                if ($tagsDeleted) {
+                    $leadModel->getTagRepository()->deleteOrphans();
+                }
+            }
+
+            /** @var \Doctrine\ORM\PersistentCollection $leadTags */
+            $leadTags    = $lead->getTags();
+            $leadTagKeys = $leadTags->getKeys();
+
+            // Get an updated list of tags
+            $tags       = $leadModel->getTagRepository()->getSimpleList(null, array(), 'tag');
+            $tagOptions = '';
+
+            foreach ($tags as $tag) {
+                $selected = (in_array($tag['label'], $leadTagKeys)) ? ' selected="selected"' : '';
+                $tagOptions .= '<option' . $selected. ' value="' . $tag['value'] . '">' . $tag['label'] . '</option>';
+            }
+
+            $data['success'] = 1;
+            $data['tags'] = $tagOptions;
         }
 
         return $this->sendJsonResponse($data);

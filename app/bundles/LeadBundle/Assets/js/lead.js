@@ -327,9 +327,6 @@ Mautic.leadfieldOnLoad = function (container) {
 
 };
 
-/**
- * Update the properties for field data types
- */
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     if (mQuery('#field-templates .'+selectedVal).length) {
         mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
@@ -670,16 +667,24 @@ Mautic.updateLeadList = function () {
     });
 };
 
-/**
- * Obtains the HTML for an email
- *
- * @param el
- */
 Mautic.getLeadEmailContent = function (el) {
     Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
         CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.updateLeadTags = function () {
+    Mautic.activateLabelLoadingIndicator('lead_tags_tags');
+    var formData = mQuery('form[name="lead_tags"]').serialize();
+    console.log(formData);
+    Mautic.ajaxActionRequest('lead:updateLeadTags', formData, function(response) {
+        if (response.tags) {
+            mQuery('#lead_tags_tags').html(response.tags);
+            mQuery('#lead_tags_tags').trigger('chosen:updated');
+        }
         Mautic.removeLabelLoadingIndicator();
     });
 };

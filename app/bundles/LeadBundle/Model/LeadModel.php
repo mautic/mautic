@@ -61,6 +61,16 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\TagRepository
+     */
+    public function getTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -121,7 +131,7 @@ class LeadModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
-     * @return null|object
+     * @return null|Lead
      */
     public function getEntity($id = null)
     {

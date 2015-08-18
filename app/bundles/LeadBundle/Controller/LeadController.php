@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -402,7 +403,18 @@ class LeadController extends FormController
                             'leadId'     => $lead->getId(),
                             'ignoreAjax' => 1
                         )
-                    )->getContent()
+                    )->getContent(),
+                    'tagForm'           => $this->createForm(
+                        'lead_tags',
+                        $lead,
+                        array(
+                            'allow_edit' => $this->factory->getSecurity()->hasEntityAccess(
+                                'lead:leads:editown',
+                                'lead:leads:editother',
+                                $lead->getOwner()
+                            )
+                        )
+                    )->createView()
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
                 'passthroughVars' => array(
@@ -1321,7 +1333,7 @@ class LeadController extends FormController
      *
      * @return JsonResponse
      */
-    protected function emailAction($objectId = 0)
+    public function emailAction($objectId = 0)
     {
         $valid = $cancelled = false;
 
