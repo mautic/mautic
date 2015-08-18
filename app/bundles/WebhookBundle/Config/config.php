@@ -71,6 +71,7 @@ return array(
     'parameters' => array(
         'webhook_start' => 0,
         'webhook_limit' => 1000,
-        'webhook_log_max' => 10
+        'webhook_log_max' => 10,
+        'queue_mode' => 'immediate_process'
     )
 );
