@@ -1013,8 +1013,9 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param      $tags
+     * @param      $removeTags
      */
-    public function modifyTags(Lead $lead, $tags)
+    public function modifyTags(Lead $lead, $tags, array $removeTags = null)
     {
         $leadTags = $lead->getTags();
 
@@ -1043,6 +1044,15 @@ class LeadModel extends FormModel
                     $lead->addTag($newTag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $lead->addTag($foundTags[$tag]);
+                }
+            }
+        }
+
+        if ($removeTags !== null) {
+            foreach ($removeTags as $tag) {
+                // Tag to be removed
+                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                    $lead->removeTag($foundTags[$tag]);
                 }
             }
         }

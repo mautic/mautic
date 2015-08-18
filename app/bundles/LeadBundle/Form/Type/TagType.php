@@ -10,11 +10,42 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TagType extends AbstractType
 {
+
+    /**
+     * @var
+     */
+    private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ($options['add_transformer']) {
+            $transformer = new TagEntityModelTransformer(
+                $this->factory->getEntityManager(),
+                'MauticLeadBundle:Tag',
+                'id',
+                ($options['multiple']),
+                true
+            );
+
+            $builder->addModelTransformer($transformer);
+        }
+    }
 
     /**
      * @param OptionsResolverInterface $resolver
@@ -23,16 +54,17 @@ class TagType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'label'         => 'mautic.lead.tags',
-                'class'         => 'MauticLeadBundle:Tag',
-                'query_builder' => function (EntityRepository $er) {
+                'label'           => 'mautic.lead.tags',
+                'class'           => 'MauticLeadBundle:Tag',
+                'query_builder'   => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')
                         ->orderBy('t.tag', 'ASC');
                 },
-                'property'      => 'tag',
-                'multiple'      => true,
-                'required'      => false,
-                'disabled'      => false
+                'property'        => 'tag',
+                'multiple'        => true,
+                'required'        => false,
+                'disabled'        => false,
+                'add_transformer' => false
             )
         );
     }
