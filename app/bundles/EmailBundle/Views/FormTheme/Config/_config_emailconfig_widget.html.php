@@ -89,7 +89,11 @@ $template = '<div class="col-md-6">{content}</div>';
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
     </div>
     <div class="panel-body">
+        <?php if (function_exists('imap_open')): ?>
         <?php echo $view['form']->widget($form['monitored_email']); ?>
+        <?php else: ?>
+            <h4><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></h4>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>

@@ -410,17 +410,15 @@ class ConfigType extends AbstractType
             )
         );
 
-        if (function_exists('imap_open')) {
-            $builder->add(
-                'monitored_email',
-                'monitored_email',
-                array(
-                    'label'    => false,
-                    'data'     => (array_key_exists('monitored_email', $options['data'])) ? $options['data']['monitored_email'] : array(),
-                    'required' => false
-                )
-            );
-        }
+        $builder->add(
+            'monitored_email',
+            'monitored_email',
+            array(
+                'label'    => false,
+                'data'     => (array_key_exists('monitored_email', $options['data'])) ? $options['data']['monitored_email'] : array(),
+                'required' => false
+            )
+        );
     }
 
     /**
