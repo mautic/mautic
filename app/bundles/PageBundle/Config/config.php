@@ -56,7 +56,8 @@ return array(
                 'path'       => '/{slug}',
                 'controller' => 'MauticPageBundle:Public:index',
                 'requirements' => array(
-                    'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|addons/)).+'
+                    // @deprecated support for /addons; to be removed in 2.0
+                    'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/|addons/)).+'
                 )
             ),
         )

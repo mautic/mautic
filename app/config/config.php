@@ -1,72 +1,50 @@
 <?php
+include __DIR__ . '/paths_helper.php';
+
 $ormMappings = $serializerMappings = array();
 
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
-    if (strpos($namespace, 'Mautic\\') !== false) {
-        $bundleBase    = str_replace('Mautic', '', $bundle);
-        $directory     = $container->getParameter('kernel.root_dir') . '/bundles/' . $bundleBase;
-        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
+$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings) {
+    $isPlugin = $isMautic = false;
 
-        // Check for a single config file
-        if (file_exists($directory.'/Config/config.php')) {
-            $config = include $directory.'/Config/config.php';
-        } else {
-            $config = array();
-        }
-
-        // Set ORM mapping to staticphp for core entities
-        if (file_exists($directory.'/Entity')) {
-            $ormMappings[$bundle] = array(
-                'dir'       => 'Entity',
-                'type'      => 'staticphp',
-                'prefix'    => $baseNamespace . '\\Entity',
-                'mapping'   => true,
-                'is_bundle' => true
-            );
-
-            // Set API metadata
-            $serializerMappings[$bundle] = array(
-                'namespace_prefix' => $baseNamespace . '\\Entity',
-                'path'             => "@$bundle/Entity"
-            );
-        }
-
-        return array(
-            "isAddon"           => false,
-            "base"              => str_replace('Bundle', '', $bundleBase),
-            "bundle"            => $bundleBase,
-            "namespace"         => $baseNamespace,
-            "symfonyBundleName" => $bundle,
-            "bundleClass"       => $namespace,
-            "relative"          => basename($container->getParameter('kernel.root_dir')) . '/bundles/' . $bundleBase,
-            "directory"         => $directory,
-            "config"            => $config
-        );
+    if (strpos($namespace, 'MauticPlugin\\') !== false) {
+        $isPlugin   = true;
+        $bundleBase = $bundle;
+        $relative   = $paths['plugins'].'/'.$bundleBase;
+    } elseif (strpos($namespace, 'MauticAddon\\') !== false) {
+        // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
+        $isPlugin   = true;
+        $bundleBase = $bundle;
+        $relative   = 'addons/'.$bundleBase;
+    } elseif (strpos($namespace, 'Mautic\\') !== false) {
+        $isMautic   = true;
+        $bundleBase = str_replace('Mautic', '', $bundle);
+        $relative   = $paths['bundles'] . '/' . $bundleBase;
     }
-    return false;
-};
 
-// Note MauticAddon bundles so they can be applied as needed
-$buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMappings, &$serializerMappings) {
-    if (strpos($namespace, 'MauticAddon\\') !== false) {
-        $directory     = dirname($container->getParameter('kernel.root_dir')) . '/addons/' . $bundle;
+    if ($isMautic || $isPlugin) {
         $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
+        $directory     = $paths['root'].'/'.$relative;
 
         // Check for a single config file
-        if (file_exists($directory.'/Config/config.php')) {
-            $config = include $directory.'/Config/config.php';
-        } else {
-            $config = array();
-        }
+        $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->notName('*Repository.php');
+            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
 
             foreach ($finder as $file) {
+                // @deprecated 1.1.4; to be removed in 2.0; BC support for Addon
+                if (strpos($baseNamespace, 'PluginBundle') !== false && $file->getFilename() == 'Addon.php') {
+                    // Do not include this class as it's used for BC support
+                    continue;
+                }
+
+                // Check to see if entities are organized by subfolder
+                $subFolder = $file->getRelativePath();
+
                 // Just check first file for the loadMetadata function
-                $reflectionClass = new \ReflectionClass($namespace . '\\Entity\\' . basename($file->getFilename(), '.php'));
+                $reflectionClass = new \ReflectionClass('\\' . $baseNamespace  . '\\Entity\\' . (!empty($subFolder) ? $subFolder . '\\': '') . basename($file->getFilename(), '.php'));
 
                 // Register API metadata
                 if ($reflectionClass->hasMethod('loadApiMetadata')) {
@@ -85,51 +63,42 @@ $buildAddonBundles = function($namespace, $bundle) use ($container, &$ormMapping
                         'mapping'   => true,
                         'is_bundle' => true
                     );
-                } else {
-                    // Use Symfony's auto mapping
-
-                    break;
                 }
             }
         }
 
         return array(
-            "isAddon"           => true,
-            "base"              => str_replace('Bundle', '', $bundle),
-            "bundle"            => $bundle,
-            "namespace"         => $baseNamespace,
-            "symfonyBundleName" => $bundle,
-            "bundleClass"       => $namespace,
-            "relative"          => 'addons/' . $bundle,
-            "directory"         => $directory,
-            "config"            => $config
+            'isPlugin'          => $isPlugin,
+            'base'              => str_replace('Bundle', '', $bundleBase),
+            'bundle'            => $bundleBase,
+            'namespace'         => $baseNamespace,
+            'symfonyBundleName' => $bundle,
+            'bundleClass'       => $namespace,
+            'relative'          => $relative,
+            'directory'         => $directory,
+            'config'            => $config
         );
     }
+
     return false;
 };
 
+// Seperate out Mautic's bundles from other Symfony bundles
 $symfonyBundles = $container->getParameter('kernel.bundles');
-
 $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
 unset($buildBundles);
 
-$addonBundles  = array_filter(
-    array_map($buildAddonBundles, $symfonyBundles, array_keys($symfonyBundles)),
-    function ($v) { return (!empty($v)); }
-);
-unset($buildAddonBundles, $buildBundles);
-
-$setBundles = array();
-
+// Sort Mautic's bundles into Core and Plugins
+$setBundles = $setPluginBundles = array();
 foreach ($mauticBundles as $bundle) {
-    $setBundles[$bundle['symfonyBundleName']] = $bundle;
-}
-$setAddonBundles = array();
-foreach ($addonBundles as $bundle) {
-    $setAddonBundles[$bundle['symfonyBundleName']] = $bundle;
+    if ($bundle['isPlugin']) {
+        $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
+    } else {
+        $setBundles[$bundle['symfonyBundleName']] = $bundle;
+    }
 }
 
 // Make Core the first in the list
@@ -138,20 +107,22 @@ unset($setBundles['MauticCoreBundle']);
 $setBundles = array_merge(array('MauticCoreBundle' => $coreBundle), $setBundles);
 
 $container->setParameter('mautic.bundles', $setBundles);
-$container->setParameter('mautic.addon.bundles', $setAddonBundles);
-unset($setBundles, $setAddonBundles);
+$container->setParameter('mautic.plugin.bundles', $setPluginBundles);
+unset($setBundles, $setPluginBundles);
 
+// Load parameters
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
+// Set template engines
 $engines = ($container->getParameter('kernel.environment') == 'dev') ? array('php', 'twig') : array('php');
 
+// Generate session name
 if (isset($_COOKIE['mautic_session_name'])) {
     // Attempt to keep from losing sessions if cache is cleared through UI
     $sessionName = $_COOKIE['mautic_session_name'];
 } else {
-    $paths       = $container->getParameter('mautic.paths');
-    $key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+    $key = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
     $sessionName = md5(md5($paths['local_config']).$key);
 }
 

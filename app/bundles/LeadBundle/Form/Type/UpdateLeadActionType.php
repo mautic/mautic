@@ -34,7 +34,7 @@ class UpdateLeadActionType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $addonModel */
+        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
         $fieldModel = $this->factory->getModel('lead.field');
         $leadFields = $fieldModel->getFieldList(false, false);
 
