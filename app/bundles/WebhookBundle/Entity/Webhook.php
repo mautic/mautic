@@ -274,7 +274,6 @@ class Webhook extends FormEntity
      */
     public function addQueues($queues)
     {
-        $this->isChanged('queues', $queues);
         $this->queues = $queues;
         /**  @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queues as $queue) {
@@ -285,14 +284,12 @@ class Webhook extends FormEntity
     }
     public function addQueue(WebhookQueue $queue)
     {
-        $this->isChanged('queues', $queue);
         $this->queues[] = $queue;
 
         return $this;
     }
     public function removeQueue(WebhookQueue $queue)
     {
-        $this->isChanged('queues', $queue);
         $this->queues->removeElement($queue);
 
         return $this;
@@ -309,7 +306,6 @@ class Webhook extends FormEntity
      */
     public function addLogs($logs)
     {
-        $this->isChanged('logs', $logs);
         $this->logs = $logs;
         /**  @var \Mautic\WebhookBundle\Entity\Log $log */
         foreach ($logs as $log) {
@@ -320,14 +316,12 @@ class Webhook extends FormEntity
     }
     public function addLog(Log $log)
     {
-        $this->isChanged('logs', $log);
         $this->logs[] = $log;
 
         return $this;
     }
     public function removeLog(Log $log)
     {
-        $this->isChanged('logs', $log);
         $this->logs->removeElement($log);
 
         return $this;

@@ -223,14 +223,20 @@ class WebhookModel extends FormModel
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
         $webhookQueueRepo = $this->getQueueRepository();
 
+        /** @var Logger $log */
+        $log = $this->factory->getLogger();
+
+
         // instantiate new http class
         $http = new Http();
 
         // get the webhook payload
         $payload = ($this->getWebhookPayload($webhook));
 
-        /** @var Logger $log */
-        $log = $this->factory->getLogger();
+        // if there wasn't a payload we can stop here
+        if (! count($payload)) {
+            return;
+        }
 
         /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
         try {
