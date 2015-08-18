@@ -24,8 +24,6 @@ use Symfony\Component\Form\FormView;
  */
 class ConfigMonitoredEmailType extends AbstractType
 {
-    private $scripts;
-
     /**
      * @var MauticFactory
      */
