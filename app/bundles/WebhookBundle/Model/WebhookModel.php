@@ -226,7 +226,6 @@ class WebhookModel extends FormModel
         /** @var Logger $log */
         $log = $this->factory->getLogger();
 
-
         // instantiate new http class
         $http = new Http();
 
@@ -299,6 +298,9 @@ class WebhookModel extends FormModel
         return $this->em->getRepository('MauticWebhookBundle:Event');
     }
 
+    /*
+     * Return the log repo
+     */
     public function getLogRepository()
     {
         $logRepo = $this->em->getRepository('MauticWebhookBundle:Log');

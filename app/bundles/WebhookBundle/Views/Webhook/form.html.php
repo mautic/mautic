@@ -29,6 +29,17 @@ $view['slots']->set("headerTitle", $header);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
                     <?php echo $view['form']->row($form['webhook_url']); ?>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <?php echo $view['form']->row($form['sendTest']); ?>
+                        </div>
+                        <div class="col-md-2">
+                            <span id="spinner" class="fa fa-spinner fa-spin hide"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <div id="tester" class="text-right"></div>
+                        </div>
+                    </div>
                     <?php echo $view['form']->row($form['description']); ?>
                 </div>
                 <div class="col-md-6">

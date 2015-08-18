@@ -106,6 +106,13 @@ class WebhookType extends AbstractType
 
         $builder->add('buttons', 'form_buttons');
 
+        $builder->add('sendTest', 'button',
+            array(
+                'attr' => array('class' => 'btn btn-success', 'onclick' => 'Mautic.sendHookTest(this)'),
+                'label' => 'mautic.webhook.send.test.payload',
+
+        ));
+
         //add category
         $builder->add('category', 'category', array(
             'bundle' => 'Webhook'
