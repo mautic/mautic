@@ -61,9 +61,9 @@ class CorePermissions
     /**
      * @return array
      */
-    protected function getAddonBundles()
+    protected function getPluginBundles()
     {
-        return $this->factory->getEnabledAddons();
+        return $this->factory->getPluginBundles();
     }
 
     /**
@@ -96,15 +96,13 @@ class CorePermissions
                     continue;
                 } //do not include this file
 
-                //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
                 $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
                 }
             }
 
-            foreach ($this->getAddonBundles() as $bundle) {
-                //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
+            foreach ($this->getPluginBundles() as $bundle) {
                 $object = $this->getPermissionObject($bundle['base'], false, true);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
@@ -120,25 +118,40 @@ class CorePermissions
      *
      * @param string $bundle
      * @param bool   $throwException
-     * @param bool   $addonBundle
+     * @param bool   $pluginBundle
      *
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function getPermissionObject($bundle, $throwException = true, $addonBundle = false)
+    public function getPermissionObject($bundle, $throwException = true, $pluginBundle = false)
     {
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
-                $bundle    = ucfirst($bundle);
-                $base      = $addonBundle ? 'MauticAddon' : 'Mautic';
-                $className = "{$base}\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
-                if (class_exists($className)) {
-                    $classes[$bundle] = new $className($this->getParams());
-                } elseif ($throwException) {
-                    throw new \InvalidArgumentException("$className not found!");
+                $bundle       = ucfirst($bundle);
+                $checkBundles = ($pluginBundle) ? $this->getPluginBundles() : $this->getBundles();
+                $bundleName   = $bundle . 'Bundle';
+
+                if (!$pluginBundle) {
+                    // Core bundle
+                    $bundleName = 'Mautic' . $bundleName;
+                }
+
+                if (array_key_exists($bundleName, $checkBundles)) {
+                    $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\{$bundle}Permissions";
+                    $exists    = class_exists($className);
                 } else {
-                    $classes[$bundle] = false;
+                    $exists = false;
+                }
+
+                if ($exists) {
+                    $classes[$bundle] = new $className($this->getParams());
+                } else {
+                    if ($throwException) {
+                        throw new \InvalidArgumentException("Permission class not found for {$bundle}Bundle!");
+                    } else {
+                        $classes[$bundle] = false;
+                    }
                 }
             }
 
@@ -253,11 +266,12 @@ class CorePermissions
 
             $parts = explode(':', $permission);
 
-            if ($parts[0] == 'addon' && count($parts) == 4) {
-                $isAddon = true;
+            // addon @deprecated 1.1.4; will be removed in 2.0
+            if (($parts[0] == 'addon' ||$parts[0] == 'plugin') && count($parts) == 4) {
+                $isPlugin = true;
                 array_shift($parts);
             } else {
-                $isAddon = false;
+                $isPlugin = false;
             }
 
             if (count($parts) != 3) {
@@ -269,7 +283,7 @@ class CorePermissions
             $activePermissions =  ($userEntity instanceof User) ? $userEntity->getActivePermissions() : array();
 
             //check against bundle permissions class
-            $permissionObject = $this->getPermissionObject($parts[0], true, $isAddon);
+            $permissionObject = $this->getPermissionObject($parts[0], true, $isPlugin);
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
@@ -332,18 +346,19 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            if ($parts[0] == 'addon' && count($parts) == 4) {
-                $isAddon = true;
+            // addon @deprecated 1.1.4; will be removed in 2.0
+            if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 4) {
+                $isPlugin = true;
                 array_shift($parts);
             } else {
-                $isAddon = false;
+                $isPlugin = false;
             }
 
             if (count($parts) != 3) {
                 $result[$p] = false;
             } else {
                 //check against bundle permissions class
-                $permissionObject = $this->getPermissionObject($parts[0], false, $isAddon);
+                $permissionObject = $this->getPermissionObject($parts[0], false, $isPlugin);
                 $result[$p]       = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
             }
         }

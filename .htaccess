@@ -50,7 +50,7 @@
         # When mod_rewrite is not available, we instruct a temporary redirect of
         # the start page to the front controller explicitly so that the website
         # and the generated links can still be used.
-        RedirectMatch 302 ^(?!/(index\.php|index_dev\.php|app|addons|media|upgrade))(/(.*))$ /index.php$2
+        RedirectMatch 302 ^(?!/(index\.php|index_dev\.php|app|addons|plugins|media|upgrade))(/(.*))$ /index.php$2
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>

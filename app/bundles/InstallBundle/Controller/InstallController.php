@@ -892,7 +892,7 @@ class InstallController extends CommonController
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
                     $paths[] = $entityPath;
-                    if ($b['isAddon']) {
+                    if ($b['isPlugin']) {
                         $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
                     } else {
                         $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';

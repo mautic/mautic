@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
@@ -62,11 +61,6 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
-     * @var \Mautic\AddonBundle\Helper\AddonHelper
-     */
-    protected $addonHelper;
-
-    /**
      * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
@@ -79,7 +73,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->params      = $factory->getSystemParameters();
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
-        $this->addonHelper = $factory->getHelper('addon');
     }
 
     /**
@@ -94,9 +87,6 @@ class CommonSubscriber implements EventSubscriberInterface
      * Find and add menu items
      *
      * @param MauticEvents\MenuEvent $event
-     * @param string                 $name
-     *
-     * @return void
      */
     protected function buildMenu (MauticEvents\MenuEvent $event)
     {
@@ -108,10 +98,6 @@ class CommonSubscriber implements EventSubscriberInterface
             $bundles = $this->factory->getMauticBundles(true);
 
             foreach ($bundles as $bundle) {
-                if ($bundle['isAddon'] && !$this->addonHelper->isEnabled($bundle['bundle'])) {
-                    continue;
-                }
-
                 if (!empty($bundle['config']['menu'][$name])) {
                     $menu        = $bundle['config']['menu'][$name];
                     $menuItems[] = array(
@@ -160,10 +146,6 @@ class CommonSubscriber implements EventSubscriberInterface
             $bundles    = $this->factory->getMauticBundles(true);
             $menuHelper = $this->factory->getHelper('menu');
             foreach ($bundles as $bundle) {
-                if ($bundle['isAddon'] && !$this->addonHelper->isEnabled($bundle['bundle'])) {
-                    continue;
-                }
-
                 if (!empty($bundle['config']['menu']['main'])) {
                     $items = (!isset($bundle['config']['menu']['main']['items']) ? $bundle['config']['menu']['main'] : $bundle['config']['menu']['main']['items']);
                 }
@@ -198,7 +180,6 @@ class CommonSubscriber implements EventSubscriberInterface
      * Get routing from bundles and add to Routing event
      *
      * @param MauticEvents\RouteEvent $event
-     * @param string                  $name
      *
      * @return void
      */
@@ -209,10 +190,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $collection = $event->getCollection();
 
         foreach ($bundles as $bundle) {
-            if ($bundle['isAddon'] && !$this->addonHelper->isEnabled($bundle['bundle'])) {
-                continue;
-            }
-
             if (!empty($bundle['config']['routes'][$type])) {
                 foreach ($bundle['config']['routes'][$type] as $name => $details) {
                     // Set defaults and controller
