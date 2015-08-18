@@ -467,47 +467,8 @@ class AjaxController extends CommonAjaxController
         $data        = array('success' => 0);
 
         if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
-            $currentTags = $lead->getTags();
 
-            $leadModified = $tagsDeleted = false;
-
-            foreach ($currentTags as $tagName => $tag) {
-                if (!in_array($tag->getId(), $updatedTags)) {
-                    // Tag has been removed
-                    $lead->removeTag($tag);
-                    $leadModified = $tagsDeleted = true;
-                } else {
-                    // Remove tag so that what's left are new tags
-                    $key = array_search($tag->getId(), $updatedTags);
-                    unset($updatedTags[$key]);
-                }
-            }
-
-            if (!empty($updatedTags)) {
-                foreach($updatedTags as $tag) {
-                    if (is_numeric($tag)) {
-                        // Existing tag being added to this lead
-                        $lead->addTag(
-                            $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
-                        );
-                    } else {
-                        // New tag
-                        $newTag = new Tag();
-                        $newTag->setTag(InputHelper::clean($tag));
-                        $lead->addTag($newTag);
-                    }
-                }
-                $leadModified = true;
-            }
-
-            if ($leadModified) {
-                $leadModel->saveEntity($lead);
-
-                // Delete orphaned tags
-                if ($tagsDeleted) {
-                    $leadModel->getTagRepository()->deleteOrphans();
-                }
-            }
+            $leadModel->setTags($lead, $updatedTags, true);
 
             /** @var \Doctrine\ORM\PersistentCollection $leadTags */
             $leadTags    = $lead->getTags();
@@ -524,6 +485,53 @@ class AjaxController extends CommonAjaxController
 
             $data['success'] = 1;
             $data['tags'] = $tagOptions;
+        }
+
+        return $this->sendJsonResponse($data);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function addLeadTagsAction(Request $request)
+    {
+        $tags = $request->request->get('tags');
+        $tags = json_decode($tags, true);
+
+        if (is_array($tags)) {
+            $newTags = array();
+            foreach ($tags as $tag) {
+                if (!is_numeric($tag)) {
+                    // New tag
+                    $tagEntity = new Tag();
+                    $tagEntity->setTag(InputHelper::clean($tag));
+                    $newTags[] = $tagEntity;
+                }
+            }
+
+            $leadModel = $this->factory->getModel('lead');
+
+            if (!empty($newTags)) {
+                $leadModel->getTagRepository()->saveEntities($newTags);
+            }
+
+            // Get an updated list of tags
+            $allTags    = $leadModel->getTagRepository()->getSimpleList(null, array(), 'tag');
+            $tagOptions = '';
+
+            foreach ($allTags as $tag) {
+                $selected = (in_array($tag['value'], $tags) || in_array($tag['label'], $tags)) ? ' selected="selected"' : '';
+                $tagOptions .= '<option'.$selected.' value="'.$tag['value'].'">'.$tag['label'].'</option>';
+            }
+
+            $data = array(
+                'success' => 1,
+                'tags'    => $tagOptions
+            );
+        } else {
+            $data = array('success' => 0);
         }
 
         return $this->sendJsonResponse($data);

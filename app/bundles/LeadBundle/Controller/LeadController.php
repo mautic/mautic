@@ -1076,6 +1076,7 @@ class LeadController extends FormController
                     // Batch process
                     $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
                     $defaultList  = $session->get('mautic.lead.import.defaultlist', null);
+                    $defaultTags  = $session->get('mautic.lead.import.defaulttags', null);
                     $headers      = $session->get('mautic.lead.import.headers', array());
                     $importFields = $session->get('mautic.lead.import.fields', array());
 
@@ -1092,6 +1093,8 @@ class LeadController extends FormController
 
                         while ($batchSize && !$file->eof()) {
                             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                            array_walk($data, create_function('&$val', '$val = trim($val);'));
+
                             if ($lineNumber === 0) {
                                 $lineNumber++;
                                 continue;
@@ -1114,7 +1117,7 @@ class LeadController extends FormController
 
                                 $data = array_combine($headers, $data);
                                 try {
-                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList);
+                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
 
                                     if ($merged) {
                                         $stats['merged']++;
@@ -1197,6 +1200,7 @@ class LeadController extends FormController
                                         $linecount = $file->key();
 
                                         if (!empty($headers) && is_array($headers)) {
+                                            array_walk($headers, create_function('&$val', '$val = trim($val);'));
                                             $session->set('mautic.lead.import.headers', $headers);
                                             sort($headers);
                                             $headers = array_combine($headers, $headers);
@@ -1234,9 +1238,18 @@ class LeadController extends FormController
                         $list = $matchedFields['list'];
                         unset($matchedFields['list']);
 
+                        $tagCollection = $matchedFields['tags'];
+                        $tags = array();
+                        foreach ($tagCollection as $tag) {
+                            $tags[] = $tag->getTag();
+                        }
+                        unset($matchedFields['tags']);
+
                         foreach ($matchedFields as $k => $f) {
                             if (empty($f)) {
                                 unset($matchedFields[$k]);
+                            } else {
+                                $matchedFields[$k] = trim($matchedFields[$k]);
                             }
                         }
 
@@ -1252,6 +1265,7 @@ class LeadController extends FormController
                             $session->set('mautic.lead.import.fields', $matchedFields);
                             $session->set('mautic.lead.import.defaultowner', $defaultOwner);
                             $session->set('mautic.lead.import.defaultlist', $list);
+                            $session->set('mautic.lead.import.defaulttags', $tags);
                             $session->set('mautic.lead.import.step', 3);
 
                             return $this->importAction(0, true);

@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -19,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\EmailBundle\Entity\DoNotEmail;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -821,13 +823,14 @@ class LeadModel extends FormModel
      * @param      $data
      * @param null $owner
      * @param null $list
+     * @param null $tags
      * @param bool $persist Persist to the database; otherwise return entity
      *
      * @return bool
      * @throws \Doctrine\ORM\ORMException
      * @throws \Swift_RfcComplianceException
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
@@ -930,6 +933,10 @@ class LeadModel extends FormModel
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
 
+        if ($tags !== null) {
+            $this->modifyTags($lead, $tags);
+        }
+
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
@@ -948,5 +955,98 @@ class LeadModel extends FormModel
         }
 
         return $merged;
+    }
+
+    /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setTags(Lead $lead, array $tags, $removeOrphans = false)
+    {
+        $currentTags  = $lead->getTags();
+        $leadModified = $tagsDeleted = false;
+
+        foreach ($currentTags as $tagName => $tag) {
+            if (!in_array($tag->getId(), $tags)) {
+                // Tag has been removed
+                $lead->removeTag($tag);
+                $leadModified = $tagsDeleted = true;
+            } else {
+                // Remove tag so that what's left are new tags
+                $key = array_search($tag->getId(), $tags);
+                unset($tags[$key]);
+            }
+        }
+
+        if (!empty($tags)) {
+            foreach($tags as $tag) {
+                if (is_numeric($tag)) {
+                    // Existing tag being added to this lead
+                    $lead->addTag(
+                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
+                    );
+                } else {
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag(InputHelper::clean($tag));
+                    $lead->addTag($newTag);
+                }
+            }
+            $leadModified = true;
+        }
+
+        if ($leadModified) {
+            $this->saveEntity($lead);
+
+            // Delete orphaned tags
+            if ($tagsDeleted && $removeOrphans) {
+                $this->getTagRepository()->deleteOrphans();
+            }
+        }
+    }
+
+    /**
+     * Modify tags with support to remove via a prefixed minus sign
+     *
+     * @param Lead $lead
+     * @param      $tags
+     */
+    public function modifyTags(Lead $lead, $tags)
+    {
+        $leadTags = $lead->getTags();
+
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+
+        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+        // See which tags already exist
+        $foundTags = $this->getTagRepository()->getTagsByName($tags);
+        foreach ($tags as $tag) {
+            if (strpos($tag, '-') === 0) {
+                // Tag to be removed
+                $tag = substr($tag, 1);
+
+                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                    $lead->removeTag($foundTags[$tag]);
+                }
+            } else {
+                // Tag to be added
+                if (!array_key_exists($tag, $foundTags)) {
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag($tag);
+                    $lead->addTag($newTag);
+                } elseif (!$leadTags->contains($foundTags[$tag])) {
+                    $lead->addTag($foundTags[$tag]);
+                }
+            }
+        }
+
+        $this->saveEntity($lead);
     }
 }

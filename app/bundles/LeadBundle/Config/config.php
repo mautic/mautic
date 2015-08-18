@@ -267,6 +267,10 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
                 'alias'     => 'lead_tags',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.form.type.lead_tag'                    => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\TagType',
+                'alias'     => 'lead_tag'
             )
         ),
         'other'  => array(

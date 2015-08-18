@@ -1,19 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alan
- * Date: 8/17/15
- * Time: 14:51
+ * @package     Mautic
+ * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Form\Type;
 
-
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TagListType extends AbstractType
@@ -37,26 +35,15 @@ class TagListType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        if ($options['include_id']) {
-            $builder->add(
-                'id',
-                'hidden'
-            );
-        }
+        $builder->add(
+            'id',
+            'hidden'
+        );
 
         $builder->add(
             'tags',
-            'entity',
+            'lead_tag',
             array(
-                'label' => 'mautic.lead.tags',
-                'class' => 'MauticLeadBundle:Tag',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.tag', 'ASC');
-                },
-                'property' => 'tag',
-                'multiple' => true,
-                'required' => false,
                 'attr' => array(
                     'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
@@ -75,10 +62,6 @@ class TagListType extends AbstractType
     {
         $resolver->setRequired(array(
             'allow_edit'
-        ));
-
-        $resolver->setDefaults(array(
-            'include_id' => true
         ));
     }
 
