@@ -380,7 +380,19 @@
                 }
             }
             this.result_clear_highlight();
-            if (results < 1 && searchText.length) {
+
+
+            // Mautic hack to allow adding new options
+            var resultsCount = this.results_data.length,
+                selectedCount = 0;
+
+            for (_i = 0, _len = this.results_data.length; _i < _len; _i++) {
+                if (!this.results_data[_i].group && this.results_data[_i].selected) {
+                    selectedCount++;
+                }
+            }
+
+            if ((results < 1 || (resultsCount > 0 && resultsCount === selectedCount && $(this.form_field).data('allow-add'))) && searchText.length) {
                 this.update_results_content("");
                 return this.no_results(searchText);
             } else {
@@ -451,7 +463,20 @@
                 case 13:
                     evt.preventDefault();
                     if (this.results_showing) {
-                        return this.result_select(evt);
+
+                        // Mautic hack to allow adding new entries if applicable
+                        if (!$(this.form_field).data('allow-add') || !this.is_multiple || this.result_highlight) {
+                            return this.result_select(evt);
+                        }
+
+                        var newTag = $(evt.target).val().toLowerCase();
+                        if ($(this.form_field).find('option').filter(function(){ return $(this).text() == newTag}).length === 0) {
+                            $(this.form_field).append('<option>' + newTag + '</option>');
+                            $(this.form_field).trigger('chosen:updated');
+                            this.result_highlight = this.search_results.find('li.active-result').last();
+
+                            return this.result_select(evt);
+                        }
                     }
                     break;
                 case 27:
