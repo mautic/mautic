@@ -27,4 +27,42 @@ class WebhookRepository extends CommonRepository
     {
         return parent::getEntities($args);
     }
+
+    /***
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addCatchAllWhereClause(&$q, $filter)
+    {
+        return $this->addStandardCatchAllWhereClause($q, $filter, array('e.name'));
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addSearchCommandWhereClause(&$q, $filter)
+    {
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchCommands()
+    {
+        return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrder()
+    {
+        return array(
+            array($this->getTableAlias() . '.name', 'ASC')
+        );
+    }
 }
