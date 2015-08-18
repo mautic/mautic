@@ -493,7 +493,7 @@ class AjaxController extends CommonAjaxController
                     } else {
                         // New tag
                         $newTag = new Tag();
-                        $newTag->setTag(strtolower($tag));
+                        $newTag->setTag(InputHelper::clean($tag));
                         $lead->addTag($newTag);
                     }
                 }

@@ -17,6 +17,10 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class TagRepository extends CommonRepository
 {
+
+    /**
+     * Delete orphan tags that are not associated with any lead
+     */
     public function deleteOrphans()
     {
         $qb  = $this->_em->getConnection()->createQueryBuilder();
@@ -39,5 +43,31 @@ class TagRepository extends CommonRepository
                 )
                 ->execute();
         }
+    }
+
+    /**
+     * Get tag entities by name
+     *
+     * @param $tags
+     *
+     * @return array
+     */
+    public function getTagsByName($tags)
+    {
+        array_walk($tags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
+        $qb = $this->_em->createQueryBuilder()
+            ->select('t')
+            ->from('MauticLeadBundle:Tag', 't', 't.tag');
+
+        if ($tags) {
+            $qb->where(
+                $qb->expr()->in('t.tag', ':tags')
+            )
+                ->setParameter('tags', $tags);
+        }
+
+        $results = $qb->getQuery()->getResult();
+
+        return $results;
     }
 }

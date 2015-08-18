@@ -469,7 +469,7 @@
                             return this.result_select(evt);
                         }
 
-                        var newTag = $(evt.target).val().toLowerCase();
+                        var newTag = $(evt.target).val();
                         if ($(this.form_field).find('option').filter(function(){ return $(this).text() == newTag}).length === 0) {
                             $(this.form_field).append('<option>' + newTag + '</option>');
                             $(this.form_field).trigger('chosen:updated');
