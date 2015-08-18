@@ -28,6 +28,7 @@ $view['slots']->set("headerTitle", $header);
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
+                    <?php echo $view['form']->row($form['description']); ?>
                     <?php echo $view['form']->row($form['webhook_url']); ?>
                     <div class="row">
                         <div class="col-md-5">
@@ -40,7 +41,7 @@ $view['slots']->set("headerTitle", $header);
                             <div id="tester" class="text-right"></div>
                         </div>
                     </div>
-                    <?php echo $view['form']->row($form['description']); ?>
+
                 </div>
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['events']); ?>
