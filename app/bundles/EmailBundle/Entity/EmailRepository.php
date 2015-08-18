@@ -197,7 +197,7 @@ class EmailRepository extends CommonRepository
 
         // Has an email
         $q->andWhere(
-            $q->expr()->orX(
+            $q->expr()->andX(
                 $q->expr()->isNotNull('l.email'),
                 $q->expr()->neq('l.email', $q->expr()->literal(''))
             )

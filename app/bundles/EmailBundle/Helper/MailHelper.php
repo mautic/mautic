@@ -402,11 +402,7 @@ class MailHelper
 
                 foreach ($resetEmailTypes as $type) {
                     $type    = ucfirst($type);
-                    $headers = $this->message->getHeaders();
-
-                    if ($headers->has($type)) {
-                        $this->message->getHeaders()->remove($type);
-                    }
+                    $this->message->{"set".$type}(array());
                 }
 
                 // Clear metadata for the previous recipients
