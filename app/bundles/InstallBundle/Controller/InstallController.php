@@ -772,8 +772,6 @@ class InstallController extends CommonController
     /**
      * Installs data fixtures for the application
      *
-     * @param array $dbParams
-     *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function performFixtureInstall ()

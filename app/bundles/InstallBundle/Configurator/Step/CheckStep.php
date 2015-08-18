@@ -148,6 +148,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.simplexml';
         }
 
+        if (!extension_loaded('mcrypt')) {
+            $messages[] = 'mautic.install.extension.mcrypt';
+        }
+
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
             $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
 
@@ -234,10 +238,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.module.phpxml';
         }
 
-        if (!extension_loaded('mcrypt')) {
-            $messages[] = 'mautic.install.extension.mcrypt';
-        }
-
         if (!function_exists('mb_strlen')) {
             $messages[] = 'mautic.install.function.mbstring';
         }
@@ -248,6 +248,10 @@ class CheckStep implements StepInterface
 
         if (!function_exists('utf8_decode')) {
             $messages[] = 'mautic.install.function.xml';
+        }
+
+        if (function_exists('imap_open')) {
+            $messages[] = 'mautic.install.extension.imap';
         }
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
