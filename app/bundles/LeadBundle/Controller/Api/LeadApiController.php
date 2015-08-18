@@ -13,6 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -292,6 +293,39 @@ class LeadApiController extends CommonApiController
             }
         }
 
+        // Check for tag string
+        if (isset($parameters['tags'])) {
+            $leadTags = $entity->getTags();
+
+            $tags = explode(',', $parameters['tags']);
+            unset($parameters['tags']);
+
+            array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+            // See which tags already exist
+            $foundTags = $this->model->getTagRepository()->getTagsByName($tags);
+            foreach ($tags as $tag) {
+                if (strpos($tag, '-') === 0) {
+                    // Tag to be removed
+                    $tag = substr($tag, 1);
+
+                    if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                        $entity->removeTag($foundTags[$tag]);
+                    }
+                } else {
+                    // Tag to be added
+                    if (!array_key_exists($tag, $foundTags)) {
+                        // New tag
+                        $newTag = new Tag();
+                        $newTag->setTag($tag);
+                        $entity->addTag($newTag);
+                    } elseif (!$leadTags->contains($foundTags[$tag])) {
+                        $entity->addTag($foundTags[$tag]);
+                    }
+                }
+            }
+        }
+
         // Check for lastActive date
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
@@ -319,7 +353,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress'], $parameters['lastActive']);
+        unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
 
         return $parameters;
     }

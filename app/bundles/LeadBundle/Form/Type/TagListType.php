@@ -37,10 +37,12 @@ class TagListType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'id',
-            'hidden'
-        );
+        if ($options['include_id']) {
+            $builder->add(
+                'id',
+                'hidden'
+            );
+        }
 
         $builder->add(
             'tags',
@@ -73,6 +75,10 @@ class TagListType extends AbstractType
     {
         $resolver->setRequired(array(
             'allow_edit'
+        ));
+
+        $resolver->setDefaults(array(
+            'include_id' => true
         ));
     }
 
