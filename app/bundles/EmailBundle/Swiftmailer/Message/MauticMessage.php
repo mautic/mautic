@@ -18,6 +18,11 @@ class MauticMessage extends \Swift_Message
     protected $metadata   = array();
 
     /**
+     * @var array
+     */
+    protected $attachments = array();
+
+    /**
      * Create a new Message.
      *
      * @param string $subject
@@ -42,6 +47,8 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
+     * Get the metadata
+     *
      * @return array
      */
     public function getMetadata()
@@ -54,5 +61,41 @@ class MauticMessage extends \Swift_Message
      */
     public function clearMetadata() {
         $this->metadata = array();
+    }
+
+    /**
+     * @param            $filePath
+     * @param null       $fileName
+     * @param null       $contentType
+     * @param bool|false $inline
+     */
+    public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false)
+    {
+        $attachment = array(
+            'filePath'    => $filePath,
+            'fileName'    => $fileName,
+            'contentType' => $contentType,
+            'inline'      => $inline
+        );
+
+        $this->attachments[] = $attachment;
+    }
+
+    /**
+     * Get attachments
+     *
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * Clear attachments
+     */
+    public function clearAttachments()
+    {
+        $this->attachments = array();
     }
 }

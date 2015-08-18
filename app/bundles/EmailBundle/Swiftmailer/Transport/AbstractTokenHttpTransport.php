@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Swiftmailer\Transport;
+namespace Mautic\CoreBundle\Swiftmailer\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractTokenHttpTransport
@@ -25,6 +25,38 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
      * @var
      */
     private $password;
+
+    /**
+     * Return an array of headers for the POST
+     *
+     * @return array
+     */
+    abstract protected function getHeaders();
+
+    /**
+     * Return the payload for the POST
+     *
+     * @return mixed
+     */
+    abstract protected function getPayload();
+
+    /**
+     * Return the URL for the API endpoint
+     *
+     * @return string
+     */
+    abstract protected function getApiEndpoint();
+
+    /**
+     * Analyze the output of the API response and return any addresses that FAILED to send
+     *
+     * @param $response
+     * @param $curlInfo
+     *
+     * @throws \Swift_TransportException
+     * @return array
+     */
+    abstract protected function handlePostResponse($response, $curlInfo);
 
     /**
      * @param $username
@@ -168,43 +200,4 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
         return $this->handlePostResponse($response, $info);
     }
 
-    /**
-     * Return an array of headers for the POST
-     *
-     * @return array
-     */
-    abstract protected function getHeaders();
-
-    /**
-     * Return the payload for the POST
-     *
-     * @return mixed
-     */
-    abstract protected function getPayload();
-
-    /**
-     * Return the URL for the API endpoint
-     *
-     * @return string
-     */
-    abstract protected function getApiEndpoint();
-
-    /**
-     * Analyze the output of the API response and return any addresses that FAILED to send
-     *
-     * @param $response
-     * @param $curlInfo
-     *
-     * @throws \Swift_TransportException
-     * @return array
-     */
-    abstract protected function handlePostResponse($response, $curlInfo);
-
-    /**
-     * Get the metadata from a MauticMessage
-     */
-    public function getMetadata()
-    {
-        return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : array();
-    }
 }

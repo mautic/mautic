@@ -152,6 +152,11 @@ class MailHelper
     /**
      * @var array
      */
+    private $attachedAssets = array();
+
+    /**
+     * @var array
+     */
     private $assetStats = array();
 
     /**
@@ -263,11 +268,14 @@ class MailHelper
             if (!empty($this->assets)) {
                 /** @var \Mautic\AssetBundle\Entity\Asset $asset */
                 foreach ($this->assets as $asset) {
-                    $this->attachFile(
-                        $asset->getFilePath(),
-                        $asset->getOriginalFileName(),
-                        $asset->getMime()
-                    );
+                    if (!in_array($asset->getId(), $this->attachedAssets)) {
+                        $this->attachedAssets[] = $asset->getId();
+                        $this->attachFile(
+                            $asset->getFilePath(),
+                            $asset->getOriginalFileName(),
+                            $asset->getMime()
+                        );
+                    }
                 }
             }
 
@@ -369,7 +377,8 @@ class MailHelper
 
                     break;
                 case 'FULL_RESET':
-                    $this->message = $this->getMessageInstance();
+                    $this->message        = $this->getMessageInstance();
+                    $this->attachedAssets = array();
                     $this->clearErrors();
                     break;
                 case 'DO_NOTHING':
@@ -437,9 +446,9 @@ class MailHelper
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
 
-            unset($this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText);
+            unset($this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
 
-            $this->source  = $this->assets = $this->globalTokens = array();
+            $this->source  = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
             $this->email   = null;
             $this->subject = $this->plainText = '';
             $this->body    = array(
@@ -589,21 +598,30 @@ class MailHelper
      */
     public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false)
     {
-        $attachment = \Swift_Attachment::fromPath($filePath);
+        if ($this->tokenizationEnabled) {
+            // Stash attachment to be processed by the transport
+            $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
+        } else {
+            try {
+                $attachment = \Swift_Attachment::fromPath($filePath);
 
-        if (!empty($fileName)) {
-            $attachment->setFilename($fileName);
+                if (!empty($fileName)) {
+                    $attachment->setFilename($fileName);
+                }
+
+                if (!empty($contentType)) {
+                    $attachment->setContentType($contentType);
+                }
+
+                if ($inline) {
+                    $attachment->setDisposition('inline');
+                }
+
+                $this->message->attach($attachment);
+            } catch (\Exception $e) {
+                error_log($e);
+            }
         }
-
-        if (!empty($contentType)) {
-            $attachment->setContentType($contentType);
-        }
-
-        if ($inline) {
-            $attachment->setDisposition('inline');
-        }
-
-        $this->message->attach($attachment);
     }
 
     /**
@@ -1111,6 +1129,8 @@ class MailHelper
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
 
+        // Reset attachments
+        $this->assets = $this->attachedAssets = array();
         if (empty($assetAttachments)) {
             if ($assets = $email->getAssetAttachments()) {
                 foreach ($assets as $asset) {

@@ -75,11 +75,15 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     }
 
     /**
-     * @param MauticFactory $factory
+     * @return \Swift_Events_SimpleEventDispatcher
      */
-    public function setMauticFactory(MauticFactory $factory)
+    protected function getDispatcher()
     {
-        $this->factory = $factory;
+        if ($this->dispatcher == null) {
+            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
+        }
+
+        return $this->dispatcher;
     }
 
     /**
@@ -93,6 +97,8 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
     /**
      * Get the metadata from a MauticMessage
+     *
+     * @return array
      */
     public function getMetadata()
     {
@@ -100,15 +106,13 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     }
 
     /**
-     * @return \Swift_Events_SimpleEventDispatcher
+     * Get attachments from a MauticMessage
+     *
+     * @return array
      */
-    protected function getDispatcher()
+    public function getAttachments()
     {
-        if ($this->dispatcher == null) {
-            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
-        }
-
-        return $this->dispatcher;
+        return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : array();
     }
 
     /**
@@ -116,10 +120,10 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
      *
      * @param array          $search   If the mailer requires tokens in another format than Mautic's, pass array of Mautic tokens to replace
      * @param array          $replace  If the mailer requires tokens in another format than Mautic's, pass array of replacement tokens
-     *
+     * @param bool|false     $binaryAttachments True to convert file attachments to binary
      * @return array|\Swift_Message
      */
-    protected function messageToArray($search = array(), $replace = array())
+    protected function messageToArray($search = array(), $replace = array(), $binaryAttachments = false)
     {
         if (!empty($search)) {
             MailHelper::searchReplaceTokens($search, $replace, $this->message);
@@ -201,9 +205,53 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
                 );
             }
         }
-        $message['attachments'] = $attachments;
+
+        if ($binaryAttachments) {
+            // Convert attachments to binary if applicable
+            $message['attachments'] = $attachments;
+
+            $fileAttachments = $this->getAttachments();
+            if (!empty($fileAttachments)) {
+                foreach ($fileAttachments as $attachment) {
+                    try {
+                        $swiftAttachment = \Swift_Attachment::fromPath($attachment['filePath']);
+
+                        if (!empty($attachment['fileName'])) {
+                            $swiftAttachment->setFilename($attachment['fileName']);
+                        }
+
+                        if (!empty($attachment['contentType'])) {
+                            $swiftAttachment->setContentType($attachment['contentType']);
+                        }
+
+                        if (!empty($attachment['inline'])) {
+                            $swiftAttachment->setDisposition('inline');
+                        }
+
+                        $message['attachments'] = array(
+                            'type'    => $swiftAttachment->getContentType(),
+                            'name'    => $swiftAttachment->getFilename(),
+                            'content' => $swiftAttachment->getEncoder()->encodeString($child->getBody())
+                        );
+                    } catch (\Exception $e) {
+                        error_log($e);
+                    }
+                }
+            }
+        } else {
+            $message['binary_attachments'] = $attachments;
+            $message['file_attachments']   = $this->getAttachments();
+        }
 
         return $message;
+    }
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function setMauticFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**
