@@ -428,13 +428,39 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $this->getContent($form);
+        $html  = $this->getFormScript($form);
+        $html .= $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
         $search  = array("\n", '"');
         $replace = array('\n', '\"');
         $html = str_replace($search, $replace, $html);
         return "document.write(\"".$html."\");";
+    }
+
+    /**
+     * @param Form $form
+     *
+     * @return string
+     */
+    public function getFormScript(Form $form)
+    {
+        $templating = $this->factory->getTemplating();
+        $theme      = $form->getTemplate();
+
+        if (!empty($theme)) {
+            $theme .= '|';
+        }
+
+        $script = $templating->render(
+            $theme.'MauticFormBundle:Builder:script.html.php',
+            array(
+                'form'  => $form,
+                'theme' => $theme,
+            )
+        );
+
+        return $script;
     }
 
     /**

@@ -9,10 +9,7 @@
 
 $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
 $fields   = $form->getFields();
-$required = array();
 ?>
-
-<?php echo $view->render($theme.'MauticFormBundle:Builder:script.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
 <?php echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
 

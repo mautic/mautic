@@ -132,6 +132,7 @@
                 var formId = forms[i].getAttribute('data-mautic-form');
                 if (formId !== null) {
                     Form.prepareMessengerForm(formId);
+                    Form.prepareValidation(formId);
                 }
             }
         };
@@ -173,6 +174,28 @@
                 messengerInput.value = 1;
 
                 theForm.appendChild(messengerInput);
+            }
+        };
+
+        Form.prepareValidation = function(formId) {
+            if (typeof MauticFormValidations == 'undefined') {
+                var MauticFormValidations  = {};
+            }
+
+            if (typeof MauticFormValidations[formId] == 'undefined') {
+                MauticFormValidations[formId] = {};
+
+                var theForm = document.getElementById('mauticform_' + formId);
+
+                // Find validations via data-attributes
+                var validations = theForm.querySelectorAll('[data-validate]');
+                [].forEach.call(validations, function (container) {
+                    var alias = container.getAttribute('data-validate');
+                    MauticFormValidations[formId][alias] = {
+                        type: container.getAttribute('data-validation-type'),
+                        name: alias
+                    }
+                });
             }
         };
 

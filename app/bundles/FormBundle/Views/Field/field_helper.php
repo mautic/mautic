@@ -62,22 +62,36 @@ if (!empty($inForm)) {
     }
 }
 
-// Container
+// Container attributes
 $containerAttr         = 'id="mauticform_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
 $validationMessage     = '';
+
+// Field is required
 if ($field['isRequired']) {
+    $required = true;
     $defaultContainerClass .= ' mauticform-required';
     $validationMessage = $field['validationMessage'];
     if (empty($validationMessage)) {
         $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
     }
+
+    $name = $field['alias'];
+    if ((in_array($field['type'], array('select', 'country')) && !empty($properties['multiple'])))
+        $name .= '[]';
+    $containerAttr .= " data-validate=\"$name\" data-validation-type=\"{$field['type']}\"";
+
+    $inputAttr .= " required";
 } elseif (!empty($required)) {
+    // Forced to be required
     $defaultContainerClass .= ' mauticform-required';
+    $inputAttr             .= " required";
 }
 
+
+// Add container class
 if (!empty($deleted)) {
     $defaultContainerClass .= ' bg-danger';
 }

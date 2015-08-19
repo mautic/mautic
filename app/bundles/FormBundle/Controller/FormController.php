@@ -226,6 +226,7 @@ class FormController extends CommonFormController
                 ),
                 'activeFormActions' => $activeFormActions,
                 'activeFormFields'  => $activeFormFields,
+                'formScript'   => htmlspecialchars($model->getFormScript($activeForm), ENT_QUOTES, "UTF-8"),
                 'formContent'  => htmlspecialchars($model->getContent($activeForm), ENT_QUOTES, "UTF-8")
             ),
             'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
