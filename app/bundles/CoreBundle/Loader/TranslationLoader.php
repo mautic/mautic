@@ -58,7 +58,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         }
 
         //Theme translations
-        $themeDir = $this->factory->getSystemPath('currentTheme', true);
+        $themeDir = $this->factory->getSystemPath('current_theme', true);
         if (file_exists($themeTranslation = $themeDir . '/translations/' . $locale)) {
             $iniFiles = new Finder();
             $iniFiles->files()->in($themeTranslation)->name('*.ini');
