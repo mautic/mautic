@@ -43,7 +43,7 @@ class ModifyLeadTagsType extends AbstractType
                     'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadTag(this, true)'
+                    'onchange'              => 'Mautic.createLeadTag(this)'
                 ),
                 'data' => (isset($options['data']['add_tags'])) ? $options['data']['add_tags'] : null,
                 'add_transformer' => true
@@ -59,7 +59,7 @@ class ModifyLeadTagsType extends AbstractType
                     'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadTag(this, true)'
+                    'onchange'              => 'Mautic.createLeadTag(this)'
                 ),
                 'data' => (isset($options['data']['remove_tags'])) ? $options['data']['remove_tags'] : null,
                 'add_transformer' => true
