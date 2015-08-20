@@ -185,6 +185,12 @@ class LeadRepository extends CommonRepository
         /** @var Lead $lead */
         foreach ($results as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
+            if (!empty($this->triggerModel)) {
+                $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
+            }
+
+            $fieldValues = $this->getFieldValues($lead->getId());
+            $lead->setFields($fieldValues);
         }
 
         return $results;
