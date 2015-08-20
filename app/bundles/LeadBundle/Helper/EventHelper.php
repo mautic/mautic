@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 
 class EventHelper
