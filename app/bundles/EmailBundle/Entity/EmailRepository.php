@@ -165,7 +165,9 @@ class EmailRepository extends CommonRepository
                 $sq->expr()->in('stat.email_id', $variantIds)
             );
         } else {
-            $sq->expr()->eq('stat.email_id', $emailId);
+            $sqExpr->add(
+                $sq->expr()->eq('stat.email_id', $emailId)
+            );
         }
 
         $sq2->select('stat.lead_id')
