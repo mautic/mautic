@@ -100,12 +100,16 @@ $template = '<div class="col-md-6">{content}</div>';
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.token'); ?></h3>
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.message'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'webview_text', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
         </div>
     </div>
 </div>

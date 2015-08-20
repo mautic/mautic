@@ -78,6 +78,52 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'unsubscribe_message',
+            'textarea',
+            array(
+                'label'      => 'mautic.email.config.unsubscribe_message',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip'
+                ),
+                'required'   => false,
+                'data'       => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
+                    ? $options['data']['unsubscribe_message']
+                    : $this->factory->getTranslator()->trans(
+                        'mautic.email.unsubscribed.success',
+                        array(
+                            '%resubscribeUrl%' => '|URL|',
+                            '%email%'          => '|EMAIL|'
+                        )
+                    )
+            )
+        );
+
+        $builder->add(
+            'resubscribe_message',
+            'textarea',
+            array(
+                'label'      => 'mautic.email.config.resubscribe_message',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.resubscribe_message.tooltip'
+                ),
+                'required'   => false,
+                'data'       => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
+                    ? $options['data']['resubscribe_message']
+                    : $this->factory->getTranslator()->trans(
+                        'mautic.email.resubscribed.success',
+                        array(
+                            '%unsubscribeUrl%' => '|URL|',
+                            '%email%'          => '|EMAIL|'
+                        )
+                    )
+            )
+        );
+
+        $builder->add(
             'mailer_from_name',
             'text',
             array(

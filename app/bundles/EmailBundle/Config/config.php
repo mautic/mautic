@@ -242,6 +242,8 @@ return array(
         'mailer_spool_clear_timeout'   => 1800,
         'unsubscribe_text'             => null,
         'webview_text'                 => null,
+        'unsubscribe_message'          => null,
+        'resubscribe_message'          => null,
         'monitored_email'              => array()
     )
 );
