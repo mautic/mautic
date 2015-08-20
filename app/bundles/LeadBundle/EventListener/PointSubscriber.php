@@ -42,6 +42,15 @@ class PointSubscriber extends CommonSubscriber
         );
 
         $event->addEvent('lead.changelists', $changeLists);
+
+        // modify tags
+        $action = array(
+            'group'       => 'mautic.lead.point.trigger',
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'formType'    => 'modify_lead_tags',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::updateTags'
+        );
+        $event->addEvent('lead.changetags', $action);
     }
 
 }
