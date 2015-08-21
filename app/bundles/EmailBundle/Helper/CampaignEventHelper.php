@@ -24,23 +24,18 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateEmailTrigger (Email $eventDetails = null, $event)
+    public static function validateEmailTrigger(Email $eventDetails = null, $event)
     {
         if ($eventDetails == null) {
-            return true;
-        }
-
-        //check against selected emails
-        $limitToEmails = $event['properties']['emails'];
-
-        //check to see if the parent event is a "send email" event and that it matches the current email opened
-        if (empty($limitToEmails) && !empty($event['parent']) && $event['parent']['type'] == 'email.send') {
-            return ($eventDetails->getId() === (int) $event['parent']['properties']['email']);
-        } elseif (!empty($limitToEmails) && !in_array($eventDetails->getId(), $limitToEmails)) {
             return false;
         }
 
-        return true;
+        //check to see if the parent event is a "send email" event and that it matches the current email opened
+        if (!empty($event['parent']) && $event['parent']['type'] == 'email.send') {
+            return ($eventDetails->getId() === (int) $event['parent']['properties']['email']);
+        }
+
+        return false;
     }
 
     /**
@@ -48,21 +43,19 @@ class CampaignEventHelper
      * @param               $lead
      * @param               $event
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @return bool|mixed
      */
-    public static function sendEmailAction (MauticFactory $factory, $lead, $event)
+    public static function sendEmailAction(MauticFactory $factory, $lead, $event)
     {
         $emailSent = false;
 
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
 
-            $leadCredentials = array(
-                'id'        => $lead->getId(),
-                'email'     => $fields['core']['email']['value'],
-                'firstname' => $fields['core']['firstname']['value'],
-                'lastname'  => $fields['core']['lastname']['value']
-            );
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel             = $factory->getModel('lead');
+            $leadCredentials       = $leadModel->flattenFields($fields);
+            $leadCredentials['id'] = $lead->getId();
         } else {
             $leadCredentials = $lead;
         }
@@ -71,16 +64,17 @@ class CampaignEventHelper
             /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
             $emailModel = $factory->getModel('email');
 
-            $emailId = (int)$event['properties']['email'];
+            $emailId = (int) $event['properties']['email'];
 
             $email = $emailModel->getEntity($emailId);
 
             if ($email != null && $email->isPublished()) {
-                $options = array('source' => array('campaign', $event['campaign']['id']));
-                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), $options);
-                $emailSent = true;
+                $options   = array('source' => array('campaign', $event['campaign']['id']));
+                $emailSent = $emailModel->sendEmail($email, $leadCredentials, $options);
             }
         }
+
+        unset($lead, $leadCredentials, $email, $emailModel, $factory);
 
         return $emailSent;
     }

@@ -9,10 +9,13 @@ body {
   height: 100%;
 }
 body {
+  overflow-y: scroll;
+
   // Wrapper
   > #app-wrapper {
     //overflow-x: hidden;
     overflow: hidden;
+    // Keep the screen from bouncing with and without scrollbars
     position: relative;
     height: auto;
     min-height: 100%;

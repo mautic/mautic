@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\FormBundle\Helper\PageTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -20,6 +21,7 @@ use Mautic\PageBundle\PageEvents;
  */
 class PageSubscriber extends CommonSubscriber
 {
+    private $formRegex = '{form=(.*?)}';
 
     /**
      * {@inheritdoc}
@@ -39,26 +41,35 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageBuild (PageBuilderEvent $event)
     {
-        $tokenHelper = new PageTokenHelper($this->factory);
-        $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
 
-        //add AB Test Winner Criteria
-        $formSubmissions = array(
-            'group'    => 'mautic.form.abtest.criteria',
-            'label'    => 'mautic.form.abtest.criteria.submissions',
-            'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner'
-        );
-        $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
+        if ($event->tokenSectionsRequested()) {
+            $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
+        }
+
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $formSubmissions = array(
+                'group'    => 'mautic.form.abtest.criteria',
+                'label'    => 'mautic.form.abtest.criteria.submissions',
+                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner'
+            );
+            $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
+        }
+
+        if ($event->tokensRequested($this->formRegex)) {
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+        }
     }
 
     /**
-     * @param PageEvent $event
+     * @param PageDisplayEvent $event
      */
     public function onPageDisplay (PageDisplayEvent $event)
     {
         $content = $event->getContent();
         $page    = $event->getPage();
-        $regex   = '/{form=(.*?)}/i';
+        $regex   = '/' . $this->formRegex . '/i';
 
         preg_match_all($regex, $content, $matches);
 
@@ -75,7 +86,7 @@ class PageSubscriber extends CommonSubscriber
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $form->getCachedHtml() :
+                    $formHtml = ($form->isPublished()) ? $model->getContent($form) :
                         '<div class="mauticform-error">' .
                         $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
                         '</div>';

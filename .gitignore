@@ -28,3 +28,9 @@
 /upgrade
 /upgrade_errors.txt
 /translations
+/media/images/*
+!/media/images/flags
+!/media/images/apple-touch-icon.png
+!/media/images/avatar.png
+!/media/images/favicon.ico
+!/media/images/mautic_logo*

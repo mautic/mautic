@@ -219,13 +219,18 @@ class GraphHelper
     /**
      * Prepares data structure for basic count based line graphs
      *
-     * @param array $labels       array of labels
-     * @param array $datasets     array array(label => array of values in order of $labels)
+     * @param array   $labels       array of labels
+     * @param array   $datasets     array array(label => array of values in order of $labels)
+     * @param integer $labelsLength truncate labels to this char length
      *
      * @return array
      */
-    public static function prepareBarGraphData($labels, $datasets)
+    public static function prepareBarGraphData(array $labels, array $datasets, $labelsLength = 30)
     {
+        foreach ($labels as $key => $lab) {
+            $labels[$key] = self::truncate($lab, $labelsLength);
+        }
+
         $data = array();
         $data['labels'] = $labels;
         $j = 0;
@@ -234,13 +239,23 @@ class GraphHelper
                 $j = 0;
             }
 
-            $data['datasets'][] = array(
+            $set = array(
                 'label'                => $label,
                 'fillColor'            => self::$colors[$j]['fill'],
                 'highlightFill'        => self::$colors[$j]['highlight'],
                 'strokeColor'          => self::$colors[$j]['fillStroke'],
                 'data'                 => $dataset
             );
+
+            if (isset($dataset['datasetKey'])) {
+                $key = $dataset['datasetKey'];
+                unset($set['data']['datasetKey']);
+
+                $data['datasets'][$key] = $set;
+            } else {
+                $data['datasets'][] = $set;
+            }
+
             $j++;
         }
 
@@ -267,10 +282,12 @@ class GraphHelper
             $graphData['datasets'][$datasetKey]['count'] = array();
         }
 
+        $utc = new \DateTimeZone('UTC');
         foreach ($items as $item) {
             if (isset($item[$dateName]) && $item[$dateName]) {
                 if (is_string($item[$dateName])) {
-                    $item[$dateName] = new \DateTime($item[$dateName]);
+                    // Assume that it is UTC
+                    $item[$dateName] = new \DateTime($item[$dateName], $utc);
                 }
 
                 $oneItem = $item[$dateName]->format(self::getDateLabelFormat($unit));
@@ -355,5 +372,27 @@ class GraphHelper
         }
 
         return $graphData;
+    }
+
+    /**
+     * Helper function to shorten/truncate a string
+     *
+     * @param string  $string
+     * @param integer $length
+     * @param string  $append
+     *
+     * @return string
+     */
+    public static function truncate($string, $length = 100, $append = "...")
+    {
+        $string = trim($string);
+
+        if (strlen($string) > $length) {
+            $string = wordwrap($string, $length);
+            $string = explode("\n", $string, 2);
+            $string = $string[0] . $append;
+        }
+
+        return $string;
     }
 }

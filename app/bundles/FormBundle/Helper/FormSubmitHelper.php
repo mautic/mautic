@@ -22,41 +22,36 @@ class FormSubmitHelper
     public static function sendEmail($tokens, $config, MauticFactory $factory, $lead)
     {
         $mailer = $factory->getMailer();
+        $emails = (!empty($config['to'])) ? explode(',', $config['to']) : array();
 
-        if (!empty($config['to'])) {
-            $emails = explode(',', $config['to']);
-            foreach ($emails as $e) {
-                $mailer->message->addTo($e);
+        $fields = $lead->getFields();
+        $email  = $fields['core']['email']['value'];
+
+        if (!empty($email)) {
+            if ($config['copy_lead']) {
+                $emails[] = $email;
             }
+
+            $mailer->setReplyTo($email);
         }
 
-        if ($config['copy_lead']) {
-            $fields = $lead->getFields();
-            $email = $fields['core']['email']['value'];
-            if (!empty($email)) {
-                $mailer->message->addto($email);
-            }
-        }
+        $mailer->setTo($emails);
 
         if (!empty($config['cc'])) {
             $emails = explode(',', $config['cc']);
-            foreach ($emails as $e) {
-                $mailer->message->addCc($e);
-            }
+            $mailer->setCc($emails);
         }
 
         if (!empty($config['bcc'])) {
             $emails = explode(',', $config['bcc']);
-            foreach ($emails as $e) {
-                $mailer->message->addBcc($e);
-            }
+            $mailer->setBcc($emails);
         }
 
-        $mailer->message->setSubject($config['subject']);
+        $mailer->setSubject($config['subject']);
 
-        $message = str_ireplace($tokens['search'], $tokens['replace'], $config['message']);
-        $mailer->message->setBody($message, 'text/html');
-        $mailer->parsePlainText($message);
+        $mailer->setTokens($tokens);
+        $mailer->setBody($config['message']);
+        $mailer->parsePlainText($config['message']);
 
         $mailer->send();
     }

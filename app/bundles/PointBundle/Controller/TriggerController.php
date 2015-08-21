@@ -69,7 +69,7 @@ class TriggerController extends FormController
 
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
+            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.point.trigger.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $lastPage));
 
@@ -573,8 +573,8 @@ class TriggerController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('lead');
-            $ids       = json_decode($this->request->query->get('ids', array()));
+            $model     = $this->factory->getModel('point.trigger');
+            $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
             // Loop over the IDs to perform access checks pre-delete

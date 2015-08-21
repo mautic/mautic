@@ -391,16 +391,16 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
 
                     if(state === "checked") {
                         // add contextual class
-                        $($this).parents(target).addClass(contextual);
+                        $($this).parentsUntil(target).addClass(contextual);
 
                         // publish event
-                        $(element).trigger(settings.eventPrefix+".selectrow.selected", { "element": $($this).parents(target) });
+                        $(element).trigger(settings.eventPrefix+".selectrow.selected", { "element": $($this).parentsUntil(target) });
                     } else {
                         // remove contextual class
-                        $($this).parents(target).removeClass(contextual);
+                        $($this).parentsUntil(target).removeClass(contextual);
 
                         // publish event
-                        $(element).trigger(settings.eventPrefix+".selectrow.unselected", { "element": $($this).parents(target) });
+                        $(element).trigger(settings.eventPrefix+".selectrow.unselected", { "element": $($this).parentsUntil(target) });
                     }
                 }
 

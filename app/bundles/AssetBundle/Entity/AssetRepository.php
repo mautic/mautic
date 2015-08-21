@@ -33,25 +33,18 @@ class AssetRepository extends CommonRepository
             ->select('a')
             ->leftJoin('a.category', 'c');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        $results = new Paginator($query);
-
-        return $results;
+        return parent::getEntities($args);
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
+     * @param string     $search
+     * @param int        $limit
+     * @param int        $start
+     * @param bool|false $viewOther
+     *
+     * @return array
      */
     public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
@@ -223,5 +216,26 @@ class AssetRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'a';
+    }
+
+    /**
+     * Gets the sum size of assets
+     *
+     * @param array $assets
+     *
+     * @return int
+     */
+    public function getAssetSize(array $assets)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('sum(a.size) as total_size')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
+            ->where(
+                $q->expr()->in('a.id', $assets)
+            );
+
+        $result = $q->execute()->fetchAll();
+
+        return (int) $result[0]['total_size'];
     }
 }

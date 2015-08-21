@@ -171,11 +171,11 @@ function move_mautic_bundles(array $status)
     $errorLog = array();
 
     // First, we will move any addon bundles into position
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/addons') && !$status['updateState']['addonComplete']) {
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/addons');
+    if (is_dir(MAUTIC_UPGRADE_ROOT . '/plugins') && !$status['updateState']['addonComplete']) {
+        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/plugins');
 
         // Sanity check, make sure there are actually directories here to process
-        $dirs = glob(MAUTIC_UPGRADE_ROOT . '/addons/*', GLOB_ONLYDIR);
+        $dirs = glob(MAUTIC_UPGRADE_ROOT . '/plugins/*', GLOB_ONLYDIR);
 
         if (count($dirs)) {
             /** @var DirectoryIterator $directory */
@@ -204,18 +204,18 @@ function move_mautic_bundles(array $status)
             }
         }
 
-        // At this point, there shouldn't be any addons remaining; nuke the folder
-        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/addons');
+        // At this point, there shouldn't be any plugins remaining; nuke the folder
+        $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT . '/plugins');
 
         if (!$deleteDir) {
-            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/addons');
+            $errorLog[] = sprintf('Failed to remove the upgrade directory %s folder', '/plugins');
         }
 
         process_error_log($errorLog);
 
         $status['updateState']['addonComplete'] = true;
 
-        // Finished with addons, get a response back to the app so we can iterate to the next part
+        // Finished with plugins, get a response back to the app so we can iterate to the next part
         return $status;
     }
 
@@ -226,14 +226,14 @@ function move_mautic_bundles(array $status)
             $status['updateState']['completedBundles'] = array();
         }
 
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/app/bundles');
+        $completed = true;
+        $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/app/bundles');
 
         // Sanity check, make sure there are actually directories here to process
         $dirs = glob(MAUTIC_UPGRADE_ROOT . '/app/bundles/*', GLOB_ONLYDIR);
 
         if (count($dirs)) {
-            $count     = 0;
-            $completed = true;
+            $count = 0;
 
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
@@ -415,14 +415,14 @@ function move_mautic_vendors(array $status)
             $status['updateState']['completedSymfony'] = array();
         }
 
-        $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
+        $completed = true;
+        $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor/symfony');
 
         // Sanity check, make sure there are actually directories here to process
         $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/symfony/*', GLOB_ONLYDIR);
 
         if (count($dirs)) {
-            $count     = 0;
-            $completed = true;
+            $count = 0;
 
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
@@ -487,14 +487,14 @@ function move_mautic_vendors(array $status)
     }
 
     // Once we've gotten here, we can safely iterate through the rest of the vendor directory; the rest of the contents are rather small in size
-    $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor');
+    $completed = true;
+    $iterator  = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/vendor');
 
     // Sanity check, make sure there are actually directories here to process
     $dirs = glob(MAUTIC_UPGRADE_ROOT . '/vendor/*', GLOB_ONLYDIR);
 
     if (count($dirs)) {
-        $count     = 0;
-        $completed = true;
+        $count = 0;
 
         /** @var DirectoryIterator $directory */
         foreach ($iterator as $directory) {
@@ -575,8 +575,10 @@ function move_mautic_vendors(array $status)
 /**
  * Copy files from the directory
  *
- * @param $dir
- * @param $errorLog
+ * @param string $dir
+ * @param array  &$errorLog
+ *
+ * @return bool
  */
 function copy_files($dir, &$errorLog) {
     if (is_dir(MAUTIC_UPGRADE_ROOT . $dir)) {
@@ -596,18 +598,19 @@ function copy_files($dir, &$errorLog) {
         }
 
         return true;
-    } else {
-
-        return false;
     }
+
+    return false;
 }
 
 /**
  * Copy directories
  *
- * @param $dir
- * @param $errorLog
- * @param $createDest
+ * @param string $dir
+ * @param array  &$errorLog
+ * @param bool   $createDest
+ *
+ * @return bool|void
  */
 function copy_directories($dir, &$errorLog, $createDest = true) {
     // Ensure the destination directory exists
@@ -841,6 +844,16 @@ switch ($task) {
         $status['stepStatus'] = 'Failed';
         break;
 }
+
+// A way to keep the upgrade from failing if the session is lost after
+// the cache is cleared by upgrade.php
+$isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+$cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
+$cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
+$cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
+$cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
+
+setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
 
 // Encode the state for the next request
 $status['updateState'] = base64_encode(json_encode($status['updateState']));

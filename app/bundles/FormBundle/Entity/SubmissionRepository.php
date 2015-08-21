@@ -55,7 +55,8 @@ class SubmissionRepository extends CommonRepository
             ->where('f.form_id = ' . $form->getId())
             ->andWhere(
                 $fq->expr()->notIn('f.type', array("'button'", "'freetext'"))
-            );
+            )
+            ->orderBy('f.field_order', 'ASC');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -121,9 +122,10 @@ class SubmissionRepository extends CommonRepository
             //ORM - generates lead entities
             $q = $this
                 ->createQueryBuilder('s');
-            $q->select('s, p, i,' . $order)
+            $q->select('s, partial l.{id}, p, i,' . $order)
                 ->leftJoin('s.ipAddress', 'i')
-                ->leftJoin('s.page', 'p');
+                ->leftJoin('s.page', 'p')
+                ->leftJoin('s.lead', 'l');
 
             //only pull the submissions as filtered via DBAL
             $q->where(
@@ -164,7 +166,9 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', $id);
             $results = $q->execute()->fetchAll();
             unset($results[0]['submission_id']);
-            $entity->setResults($results[0]);
+            if (isset($results[0])) {
+                $entity->setResults($results[0]);
+            }
         }
 
         return $entity;
@@ -369,27 +373,6 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $newTrackingId
-     * @param $oldTrackingId
-     */
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'form_submissions')
-            ->set('lead_id', (int) $leadId)
-            ->set('tracking_id', ':newTrackingId')
-            ->where(
-                $q->expr()->eq('tracking_id', ':oldTrackingId')
-            )
-            ->setParameters(array(
-                'newTrackingId' => $newTrackingId,
-                'oldTrackingId' => $oldTrackingId
-            ))
-            ->execute();
-    }
-
-    /**
      * Updates lead ID (e.g. after a lead merge)
      *
      * @param $fromLeadId
@@ -402,5 +385,35 @@ class SubmissionRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
+    }
+
+    /**
+     * Validates that an array of submission IDs belong to a specific form
+     *
+     * @param $ids
+     * @param $formId
+     *
+     * @return array
+     */
+    public function validateSubmissions($ids, $formId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('s.form_id', (int) $formId),
+                    $q->expr()->in('s.id', $ids)
+                )
+            );
+
+        $validIds = array();
+        $results  = $q->execute()->fetchAll();
+
+        foreach ($results as $r) {
+            $validIds[] = $r['id'];
+        }
+
+        return $validIds;
     }
 }

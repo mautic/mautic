@@ -16,7 +16,8 @@ $header = ($activeForm->getId()) ?
     $view['translator']->trans('mautic.form.form.header.new');
 $view['slots']->set("headerTitle", $header);
 
-$formId = $form['sessionId']->vars['data'];
+$formId       = $form['sessionId']->vars['data'];
+$isStandalone = $activeForm->isStandalone();
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -26,8 +27,8 @@ $formId = $form['sessionId']->vars['data'];
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.details'); ?></a></li>
-                    <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.fields'); ?></a></li>
-                    <li class=""><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.actions'); ?></a></li>
+                    <li id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.fields'); ?></a></li>
+                    <li<?php if (!$isStandalone) echo ' class="hide"'; ?> id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.tab.actions'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -94,7 +95,7 @@ $formId = $form['sessionId']->vars['data'];
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="tab-pane fade bdr-w-0" id="actions-container">
+                    <div class="tab-pane fade bdr-w-0<?php if (!$isStandalone) echo ' hide'; ?> " id="actions-container">
                         <div id="mauticforms_actions">
                             <div class="available-actions mb-md">
                                 <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
@@ -158,9 +159,32 @@ $formId = $form['sessionId']->vars['data'];
         </div>
     </div>
 </div>
-<?php echo $view['form']->end($form); ?>
-
 <?php
+
+echo $view['form']->end($form);
+
+if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
+    echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
+        array(
+            'item'               => $activeForm,
+            'mauticLang'         => array(
+                'newStandaloneForm' => 'mautic.form.type.standalone.header',
+                'newCampaignForm'   => 'mautic.form.type.campaign.header'
+            ),
+            'typePrefix'         => 'form',
+            'cancelUrl'          => 'mautic_form_index',
+            'header'             => 'mautic.form.type.header',
+            'typeOneHeader'      => 'mautic.form.type.campaign.header',
+            'typeOneIconClass'   => 'fa-cubes',
+            'typeOneDescription' => 'mautic.form.type.campaign.description',
+            'typeOneOnClick'     => "Mautic.selectFormType('campaign');",
+            'typeTwoHeader'      => 'mautic.form.type.standalone.header',
+            'typeTwoIconClass'   => 'fa-list',
+            'typeTwoDescription' => 'mautic.form.type.standalone.description',
+            'typeTwoOnClick'     => "Mautic.selectFormType('standalone');"
+        ));
+endif;
+
 $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'           => 'formComponentModal',
     'header'       => false,

@@ -9,6 +9,7 @@
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -17,6 +18,22 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20150402000000 extends AbstractMauticMigration
 {
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws SkipMigrationException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function preUp(Schema $schema)
+    {
+        // Test to see if this migration has already been applied
+        $formTable = $schema->getTable($this->prefix . 'forms');
+        if ($formTable->hasColumn('in_kiosk_mode')) {
+            throw new SkipMigrationException('Schema includes this migration');
+        }
+    }
+
     /**
      * @param Schema $schema
      */

@@ -26,17 +26,7 @@ mkdir(__DIR__ . '/packaging');
 
 // Copy working files to packaging space
 echo "Copying files\n";
-system('cp -r ../addons packaging/');
-system('cp -r ../app packaging/');
-system('cp -r ../bin packaging/');
-system('cp -r ../media packaging/');
-system('cp -r ../themes packaging/');
-system('cp -r ../translations packaging/');
-system('cp -r ../vendor packaging/');
-system('cp ../.htaccess packaging/');
-system('cp ../index.php packaging/');
-system('cp ../LICENSE.txt packaging/');
-system('cp ../robots.txt packaging/');
+system("rsync -az --exclude-from 'excludefiles.txt' ../ packaging > /dev/null");
 
 // Generate the bootstrap.php.cache file
 system(__DIR__ . '/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
@@ -46,4 +36,13 @@ include_once __DIR__ . '/processfiles.php';
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ translations/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+chdir(__DIR__ . '/packaging');
+
+system('zip -r ../packages/mautic-head.zip . > /dev/null');
+
+// Copy over upgrade.php
+system('cp ' . __DIR__ . '/../upgrade.php ' . __DIR__ . '/packaging');
+
+chdir(__DIR__ . '/packaging');
+echo "Packaging Mautic Update Package\n";
+system('zip -r ../packages/mautic-head-update.zip . > /dev/null');

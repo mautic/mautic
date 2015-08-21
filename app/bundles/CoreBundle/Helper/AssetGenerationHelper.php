@@ -45,7 +45,7 @@ class AssetGenerationHelper
         if (empty($assets)) {
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : $this->factory->getEnvironment();
-            $rootPath   = $this->factory->getSystemPath('root');
+            $rootPath   = $this->factory->getSystemPath('assets_root');
             $assetsPath = $this->factory->getSystemPath('assets');
 
             $assetsFullPath = "$rootPath/$assetsPath";
@@ -201,7 +201,7 @@ class AssetGenerationHelper
      */
     protected function findAssets($dir, $ext, $env, &$assets)
     {
-        $rootPath    = $this->factory->getSystemPath('root') . '/';
+        $rootPath    = $this->factory->getSystemPath('assets_root') . '/';
         $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
 
@@ -289,8 +289,8 @@ class AssetGenerationHelper
      */
     protected function findOverrides($env, &$assets)
     {
-        $rootPath      = $this->factory->getSystemPath('root');
-        $currentTheme  = $this->factory->getSystemPath('currentTheme');
+        $rootPath      = $this->factory->getSystemPath('assets_root');
+        $currentTheme  = $this->factory->getSystemPath('current_theme');
         $modifiedLast  = array();
         $types         = array('css', 'js');
         $overrideFiles = array(

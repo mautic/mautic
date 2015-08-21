@@ -9,8 +9,35 @@
 
 //extend the template chosen
 
-if (!empty($googleAnalytics)) {
-    $view['assets']->addCustomDeclaration(htmlspecialchars_decode($googleAnalytics));
-}
+if ($template !== null):
+    $view['slots']->set('pageTitle', $name);
+    if ($code = $view['analytics']->getCode()) {
+        $view['assets']->addCustomDeclaration($code);
+    }
 
-$view->extend(":$template:form.html.php");
+    if (!empty($stylesheets)) {
+        foreach ($stylesheets as $css) {
+            $view['assets']->addStylesheet($css);
+        }
+    }
+
+    $view->extend(":$template:form.html.php");
+else:
+?>
+
+<html>
+    <head>
+        <title><?php echo $name; ?></title>
+
+        <?php echo $view['analytics']->getCode(); ?>
+
+        <?php foreach ($stylesheets as $css): ?>
+        <link rel="stylesheet" type="text/css" href="<?php echo $css; ?>" />
+        <?php endforeach; ?>
+
+    </head>
+    <body>
+        <?php echo $content; ?>
+    </body>
+</html>
+<?php endif; ?>

@@ -9,8 +9,10 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\AddonBundle\Helper\IntegrationHelper;
+use Mautic\LeadBundle\Entity\Tag;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
@@ -98,7 +100,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $fields            = $lead->getFields();
-                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
                 $integrationHelper = $this->factory->getHelper('integration');
                 $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields, true, $network);
                 $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
@@ -150,7 +152,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $dataArray['success'] = 1;
-                /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $helper */
+                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
                 $socialProfiles = $helper->clearIntegrationCache($lead, $network);
                 $socialCount    = count($socialProfiles);
@@ -305,5 +307,233 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function removeBounceStatusAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $dncId     = $request->request->get('id');
+
+        if (!empty($dncId)) {
+            $this->factory->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Get the rows for new leads
+     *
+     * @param Request $request
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected function getNewLeadsAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $maxId     = $request->get('maxId');
+
+        if (!empty($maxId)) {
+            //set some permissions
+            $permissions = $this->factory->getSecurity()->isGranted(array(
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother'
+            ), "RETURN_ARRAY");
+
+            if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+                return $this->accessDenied(true);
+            }
+
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model   = $this->factory->getModel('lead.lead');
+            $session = $this->factory->getSession();
+
+            $search = $session->get('mautic.lead.filter', '');
+
+            $filter     = array('string' => $search, 'force' => array());
+            $translator = $this->factory->getTranslator();
+            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+            $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+
+            $session->set('mautic.lead.indexmode', $indexMode);
+
+            // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
+            if ($indexMode != 'list') {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'][] = "!$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'][] = $mine;
+            }
+
+            $filter['force'][] = array(
+                'column' => 'l.id',
+                'expr'   => 'gt',
+                'value'  => $maxId
+            );
+
+            $results = $model->getEntities(
+                array(
+                    'filter'         => $filter,
+                    'withTotalCount' => true
+                )
+            );
+            $count = $results['count'];
+
+            if (!empty($count)) {
+                // Get the max ID of the latest lead added
+                $maxLeadId = $model->getRepository()->getMaxLeadId();
+
+                // We need the EmailRepository to check if a lead is flagged as do not contact
+                /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+                $emailRepo = $this->factory->getModel('email')->getRepository();
+                $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+                $template  = ($indexMode == 'list') ? 'list_rows' : 'grid_cards';
+                $dataArray['leads'] = $this->factory->getTemplating()->render("MauticLeadBundle:Lead:{$template}.html.php", array(
+                    'items'         => $results['results'],
+                    'noContactList' => $emailRepo->getDoNotEmailList(),
+                    'permissions'   => $permissions,
+                    'security'      => $this->factory->getSecurity(),
+                    'highlight'      => true
+                ));
+                $dataArray['indexMode'] = $indexMode;
+                $dataArray['maxId']     = $maxLeadId;
+                $dataArray['success']   = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getEmailTemplateAction(Request $request)
+    {
+        $data    = array('success' => 1, 'body' => '', 'subject' => '');
+        $emailId = $request->get('template');
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model    = $this->factory->getModel('email');
+
+        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        $email    = $model->getEntity($emailId);
+
+        if ($email !== null && $this->factory->getSecurity()->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
+        )
+        ) {
+
+            $mailer = $this->factory->getMailer();
+            $mailer->setEmail($email, true, array(), array(), true);
+
+            $data['body']    = $mailer->getBody();
+            $data['subject'] = $mailer->getSubject();
+
+            // Parse tokens into view data
+            $tokens = $model->getBuilderComponents($email, array('tokens', 'visualTokens'));
+
+            BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
+        }
+
+        return $this->sendJsonResponse($data);
+    }
+
+    protected function updateLeadTagsAction(Request $request)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel   = $this->factory->getModel('lead');
+        $post        = $request->request->get('lead_tags', array(), true);
+        $lead        = $leadModel->getEntity((int) $post['id']);
+        $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : array();
+        $data        = array('success' => 0);
+
+        if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+
+            $leadModel->setTags($lead, $updatedTags, true);
+
+            /** @var \Doctrine\ORM\PersistentCollection $leadTags */
+            $leadTags    = $lead->getTags();
+            $leadTagKeys = $leadTags->getKeys();
+
+            // Get an updated list of tags
+            $tags       = $leadModel->getTagRepository()->getSimpleList(null, array(), 'tag');
+            $tagOptions = '';
+
+            foreach ($tags as $tag) {
+                $selected = (in_array($tag['label'], $leadTagKeys)) ? ' selected="selected"' : '';
+                $tagOptions .= '<option' . $selected. ' value="' . $tag['value'] . '">' . $tag['label'] . '</option>';
+            }
+
+            $data['success'] = 1;
+            $data['tags'] = $tagOptions;
+        }
+
+        return $this->sendJsonResponse($data);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function addLeadTagsAction(Request $request)
+    {
+        $tags = $request->request->get('tags');
+        $tags = json_decode($tags, true);
+
+        if (is_array($tags)) {
+            $newTags = array();
+            foreach ($tags as $tag) {
+                if (!is_numeric($tag)) {
+                    // New tag
+                    $tagEntity = new Tag();
+                    $tagEntity->setTag(InputHelper::clean($tag));
+                    $newTags[] = $tagEntity;
+                }
+            }
+
+            $leadModel = $this->factory->getModel('lead');
+
+            if (!empty($newTags)) {
+                $leadModel->getTagRepository()->saveEntities($newTags);
+            }
+
+            // Get an updated list of tags
+            $allTags    = $leadModel->getTagRepository()->getSimpleList(null, array(), 'tag');
+            $tagOptions = '';
+
+            foreach ($allTags as $tag) {
+                $selected = (in_array($tag['value'], $tags) || in_array($tag['label'], $tags)) ? ' selected="selected"' : '';
+                $tagOptions .= '<option'.$selected.' value="'.$tag['value'].'">'.$tag['label'].'</option>';
+            }
+
+            $data = array(
+                'success' => 1,
+                'tags'    => $tagOptions
+            );
+        } else {
+            $data = array('success' => 0);
+        }
+
+        return $this->sendJsonResponse($data);
     }
 }

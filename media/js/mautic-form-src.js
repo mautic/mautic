@@ -23,18 +23,19 @@
         };
         //Mautic Profiler
         var Profiler = {};
+
         //global configuration
         var config = {devmode: false, debug: false};
 
         Profiler.startTime = function() {
             this._startTime = performance.now();
-        }
+        };
 
         Profiler.runTime = function() {
             this._endTime = performance.now();
             this._runtime = this._endTime - this._startTime;
             if (Core.debug()) console.log('Execution time: ' + this._runtime + ' ms.');
-        }
+        };
 
         Form.initialize = function(){
             var re = /{mauticform([^}]+)}/g, text;
@@ -71,7 +72,7 @@
 
             this.bindClickEvents();
             Profiler.runTime();
-        }
+        };
 
         Form.bindClickEvents = function() {
             if (Core.debug()) console.log('binding modal click events');
@@ -83,7 +84,7 @@
                     Form.openModal(Form.clickEvents[this.getAttribute('_mautic_form_index')]);
                 });
             }
-        }
+        };
 
         Form.openModal = function(options){
             Core.openModal({
@@ -91,12 +92,12 @@
                 width: typeof(options.data['width']) != 'undefined' ? options.data['width'] : '600px',
                 height: typeof(options.data['height']) != 'undefined' ? options.data['height'] : '480px'
             });
-        }
+        };
 
         Form.getFormLink = function(options) {
             var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
             return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
-        }
+        };
 
         Form.createIframe = function(options, embed) {
             var embed = (typeof(embed) == 'undefined') ? false : true ;
@@ -109,6 +110,347 @@
             iframe.src = this.getFormLink(options);
 
             return iframe;
+        };
+
+        Form.customCallbackHandler = function(formId, event, data) {
+            if (typeof MauticFormCallback !== 'undefined' &&
+                typeof MauticFormCallback[formId] !== 'undefined' &&
+                typeof MauticFormCallback[formId][event] == 'function'
+            ) {
+                if (typeof data == 'undefined') {
+                    data = null;
+                }
+                return MauticFormCallback[formId][event](data);
+            }
+
+            return null;
+        };
+
+        Form.prepareForms = function() {
+            var forms = document.getElementsByTagName('form');
+            for (var i = 0, n = forms.length; i < n; i++) {
+                var formId = forms[i].getAttribute('data-mautic-form');
+                if (formId !== null) {
+                    forms[i].onsubmit = function(event) {
+                        event.preventDefault();
+
+                        Core.validateForm(formId, true);
+                    }
+
+                    // Check to see if the iframe exists
+                    if (!document.getElementById('mauticiframe_' + formId)) {
+                        // Likely an editor has stripped out the iframe so let's dynmamically create it
+                        var ifrm = document.createElement("IFRAME");
+                        ifrm.style.display = "none";
+                        ifrm.style.margin = 0;
+                        ifrm.style.padding = 0;
+                        ifrm.style.border = "none";
+                        ifrm.style.width = 0;
+                        ifrm.style.heigh = 0;
+                        ifrm.setAttribute( 'id', 'mauticiframe_' + formId);
+                        ifrm.setAttribute('name', 'mauticiframe_' + formId);
+                        document.body.appendChild(ifrm);
+
+                        forms[i].target = 'mauticiframe_' + formId;
+                    }
+
+                    if (!document.getElementById('mauticform_' + formId + '_messenger')) {
+                        var messengerInput = document.createElement('INPUT');
+                        messengerInput.type = 'hidden';
+                        messengerInput.setAttribute('name', 'mauticform[messenger]');
+                        messengerInput.setAttribute('id', 'mauticform_' + formId + '_messenger');
+                        messengerInput.value = 1;
+
+                        forms[i].appendChild(messengerInput);
+                    }
+                }
+            }
+        };
+
+        Form.validator = function(formId) {
+            var validator = {
+                validateForm: function (submitForm) {
+                    function validateOptions(elOptions) {
+                        if (typeof elOptions === 'undefined') {
+                            return;
+                        }
+
+                        var optionsValid = false;
+
+                        if (elOptions.length == undefined) {
+                            elOptions = [elOptions];
+                        }
+
+                        for (var i = 0; i < elOptions.length; i++) {
+                            if (elOptions[i].checked) {
+                                optionsValid = true;
+                                break;
+                            }
+                        }
+
+                        return optionsValid;
+                    }
+
+                    function validateEmail(email) {
+                        var atpos = email.indexOf("@");
+                        var dotpos = email.lastIndexOf(".");
+                        var valid = (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) ? false : true;
+                        return valid;
+                    }
+
+                    var formValid = Form.customCallbackHandler(formId, 'onValidate');
+
+                    // If true, then a callback handled it
+                    if (formValid === null) {
+                        Form.customCallbackHandler(formId, 'onValidateStart');
+
+                        validator.disableSubmitButton();
+
+                        // Remove success class if applicable
+                        var formContainer = document.getElementById('mauticform_wrapper_' + formId);
+                        if (formContainer) {
+                            formContainer.className = formContainer.className.replace(" mauticform-post-success", "");
+                        }
+
+                        validator.setMessage('', 'message');
+                        validator.setMessage('', 'error');
+
+                        var formValid = true;
+                        var elId      = 'mauticform_' + formId;
+                        var elForm    = document.getElementById(elId);
+
+                        // Find each required element
+                        for (var fieldKey in MauticFormValidations[formId]) {
+                            var field = MauticFormValidations[formId][fieldKey];
+                            var name = 'mauticform[' + field.name + ']';
+                            switch (field.type) {
+                                case 'radiogrp':
+                                    var elOptions = elForm.elements[name];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+
+                                case 'checkboxgrp':
+                                    var elOptions = elForm.elements[name + '[]'];
+                                    var valid = validateOptions(elOptions);
+                                    break;
+
+                                case 'email':
+                                    var valid = validateEmail(elForm.elements[name].value);
+                                    break;
+
+                                default:
+                                    var valid = (elForm.elements[name].value != '')
+                                    break;
+                            }
+
+                            if (!valid) {
+                                validator.markError('mauticform_' + fieldKey, valid);
+                                formValid = false;
+
+                                validator.enableSubmitButton();
+                            } else {
+                                validator.clearError('mauticform_' + fieldKey);
+                            }
+                        }
+
+                        if (formValid) {
+                            document.getElementById(elId + '_return').value = document.URL;
+                        }
+                    }
+
+                    Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
+
+                    if (formValid && submitForm) {
+                        elForm.submit();
+                    }
+
+                    return formValid;
+                },
+
+                markError: function(containerId, valid, validationMessage) {
+                    var elErrorSpan = false;
+                    var callbackValidationMessage = validationMessage;
+                    var elContainer = document.getElementById(containerId);
+                    if (elContainer) {
+                        elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                        if (typeof validationMessage == 'undefined' && elErrorSpan) {
+                            callbackValidationMessage = elErrorSpan.innerHTML;
+                        }
+                    }
+
+                    var callbackData = {
+                        containerId: containerId,
+                        valid: valid,
+                        validationMessage: callbackValidationMessage
+                    };
+
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onErrorMark', callbackData)) {
+                        if (elErrorSpan) {
+                            if (typeof validationMessage !== 'undefined') {
+                                elErrorSpan.innerHTML = validationMessage;
+                            }
+
+                            elErrorSpan.style.display = (valid) ? 'none' : '';
+                            elContainer.className = elContainer.className + " mauticform-has-error";
+                        }
+                    }
+                },
+
+                clearErrors: function() {
+                    var elForm    = document.getElementById('mauticform_' + formId);
+                    var hasErrors = elForm.querySelectorAll('.mauticform-has-error');
+                    var that      = this;
+                    [].forEach.call(hasErrors, function(container) {
+                        that.clearError(container.id);
+                    });
+                },
+
+                clearError: function(containerId) {
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onErrorClear', containerId)) {
+                        var elContainer = document.getElementById(containerId);
+                        if (elContainer) {
+                            var elErrorSpan = elContainer.querySelector('.mauticform-errormsg');
+                            if (elErrorSpan) {
+                                elErrorSpan.style.display = 'none';
+                                elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
+                            }
+                        }
+                    }
+                },
+
+                parseFormResponse: function (response) {
+                    // Reset the iframe so that back doesn't repost for some browsers
+                    var ifrm = document.getElementById('mauticiframe_' + formId);
+                    if (ifrm) {
+                        ifrm.src = 'about:blank';
+                    }
+
+                    // If true, a callback handled response parsing
+                    if (!Form.customCallbackHandler(formId, 'onResponse', response)) {
+
+                        Form.customCallbackHandler(formId, 'onResponseStart', response);
+                        if (response.download) {
+                            // Hit the download in the iframe
+                            document.getElementById('mauticiframe_' + formId).src = response.download;
+
+                            // Register a callback for a redirect
+                            if (response.redirect) {
+                                setTimeout(function () {
+                                    window.location = response.redirect;
+                                }, 2000);
+                            }
+                        } else if (response.redirect) {
+                            window.location = response.redirect;
+                        } else if (response.validationErrors) {
+                            for (var field in response.validationErrors) {
+                                this.markError('mauticform_' + field, false, response.validationErrors[field]);
+                            }
+                        } else if (response.errorMessage) {
+                            this.setMessage(response.errorMessage, 'error');
+                        }
+
+                        if (response.success) {
+                            if (response.successMessage) {
+                                this.setMessage(response.successMessage, 'message');
+                            }
+
+                            // Add a post success class
+                            var formContainer = document.getElementById('mauticform_wrapper_' + formId);
+                            if (formContainer) {
+                                formContainer.className = formContainer.className + " mauticform-post-success";
+                            }
+
+                            // Reset the form
+                            this.resetForm();
+                        }
+
+                        validator.enableSubmitButton();
+
+                        Form.customCallbackHandler(formId, 'onResponseEnd', response);
+                    }
+                },
+
+                setMessage: function (message, type) {
+                    // If true, a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onMessageSet', {message: message, type: type})) {
+                        var container = document.getElementById('mauticform_' + formId + '_' + type);
+                        if (container) {
+                            container.innerHTML = message;
+                        } else if (message) {
+                            alert(message);
+                        }
+                    }
+                },
+
+                resetForm: function () {
+
+                    this.clearErrors();
+
+                    document.getElementById('mauticform_' + formId).reset();
+                },
+
+                disableSubmitButton: function() {
+                    // If true, then a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onSubmitButtonDisable')) {
+                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+
+                        if (submitButton) {
+                            MauticLang.submitMessage = submitButton.innerHTML;
+                            submitButton.innerHTML = MauticLang.submittingMessage;
+                            submitButton.disabled = 'disabled';
+                        }
+                    }
+                },
+
+                enableSubmitButton: function() {
+                    // If true, then a callback handled it
+                    if (!Form.customCallbackHandler(formId, 'onSubmitButtonEnable')) {
+                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+                        if (submitButton) {
+                            submitButton.innerHTML = MauticLang.submitMessage;
+                            submitButton.disabled = '';
+                        }
+                    }
+                }
+            };
+
+            return validator;
+        };
+
+        Form.registerFormMessenger = function() {
+            window.addEventListener('message', function(event) {
+                if (Core.debug()) console.log(event);
+
+                if(event.origin !== MauticDomain) return;
+
+                try {
+                    var response = JSON.parse(event.data);
+                    if (response && response.formName) {
+                        Core.getValidator(response.formName).parseFormResponse(response);
+                    }
+                } catch (err) {
+                    if (Core.debug()) console.log(err);
+                }
+            }, false);
+
+            if (Core.debug()) console.log('Messenger listener started.');
+        };
+
+        Core.getValidator = function(formId) {
+            return Form.validator(formId);
+        };
+
+        Core.validateForm = function(formId, submit) {
+            if (typeof submit == 'undefined') {
+                submit = false;
+            }
+            return Core.getValidator(formId).validateForm(submit);
+        };
+
+        Core.prepareForm = function(formId) {
+            return Form.prepareForm(formId);
         }
 
         Modal.loadStyle = function() {
@@ -123,7 +465,7 @@
             s.href = Core.debug() ? Core.getMauticBaseUrl() + 'media/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
             document.head.appendChild(s);
             if (Core.debug()) console.log(s);
-        }
+        };
 
         Modal.open = function() {
             if (arguments[0] && typeof arguments[0] === "object") {
@@ -134,7 +476,7 @@
             window.getComputedStyle(this.modal).height;
             this.modal.className = this.modal.className + (this.modal.offsetHeight > window.innerHeight ? " mauticForm-open mauticForm-anchored" : " mauticForm-open");
             this.overlay.className = this.overlay.className + " mauticForm-open";
-        }
+        };
 
         Modal.buildOut = function() {
             var content, contentHolder, docFrag;
@@ -174,24 +516,24 @@
 
             // Append DocumentFragment to body
             document.body.appendChild(docFrag);
-        }
+        };
 
         Modal.extendDefaults = function(source, properties) {
             for (var property in properties) {
                 if (properties.hasOwnProperty(property)) source[property] = properties[property];
             }
             return source;
-        }
+        };
 
         Modal.initializeEvents = function() {
             if (this.closeButton) this.closeButton.addEventListener('click', this.close.bind(this));
             if (this.overlay) this.overlay.addEventListener('click', this.close.bind(this));
-        }
+        };
 
         Modal.transitionSelect = function() {
             var el = document.createElement("div");
             return (el.style.WebkitTransition) ? "webkitTransitionEnd" : (el.style.WebkitTransition) ? "webkitTransitionEnd" : "oTransitionEnd" ;
-        }
+        };
 
         Modal.close = function() {
             var _ = this;
@@ -207,37 +549,35 @@
             //remove modal and overlay
             this.overlay.parentNode.removeChild(this.overlay);
             this.modal.parentNode.removeChild(this.modal);
-
-        }
+        };
 
         Core.parseToObject = function(params) {
             return JSON.parse('{"' + decodeURI(params.trim().replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
-        }
+        };
 
         Core.setConfig = function (options) {
             config = options;
-        }
+        };
 
         Core.getConfig = function() {
             return config;
-        }
+        };
 
         Core.debug = function() {
             return (typeof(config.debug) != 'undefined' && parseInt(config.debug) != 'Nan' && config.debug == 1) ? true : false ;
-        }
+        };
 
         Core.devMode = function() {
             return (typeof(config.devmode) != 'undefined' && parseInt(config.devmode) != 'Nan' && config.devmode == 1) ? true : false ;
-        }
+        };
 
         Core.setMauticBaseUrl = function(base_url) {
             config.mautic_base_url = base_url.split('/').slice(0,-3).join('/')+'/';
-        }
+        };
 
-        Core.getMauticBaseUrl = function()
-        {
+        Core.getMauticBaseUrl = function() {
             return config.mautic_base_url;
-        }
+        };
 
         Core.initialize = function(base_url) {
             Profiler.startTime();
@@ -249,11 +589,16 @@
                 if (Core.debug()) console.log('DOM is ready');
                 Form.initialize();
             });
-        }
+        };
 
         Core.openModal = function(options){
             Modal.open(options);
-        }
+        };
+
+        Core.onLoad = function() {
+            Form.prepareForms();
+            Form.registerFormMessenger();
+        };
 
         return Core;
     }

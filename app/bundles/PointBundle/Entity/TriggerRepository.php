@@ -30,18 +30,9 @@ class TriggerRepository extends CommonRepository
             ->from('MauticPointBundle:Trigger', $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
-        $this->buildClauses($q, $args);
+        $args['qb'] = $q;
 
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        $results = new Paginator($query);
-
-        return $results;
+        return parent::getEntities($args);
     }
 
     /**

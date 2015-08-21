@@ -6,53 +6,145 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$template   = '<div class="col-md-6">{content}</div>';
-$properties = (isset($form['properties'])) ? $form['properties'] : array();
+$template       = '<div class="col-md-6">{content}</div>';
+$toggleTemplate = '<div class="col-md-3">{content}</div>';
+$properties     = (isset($form['properties'])) ? $form['properties'] : array();
+
+$showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']);
+
+$placeholder    = '';
+if (isset($properties['placeholder'])):
+    $placeholder = $view['form']->rowIfExists($properties, 'placeholder', $template);
+    unset($properties['placeholder']);
+    unset($form['properties']['placeholder']);
+endif;
+
+$customAttributes = '';
+if (isset($properties['labelAttributes'])):
+    $customAttributes = $view['form']->rowIfExists($properties, 'labelAttributes', $template);
+    unset($properties['labelAttributes']);
+    unset($form['properties']['labelAttributes']);
+endif;
+
+$showProperties = (isset($form['properties']) && count($form['properties']));
 ?>
 
 <div class="bundle-form">
     <div class="bundle-form-header">
-        <h3><?php echo $fieldHeader; ?></h3>
+        <h3 class="mb-lg"><?php echo $fieldHeader; ?></h3>
     </div>
 
     <?php echo $view['form']->start($form); ?>
-    <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'label', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'showLabel', $template); ?>
-        <?php echo $view['form']->rowIfExists($properties, 'captcha', $template); ?>
 
-    </div>
-    <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'validationMessage', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'isRequired', $template); ?>
-    </div>
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
+                </a>
+            </li>
 
-    <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'defaultValue', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'helpMessage', $template); ?>
-        <?php echo $view['form']->rowIfExists($properties, 'errorMessage', $template); ?>
-    </div>
-    <div class="row">
-        <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
-        <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
-    </div>
+            <?php if (isset($form['leadField'])): ?>
+            <li role="presentation">
+                <a href="#leadfields" aria-controls="leadfields" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.leadfield'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
 
-    <div class="row">
-        <?php foreach ($form->children as $child): ?>
-        <?php if ($child->isRendered()) continue; ?>
-        <?php if (!empty($child['text'])) continue; ?>
-        <div class="col-md-6">
-            <?php echo $view['form']->row($child); ?>
+            <?php if (isset($form['isRequired'])): ?>
+            <li role="presentation">
+                <a href="#required" aria-controls="required" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.validation'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
+
+            <?php if ($showProperties): ?>
+            <li role="presentation">
+                <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
+
+            <?php if ($showAttributes): ?>
+            <li role="presentation">
+                <a href="#attributes" aria-controls="attributes" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.attributes'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content pa-lg">
+            <div role="tabpanel" class="tab-pane active" id="general">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'label', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showLabel', $toggleTemplate); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'saveResult', $toggleTemplate); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'defaultValue', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'helpMessage', $template); ?>
+                    <?php echo $placeholder; ?>
+                </div>
+            </div>
+
+            <?php if (isset($form['leadField'])): ?>
+            <div role="tabpanel" class="tab-pane" id="leadfields">
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['leadField']); ?>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($form['isRequired'])): ?>
+            <div role="tabpanel" class="tab-pane" id="required">
+                    <div class="row">
+                        <?php echo $view['form']->rowIfExists($form, 'validationMessage', $template); ?>
+                        <?php echo $view['form']->rowIfExists($form, 'isRequired', $toggleTemplate); ?>
+                    </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($showProperties): ?>
+            <div role="tabpanel" class="tab-pane" id="properties">
+                <?php echo $view['form']->errors($form['properties']); ?>
+                <div class="row">
+                    <?php if (isset($properties['list']) && count($properties) === 1): ?>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['properties']); ?>
+                        </div>
+                    <?php else: ?>
+
+                        <?php foreach ($properties as $name => $property): ?>
+                            <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
+                            <?php $col = ($name == 'text') ? 12 : 6; ?>
+                            <div class="col-md-<?php echo $col; ?>">
+                                <?php echo $view['form']->row($form['properties'][$name]); ?>
+                            </div>
+                        <?php endforeach; ?>
+
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+
+            <?php if ($showAttributes): ?>
+            <div role="tabpanel" class="tab-pane" id="attributes">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>
+                    <?php echo $customAttributes; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endforeach; ?>
-
-        <?php foreach ($properties as $name => $property): ?>
-        <?php if ($name == 'test'): ?>
-        <?php echo $view['form']->rowIfExists($properties, $name, '<div class="col-md-12">{content}</div>'); ?>
-        <?php else: ?>
-        <?php echo $view['form']->rowIfExists($properties, $name, $template); ?>
-        <?php endif; ?>
-        <?php endforeach; ?>
     </div>
+
     <?php echo $view['form']->end($form); ?>
 </div>

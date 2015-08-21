@@ -15,6 +15,9 @@ $view['slots']->set('headerTitle', $header);
 $view['slots']->set('mauticContent', 'lead');
 
 $groups = array_keys($fields);
+sort($groups);
+
+$img = $view['lead_avatar']->getAvatar($lead);
 ?>
     <!-- start: box layout -->
     <div class="box-layout">
@@ -24,7 +27,7 @@ $groups = array_keys($fields);
                 <?php if ($lead->getId()): ?>
                     <div class="media">
                         <div class="pull-left">
-                            <img class="img-rounded img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
+                            <img class="img-rounded img-bordered media-object" src="<?php echo $img; ?>" alt="" width="65px">
                         </div>
                         <div class="media-body">
                             <h4><?php echo $header; ?></h4>
@@ -36,8 +39,9 @@ $groups = array_keys($fields);
 
                                         $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
                                         ?>
-                                        <span class="label label-default"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></span>
-                                        <?php echo $view['translator']->trans('mautic.lead.points'); ?>
+                                        <span class="label label-default"<?php echo $style; ?>>
+                                            <?php echo $view['translator']->transChoice('mautic.lead.points.count', $lead->getPoints(), array('%points%' => $lead->getPoints())); ?>
+                                        </span>
                                     </span>
                                 </p>
                             </div>
@@ -87,6 +91,18 @@ $groups = array_keys($fields);
                                     <div class="col-sm-4">
                                         <?php echo $view['form']->label($form['preferred_profile_image']); ?>
                                         <?php echo $view['form']->widget($form['preferred_profile_image']); ?>
+                                    </div>
+                                </div>
+                                <div class="row mt-md">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->label($form['tags']); ?>
+                                        <?php echo $view['form']->widget($form['tags']); ?>
+                                    </div>
+                                </div>
+                                <div class="row<?php if ($view['form']->containsErrors($form['custom_avatar'])) echo ' has-error'; ?>" id="customAvatarContainer" style="<?php if ($form['preferred_profile_image']->vars['data'] != 'custom') echo 'display: none;'; ?>">
+                                    <div class="col-sm-offset-4 col-sm-4 mt-sm">
+                                        <?php echo $view['form']->widget($form['custom_avatar']); ?>
+                                        <?php echo $view['form']->errors($form['custom_avatar']); ?>
                                     </div>
                                 </div>
                             </div>

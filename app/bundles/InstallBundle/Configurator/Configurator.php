@@ -215,7 +215,10 @@ class Configurator
     }
 
     /**
-     * @param $array
+     * @param            $array
+     * @param bool|false $addClosingComma
+     *
+     * @return string
      */
     protected function renderArray($array, $addClosingComma = false)
     {

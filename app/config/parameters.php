@@ -7,12 +7,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+include __DIR__ . '/paths_helper.php';
+
 //load default parameters from bundle files
 $core    = $container->getParameter('mautic.bundles');
-$addons  = $container->getParameter('mautic.addon.bundles');
+$plugins = $container->getParameter('mautic.plugin.bundles');
 
-$bundles = array_merge($core, $addons);
-unset($core, $addons);
+$bundles = array_merge($core, $plugins);
+unset($core, $plugins);
 
 $mauticParams = array();
 
@@ -21,24 +23,6 @@ foreach ($bundles as $bundle) {
         $mauticParams = array_merge($mauticParams, $bundle['config']['parameters']);
     }
 }
-
-// Include path settings
-$root  = $container->getParameter('kernel.root_dir');
-
-// Closure to replace %kernel_root_dir% placeholders
-$replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder) {
-    if (is_array($value)) {
-        foreach ($value as &$v) {
-            $replaceRootPlaceholder($v);
-        }
-    } elseif (strpos($value, '%kernel.root_dir%') !== false) {
-        $value = str_replace('%kernel.root_dir%', $root, $value);
-    }
-};
-
-// Include local paths
-require 'paths.php';
-$replaceRootPlaceholder($paths);
 
 // Find available translations
 $locales = array();
@@ -109,9 +93,19 @@ if (isset($mauticParams['site_url'])) {
     $parts = parse_url($mauticParams['site_url']);
 
     if (!empty($parts['host'])) {
+        $path = '';
+
+        if (!empty($parts['path'])) {
+            // Check and remove trailing slash to prevent double // in Symfony cli generated URLs
+            $path = $parts['path'];
+            if (substr($path, -1) == '/') {
+                $path = substr($path, 0, -1);
+            }
+        }
+
         $container->setParameter('router.request_context.host', $parts['host']);
         $container->setParameter('router.request_context.scheme', (!empty($parts['scheme']) ? $parts['scheme'] : 'http'));
-        $container->setParameter('router.request_context.base_url', (!empty($parts['path']) ? $parts['path'] : '/'));
+        $container->setParameter('router.request_context.base_url', $path);
     }
 }
 

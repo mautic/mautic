@@ -9,7 +9,9 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -17,28 +19,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class FormModel extends CommonModel
 {
-
-    /**
-     * Get a specific entity
-     *
-     * @param $id
-     *
-     * @return null|object
-     */
-    public function getEntity($id = null)
-    {
-        if (null !== $id) {
-            $repo = $this->getRepository();
-            if (method_exists($repo, 'getEntity')) {
-                return $repo->getEntity($id);
-            }
-
-            return $repo->find($id);
-        }
-
-        return null;
-    }
-
     /**
      * Lock an entity to prevent multiple people from editing
      *
@@ -209,7 +189,6 @@ class FormModel extends CommonModel
         return false;
     }
 
-
     /**
      * Set timestamps and user ids
      *
@@ -221,14 +200,14 @@ class FormModel extends CommonModel
     {
         $user = $this->factory->getUser(true);
         if ($isNew) {
-            if (method_exists($entity, 'setDateAdded')) {
+            if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
                 $entity->setDateAdded(new \DateTime());
             }
 
             if ($user instanceof User) {
-                if (method_exists($entity, 'setCreatedBy')) {
+                if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
                     $entity->setCreatedBy($user);
-                } elseif (method_exists($entity, 'setCreatedByUser')) {
+                } elseif (method_exists($entity, 'setCreatedByUser') && !$entity->getCreatedByUser()) {
                     $entity->setCreatedByUser($user->getName());
                 }
             }
@@ -321,14 +300,18 @@ class FormModel extends CommonModel
     /**
      * Dispatches events for child classes
      *
-     * @param string $action
-     * @param object $entity
-     * @param bool   $isNew
-     * @param bool   $event
+     * @param       $action
+     * @param       $entity
+     * @param bool  $isNew
+     * @param Event $event
+     *
+     * @return Event|null
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         //...
+
+        return $event;
     }
 
     /**
@@ -367,5 +350,34 @@ class FormModel extends CommonModel
     public function getNameGetter()
     {
         return "getName";
+    }
+
+    /**
+     * Cleans a string to be used as an alias. The returned string will be alphanumeric or underscore, less than 25 characters
+     * and if it is a reserved SQL keyword, it will be prefixed with f_
+     *
+     * @param $alias
+     *
+     * @return string
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function cleanAlias($alias)
+    {
+        // Some labels are quite long if a question so cut this short
+        $alias = substr(strtolower(InputHelper::alphanum($alias, false, '_')), 0, 25);
+
+        if (substr($alias, -1) == '_') {
+            $alias = substr($alias, 0, -1);
+        }
+
+        // Check that alias is SQL safe since it will be used for the column name
+        $databasePlatform = $this->em->getConnection()->getDatabasePlatform();
+        $reservedWords = $databasePlatform->getReservedKeywordsList();
+
+        if ($reservedWords->isKeyword($alias) || is_numeric($alias)) {
+            $alias = 'f_' . $alias;
+        }
+
+        return $alias;
     }
 }

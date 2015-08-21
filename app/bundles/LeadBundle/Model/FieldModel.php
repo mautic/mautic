@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -95,11 +96,12 @@ class FieldModel extends FormModel
         if ($isNew) {
             if (empty($alias)) {
                 $alias = strtolower(InputHelper::alphanum($entity->getName()));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias));
             }
 
-            //make sure alias is not already taken
+            // clean the alias
+            $alias = $this->cleanAlias($alias);
+
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $aliases   = $repo->getAliases($entity->getId());
@@ -303,7 +305,7 @@ class FieldModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(array('LeadField'));
@@ -323,7 +325,7 @@ class FieldModel extends FormModel
                 $name = LeadEvents::FIELD_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -336,13 +338,14 @@ class FieldModel extends FormModel
 
             return $event;
         } else {
-            return false;
+            return null;
         }
     }
 
     /**
-     * @param bool $byGroup
-     * @param bool $alphabetical
+     * @param bool|true $byGroup
+     * @param bool|true $alphabetical
+     * @param array     $filters
      *
      * @return array
      */
@@ -390,5 +393,59 @@ class FieldModel extends FormModel
         }
 
         return $leadFields;
+    }
+
+    /**
+     * Get the fields for a specific group
+     *
+     * @param       $group
+     * @param array $filters
+     */
+    public function getGroupFields($group, $filters = array('isPublished' => true))
+    {
+        $forceFilters = array(
+            array(
+                'column' => 'f.group',
+                'expr'   => 'eq',
+                'value'  => $group
+            )
+        );
+        foreach ($filters as $col => $val) {
+            $forceFilters[] = array(
+                'column' => "f.{$col}",
+                'expr'   => 'eq',
+                'value'  => $val
+            );
+        }
+        // Get a list of custom form fields
+        $fields = $this->getEntities(array(
+            'filter'     => array(
+                'force' => $forceFilters
+            ),
+            'orderBy'    => 'f.order',
+            'orderByDir' => 'asc'
+        ));
+
+        $leadFields = array();
+
+        foreach ($fields as $f) {
+            $leadFields[$f->getAlias()] = $f->getLabel();
+        }
+
+        return $leadFields;
+    }
+
+    /*
+     * Retrieves a list of published fields that are unique identifers
+     *
+     * @return array
+     */
+    public function getUniqueIdentiferFields()
+    {
+        $filters = array ('isPublished' => true, 'isUniqueIdentifer' => true);
+
+        $fields = $this->getFieldList(false, true, $filters);
+
+        return $fields;
     }
 }

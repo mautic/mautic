@@ -122,17 +122,6 @@ class ProfileController extends FormController
             }
         }
 
-        //add an input to request the current password in order to change existing details
-        $form->add('currentPassword', 'password', array(
-            'label'      => 'mautic.user.account.form.password.current',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.user.account.form.help.password.current',
-                'preaddon' => 'fa fa-lock'
-            )
-        ));
-
         //Check for a submitted form and process it
         $submitted = $this->factory->getSession()->get('formProcessed', 0);
         if ($this->request->getMethod() == 'POST' && !$submitted) {

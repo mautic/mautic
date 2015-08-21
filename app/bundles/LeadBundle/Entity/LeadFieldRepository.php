@@ -18,54 +18,44 @@ use Doctrine\ORM\Query;
  */
 class LeadFieldRepository extends CommonRepository
 {
-
-    /**
-     * Get a list of entities
-     *
-     * @param array      $args
-     * @return Paginator
-     */
-    public function getEntities($args = array())
-    {
-        $q = $this->createQueryBuilder($this->getTableAlias());
-
-        $this->buildClauses($q, $args);
-
-        $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
-        }
-
-        $results = new Paginator($query);
-        return $results;
-    }
-
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields
      *
      * @param $exludingId
+     * @param $publishedOnly
+     * @param $includeEntityFields
+     *
      * @return array
      */
-    public function getAliases($exludingId)
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true)
     {
-        $q = $this->createQueryBuilder('l')
-            ->select('l.alias');
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.alias')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'l');
+
         if (!empty($exludingId)) {
-        $q->where('l.id != :id')
-            ->setParameter('id', $exludingId);
+            $q->where('l.id != :id')
+                ->setParameter('id', $exludingId);
         }
 
-        $results = $q->getQuery()->getArrayResult();
+        if ($publishedOnly) {
+            $q->andWhere(
+                $q->expr()->eq('is_published', ':true')
+            )
+                ->setParameter(':true', true, 'boolean');
+        }
+
+        $results = $q->execute()->fetchAll();
         $aliases = array();
         foreach($results as $item) {
             $aliases[] = $item['alias'];
         }
 
-        //add lead main column names to prevent attempt to create a field with the same name
-        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead')->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
-        $aliases = array_merge($aliases, $leadRepo);
+        if ($includeEntityFields) {
+            //add lead main column names to prevent attempt to create a field with the same name
+            $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead')->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
+            $aliases  = array_merge($aliases, $leadRepo);
+        }
 
         return $aliases;
     }

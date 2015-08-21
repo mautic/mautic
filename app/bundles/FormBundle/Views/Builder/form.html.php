@@ -7,27 +7,38 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$formName = \Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName());
+$formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
 $fields   = $form->getFields();
 $required = array();
 ?>
 
-<form autocomplete="off" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" onsubmit="return MauticForm_<?php echo $formName; ?>.validateForm();">
-	<div class="mauticform-error" id="mauticform_<?php echo $formName ?>_error"></div>
-	<div class="mauticform-message" id="mauticform_<?php echo $formName ?>_message"></div>
-	<?php foreach ($fields as $f):
-			if ($f->isCustom()):
-				$params = $f->getCustomParameters();
-				$template = $params['template'];
-			else:
-				$template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
-			endif;
+<?php echo $view->render($theme.'MauticFormBundle:Builder:script.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
-			echo $view->render($template, array('field' => $f->convertToArray(), 'id' => $f->getAlias()));
-	endforeach; ?>
+<?php echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
-	<div class="mauticform-row mauticform-hidden">
-	    <input type="hidden" name="mauticform[formid]" value="<?php echo $form->getId(); ?>" />
-	    <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
-	</div>
-</form>
+<div id="mauticform_wrapper_<?php echo $formName ?>" class="mauticform_wrapper">
+    <form autocomplete="off" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" data-mautic-form="<?php echo $formName ?>">
+        <div class="mauticform-error" id="mauticform_<?php echo $formName ?>_error"></div>
+        <div class="mauticform-message" id="mauticform_<?php echo $formName ?>_message"></div>
+        <div class="mauticform-innerform">
+<?php
+foreach ($fields as $f):
+    if ($f->isCustom()):
+        $params = $f->getCustomParameters();
+        $template = $params['template'];
+    else:
+        $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
+    endif;
+
+    echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias()));
+endforeach;
+?>
+
+
+            <input type="hidden" name="mauticform[formId]" id="mauticform_<?php echo $formName ?>_id" value="<?php echo $form->getId(); ?>" />
+            <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />
+            <input type="hidden" name="mauticform[formName]" id="mauticform_<?php echo $formName ?>_name" value="<?php echo $formName; ?>" />
+
+        </div>
+    </form>
+</div>

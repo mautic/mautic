@@ -10,10 +10,10 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Helper\EmailTokenHelper;
 
 /**
  * Class EmailSubscriber
@@ -22,6 +22,8 @@ use Mautic\LeadBundle\Helper\EmailTokenHelper;
  */
 class EmailSubscriber extends CommonSubscriber
 {
+
+    private static $leadFieldRegex = '{leadfield=(.*?)}';
 
     /**
      * @return array
@@ -35,40 +37,117 @@ class EmailSubscriber extends CommonSubscriber
         );
     }
 
+    /**
+     * @param EmailBuilderEvent $event
+     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        //add email tokens
-        $tokenHelper = new EmailTokenHelper($this->factory);
-        $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent(), 255);
+        $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
+        $tokenHelper->setPermissionSet(array('lead:fields:full'));
+
+        if ($event->tokenSectionsRequested()) {
+            //add email tokens
+            $event->addTokenSection(
+                'lead.emailtokens',
+                'mautic.lead.email.header.index',
+                $tokenHelper->getTokenContent(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'f.isPublished',
+                                    'expr'   => 'eq',
+                                    'value'  => true
+                                )
+                            )
+                        ),
+                        'orderBy'        => 'f.label',
+                        'orderByDir'     => 'ASC',
+                        'hydration_mode' => 'HYDRATE_ARRAY'
+                    )
+                ),
+                255
+            );
+        }
+
+        if ($event->tokensRequested(self::$leadFieldRegex)) {
+            $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);
+        }
     }
 
+    /**
+     * @param EmailSendEvent $event
+     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        if ($this->factory->getSecurity()->isAnonymous()) {
-            $this->onEmailGenerate($event);
-        } //else this is a user previewing so leave lead fields tokens in place
+        $this->onEmailGenerate($event);
     }
 
+    /**
+     * @param EmailSendEvent $event
+     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content  = $event->getContent();
-        $regex    = '/{leadfield=(.*?)}/';
+        $content = $event->getContent();
+        $lead    = $event->getLead();
 
-        $lead = $event->getLead();
+        $tokenList = self::findLeadTokens($content, $lead);
+        if (count($tokenList)) {
+            $event->addTokens($tokenList);
+            unset($tokenList);
+        }
+    }
 
-        preg_match_all($regex, $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
-                $urlencode = (strpos($match, '|true') !== false);
-                $alias = ($urlencode) ? str_replace('|true', '', $match) : $match;
+    /**
+     * @param string $content
+     * @param array  $lead
+     * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
+     *                        rather than an array of found matches
+     *
+     * @return array|string
+     */
+    static function findLeadTokens($content, $lead, $replace = false)
+    {
+        // Search for bracket or bracket encoded
+        $regex     = '/({|%7B)leadfield=(.*?)(}|%7D)/';
+        $tokenList = array();
 
-                if (isset($lead[$alias])) {
-                    $value   = ($urlencode) ? urlencode($lead[$alias]) : $lead[$alias];
-                    $content = str_ireplace('{leadfield=' . $match . '}', $value, $content);
+        $foundMatches = preg_match_all($regex, $content, $matches);
+        if ($foundMatches) {
+            foreach ($matches[2] as $key => $match) {
+                $token = $matches[0][$key];
+
+                if (isset($tokenList[$token])) {
+                    continue;
                 }
+
+                $fallbackCheck = explode('|', $match);
+                $urlencode     = false;
+                $fallback      = '';
+
+                if (isset($fallbackCheck[1])) {
+                    // There is a fallback or to be urlencoded
+                    $alias = $fallbackCheck[0];
+
+                    if ($fallbackCheck[1] === 'true') {
+                        $urlencode = true;
+                        $fallback  = '';
+                    } else {
+                        $fallback = $fallbackCheck[1];
+                    }
+                } else {
+                    $alias = $match;
+                }
+
+                $value             = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;
+                $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
+            }
+
+            if ($replace) {
+                $content = str_replace(array_keys($tokenList), $tokenList, $content);
             }
         }
 
-        $event->setContent($content);
+        return $replace ? $content : $tokenList;
     }
 }

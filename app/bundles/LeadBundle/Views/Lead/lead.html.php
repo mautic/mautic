@@ -15,28 +15,20 @@ $isAnonymous = $lead->isAnonymous();
 
 $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
 
-$leadName = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadActualName = $lead->getName();
+$leadCompany    = $lead->getCompany();
 
 $view['slots']->set('mauticContent', 'lead');
 
 $avatar = '';
 if (!$isAnonymous) {
-    $preferred = $lead->getPreferredProfileImage();
-
-    if ($preferred == 'gravatar' || empty($preferred))  {
-        $img = $view['gravatar']->getImage($fields['core']['email']['value']);
-    } else {
-        $socialData = $lead->getSocialCache();
-        $img = !empty($socialData[$preferred]['profile']['profileImage']) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($fields['core']['email']['value']);
-    }
-
+    $img    = $view['lead_avatar']->getAvatar($lead);
     $avatar = '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="' . $img . '" alt="" /></span>';
 }
-?>
-<?php
 
-$view['slots']->set("headerTitle",
-       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small">' . $lead->getSecondaryIdentifier() . '</span></div>');
+$view['slots']->set('headerTitle',
+       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
@@ -45,10 +37,18 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
 $groups = array_keys($fields);
 $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
-$buttons = $preButtons = array();
+$buttons = array();
 
 if ($edit) {
-    $preButtons[] = array(
+    $buttons[] = array(
+        'attr' => array(
+            'href' => $view['router']->generate( 'mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'edit'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
+        'iconClass' => 'fa fa-pencil-square-o'
+    );
+
+    $buttons[] = array(
         'attr'      => array(
             'id'          => 'addNoteButton',
             'data-toggle' => 'ajaxmodal',
@@ -58,6 +58,20 @@ if ($edit) {
         ),
         'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
         'iconClass' => 'fa fa-file-o'
+    );
+}
+
+if (!empty($fields['core']['email']['value'])) {
+    $buttons[] = array(
+        'attr'      => array(
+            'id'          => 'sendEmailButton',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
+            'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'email'))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
+        'iconClass' => 'fa fa-send'
     );
 }
 
@@ -85,15 +99,20 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     );
 }
 
+if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) {
+    $buttons[] = array(
+        'confirm'      => array(
+            'message'       => $view["translator"]->trans('mautic.lead.lead.form.confirmdelete', array('%name%' => $lead->getName() . ' (' . $lead->getId() . ')')),
+            'confirmAction' => $view['router']->generate('mautic_lead_action', array_merge(array('objectAction' => 'delete', 'objectId' => $lead->getId()))),
+            'template'      => 'delete'
+        )
+    );
+}
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $lead,
-    'templateButtons' => array(
-        'edit'       => $edit,
-        'delete'     => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())
-    ),
     'routeBase'  => 'lead',
     'langVar'    => 'lead.lead',
-    'preCustomButtons' => $preButtons,
     'customButtons' => $buttons
 )));
 ?>
@@ -257,8 +276,35 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- form HTML -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-            <div class="points-panel text-center">
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <?php if ($leadActualName || $leadCompany): ?>
+            <div class="lead-avatar-panel">
+                <div class="avatar-collapser hr-expand nm">
+                    <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
+                </div>
+                <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>" id="lead-avatar-block">
+                    <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
+                    <div class="pa-sm">
+                        <?php if ($leadActualName && $leadCompany): ?>
+                        <h2>
+                            <div>
+                                <?php echo $leadName; ?>
+                            </div>
+                            <div class="mt-xs span-block small">
+                                <?php echo $leadCompany; ?>
+                            </div>
+                        <?php elseif ($leadActualName || $leadCompany): ?>
+                        <h2>
+                            <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
+                        </h2>
+                        <?php endif; ?>
+                    </div>
+                    <hr />
+                </div>
+            </div>
+
+            <?php endif; ?>
+            <div class="mt-sm points-panel text-center">
                 <?php
                 $color = $lead->getColor();
                 $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
@@ -269,14 +315,23 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <hr />
             </div>
             <?php if ($doNotContact) : ?>
-                <div class="panel-heading text-center">
-                    <h4 class="fw-sb">
-                        <span class="label label-danger">
-                            <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                        </span>
-                    </h4>
+                <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
+                    <div class="panel-heading text-center">
+                        <h4 class="fw-sb">
+                            <?php if ($doNotContact['unsubscribed']): ?>
+                            <span class="label label-danger">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                            </span>
+                            <?php elseif ($doNotContact['bounced']): ?>
+                            <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
+                                <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_bounce_status'); ?>"><i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i></span>
+                            </span>
+                            <?php endif; ?>
+                        </h4>
+                    </div>
+                    <hr />
                 </div>
-                <hr />
             <?php endif; ?>
             <div class="panel-heading">
                 <div class="panel-title">
@@ -309,7 +364,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php if ($upcomingEvents) : ?>
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
             </div>
@@ -331,7 +386,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
         </div>
         <?php endif; ?>
-
+        <div class="pa-sm">
+            <?php echo $view['form']->form($tagForm); ?>
+        </div>
     </div>
     <!--/ right section -->
 </div>

@@ -17,29 +17,24 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     ),
     'routeBase' => 'email'
 )));
+
 ?>
 
-<div class="box-layout">
-	<!-- filters -->
-    <?php echo $view->render('MauticEmailBundle:Email:filters.html.php', array('filters' => $filters)); ?>
-    <!--/ filters -->
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
+        'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.email.help.searchcommands',
+        'searchId'    => 'email-search',
+        'action'      => $currentRoute,
+        'routeBase'   => 'email',
+        'templateButtons' => array(
+            'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
+        ),
+        'filters'     => $filters
+    )); ?>
 
-    <div class="col-md-9 bg-auto height-auto bdr-l">
-        <div class="panel panel-default bdr-t-wdh-0 bdr-l-wdh-0 mb-0">
-            <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
-                'searchValue' => $searchValue,
-                'searchHelp'  => 'mautic.email.help.searchcommands',
-                'action'      => $currentRoute,
-                'routeBase'   => 'email',
-                'templateButtons' => array(
-                    'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
-                )
-            )); ?>
-
-            <div class="page-list">
-                <?php $view['slots']->output('_content'); ?>
-            </div>
-        </div>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
     </div>
 </div>
 

@@ -164,17 +164,33 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['view'])) {
                 $level = 'view';
             }
+        } elseif ($level == 'view') {
+            if (isset($this->permissions[$name]['viewown'])) {
+                $level = 'viewown';
+            }
         } elseif (in_array($level, array('editown', 'editother'))) {
             if (isset($this->permissions[$name]['edit'])) {
                 $level = 'edit';
+            }
+        } elseif ($level == 'edit') {
+            if (isset($this->permissions[$name]['editown'])) {
+                $level = 'editown';
             }
         } elseif (in_array($level, array('deleteown', 'deleteother'))) {
             if (isset($this->permissions[$name]['delete'])) {
                 $level = 'delete';
             }
+        }  elseif ($level == 'delete') {
+            if (isset($this->permissions[$name]['deleteown'])) {
+                $level = 'deleteown';
+            }
         } elseif (in_array($level, array('publishown', 'publishother'))) {
             if (isset($this->permissions[$name]['publish'])) {
                 $level = 'publish';
+            }
+        } elseif ($level == 'publish') {
+            if (isset($this->permissions[$name]['publishown'])) {
+                $level = 'publishown';
             }
         }
 
@@ -380,7 +396,6 @@ abstract class AbstractPermissions
      * Add a single full permission
      *
      * @param array $permissionNames
-     * @param bool  $includePublish
      *
      * @return void
      */
@@ -404,7 +419,6 @@ abstract class AbstractPermissions
      * @param string               $level
      * @param FormBuilderInterface $builder
      * @param array                $data
-     * @param bool                 $includePublish
      */
     protected function addManageFormFields($bundle, $level, &$builder, $data)
     {

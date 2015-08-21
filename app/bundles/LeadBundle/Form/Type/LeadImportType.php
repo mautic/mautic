@@ -69,6 +69,17 @@ class LeadImportType extends AbstractType
             'constraints' => $constraints
         ));
 
+        $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
+        $builder->add('batchlimit', 'text', array(
+            'label'       => 'mautic.lead.import.batchlimit',
+            'attr'        => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.lead.import.batchlimit_tooltip'
+            ),
+            'data'        => $default,
+            'constraints' => $constraints
+        ));
+
         $builder->add('start', 'submit', array(
             'attr'  => array(
                 'class'   => 'btn btn-primary',

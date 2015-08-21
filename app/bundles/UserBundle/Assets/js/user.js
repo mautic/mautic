@@ -89,6 +89,5 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
             });
         });
         mQuery('.' + bundle + '_granted').html(granted);
-        console.log(mQuery('.' + bundle + '_granted'));
     }
 };

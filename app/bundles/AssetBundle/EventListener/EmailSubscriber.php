@@ -35,12 +35,14 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailBuild (EmailBuilderEvent $event)
     {
-        //add AB Test Winner Criteria
-        $formSubmissions = array(
-            'group'    => 'mautic.asset.abtest.criteria',
-            'label'    => 'mautic.asset.abtest.criteria.downloads',
-            'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner'
-        );
-        $event->addAbTestWinnerCriteria('asset.downloads', $formSubmissions);
+        if ($event->abTestWinnerCriteriaRequested()) {
+            //add AB Test Winner Criteria
+            $formSubmissions = array(
+                'group'    => 'mautic.asset.abtest.criteria',
+                'label'    => 'mautic.asset.abtest.criteria.downloads',
+                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner'
+            );
+            $event->addAbTestWinnerCriteria('asset.downloads', $formSubmissions);
+        }
     }
 }

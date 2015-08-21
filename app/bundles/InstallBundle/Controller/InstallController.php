@@ -12,6 +12,7 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Sequence;
@@ -52,9 +53,9 @@ class InstallController extends CommonController
 
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
-
-        $action = $this->generateUrl('mautic_installer_step', array('index' => $index));
-        $step   = $configurator->getStep($index);
+        $params       = $configurator->getParameters();
+        $step         = $configurator->getStep($index);
+        $action       = $this->generateUrl('mautic_installer_step', array('index' => $index));
 
         /** @var \Symfony\Component\Form\Form $form */
         $form = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
@@ -66,6 +67,12 @@ class InstallController extends CommonController
 
         $session        = $this->factory->getSession();
         $completedSteps = $session->get('mautic.installer.completedsteps', array());
+
+        // Check to ensure the installer is in the right place
+        if ((empty($params) || empty($params['db_driver'])) && $index > 1) {
+            $session->set('mautic.installer.completedsteps', array(0));
+            return $this->redirect($this->generateUrl('mautic_installer_step', array('index' => 1)));
+        }
 
         if ('POST' === $this->request->getMethod()) {
             $form->handleRequest($this->request);
@@ -421,8 +428,9 @@ class InstallController extends CommonController
      */
     private function performDatabaseInstallation ($dbParams)
     {
-        $dbName             = $dbParams['dbname'];
-        $dbParams['dbname'] = null;
+        $dbName              = $dbParams['dbname'];
+        $dbParams['dbname']  = null;
+        $dbParams['charset'] = 'UTF8';
 
         //suppress display of errors as we know its going to happen while testing the connection
         ini_set('display_errors', 0);
@@ -873,6 +881,9 @@ class InstallController extends CommonController
                 unset($dbParams['name']);
             }
 
+            // Ensure UTF8 charset
+            $dbParams['charset'] = 'UTF8';
+
             $paths = $namespaces = array();
 
             // Build entity namespaces
@@ -881,7 +892,7 @@ class InstallController extends CommonController
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
                     $paths[] = $entityPath;
-                    if ($b['isAddon']) {
+                    if ($b['isPlugin']) {
                         $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
                     } else {
                         $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
@@ -889,7 +900,12 @@ class InstallController extends CommonController
                 }
             }
 
-            $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
+            $driver = new StaticPHPDriver($paths);
+            $config = Setup::createConfiguration();
+            $config->setMetadataDriverImpl(
+                $driver
+            );
+
             $config->setEntityNamespaces($namespaces);
 
             //set the table prefix

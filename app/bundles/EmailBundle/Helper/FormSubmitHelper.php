@@ -15,10 +15,11 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class FormSubmitHelper
 {
-	/**
-     * @param       $action
-     *
-     * @return array
+    /**
+     * @param               $tokens
+     * @param Action        $action
+     * @param MauticFactory $factory
+     * @param               $feedback
      */
     public static function sendEmail($tokens, Action $action, MauticFactory $factory, $feedback)
     {
@@ -60,11 +61,11 @@ class FormSubmitHelper
 			} elseif (isset($currentLead)) {
 		    	if (isset($leadFields['email'])) {
 					$options = array(
-						'source' 		   => array('form', $form->getId()),
-						'tokens' 		   => $tokens,
-						'ignoreLeadChecks' => true
+						'source' 	   => array('form', $form->getId()),
+						'tokens' 	   => $tokens,
+                        'ignoreDNC'    => true
 					);
-		    		$emailModel->sendEmail($email, array($currentLead['id'] => $currentLead), $options);
+		    		$emailModel->sendEmail($email, $currentLead, $options);
 		    	}
 		    }
 		}

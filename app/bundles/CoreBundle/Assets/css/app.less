@@ -143,3 +143,33 @@ label.required:after {
 .shuffle-item .card{
   height: 150px;
 }
+
+.equal, .equal > div[class*='col-'] {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex:1 1 auto;
+}
+
+.mautic-pleasewait {
+  width: 200px;
+  height: 50px;
+  position: fixed;
+  left: 50%;
+  top: 10px;
+  margin: 0 0 0 -100px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 2em;
+  color: #eee;
+  z-index: 9999;
+}
+
+body.noscroll
+{
+  position: fixed;
+  overflow-y: scroll;
+  width: 100%;
+}

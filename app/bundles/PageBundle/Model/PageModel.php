@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -18,6 +19,7 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -32,7 +34,11 @@ class PageModel extends FormModel
      */
     public function getRepository ()
     {
-        return $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo->setCurrentUser(
+            $this->factory->getUser()
+        );
+        return $repo;
     }
 
     /**
@@ -202,7 +208,7 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(array('Page'));
@@ -222,7 +228,7 @@ class PageModel extends FormModel
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
             default:
-                return false;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -236,7 +242,7 @@ class PageModel extends FormModel
             return $event;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -274,6 +280,12 @@ class PageModel extends FormModel
      */
     public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
+        // If this is a variant, then get the parent's URL
+        $parent = $entity->getVariantParent();
+        if ($parent != null) {
+            $entity = $parent;
+        }
+
         $slug = $this->generateSlug($entity);
 
         return $this->buildUrl('mautic_page_public', array('slug' => $slug), $absolute, $clickthrough);
@@ -384,35 +396,57 @@ class PageModel extends FormModel
                 // if additional data were sent with the tracking pixel
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
-                    // URL attr 'd' is decoded. Encode it first.
+
+                    // URL attr 'd' is encoded so let's decode it first.
                     $decoded = false;
                     if (isset($query['d'])) {
-                        $query   = unserialize(base64_decode(urldecode($query['d'])));
+                        // parse_str auto urldecodes
+                        $query   = unserialize(base64_decode($query['d']));
                         $decoded = true;
                     }
 
-                    if (isset($query['url'])) {
+                    if (isset($query['page_url'])) {
+                        $pageURL = $query['page_url'];
+                        if (!$decoded) {
+                            $pageURL = urldecode($pageURL);
+                        }
+                    } elseif (isset($query['url'])) {
                         $pageURL = $query['url'];
                         if (!$decoded) {
                             $pageURL = urldecode($pageURL);
                         }
                     }
 
-                    if (isset($query['referrer'])) {
+                    if (isset($query['page_referrer'])) {
+                        if (!$decoded) {
+                            $query['page_referrer'] = urldecode($query['page_referrer']);
+                        }
+                        $hit->setReferer($query['page_referrer']);
+                    } elseif (isset($query['referrer'])) {
                         if (!$decoded) {
                             $query['referrer'] = urldecode($query['referrer']);
                         }
                         $hit->setReferer($query['referrer']);
                     }
 
-                    if (isset($query['language'])) {
+                    if (isset($query['page_language'])) {
+                        if (!$decoded) {
+                            $query['page_language'] = urldecode($query['page_language']);
+                        }
+                        $hit->setPageLanguage($query['page_language']);
+                    } elseif (isset($query['language'])) {
                         if (!$decoded) {
                             $query['language'] = urldecode($query['language']);
                         }
                         $hit->setPageLanguage($query['language']);
                     }
 
-                    if (isset($query['title'])) {
+                    if (isset($query['page_title'])) {
+                        if (!$decoded) {
+                            $query['page_title'] = urldecode($query['page_title']);
+                        }
+                        $hit->setUrlTitle($query['page_title']);
+                    } elseif (isset($query['title'])) {
                         if (!$decoded) {
                             $query['title'] = urldecode($query['title']);
                         }
@@ -422,40 +456,91 @@ class PageModel extends FormModel
                     // Update lead fields if some data were sent in the URL query
                     /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
                     $leadFieldModel      = $this->factory->getModel('lead.field');
-                    $availableLeadFields = $leadFieldModel->getFieldList(false, false, array(
-                        'isPublished'         => true,
-                        'isPubliclyUpdatable' => true
-                    ));
+                    $availableLeadFields = $leadFieldModel->getFieldList(
+                        false,
+                        false,
+                        array(
+                            'isPublished'         => true,
+                            'isPubliclyUpdatable' => true
+                        )
+                    );
 
-                    $inQuery = array_intersect_key($query, $availableLeadFields);
+                    $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+                    $uniqueLeadFieldData = array();
+                    $inQuery             = array_intersect_key($query, $availableLeadFields);
                     foreach ($inQuery as $k => $v) {
                         if (empty($query[$k])) {
                             unset($inQuery[$k]);
                         }
+
+                        if (array_key_exists($k, $uniqueLeadFields)) {
+                            $uniqueLeadFieldData[$k] = $v;
+                        }
                     }
 
+                    $persistLead = false;
                     if (count($inQuery)) {
-                        if (isset($inQuery['email'])) {
-                            // Make sure a lead does not currently exist if the current lead doesn't match
-                            $fields = $lead->getFields();
-                            if (strtolower($inQuery['email']) != $fields['core']['email']['value']) {
-                                $exists = $leadModel->getRepository()->getLeadsByFieldValue('email', $inQuery['email'], $lead->getId());
-                                if (!empty($exists)) {
-                                    //merge with current lead
-                                    $lead = $leadModel->mergeLeads($lead, $exists[0]);
-                                    $leadIpAddresses = $lead->getIpAddresses();
+                        if (count($uniqueLeadFieldData)) {
+                            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
+                                $uniqueLeadFieldData,
+                                $lead->getId()
+                            );
+                            if (!empty($existingLeads)) {
+                                $lead = $leadModel->mergeLeads($lead, $existingLeads[0]);
+                            }
+                            $leadIpAddresses = $lead->getIpAddresses();
 
-                                    if (!$leadIpAddresses->contains($ipAddress)) {
-                                        $lead->addIpAddress($ipAddress);
-                                    }
-
-                                    $leadModel->setCurrentLead($lead);
-                                }
+                            if (!$leadIpAddresses->contains($ipAddress)) {
+                                $lead->addIpAddress($ipAddress);
                             }
 
+                            $leadModel->setCurrentLead($lead);
                         }
+
                         $leadModel->setFieldValues($lead, $inQuery);
-                        $leadModel->saveEntity($lead);
+
+                        $persistLead = true;
+                    }
+
+                    if (isset($query['tags'])) {
+                        if (!$decoded) {
+                            $query['tags'] = urldecode($query['tags']);
+                        }
+
+                        $leadTags = $lead->getTags();
+
+                        $tags = explode(',', $query['tags']);
+                        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+                        // See which tags already exist
+                        $foundTags = $leadModel->getTagRepository()->getTagsByName($tags);
+                        foreach ($tags as $tag) {
+                            if (strpos($tag, '-') === 0) {
+                                // Tag to be removed
+                                $tag = substr($tag, 1);
+
+                                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                                    $lead->removeTag($foundTags[$tag]);
+                                    $persistLead = true;
+                                }
+                            } else {
+                                // Tag to be added
+                                if (!array_key_exists($tag, $foundTags)) {
+                                    // New tag
+                                    $newTag = new Tag();
+                                    $newTag->setTag($tag);
+                                    $lead->addTag($newTag);
+                                    $persistLead = true;
+                                } elseif (!$leadTags->contains($foundTags[$tag])) {
+                                    $lead->addTag($foundTags[$tag]);
+                                    $persistLead = true;
+                                }
+                            }
+                        }
+
+                        if ($persistLead) {
+                            $leadModel->saveEntity($lead);
+                        }
                     }
                 }
             } else {
@@ -559,24 +644,46 @@ class PageModel extends FormModel
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
-     * @param $page
-     * @param $component null | pageTokens | abTestWinnerCriteria
+     * @param null|Page    $page
+     * @param array|string $requestedComponents all | tokens | tokenSections | abTestWinnerCriteria
+     * @param null|string  $tokenFilter
      *
-     * @return mixed
+     * @return array
      */
-    public function getBuilderComponents ($page = null, $component = null)
+    public function getBuilderComponents (Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
-        static $components;
+        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
+        $components      = array();
+        $event           = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
+        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
 
-        if (empty($components)) {
-            $components = array();
-            $event      = new PageBuilderEvent($this->translator, $page);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
-            $components['pageTokens']           = $event->getTokenSections();
-            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+        if (!is_array($requestedComponents)) {
+            $requestedComponents = array($requestedComponents);
         }
 
-        return ($component !== null && isset($components[$component])) ? $components[$component] : $components;
+        foreach ($requestedComponents as $requested) {
+            switch ($requested) {
+                case 'tokens':
+                    $components[$requested] = $event->getTokens();
+                    break;
+                case 'visualTokens':
+                    $components[$requested] = $event->getVisualTokens();
+                    break;
+                case 'tokenSections':
+                    $components[$requested] = $event->getTokenSections();
+                    break;
+                case 'abTestWinnerCriteria':
+                    $components[$requested] = $event->getAbTestWinnerCriteria();
+                    break;
+                default:
+                    $components['tokens']               = $event->getTokens();
+                    $components['tokenSections']        = $event->getTokenSections();
+                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+                    break;
+            }
+        }
+
+        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
     }
 
     /**

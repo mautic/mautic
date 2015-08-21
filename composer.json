@@ -5,7 +5,9 @@
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
+            "Mautic\\AddonBundle\\Bundle\\":"app/bundles/PluginBundle/Bundle/BC",
             "Mautic\\": "app/bundles/",
+            "MauticPlugin\\": "plugins/",
             "MauticAddon\\": "addons/"
         }
     },
@@ -41,14 +43,13 @@
         "symfony/monolog-bridge": "2.5.*",
 
         "sensio/distribution-bundle": "~2.3",
-        "sensio/framework-extra-bundle": "~3.0",
 
         "doctrine/orm": "~2.3,<2.5",
         "doctrine/dbal": "2.4.*",
         "doctrine/doctrine-bundle": "~1.2",
         "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
         "doctrine/migrations": "dev-master",
-        "doctrine/doctrine-migrations-bundle": "dev-master",
+        "doctrine/doctrine-migrations-bundle": "~1.0",
 
         "knplabs/gaufrette": "dev-master",
         "aws/aws-sdk-php": "~2.7",

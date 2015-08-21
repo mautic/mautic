@@ -10,42 +10,80 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Joomla\Http\HttpFactory;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class IpAddress
  *
- * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\IpAddressRepository")
- * @ORM\Table(name="ip_addresses")
- * @ORM\HasLifecycleCallbacks
- * @Serializer\ExclusionPolicy("all")
+ * @package Mautic\CoreBundle\Entity
  */
 class IpAddress
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * Set by factory of configured IPs to not track
+     *
+     * @var array
+     */
+    private $doNotTrack = array();
+
+    /**
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="ip_address", type="text", length=15)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
+     * @var string
      */
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="ip_details", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"ipAddress"})
+     * @var array
      */
     private $ipDetails;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('ip_addresses')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository');
+
+        $builder->addId();
+
+        $builder->createField('ipAddress', 'string')
+            ->columnName('ip_address')
+            ->length(45)
+            ->build();
+
+        $builder->createField('ipDetails', 'array')
+            ->columnName('ip_details')
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->addProperties(
+                array(
+                    'id',
+                    'ipAddress',
+                    'ipDetails'
+                )
+            )
+            ->addGroup('ipAddress')
+            ->build();
+    }
 
     /**
      * Get id
@@ -276,5 +314,55 @@ class IpAddress
     public function getIpDetails()
     {
         return $this->ipDetails;
+    }
+
+    /**
+     * Set list of IPs to not track
+     *
+     * @param array $ips
+     */
+    public function setDoNotTrackList(array $ips)
+    {
+        $this->doNotTrack = $ips;
+    }
+
+    /**
+     * Get list of IPs to not track
+     *
+     * @return array
+     */
+    public function getDoNotTrackList()
+    {
+        return $this->doNotTrack;
+    }
+
+    /**
+     * Determine if this IP is trackable
+     */
+    public function isTrackable()
+    {
+        if (!empty($this->doNotTrack)) {
+            foreach ($this->doNotTrack as $ip) {
+                if ( strpos( $ip, '/' ) == false ) {
+                    if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                        return false;
+                    }
+                } else {
+                    // has a netmask range
+                    // https://gist.github.com/tott/7684443
+                    list($range, $netmask) = explode('/', $ip, 2);
+                    $range_decimal    = ip2long($range);
+                    $ip_decimal       = ip2long($ip);
+                    $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
+                    $netmask_decimal  = ~$wildcard_decimal;
+
+                    if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

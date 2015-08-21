@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -19,34 +20,49 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class FormListType extends AbstractType
 {
 
-    /**
-     * @var array
-     */
-    private $choices = array();
+    private $viewOther;
+    private $repo;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-        $choices = $factory->getModel('form')->getRepository()->getFormList('', 0, 0, $viewOther);
-
-        foreach ($choices as $form) {
-            $this->choices[$form['id']] = "{$form['name']} ({$form['id']})";
-        }
-
-        //sort by language
-        ksort($this->choices);
+        $this->viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
+        $this->repo      = $factory->getModel('form')->getRepository();
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $viewOther = $this->viewOther;
+        $repo      = $this->repo;
+
         $resolver->setDefaults(array(
-            'choices'       => $this->choices,
+            'choices'     => function (Options $options) use ($repo, $viewOther) {
+                static $choices;
+
+                if (is_array($choices)) {
+                    return $choices;
+                }
+
+                $choices = array();
+
+                $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
+                foreach ($forms as $form) {
+                    $choices[$form['id']] = $form['name'];
+                }
+
+                //sort by language
+                asort($choices);
+
+                return $choices;
+            },
             'expanded'      => false,
             'multiple'      => true,
             'empty_value'   => false,
+            'form_type'     => null
         ));
+
+        $resolver->setOptional(array('form_type'));
     }
 
     /**

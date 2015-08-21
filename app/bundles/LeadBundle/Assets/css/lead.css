@@ -1,6 +1,6 @@
 /* LeadBundle */
 
-.col-leadfield-id, .col-leadlist-id {
+.col-leadfield-id, .col-leadlist-id, .col-lead-id {
     width: 75px;
 }
 
@@ -101,4 +101,25 @@ ul.tag-cloud li {
     height: 250px;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.card.highlight {
+    background-color: #faf2cc;
+    border: 3px solid #4e5d9d !important;
+}
+
+.lead-avatar-panel {
+    position: relative;
+}
+
+.lead-avatar-panel .avatar-collapser a.arrow {
+    position: absolute;
+    top:0;
+    right: 0px;
+    margin: 0 3px 0 0;
+    padding: 0 10px;
+}
+
+.lead-avatar-panel .img-responsive {
+    min-width: 100%;
 }

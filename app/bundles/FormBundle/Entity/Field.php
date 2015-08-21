@@ -10,138 +10,111 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Field
- * @ORM\Table(name="form_fields")
- * @ORM\Entity(repositoryClass="Mautic\FormBundle\Entity\FieldRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\FormBundle\Entity
  */
 class Field
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $label;
 
     /**
-     * @ORM\Column(name="show_label", type="boolean", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var bool
      */
     private $showLabel = true;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $alias;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $type;
 
     /**
-     * @ORM\Column(name="is_custom", type="boolean")
+     * @var bool
      */
     private $isCustom = false;
 
     /**
-     * @ORM\Column(name="custom_parameters", type="array", nullable=true)
+     * @var array
      */
     private $customParameters = array();
 
     /**
-     * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $defaultValue;
 
     /**
-     * @ORM\Column(name="is_required", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var bool
      */
     private $isRequired = false;
 
     /**
-     * @ORM\Column(name="validation_message", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $validationMessage;
 
     /**
-     * @ORM\Column(name="help_message", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $helpMessage;
 
     /**
-     * @ORM\Column(name="field_order", type="integer", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var int
      */
     private $order = 0;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var array
      */
     private $properties = array();
 
     /**
-     * @ORM\ManyToOne(targetEntity="Form", inversedBy="fields")
-     * @ORM\JoinColumn(name="form_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @var Form
      */
     private $form;
 
     /**
-     * @ORM\Column(name="label_attr", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $labelAttributes;
 
     /**
-     * @ORM\Column(name="input_attr", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $inputAttributes;
+
+    /**
+     * @var string
+     */
+    private $containerAttributes;
+
+    /**
+     * @var string
+     */
+    private $leadField;
+
+    /**
+     * @var bool
+     */
+    private $saveResult = true;
 
     /**
      * @var array
@@ -154,12 +127,119 @@ class Field
     private $sessionId;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('form_fields')
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FieldRepository');
+
+        $builder->addId();
+
+        $builder->addField('label', 'text');
+
+        $builder->createField('showLabel', 'boolean')
+            ->columnName('show_label')
+            ->nullable()
+            ->build();
+
+        $builder->addField('alias', 'string');
+
+        $builder->addField('type', 'string');
+
+        $builder->createField('isCustom', 'boolean')
+            ->columnName('is_custom')
+            ->build();
+
+        $builder->createField('customParameters', 'array')
+            ->columnName('custom_parameters')
+            ->nullable()
+            ->build();
+
+        $builder->createField('defaultValue', 'text')
+            ->columnName('default_value')
+            ->nullable()
+            ->build();
+
+        $builder->createField('isRequired', 'boolean')
+            ->columnName('is_required')
+            ->build();
+
+        $builder->createField('validationMessage', 'text')
+            ->columnName('validation_message')
+            ->nullable()
+            ->build();
+
+        $builder->createField('helpMessage', 'text')
+            ->columnName('help_message')
+            ->nullable()
+            ->build();
+
+        $builder->createField('order', 'integer')
+            ->columnName('field_order')
+            ->nullable()
+            ->build();
+
+        $builder->createField('properties', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createManyToOne('form', 'Form')
+            ->inversedBy('fields')
+            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addNullableField('labelAttributes', 'string', 'label_attr');
+
+        $builder->addNullableField('inputAttributes', 'string', 'input_attr');
+
+        $builder->addNullableField('containerAttributes', 'string', 'container_attr');
+
+        $builder->addNullableField('leadField', 'string', 'lead_field');
+
+        $builder->addNullableField('saveResult', 'boolean', 'save_result');
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('form')
+            ->addProperties(
+                array(
+                    'id',
+                    'label',
+                    'showLabel',
+                    'alias',
+                    'type',
+                    'defaultValue',
+                    'isRequired',
+                    'validationMessage',
+                    'helpMessage',
+                    'order',
+                    'properties',
+                    'labelAttributes',
+                    'inputAttributes',
+                    'containerAttributes',
+                    'leadField',
+                    'saveResult'
+                )
+            )
+            ->build();
+    }
+
+    /**
      * @param $prop
      * @param $val
      *
      * @return void
      */
-    private function isChanged($prop, $val)
+    private function isChanged ($prop, $val)
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = array($this->$prop, $val);
@@ -169,7 +249,7 @@ class Field
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges ()
     {
         return $this->changes;
     }
@@ -179,7 +259,7 @@ class Field
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -191,7 +271,7 @@ class Field
      *
      * @return Field
      */
-    public function setLabel($label)
+    public function setLabel ($label)
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -204,7 +284,7 @@ class Field
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel ()
     {
         return $this->label;
     }
@@ -216,7 +296,7 @@ class Field
      *
      * @return Field
      */
-    public function setAlias($alias)
+    public function setAlias ($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -229,7 +309,7 @@ class Field
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias ()
     {
         return $this->alias;
     }
@@ -241,7 +321,7 @@ class Field
      *
      * @return Field
      */
-    public function setType($type)
+    public function setType ($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -254,7 +334,7 @@ class Field
      *
      * @return string
      */
-    public function getType()
+    public function getType ()
     {
         return $this->type;
     }
@@ -266,7 +346,7 @@ class Field
      *
      * @return Field
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue ($defaultValue)
     {
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
@@ -279,7 +359,7 @@ class Field
      *
      * @return string
      */
-    public function getDefaultValue()
+    public function getDefaultValue ()
     {
         return $this->defaultValue;
     }
@@ -291,7 +371,7 @@ class Field
      *
      * @return Field
      */
-    public function setIsRequired($isRequired)
+    public function setIsRequired ($isRequired)
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -304,7 +384,7 @@ class Field
      *
      * @return boolean
      */
-    public function getIsRequired()
+    public function getIsRequired ()
     {
         return $this->isRequired;
     }
@@ -314,7 +394,7 @@ class Field
      *
      * @return bool
      */
-    public function isRequired()
+    public function isRequired ()
     {
         return $this->getIsRequired();
     }
@@ -326,7 +406,7 @@ class Field
      *
      * @return Field
      */
-    public function setOrder($order)
+    public function setOrder ($order)
     {
         $this->isChanged('order', $order);
         $this->order = $order;
@@ -339,7 +419,7 @@ class Field
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrder ()
     {
         return $this->order;
     }
@@ -351,7 +431,7 @@ class Field
      *
      * @return Field
      */
-    public function setProperties($properties)
+    public function setProperties ($properties)
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -364,7 +444,7 @@ class Field
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties ()
     {
         return $this->properties;
     }
@@ -376,7 +456,7 @@ class Field
      *
      * @return Field
      */
-    public function setValidationMessage($validationMessage)
+    public function setValidationMessage ($validationMessage)
     {
         $this->isChanged('validationMessage', $validationMessage);
         $this->validationMessage = $validationMessage;
@@ -389,7 +469,7 @@ class Field
      *
      * @return string
      */
-    public function getValidationMessage()
+    public function getValidationMessage ()
     {
         return $this->validationMessage;
     }
@@ -401,7 +481,7 @@ class Field
      *
      * @return Field
      */
-    public function setForm(Form $form)
+    public function setForm (Form $form)
     {
         $this->form = $form;
 
@@ -413,7 +493,7 @@ class Field
      *
      * @return Form
      */
-    public function getForm()
+    public function getForm ()
     {
         return $this->form;
     }
@@ -425,7 +505,7 @@ class Field
      *
      * @return Field
      */
-    public function setLabelAttributes($labelAttributes)
+    public function setLabelAttributes ($labelAttributes)
     {
         $this->isChanged('labelAttributes', $labelAttributes);
         $this->labelAttributes = $labelAttributes;
@@ -438,7 +518,7 @@ class Field
      *
      * @return string
      */
-    public function getLabelAttributes()
+    public function getLabelAttributes ()
     {
         return $this->labelAttributes;
     }
@@ -450,7 +530,7 @@ class Field
      *
      * @return Field
      */
-    public function setInputAttributes($inputAttributes)
+    public function setInputAttributes ($inputAttributes)
     {
         $this->isChanged('inputAttributes', $inputAttributes);
         $this->inputAttributes = $inputAttributes;
@@ -463,15 +543,35 @@ class Field
      *
      * @return string
      */
-    public function getInputAttributes()
+    public function getInputAttributes ()
     {
         return $this->inputAttributes;
     }
 
     /**
+     * @return mixed
+     */
+    public function getContainerAttributes()
+    {
+        return $this->containerAttributes;
+    }
+
+    /**
+     * @param $containerAttributes
+     *
+     * @return $this
+     */
+    public function setContainerAttributes($containerAttributes)
+    {
+        $this->containerAttributes = $containerAttributes;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
-    public function convertToArray()
+    public function convertToArray ()
     {
         return get_object_vars($this);
     }
@@ -483,7 +583,7 @@ class Field
      *
      * @return Field
      */
-    public function setShowLabel($showLabel)
+    public function setShowLabel ($showLabel)
     {
         $this->isChanged('showLabel', $showLabel);
         $this->showLabel = $showLabel;
@@ -496,7 +596,7 @@ class Field
      *
      * @return boolean
      */
-    public function getShowLabel()
+    public function getShowLabel ()
     {
         return $this->showLabel;
     }
@@ -506,7 +606,7 @@ class Field
      *
      * @return bool
      */
-    public function showLabel()
+    public function showLabel ()
     {
         return $this->getShowLabel();
     }
@@ -518,7 +618,7 @@ class Field
      *
      * @return Field
      */
-    public function setHelpMessage($helpMessage)
+    public function setHelpMessage ($helpMessage)
     {
         $this->isChanged('helpMessage', $helpMessage);
         $this->helpMessage = $helpMessage;
@@ -531,7 +631,7 @@ class Field
      *
      * @return string
      */
-    public function getHelpMessage()
+    public function getHelpMessage ()
     {
         return $this->helpMessage;
     }
@@ -543,7 +643,7 @@ class Field
      *
      * @return Field
      */
-    public function setIsCustom($isCustom)
+    public function setIsCustom ($isCustom)
     {
         $this->isCustom = $isCustom;
 
@@ -555,7 +655,7 @@ class Field
      *
      * @return boolean
      */
-    public function getIsCustom()
+    public function getIsCustom ()
     {
         return $this->isCustom;
     }
@@ -565,7 +665,7 @@ class Field
      *
      * @return bool
      */
-    public function isCustom()
+    public function isCustom ()
     {
         return $this->getIsCustom();
     }
@@ -577,7 +677,7 @@ class Field
      *
      * @return Field
      */
-    public function setCustomParameters($customParameters)
+    public function setCustomParameters ($customParameters)
     {
         $this->customParameters = $customParameters;
 
@@ -589,7 +689,7 @@ class Field
      *
      * @return array
      */
-    public function getCustomParameters()
+    public function getCustomParameters ()
     {
         return $this->customParameters;
     }
@@ -608,5 +708,37 @@ class Field
     public function setSessionId ($sessionId)
     {
         $this->sessionId = $sessionId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLeadField()
+    {
+        return $this->leadField;
+    }
+
+    /**
+     * @param mixed $leadField
+     */
+    public function setLeadField($leadField)
+    {
+        $this->leadField = $leadField;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSaveResult()
+    {
+        return $this->saveResult;
+    }
+
+    /**
+     * @param mixed $saveResult
+     */
+    public function setSaveResult($saveResult)
+    {
+        $this->saveResult = $saveResult;
     }
 }
