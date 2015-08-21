@@ -1730,20 +1730,8 @@ var Mautic = {
             // Action is currently being executed
             return;
         }
-        var checkboxes = 'input[class=list-checkbox]:checked';
 
-        // Check for a target
-        if (typeof el != 'undefined') {
-            var target = mQuery(el).data('target');
-            if (target) {
-                checkboxes = target + ' ' + checkboxes;
-            }
-        }
-
-        // Retrieve all of the selected items
-        var items = JSON.stringify(mQuery(checkboxes).map(function () {
-            return mQuery(this).val();
-        }).get());
+        var items = Mautic.getCheckedListIds(el, true);
 
         var queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
 
@@ -1752,6 +1740,36 @@ var Mautic = {
 
         // Hand over processing to the executeAction method
         Mautic.executeAction(action);
+    },
+
+    /**
+     * Retrieves the IDs of the items checked in a list
+     *
+     * @param el
+     * @param stringify
+     * @returns {*}
+     */
+    getCheckedListIds: function(el, stringify) {
+        var checkboxes = 'input[class=list-checkbox]:checked';
+
+        // Check for a target
+        if (typeof el != 'undefined' && el) {
+            var target = mQuery(el).data('target');
+            if (target) {
+                checkboxes = target + ' ' + checkboxes;
+            }
+        }
+
+        // Retrieve all of the selected items
+        var items = mQuery(checkboxes).map(function () {
+            return mQuery(this).val();
+        }).get();
+
+        if (stringify) {
+            items = JSON.stringify(items);
+        }
+
+        return items;
     },
 
     /**

@@ -72,6 +72,24 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
                 'iconClass' => 'fa fa-bolt'
+            ),
+            array(
+                'attr'      => array(
+                    'class'   => 'btn btn-default btn-sm btn-nospin',
+                    'href'    => 'javascript: void(0)',
+                    'onclick' => 'Mautic.bulkLeadLists();',
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_lists'),
+                'iconClass' => 'fa fa-list'
+            ),
+            array(
+                'attr'      => array(
+                    'class'   => 'btn btn-default btn-sm btn-nospin',
+                    'href'    => 'javascript: void(0)',
+                    'onclick' => 'Mautic.bulkLeadCampaigns();',
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_campaigns'),
+                'iconClass' => 'fa fa-clock-o'
             )
         ),
         'templateButtons' => array(

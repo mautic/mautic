@@ -122,6 +122,16 @@ Mautic.leadOnUnload = function(id) {
     }
 };
 
+Mautic.bulkLeadLists = function() {
+    var items = Mautic.getCheckedListIds(false, true);
+
+    Mautic.ajaxActionRequest: function(action, data, successClosure, showLoadingBar) {
+};
+
+Mautic.bulkLeadCampaigns = function() {
+
+}
+
 Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
 }
