@@ -92,7 +92,7 @@ $template = '<div class="col-md-6">{content}</div>';
         <?php if (function_exists('imap_open')): ?>
         <?php echo $view['form']->widget($form['monitored_email']); ?>
         <?php else: ?>
-            <h4><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></h4>
+            <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
         <?php endif; ?>
     </div>
 </div>
