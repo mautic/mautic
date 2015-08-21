@@ -63,13 +63,8 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
                         'mapping'   => true,
                         'is_bundle' => true
                     );
-                } else {
-                    // Use Symfony's auto mapping
-
-                    break;
                 }
             }
-
         }
 
         return array(

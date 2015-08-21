@@ -50,6 +50,19 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
+            $builder->add(
+                'tags',
+                'lead_tag',
+                array(
+                    'attr' => array(
+                        'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                        'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                        'data-allow-add'        => 'true',
+                        'onchange'              => 'Mautic.createLeadTag(this)'
+                    )
+                )
+            );
+
             $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
                 $this->factory->getEntityManager(),
                 'MauticUserBundle:User'
