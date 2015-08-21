@@ -59,7 +59,7 @@ class MergeType extends AbstractType
                 'choice',
                 array(
                     'choices'    => $leadChoices,
-                    'label'      => 'Lead to merge with this one',
+                    'label'      => $this->factory->getTranslator()->trans('mautic.lead.merge.select'),
                     'label_attr' => array('class' => 'control-label'),
                     'multiple'   => false,
                     'attr'       => array(
