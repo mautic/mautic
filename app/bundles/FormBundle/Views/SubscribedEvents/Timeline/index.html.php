@@ -53,7 +53,7 @@ if ($page->getId()) {
 					<?php foreach ($form->getFields() as $field) : ?>
 						<?php if (array_key_exists($field->getAlias(), $results)) : ?>
 							<dt><?php echo $field->getLabel(); ?></dt>
-							<dd class="ellipsis"><?php echo $results[$field->getAlias()]; ?></dd>
+							<dd class="ellipsis"><?php echo empty($results[$field->getAlias()]) ? '&nbsp;' : $results[$field->getAlias()]; ?></dd>
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
