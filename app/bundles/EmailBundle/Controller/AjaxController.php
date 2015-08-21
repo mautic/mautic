@@ -14,6 +14,10 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
 
 /**
  * Class AjaxController
@@ -381,8 +385,8 @@ class AjaxController extends CommonAjaxController
 
                     if ($settings['send_test'] == 'true') {
                         $message = new \Swift_Message(
-                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.subject'),
-                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
+                            $translator->trans('mautic.email.config.mailer.transport.test_send.subject'),
+                            $translator->trans('mautic.email.config.mailer.transport.test_send.body')
                         );
 
                         $user = $this->factory->getUser();

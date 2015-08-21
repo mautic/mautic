@@ -40,6 +40,18 @@ $item = $event['extra']['stats'];
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['list_name'])); ?>
 	            <?php endif; ?>
 	            </p>
+		        <?php if (isset($item['openDetails']['bounces'])): ?>
+		        <?php unset($item['openDetails']['bounces']); ?>
+		        <?php endif; ?>
+
+		        <?php if (!empty($item['openDetails'])): ?>
+		        <div class="small">
+		        <?php foreach ($item['openDetails'] as $detail): ?>
+                    <hr />
+					<strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br /><?php echo $detail['useragent']; ?>
+			        <?php endforeach; ?>
+		        </div>
+		        <?php endif; ?>
 	        </div>
 	    <?php endif; ?>
 	</div>
