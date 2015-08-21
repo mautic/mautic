@@ -76,6 +76,9 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
                 <div class="col-xs-4">
                     <?php echo $view['form']->row($form['list']); ?>
                 </div>
+                <div class="col-xs-4">
+                    <?php echo $view['form']->row($form['tags']); ?>
+                </div>
             </div>
         </div>
         <div class="panel panel-info">
