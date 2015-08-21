@@ -1111,15 +1111,7 @@ class LeadController extends FormController
             $lists = $leadsLists = array();
         }
 
-        $form       = $this->get('form.factory')->create(
-            'campaign_leadsource',
-            $source,
-            array(
-                'action'         => $this->generateUrl('mautic_campaignsource_action', array('objectAction' => 'new', 'objectId' => $objectId)),
-                'source_choices' => $sourceList
-            )
-        );
-
+        
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
