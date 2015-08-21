@@ -327,9 +327,6 @@ Mautic.leadfieldOnLoad = function (container) {
 
 };
 
-/**
- * Update the properties for field data types
- */
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     if (mQuery('#field-templates .'+selectedVal).length) {
         mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
@@ -670,11 +667,6 @@ Mautic.updateLeadList = function () {
     });
 };
 
-/**
- * Obtains the HTML for an email
- *
- * @param el
- */
 Mautic.getLeadEmailContent = function (el) {
     Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
     mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
@@ -682,6 +674,44 @@ Mautic.getLeadEmailContent = function (el) {
         mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
         CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.updateLeadTags = function () {
+    Mautic.activateLabelLoadingIndicator('lead_tags_tags');
+    var formData = mQuery('form[name="lead_tags"]').serialize();
+    Mautic.ajaxActionRequest('lead:updateLeadTags', formData, function(response) {
+        if (response.tags) {
+            mQuery('#lead_tags_tags').html(response.tags);
+            mQuery('#lead_tags_tags').trigger('chosen:updated');
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.createLeadTag = function(el) {
+    var newFound = false;
+    mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
+        if (!mQuery.isNumeric(mQuery(selected).val())) {
+            newFound = true;
+        }
+    });
+
+    if (!newFound) {
+        return;
+    }
+
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var tags = JSON.stringify(mQuery(el).val());
+
+    Mautic.ajaxActionRequest('lead:addLeadTags', {tags: tags}, function(response) {
+        if (response.tags) {
+            mQuery('#' + mQuery(el).attr('id')).html(response.tags);
+            mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
+        }
+
         Mautic.removeLabelLoadingIndicator();
     });
 };

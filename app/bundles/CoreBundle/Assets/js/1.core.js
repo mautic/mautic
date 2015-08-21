@@ -610,10 +610,14 @@ var Mautic = {
      * @param el
      */
     activateChosenSelect: function(el) {
+        var noResultsText = mQuery(el).data('no-results-text');
+        if (!noResultsText) {
+            noResultsText = mauticLang['chosenNoResults'];
+        }
         mQuery(el).chosen({
             placeholder_text_multiple: mauticLang['chosenChooseMore'],
             placeholder_text_single: mauticLang['chosenChooseOne'],
-            no_results_text: mauticLang['chosenNoResults'],
+            no_results_text: noResultsText,
             width: "100%",
             allow_single_deselect: true,
             include_group_label_in_selected: true,

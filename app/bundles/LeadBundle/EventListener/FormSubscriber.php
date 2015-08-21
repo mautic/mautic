@@ -58,5 +58,15 @@ class FormSubscriber extends CommonSubscriber
             'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists'
         );
         $event->addSubmitAction('lead.changelist', $action);
+
+        // modify tags
+        $action = array(
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType'    => 'modify_lead_tags',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::updateTags'
+        );
+        $event->addSubmitAction('lead.changetags', $action);
     }
 }
