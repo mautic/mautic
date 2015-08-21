@@ -602,24 +602,26 @@ class MailHelper
             // Stash attachment to be processed by the transport
             $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
         } else {
-            try {
-                $attachment = \Swift_Attachment::fromPath($filePath);
+            if (file_exists($filePath) && is_readable($filePath)) {
+                try {
+                    $attachment = \Swift_Attachment::fromPath($filePath);
 
-                if (!empty($fileName)) {
-                    $attachment->setFilename($fileName);
+                    if (!empty($fileName)) {
+                        $attachment->setFilename($fileName);
+                    }
+
+                    if (!empty($contentType)) {
+                        $attachment->setContentType($contentType);
+                    }
+
+                    if ($inline) {
+                        $attachment->setDisposition('inline');
+                    }
+
+                    $this->message->attach($attachment);
+                } catch (\Exception $e) {
+                    error_log($e);
                 }
-
-                if (!empty($contentType)) {
-                    $attachment->setContentType($contentType);
-                }
-
-                if ($inline) {
-                    $attachment->setDisposition('inline');
-                }
-
-                $this->message->attach($attachment);
-            } catch (\Exception $e) {
-                error_log($e);
             }
         }
     }

@@ -213,28 +213,30 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
             $fileAttachments = $this->getAttachments();
             if (!empty($fileAttachments)) {
                 foreach ($fileAttachments as $attachment) {
-                    try {
-                        $swiftAttachment = \Swift_Attachment::fromPath($attachment['filePath']);
+                    if (file_exists($attachment['filePath']) && is_readable($attachment['filePath'])) {
+                        try {
+                            $swiftAttachment = \Swift_Attachment::fromPath($attachment['filePath']);
 
-                        if (!empty($attachment['fileName'])) {
-                            $swiftAttachment->setFilename($attachment['fileName']);
+                            if (!empty($attachment['fileName'])) {
+                                $swiftAttachment->setFilename($attachment['fileName']);
+                            }
+
+                            if (!empty($attachment['contentType'])) {
+                                $swiftAttachment->setContentType($attachment['contentType']);
+                            }
+
+                            if (!empty($attachment['inline'])) {
+                                $swiftAttachment->setDisposition('inline');
+                            }
+
+                            $message['attachments'] = array(
+                                'type'    => $swiftAttachment->getContentType(),
+                                'name'    => $swiftAttachment->getFilename(),
+                                'content' => $swiftAttachment->getEncoder()->encodeString($child->getBody())
+                            );
+                        } catch (\Exception $e) {
+                            error_log($e);
                         }
-
-                        if (!empty($attachment['contentType'])) {
-                            $swiftAttachment->setContentType($attachment['contentType']);
-                        }
-
-                        if (!empty($attachment['inline'])) {
-                            $swiftAttachment->setDisposition('inline');
-                        }
-
-                        $message['attachments'] = array(
-                            'type'    => $swiftAttachment->getContentType(),
-                            'name'    => $swiftAttachment->getFilename(),
-                            'content' => $swiftAttachment->getEncoder()->encodeString($child->getBody())
-                        );
-                    } catch (\Exception $e) {
-                        error_log($e);
                     }
                 }
             }
