@@ -1111,7 +1111,6 @@ class LeadController extends FormController
             $lists = $leadsLists = array();
         }
 
-        
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
