@@ -122,7 +122,7 @@ return array(
                 'path'       => '/lists/{id}/lead/remove/{leadId}',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST'
-            )
+            ),
 
         )
     ),
@@ -258,11 +258,17 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_field_import'
             ),
+            'mautic.form.type.lead_merge'                    => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_merge'
+            ),
             'mautic.form.type.lead_quickemail'                    => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_quickemail'
             ),
+
         ),
         'other'  => array(
             'mautic.validator.leadlistaccess' => array(

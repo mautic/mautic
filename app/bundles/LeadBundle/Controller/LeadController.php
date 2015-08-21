@@ -752,6 +752,116 @@ class LeadController extends FormController
         $this->request->files->remove('lead');
     }
 
+/**
+     * Generates edit form
+     *
+     * @param            $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function mergeAction ($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model  = $this->factory->getModel('lead.lead');
+        $lead1  = $model->getEntity($objectId);
+
+        if ($this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data = $this->request->request->get('lead');
+
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
+                        
+
+                        $leadId2 = $data['lead_to_merge'];
+                        $lead2 = $model->getEntity($leadId2);
+                        $mergedLead = $model->mergeLeads($lead1, $lead2);
+
+                        $model->deleteEntity($lead1);
+                        $model->deleteEntity($lead2);
+                    }
+                    
+                }
+            } 
+            
+            
+            if ($cancelled){
+            	$route          = 'mautic_lead_action';  
+           		$func           = 'view';
+ 				
+ 				$viewParameters = array(
+ 					'objectId'     => $lead1->getId(),
+                    'objectAction' => 'view',
+                );
+            }
+
+
+            if ($valid && $form->get('buttons')->get('save')->isClicked()){
+            	$route          = 'mautic_lead_action';  
+           		$func           = 'index';
+                
+                $viewParameters = array(
+                     'objectAction' => 'index'
+                 );
+             }
+
+            return $this->postActionRedirect(
+                array(
+                    'returnUrl'       => $this->generateUrl($route, $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
+                    'passthroughVars' => array(
+                        'mauticContent' => 'lead',
+                        'closeModal'    => 1
+                    )
+                )
+            );
+      	}
+
+      	else {
+      		        //do some default filtering
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        
+        $leads = $model->getEntities(
+            array(
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => false
+            )
+        );
+
+        // Remove the current lead from the list
+        if(($key = array_search($lead1, $leads)) !== false) {
+            unset($leads[$key]);
+        }
+
+        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $objectId));
+        //$form = $this->get('form.factory')->create('lead_merge', array(), array('action' => $action, 'leads' => $leads));
+        $form = $this->get('form.factory')->create(
+                    'lead_merge',
+                    array(),
+                    array('action'        => $action,
+                            'data'   => $leads,
+                            'data_class' => null)
+                );
+        
+        return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'leads'     => $leads,
+                    'form' => $form->createView()
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php'
+            )
+         );
+    }
+    }
 
     /**
      * Deletes the entity
@@ -923,6 +1033,15 @@ class LeadController extends FormController
         } else {
             $lists = $leadsLists = array();
         }
+
+        $form       = $this->get('form.factory')->create(
+            'campaign_leadsource',
+            $source,
+            array(
+                'action'         => $this->generateUrl('mautic_campaignsource_action', array('objectAction' => 'new', 'objectId' => $objectId)),
+                'source_choices' => $sourceList
+            )
+        );
 
         return $this->delegateView(
             array(

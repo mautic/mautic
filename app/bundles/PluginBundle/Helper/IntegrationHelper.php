@@ -173,7 +173,7 @@ class IntegrationHelper
         if (!empty($withFeatures)) {
             $integrationsWithFeatures = array();
             foreach ($withFeatures as $feature) {
-                $integrationsWithFeatures = $integrationsWithFeatures + $byFeatureList[$feature];
+               // $integrationsWithFeatures = $integrationsWithFeatures + $byFeatureList[$feature];
             }
 
             $filteredIntegrations = array_intersect($filteredIntegrations, $integrationsWithFeatures);
