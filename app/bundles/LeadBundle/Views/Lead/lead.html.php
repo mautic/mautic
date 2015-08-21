@@ -109,16 +109,19 @@ if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permission
     );
 }
 
-$buttons[] = array(
-    'attr' => array(
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#leadModal',
-        'data-header' => $view['translator']->trans('mautic.lead.lead.header.merge', array('%name%' => $lead->getPrimaryIdentifier())),
-        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "merge"))
-    ),
-    'btnText'   => 'Merge',
-    'iconClass' => 'fa fa-list'
-);
+if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
+
+    $buttons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#leadModal',
+            'data-header' => $view['translator']->trans('mautic.lead.lead.header.merge', array('%name%' => $lead->getPrimaryIdentifier())),
+            'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "merge"))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.merge'),
+        'iconClass' => 'fa fa-user'
+    );
+}
 
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(

@@ -275,6 +275,11 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.form.type.lead_merge'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
+                'alias'     => 'lead_merge',
+                'arguments' => 'mautic.factory'
             )
         ),
         'other'   => array(

@@ -765,7 +765,7 @@ class LeadController extends FormController
     }
 
 /**
-     * Generates edit form
+     * Generates merge form and action
      *
      * @param            $objectId
      *
@@ -776,6 +776,74 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model  = $this->factory->getModel('lead.lead');
         $lead1  = $model->getEntity($objectId);
+
+        //set the page we came from
+        $page = $this->factory->getSession()->get('mautic.lead.page', 1);
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead'
+            )
+        );
+
+        if ($lead1 === null) {
+            return $this->postActionRedirect(
+                array_merge(
+                	$postActionVars,
+                    array(
+                        'flashes' => array(
+                            array(
+                                'type'    => 'error',
+                                'msg'     => 'mautic.lead.lead.error.notfound',
+                                'msgVars' => array('%id%' => $objectId)
+                            )
+                        )
+                    )
+                )
+            );
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'lead:leads:editown',
+            'lead:leads:editother',
+            $lead1->getOwner())
+        ) {
+            return $this->accessDenied();
+        } elseif ($model->isLocked($lead1)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $lead1, 'lead.lead');
+        }
+
+ 		//Order the leads
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        
+        $leads = $model->getEntities(
+            array(
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => false
+            )
+        );
+
+        //Remove the already selected lead
+        if(($key = array_search($lead1, $leads)) !== false) {
+            unset($leads[$key]);
+        }
+
+        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $objectId));
+        $form = $this->get('form.factory')->create(
+                    'lead_merge',
+                    array(),
+                    array('action'        => $action,
+                            'data'   => $leads,
+                            'data_class' => null)
+                );
 
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
@@ -793,26 +861,42 @@ class LeadController extends FormController
 
                         $leadId2 = $data['lead_to_merge'];
                         $lead2 = $model->getEntity($leadId2);
+
+                        if ($lead2 === null) {
+            				return $this->postActionRedirect(
+                				array_merge(
+                    				$postActionVars,
+                    				array(
+                        				'flashes' => array(
+                            				array(
+                                				'type'    => 'error',
+                                				'msg'     => 'mautic.lead.lead.error.notfound',
+                                				'msgVars' => array('%id%' => $lead2->getId())
+                            				)
+                        				)
+                    				)
+                				)
+            				);
+        				} elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            				'lead:leads:editown',
+            				'lead:leads:editother',
+            				$lead1->getOwner())
+        				) {
+            				return $this->accessDenied();
+        				} elseif ($model->isLocked($lead2)) {
+            				//deny access if the entity is locked
+            				return $this->isLocked($postActionVars, $lead2, 'lead.lead');
+        				}
+
+        				//Both leads are good so now we merge them
                         $mergedLead = $model->mergeLeads($lead1, $lead2);
 
-                        $model->deleteEntity($lead1);
+                       	$model->deleteEntity($lead1);
                         $model->deleteEntity($lead2);
                     }
                     
                 }
             } 
-            
-            
-            if ($cancelled){
-            	$route          = 'mautic_lead_action';  
-           		$func           = 'view';
- 				
- 				$viewParameters = array(
- 					'objectId'     => $lead1->getId(),
-                    'objectAction' => 'view',
-                );
-            }
-
 
             if ($valid && $form->get('buttons')->get('save')->isClicked()){
             	$route          = 'mautic_lead_action';  
@@ -821,6 +905,14 @@ class LeadController extends FormController
                 $viewParameters = array(
                      'objectAction' => 'index'
                  );
+             } else {
+             	$route          = 'mautic_lead_action';  
+           		$func           = 'view';
+ 				
+ 				$viewParameters = array(
+ 					'objectId'     => $lead1->getId(),
+                    'objectAction' => 'view',
+                );
              }
 
             return $this->postActionRedirect(
@@ -837,42 +929,15 @@ class LeadController extends FormController
       	}
 
       	else {
-      		        //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
-        
-        $leads = $model->getEntities(
-            array(
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'withTotalCount' => false
-            )
-        );
-
-        // Remove the current lead from the list
-        if(($key = array_search($lead1, $leads)) !== false) {
-            unset($leads[$key]);
-        }
-
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $objectId));
-        //$form = $this->get('form.factory')->create('lead_merge', array(), array('action' => $action, 'leads' => $leads));
-        $form = $this->get('form.factory')->create(
-                    'lead_merge',
-                    array(),
-                    array('action'        => $action,
-                            'data'   => $leads,
-                            'data_class' => null)
-                );
-        
-        return $this->delegateView(array(
-                'viewParameters'  => array(
+        	return $this->delegateView(array(
+                	'viewParameters'  => array(
                     'leads'     => $leads,
                     'form' => $form->createView()
-                ),
-                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php'
-            )
-         );
-    }
+                	),
+                	'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php'
+            		)
+         		);
+    	}
     }
 
     /**
