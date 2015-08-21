@@ -49,14 +49,14 @@
     <?php endif; ?>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-sm-12 col-md-6">
             <?php echo $view['form']->row($form['host']); ?>
         </div>
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-4 col-md-2">
             <?php echo $view['form']->row($form['port']); ?>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <?php echo $view['form']->row($form['ssl']); ?>
+        <div class="col-sm-8 col-md-4">
+            <?php echo $view['form']->row($form['encryption']); ?>
         </div>
     </div>
 

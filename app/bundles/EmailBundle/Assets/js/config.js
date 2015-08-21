@@ -2,7 +2,7 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
     var data = {
         host:       mQuery('#config_emailconfig_monitored_email_' + mailbox + '_host').val(),
         port:       mQuery('#config_emailconfig_monitored_email_' + mailbox + '_port').val(),
-        ssl:        (mQuery('#config_emailconfig_monitored_email_' + mailbox + '_ssl_1').prop('checked') ? 1 : 0),
+        encryption: mQuery('#config_emailconfig_monitored_email_' + mailbox + '_encryption').val(),
         user:       mQuery('#config_emailconfig_monitored_email_' + mailbox + '_user').val(),
         password:   mQuery('#config_emailconfig_monitored_email_' + mailbox + '_password').val()
     };

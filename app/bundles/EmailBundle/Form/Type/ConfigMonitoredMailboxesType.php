@@ -92,24 +92,30 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 ),
                 'required'   => false,
                 'data'       => (array_key_exists('port', $options['data']))
-                    ? $options['data']['port'] : 993,
+                    ? $options['data']['port'] : 993
             )
         );
 
         if (extension_loaded('openssl')) {
             $builder->add(
-                'ssl',
-                'yesno_button_group',
+                'encryption',
+                'choice',
                 array(
-                    'label'      => 'mautic.email.config.monitored_email_ssl',
-                    'label_attr' => array('class' => 'control-label'),
-                    'data'       => (array_key_exists('ssl', $options['data']) && empty($options['data']['ssl'])) ? false : true,
-                    'attr'       => array(
-                        'class'        => 'form-control',
-                        'tooltip'      => 'mautic.email.config.monitored_email_ssl.tooltip',
-                        'data-show-on' => $monitoredHideOn
+                    'choices'     => array(
+                        '/ssl' => 'mautic.email.config.mailer_encryption.ssl',
+                        '/ssl/no-validate' => 'mautic.email.config.monitored_email_encryption.ssl_novalidate',
+                        '/tls' => 'mautic.email.config.mailer_encryption.tls',
+                        '/tls/no-validate' => 'mautic.email.config.monitored_email_encryption.tls_novalidate'
                     ),
-                    'required'   => false
+                    'label'       => 'mautic.email.config.monitored_email_encryption',
+                    'required'    => false,
+                    'attr'        => array(
+                        'class'        => 'form-control',
+                        'data-show-on' => $monitoredHideOn,
+                        'tooltip'      => 'mautic.email.config.monitored_email_encryption.tooltip'
+                    ),
+                    'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                    'data'        => (isset($options['data']['encryption'])) ? $options['data']['encryption'] : '/ssl'
                 )
             );
         }

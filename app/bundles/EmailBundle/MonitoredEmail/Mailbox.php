@@ -46,11 +46,11 @@ class Mailbox
             $this->settings = $this->mailboxes['general'];
         } else {
             $this->settings = array(
-                'host'     => '',
-                'port'     => '',
-                'password' => '',
-                'user'     => '',
-                'ssl'      => ''
+                'host'      => '',
+                'port'      => '',
+                'password'  => '',
+                'user'      => '',
+                'encryption' => ''
             );
         }
 
@@ -118,14 +118,16 @@ class Mailbox
         /**
          * @var $host
          * @var $port
-         * @var $ssl
+         * @var $encryption
          * @var $folder
          * @var $user
          * @var $password
          */
         extract($settings);
-        $useSsl   = !empty($ssl) ? '/ssl' : '';
-        $path     = "{{$host}:{$port}/imap{$useSsl}}";
+        if (!isset($encryption)) {
+            $encryption = (!empty($ssl)) ? '/ssl' : '';
+        }
+        $path     = "{{$host}:{$port}/imap{$encryption}}";
         $fullPath = $path;
 
         if (isset($folder)) {
