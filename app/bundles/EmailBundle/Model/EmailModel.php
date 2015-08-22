@@ -727,7 +727,10 @@ class EmailModel extends FormModel
         $options       = array(
             'source'        => array('email', $email->getId()),
             'emailSettings' => $emailSettings,
-            'allowResends'  => false
+            'allowResends'  => false,
+            'customHeaders' => array(
+                'Precedence' => 'Bulk'
+            )
         );
 
         $failed      = array();
@@ -873,6 +876,7 @@ class EmailModel extends FormModel
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : array();
+        $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : array();
 
         if (!$email->getId()) {
             return false;
@@ -1010,6 +1014,10 @@ class EmailModel extends FormModel
                 $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
+
+                if (!empty($customHeaders)) {
+                    $mailer->setCustomHeaders($customHeaders);
+                }
             }
 
             $idHash = uniqid();

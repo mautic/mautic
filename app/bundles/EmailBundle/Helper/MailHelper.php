@@ -30,32 +30,32 @@ class MailHelper
     /**
      * @var MauticFactory
      */
-    private $factory;
+    protected $factory;
 
     /**
      * @var
      */
-    private $mailer;
+    protected $mailer;
 
     /**
      * @var
      */
-    private $transport;
+    protected $transport;
 
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
-    private $templating = null;
+    protected $templating = null;
 
     /**
      * @var null
      */
-    private $dispatcher = null;
+    protected $dispatcher = null;
 
     /**
      * @var \Swift_Plugins_Loggers_ArrayLogger
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var bool|MauticMessage
@@ -65,104 +65,109 @@ class MailHelper
     /**
      * @var null
      */
-    private $from;
+    protected $from;
 
     /**
      * @var string
      */
-    private $returnPath;
+    protected $returnPath;
 
     /**
      * @var array
      */
-    private $errors = array();
+    protected $errors = array();
 
     /**
      * @var null
      */
-    private $lead = null;
+    protected $lead = null;
 
     /**
      * @var bool
      */
-    private $internalSend = false;
+    protected $internalSend = false;
 
     /**
      * @var null
      */
-    private $idHash = null;
+    protected $idHash = null;
 
     /**
      * @var bool
      */
-    private $appendTrackingPixel = false;
+    protected $appendTrackingPixel = false;
 
     /**
      * @var array
      */
-    private $source = array();
+    protected $source = array();
 
     /**
      * @var null
      */
-    private $email = null;
+    protected $email = null;
 
     /**
      * @var array
      */
-    private $globalTokens = array();
+    protected $globalTokens = array();
 
     /**
      * @var array
      */
-    private $eventTokens   = array();
+    protected $eventTokens   = array();
 
     /**
      * Tells the mailer to use batching/tokenized emails if it's available
      *
      * @var bool
      */
-    private $tokenizationEnabled = false;
+    protected $tokenizationEnabled = false;
 
     /**
      * @var bool
      */
-    private $tokenizationSupported = false;
+    protected $tokenizationSupported = false;
 
     /**
      * @var array
      */
-    private $queuedRecipients = array();
+    protected $queuedRecipients = array();
 
     /**
      * @var string
      */
-    private $subject = '';
+    protected $subject = '';
 
     /**
      * @var string
      */
-    private $plainText = '';
+    protected $plainText = '';
 
     /**
      * @var array
      */
-    private $assets = array();
+    protected $assets = array();
 
     /**
      * @var array
      */
-    private $attachedAssets = array();
+    protected $attachedAssets = array();
 
     /**
      * @var array
      */
-    private $assetStats = array();
+    protected $assetStats = array();
 
     /**
      * @var array
      */
-    private $body = array(
+    protected $headers = array();
+
+    /**
+     * @var array
+     */
+    protected $body = array(
         'content'     => '',
         'contentType' => 'text/html',
         'charset'     => null
@@ -171,7 +176,7 @@ class MailHelper
     /**
      * @var bool
      */
-    private $fatal = false;
+    protected $fatal = false;
 
     /**
      * @param MauticFactory $factory
@@ -275,6 +280,19 @@ class MailHelper
                             $asset->getOriginalFileName(),
                             $asset->getMime()
                         );
+                    }
+                }
+            }
+
+            // Set custom headers
+            if (!empty($this->headers)) {
+                $headers = $this->message->getHeaders();
+                foreach ($this->headers as $headerKey => $headerValue) {
+                    if ($headers->has($headerKey)) {
+                        $header = $headers->get($headerKey);
+                        $header->setFieldBodyModel($headerValue);
+                    } else {
+                        $headers->addTextHeader($headerKey, $headerValue);
                     }
                 }
             }
@@ -446,9 +464,9 @@ class MailHelper
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
 
-            unset($this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
+            unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
 
-            $this->source  = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
+            $this->headers = $this->source  = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
             $this->email   = null;
             $this->subject = $this->plainText = '';
             $this->body    = array(
@@ -896,7 +914,7 @@ class MailHelper
      *
      * @throws BatchQueueMaxException
      */
-    private function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
+    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
     {
         if ($this->tokenizationEnabled) {
             // Check if max batching has been hit
@@ -1147,6 +1165,16 @@ class MailHelper
     }
 
     /**
+     * Set custom headers
+     *
+     * @param array $headers
+     */
+    public function setCustomHeaders(array $headers)
+    {
+        $this->headers = $headers;
+    }
+
+    /**
      * Append tokens
      *
      * @param array $tokens
@@ -1261,7 +1289,7 @@ class MailHelper
      *
      * @param \Exception|string $error
      */
-    private function logError($error)
+    protected function logError($error)
     {
         if ($error instanceof \Exception) {
             $error = $error->getMessage();
@@ -1320,7 +1348,7 @@ class MailHelper
     /**
      * Creates a download stat for the asset
      */
-    private function createAssetDownloadEntries()
+    protected function createAssetDownloadEntries()
     {
         // Nothing was sent out so bail
         if ($this->fatal || empty($this->assetStats)) {
@@ -1357,7 +1385,7 @@ class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated
      */
-    private function queueAssetDownloadEntry()
+    protected function queueAssetDownloadEntry()
     {
         if (!$this->internalSend && !empty($this->lead) && !empty($this->assets)) {
             $this->assetStats[$this->lead['email']] = array(

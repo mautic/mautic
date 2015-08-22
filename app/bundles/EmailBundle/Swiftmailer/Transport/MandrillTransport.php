@@ -42,6 +42,9 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         $message = $this->messageToArray($mauticTokens, $mandrillMergePlaceholders, true);
 
+        // Not used ATM
+        unset($message['headers']);
+
         $message['from_email'] = $message['from']['email'];
         $message['from_name']  = $message['from']['name'];
         unset($message['from']);

@@ -245,6 +245,15 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
             $message['file_attachments']   = $this->getAttachments();
         }
 
+        $message['headers'] = array();
+        $headers = $this->message->getHeaders()->getAll();
+        /** @var \Swift_Mime_Header $header */
+        foreach ($headers as $header) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+                $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
+            }
+        }
+
         return $message;
     }
 
