@@ -454,7 +454,6 @@ class Email extends FormEntity
                     'publishUp',
                     'publishDown',
                     'readCount',
-                    'readInBrowser',
                     'sentCount',
                     'revision',
                     'assetAttachments',
@@ -465,8 +464,8 @@ class Email extends FormEntity
                     'variantChildren'
                 )
             )
-            ->setMaxDepth('variantParent', 1)
-            ->setMaxDepth('variantChildren', 1)
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
             ->build();
     }
 
