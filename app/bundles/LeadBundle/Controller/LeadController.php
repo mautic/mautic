@@ -846,9 +846,8 @@ class LeadController extends FormController
                 );
 
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+            if (!$this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
                     $data = $this->request->request->get('lead');
 
                     //pull the data from the form in order to apply the form's formatting
@@ -926,7 +925,7 @@ class LeadController extends FormController
                 	'viewParameters'  => array(
                     'leads'     => $leads,
                     'form' => $form->createView()
-                	),
+                	   ),
                 	'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php'
             		)
          		);
