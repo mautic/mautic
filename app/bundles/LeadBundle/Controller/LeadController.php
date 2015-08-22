@@ -774,8 +774,8 @@ class LeadController extends FormController
     public function mergeAction ($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model  = $this->factory->getModel('lead.lead');
-        $lead1  = $model->getEntity($objectId);
+        $model  = $this->factory->getModel('lead');
+        $mainLead  = $model->getEntity($objectId);
 
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.lead.page', 1);
@@ -793,7 +793,7 @@ class LeadController extends FormController
             )
         );
 
-        if ($lead1 === null) {
+        if ($mainLead === null) {
             return $this->postActionRedirect(
                 array_merge(
                 	$postActionVars,
@@ -811,12 +811,12 @@ class LeadController extends FormController
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
-            $lead1->getOwner())
+            $mainLead->getOwner())
         ) {
             return $this->accessDenied();
-        } elseif ($model->isLocked($lead1)) {
+        } elseif ($model->isLocked($mainLead)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $lead1, 'lead.lead');
+            return $this->isLocked($postActionVars, $mainLead, 'lead.lead');
         }
 
  		//Order the leads
@@ -832,7 +832,7 @@ class LeadController extends FormController
         );
 
         //Remove the already selected lead
-        if(($key = array_search($lead1, $leads)) !== false) {
+        if(($key = array_search($mainLead, $leads)) !== false) {
             unset($leads[$key]);
         }
 
@@ -859,10 +859,11 @@ class LeadController extends FormController
                         }
                         
 
-                        $leadId2 = $data['lead_to_merge'];
-                        $lead2 = $model->getEntity($leadId2);
+                        $secLeadId = $data['lead_to_merge'];
+                        $secLead =  $model->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(array(),$secLeadId)[0];
+                        //$secLead = $model->getEntity($secLeadId);
 
-                        if ($lead2 === null) {
+                        if ($secLead === null) {
             				return $this->postActionRedirect(
                 				array_merge(
                     				$postActionVars,
@@ -871,7 +872,7 @@ class LeadController extends FormController
                             				array(
                                 				'type'    => 'error',
                                 				'msg'     => 'mautic.lead.lead.error.notfound',
-                                				'msgVars' => array('%id%' => $lead2->getId())
+                                				'msgVars' => array('%id%' => $secLead->getId())
                             				)
                         				)
                     				)
@@ -880,21 +881,27 @@ class LeadController extends FormController
         				} elseif (!$this->factory->getSecurity()->hasEntityAccess(
             				'lead:leads:editown',
             				'lead:leads:editother',
-            				$lead1->getOwner())
+            				$mainLead->getOwner())
         				) {
             				return $this->accessDenied();
-        				} elseif ($model->isLocked($lead2)) {
+        				} elseif ($model->isLocked($secLead)) {
             				//deny access if the entity is locked
-            				return $this->isLocked($postActionVars, $lead2, 'lead.lead');
+            				return $this->isLocked($postActionVars, $secLead, 'lead.lead');
         				}
 
-        				//Both leads are good so now we merge them
-                        $mergedLead = $model->mergeLeads($lead1, $lead2);
+                        $switched = false;
+                        if ($mainLead->getDateAdded() > $secLead->getDateAdded()){
+                            list($secLead,$mainLead) = array($mainLead,$secLead);
+                            $switched = true;
+                        }
 
-                       	$model->deleteEntity($lead1);
-                        $model->deleteEntity($lead2);
-                    }
-                    
+        				//Both leads are good so now we merge them  If mainLead matches it works, if it is the otherway around it doesn't
+                        $mainLead = $model->mergeLeads($mainLead, $secLead);
+                        $model->saveEntity($mainLead);
+
+                        if (!$switched)
+                            $model->deleteEntity($secLead);
+                    }       
                 }
             } 
 
@@ -910,7 +917,7 @@ class LeadController extends FormController
            		$func           = 'view';
  				
  				$viewParameters = array(
- 					'objectId'     => $lead1->getId(),
+ 					'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',
                 );
              }
