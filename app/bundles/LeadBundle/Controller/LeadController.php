@@ -895,10 +895,11 @@ class LeadController extends FormController
                             $switched = true;
                         }
 
-        				//Both leads are good so now we merge them  If mainLead matches it works, if it is the otherway around it doesn't
+        				//Both leads are good so now we merge them
                         $mainLead = $model->mergeLeads($mainLead, $secLead);
                         $model->saveEntity($mainLead);
 
+                        // Workaround for a bug where it isn't deleted if they aren't switched
                         if (!$switched)
                             $model->deleteEntity($secLead);
                     }       
