@@ -39,46 +39,38 @@ class MergeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //$builder->addEventSubscriber(new CleanFormSubscriber());
-        //$builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
-            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-                $this->factory->getEntityManager(),
-                'MauticUserBundle:User'
-            );
+        $leadChoices = array();
 
-            $leadChoices = array(
-            );
+        foreach ($options['data'] as $l) {
+             $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+         }
 
-            foreach ($options['data'] as $l) {
-                 $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
-             }
-
-            $builder->add(
-                'lead_to_merge',
-                'choice',
-                array(
-                    'choices'    => $leadChoices,
-                    'label'      => $this->factory->getTranslator()->trans('mautic.lead.merge.select'),
-                    'label_attr' => array('class' => 'control-label'),
-                    'multiple'   => false,
-                    'attr'       => array(
-                        'class' => 'form-control'
-                    ),
-                    'constraints' => array(
-                            new NotBlank(
-                                array(
-                                    'message' => 'mautic.core.value.required'
-                                )
+        $builder->add(
+            'lead_to_merge',
+            'choice',
+            array(
+                'choices'    => $leadChoices,
+                'label'      => $this->factory->getTranslator()->trans('mautic.lead.merge.select'),
+                'label_attr' => array('class' => 'control-label'),
+                'multiple'   => false,
+                'attr'       => array(
+                    'class' => 'form-control'
+                ),
+                'constraints' => array(
+                        new NotBlank(
+                            array(
+                                'message' => 'mautic.core.value.required'
                             )
                         )
-                )
-            );
+                    )
+            )
+        );
 
-            $builder->add('buttons', 'form_buttons', array(
-            'container_class' => 'lead-merge-buttons',
-            'apply_text'      => false,
-            'save_text'       => 'mautic.core.form.save'
+        $builder->add('buttons', 'form_buttons', array(
+        'container_class' => 'lead-merge-buttons',
+        'apply_text'      => false,
+        'save_text'       => 'mautic.core.form.save'
         ));
 
         

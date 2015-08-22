@@ -889,39 +889,24 @@ class LeadController extends FormController
             				return $this->isLocked($postActionVars, $secLead, 'lead.lead');
         				}
 
-                        $switched = false;
                         if ($mainLead->getDateAdded() > $secLead->getDateAdded()){
                             list($secLead,$mainLead) = array($mainLead,$secLead);
-                            $switched = true;
                         }
 
         				//Both leads are good so now we merge them
                         $mainLead = $model->mergeLeads($mainLead, $secLead);
                         $model->saveEntity($mainLead);
-
-                        // Workaround for a bug where it isn't deleted if they aren't switched
-                        //if (!$switched)
-                            //$model->deleteEntity($secLead, false);
                     }       
                 }
             } 
 
-            // if ($valid && $form->get('buttons')->get('save')->isClicked()){
-            // 	$route          = 'mautic_lead_action';  
-           	// 	$func           = 'index';
-                
-            //     $viewParameters = array(
-            //          'objectAction' => 'index'
-            //      );
-            //  } else {
-             	$route          = 'mautic_lead_action';  
-           		$func           = 'view';
- 				
- 				$viewParameters = array(
- 					'objectId'     => $mainLead->getId(),
+         	$route          = 'mautic_lead_action';  
+       		$func           = 'view';
+				
+			$viewParameters = array(
+					'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',
-                );
-             // }
+            );
 
             return $this->postActionRedirect(
                 array(
