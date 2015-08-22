@@ -133,6 +133,11 @@ class Lead extends FormEntity
     public $imported = false;
 
     /**
+     * @var ArrayCollection
+     */
+    private $tags;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -210,6 +215,18 @@ class Lead extends FormEntity
             ->columnName('preferred_profile_image')
             ->nullable()
             ->build();
+
+        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+            ->setJoinTable('lead_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(array('tag' => 'ASC'))
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
     /**
@@ -234,6 +251,7 @@ class Lead extends FormEntity
                     'lastActive',
                     'owner',
                     'ipAddresses',
+                    'tags',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -242,7 +260,8 @@ class Lead extends FormEntity
     }
 
     /**
-     * Constructor
+     * @param string $prop
+     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
@@ -261,6 +280,13 @@ class Lead extends FormEntity
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
+        } elseif ($prop == 'tags') {
+            if ($val instanceof Tag) {
+                $this->changes['tags']['added'][] = $val->getTag();
+            } else {
+                $this->changes['tags']['removed'][] = $val;
+            }
+
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -274,6 +300,7 @@ class Lead extends FormEntity
         $this->ipAddresses     = new ArrayCollection();
         $this->doNotEmail      = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
+        $this->tags            = new ArrayCollection();
     }
 
     /**
@@ -865,5 +892,55 @@ class Lead extends FormEntity
     public function setAvailableSocialFields(array $availableSocialFields)
     {
         $this->availableSocialFields = $availableSocialFields;
+    }
+
+    /**
+     * Add tag
+     *
+     * @param Tag $tag
+     *
+     * @return Lead
+     */
+    public function addTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag);
+        $this->tags[$tag->getTag()] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * Remove tag
+     *
+     * @param Tag $tag
+     */
+    public function removeTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag->getTag());
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getTags ()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }

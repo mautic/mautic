@@ -263,13 +263,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             )
         ));
 
-        $metadata->addPropertyConstraint('currentPassword', new SecurityAssert\UserPassword(
-            array(
-                'message' => 'mautic.user.account.password.userpassword',
-                'groups'  => array('Profile')
-            )
-        ));
-
         $metadata->setGroupSequence(array('User', 'SecondPass', 'CheckPassword'));
     }
 
@@ -286,11 +279,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         //check if creating a new user or editing an existing user and the password has been updated
         if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
             $groups[] = 'CheckPassword';
-        }
-
-        //require current password if on profile page
-        if ($form->has('currentPassword')) {
-            $groups[] = 'Profile';
         }
 
         return $groups;
