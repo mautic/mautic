@@ -900,20 +900,20 @@ class LeadController extends FormController
                         $model->saveEntity($mainLead);
 
                         // Workaround for a bug where it isn't deleted if they aren't switched
-                        if (!$switched)
-                            $model->deleteEntity($secLead);
+                        //if (!$switched)
+                            //$model->deleteEntity($secLead, false);
                     }       
                 }
             } 
 
-            if ($valid && $form->get('buttons')->get('save')->isClicked()){
-            	$route          = 'mautic_lead_action';  
-           		$func           = 'index';
+            // if ($valid && $form->get('buttons')->get('save')->isClicked()){
+            // 	$route          = 'mautic_lead_action';  
+           	// 	$func           = 'index';
                 
-                $viewParameters = array(
-                     'objectAction' => 'index'
-                 );
-             } else {
+            //     $viewParameters = array(
+            //          'objectAction' => 'index'
+            //      );
+            //  } else {
              	$route          = 'mautic_lead_action';  
            		$func           = 'view';
  				
@@ -921,7 +921,7 @@ class LeadController extends FormController
  					'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',
                 );
-             }
+             // }
 
             return $this->postActionRedirect(
                 array(
