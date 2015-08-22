@@ -29,7 +29,7 @@
         "symfony/process": "2.5.*",
         "symfony/routing": "2.5.*",
         "symfony/security": "2.5.*",
-        "symfony/templating": "2.5.*",
+        "symfony/templating": "2.6.*",
         "symfony/translation": "2.5.*",
         "symfony/validator": "2.5.*",
         "symfony/yaml": "2.5.*",
