@@ -876,6 +876,10 @@ class Asset extends FormEntity
      */
     public function getFileType()
     {
+        if (!empty($this->extension)) {
+            return $this->extension;
+        }
+
         if ($this->getStorageLocation() == 'remote') {
             return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
         }
