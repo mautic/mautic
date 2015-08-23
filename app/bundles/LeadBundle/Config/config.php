@@ -279,6 +279,10 @@ return array(
             'mautic.form.type.lead_batch'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\BatchType',
                 'alias'     => 'lead_batch'
+            ),
+            'mautic.form.type.lead_batch_dnc'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
+                'alias'     => 'lead_batch_dnc'
             )
         ),
         'other'   => array(

@@ -715,11 +715,18 @@ Mautic.createLeadTag = function(el) {
 };
 
 Mautic.leadBatchSubmit = function() {
-    if (Mautic.batchActionPrecheck() && (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val())) {
-        var ids = Mautic.getCheckedListIds(false, true);
-        mQuery('#lead_batch_ids').val(ids);
+    if (Mautic.batchActionPrecheck()) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length) {
+            var ids = Mautic.getCheckedListIds(false, true);
 
-        return true;
+            if (mQuery('#lead_batch_ids').length) {
+                mQuery('#lead_batch_ids').val(ids);
+            } else if (mQuery('#lead_batch_dnc_reason').length) {
+                mQuery('#lead_batch_dnc_ids').val(ids);
+            }
+
+            return true;
+        }
     }
 
     mQuery('#MauticSharedModal').modal('hide');

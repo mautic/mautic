@@ -790,8 +790,7 @@ class LeadModel extends FormModel
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
     {
         if (empty($emailAddress)) {
-            $fields = $lead->getFields();
-            $emailAddress = $fields['core']['email']['value'];
+            $emailAddress = $lead->getEmail();
 
             if (empty($emailAddress)) {
                 return;

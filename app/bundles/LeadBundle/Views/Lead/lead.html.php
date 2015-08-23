@@ -319,7 +319,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if ($doNotContact['unsubscribed']): ?>
-                            <span class="label label-danger">
+                            <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                             </span>
                             <?php elseif ($doNotContact['bounced']): ?>

@@ -79,9 +79,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     'data-toggle' => 'ajaxmodal',
                     'data-target' => '#MauticSharedModal',
                     'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
-                    'data-header' => $view['translator']->trans('mautic.lead.lead.bulk_lists')
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
                 ),
-                'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_lists'),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
                 'iconClass' => 'fa fa-list'
             ),
             array(
@@ -90,10 +90,21 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     'data-toggle' => 'ajaxmodal',
                     'data-target' => '#MauticSharedModal',
                     'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
-                    'data-header' => $view['translator']->trans('mautic.lead.lead.bulk_campaigns'),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
                 ),
-                'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_campaigns'),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
                 'iconClass' => 'fa fa-clock-o'
+            ),
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                'iconClass' => 'fa fa-send text-danger'
             )
         ),
         'templateButtons' => array(
