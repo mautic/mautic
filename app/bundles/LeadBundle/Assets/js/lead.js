@@ -128,7 +128,7 @@ Mautic.getLeadId = function() {
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
     if (options) {
-        var keys = values = [];
+        var keys = [], values = [];
         //check to see if there is a key/value split
         options = options.split('||');
         if (options.length == 2) {
@@ -170,7 +170,14 @@ Mautic.leadlistOnLoad = function(container) {
     if (mQuery('#leadlist_filters').length) {
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
-                mQuery(this).closest('.panel').remove();
+                mQuery(this).closest('.panel').animate(
+                    {'opacity': 0},
+                    'fast',
+                    function () {
+                        mQuery(this).remove();
+                    }
+                );
+
                 if (!mQuery('#leadlist_filters li:not(.placeholder)').length) {
                     mQuery('#leadlist_filters li.placeholder').removeClass('hide');
                 } else {
@@ -195,6 +202,8 @@ Mautic.addLeadListFilter = function (elId) {
     //create a new filter
 
     var filterNum = parseInt(mQuery('.available-filters').data('index'));
+    mQuery('.available-filters').data('index', filterNum + 1);
+
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
     var isSpecial = (fieldType == 'country' || fieldType == 'timezone' || fieldType == 'region');
@@ -205,22 +214,29 @@ Mautic.addLeadListFilter = function (elId) {
     // Convert to DOM
     prototype = mQuery(prototype);
 
-    var filterBase = "leadlist[filters][" + filterNum + "]";
+    var filterBase  = "leadlist[filters][" + filterNum + "]";
+    var filterIdBase = "leadlist_filters_" + filterNum + "_";
 
     if (isSpecial) {
-        var template = mQuery('.' + fieldType + '-template').clone();
+        var template = mQuery('#templates .' + fieldType + '-template').clone();
         mQuery(template).attr('name', mQuery(template).attr('name').replace(/__name__/g, filterNum));
         mQuery(template).attr('id', mQuery(template).attr('id').replace(/__name__/g, filterNum));
         mQuery(prototype).find('input[name="' + filterBase + '[filter]"]').replaceWith(template);
     }
 
-    if (filterNum === 1) {
+    if (mQuery('#leadlist_filters div.panel').length == 0) {
         // First filter so hide the glue footer
         mQuery(prototype).find(".panel-footer").addClass('hide');
     }
 
     mQuery(prototype).find("a.remove-selected").on('click', function() {
-        mQuery(prototype).remove();
+        mQuery(this).closest('.panel').animate(
+            {'opacity': 0},
+            'fast',
+            function () {
+                mQuery(this).remove();
+            }
+        );
     });
 
     mQuery(prototype).find("input[name='" + filterBase + "[field]']").val(elId);
@@ -228,7 +244,9 @@ Mautic.addLeadListFilter = function (elId) {
 
     var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
 
-    var filter =  mQuery(prototype).find(filterEl);
+    mQuery(prototype).appendTo('#leadlist_filters');
+
+    var filter = '#' + filterIdBase + 'filter';
 
     //activate fields
     if (isSpecial) {
@@ -237,12 +255,11 @@ Mautic.addLeadListFilter = function (elId) {
             width: "100%",
             allow_single_deselect: true
         });
-        console.log(filter);
     } else if (fieldType == 'lookup' || fieldType == 'select') {
         var fieldCallback = mQuery(filterId).data("field-callback");
-        if (fieldCallback) {
+        if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
             var fieldOptions = mQuery(filterId).data("field-list");
-            Mautic[fieldCallback](elId, fieldOptions);
+            Mautic[fieldCallback](filterIdBase + 'filter', elId, fieldOptions);
         }
     } else if (fieldType == 'datetime') {
         mQuery(filter).datetimepicker({
@@ -277,7 +294,7 @@ Mautic.addLeadListFilter = function (elId) {
         var newDisplay = mQuery(oldFilter).clone();
         mQuery(newDisplay).attr('name', filterBase + '[display]');
 
-        var oldDisplay = mQuery(container).find("input[name='" + filterBase + "[display]']");
+        var oldDisplay = mQuery(prototype).find("input[name='" + filterBase + "[display]']");
         var newFilter = mQuery(oldDisplay).clone();
         mQuery(newFilter).attr('name', filterBase + '[filter]');
 
@@ -285,16 +302,13 @@ Mautic.addLeadListFilter = function (elId) {
         mQuery(oldDisplay).replaceWith(newDisplay);
 
         var fieldCallback = mQuery(filterId).data("field-callback");
-        if (fieldCallback) {
+        if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
             var fieldOptions = mQuery(filterId).data("field-list");
-            Mautic[fieldCallback](elId, fieldOptions);
+            Mautic[fieldCallback](filterIdBase + 'filter', elId, fieldOptions);
         }
     } else {
         mQuery(filter).attr('type', fieldType);
     }
-
-    mQuery(prototype).appendTo('.selected-filters');
-
 };
 
 Mautic.leadfieldOnLoad = function (container) {

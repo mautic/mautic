@@ -9,7 +9,9 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadlist');
 $fields = $form->vars['fields'];
-$id = $form->vars['data']->getId();
+$id     = $form->vars['data']->getId();
+$index  = count($form['filters']->vars['value']) ? max(array_keys($form['filters']->vars['value'])) : 0;
+
 if (!empty($id)) {
     $name   = $form->vars['data']->getName();
     $header = $view['translator']->trans('mautic.lead.list.header.edit', array("%name%" => $name));
@@ -59,7 +61,7 @@ $templates = array(
                         <div class="tab-pane fade bdr-w-0" id="filters">
                             <div class="form-group">
                                 <?php echo $view['form']->errors($form['filters']); ?>
-                                <div class="available-filters mb-md" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo count($form['filters']) + 1; ?>">
+                                <div class="available-filters mb-md" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                                             <?php echo $view['translator']->trans('mautic.lead.list.form.filters.add'); ?>
@@ -78,7 +80,7 @@ $templates = array(
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="selected-filters">
+                                <div class="selected-filters" id="leadlist_filters">
                                     <?php echo $view['form']->widget($form['filters']); ?>
                                 </div>
                             </div>
@@ -96,7 +98,7 @@ $templates = array(
     </div>
 <?php echo $view['form']->end($form); ?>
 
-<div class="templates hide">
+<div class="hide" id="templates">
 <?php foreach ($templates as $dataKey => $template): ?>
     <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter">
         <option value=""></option>
