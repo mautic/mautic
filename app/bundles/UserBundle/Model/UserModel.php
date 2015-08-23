@@ -268,13 +268,15 @@ class UserModel extends FormModel
 
         if (in_array($status, $this->supportedOnlineStatuses)) {
             $user = $this->factory->getUser();
-            $user->setOnlineStatus($status);
-            $this->getRepository()->saveEntity($user);
+            if ($user->getId()) {
+                $user->setOnlineStatus($status);
+                $this->getRepository()->saveEntity($user);
 
-            $dispatcher = $this->factory->getDispatcher();
-            if ($dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                $event = new StatusChangeEvent($this->factory);
-                $dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
+                $dispatcher = $this->factory->getDispatcher();
+                if ($dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
+                    $event = new StatusChangeEvent($this->factory);
+                    $dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
+                }
             }
         }
     }
