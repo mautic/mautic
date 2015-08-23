@@ -597,6 +597,7 @@ Mautic.removeBounceStatus = function (el, dncId) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+        mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
 };

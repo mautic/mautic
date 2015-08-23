@@ -1756,7 +1756,7 @@ class LeadController extends FormController
                 foreach ($entities as $lead) {
                     if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
 
-                        if ($dnc = $model->setDoNotContact($lead, null, $data['reason'], false)) {
+                        if ($dnc = $model->setDoNotContact($lead, null, $data['reason'], false, true)) {
                             $dncEntities[] = $dnc;
                         }
                     }
