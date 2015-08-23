@@ -223,6 +223,10 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Get a count of leads that belong to the list
+     *
+     * @param $listIds
+     *
+     * @return array
      */
     public function getLeadCount($listIds)
     {
@@ -262,10 +266,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param      $lists
-     * @param bool $idOnly
-     * @param bool $dynamic
-     * @param bool $ignoreCache
+     * @param       $lists
+     * @param array $args
      *
      * @return array
      */
@@ -592,7 +594,7 @@ class LeadListRepository extends CommonRepository
             $field                     = "l.{$details['field']}";
             $uniqueFilter              = $this->generateRandomParameterName();
             $parameters[$uniqueFilter] = $details['filter'];
-            if ($func == 'like' || $func == 'notLike') {
+            if (($func == 'like' || $func == 'notLike') && strpos($parameters[$uniqueFilter], '%') === false) {
                 $parameters[$uniqueFilter] = '%'.$parameters[$uniqueFilter].'%';
             }
 
@@ -827,6 +829,9 @@ class LeadListRepository extends CommonRepository
         );
     }
 
+    /**
+     * @return string
+     */
     public function getTableAlias()
     {
         return 'l';
