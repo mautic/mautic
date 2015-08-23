@@ -674,7 +674,7 @@ class CampaignController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     //make sure that at least one field is selected
-                    if (empty($modifiedEvents)) {
+                    if (empty($campaignEvents)) {
                         //set the error
                         $form->addError(
                             new FormError(
@@ -1164,6 +1164,7 @@ class CampaignController extends FormController
 
         foreach ($sources as $type => &$typeSources) {
             $typeSources = array_keys($typeSources);
+            $typeSources = array_combine($typeSources, $typeSources);
         }
 
         $session->set('mautic.campaign.'.$id.'.leadsources.current', $sources);
