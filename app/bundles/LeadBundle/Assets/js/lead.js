@@ -122,16 +122,6 @@ Mautic.leadOnUnload = function(id) {
     }
 };
 
-Mautic.bulkLeadLists = function() {
-    var items = Mautic.getCheckedListIds(false, true);
-
-    Mautic.ajaxActionRequest: function(action, data, successClosure, showLoadingBar) {
-};
-
-Mautic.bulkLeadCampaigns = function() {
-
-}
-
 Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
 }
@@ -722,4 +712,17 @@ Mautic.createLeadTag = function(el) {
 
         Mautic.removeLabelLoadingIndicator();
     });
+};
+
+Mautic.leadBatchSubmit = function() {
+    if (Mautic.batchActionPrecheck() && (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val())) {
+        var ids = Mautic.getCheckedListIds(false, true);
+        mQuery('#lead_batch_ids').val(ids);
+
+        return true;
+    }
+
+    mQuery('#MauticSharedModal').modal('hide');
+
+    return false;
 };

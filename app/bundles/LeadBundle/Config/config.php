@@ -275,6 +275,10 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.form.type.lead_batch'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\BatchType',
+                'alias'     => 'lead_batch'
             )
         ),
         'other'   => array(

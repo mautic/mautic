@@ -75,18 +75,22 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             ),
             array(
                 'attr'      => array(
-                    'class'   => 'btn btn-default btn-sm btn-nospin',
-                    'href'    => 'javascript: void(0)',
-                    'onclick' => 'Mautic.bulkLeadLists();',
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
+                    'data-header' => $view['translator']->trans('mautic.lead.lead.bulk_lists')
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_lists'),
                 'iconClass' => 'fa fa-list'
             ),
             array(
                 'attr'      => array(
-                    'class'   => 'btn btn-default btn-sm btn-nospin',
-                    'href'    => 'javascript: void(0)',
-                    'onclick' => 'Mautic.bulkLeadCampaigns();',
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
+                    'data-header' => $view['translator']->trans('mautic.lead.lead.bulk_campaigns'),
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.lead.bulk_campaigns'),
                 'iconClass' => 'fa fa-clock-o'

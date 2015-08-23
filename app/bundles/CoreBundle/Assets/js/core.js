@@ -1281,6 +1281,16 @@ var Mautic = {
             if (MauticVars.formSubmitInProgress) {
                 return false;
             } else {
+                var callback = mQuery(this).data('submit-callback');
+
+                // Allow a callback to do stuff before submit and abort if needed
+                if (callback && typeof Mautic[callback] == 'function') {
+                    if (!Mautic[callback]()) {
+
+                        return false;
+                    }
+                }
+
                 MauticVars.formSubmitInProgress = true;
             }
 
