@@ -198,8 +198,9 @@ return array(
                 'alias'     => 'leadlist_choices'
             ),
             'mautic.form.type.leadlist_filters'               => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\FilterType',
-                'alias' => 'leadlist_filters'
+                'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'alias'     => 'leadlist_filters',
+                'arguments' => 'mautic.factory',
             ),
             'mautic.form.type.leadfield'                      => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
