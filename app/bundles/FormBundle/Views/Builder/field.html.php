@@ -27,7 +27,12 @@ if (isset($properties['labelAttributes'])):
 endif;
 
 $showProperties = (isset($form['properties']) && count($form['properties']));
+
+// Check for validation errors to show on tabs
+$generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
+$propertiesTabError = (isset($form['properties']) && ($view['form']->containsErrors($form['properties'])));
 ?>
+
 
 <div class="bundle-form">
     <div class="bundle-form-header">
@@ -39,8 +44,11 @@ $showProperties = (isset($form['properties']) && count($form['properties']));
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError) echo ' class="text-danger" '; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
+                    <?php if ($generalTabError): ?>
+                        <i class="fa fa-warning"></i>
+                    <?php endif; ?>
                 </a>
             </li>
 
@@ -62,8 +70,11 @@ $showProperties = (isset($form['properties']) && count($form['properties']));
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError) echo ' class="text-danger" '; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
+                    <?php if ($propertiesTabError): ?>
+                        <i class="fa fa-warning"></i>
+                    <?php endif; ?>
                 </a>
             </li>
             <?php endif; ?>
