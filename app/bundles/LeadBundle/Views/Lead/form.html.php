@@ -73,10 +73,12 @@ $img = $view['lead_avatar']->getAvatar($lead);
             <!-- Tab panes act as a form -->
             <?php echo $view['form']->start($form, array('attr' => array('class' => 'tab-content'))); ?>
                 <!-- pane -->
-                <?php $first = ' in active'; ?>
-                <?php foreach ($fields as $group => $groupFields): ?>
-                <?php if (!empty($groupFields)): ?>
-                    <div class="tab-pane fade<?php echo $first; ?> bdr-rds-0 bdr-w-0" id="<?php echo $group; ?>">
+                <?php
+                foreach ($groups as $key => $group):
+                if (isset($fields[$group])):
+                    $groupFields = $fields[$group];
+                    if (!empty($groupFields)): ?>
+                    <div class="tab-pane fade<?php if ($key === 0) echo ' in active'; ?> bdr-rds-0 bdr-w-0" id="<?php echo $group; ?>">
                         <div class="pa-md bg-auto bg-light-xs bdr-b">
                             <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $group); ?></h4>
                         </div>
@@ -186,9 +188,11 @@ $img = $view['lead_avatar']->getAvatar($lead);
                             ?>
                         </div>
                     </div>
-                <?php $first = ''; ?>
-                <?php endif; ?>
-                <?php endforeach; ?>
+                <?php
+                    endif;
+                    endif;
+                    endforeach;
+                ?>
                 <!--/ #pane -->
             <?php echo $view['form']->end($form); ?>
             <!--/ Tab panes act as a form -->
