@@ -823,26 +823,12 @@ class LeadController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
         $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
         
-        $leads = $model->getEntities(
-            array(
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'withTotalCount' => false
-            )
-        );
-
-        //Remove the already selected lead
-        if(($key = array_search($mainLead, $leads)) !== false) {
-            unset($leads[$key]);
-        }
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $objectId));
         $form = $this->get('form.factory')->create(
                     'lead_merge',
                     array(),
-                    array('action'        => $action,
-                            'data'   => $leads,
-                            'data_class' => null)
+                    array('action'        => $action)
                 );
 
         if ($this->request->getMethod() == 'POST') {
@@ -921,6 +907,18 @@ class LeadController extends FormController
       	}
 
       	else {
+      		$leads = $model->getEntities(
+            array(
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => false
+            )
+        	);
+
+        //Remove the already selected lead
+        if(($key = array_search($mainLead, $leads)) !== false) {
+            unset($leads[$key]);
+        }
         	return $this->delegateView(array(
                 	'viewParameters'  => array(
                     'leads'     => $leads,
