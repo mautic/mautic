@@ -12,12 +12,10 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\LeadBundle\Form\DataTransformer\FieldDateTimeTransformer;
-use Mautic\LeadBundle\Form\DataTransformer\FieldTypeTransformer;
+use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -36,6 +34,7 @@ class ListType extends AbstractType
     private $timezoneChoices;
     private $countryChoices;
     private $regionChoices;
+    private $listChoices;
 
     /**
      * @param MauticFactory $factory
@@ -51,6 +50,11 @@ class ListType extends AbstractType
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
+        $lists                 = $listModel->getUserLists();
+        $this->listChoices     = array();
+        foreach ($lists as $list) {
+            $this->listChoices[$list['id']] = $list['name'];
+        }
     }
 
     /**
@@ -108,24 +112,28 @@ class ListType extends AbstractType
 
         $builder->add('isPublished', 'yesno_button_group');
 
+        $filterModalTransformer = new FieldFilterTransformer($this->translator);
         $builder->add(
-            'filters',
-            'collection',
-            array(
-                'type'           => 'leadlist_filters',
-                'options'        => array(
-                    'label'     => false,
-                    'timezones' => $this->timezoneChoices,
-                    'countries' => $this->countryChoices,
-                    'regions'   => $this->regionChoices,
-                    'fields'    => $this->fieldChoices
-                ),
-                'error_bubbling' => false,
-                'mapped'         => true,
-                'allow_add'      => true,
-                'allow_delete'   => true,
-                'label'          => false
-            )
+            $builder->create(
+                'filters',
+                'collection',
+                array(
+                    'type'           => 'leadlist_filter',
+                    'options'        => array(
+                        'label'     => false,
+                        'timezones' => $this->timezoneChoices,
+                        'countries' => $this->countryChoices,
+                        'regions'   => $this->regionChoices,
+                        'fields'    => $this->fieldChoices,
+                        'lists'     => $this->listChoices
+                    ),
+                    'error_bubbling' => false,
+                    'mapped'         => true,
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
+                    'label'          => false
+                )
+            )->addModelTransformer($filterModalTransformer)
         );
 
         $builder->add('buttons', 'form_buttons');
@@ -156,6 +164,7 @@ class ListType extends AbstractType
         $view->vars['countries'] = $this->countryChoices;
         $view->vars['regions']   = $this->regionChoices;
         $view->vars['timezones'] = $this->timezoneChoices;
+        $view->vars['lists']     = $this->listChoices;
     }
 
     /**

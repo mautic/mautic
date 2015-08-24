@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SortableListType
+ *
+ * @deprecated Use DynamicListType instead
  */
 class SortableListType extends AbstractType
 {

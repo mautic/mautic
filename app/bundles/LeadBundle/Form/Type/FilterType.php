@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -38,7 +40,9 @@ class FilterType extends AbstractType
 
         $this->operatorChoices = array();
         foreach ($operatorChoices as $key => $value) {
-            $this->operatorChoices[$key] = $value['label'];
+            if (empty($value['hide'])) {
+                $this->operatorChoices[$key] = $value['label'];
+            }
         }
 
         $this->translator = $factory->getTranslator();
@@ -65,48 +69,54 @@ class FilterType extends AbstractType
             )
         );
 
-        $builder->add(
-            'operator',
-            'choice',
-            array(
-                'label'   => false,
-                'choices' => $this->operatorChoices,
-                'attr'    => array(
-                    'class' => 'form-control not-chosen'
-                )
-            )
-        );
+        $translator      = $this->translator;
+        $operatorChoices = $this->operatorChoices;
 
-        $type        = 'text';
-        $attr        = array(
-            'class' => 'form-control'
-        );
-        $displayType = 'hidden';
-        $displayAttr = array();
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $options) {
+            $data      = $event->getData();
+            $form      = $event->getForm();
+            $options   = $form->getConfig()->getOptions();
+            $fieldType = $data['type'];
+            $fieldName = $data['field'];
 
-        if (!empty($options['data'])) {
-            $fieldType = $options['data']['field'];
+            $type        = 'text';
+            $attr        = array(
+                'class' => 'form-control'
+            );
+            $displayType = 'hidden';
+            $displayAttr = array();
+
+            $customOptions = array();
             switch ($fieldType) {
+                case 'leadlist':
+                    if (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+                    $customOptions['choices']  = $options['lists'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
-                    $attr['choices'] = $options['timezones'];
-                    $type            = 'choice';
+                    $customOptions['choices']  = $options['timezones'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
                     break;
                 case 'country':
-                    $attr['choices'] = $options['countries'];
-                    $type            = 'choice';
+                    $customOptions['choices']  = $options['countries'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
                     break;
                 case 'region':
-                    $attr['choices'] = $options['regions'];
-                    $type            = 'choice';
+                    $customOptions['choices']  = $options['regions'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
                     break;
                 case 'time':
                 case 'date':
                 case 'datetime':
-                    $type                = $fieldType;
                     $attr['data-toggle'] = $fieldType;
                     break;
                 case 'lookup_id':
-                case 'boolean':
                     $type        = 'hidden';
                     $displayType = 'text';
                     $displayAttr = array_merge(
@@ -114,62 +124,158 @@ class FilterType extends AbstractType
                         array(
                             'class'       => 'form-control',
                             'data-toggle' => 'field-lookup',
-                            'data-target' => $options['data']['filter'],
-                            'placeholder' => $this->translator->trans(
+                            'data-target' => $data['field'],
+                            'placeholder' => $translator->trans(
                                 'mautic.lead.list.form.filtervalue'
                             )
                         )
                     );
 
-                    if (isset($this->fieldChoices[$fieldType]['properties']['list'])) {
-                        $displayAttr['data-options'] = $this->fieldChoices[$fieldType]['properties']['list'];
+                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                        $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
                     break;
-
-                case 'lookup':
                 case 'select':
+                case 'boolean':
+                    $type = 'choice';
+                    $attr = array_merge(
+                        $attr,
+                        array(
+                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue')
+                        )
+                    );
+
+                    if (in_array($data['operator'], array('in', '!in'))) {
+                        $customOptions['multiple'] = true;
+                        if (!is_array($data['filter'])) {
+                            $data['filter'] = array($data['filter']);
+                        }
+                    }
+
+                    $list  = $options['fields'][$fieldName]['properties']['list'];
+                    if (!is_array($list)) {
+                        $parts = explode('||', $list);
+                        if (count($parts) > 1) {
+                            $labels  = explode('|', $parts[0]);
+                            $values  = explode('|', $parts[1]);
+                            $choices = array_combine($values, $labels);
+                        } else {
+                            $list    = explode('|', $list);
+                            $choices = array_combine($list, $list);
+                        }
+                    } else {
+                        $choices = $list;
+                    }
+
+                    if ($fieldType == 'select') {
+                        array_unshift($choices, array('' => ''));
+                    }
+
+                    $customOptions['choices'] = $choices;
+                    break;
+                case 'lookup':
                 default:
                     $attr = array_merge(
                         $attr,
                         array(
                             'data-toggle' => 'field-lookup',
-                            'data-target' => $options['data']['filter'],
-                            'placeholder' => $this->translator->trans('mautic.lead.list.form.filtervalue')
+                            'data-target' => $data['field'],
+                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue')
                         )
                     );
 
-                    if (isset($this->fieldChoices[$fieldType]['properties']['list'])) {
-                        $attr['data-options'] = $this->fieldChoices[$fieldType]['properties']['list'];
+                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                        $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
                     break;
             }
-        }
 
-        $builder->add(
-            'filter',
-            $type,
-            array(
-                'label' => false,
-                'attr'  => $attr
-            )
+            // @todo implement in UI
+            if (in_array($data['operator'], array('between', '!between'))) {
+                $form->add(
+                    'filter',
+                    'collection',
+                    array(
+                        'type'    => $type,
+                        'options' => array(
+                            'label' => false,
+                            'attr'  => $attr
+                        ),
+                        'label'   => false
+                    )
+                );
+            } else {
+                $form->add(
+                    'filter',
+                    $type,
+                    array_merge(
+                        array(
+                            'label' => false,
+                            'attr'  => $attr,
+                            'data'  => $data['filter']
+                        ),
+                        $customOptions
+                    )
+                );
+            }
+
+            $form->add(
+                'display',
+                $displayType,
+                array(
+                    'label' => false,
+                    'attr'  => $displayAttr,
+                    'data'  => $data['display']
+                )
+            );
+
+            $choices = $operatorChoices;
+            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+                // Inclusive operators
+                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
+            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                // Inclusive operators
+                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+            }
+
+            $form->add(
+                'operator',
+                'choice',
+                array(
+                    'label'   => false,
+                    'choices' => $choices,
+                    'attr'    => array(
+                        'class'    => 'form-control not-chosen',
+                        'onchange' => 'Mautic.convertLeadFilterInput(this)'
+                    )
+                )
+            );
+
+            if ($eventName == FormEvents::PRE_SUBMIT) {
+                $event->setData($data);
+            }
+        };
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $formModifier($event, FormEvents::PRE_SET_DATA);
+            }
         );
 
-        $builder->add(
-            'display',
-            $displayType,
-            array(
-                'label' => false,
-                'attr'  => $displayAttr
-            )
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($formModifier) {
+                $formModifier($event, FormEvents::PRE_SUBMIT);
+            }
         );
 
         $builder->add('field', 'hidden');
 
         $builder->add('type', 'hidden');
     }
-
 
     /**
      * @param OptionsResolverInterface $resolver
@@ -181,7 +287,14 @@ class FilterType extends AbstractType
                 'timezones',
                 'countries',
                 'regions',
-                'fields'
+                'fields',
+                'lists'
+            )
+        );
+
+        $resolver->setDefaults(
+            array(
+                'label' => false
             )
         );
     }
@@ -191,10 +304,7 @@ class FilterType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields']    = $options['fields'];
-        $view->vars['countries'] = $options['countries'];
-        $view->vars['regions']   = $options['regions'];
-        $view->vars['timezones'] = $options['timezones'];
+        $view->vars['fields'] = $options['fields'];
     }
 
     /**
@@ -202,6 +312,6 @@ class FilterType extends AbstractType
      */
     public function getName()
     {
-        return "leadlist_filters";
+        return "leadlist_filter";
     }
 }

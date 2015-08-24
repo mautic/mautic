@@ -23,7 +23,9 @@ $view['slots']->set("headerTitle", $header);
 $templates = array(
     'countries' => 'country-template',
     'regions'   => 'region-template',
-    'timezones' => 'timezone-template'
+    'timezones' => 'timezone-template',
+    'select'    => 'select-template',
+    'lists'     => 'leadlist-template'
 );
 ?>
 
@@ -68,11 +70,26 @@ $templates = array(
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu scrollable-menu" role="menu">
-                                            <?php foreach ($fields as $value => $params): ?>
-                                                <?php $list = (!empty($params['properties']['list'])) ? $params['properties']['list'] : ''; ?>
-                                                <?php $callback = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : ''; ?>
+                                            <?php
+                                            foreach ($fields as $value => $params):
+                                                $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
+                                                if (!is_array($list) && strpos($list, '|') !== false):
+                                                    $parts = explode('||', $list);
+                                                    if (count($parts) > 1):
+                                                        $labels = explode('|', $parts[0]);
+                                                        $values = explode('|', $parts[1]);
+                                                        $list = array_combine($values, $labels);
+                                                    else:
+                                                        $list = explode('|', $list);
+                                                        $list = array_combine($list, $list);
+                                                    endif;
+                                                endif;
+                                                $list      = json_encode($list);
+                                                $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
+                                                $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
+                                                ?>
                                                 <li>
-                                                    <a id="available_<?php echo $value; ?>" class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $list; ?>" data-field-callback="<?php echo $callback; ?>">
+                                                    <a id="available_<?php echo $value; ?>" class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>">
                                                         <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
                                                     </a>
                                                 </li>
@@ -103,6 +120,7 @@ $templates = array(
     <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter">
         <option value=""></option>
         <?php
+        if (isset($form->vars[$dataKey])):
         foreach ($form->vars[$dataKey] as $value => $label):
         if (is_array($label)):
             echo "<optgroup label=\"$value\">$value</optgroup>\n";
@@ -114,6 +132,7 @@ $templates = array(
             echo "<option value=\"$value\">$label</option>\n";
         endif;
         endforeach;
+        endif;
         ?>
     </select>
 <?php endforeach; ?>

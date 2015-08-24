@@ -130,9 +130,13 @@ return array(
                 'alias'     => 'hidden_entity',
                 'arguments' => 'doctrine.orm.entity_manager'
             ),
-            'mautic.form.type.list'               => array(
+            'mautic.form.type.sortablelist'        => array(
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
                 'alias' => 'sortablelist'
+            ),
+            'mautic.form.type.dynamiclist'         => array(
+                'class' => 'Mautic\CoreBundle\Form\Type\DynamicListType',
+                'alias' => 'dynamiclist'
             ),
             'mautic.form.type.coreconfig'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ConfigType',
