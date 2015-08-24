@@ -29,7 +29,7 @@ class FormModel extends CommonModel
     public function lockEntity($entity)
     {
         //lock the row if applicable
-        if (method_exists($entity, 'setCheckedOut')) {
+        if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
             $user = $this->factory->getUser();
             if ($user->getId()) {
                 $entity->setCheckedOut(new \DateTime());
@@ -73,7 +73,7 @@ class FormModel extends CommonModel
     public function unlockEntity($entity, $extra = null)
     {
         //unlock the row if applicable
-        if (method_exists($entity, 'setCheckedOut')) {
+        if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
             //flush any potential changes
             $this->em->refresh($entity);
 
