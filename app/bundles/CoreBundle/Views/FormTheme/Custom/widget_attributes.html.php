@@ -15,6 +15,6 @@ printf('%s="%s" ', $view->escape($k), $view->escape($v));
 endif;
 endforeach;
 if (!isset($attr['autocomplete'])): // Disable by default and use false for chrome support
-printf('autocomplete=false ');
+printf('autocomplete="false" ');
 endif;
 
