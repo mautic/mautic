@@ -1,7 +1,6 @@
 <?php
 $preaddonAttr  = (isset($form->vars['attr']['preaddon_attr'])) ? $form->vars['attr']['preaddon_attr'] : array();
 $postaddonAttr = (isset($form->vars['attr']['postaddon_attr'])) ? $form->vars['attr']['postaddon_attr'] : array();
-
 if (!empty($form->vars['attr']['preaddon']) ||
     !empty($form->vars['attr']['postaddon'])): ?>
 <div class="input-group">
