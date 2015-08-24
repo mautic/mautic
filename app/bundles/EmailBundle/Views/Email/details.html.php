@@ -184,6 +184,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         'header'  => 'mautic.email.click_tracks.header_none',
                         'message' => 'mautic.email.click_tracks.none'
                     )); ?>
+                    <div class="clearfix"></div>
                 <?php endif; ?>
             </div>
 

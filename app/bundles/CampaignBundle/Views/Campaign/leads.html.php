@@ -80,6 +80,7 @@
     </div>
     <?php else: ?>
         <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+        <div class="clearfix"></div>
     <?php endif; ?>
 </div>
 <?php if (count($items)): ?>
