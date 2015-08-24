@@ -86,11 +86,10 @@ if ($tmpl == 'index')
 </div>
 <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => $totalItems,
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_leadfield_index',
-        "baseUrl"         => $view['router']->generate('mautic_leadfield_index'),
+        'totalItems'      => $totalItems,
+        'page'            => $page,
+        'limit'           => $limit,
+        'baseUrl'         => $view['router']->generate('mautic_leadfield_index'),
         'sessionVar'      => 'leadfield'
     )); ?>
 </div>
