@@ -1527,7 +1527,7 @@ var Mautic = {
                 if (response.mauticContent) {
                     if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
                         Mautic[response.mauticContent + "OnLoad"](target, response);
-                        Mautic.loadedContent[contentSpecific] = true;
+                        Mautic.loadedContent[response.mauticContent] = true;
                     }
                 }
             } else {
