@@ -40,7 +40,7 @@ class Version20150801000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP FOREIGN KEY ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
 
         $this->addSql('RENAME TABLE ' . $this->prefix . 'addons TO ' . $this->prefix . 'plugins');
-        $this->addSql('ALTER TABLE ' . $this->prefix . ' plugins DROP COLUMN is_enabled');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
 
         $this->addSql('RENAME TABLE ' . $this->prefix . 'addon_integration_settings TO ' . $this->prefix . 'plugin_integration_settings');
 
@@ -54,7 +54,7 @@ class Version20150801000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP CONSTRAINT ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addons RENAME TO ' . $this->prefix . 'plugins');
-        $this->addSql('ALTER TABLE ' . $this->prefix . ' plugins DROP COLUMN is_enabled');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings RENAME TO ' . $this->prefix . 'plugin_integration_settings');
 
