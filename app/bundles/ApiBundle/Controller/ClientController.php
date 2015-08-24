@@ -217,7 +217,7 @@ class ClientController extends FormController
                     )
                 ));
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($client->getId(), false);
+                return $this->editAction($client->getId(), true);
             }
         }
 

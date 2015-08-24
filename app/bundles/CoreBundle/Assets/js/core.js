@@ -1530,7 +1530,7 @@ var Mautic = {
 
                 if (response.mauticContent) {
                     if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
-                        if (typeof Mautic.loadedContent[response.mauticContent]  == 'undefined') {
+                        if (typeof Mautic.loadedContent[response.mauticContent] == 'undefined') {
                             Mautic.loadedContent[response.mauticContent] = true;
                             Mautic[response.mauticContent + "OnLoad"](target, response);
                         }
