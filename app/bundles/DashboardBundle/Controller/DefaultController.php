@@ -45,13 +45,14 @@ class DefaultController extends CommonController
         $popularCampaigns     = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 
         $returnRate = 0;
-        if ($totalVisits = array_sum($newReturningVisitors)) {
+        $totalVisits = array_sum($newReturningVisitors);
+        if ($totalVisits > 0) {
             $returnRate = round($newReturningVisitors['returning'] / $totalVisits * 100);
         }
 
         $clickRate = 0;
 
-        if ($sentReadCount['read_count']) {
+        if ($sentReadCount['sent_count'] > 0) {
             $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
