@@ -243,13 +243,18 @@
                                     break;
                             }
 
+                            var containerId = 'mauticform_' + formId + '_' + fieldKey;
+                            if (!document.getElementById(containerId)) {
+                                containerId = 'mauticform_' + fieldKey;
+                            }
+
                             if (!valid) {
-                                validator.markError('mauticform_' + formId + '_' + fieldKey, valid);
+                                validator.markError(containerId, valid);
                                 formValid = false;
 
                                 validator.enableSubmitButton();
                             } else {
-                                validator.clearError('mauticform_' + formId + '_' + fieldKey);
+                                validator.clearError(containerId);
                             }
                         }
 
