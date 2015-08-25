@@ -1100,6 +1100,8 @@ class LeadController extends FormController
                                 continue;
                             }
 
+                            $lineNumber++;
+
                             // Increase progress count
                             $progress[0]++;
 
@@ -1109,9 +1111,18 @@ class LeadController extends FormController
                             if (is_array($data) && $dataCount = count($data)) {
                                 // Ensure the number of headers are equal with data
                                 $headerCount = count($headers);
+
                                 if ($headerCount !== $dataCount) {
+                                    $diffCount = ($headerCount - $dataCount);
+
+                                    if ($diffCount < 0) {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.header_mismatch');
+
+                                        continue;
+                                    }
                                     // Fill in the data with empty string
-                                    $fill = array_fill($dataCount, ($headerCount - $dataCount), '');
+                                    $fill = array_fill($dataCount, $diffCount, '');
                                     $data = $data + $fill;
                                 }
 
@@ -1127,10 +1138,11 @@ class LeadController extends FormController
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
-                                    $stats['failures'][] = $e->getMessage();
+                                    $stats['failures'][$lineNumber] = $e->getMessage();
                                 }
                             } else {
                                 $stats['ignored']++;
+                                $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
                             }
                         }
 
@@ -1339,6 +1351,7 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.defaultlist', null);
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', array());
+
         unlink($filepath);
     }
 
