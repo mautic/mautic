@@ -23,6 +23,9 @@ class CampaignEventHelper
     /**
      * @param $event
      * @param $factory
+     * @param $lead
+     *
+     * @return bool
      */
     public static function changeLists ($event, $factory, $lead)
     {
@@ -49,8 +52,9 @@ class CampaignEventHelper
     }
 
     /**
-     * @param $event
-     * @param $lead
+     * @param               $event
+     * @param               $lead
+     * @param MauticFactory $factory
      *
      * @return bool
      */
@@ -74,6 +78,7 @@ class CampaignEventHelper
             $log->setDateAdded(new \DateTime());
             $lead->addPointsChangeLog($log);
 
+            $factory->getModel('lead')->saveEntity($lead);
             $somethingHappened = true;
         }
 
@@ -81,11 +86,11 @@ class CampaignEventHelper
     }
 
     /**
-     * Method let update some lead fields if event occurs
-     * 
      * @param $event
      * @param $factory
-     * @param Lead $lead
+     * @param $lead
+     *
+     * @return bool
      */
     public static function updateLead ($event, $factory, $lead)
     {

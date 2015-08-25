@@ -364,7 +364,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php if ($upcomingEvents) : ?>
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
             </div>
@@ -386,7 +386,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
         </div>
         <?php endif; ?>
-
+        <div class="pa-sm">
+            <?php echo $view['form']->form($tagForm); ?>
+        </div>
     </div>
     <!--/ right section -->
 </div>

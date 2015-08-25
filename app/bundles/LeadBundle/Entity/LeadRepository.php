@@ -185,6 +185,12 @@ class LeadRepository extends CommonRepository
         /** @var Lead $lead */
         foreach ($results as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
+            if (!empty($this->triggerModel)) {
+                $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
+            }
+
+            $fieldValues = $this->getFieldValues($lead->getId());
+            $lead->setFields($fieldValues);
         }
 
         return $results;
@@ -744,6 +750,29 @@ class LeadRepository extends CommonRepository
                 foreach ($results as $row) {
                     $leadIds[] = $row['lead_id'];
                 }
+                if (!count($leadIds)) {
+                    $leadIds[] = 0;
+                }
+                $expr = $q->expr()->in('l.id', $leadIds);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
+                // search by tag
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('x.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
+                    ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+                    ->where(
+                        $sq->expr()->$eqFunc('t.tag', ":$unique")
+                    )
+                    ->setParameter($unique, $string);
+                $results = $sq->execute()->fetchAll();
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                if (!count($leadIds)) {
+                    $leadIds[] = 0;
+                }
                 $expr = $q->expr()->in('l.id', $leadIds);
                 break;
         }
@@ -775,7 +804,8 @@ class LeadRepository extends CommonRepository
             'mautic.lead.lead.searchcommand.company',
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
-            'mautic.core.searchcommand.ip'
+            'mautic.core.searchcommand.ip',
+            'mautic.lead.lead.searchcommand.tag'
         );
     }
 

@@ -11,9 +11,10 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -23,239 +24,159 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Email
- * @ORM\Table(name="emails")
- * @ORM\Entity(repositoryClass="Mautic\EmailBundle\Entity\EmailRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\EmailBundle\Entity
  */
 class Email extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var string
      */
     private $subject;
 
     /**
-     * @ORM\Column(type="string", name="from_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $fromAddress;
 
     /**
-     * @ORM\Column(type="string", name="from_name", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $fromName;
 
     /**
-     * @ORM\Column(type="string", name="reply_to_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $replyToAddress;
 
     /**
-     * @ORM\Column(type="string", name="bcc_address", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var string
      */
     private $bccAddress;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $template;
 
     /**
-     * @ORM\Column(name="lang", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var string
      */
     private $language = 'en';
 
     /**
-     * @ORM\Column(name="content", type="array", nullable=true)
+     * @var array
      */
     private $content = array();
 
     /**
-     * @ORM\Column(name="plain_text", type="text", nullable=true)
+     * @var string
      */
     private $plainText;
 
     /**
-     * @ORM\Column(name="custom_html", type="text", nullable=true)
+     * @var string
      */
     private $customHtml;
 
     /**
-     * @ORM\Column(name="email_type", type="string", nullable=true)
+     * @var
      */
     private $emailType;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var \DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var \DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\Column(name="read_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var int
      */
     private $readCount = 0;
 
     /**
-     * @ORM\Column(name="sent_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var int
      */
     private $sentCount = 0;
 
     /**
-     * @ORM\Column(name="revision", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var int
      */
     private $revision = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails", "emailList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\LeadList", fetch="EXTRA_LAZY", indexBy="id")
-     * @ORM\JoinTable(name="email_list_xref")
-     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
-     **/
+     * @var ArrayCollection
+     */
     private $lists;
 
     /**
-     * @ORM\OneToMany(targetEntity="Stat", mappedBy="email", cascade={"persist"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var ArrayCollection
      */
     private $stats;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var Email
      **/
     private $variantParent = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Email", mappedBy="variantParent", indexBy="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var ArrayCollection
      **/
     private $variantChildren;
 
     /**
-     * @ORM\Column(name="variant_settings", type="array", nullable=true)
+     * @var array
      */
     private $variantSettings = array();
 
     /**
-     * @ORM\Column(name="variant_start_date", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var \DateTime
      */
     private $variantStartDate;
 
     /**
-     * @ORM\Column(name="variant_sent_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var int
      */
     private $variantSentCount = 0;
 
     /**
-     * @ORM\Column(name="variant_read_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var int
      */
     private $variantReadCount = 0;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\FormBundle\Entity\Form", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="unsubscribeform_id", onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
+     * @var \Mautic\FormBundle\Entity\Form
      */
     private $unsubscribeForm;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\AssetBundle\Entity\Asset", indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="email_assets_xref",
-     *   joinColumns={@ORM\JoinColumn(name="email_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="asset_id", referencedColumnName="id")}
-     * )
+     * @var ArrayCollection
      */
     private $assetAttachments;
 
@@ -273,7 +194,7 @@ class Email extends FormEntity
         parent::__clone();
     }
 
-    public function __construct()
+    public function __construct ()
     {
         $this->lists            = new ArrayCollection();
         $this->stats            = new ArrayCollection();
@@ -299,9 +220,141 @@ class Email extends FormEntity
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('emails')
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository');
+
+        $builder->addIdColumns();
+
+        $builder->createField('subject', 'text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('fromAddress', 'string')
+            ->columnName('from_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('fromName', 'string')
+            ->columnName('from_name')
+            ->nullable()
+            ->build();
+
+        $builder->createField('replyToAddress', 'string')
+            ->columnName('reply_to_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('bccAddress', 'string')
+            ->columnName('bcc_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('template', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->build();
+
+        $builder->createField('content', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('plainText', 'text')
+            ->columnName('plain_text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('customHtml', 'text')
+            ->columnName('custom_html')
+            ->nullable()
+            ->build();
+
+        $builder->createField('emailType', 'text')
+            ->columnName('email_type')
+            ->nullable()
+            ->build();
+
+        $builder->addPublishDates();
+
+        $builder->createField('readCount', 'integer')
+            ->columnName('read_count')
+            ->build();
+
+        $builder->createField('sentCount', 'integer')
+            ->columnName('sent_count')
+            ->build();
+
+        $builder->addField('revision', 'integer');
+
+        $builder->addCategory();
+
+        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+            ->setJoinTable('email_list_xref')
+            ->setIndexBy('id')
+            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('stats', 'Stat')
+            ->setIndexBy('id')
+            ->mappedBy('email')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToOne('variantParent', 'Email')
+            ->inversedBy('variantChildren')
+            ->addJoinColumn('variant_parent_id', 'id')
+            ->build();
+
+        $builder->createOneToMany('variantChildren', 'Email')
+            ->setIndexBy('id')
+            ->mappedBy('variantParent')
+            ->build();
+
+        $builder->createField('variantSettings', 'array')
+            ->columnName('variant_settings')
+            ->nullable()
+            ->build();
+
+        $builder->createField('variantStartDate', 'datetime')
+            ->columnName('variant_start_date')
+            ->nullable()
+            ->build();
+
+        $builder->createField('variantSentCount', 'integer')
+            ->columnName('variant_sent_count')
+            ->build();
+
+        $builder->createField('variantReadCount', 'integer')
+            ->columnName('variant_read_count')
+            ->build();
+
+        $builder->createManyToOne('unsubscribeForm', 'Mautic\FormBundle\Entity\Form')
+            ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createManyToMany('assetAttachments', 'Mautic\AssetBundle\Entity\Asset')
+            ->setJoinTable('email_assets_xref')
+            ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -375,10 +428,52 @@ class Email extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('email')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'subject',
+                    'language',
+                    'category',
+
+                )
+            )
+            ->addProperties(
+                array(
+                    'fromAddress',
+                    'fromName',
+                    'replyToAddress',
+                    'bccAddress',
+                    'publishUp',
+                    'publishDown',
+                    'readCount',
+                    'sentCount',
+                    'revision',
+                    'assetAttachments',
+                    'variantStartDate',
+                    'variantSentCount',
+                    'variantReadCount',
+                    'variantParent',
+                    'variantChildren'
+                )
+            )
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
+            ->build();
+    }
+
+    /**
      * @param $prop
      * @param $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -439,7 +534,7 @@ class Email extends FormEntity
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -713,9 +808,10 @@ class Email extends FormEntity
      * Add variantChildren
      *
      * @param \Mautic\EmailBundle\Entity\Email $variantChildren
+     *
      * @return Email
      */
-    public function addVariantChild(\Mautic\EmailBundle\Entity\Email $variantChildren)
+    public function addVariantChild (\Mautic\EmailBundle\Entity\Email $variantChildren)
     {
         $this->variantChildren[] = $variantChildren;
 
@@ -727,7 +823,7 @@ class Email extends FormEntity
      *
      * @param \Mautic\EmailBundle\Entity\Email $variantChildren
      */
-    public function removeVariantChild(\Mautic\EmailBundle\Entity\Email $variantChildren)
+    public function removeVariantChild (\Mautic\EmailBundle\Entity\Email $variantChildren)
     {
         $this->variantChildren->removeElement($variantChildren);
     }
@@ -737,7 +833,7 @@ class Email extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVariantChildren()
+    public function getVariantChildren ()
     {
         return $this->variantChildren;
     }
@@ -746,9 +842,10 @@ class Email extends FormEntity
      * Set variantParent
      *
      * @param \Mautic\EmailBundle\Entity\Email $variantParent
+     *
      * @return Email
      */
-    public function setVariantParent(\Mautic\EmailBundle\Entity\Email $variantParent = null)
+    public function setVariantParent (\Mautic\EmailBundle\Entity\Email $variantParent = null)
     {
         $this->isChanged('variantParent', $variantParent);
         $this->variantParent = $variantParent;
@@ -761,7 +858,7 @@ class Email extends FormEntity
      *
      * @return \Mautic\EmailBundle\Entity\Email
      */
-    public function getVariantParent()
+    public function getVariantParent ()
     {
         return $this->variantParent;
     }
@@ -770,9 +867,10 @@ class Email extends FormEntity
      * Set variantSettings
      *
      * @param array $variantSettings
+     *
      * @return Email
      */
-    public function setVariantSettings($variantSettings)
+    public function setVariantSettings ($variantSettings)
     {
         $this->isChanged('variantSettings', $variantSettings);
         $this->variantSettings = $variantSettings;
@@ -785,7 +883,7 @@ class Email extends FormEntity
      *
      * @return array
      */
-    public function getVariantSettings()
+    public function getVariantSettings ()
     {
         return $this->variantSettings;
     }
@@ -966,7 +1064,7 @@ class Email extends FormEntity
     /**
      * Increase sent counts by one
      */
-    public function upSentCounts()
+    public function upSentCounts ()
     {
         $this->sentCount++;
         if (!empty($this->variantStartDate)) {
@@ -977,7 +1075,7 @@ class Email extends FormEntity
     /**
      * Decrease sent counts by one
      */
-    public function downSentCounts()
+    public function downSentCounts ()
     {
         if ($this->sentCount) {
             $this->sentCount--;

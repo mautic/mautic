@@ -11,43 +11,65 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class LeadPointLog
- * @ORM\Table(name="point_lead_action_log")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\LeadPointLogRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\PointBundle\Entity
  */
 class LeadPointLog
 {
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Point", inversedBy="log")
+     * @var Point
      **/
     private $point;
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     private $lead;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
-     **/
+     * @var \Mautic\CoreBundle\Entity\IpAddress
+     */
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="date_fired", type="datetime")
+     * @var \DateTime
      **/
     private $dateFired;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('point_lead_action_log')
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository');
+
+        $builder->createManyToOne('point', 'Point')
+            ->isPrimaryKey()
+            ->addJoinColumn('point_id', 'id', true, false, 'CASCADE')
+            ->inversedBy('log')
+            ->build();
+
+        $builder->addLead(false, 'CASCADE', true);
+
+        $builder->addIpAddress(true);
+
+        $builder->createField('dateFired', 'datetime')
+            ->columnName('date_fired')
+            ->build();
+    }
+
+    /**
      * @return mixed
      */
-    public function getDateFired()
+    public function getDateFired ()
     {
         return $this->dateFired;
     }
@@ -55,7 +77,7 @@ class LeadPointLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired)
+    public function setDateFired ($dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -63,7 +85,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getIpAddress()
+    public function getIpAddress ()
     {
         return $this->ipAddress;
     }
@@ -71,7 +93,7 @@ class LeadPointLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress ($ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -79,7 +101,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getLead()
+    public function getLead ()
     {
         return $this->lead;
     }
@@ -87,7 +109,7 @@ class LeadPointLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead ($lead)
     {
         $this->lead = $lead;
     }
@@ -95,7 +117,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getPoint()
+    public function getPoint ()
     {
         return $this->point;
     }
@@ -103,7 +125,7 @@ class LeadPointLog
     /**
      * @param mixed $point
      */
-    public function setPoint($point)
+    public function setPoint ($point)
     {
         $this->point = $point;
     }
