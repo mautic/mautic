@@ -194,7 +194,47 @@ class CheckStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
+        $phpSupportData = array(
+            '5.3' => array(
+                'security' => '2013-07-11',
+                'eos'      => '2014-08-14',
+            ),
+            '5.4' => array(
+                'security' => '2014-09-14',
+                'eos'      => '2015-09-14',
+            ),
+            '5.5' => array(
+                'security' => '2015-07-10',
+                'eos'      => '2016-07-10'
+            ),
+            '5.6' => array(
+                'security' => '2016-08-28',
+                'eos'      => '2017-08-28'
+            ),
+        );
+
         $messages = array();
+
+        // Check the PHP version's support status
+        $activePhpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
+
+        // Do we have the PHP version's data?
+        if (isset($phpSupportData[$activePhpVersion])) {
+            // First check if the version has reached end of support
+            $today = new \DateTime();
+            $phpEndOfSupport = new \DateTime($phpSupportData[$activePhpVersion]['eos']);
+
+            if ($phpNotSupported = $today > $phpEndOfSupport) {
+                $messages[] = 'mautic.install.php.version.not.supported';
+            }
+
+            // If the version is still supported, check if it has reached security support only
+            $phpSecurityOnlyDate = new \DateTime($phpSupportData[$activePhpVersion]['security']);
+
+            if (!$phpNotSupported && $today > $phpSecurityOnlyDate) {
+                $messages[] = 'mautic.install.php.version.has.only.security.support';
+            }
+        }
 
         if (version_compare(PHP_VERSION, '5.3.8', '<')) {
             $messages[] = 'mautic.install.php.version.annotations';

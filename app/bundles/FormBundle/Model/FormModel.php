@@ -446,16 +446,17 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters($form, &$formHtml)
     {
         $request = $this->factory->getRequest();
+        $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
 
         $fields = $form->getFields();
         foreach ($fields as $f) {
             $alias = $f->getAlias();
             if ($request->query->has($alias)) {
-                preg_match('/<input id="mauticform_input_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match);
+                preg_match('/<input id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match);
                 if (!empty($match)) {
 
                     //replace value with GET
-                    $replace = '<input id="mauticform_input_' . $alias . '"' . $match[1] . 'value="' . urldecode($request->query->get($alias)) . '"' . $match[3] . '/>';
+                    $replace = '<input id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[1] . 'value="' . urldecode($request->query->get($alias)) . '"' . $match[3] . '/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
             }

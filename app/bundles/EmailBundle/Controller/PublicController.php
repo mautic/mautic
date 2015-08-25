@@ -102,7 +102,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+        $this->notFound();
     }
 
     /**
@@ -319,7 +319,7 @@ class PublicController extends CommonFormController
             return new Response('success');
         }
 
-        throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+        $this->notFound();
     }
 
     /**

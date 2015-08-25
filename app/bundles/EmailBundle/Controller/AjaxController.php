@@ -235,12 +235,8 @@ class AjaxController extends CommonAjaxController
             // Convert placeholders into raw tokens
             BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-            $parsed = array();
-            foreach ($content as $html) {
-                $parsed[] = $parser->setHtml($html)->getText();
-            }
-
-            $dataArray['text'] = implode("\n\n", $parsed);
+            $content           = implode("<br /><br />", $content);
+            $dataArray['text'] = $parser->setHtml($content)->getText();
         }
 
         return $this->sendJsonResponse($dataArray);

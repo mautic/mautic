@@ -119,6 +119,16 @@ class Event
     }
 
     /**
+     * Clean up after clone
+     */
+    public function __clone()
+    {
+        $this->id       = null;
+        $this->tempId   = null;
+        $this->campaign = null;
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
