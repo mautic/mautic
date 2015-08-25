@@ -18,15 +18,10 @@ if (!empty($id)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
+
 <div class="row">
     <div class="pa-md">
         <div class="col-md-6">
-            <?php if (empty($id)): ?>
-            <?php echo $view['form']->start($form); ?>
-            <?php echo $view->render('MauticCoreBundle:Helper:list_filters.html.php', array(
-                'filters' => $filters
-            )); ?>
-            <?php endif; ?>
             <?php echo $view['form']->form($form); ?>
         </div>
     </div>

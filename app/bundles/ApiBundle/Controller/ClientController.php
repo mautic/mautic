@@ -90,19 +90,12 @@ class ClientController extends FormController
 
         // api options
         $apiOptions = array();
-//        if ($this->factory->getParameter('api_oauth1', false)) {
         $apiOptions['oauth1'] = 'OAuth 1';
-//        }
-//        if ($this->factory->getParameter('api_oauth2', false)) {
         $apiOptions['oauth2'] = 'OAuth 2';
-//        }
-
-//        if (count($apiOptions) == 2) {
         $filters['api_mode'] = array(
             'values'  => array($api_mode),
             'options' => $apiOptions
         );
-//        }
 
         $parameters = array(
             'items'       => $clients,
@@ -187,16 +180,17 @@ class ClientController extends FormController
     }
 
     /**
-     * Generate's form and processes new post data
+     * @param mixed $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction($objectId = 0)
     {
         if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
-        $api_mode = $this->request->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+
+        $api_mode = ($objectId === 0) ? $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
         $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
