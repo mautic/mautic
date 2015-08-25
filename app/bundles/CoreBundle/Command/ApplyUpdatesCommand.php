@@ -71,7 +71,7 @@ EOT
 
         if ($package) {
             if (!file_exists($package)) {
-                $output->writeln('<error>' . $translator->trans('mautic.core.update.archive_no_such_file') . '</error>');
+                $output->writeln('<error>'.$translator->trans('mautic.core.update.archive_no_such_file').'</error>');
 
                 return 1;
             }
@@ -102,7 +102,7 @@ EOT
             $update       = $updateHelper->fetchData();
 
             if (!isset($update['package'])) {
-                $output->writeln('<error>' . $translator->trans('mautic.core.update.no_cache_data') . '</error>');
+                $output->writeln('<error>'.$translator->trans('mautic.core.update.no_cache_data').'</error>');
 
                 return 1;
             }
@@ -111,12 +111,12 @@ EOT
             $package = $updateHelper->fetchPackage($update['package']);
 
             if ($package['error']) {
-                $output->writeln('<error>' . $translator->trans($package['message']) . '</error>');
+                $output->writeln('<error>'.$translator->trans($package['message']).'</error>');
 
                 return 1;
             }
 
-            $zipFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/' . basename($update['package']);
+            $zipFile = $this->getContainer()->getParameter('kernel.cache_dir').'/'.basename($update['package']);
             $version = $update['version'];
         }
 
@@ -124,14 +124,49 @@ EOT
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
-            $output->writeln('<error>' . $translator->trans('mautic.core.update.archive_not_valid_zip') . '</error>');
+            // Get the exact error
+            switch ($archive) {
+                case \ZipArchive::ER_EXISTS:
+                    $error = 'mautic.core.update.archive_file_exists';
+                    break;
+                case \ZipArchive::ER_INCONS:
+                case \ZipArchive::ER_INVAL:
+                case \ZipArchive::ER_MEMORY:
+                    $error = 'mautic.core.update.archive_zip_corrupt';
+                    break;
+                case \ZipArchive::ER_NOENT:
+                    $error = 'mautic.core.update.archive_no_such_file';
+                    break;
+                case \ZipArchive::ER_NOZIP:
+                    $error = 'mautic.core.update.archive_not_valid_zip';
+                    break;
+                case \ZipArchive::ER_READ:
+                case \ZipArchive::ER_SEEK:
+                case \ZipArchive::ER_OPEN:
+                default:
+                    $error = 'mautic.core.update.archive_could_not_open';
+                    break;
+            }
+
+            $output->writeln('<error>'.$translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($error))).'</error>');
 
             return 1;
         }
 
         // Extract the archive file now in place
         $output->writeln('<info>Extracting zip...</info>');
-        $zipper->extractTo($appRoot);
+
+        if (!$zipper->extractTo($appRoot)) {
+            $output->writeln(
+                '<error>'.$translator->trans(
+                    'mautic.core.update.error',
+                    array('%error%' => $translator->trans('mautic.core.update.error_extracting_package'))
+                ).'</error>'
+            );
+
+            return 1;
+        }
+
         $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
@@ -149,16 +184,16 @@ EOT
         $command->run($input, $output);
 
         // Make sure we have a deleted_files list otherwise we can't process this step
-        if (file_exists(__DIR__ . '/deleted_files.txt')) {
+        if (file_exists(__DIR__.'/deleted_files.txt')) {
             $output->writeln('<info>Remove deleted files...</info>');
-            $deletedFiles = json_decode(file_get_contents(__DIR__ . '/deleted_files.txt'), true);
+            $deletedFiles = json_decode(file_get_contents(__DIR__.'/deleted_files.txt'), true);
             $errorLog     = array();
 
             // Before looping over the deleted files, add in our upgrade specific files
             $deletedFiles += array('deleted_files.txt', 'upgrade.php');
 
             foreach ($deletedFiles as $file) {
-                $path = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/' . $file;
+                $path = dirname($this->getContainer()->getParameter('kernel.root_dir')).'/'.$file;
 
                 // Try setting the permissions to 777 just to make sure we can get rid of the file
                 @chmod($path, 0777);
@@ -177,15 +212,15 @@ EOT
             // If there were any errors, add them to the error log
             if (count($errorLog)) {
                 // Check if the error log exists first
-                if (file_exists($appRoot . '/upgrade_errors.txt')) {
-                    $errors = file_get_contents($appRoot . '/upgrade_errors.txt');
+                if (file_exists($appRoot.'/upgrade_errors.txt')) {
+                    $errors = file_get_contents($appRoot.'/upgrade_errors.txt');
                 } else {
                     $errors = '';
                 }
 
                 $errors .= implode(PHP_EOL, $errorLog);
 
-                @file_put_contents($appRoot . '/upgrade_errors.txt', $errors);
+                @file_put_contents($appRoot.'/upgrade_errors.txt', $errors);
             }
         }
 
@@ -212,7 +247,9 @@ EOT
                     $extractResult = $languageHelper->extractLanguagePackage($locale);
 
                     if ($extractResult['error']) {
-                        $output->writeln('<error>' . $translator->trans('mautic.core.update.error_updating_language', array('%language%' => $name)) . '</error>');
+                        $output->writeln(
+                            '<error>'.$translator->trans('mautic.core.update.error_updating_language', array('%language%' => $name)).'</error>'
+                        );
                     }
                 }
             }
@@ -220,7 +257,7 @@ EOT
 
         // Migrate the database to the current version if migrations exist
         $output->writeln('<info>Migrate database schema...</info>');
-        $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $command = $this->getApplication()->find('doctrine:migrations:migrate');
@@ -232,7 +269,7 @@ EOT
             $exitCode = $command->run($input, $output);
 
             if ($exitCode !== 0) {
-                $output->writeln('<error>' . $translator->trans('mautic.core.update.error_performing_migration') . '</error>');
+                $output->writeln('<error>'.$translator->trans('mautic.core.update.error_performing_migration').'</error>');
             }
         }
 
@@ -241,13 +278,13 @@ EOT
         if (empty($package)) {
             @unlink($zipFile);
         } else {
-            @unlink($this->getContainer()->getParameter('kernel.cache_dir') . '/lastUpdateCheck.txt');
+            @unlink($this->getContainer()->getParameter('kernel.cache_dir').'/lastUpdateCheck.txt');
         }
-        @unlink($appRoot . '/deleted_files.txt');
-        @unlink($appRoot . '/upgrade.php');
+        @unlink($appRoot.'/deleted_files.txt');
+        @unlink($appRoot.'/upgrade.php');
 
         // Update successful
-        $output->writeln('<info>' . $translator->trans('mautic.core.update.update_successful', array('%version%' => $version)) . '</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.update.update_successful', array('%version%' => $version)).'</info>');
 
         return 0;
     }

@@ -67,5 +67,14 @@ class CampaignSubscriber extends CommonSubscriber
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::updateLead'
         );
         $event->addAction('lead.updatelead', $action);
+
+        $action = array(
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType'    => 'modify_lead_tags',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::updateTags'
+        );
+        $event->addAction('lead.changetags', $action);
+
     }
 }

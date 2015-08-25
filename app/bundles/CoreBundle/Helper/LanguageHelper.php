@@ -109,7 +109,7 @@ class LanguageHelper
         }
 
         // Extract the archive file now
-        $zipper->extractTo($this->factory->getSystemPath('root') . '/translations');
+        $zipper->extractTo($this->factory->getSystemPath('translations_root') . '/translations');
         $zipper->close();
 
         // We can remove the package now

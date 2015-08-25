@@ -10,8 +10,10 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -19,195 +21,124 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class Page
- * @ORM\Table(name="pages")
- * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\PageRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\PageBundle\Entity
  */
 class Page extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
+     * @var string
      */
     private $title;
 
     /**
-     * @ORM\Column(name="alias", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
+     * @var string
      */
     private $alias;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $template;
 
     /**
-     * @ORM\Column(name="lang", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $language = 'en';
 
     /**
-     * @ORM\Column(name="custom_html", type="text", nullable=true)
+     * @var string
      */
     private $customHtml;
 
     /**
-     * @ORM\Column(name="content", type="array", nullable=true)
+     * @var array
      */
     private $content = array();
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var \DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var \DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\Column(name="hits", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var int
      */
     private $hits = 0;
 
     /**
-     * @ORM\Column(name="unique_hits", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var int
      */
     private $uniqueHits = 0;
 
     /**
-     * @ORM\Column(name="variant_hits", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var int
      */
     private $variantHits = 0;
 
     /**
-     * @ORM\Column(name="revision", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var int
      */
     private $revision = 1;
 
     /**
-     * @ORM\Column(name="meta_description", type="string", nullable=true, length=320)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $metaDescription;
 
     /**
-     * @ORM\Column(name="redirect_type", type="string", nullable=true, length=100)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $redirectType;
 
     /**
-     * @ORM\Column(name="redirect_url", type="string", nullable=true, length=200)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var string
      */
     private $redirectUrl;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails", "pageList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="translationParent", indexBy="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var ArrayCollection
      **/
     private $translationChildren;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Page", inversedBy="translationChildren")
-     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var Page
      **/
     private $translationParent = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id")
-     * @ORM\OrderBy({"isPublished" = "DESC"})
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var ArrayCollection
      **/
     private $variantChildren;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Page", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
-     * @Serializer\MaxDepth(1)
+     * @var Page
      **/
     private $variantParent = null;
 
     /**
-     * @ORM\Column(name="variant_settings", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var array
      */
     private $variantSettings = array();
 
     /**
-     * @ORM\Column(name="variant_start_date", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"pageDetails"})
+     * @var \DateTime
      */
     private $variantStartDate;
 
@@ -228,16 +159,113 @@ class Page extends FormEntity
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct ()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('pages')
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository');
+
+        $builder->addId();
+
+        $builder->addField('title', 'string');
+
+        $builder->addField('alias', 'string');
+
+        $builder->addNullableField('template', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->build();
+
+        $builder->createField('customHtml', 'text')
+            ->columnName('custom_html')
+            ->nullable()
+            ->build();
+
+        $builder->createField('content', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->addPublishDates();
+
+        $builder->addField('hits', 'integer');
+
+        $builder->createField('uniqueHits', 'integer')
+            ->columnName('unique_hits')
+            ->build();
+
+        $builder->createField('variantHits', 'integer')
+            ->columnName('variant_hits')
+            ->build();
+
+        $builder->addField('revision', 'integer');
+
+        $builder->createField('metaDescription', 'string')
+            ->columnName('meta_description')
+            ->nullable()
+            ->build();
+
+        $builder->createField('redirectType', 'string')
+            ->columnName('redirect_type')
+            ->nullable()
+            ->length(100)
+            ->build();
+
+        $builder->createField('redirectUrl', 'string')
+            ->columnName('redirect_url')
+            ->nullable()
+            ->length(100)
+            ->build();
+
+        $builder->addCategory();
+
+        $builder->createOneToMany('translationChildren', 'Page')
+            ->setIndexBy('id')
+            ->setOrderBy(array('isPublished' => 'DESC'))
+            ->mappedBy('translationParent')
+            ->build();
+
+        $builder->createManyToOne('translationParent', 'Page')
+            ->inversedBy('translationChildren')
+            ->addJoinColumn('translation_parent_id', 'id', true)
+            ->build();
+
+        $builder->createManyToOne('variantParent', 'Page')
+            ->inversedBy('variantChildren')
+            ->addJoinColumn('variant_parent_id', 'id', true)
+            ->build();
+
+        $builder->createOneToMany('variantChildren', 'Page')
+            ->setIndexBy('id')
+            ->setOrderBy(array('isPublished' => 'DESC'))
+            ->mappedBy('variantParent')
+            ->build();
+
+        $builder->createField('variantSettings', 'array')
+            ->columnName('variant_settings')
+            ->nullable()
+            ->build();
+
+        $builder->createField('variantStartDate', 'datetime')
+            ->columnName('variant_start_date')
+            ->nullable()
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank(array(
             'message' => 'mautic.core.title.required'
@@ -261,7 +289,7 @@ class Page extends FormEntity
      *
      * @param ExecutionContextInterface $context
      */
-    public function translationParentValidation(ExecutionContextInterface $context)
+    public function translationParentValidation (ExecutionContextInterface $context)
     {
         $translationParent = $this->getTranslationParent();
 
@@ -280,7 +308,7 @@ class Page extends FormEntity
      *
      * @return array
      */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(Form $form)
     {
         $data   = $form->getData();
         $groups = array('Page');
@@ -295,11 +323,54 @@ class Page extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('page')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'category',
+                )
+            )
+            ->addProperties(
+                array(
+                    'language',
+                    'publishUp',
+                    'publishDown',
+                    'hits',
+                    'uniqueHits',
+                    'variantHits',
+                    'revision',
+                    'metaDescription',
+                    'redirectType',
+                    'redirectUrl',
+                    'variantSettings',
+                    'variantStartDate',
+                    'variantParent',
+                    'variantChildren',
+                    'translationParent',
+                    'translationChildren'
+                )
+            )
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
+            ->setMaxDepth(1, 'translationParent')
+            ->setMaxDepth(1, 'translationChildren')
+            ->build();
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -311,7 +382,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setTitle($title)
+    public function setTitle ($title)
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -324,7 +395,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle ()
     {
         return $this->title;
     }
@@ -336,7 +407,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setAlias($alias)
+    public function setAlias ($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -349,7 +420,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias ()
     {
         return $this->alias;
     }
@@ -361,7 +432,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setContent($content)
+    public function setContent ($content)
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -374,7 +445,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getContent()
+    public function getContent ()
     {
         return $this->content;
     }
@@ -386,7 +457,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -399,7 +470,7 @@ class Page extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishUp()
+    public function getPublishUp ()
     {
         return $this->publishUp;
     }
@@ -411,7 +482,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -424,7 +495,7 @@ class Page extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishDown()
+    public function getPublishDown ()
     {
         return $this->publishDown;
     }
@@ -436,7 +507,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setHits($hits)
+    public function setHits ($hits)
     {
         $this->hits = $hits;
 
@@ -448,7 +519,7 @@ class Page extends FormEntity
      *
      * @return integer
      */
-    public function getHits()
+    public function getHits ()
     {
         return $this->hits;
     }
@@ -460,7 +531,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setRevision($revision)
+    public function setRevision ($revision)
     {
         $this->revision = $revision;
 
@@ -472,7 +543,7 @@ class Page extends FormEntity
      *
      * @return integer
      */
-    public function getRevision()
+    public function getRevision ()
     {
         return $this->revision;
     }
@@ -484,7 +555,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setMetaDescription($metaDescription)
+    public function setMetaDescription ($metaDescription)
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -497,7 +568,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getMetaDescription()
+    public function getMetaDescription ()
     {
         return $this->metaDescription;
     }
@@ -555,7 +626,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setLanguage($language)
+    public function setLanguage ($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -568,7 +639,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage ()
     {
         return $this->language;
     }
@@ -580,7 +651,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
+    public function setCategory (\Mautic\CategoryBundle\Entity\Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -593,7 +664,7 @@ class Page extends FormEntity
      *
      * @return \Mautic\CategoryBundle\Entity\Category
      */
-    public function getCategory()
+    public function getCategory ()
     {
         return $this->category;
     }
@@ -605,7 +676,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setSessionId($id)
+    public function setSessionId ($id)
     {
         $this->sessionId = $id;
 
@@ -617,7 +688,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getSessionId()
+    public function getSessionId ()
     {
         return $this->sessionId;
     }
@@ -629,7 +700,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setTemplate($template)
+    public function setTemplate ($template)
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -642,7 +713,7 @@ class Page extends FormEntity
      *
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate ()
     {
         return $this->template;
     }
@@ -651,7 +722,7 @@ class Page extends FormEntity
      * @param $prop
      * @param $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged ($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
@@ -674,7 +745,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function addTranslationChild(Page $translationChildren)
+    public function addTranslationChild (Page $translationChildren)
     {
         $this->translationChildren[] = $translationChildren;
 
@@ -686,7 +757,7 @@ class Page extends FormEntity
      *
      * @param Page $translationChildren
      */
-    public function removeTranslationChild(Page $translationChildren)
+    public function removeTranslationChild (Page $translationChildren)
     {
         $this->translationChildren->removeElement($translationChildren);
     }
@@ -696,7 +767,7 @@ class Page extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getTranslationChildren()
+    public function getTranslationChildren ()
     {
         return $this->translationChildren;
     }
@@ -708,7 +779,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setTranslationParent(Page $translationParent = null)
+    public function setTranslationParent (Page $translationParent = null)
     {
         $this->isChanged('translationParent', $translationParent);
         $this->translationParent = $translationParent;
@@ -719,7 +790,7 @@ class Page extends FormEntity
     /**
      * Remove variant parent
      */
-    public function removeVariantParent()
+    public function removeVariantParent ()
     {
         $this->isChanged('variantParent', '');
         $this->variantParent = null;
@@ -730,7 +801,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function getTranslationParent()
+    public function getTranslationParent ()
     {
         return $this->translationParent;
     }
@@ -742,7 +813,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function addVariantChild(Page $variantChildren)
+    public function addVariantChild (Page $variantChildren)
     {
         $this->variantChildren[] = $variantChildren;
 
@@ -754,7 +825,7 @@ class Page extends FormEntity
      *
      * @param Page $variantChildren
      */
-    public function removeVariantChild(Page $variantChildren)
+    public function removeVariantChild (Page $variantChildren)
     {
         $this->variantChildren->removeElement($variantChildren);
     }
@@ -764,7 +835,7 @@ class Page extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVariantChildren()
+    public function getVariantChildren ()
     {
         return $this->variantChildren;
     }
@@ -776,7 +847,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setVariantParent(Page $variantParent = null)
+    public function setVariantParent (Page $variantParent = null)
     {
         $this->isChanged('variantParent', $variantParent);
         $this->variantParent = $variantParent;
@@ -787,7 +858,7 @@ class Page extends FormEntity
     /**
      * Remove translation parent
      */
-    public function removeTranslationParent()
+    public function removeTranslationParent ()
     {
         $this->isChanged('translationParent', '');
         $this->translationParent = null;
@@ -798,7 +869,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function getVariantParent()
+    public function getVariantParent ()
     {
         return $this->variantParent;
     }
@@ -810,7 +881,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setVariantSettings($variantSettings)
+    public function setVariantSettings ($variantSettings)
     {
         $this->isChanged('variantSettings', $variantSettings);
         $this->variantSettings = $variantSettings;
@@ -823,7 +894,7 @@ class Page extends FormEntity
      *
      * @return array
      */
-    public function getVariantSettings()
+    public function getVariantSettings ()
     {
         return $this->variantSettings;
     }
@@ -835,7 +906,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setUniqueHits($uniqueHits)
+    public function setUniqueHits ($uniqueHits)
     {
         $this->uniqueHits = $uniqueHits;
 
@@ -847,7 +918,7 @@ class Page extends FormEntity
      *
      * @return integer
      */
-    public function getUniqueHits()
+    public function getUniqueHits ()
     {
         return $this->uniqueHits;
     }
@@ -855,7 +926,7 @@ class Page extends FormEntity
     /**
      * @return mixed
      */
-    public function getVariantHits()
+    public function getVariantHits ()
     {
         return $this->variantHits;
     }
@@ -863,7 +934,7 @@ class Page extends FormEntity
     /**
      * @param mixed $variantHits
      */
-    public function setVariantHits($variantHits)
+    public function setVariantHits ($variantHits)
     {
         $this->variantHits = $variantHits;
     }
@@ -871,7 +942,7 @@ class Page extends FormEntity
     /**
      * @return mixed
      */
-    public function getVariantStartDate()
+    public function getVariantStartDate ()
     {
         return $this->variantStartDate;
     }
@@ -879,7 +950,7 @@ class Page extends FormEntity
     /**
      * @param mixed $variantStartDate
      */
-    public function setVariantStartDate($variantStartDate)
+    public function setVariantStartDate ($variantStartDate)
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;

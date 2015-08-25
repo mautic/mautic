@@ -76,8 +76,13 @@ class MauticFactory
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
 
+            // @deprecated support for addon in 1.1.4; to be removed in 2.0
             if ($parts[0] == 'addon' && $parts[1] != 'addon') {
+                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
                 $namespace = 'MauticAddon';
+                array_shift($parts);
+            } elseif ($parts[0] == 'plugin' && $parts[1] != 'plugin') {
+                $namespace = 'MauticPlugin';
                 array_shift($parts);
             } else {
                 $namespace = 'Mautic';
@@ -88,7 +93,6 @@ class MauticFactory
             }
 
             $modelClass = '\\'.$namespace.'\\'.ucfirst($parts[0]).'Bundle\\Model\\'.ucfirst($parts[1]).'Model';
-
             if (!class_exists($modelClass)) {
                 throw new NotAcceptableHttpException($name." is not an acceptable model name.");
             }
@@ -382,26 +386,33 @@ class MauticFactory
     {
         $paths = $this->getParameter('paths');
 
-        if ($name == 'currentTheme') {
+        if ($name == 'currentTheme' || $name == 'current_theme') {
             $theme = $this->getParameter('theme');
             $path  = $paths['themes']."/$theme";
         } elseif ($name == 'cache' || $name == 'log') {
             //these are absolute regardless as they are configurable
             return $this->container->getParameter("kernel.{$name}_dir");
         } elseif ($name == 'images') {
-            $imageDir = $this->getParameter('image_path');
-            if (substr($imageDir, -1) === '/') {
-                $imageDir = substr($imageDir, 0, -1);
+            $path = $this->getParameter('image_path');
+            if (substr($path, -1) === '/') {
+                $path = substr($path, 0, -1);
             }
-
-            return ($fullPath)  ? $paths['local_root'] . '/' . $imageDir : $imageDir;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
+        } elseif (strpos($name, '_root') !== false) {
+            // Assume system root if one is not set specifically
+            $path = $paths['root'];
         } else {
             throw new \InvalidArgumentException("$name does not exist.");
         }
 
-        return ($fullPath) ? $paths['root'].'/'.$path : $path;
+        if ($fullPath) {
+            $rootPath = (!empty($paths[$name . '_root'])) ? $paths[$name . '_root'] : $paths['root'];
+
+            return $rootPath . '/' . $path;
+        }
+
+        return $path;
     }
 
     /**
@@ -699,17 +710,29 @@ class MauticFactory
     /**
      * Get's an array of details for Mautic core bundles
      *
-     * @return mixed
+     * @param bool|false $includePlugins
+     *
+     * @return array|mixed
      */
-    public function getMauticBundles($includeAddons = false)
+    public function getMauticBundles($includePlugins = false)
     {
         $bundles = $this->container->getParameter('mautic.bundles');
-        if ($includeAddons) {
-            $addons  = $this->container->getParameter('mautic.addon.bundles');
-            $bundles = array_merge($bundles, $addons);
+        if ($includePlugins) {
+            $plugins  = $this->container->getParameter('mautic.plugin.bundles');
+            $bundles = array_merge($bundles, $plugins);
         }
 
         return $bundles;
+    }
+
+    /**
+     * Get's an array of details for enabled Mautic plugins
+     *
+     * @return array
+     */
+    public function getPluginBundles()
+    {
+        return $this->getKernel()->getPluginBundles();
     }
 
     /**
@@ -717,15 +740,15 @@ class MauticFactory
      *
      * @param        $bundleName
      * @param string $configKey
-     * @param bool   $includeAddons
+     * @param bool   $includePlugins
      *
      * @return mixed
      * @throws \Exception
      */
-    public function getBundleConfig($bundleName, $configKey = '', $includeAddons = false)
+    public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)
     {
         // get the configs
-        $configFiles = $this->getMauticBundles($includeAddons);
+        $configFiles = $this->getMauticBundles($includePlugins);
 
         // if no bundle name specified we throw
         if (!$bundleName) {
@@ -752,16 +775,6 @@ class MauticFactory
 
         // we didn't throw so we can send the key value
         return $bundleConfig[$configKey];
-    }
-
-    /**
-     * Get's an array of details for enabled Mautic addons
-     *
-     * @return array
-     */
-    public function getEnabledAddons()
-    {
-        return $this->getKernel()->getAddonBundles();
     }
 
     /**

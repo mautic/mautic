@@ -68,7 +68,7 @@ if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
 $validationMessage     = '';
-if ($field['isRequired']) {
+if (isset($field['isRequired']) && $field['isRequired']) {
     $defaultContainerClass .= ' mauticform-required';
     $validationMessage = $field['validationMessage'];
     if (empty($validationMessage)) {

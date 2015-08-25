@@ -67,12 +67,12 @@ class AjaxController extends CommonController
                 //call the specified bundle's ajax action
                 $parts = explode(":", $action);
                 $namespace = 'Mautic';
-                $isAddon = false;
-
-                if ($parts[0] == 'addon' && count($parts) == 3) {
-                    $namespace = 'MauticAddon';
+                $isPlugin = false;
+                // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
+                if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
+                    $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
                     array_shift($parts);
-                    $isAddon = true;
+                    $isPlugin = true;
                 }
 
                 if (count($parts) == 2) {
@@ -80,7 +80,7 @@ class AjaxController extends CommonController
                     $action     = $parts[1];
 
                     if (class_exists($namespace . '\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
-                        if (!$isAddon) {
+                        if (!$isPlugin) {
                             $bundle = 'Mautic' . $bundle;
                         }
                         return $this->forward("{$bundle}Bundle:Ajax:executeAjax", array(
@@ -432,19 +432,26 @@ class AjaxController extends CommonController
             $cookieHelper->delete('mautic_update');
         } else {
             // Extract the archive file now
-            $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
-            $zipper->close();
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
+                $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+                $dataArray['message']    = $translator->trans(
+                    'mautic.core.update.error',
+                    array('%error%' => $translator->trans('mautic.core.update.error_extracting_package'))
+                );
+            } else {
+                $zipper->close();
 
-            $dataArray['success']        = 1;
-            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
-            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
-            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+                $dataArray['success']        = 1;
+                $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+                $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
+                $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
 
-            // A way to keep the upgrade from failing if the session is lost after
-            // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
+                // A way to keep the upgrade from failing if the session is lost after
+                // the cache is cleared by upgrade.php
+                /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+                $cookieHelper = $this->factory->getHelper('cookie');
+                $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
+            }
         }
 
         return $this->sendJsonResponse($dataArray);

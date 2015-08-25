@@ -368,7 +368,7 @@ return array(
         'log_path'                     => '%kernel.root_dir%/logs',
         'image_path'                   => 'media/images',
         'theme'                        => 'Mauve',
-        'db_driver'                    => 'pdo_mysql',
+        'db_driver'                    => 'mysqli',
         'db_host'                      => 'localhost',
         'db_port'                      => 3306,
         'db_name'                      => '',

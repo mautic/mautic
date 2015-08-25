@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -477,6 +478,7 @@ class PageModel extends FormModel
                         }
                     }
 
+                    $persistLead = false;
                     if (count($inQuery)) {
                         if (count($uniqueLeadFieldData)) {
                             $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
@@ -496,7 +498,49 @@ class PageModel extends FormModel
                         }
 
                         $leadModel->setFieldValues($lead, $inQuery);
-                        $leadModel->saveEntity($lead);
+
+                        $persistLead = true;
+                    }
+
+                    if (isset($query['tags'])) {
+                        if (!$decoded) {
+                            $query['tags'] = urldecode($query['tags']);
+                        }
+
+                        $leadTags = $lead->getTags();
+
+                        $tags = explode(',', $query['tags']);
+                        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+                        // See which tags already exist
+                        $foundTags = $leadModel->getTagRepository()->getTagsByName($tags);
+                        foreach ($tags as $tag) {
+                            if (strpos($tag, '-') === 0) {
+                                // Tag to be removed
+                                $tag = substr($tag, 1);
+
+                                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                                    $lead->removeTag($foundTags[$tag]);
+                                    $persistLead = true;
+                                }
+                            } else {
+                                // Tag to be added
+                                if (!array_key_exists($tag, $foundTags)) {
+                                    // New tag
+                                    $newTag = new Tag();
+                                    $newTag->setTag($tag);
+                                    $lead->addTag($newTag);
+                                    $persistLead = true;
+                                } elseif (!$leadTags->contains($foundTags[$tag])) {
+                                    $lead->addTag($foundTags[$tag]);
+                                    $persistLead = true;
+                                }
+                            }
+                        }
+
+                        if ($persistLead) {
+                            $leadModel->saveEntity($lead);
+                        }
                     }
                 }
             } else {

@@ -252,10 +252,8 @@ class BuilderTokenHelper
      */
     static public function encodeUrlTokens(&$content, array $tokenKeys)
     {
-        // Special handling for leadfield tokens in URLs
-        $foundMatches = preg_match_all('/<a.*?href=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
-        if ($foundMatches) {
-            foreach ($matches[0] as $link) {
+        $processMatches = function($matches) use (&$content, $tokenKeys) {
+            foreach ($matches as $link) {
                 // There may be more than one leadfield token in the URL
                 preg_match_all('/{['.implode('|', $tokenKeys).'].*?}/i', $link, $tokens);
                 $newLink = $link;
@@ -266,6 +264,18 @@ class BuilderTokenHelper
                 }
                 $content = str_replace($link, $newLink, $content);
             }
+        };
+
+        // Special handling for leadfield tokens in URLs
+        $foundMatches = preg_match_all('/<a.*?href=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
+        if ($foundMatches) {
+            $processMatches($matches[0]);
+        }
+
+        // Special handling for leadfield tokens in image src
+        $foundMatches = preg_match_all('/<img.*?src=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
+        if ($foundMatches) {
+            $processMatches($matches[0]);
         }
     }
 

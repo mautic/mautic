@@ -75,10 +75,10 @@ class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse(array('success' => 0));
         }
 
-        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
-        /** @var \Mautic\AddonBundle\Integration\AbstractIntegration $integration */
+        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */
         $integration = $integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);

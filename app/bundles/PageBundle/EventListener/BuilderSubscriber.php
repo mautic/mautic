@@ -616,8 +616,11 @@ class BuilderSubscriber extends CommonSubscriber
         foreach ($links as $link) {
             $url = $link->getAttribute('href');
 
+            // The editor will have converted & to &amp; but DOMDocument will have converted them back so this must be accounted for
+            $url = str_replace('&', '&amp;', $url);
+
             // Ensure a valid URL
-            if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp' && !in_array($url, $foundLinks) && !in_array($url, $trackedLinks)) {
+            if ((substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') || in_array($url, $foundLinks) || in_array($url, $trackedLinks)) {
                 continue;
             }
 

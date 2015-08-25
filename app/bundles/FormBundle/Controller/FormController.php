@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -411,7 +412,21 @@ class FormController extends CommonFormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         $model      = $this->factory->getModel('form.form');
-        $entity     = $model->getEntity($objectId);
+        $formData   = $this->request->request->get('mauticform');
+        $sessionId  = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+
+        if ($objectId instanceof Form) {
+            $entity = $objectId;
+            $objectId = sha1(uniqid(mt_rand(), true));
+        } else {
+            $entity = $model->getEntity($objectId);
+
+            // Process submit of cloned form
+            if ($entity == null && $objectId == $sessionId) {
+                $entity = $model->getEntity();
+            }
+        }
+
         $session    = $this->factory->getSession();
         $cleanSlate = true;
 
@@ -492,6 +507,9 @@ class FormController extends CommonFormController
 
                         //save the form first so that new fields are available to actions
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
+                        $objectId = $entity->getId();
 
                         if ($entity->isStandalone()) {
                             //now set the actions
@@ -702,17 +720,17 @@ class FormController extends CommonFormController
                 return $this->accessDenied();
             }
 
-            $newForm = clone $entity;
-            $newForm->setIsPublished(false);
+            $entity = clone $entity;
+            $entity->setIsPublished(false);
 
             // Clone the forms's fields
             $fields = $entity->getFields();
             /** @var \Mautic\FormBundle\Entity\Field $field */
             foreach ($fields as $field) {
                 $fieldClone = clone $field;
-                $fieldClone->setForm($newForm);
+                $fieldClone->setForm($entity);
                 $fieldClone->setSessionId(null);
-                $newForm->addField($field->getId(), $fieldClone);
+                $entity->addField($field->getId(), $fieldClone);
             }
 
             // Clone the forms's actions
@@ -720,15 +738,12 @@ class FormController extends CommonFormController
             /** @var \Mautic\FormBundle\Entity\Action $action */
             foreach ($actions as $action) {
                 $actionClone = clone $action;
-                $actionClone->setForm($newForm);
-                $newForm->addAction($action->getId(), $actionClone);
+                $actionClone->setForm($entity);
+                $entity->addAction($action->getId(), $actionClone);
             }
-
-            $model->saveEntity($newForm);
-            $objectId = $newForm->getId();
         }
 
-        return $this->editAction($objectId, true, true);
+        return $this->editAction($entity, true, true);
     }
 
     /**
