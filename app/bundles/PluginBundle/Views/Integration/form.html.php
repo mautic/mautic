@@ -9,7 +9,7 @@
 $formSettings  = $integration->getFormSettings();
 $hasFeatures   = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
 $hasFields     = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
-$fieldHtml     = (!empty($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields'], array('integration' => $integration)) : '';
+$fieldHtml     = (isset($form['featureSettings']) && !empty($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields'], array('integration' => $integration)) : '';
 
 $fieldTabClass = ($hasFields) ? '' : ' hide';
 $description   = $integration->getDescription();
@@ -76,9 +76,11 @@ $description   = $integration->getDescription();
     </div>
     <?php endif; ?>
 
+    <?php if ($hasFeatures): ?>
     <div class="tab-pane fade bdr-w-0" id="fields-container">
         <h4 class="mb-sm"><?php echo $view['translator']->trans($form['featureSettings']['leadFields']->vars['label']); ?></h4>
         <?php echo $fieldHtml; ?>
     </div>
+    <?php endif; ?>
 </div>
 <?php echo $view['form']->end($form); ?>
