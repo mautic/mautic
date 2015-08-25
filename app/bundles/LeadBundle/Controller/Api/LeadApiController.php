@@ -13,9 +13,8 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class LeadApiController
@@ -341,9 +340,11 @@ class LeadApiController extends CommonApiController
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
-        $fields        = $entity->getFields();
-        $all           = $this->model->flattenFields($fields);
-        $fields['all'] = $all;
-        $entity->setFields($fields);
+        if ($entity instanceof Lead) {
+            $fields        = $entity->getFields();
+            $all           = $this->model->flattenFields($fields);
+            $fields['all'] = $all;
+            $entity->setFields($fields);
+        }
     }
 }
