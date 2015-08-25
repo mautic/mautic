@@ -76,7 +76,7 @@ $description   = $integration->getDescription();
     </div>
     <?php endif; ?>
 
-    <?php if ($hasFeatures): ?>
+    <?php if ($hasFields): ?>
     <div class="tab-pane fade bdr-w-0" id="fields-container">
         <h4 class="mb-sm"><?php echo $view['translator']->trans($form['featureSettings']['leadFields']->vars['label']); ?></h4>
         <?php echo $fieldHtml; ?>
