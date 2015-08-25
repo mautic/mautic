@@ -25,7 +25,9 @@ $description   = $integration->getDescription();
     <?php if ($hasFeatures): ?>
     <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
     <?php endif; ?>
+    <?php if ($hasFields): ?>
     <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
+    <?php endif; ?>
 </ul>
 
 <?php echo $view['form']->start($form); ?>
