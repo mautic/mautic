@@ -94,7 +94,7 @@ foreach ($buttonGroupTypes as $groupType) {
                     'message'       => $view["translator"]->trans("mautic." . $langVar . ".form.confirmdelete", array("%name%" => $item->$nameGetter() . " (" . $item->getId() . ")")),
                     'confirmAction' => $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $query)),
                     'template'      => 'delete',
-                    'btnClass'      => ($groupType == 'button-dropdown') ? '' : $btnClass
+                    'btnClass'      => $btnClass
                 ));
                 break;
         }
