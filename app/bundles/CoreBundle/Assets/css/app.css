@@ -4316,11 +4316,11 @@ lesshat-selector { -lh-property: 0 ;
   width: 100%;
 }
 .builder-content {
+  position: fixed;
   left: 0;
   top: 0;
   right: 300px;
   height: 100%;
-  position: fixed;
 }
 .builder-panel .panel a.btn {
   white-space: normal;

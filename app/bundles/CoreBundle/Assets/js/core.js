@@ -2980,6 +2980,9 @@ var Mautic = {
 
         mQuery('body').css('overflow-y', 'hidden');
 
+        // Activate the builder
+        mQuery('.builder').addClass('builder-active').removeClass('hide');
+
         if (typeof actionName == 'undefined') {
             actionName = formName;
         }
@@ -2992,14 +2995,15 @@ var Mautic = {
             height: "100%"
         };
 
-        var spinnerLeft = (mQuery(document).width() - 300) / 2;
-        var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+        var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
+            panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
+            spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
+            spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+
+        var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
         // Disable the close button until everything is loaded
         mQuery('.btn-close-builder').prop('disabled', true);
-
-        // Activate the builder
-        mQuery('.builder').addClass('builder-active').removeClass('hide');
 
         if (Mautic.builderMode == 'template') {
             // Template
@@ -3147,7 +3151,16 @@ var Mautic = {
      * @param model
      */
     closeBuilder: function(model) {
+        var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
+            panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
+            spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
+            spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+        mQuery('.builder-spinner').css({
+            left: spinnerLeft,
+            top: spinnerTop
+        });
         mQuery('#builder-overlay').removeClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', true);
 
         if (Mautic.builderMode == 'template') {
             // Save content
@@ -3184,6 +3197,7 @@ var Mautic = {
 
                     // Hide builder
                     mQuery('.builder').removeClass('builder-active').addClass('hide');
+                    mQuery('.btn-close-builder').prop('disabled', false);
 
                     mQuery('body').css('overflow-y', '');
 
@@ -3218,6 +3232,7 @@ var Mautic = {
 
             // Hide builder
             mQuery('.builder').removeClass('builder-active').addClass('hide');
+            mQuery('.btn-close-builder').prop('disabled', false);
 
             mQuery('body').css('overflow-y', '');
 
