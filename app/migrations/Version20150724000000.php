@@ -77,6 +77,7 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats CHANGE retry_count retry_count INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields CHANGE form_id form_id INT NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP FOREIGN KEY ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
@@ -162,6 +163,7 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count DROP DEFAULT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count TYPE integer USING (trim(retry_count)::integer)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name TYPE VARCHAR(255)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER form_id SET NOT NULL');

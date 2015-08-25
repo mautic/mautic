@@ -14,7 +14,7 @@ $required = array();
 
 <?php echo $view->render($theme.'MauticFormBundle:Builder:script.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
-<?php echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
+<?php if ($form->getRenderStyle()) echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
 <div id="mauticform_wrapper_<?php echo $formName ?>" class="mauticform_wrapper">
     <form autocomplete="off" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform_<?php echo $formName ?>" data-mautic-form="<?php echo $formName ?>">

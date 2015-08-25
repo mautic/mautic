@@ -157,7 +157,6 @@ return array(
 
     'parameters' => array(
         "api_enabled"                       => false,
-        "api_mode"                          => "oauth1", //oauth1 or oauth2
         "api_oauth2_access_token_lifetime"  => 60,
         "api_oauth2_refresh_token_lifetime" => 14
     )
