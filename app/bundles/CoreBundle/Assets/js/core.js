@@ -54,6 +54,13 @@ mQuery( document ).ready(function() {
             statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
+
+    // Prevent backspace from activating browser back
+    mQuery(document).on('keydown', function (e) {
+        if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
+            e.preventDefault();
+        }
+    });
 });
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
@@ -460,7 +467,6 @@ var Mautic = {
             }
         }
 
-        //activate editors
         mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
@@ -494,6 +500,8 @@ var Mautic = {
                             settings.extraPlugins = 'tokens';
                         }
                     }
+
+                    settings.on = Mautic.getGlobalEditorEvents();
 
                     mQuery(this).ckeditor(settings);
                 });
@@ -553,8 +561,12 @@ var Mautic = {
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-            Mautic[contentSpecific + "OnLoad"](container, response);
-            Mautic.loadedContent[contentSpecific] = true;
+            if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+                if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+                    Mautic.loadedContent[contentSpecific] = true;
+                    Mautic[contentSpecific + "OnLoad"](container, response);
+                }
+            }
         }
 
         if (!inModal && container == 'body') {
@@ -679,7 +691,6 @@ var Mautic = {
                         }
                     });
 
-
                 var selectOrder = mQuery(el).data('order');
                 if (selectOrder && selectOrder.length > 1) {
                     this.deselect_all();
@@ -779,6 +790,54 @@ var Mautic = {
         mQuery('#globalSearchContainer').removeClass('active');
         mQuery('#globalSearchDropdown').removeClass('open');
         mQuery('body').off('click.globalsearch');
+    },
+
+    /**
+     *
+     * Global CKEditor events
+     *
+     * @returns {{contentDom: Function}}
+     */
+    getGlobalEditorEvents: function() {
+
+        return {
+            contentDom: function (event) {
+                var editable = event.editor.editable();
+
+                var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
+                var tokens = mQuery(doc).find('*[data-token]');
+
+                tokens.each(function (i) {
+                    mQuery(this).off('dblclick').on('dblclick', function (e) {
+                        console.log(e);
+                        var selEl = new CKEDITOR.dom.element(e.target);
+                        var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
+                        rangeObjForSelection.selectNodeContents(selEl);
+                        event.editor.getSelection().selectRanges([rangeObjForSelection]);
+
+                        // Remove contenteditable=false to make it deletable
+                        mQuery(e.target).prop('contenteditable', true);
+                    });
+                });
+
+                CKEDITOR.instances[event.editor.name].on('key', function (e) {
+                    var key = e.data.keyCode;
+                    if (key !== 8) {
+                        var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+                        tokens.each(function (i) {
+                            mQuery(this).prop('contenteditable', false);
+                        });
+                    }
+                });
+
+                editable.attachListener(editable, 'click', function (e) {
+                    var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+                    tokens.each(function (i) {
+                        mQuery(this).prop('contenteditable', false);
+                    });
+                });
+            }
+        }
     },
 
     /**
@@ -946,10 +1005,10 @@ var Mautic = {
         mQuery.getScript(url, function( data, textStatus, jqxhr ) {
             if (textStatus == 'success') {
                 // Likely a page refresh; execute onLoad content
-                if (typeof Mautic.loadedContent[mauticContent] == 'undefined') {
-                    if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
-                        Mautic[mauticContent + "OnLoad"]('#app-content', {});
+                if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
+                    if (typeof Mautic.loadedContent[mauticContent] == 'undefined') {
                         Mautic.loadedContent[mauticContent] = true;
+                        Mautic[mauticContent + "OnLoad"]('#app-content', {});
                     }
                 }
             }
@@ -1383,8 +1442,9 @@ var Mautic = {
         }
 
         var header = mQuery(el).attr('data-header');
+        var footer = mQuery(el).attr('data-footer');
 
-        Mautic.loadAjaxModal(target, route, method, header);
+        Mautic.loadAjaxModal(target, route, method, header, footer);
     },
 
     /**
@@ -1393,8 +1453,9 @@ var Mautic = {
      * @param route
      * @param method
      * @param header
+     * @param footer
      */
-    loadAjaxModal: function (target, route, method, header) {
+    loadAjaxModal: function (target, route, method, header, footer) {
 
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
@@ -1406,10 +1467,18 @@ var Mautic = {
             }
         }
 
+        if (footer == 'false') {
+            mQuery(target + " .modal-footer").addClass('hide');
+        }
+
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
             if (header) {
                 mQuery(target + " .modal-title").html(header);
+            }
+
+            if (footer && footer != 'false') {
+                mQuery(target + " .modal-footer").html(header);
             }
         });
 
@@ -1479,6 +1548,7 @@ var Mautic = {
                 //add footer buttons
                 mQuery('<div class="modal-form-buttons" />').appendTo(target + " .modal-footer");
             }
+            mQuery(target + " .modal-footer").removeClass('hide');
         }
     },
 
@@ -1526,8 +1596,10 @@ var Mautic = {
 
                 if (response.mauticContent) {
                     if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
-                        Mautic[response.mauticContent + "OnLoad"](target, response);
-                        Mautic.loadedContent[response.mauticContent] = true;
+                        if (typeof Mautic.loadedContent[response.mauticContent] == 'undefined') {
+                            Mautic.loadedContent[response.mauticContent] = true;
+                            Mautic[response.mauticContent + "OnLoad"](target, response);
+                        }
                     }
                 }
             } else {
@@ -1591,8 +1663,10 @@ var Mautic = {
             var cancelButton = mQuery('<button type="button" />')
                 .addClass("btn btn-primary")
                 .click(function () {
-                    if (typeof Mautic[cancelCallback] === "function") {
+                    if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
                         window["Mautic"][cancelCallback].apply('window', []);
+                    } else {
+                        Mautic.dismissConfirmation();
                     }
                 })
                 .html(cancelText);
@@ -2178,14 +2252,18 @@ var Mautic = {
      * Apply filter
      * @param list
      */
-    setSearchFilter: function (el, searchId) {
+    setSearchFilter: function (el, searchId, string) {
         if (typeof searchId == 'undefined')
             searchId = '#list-search';
         else
             searchId = '#' + searchId;
-        var filter = mQuery(el).val();
-        var current = mQuery('#list-search').typeahead('val');
-        current += " " + filter;
+
+        if (string) {
+            var current = string;
+        } else {
+            var filter  = mQuery(el).val();
+            var current = mQuery('#list-search').typeahead('val') + " " + filter;
+        }
 
         //append the filter
         mQuery(searchId).typeahead('val', current);
@@ -2201,9 +2279,6 @@ var Mautic = {
             mQuery(searchId).attr('data-target'),
             'liveCache'
         );
-
-        //clear filter
-        mQuery(el).val('');
     },
 
     /**

@@ -35,26 +35,12 @@ class ConfigType extends AbstractType
             )
         ));
 
-        $builder->add('api_mode', 'choice', array(
-            'choices'  => array(
-                'oauth1' => 'mautic.api.config.oauth1',
-                'oauth2' => 'mautic.api.config.oauth2'
-            ),
-            'label'    => 'mautic.api.config.form.api.mode',
-            'required' => false,
-            'attr'     => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.api.config.form.api.mode.tooltip'
-            ),
-            'empty_value' => false
-        ));
-
         $builder->add('api_oauth2_access_token_lifetime', 'number', array(
             'label'       => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
             'attr'        => array(
                 'tooltip' => 'mautic.api.config.form.api.oauth2_access_token_lifetime.tooltip',
                 'class'   => 'form-control',
-                'data-show-on' => '{"config_apiconfig_api_mode":["oauth2"]}',
+                'data-show-on' => '{"config_apiconfig_api_enabled_1:checked":["1"]}',
             ),
             'constraints' => array(
                 new NotBlank(
@@ -70,7 +56,7 @@ class ConfigType extends AbstractType
             'attr'        => array(
                 'tooltip' => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime.tooltip',
                 'class'   => 'form-control',
-                'data-show-on' => '{"config_apiconfig_api_mode":["oauth2"]}',
+                'data-show-on' => '{"config_apiconfig_api_enabled_1:checked":["1"]}',
             ),
             'constraints' => array(
                 new NotBlank(

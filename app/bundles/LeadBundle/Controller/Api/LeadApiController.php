@@ -13,9 +13,8 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class LeadApiController
@@ -155,6 +154,8 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead
      *
+     * @param $id
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getNotesAction($id)
@@ -220,6 +221,15 @@ class LeadApiController extends CommonApiController
 
             $lists = $this->model->getLists($entity, true, true);
 
+            foreach ($lists as &$l) {
+                unset($l['leads'][0]['leadlist_id']);
+                unset($l['leads'][0]['lead_id']);
+
+                $l = array_merge($l, $l['leads'][0]);
+
+                unset($l['leads']);
+            }
+
             $view = $this->view(
                 array(
                     'total' => count($lists),
@@ -254,7 +264,17 @@ class LeadApiController extends CommonApiController
             $campaigns = $campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
-                unset($c['lists']);
+                if (!empty($c['lists'])) {
+                    $c['listMembership'] = array_keys($c['lists']);
+                    unset($c['lists']);
+                }
+
+                unset($c['leads'][0]['campaign_id']);
+                unset($c['leads'][0]['lead_id']);
+
+                $c = array_merge($c, $c['leads'][0]);
+
+                unset($c['leads']);
             }
 
             $view = $this->view(
@@ -341,9 +361,11 @@ class LeadApiController extends CommonApiController
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
-        $fields        = $entity->getFields();
-        $all           = $this->model->flattenFields($fields);
-        $fields['all'] = $all;
-        $entity->setFields($fields);
+        if ($entity instanceof Lead) {
+            $fields        = $entity->getFields();
+            $all           = $this->model->flattenFields($fields);
+            $fields['all'] = $all;
+            $entity->setFields($fields);
+        }
     }
 }
