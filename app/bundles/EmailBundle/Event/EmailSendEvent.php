@@ -202,6 +202,34 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
+     * @return string
+     */
+    public function getSubject()
+    {
+        if ($this->helper !== null) {
+
+            return $this->helper->getSubject();
+        } else {
+
+            return $this->subject;
+        }
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return EmailSendEvent
+     */
+    public function setSubject($subject)
+    {
+        if ($this->helper !== null) {
+            $this->helper->setSubject($subject);
+        } else {
+            $this->subject = $subject;
+        }
+    }
+
+    /**
      * Get the MailHelper object
      *
      * @return MailHelper

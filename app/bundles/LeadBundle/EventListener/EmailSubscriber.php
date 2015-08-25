@@ -88,8 +88,11 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $content = $event->getContent();
-        $lead    = $event->getLead();
+        // Combine all possible content to find tokens across them
+        $content  = $event->getSubject();
+        $content .= $event->getContent();
+        $content .= $event->getPlainText();
+        $lead     = $event->getLead();
 
         $tokenList = self::findLeadTokens($content, $lead);
         if (count($tokenList)) {

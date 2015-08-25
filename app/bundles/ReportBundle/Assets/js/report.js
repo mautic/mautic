@@ -203,17 +203,18 @@ Mautic.initReportGraphs = function () {
 	});
 }
 
-Mautic.updateReportGraph = function(element, options) {
-	var id       = options.graphName.replace(/\./g, '-');
+Mautic.updateReportGraph = function(element, amount, unit) {
+	var canvas   = mQuery(element).closest('.panel').find('canvas');
+	var id       = canvas.attr('id');
 	var reportId = Mautic.getEntityId();
-	var query    = "reportId=" + reportId + '&' + mQuery.param(options);
+	var options  = {'graphName': id.replace(/\-/g, '.'), 'amount': amount, 'unit': unit};
+	var query    = 'reportId=' + reportId + '&' + mQuery.param(options);
 
     var callback = function(response) {
         Mautic.reportGraphs[id].destroy();
         delete Mautic.reportGraphs[id];
-        var mGraph = mQuery('#' + id);
         if (typeof response.graph.datasets != 'undefined') {
-            Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(mGraph.get(0).getContext("2d"), response.graph);
+            Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(canvas.get(0).getContext("2d"), response.graph);
         }
     };
 

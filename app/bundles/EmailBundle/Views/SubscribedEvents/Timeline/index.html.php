@@ -17,7 +17,7 @@ $item = $event['extra']['stats'];
 	    <div class="panel-body">
 	    	<h3>
 	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
-				    <?php echo (!empty($item['subject'])) ? $item['subject'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
+				    <?php echo (!empty($item['name'])) ? $item['name'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
 				</a>
 			</h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
