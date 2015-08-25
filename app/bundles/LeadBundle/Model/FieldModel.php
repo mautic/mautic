@@ -400,6 +400,8 @@ class FieldModel extends FormModel
      *
      * @param       $group
      * @param array $filters
+     *
+     * @return array
      */
     public function getGroupFields($group, $filters = array('isPublished' => true))
     {
