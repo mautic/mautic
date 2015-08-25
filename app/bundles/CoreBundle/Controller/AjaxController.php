@@ -749,11 +749,13 @@ class AjaxController extends CommonController
 
         if (method_exists($this, 'getBuilderTokens')) {
             $query = $request->get('query');
+            $visual = $request->get('visual');
+
             if ($query && $query !== '{' && $query !== '{@') {
                 $tokenList = $this->getBuilderTokens($query);
 
                 $tokens       = (isset($tokenList['tokens'])) ? $tokenList['tokens'] : array();
-                $visualTokens = (isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
+                $visualTokens = ($visual !== 'false' && isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
 
                 if (!empty($tokens)) {
                     asort($tokens);

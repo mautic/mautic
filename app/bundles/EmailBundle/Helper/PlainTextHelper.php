@@ -304,7 +304,7 @@ class PlainTextHelper
         $text = ltrim($text, "\n");
 
         if ($this->options['width'] > 0) {
-            $text = wordwrap($text, $this->options['width']);
+            $text = $this->linewrap($text, $this->options['width']);
         }
     }
 
@@ -525,5 +525,25 @@ class PlainTextHelper
         $str = htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
 
         return $str;
+    }
+
+    /**
+     * @param            $text
+     * @param            $width
+     * @param string     $breakline
+     * @param bool|false $cut
+     *
+     * @return string
+     */
+    private function linewrap($text, $width, $breakline = "\n", $cut = false)
+    {
+        $lines = explode("\n", $text);
+        $text  = '';
+        foreach ($lines as $line) {
+            $text .= trim(wordwrap(trim($line), $width, $breakline, $cut));
+            $text .= "\n";
+        }
+
+        return $text;
     }
 }
