@@ -4490,3 +4490,11 @@ body.noscroll {
   overflow-y: scroll;
   width: 100%;
 }
+.form-select-modal .panel-body {
+  min-height: 150px;
+}
+@media (max-width: 768px) {
+  .form-select-modal .panel-body {
+    min-height: 0;
+  }
+}
