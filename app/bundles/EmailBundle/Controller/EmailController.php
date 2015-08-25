@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
@@ -421,13 +422,19 @@ class EmailController extends FormController
     /**
      * Generates new form and processes post data
      *
+     * @param  \Mautic\EmailBundle\Entity\Email $entity
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction($entity = null)
     {
         $model   = $this->factory->getModel('email');
-        /** @var \Mautic\EmailBundle\Entity\Email $entity */
-        $entity  = $model->getEntity();
+
+        if (!($entity instanceof Email)) {
+            /** @var \Mautic\EmailBundle\Entity\Email $entity */
+            $entity  = $model->getEntity();
+        }
+
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
         if (!$this->factory->getSecurity()->isGranted('email:emails:create')) {
@@ -782,33 +789,30 @@ class EmailController extends FormController
     public function cloneAction($objectId)
     {
         $model  = $this->factory->getModel('email');
-        $entity = $model->getEntity($objectId);
+        $clone = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if ($clone != null) {
             if (!$this->factory->getSecurity()->isGranted('email:emails:create')
                 || !$this->factory->getSecurity()->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
-                    $entity->getCreatedBy()
+                    $clone->getCreatedBy()
                 )
             ) {
                 return $this->accessDenied();
             }
 
             /** @var \Mautic\EmailBundle\Entity\Email $clone */
-            $clone = clone $entity;
+            $clone = clone $clone;
             $clone->clearStats();
             $clone->setSentCount(0);
             $clone->setReadCount(0);
             $clone->setRevision(0);
             $clone->setVariantSentCount(0);
             $clone->setVariantStartDate(null);
-
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId, true, true);
+        return $this->newAction($clone);
     }
 
     /**

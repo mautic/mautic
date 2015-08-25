@@ -352,14 +352,20 @@ class InputHelper
      */
     public static function html($value)
     {
-        // Specially handling for doctype
-        $doctypeFound = preg_match("~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i", $value, $doctype);
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::html($val);
+            }
+        } else {
+            // Specially handling for doctype
+            $doctypeFound = preg_match("/(<!DOCTYPE(.*?)>)/is", $value, $doctype);
 
-        $value = self::getFilter()->clean($value, 'html');
+            $value = self::getFilter()->clean($value, 'html');
 
-        // Was a doctype found?
-        if ($doctypeFound) {
-            $value = "$doctype[0]\n$value";
+            // Was a doctype found?
+            if ($doctypeFound) {
+                $value = "$doctype[0]\n$value";
+            }
         }
 
         return $value;

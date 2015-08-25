@@ -809,7 +809,7 @@ class EmailModel extends FormModel
                             if (isset($slots[$template])) {
                                 $useSlots = $slots[$template];
                             } else {
-                                $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
+                                $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
                                 $useSlots         = $slots[$template];
                             }
                             $variantSettings = $child->getVariantSettings();

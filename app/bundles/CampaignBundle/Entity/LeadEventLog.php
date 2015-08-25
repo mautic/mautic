@@ -10,70 +10,114 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class LeadEventLog
- * @ORM\Table(name="campaign_lead_event_log")
- * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\LeadEventLogRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\CampaignBundle\Entity
  */
 class LeadEventLog
 {
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Event", inversedBy="log")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var Event
+     */
     private $event;
 
     /**
-     * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     **/
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     private $lead;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Campaign")
-     **/
+     * @var Campaign
+     */
     private $campaign;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
-     **/
+     * @var \Mautic\CoreBundle\Entity\IpAddress
+     */
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="date_triggered", type="datetime", nullable=true)
+     * @var \DateTime
      **/
     private $dateTriggered;
 
     /**
-     * @ORM\Column(name="is_scheduled", type="boolean")
+     * @var bool
      */
     private $isScheduled = false;
 
     /**
-     * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
+     * @var null|\DateTime
      */
     private $triggerDate;
 
     /**
-     * @ORM\Column(name="system_triggered", type="boolean")
+     * @var bool
      */
     private $systemTriggered = false;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @var array
      */
     private $metadata = array();
 
     /**
-     * @ORM\Column(name="non_action_path_taken", type="boolean", nullable=true)
+     * @var bool
      */
     private $nonActionPathTaken = false;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('campaign_lead_event_log')
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository');
+
+        $builder->createManyToOne('event', 'Event')
+            ->isPrimaryKey()
+            ->inversedBy('log')
+            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->addLead(false, 'CASCADE', true);
+
+        $builder->createManyToOne('campaign', 'Campaign')
+            ->addJoinColumn('campaign_id', 'id')
+            ->build();
+
+        $builder->addIpAddress(true);
+
+        $builder->createField('dateTriggered', 'datetime')
+            ->columnName('date_triggered')
+            ->nullable()
+            ->build();
+
+        $builder->createField('isScheduled', 'boolean')
+            ->columnName('is_scheduled')
+            ->build();
+
+        $builder->createField('triggerDate', 'datetime')
+            ->columnName('trigger_date')
+            ->nullable()
+            ->build();
+
+        $builder->createField('systemTriggered', 'boolean')
+            ->columnName('system_triggered')
+            ->build();
+
+        $builder->createField('metadata', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
+    }
 
     /**
      * @return \DateTime

@@ -12,6 +12,8 @@ namespace Mautic\InstallBundle\Configurator\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Email Form Type.
@@ -30,7 +32,14 @@ class EmailStepType extends AbstractType
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.install.form.email.from_name'
             ),
-            'required'   => true
+            'required'   => true,
+            'constraints' => array(
+                new NotBlank(
+                    array(
+                        'message' => 'mautic.core.value.required'
+                    )
+                )
+            )
         ));
 
         $builder->add('mailer_from_email', 'email', array(
@@ -41,7 +50,19 @@ class EmailStepType extends AbstractType
                 'preaddon' => 'fa fa-envelope',
                 'placeholder' => 'mautic.install.form.email.from_address',
             ),
-            'required'   => true
+            'required'   => true,
+            'constraints' => array(
+                new NotBlank(
+                    array(
+                        'message' => 'mautic.core.value.required'
+                    )
+                ),
+                new Email(
+                    array(
+                        'message' => 'mautic.core.email.required'
+                    )
+                )
+            )
         ));
 
         $builder->add('mailer_transport', 'choice', array(

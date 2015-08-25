@@ -1150,7 +1150,7 @@ class MailHelper
      *
      * @param array $tokens
      *
-     * @depracated Since 1.1.  Use setTokens() instead. To be removed in 2.0
+     * @deprecated Since 1.1.  Use setTokens() instead. To be removed in 2.0
      */
     public function setCustomTokens(array $tokens)
     {

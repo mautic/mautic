@@ -41,7 +41,7 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        return $this->catalogues[$locale]->has((string) $id, $domain);
+        return $this->getCatalogue($locale)->has((string) $id, $domain);
     }
 
     /**

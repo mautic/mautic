@@ -87,10 +87,6 @@ class CheckStep implements StepInterface
     {
         $messages = array();
 
-        if (version_compare(PHP_VERSION, '5.3.7', '<')) {
-            $messages[] = 'mautic.install.minimum.php.version';
-        }
-
         if (version_compare(PHP_VERSION, '5.3.16', '==')) {
             $messages[] = 'mautic.install.buggy.php.version';
         }
@@ -111,17 +107,16 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
-        if (version_compare(PHP_VERSION, '5.3.7', '>=')) {
-            $timezones = array();
-            foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
-                foreach ($abbreviations as $abbreviation) {
-                    $timezones[$abbreviation['timezone_id']] = true;
-                }
-            }
+        $timezones = array();
 
-            if (!isset($timezones[date_default_timezone_get()])) {
-                $messages[] = 'mautic.install.timezone.not.supported';
+        foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
+            foreach ($abbreviations as $abbreviation) {
+                $timezones[$abbreviation['timezone_id']] = true;
             }
+        }
+
+        if (!isset($timezones[date_default_timezone_get()])) {
+            $messages[] = 'mautic.install.timezone.not.supported';
         }
 
         if (get_magic_quotes_gpc()) {

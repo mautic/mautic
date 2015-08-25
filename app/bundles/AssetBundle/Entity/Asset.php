@@ -10,8 +10,10 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\ApiBundle\Serializer\Driver\PhpDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -22,61 +24,47 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Asset
- * @ORM\Table(name="assets")
- * @ORM\Entity(repositoryClass="Mautic\AssetBundle\Entity\AssetRepository")
- * @Serializer\ExclusionPolicy("all")
  */
 class Asset extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails", "assetList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails", "assetList"})
+     * @var string
      */
     private $title;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\Column(name="storage_location", type="string", nullable=true)
+     * @var string
      */
     private $storageLocation = 'local';
 
     /**
-     * @ORM\Column(name="path", type="string", nullable=true)
+     * @var string
      */
     private $path;
 
     /**
-     * @ORM\Column(name="remote_path", type="string", nullable=true)
+     * @var string
      */
     private $remotePath;
 
     /**
-     * @ORM\Column(name="original_file_name", type="string", nullable=true)
+     * @var string
      */
     private $originalFileName;
 
     /**
-     * @Assert\File
+     * @var File
      */
     private $file;
 
@@ -89,11 +77,6 @@ class Asset extends FormEntity
      * Holds max size of uploaded file
      */
     private $maxSize;
-
-    /**
-     * Holds file type (file extension)
-     */
-    private $fileType;
 
     /**
      * Temporary location when asset file is beeing updated.
@@ -115,94 +98,160 @@ class Asset extends FormEntity
     private $tempName;
 
     /**
-     * @ORM\Column(name="alias", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails", "assetList"})
+     * @var string
      */
     private $alias;
 
     /**
-     * @ORM\Column(name="lang", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var string
      */
     private $language = 'en';
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var null|\DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var null|\DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\Column(name="download_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var int
      */
     private $downloadCount = 0;
 
     /**
-     * @ORM\Column(name="unique_download_count", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var int
      */
     private $uniqueDownloadCount = 0;
 
     /**
-     * @ORM\Column(name="revision", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var int
      */
     private $revision = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails", "assetList"})
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var string
      */
     private $extension;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var string
      */
     private $mime;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
+     * @var int
      */
     private $size;
 
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('assets')
+            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository');
+
+        $builder->addIdColumns('title');
+
+        $builder->addField('alias', 'string');
+
+        $builder->createField('storageLocation', 'string')
+            ->columnName('storage_location')
+            ->nullable()
+            ->build();
+
+        $builder->createField('path', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('remotePath', 'string')
+            ->columnName('remote_path')
+            ->nullable()
+            ->build();
+
+        $builder->createField('originalFileName', 'string')
+            ->columnName('original_file_name')
+            ->nullable()
+            ->build();
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->build();
+
+        $builder->addPublishDates();
+
+        $builder->createField('downloadCount', 'integer')
+            ->columnName('download_count')
+            ->build();
+
+        $builder->createField('uniqueDownloadCount', 'integer')
+            ->columnName('unique_download_count')
+            ->build();
+
+        $builder->addField('revision', 'integer');
+
+        $builder->addCategory();
+
+        $builder->createField('extension', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('mime', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('size', 'integer')
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('asset')
+            ->addListProperties(
+                array(
+                    'id',
+                    'title',
+                    'alias',
+                    'category',
+                    'description'
+                )
+            )
+            ->addProperties(
+                array(
+                    'language',
+                    'publishUp',
+                    'publishDown',
+                    'downloadCount',
+                    'uniqueDownloadCount',
+                    'revision',
+                    'extension',
+                    'mime',
+                    'size'
+                )
+            )
+            ->build();
+    }
+
+    /**
+     * Clone magic function
+     */
     public function __clone()
     {
         $this->id = null;
