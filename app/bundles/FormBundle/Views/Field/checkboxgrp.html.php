@@ -15,6 +15,7 @@ echo $view->render(
         'id'      => $id,
         'deleted' => (!empty($deleted)) ? true : false,
         'formId'  => (isset($formId)) ? $formId : 0,
-        'type'    => 'checkbox'
+        'type'    => 'checkbox',
+        'formName'  => (isset($formName)) ? $formName : ''
     )
 );

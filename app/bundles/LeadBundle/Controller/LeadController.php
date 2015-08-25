@@ -85,10 +85,12 @@ class LeadController extends FormController
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
-        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-        if ($indexMode != 'list') {
+        $anonymousShowing = false;
+        if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
+        } elseif (strpos($search, $anonymous) !== false && strpos($search, '!'.$anonymous) === false) {
+            $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
@@ -173,20 +175,21 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'searchValue'   => $search,
-                    'items'         => $leads,
-                    'page'          => $page,
-                    'totalItems'    => $count,
-                    'limit'         => $limit,
-                    'permissions'   => $permissions,
-                    'tmpl'          => $tmpl,
-                    'indexMode'     => $indexMode,
-                    'lists'         => $lists,
-                    'currentList'   => $list,
-                    'security'      => $this->factory->getSecurity(),
-                    'inSingleList'  => $inSingleList,
-                    'noContactList' => $emailRepo->getDoNotEmailList(),
-                    'maxLeadId'     => $maxLeadId
+                    'searchValue'      => $search,
+                    'items'            => $leads,
+                    'page'             => $page,
+                    'totalItems'       => $count,
+                    'limit'            => $limit,
+                    'permissions'      => $permissions,
+                    'tmpl'             => $tmpl,
+                    'indexMode'        => $indexMode,
+                    'lists'            => $lists,
+                    'currentList'      => $list,
+                    'security'         => $this->factory->getSecurity(),
+                    'inSingleList'     => $inSingleList,
+                    'noContactList'    => $emailRepo->getDoNotEmailList(),
+                    'maxLeadId'        => $maxLeadId,
+                    'anonymousShowing' => $anonymousShowing
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => array(
@@ -1100,6 +1103,8 @@ class LeadController extends FormController
                                 continue;
                             }
 
+                            $lineNumber++;
+
                             // Increase progress count
                             $progress[0]++;
 
@@ -1109,9 +1114,18 @@ class LeadController extends FormController
                             if (is_array($data) && $dataCount = count($data)) {
                                 // Ensure the number of headers are equal with data
                                 $headerCount = count($headers);
+
                                 if ($headerCount !== $dataCount) {
+                                    $diffCount = ($headerCount - $dataCount);
+
+                                    if ($diffCount < 0) {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.header_mismatch');
+
+                                        continue;
+                                    }
                                     // Fill in the data with empty string
-                                    $fill = array_fill($dataCount, ($headerCount - $dataCount), '');
+                                    $fill = array_fill($dataCount, $diffCount, '');
                                     $data = $data + $fill;
                                 }
 
@@ -1127,10 +1141,11 @@ class LeadController extends FormController
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
-                                    $stats['failures'][] = $e->getMessage();
+                                    $stats['failures'][$lineNumber] = $e->getMessage();
                                 }
                             } else {
                                 $stats['ignored']++;
+                                $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
                             }
                         }
 
@@ -1339,6 +1354,7 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.defaultlist', null);
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', array());
+
         unlink($filepath);
     }
 

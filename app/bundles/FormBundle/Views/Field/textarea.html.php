@@ -17,6 +17,7 @@ echo $view->render(
         'containerClass' => 'text',
         'id'             => $id,
         'deleted'        => (!empty($deleted)) ? true : false,
-        'formId'         => (isset($formId)) ? $formId : 0
+        'formId'         => (isset($formId)) ? $formId : 0,
+        'formName'       => (isset($formName)) ? $formName : ''
     )
 );

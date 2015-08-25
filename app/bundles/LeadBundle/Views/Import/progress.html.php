@@ -37,10 +37,10 @@ $header   = ($complete) ? 'mautic.lead.import.success': 'mautic.lead.import.dono
             </div>
             <?php if (!empty($stats['failures'])): ?>
                 <ul class="list-group">
-                    <?php foreach ($stats['failures'] as $failure): ?>
+                    <?php foreach ($stats['failures'] as $lineNumber => $failure): ?>
                         <li class="list-group-item text-left">
                             <a target="_new" class="text-danger">
-                                <?php echo $failure; ?>
+                                <?php echo "(#$lineNumber) $failure"; ?>
                             </a>
                         </li>
                     <?php endforeach; ?>
