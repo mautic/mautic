@@ -38,7 +38,8 @@ class DefaultController extends CommonController
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
-                throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+
+                $this->notFound();
             }
 
             $slug = $pageModel->generateSlug($page);
