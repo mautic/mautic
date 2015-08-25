@@ -192,7 +192,13 @@ class AssetModel extends FormModel
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
         $this->em->persist($download);
-        $this->em->flush();
+
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            error_log($e);
+        }
     }
 
     /**
