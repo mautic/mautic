@@ -197,6 +197,16 @@ return array(
             )
         ),
         'other'   => array(
+            // Error handler
+            'mautic.core.errorhandler.subscriber' => array(
+                'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
+                'arguments' => array(
+                    '%kernel.environment%',
+                    'monolog.logger.mautic'
+                ),
+                'tag' => 'kernel.event_subscriber'
+            ),
+
             // Template helper overrides
             'templating.helper.assets.class'     => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
             'templating.helper.slots.class'      => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
@@ -357,7 +367,7 @@ return array(
                 'alias'          => 'admin'
             ),
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler'
+            'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
         )
     ),
 
@@ -368,7 +378,7 @@ return array(
         'log_path'                     => '%kernel.root_dir%/logs',
         'image_path'                   => 'media/images',
         'theme'                        => 'Mauve',
-        'db_driver'                    => 'pdo_mysql',
+        'db_driver'                    => 'mysqli',
         'db_host'                      => 'localhost',
         'db_port'                      => 3306,
         'db_name'                      => '',

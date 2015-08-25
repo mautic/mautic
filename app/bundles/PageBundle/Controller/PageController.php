@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Mautic\PageBundle\Entity\Page;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -314,13 +315,20 @@ class PageController extends FormController
     /**
      * Generates new form and processes post data
      *
+     * @param  \Mautic\PageBundle\Entity\Page|null $entity
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction($entity = null)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
-        $entity  = $model->getEntity();
+
+        if (!($entity instanceof Page)) {
+            /** @var \Mautic\PageBundle\Entity\Page $entity */
+            $entity  = $model->getEntity();
+        }
+
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
         if (!$this->factory->getSecurity()->isGranted('page:pages:create')) {
@@ -609,18 +617,16 @@ class PageController extends FormController
                 return $this->accessDenied();
             }
 
-            $clone = clone $entity;
-            $clone->setHits(0);
-            $clone->setUniqueHits(0);
-            $clone->setRevision(0);
-            $clone->setVariantStartDate(null);
-            $clone->setVariantHits(0);
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+            $entity = clone $entity;
+            $entity->setHits(0);
+            $entity->setUniqueHits(0);
+            $entity->setRevision(0);
+            $entity->setVariantStartDate(null);
+            $entity->setVariantHits(0);
+            $entity->setIsPublished(false);
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($entity);
     }
 
     /**

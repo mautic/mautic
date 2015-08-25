@@ -72,16 +72,17 @@ Mautic.emailOnLoad = function (container, response) {
         // Now empty it so that ckeditor doesn't load it as html
         mQuery('#emailform_plainText').val('');
 
+        var events = Mautic.getGlobalEditorEvents();
+        events.instanceReady = function( event ) {
+            event.editor.insertText(plainText);
+        };
+
         mQuery('#emailform_plainText').ckeditor({
             removePlugins: 'elementspath,toolbar',
             extraPlugins: 'tokens',
             autoParagraph: false,
             height: "235px",
-            on: {
-                instanceReady: function( event ) {
-                    event.editor.insertText(plainText);
-                }
-            }
+            on: events
         });
 
         if (mQuery('#emailform_emailType').val() == '') {

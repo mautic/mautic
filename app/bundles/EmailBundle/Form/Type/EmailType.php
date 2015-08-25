@@ -200,7 +200,8 @@ class EmailType extends AbstractType
                     'class'                => 'form-control',
                     'rows'                 => '15',
                     'data-token-callback'  => 'email:getBuilderTokens',
-                    'data-token-activator' => '{'
+                    'data-token-activator' => '{',
+                    'data-token-visual'    => 'false'
                 ),
                 'required'   => false
             )
@@ -218,8 +219,8 @@ class EmailType extends AbstractType
 
                 $data = $event->getData();
 
+                // Then strip out HTML
                 $data['plainText'] = $parser->setHtml($data['plainText'])->getText();
-
                 $event->setData($data);
             }
         );

@@ -73,6 +73,16 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->params      = $factory->getSystemParameters();
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
+
+        $this->init();
+    }
+
+    /**
+     * Post __construct setup so that inheriting classes don't have to pass all the arguments
+     */
+    protected function init()
+    {
+
     }
 
     /**
@@ -224,7 +234,12 @@ class CommonSubscriber implements EventSubscriberInterface
                     }
                     if (strpos($details['path'], '{objectId}') !== false) {
                         if (!isset($defaults['objectId'])) {
+                            // Set default to 0 for the "new" actions
                             $defaults['objectId'] = 0;
+                        }
+                        if (!isset($requirements['objectId'])) {
+                            // Only allow alphanumeric for objectId
+                            $requirements['objectId'] = "[a-zA-Z0-9_]+";
                         }
                     }
                     if ($type == 'api' && strpos($details['path'], '{id}') !== false) {

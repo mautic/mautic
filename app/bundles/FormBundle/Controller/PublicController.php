@@ -238,7 +238,8 @@ class PublicController extends CommonFormController
         $customStylesheets = (!empty($css)) ? explode(',', $css) : array();
 
         if ($form === null || !$form->isPublished()) {
-            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+
+            $this->notFound();
 
         } else {
             $html = $model->getContent($form);

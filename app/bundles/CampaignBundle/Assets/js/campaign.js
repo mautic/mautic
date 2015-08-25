@@ -85,15 +85,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
     Mautic.campaignBuilderUpdateLabel(domEventId);
 
     if (response.deleted) {
-        //remove the connections
-        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
-
-        mQuery('.' + domEventId).each(function () {
-            mQuery(this).remove();
-        });
-
-        //remove the div
-        mQuery(eventId).remove();
+        Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
     } else if (response.updateHtml) {
 
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
@@ -174,11 +166,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
     var eventId = '#' + domEventId;
 
     if (response.deleted) {
-        //remove the connections
-        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
-
-        //remove the div
-        mQuery(eventId).remove();
+        Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
 
         mQuery('#campaignLeadSource_' + response.sourceType).removeClass('disabled');
     } else if (response.updateHtml) {
@@ -563,7 +551,7 @@ Mautic.launchCampaignEditor = function() {
 
         //enable drag and drop
         Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-event"), Mautic.campaignDragOptions);
-        mQuery('#CampaignCanvas .list-campaign-source').draggable(Mautic.campaignDragOptions);
+        Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-source"), Mautic.campaignDragOptions);
 
         //activate existing connections
         Mautic.campaignBuilderReconnectEndpoints();

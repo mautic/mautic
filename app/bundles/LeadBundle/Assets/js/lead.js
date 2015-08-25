@@ -110,6 +110,17 @@ Mautic.leadOnLoad = function (container) {
             }, 500);
         });
     }
+
+    if (mQuery('#anonymousLeadButton').length) {
+        var searchValue = mQuery('#list-search').typeahead('val').toLowerCase();
+        var string      = mQuery('#anonymousLeadButton').data('anonymous').toLowerCase();
+
+        if (searchValue.indexOf(string) >= 0 && searchValue.indexOf('!' + string) == -1) {
+            mQuery('#anonymousLeadButton').addClass('btn-primary');
+        } else {
+            mQuery('#anonymousLeadButton').removeClass('btn-primary');
+        }
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -666,6 +677,28 @@ Mautic.updateLeadList = function () {
             Mautic.moderatedIntervalCallbackIsComplete('leadListLiveUpdate');
         }
     });
+};
+
+Mautic.toggleAnonymousLeads = function() {
+    var searchValue = mQuery('#list-search').typeahead('val');
+    var string      = mQuery('#anonymousLeadButton').data('anonymous').toLowerCase();
+
+    if (searchValue.toLowerCase().indexOf('!' + string) == 0) {
+        searchValue = searchValue.replace('!' + string, string);
+        mQuery('#anonymousLeadButton').addClass('btn-primary');
+    } else if (searchValue.toLowerCase().indexOf(string) == -1) {
+        if (searchValue) {
+            searchValue = searchValue + ' ' + string;
+        } else {
+            searchValue = string;
+        }
+        mQuery('#anonymousLeadButton').addClass('btn-primary');
+    } else {
+        searchValue = mQuery.trim(searchValue.replace(string, ''));
+        mQuery('#anonymousLeadButton').removeClass('btn-primary');
+    }
+    searchValue = searchValue.replace("  ", " ");
+    Mautic.setSearchFilter(null, 'list-search', searchValue);
 };
 
 Mautic.getLeadEmailContent = function (el) {

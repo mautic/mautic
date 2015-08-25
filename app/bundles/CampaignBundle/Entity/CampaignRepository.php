@@ -84,7 +84,7 @@ class CampaignRepository extends CommonRepository
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
         if ($forList) {
-            $q->select('partial c.{id, name}, partial ll.{id}');
+            $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
         } else {
             $q->select('c, l, partial ll.{id}')
                 ->leftJoin('c.events', 'e')
