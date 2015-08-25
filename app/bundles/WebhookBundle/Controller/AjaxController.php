@@ -22,6 +22,19 @@ class AjaxController extends CommonAjaxController
     {
         $url = InputHelper::clean($request->request->get('url'));
 
+        if ($url == '' || ! $url) {
+            // default to an error message
+            $dataArray = array(
+                'success' => 1,
+                'html' =>
+                    '<div class="has-error"><span class="help-block">'
+                    . $this->factory->getTranslator()->trans('mautic.webhook.label.no.url')
+                    . '</span></div>',
+            );
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
