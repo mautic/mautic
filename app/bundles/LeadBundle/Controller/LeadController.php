@@ -85,10 +85,12 @@ class LeadController extends FormController
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
-        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-        if ($indexMode != 'list') {
+        $anonymousShowing = false;
+        if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
+        } elseif (strpos($search, $anonymous) !== false && strpos($search, '!'.$anonymous) === false) {
+            $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
@@ -173,20 +175,21 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'searchValue'   => $search,
-                    'items'         => $leads,
-                    'page'          => $page,
-                    'totalItems'    => $count,
-                    'limit'         => $limit,
-                    'permissions'   => $permissions,
-                    'tmpl'          => $tmpl,
-                    'indexMode'     => $indexMode,
-                    'lists'         => $lists,
-                    'currentList'   => $list,
-                    'security'      => $this->factory->getSecurity(),
-                    'inSingleList'  => $inSingleList,
-                    'noContactList' => $emailRepo->getDoNotEmailList(),
-                    'maxLeadId'     => $maxLeadId
+                    'searchValue'      => $search,
+                    'items'            => $leads,
+                    'page'             => $page,
+                    'totalItems'       => $count,
+                    'limit'            => $limit,
+                    'permissions'      => $permissions,
+                    'tmpl'             => $tmpl,
+                    'indexMode'        => $indexMode,
+                    'lists'            => $lists,
+                    'currentList'      => $list,
+                    'security'         => $this->factory->getSecurity(),
+                    'inSingleList'     => $inSingleList,
+                    'noContactList'    => $emailRepo->getDoNotEmailList(),
+                    'maxLeadId'        => $maxLeadId,
+                    'anonymousShowing' => $anonymousShowing
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => array(

@@ -51,6 +51,35 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons'    => $buttons,
     'extraHtml'        => $extraHtml
 )));
+
+$customButtons = array(
+    array(
+        'attr'      => array(
+            'class'   => 'btn btn-default btn-sm btn-nospin',
+            'href'    => 'javascript: void(0)',
+            'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
+            'id'      => 'liveModeButton',
+            'data-toggle' => false,
+            'data-max-id' => $maxLeadId
+        ),
+        'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
+        'iconClass' => 'fa fa-bolt'
+    )
+);
+
+if ($indexMode == 'list') {
+    $customButtons[] = array(
+        'attr'      => array(
+            'class'          => 'btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),
+            'href'           => 'javascript: void(0)',
+            'onclick'        => 'Mautic.toggleAnonymousLeads();',
+            'id'             => 'anonymousLeadButton',
+            'data-anonymous' => $view['translator']->trans('mautic.lead.lead.searchcommand.isanonymous')
+        ),
+        'tooltip'   => $view['translator']->trans('mautic.lead.lead.anonymous_leads'),
+        'iconClass' => 'fa fa-user-secret'
+    );
+}
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
@@ -60,20 +89,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
         'routeBase'   => 'lead',
-        'preCustomButtons' => array(
-            array(
-                'attr'      => array(
-                    'class'   => 'btn btn-default btn-sm btn-nospin',
-                    'href'    => 'javascript: void(0)',
-                    'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
-                    'id'      => 'liveModeButton',
-                    'data-toggle' => false,
-                    'data-max-id' => $maxLeadId
-                ),
-                'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
-                'iconClass' => 'fa fa-bolt'
-            )
-        ),
+        'preCustomButtons' => $customButtons,
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
         )

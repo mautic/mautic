@@ -2184,14 +2184,18 @@ var Mautic = {
      * Apply filter
      * @param list
      */
-    setSearchFilter: function (el, searchId) {
+    setSearchFilter: function (el, searchId, string) {
         if (typeof searchId == 'undefined')
             searchId = '#list-search';
         else
             searchId = '#' + searchId;
-        var filter = mQuery(el).val();
-        var current = mQuery('#list-search').typeahead('val');
-        current += " " + filter;
+
+        if (string) {
+            var current = string;
+        } else {
+            var filter  = mQuery(el).val();
+            var current = mQuery('#list-search').typeahead('val') + " " + filter;
+        }
 
         //append the filter
         mQuery(searchId).typeahead('val', current);
@@ -2207,9 +2211,6 @@ var Mautic = {
             mQuery(searchId).attr('data-target'),
             'liveCache'
         );
-
-        //clear filter
-        mQuery(el).val('');
     },
 
     /**
