@@ -10,85 +10,129 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class Download
- * @ORM\Table(name="asset_downloads")
- * @ORM\Entity(repositoryClass="Mautic\AssetBundle\Entity\DownloadRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\AssetBundle\Entity
  */
 class Download
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="date_download", type="datetime")
+     * @var \DateTime
      */
     private $dateDownload;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Asset")
-     * @ORM\JoinColumn(name="asset_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @var Asset
      */
     private $asset;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
-     * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
+     * @var \Mautic\CoreBundle\Entity\IpAddress
      */
     private $ipAddress;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL"))
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var string
      */
     private $code;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     private $referer;
 
     /**
-     * @ORM\Column(type="string", name="tracking_id")
-     **/
+     * @var string
+     */
     private $trackingId;
 
     /**
-     * @ORM\Column(name="source", type="string", nullable=true)
+     * @var string
      */
     private $source;
 
     /**
-     * @ORM\Column(name="source_id", type="integer", nullable=true)
+     * @var string
      */
     private $sourceId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL"))
+     * @var \Mautic\EmailBundle\Entity\Email
      */
     private $email;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('asset_downloads')
+            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository');
+
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createField('dateDownload', 'datetime')
+            ->columnName('date_download')
+            ->build();
+
+        $builder->createManyToOne('asset', 'Asset')
+            ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->addIpAddress();
+
+        $builder->addLead(true, 'SET NULL');
+
+        $builder->addField('code', 'integer');
+
+        $builder->createField('referer', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('trackingId', 'string')
+            ->columnName('tracking_id')
+            ->build();
+
+        $builder->createField('source', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('sourceId', 'integer')
+            ->columnName('source_id')
+            ->nullable()
+            ->build();
+
+        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+    }
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -100,7 +144,7 @@ class Download
      *
      * @return Download
      */
-    public function setDateDownload($dateDownload)
+    public function setDateDownload ($dateDownload)
     {
         $this->dateDownload = $dateDownload;
 
@@ -112,7 +156,7 @@ class Download
      *
      * @return \DateTime
      */
-    public function getDateDownload()
+    public function getDateDownload ()
     {
         return $this->dateDownload;
     }
@@ -124,7 +168,7 @@ class Download
      *
      * @return Download
      */
-    public function setCode($code)
+    public function setCode ($code)
     {
         $this->code = $code;
 
@@ -136,7 +180,7 @@ class Download
      *
      * @return integer
      */
-    public function getCode()
+    public function getCode ()
     {
         return $this->code;
     }
@@ -148,7 +192,7 @@ class Download
      *
      * @return Download
      */
-    public function setReferer($referer)
+    public function setReferer ($referer)
     {
         $this->referer = $referer;
 
@@ -160,7 +204,7 @@ class Download
      *
      * @return string
      */
-    public function getReferer()
+    public function getReferer ()
     {
         return $this->referer;
     }
@@ -172,7 +216,7 @@ class Download
      *
      * @return Download
      */
-    public function setAsset(Asset $asset = null)
+    public function setAsset (Asset $asset = null)
     {
         $this->asset = $asset;
 
@@ -184,7 +228,7 @@ class Download
      *
      * @return Asset
      */
-    public function getAsset()
+    public function getAsset ()
     {
         return $this->asset;
     }
@@ -196,7 +240,7 @@ class Download
      *
      * @return Download
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress (\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -208,7 +252,7 @@ class Download
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
-    public function getIpAddress()
+    public function getIpAddress ()
     {
         return $this->ipAddress;
     }
@@ -220,7 +264,7 @@ class Download
      *
      * @return Download
      */
-    public function setTrackingId($trackingId)
+    public function setTrackingId ($trackingId)
     {
         $this->trackingId = $trackingId;
 
@@ -232,7 +276,7 @@ class Download
      *
      * @return integer
      */
-    public function getTrackingId()
+    public function getTrackingId ()
     {
         return $this->trackingId;
     }
@@ -240,7 +284,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getLead()
+    public function getLead ()
     {
         return $this->lead;
     }
@@ -248,7 +292,7 @@ class Download
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead ($lead)
     {
         $this->lead = $lead;
     }
@@ -256,7 +300,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getSource()
+    public function getSource ()
     {
         return $this->source;
     }
@@ -264,7 +308,7 @@ class Download
     /**
      * @param mixed $source
      */
-    public function setSource($source)
+    public function setSource ($source)
     {
         $this->source = $source;
     }
@@ -272,7 +316,7 @@ class Download
     /**
      * @return integer
      */
-    public function getSourceId()
+    public function getSourceId ()
     {
         return $this->sourceId;
     }
@@ -280,9 +324,9 @@ class Download
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId ($sourceId)
     {
-        $this->sourceId = (int) $sourceId;
+        $this->sourceId = (int)$sourceId;
     }
 
     /**

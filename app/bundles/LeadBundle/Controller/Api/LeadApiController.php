@@ -13,6 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -291,6 +292,12 @@ class LeadApiController extends CommonApiController
             }
         }
 
+        // Check for tag string
+        if (isset($parameters['tags'])) {
+            $this->model->modifyTags($entity, $parameters['tags']);
+            unset($parameters['tags']);
+        }
+
         // Check for lastActive date
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
@@ -318,7 +325,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress'], $parameters['lastActive']);
+        unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
 
         return $parameters;
     }

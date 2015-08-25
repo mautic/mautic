@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 /** @var \Gaufrette\Filesystem $connector */
-/** @var \MauticAddon\MauticCloudStorageBundle\Integration\CloudStorageIntegration $integration */
+/** @var \MauticPlugin\MauticCloudStorageBundle\Integration\CloudStorageIntegration $integration */
 if (count($items)): ?>
     <div class="panel panel-primary mb-0">
         <div class="panel-body">

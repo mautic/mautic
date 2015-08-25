@@ -12,58 +12,89 @@ namespace Mautic\ApiBundle\Entity\oAuth1;
 use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
 use Bazinga\OAuthServerBundle\Model\RequestTokenInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="oauth1_request_tokens")
+ * Class RequestToken
+ *
+ * @package Mautic\ApiBundle\Entity\oAuth1
  */
 class RequestToken implements RequestTokenInterface
 {
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Consumer")
-     * @ORM\JoinColumn(name="consumer_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var Consumer
      */
     protected $consumer;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var \Mautic\UserBundle\Entity\User
      */
     protected $user;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $token;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $secret;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var integer
      */
     protected $expiresAt;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $verifier;
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('oauth1_request_tokens');
+
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createManyToOne('consumer', 'Consumer')
+            ->addJoinColumn('consumer_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+            ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->addField('token', 'string');
+
+        $builder->addField('secret', 'string');
+
+        $builder->createField('expiresAt', 'bigint')
+            ->columnName('expires_at')
+            ->build();
+
+        $builder->addField('verifier', 'string');
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -71,7 +102,7 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function getToken()
+    public function getToken ()
     {
         return $this->token;
     }
@@ -79,16 +110,17 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function setToken($token)
+    public function setToken ($token)
     {
         $this->token = $token;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSecret()
+    public function getSecret ()
     {
         return $this->secret;
     }
@@ -96,16 +128,17 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function setSecret($secret)
+    public function setSecret ($secret)
     {
         $this->secret = $secret;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getExpiresAt()
+    public function getExpiresAt ()
     {
         return $this->expiresAt;
     }
@@ -113,16 +146,17 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function setExpiresAt($expiresAt)
+    public function setExpiresAt ($expiresAt)
     {
         $this->expiresAt = $expiresAt;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getExpiresIn()
+    public function getExpiresIn ()
     {
         if ($this->expiresAt) {
             return $this->expiresAt - time();
@@ -134,7 +168,7 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function hasExpired()
+    public function hasExpired ()
     {
         if ($this->expiresAt) {
             return time() > $this->expiresAt;
@@ -146,7 +180,7 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function getUser()
+    public function getUser ()
     {
         return $this->user;
     }
@@ -154,25 +188,27 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function setUser(UserInterface $user)
+    public function setUser (UserInterface $user)
     {
         $this->user = $user;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setConsumer(ConsumerInterface $consumer)
+    public function setConsumer (ConsumerInterface $consumer)
     {
         $this->consumer = $consumer;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getConsumer()
+    public function getConsumer ()
     {
         return $this->consumer;
     }
@@ -180,7 +216,7 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function getVerifier()
+    public function getVerifier ()
     {
         return $this->verifier;
     }
@@ -188,9 +224,8 @@ class RequestToken implements RequestTokenInterface
     /**
      * {@inheritDoc}
      */
-    public function setVerifier($verifier)
+    public function setVerifier ($verifier)
     {
         $this->verifier = $verifier;
     }
-
 }

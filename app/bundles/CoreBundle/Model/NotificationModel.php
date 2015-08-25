@@ -31,16 +31,23 @@ class NotificationModel extends FormModel
     /**
      * Write a notification
      *
-     * @param        $message    Message of the notification
-     * @param        $type       Optional $type to ID the source of the notification
-     * @param        $isRead     Add unread indicator
-     * @param        $header     Header for message
-     * @param string $iconClass  Font Awesome CSS class for the icon (e.g. fa-eye)
-     * @param DateTime $datetime Date the item was created
-     * @param null   $user       User object; defaults to current user
+     * @param           $message    Message of the notification
+     * @param           $type       Optional $type to ID the source of the notification
+     * @param bool|true $isRead     Add unread indicator
+     * @param           $header     Header for message
+     * @param string    $iconClass  Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param \DateTime $datetime   Date the item was created
+     * @param User|null $user       User object; defaults to current user
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null, User $user = null)
-    {
+    public function addNotification(
+        $message,
+        $type = null,
+        $isRead = true,
+        $header = null,
+        $iconClass = null,
+        \DateTime $datetime = null,
+        User $user = null
+    ) {
         if ($user === null) {
             $user = $this->factory->getUser();
         }
@@ -65,43 +72,52 @@ class NotificationModel extends FormModel
     }
 
     /**
+     * @param null $afterId
      * @param null $key
+     *
+     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getNotifications($afterId = null, $key = null)
     {
-        $filter = array(
-            'force' => array(
-                array(
-                    'column' => 'n.user',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()
+        $user = $this->factory->getUser();
+
+        if ($user->getId()) {
+            $filter = array(
+                'force' => array(
+                    array(
+                        'column' => 'n.user',
+                        'expr'   => 'eq',
+                        'value'  => $this->factory->getUser()
+                    )
                 )
-            )
-        );
-
-        if ($key != null) {
-            $filter['force'][] = array(
-                'column' => 'n.key',
-                'expr'   => 'eq',
-                'value'  => $key
             );
+
+            if ($key != null) {
+                $filter['force'][] = array(
+                    'column' => 'n.key',
+                    'expr'   => 'eq',
+                    'value'  => $key
+                );
+            }
+
+            if ($afterId != null) {
+                $filter['force'][] = array(
+                    'column' => 'n.id',
+                    'expr'   => 'gt',
+                    'value'  => (int) $afterId
+                );
+            }
+
+            $args = array(
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+                'hydration_mode'   => 'HYDRATE_ARRAY'
+            );
+
+            return $this->getEntities($args);
         }
 
-        if ($afterId != null) {
-            $filter['force'][] = array(
-                'column' => 'n.id',
-                'expr'   => 'gt',
-                'value'  => (int) $afterId
-            );
-        }
-
-        $args = array(
-            'filter' => $filter,
-            'ignore_paginator' => true,
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        );
-
-        return $this->getEntities($args);
+        return array();
     }
 
     /**
@@ -124,6 +140,8 @@ class NotificationModel extends FormModel
 
     /**
      * Get content for notifications
+     *
+     * @param null $afterId
      *
      * @return array
      */
@@ -151,7 +169,7 @@ class NotificationModel extends FormModel
 
         if (!$this->factory->getParameter('security.disableUpdates') && $this->factory->getUser()->isAdmin()) {
             $updateData = array();
-            $cacheFile  = $this->factory->getSystemPath('cache') . '/lastUpdateCheck.txt';
+            $cacheFile  = $this->factory->getSystemPath('cache').'/lastUpdateCheck.txt';
             $session    = $this->factory->getSession();
 
             //check to see when we last checked for an update
@@ -169,10 +187,16 @@ class NotificationModel extends FormModel
 
             // If the version key is set, we have an update
             if (isset($updateData['version'])) {
-                $translator    = $this->factory->getTranslator();
-                $announcement  = $translator->trans('mautic.core.updater.update.announcement_link', array('%announcement%' => $updateData['announcement']));
+                $translator   = $this->factory->getTranslator();
+                $announcement = $translator->trans(
+                    'mautic.core.updater.update.announcement_link',
+                    array('%announcement%' => $updateData['announcement'])
+                );
 
-                $updateMessage = $translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $announcement));
+                $updateMessage = $translator->trans(
+                    $updateData['message'],
+                    array('%version%' => $updateData['version'], '%announcement%' => $announcement)
+                );
 
                 $alreadyNotified = $session->get('mautic.update.notified');
 

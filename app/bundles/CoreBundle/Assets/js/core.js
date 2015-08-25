@@ -553,8 +553,12 @@ var Mautic = {
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-            Mautic[contentSpecific + "OnLoad"](container, response);
-            Mautic.loadedContent[contentSpecific] = true;
+            if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+                if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+                    Mautic.loadedContent[contentSpecific] = true;
+                    Mautic[contentSpecific + "OnLoad"](container, response);
+                }
+            }
         }
 
         if (!inModal && container == 'body') {
@@ -610,10 +614,14 @@ var Mautic = {
      * @param el
      */
     activateChosenSelect: function(el) {
+        var noResultsText = mQuery(el).data('no-results-text');
+        if (!noResultsText) {
+            noResultsText = mauticLang['chosenNoResults'];
+        }
         mQuery(el).chosen({
             placeholder_text_multiple: mauticLang['chosenChooseMore'],
             placeholder_text_single: mauticLang['chosenChooseOne'],
-            no_results_text: mauticLang['chosenNoResults'],
+            no_results_text: noResultsText,
             width: "100%",
             allow_single_deselect: true,
             include_group_label_in_selected: true,
@@ -942,10 +950,10 @@ var Mautic = {
         mQuery.getScript(url, function( data, textStatus, jqxhr ) {
             if (textStatus == 'success') {
                 // Likely a page refresh; execute onLoad content
-                if (typeof Mautic.loadedContent[mauticContent] == 'undefined') {
-                    if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
-                        Mautic[mauticContent + "OnLoad"]('#app-content', {});
+                if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
+                    if (typeof Mautic.loadedContent[mauticContent] == 'undefined') {
                         Mautic.loadedContent[mauticContent] = true;
+                        Mautic[mauticContent + "OnLoad"]('#app-content', {});
                     }
                 }
             }
@@ -1522,8 +1530,10 @@ var Mautic = {
 
                 if (response.mauticContent) {
                     if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
-                        Mautic[response.mauticContent + "OnLoad"](target, response);
-                        Mautic.loadedContent[contentSpecific] = true;
+                        if (typeof Mautic.loadedContent[response.mauticContent] == 'undefined') {
+                            Mautic.loadedContent[response.mauticContent] = true;
+                            Mautic[response.mauticContent + "OnLoad"](target, response);
+                        }
                     }
                 }
             } else {

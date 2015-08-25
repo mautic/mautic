@@ -96,18 +96,6 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
             }
-
-            $reader = new AnnotationReader();
-            $class = $classMetadata->getReflectionClass();
-
-            $annotation = $reader->getClassAnnotation($class, 'Mautic\CoreBundle\Doctrine\Annotation\LoadClassMetadataCallback');
-
-            if (null !== $annotation) {
-                if (method_exists($class->getName(), $annotation->functionName['value'])) {
-                    $func = $class->getName() . '::' . $annotation->functionName['value'];
-                    call_user_func($func, $args);
-                }
-            }
         }
     }
 }

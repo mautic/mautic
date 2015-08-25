@@ -12,6 +12,7 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Sequence;
@@ -891,7 +892,7 @@ class InstallController extends CommonController
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
                     $paths[] = $entityPath;
-                    if ($b['isAddon']) {
+                    if ($b['isPlugin']) {
                         $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
                     } else {
                         $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
@@ -899,7 +900,12 @@ class InstallController extends CommonController
                 }
             }
 
-            $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
+            $driver = new StaticPHPDriver($paths);
+            $config = Setup::createConfiguration();
+            $config->setMetadataDriverImpl(
+                $driver
+            );
+
             $config->setEntityNamespaces($namespaces);
 
             //set the table prefix

@@ -10,59 +10,93 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
 /**
  * Class Notification
  *
- * @ORM\Table(name="notifications")
- * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\NotificationRepository")
+ * @package Mautic\CoreBundle\Entity
  */
 class Notification
 {
 
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    /** @var  int */
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var \Mautic\UserBundle\Entity\User
      */
     protected $user;
 
     /**
-     * @ORM\Column(type="string", length=25, nullable=true)
+     * @var string
      */
     protected $type;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @var string
      */
     protected $header;
 
     /**
-     * @ORM\Column(type="text")
+     * @var string
      */
     protected $message;
 
     /**
-     * @ORM\Column(name="date_added", type="datetime")
+     * @var \DateTiem
      */
     protected $dateAdded;
 
     /**
-     * @ORM\Column(name="icon_class", type="string", nullable=true)
+     * @var string
      */
     protected $iconClass;
 
     /**
-     * @ORM\Column(name="is_read", type="boolean")
-     * */
+     * @var bool
+     */
     protected $isRead = false;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('notifications')
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository');
+
+        $builder->addId();
+
+        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createField('type', 'string')
+            ->nullable()
+            ->length(25)
+            ->build();
+
+        $builder->createField('header', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->addField('message', 'text');
+
+        $builder->addDateAdded();
+
+        $builder->createField('iconClass', 'string')
+            ->columnName('icon_class')
+            ->nullable()
+            ->build();
+
+        $builder->createField('isRead', 'boolean')
+            ->columnName('is_read')
+            ->build();
+    }
 
     /**
      * @return mixed

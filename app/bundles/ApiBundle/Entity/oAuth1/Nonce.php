@@ -10,39 +10,55 @@
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\oAuth1\NonceRepository")
- * @ORM\Table(name="oauth1_nonces")
+ * Class Nonce
+ *
+ * @package Mautic\ApiBundle\Entity\oAuth1
  */
 class Nonce
 {
 
     /**
-     * @ORM\Id()
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $nonce;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    /** @var  string */
     private $timestamp;
 
     /**
      * @param $nonce
      * @param $timestamp
      */
-    public function __construct($nonce, $timestamp)
+    public function __construct ($nonce, $timestamp)
     {
         $this->nonce     = $nonce;
         $this->timestamp = $timestamp;
     }
 
     /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('oauth1_nonces')
+            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth1\NonceRepository');
+
+        $builder->createField('nonce', 'string')
+            ->isPrimaryKey()
+            ->build();
+
+        $builder->addField('timestamp', 'string');
+    }
+
+    /**
      * @return mixed
      */
-    public function getNonce()
+    public function getNonce ()
     {
         return $this->nonce;
     }
@@ -50,7 +66,7 @@ class Nonce
     /**
      * @return mixed
      */
-    public function getTimestamp()
+    public function getTimestamp ()
     {
         return $this->timestamp;
     }

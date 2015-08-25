@@ -10,7 +10,7 @@
 namespace Mautic\AssetBundle\Event;
 
 use Gaufrette\Adapter;
-use Mautic\AddonBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
