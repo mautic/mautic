@@ -55,7 +55,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 $customButtons = array(
     array(
         'attr'      => array(
-            'class'   => 'btn btn-default btn-sm btn-nospin',
+            'class'   => 'hidden-xs btn btn-default btn-sm btn-nospin',
             'href'    => 'javascript: void(0)',
             'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
             'id'      => 'liveModeButton',
@@ -70,7 +70,7 @@ $customButtons = array(
 if ($indexMode == 'list') {
     $customButtons[] = array(
         'attr'      => array(
-            'class'          => 'btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),
+            'class'          => 'hidden-xs btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),
             'href'           => 'javascript: void(0)',
             'onclick'        => 'Mautic.toggleAnonymousLeads();',
             'id'             => 'anonymousLeadButton',
@@ -108,7 +108,7 @@ $customButtons = array_merge(
         ),
         array(
             'attr'      => array(
-                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
                 'data-toggle' => 'ajaxmodal',
                 'data-target' => '#MauticSharedModal',
                 'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
