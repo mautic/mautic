@@ -33,6 +33,7 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_POST_SAVE    => array('onEmailPostSave', 0),
             EmailEvents::EMAIL_POST_DELETE  => array('onEmailDelete', 0),
             EmailEvents::EMAIL_FAILED       => array('onEmailFailed', 0),
+            EmailEvents::EMAIL_ON_SEND      => array('onEmailSend', 0),
             EmailEvents::EMAIL_RESEND       => array('onEmailResend', 0),
             EmailEvents::EMAIL_PARSE        => array('onEmailParse', 0)
         );
@@ -97,6 +98,33 @@ class EmailSubscriber extends CommonSubscriber
                 ));
                 $model->setDoNotContact($stat, $reason);
             }
+        }
+    }
+
+    /**
+     * Add an unsubscribe email to the List-Unsubscribe header if applicable
+     *
+     * @param Events\EmailSendEvent $event
+     */
+    public function onEmailSend(Events\EmailSendEvent $event)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model = $this->factory->getModel('email');
+        if ($config = $model->getMonitoredMailbox('EmailBundle', 'unsubscribes')) {
+            $headers  = $event->getTextHeaders();
+            $existing = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+
+            $append = 'unsubscribe';
+            $idHash = $event->getIdHash();
+            if ($idHash) {
+                $append .= "_{$idHash}";
+            }
+
+            list($email, $domain) = explode('@', $config['address']);
+            $unsubscribeEmail     = "<mailto:$email+$append@$domain>";
+            $updatedHeader        = ($existing) ? $unsubscribeEmail . ", " . $existing : $unsubscribeEmail;
+
+            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
         }
     }
 

@@ -1331,4 +1331,31 @@ class EmailModel extends FormModel
 
         $this->em->flush();
     }
+
+    /**
+     * Get the settings for a monitored mailbox if enabled
+     *
+     * @param $bundleKey
+     * @param $folderKey
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function getMonitoredMailbox($bundleKey, $folderKey)
+    {
+        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
+        $mailboxHelper = $this->factory->getHelper('mailbox');
+
+        if ($folderKey) {
+            $bundleKey .= '_' . $folderKey;
+        }
+
+        $config = $mailboxHelper->getMailboxSettings($bundleKey);
+        if (empty($config['host']) || empty($config['folder']) || empty($config['address'])) {
+
+            return false;
+        }
+
+         return $config;
+    }
 }

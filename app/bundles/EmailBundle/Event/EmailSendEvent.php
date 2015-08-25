@@ -67,6 +67,11 @@ class EmailSendEvent extends CommonEvent
     private $internalSend = false;
 
     /**
+     * @var array
+     */
+    private $textHeaders = array();
+
+    /**
      * @param MailHelper $helper
      * @param array      $args
      */
@@ -106,6 +111,10 @@ class EmailSendEvent extends CommonEvent
             $this->internalSend = $args['internalSend'];
         } elseif ($helper !== null) {
             $this->internalSend = $helper->isInternalSend();
+        }
+
+        if (isset($args['textHeaders'])) {
+            $this->textHeaders = $args['textHeaders'];
         }
     }
 
@@ -288,5 +297,26 @@ class EmailSendEvent extends CommonEvent
     public function getTokens()
     {
         return $this->tokens;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    public function addTextHeader($name, $value)
+    {
+        if ($this->helper !== null) {
+            $this->helper->addCustomHeader($name, $value);
+        } else {
+            $this->textHeaders[$name] = $value;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getTextHeaders()
+    {
+        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->headers;
     }
 }
