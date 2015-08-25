@@ -4328,6 +4328,27 @@ lesshat-selector { -lh-property: 0 ;
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
 }
+@media (max-width: 767px) {
+  .builder .builder-panel {
+    width: 100%;
+    bottom: 0;
+    top: auto;
+    height: 35%;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    border-top: 1px solid #757575;
+  }
+  .builder .builder-content {
+    right: 0;
+  }
+  .builder .builder-panel-top {
+    position: relative;
+    width: 100%;
+  }
+  .builder .builder-tokens {
+    margin-top: 10px;
+  }
+}
 .mautic-editable {
   min-height: 75px;
   width: 100%;
