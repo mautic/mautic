@@ -21,7 +21,7 @@ if (isset($attr['onchange'])) {
             ($child->vars['value'] === '1' && !empty($child->vars['checked']) ? ' btn-success' : ''); ?>
         <label class="btn btn-default <?php echo $class; ?>">
             <?php echo $view['form']->widget($child, array('attr' => $attr)); ?>
-            <?php echo $view['translator']->trans($child->vars['label']); ?>
+            <span><?php echo $view['translator']->trans($child->vars['label']); ?></span>
         </label>
     <?php endforeach; ?>
 </div>

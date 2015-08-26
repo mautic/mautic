@@ -136,12 +136,12 @@ class FieldType extends AbstractType
             'default_bool_template',
             'yesno_button_group',
             array(
-                'label'       => 'mautic.core.defaultvalue',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control'),
-                'required'    => false,
-                'mapped'      => false,
-                'data'        => false
+                'label'      => 'mautic.core.defaultvalue',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => false
             )
         );
 
@@ -189,7 +189,17 @@ class FieldType extends AbstractType
                     )
                 );
             } elseif ($type == 'boolean') {
-                $value = (is_array($data)) ? (isset($data['defaultValue']) ? $data['defaultValue'] : false) : $data->getDefaultValue();
+                if (is_array($data)) {
+                    $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
+                    $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'matuic.core.form.yes';
+                    $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'matuic.core.form.no';
+                } else {
+                    $value    = $data->getDefaultValue();
+                    $props    = $data->getProperties();
+                    $yesLabel = !empty($props['yes']) ? $props['yes'] : 'matuic.core.form.yes';
+                    $noLabel  = !empty($props['no']) ? $props['no'] : 'matuic.core.form.no';
+                }
+
                 $form->add(
                     'defaultValue',
                     'yesno_button_group',
@@ -198,7 +208,11 @@ class FieldType extends AbstractType
                         'label_attr'  => array('class' => 'control-label'),
                         'attr'        => array('class' => 'form-control'),
                         'required'    => false,
-                        'data'        => (bool) $value
+                        'data'        => !empty($value),
+                        'choice_list' => new ChoiceList(
+                            array(false, true),
+                            array($noLabel, $yesLabel)
+                        )
                     )
                 );
             }

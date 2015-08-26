@@ -372,6 +372,16 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
+/**
+ *
+ * @param label
+ */
+Mautic.updateLeadFieldBooleanLabels = function(el, label) {
+    mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
+        mQuery(el).val()
+    );
+};
+
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
     Mautic.startIconSpinOnEvent(event);
     var query = "action=lead:updateSocialProfile&network=" + network + "&lead=" + leadId;
