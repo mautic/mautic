@@ -1252,7 +1252,7 @@ var Mautic = {
         var form = 'form[name="' + formName + '"]';
         mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
         mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
-            if(e.keyCode == 13 && e.metaKey) {
+            if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)) {
                 if (MauticVars.formSubmitInProgress) {
                     return false;
                 }
