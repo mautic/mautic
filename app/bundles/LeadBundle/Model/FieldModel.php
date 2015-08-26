@@ -27,9 +27,7 @@ class FieldModel extends FormModel
 {
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getRepository()
     {
@@ -222,13 +220,14 @@ class FieldModel extends FormModel
      * Reorders fields by a list of field ids
      *
      * @param array $list
+     * @param int   $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list)
+    public function reorderFieldsByList(array $list, $start = 1)
     {
         $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
-                $order = ((int) array_search($field->getId(), $list) + 1);
+                $order = ((int) array_search($field->getId(), $list) + $start);
                 $field->setOrder($order);
                 $this->em->persist($field);
             }
@@ -400,6 +399,8 @@ class FieldModel extends FormModel
      *
      * @param       $group
      * @param array $filters
+     *
+     * @return array
      */
     public function getGroupFields($group, $filters = array('isPublished' => true))
     {

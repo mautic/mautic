@@ -316,10 +316,13 @@ Mautic.leadfieldOnLoad = function (container) {
         mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
             helper: fixHelper,
+            scroll: false,
+            axis: 'y',
             stop: function(i) {
+                // Get the page and limit
                 mQuery.ajax({
                     type: "POST",
-                    url: mauticAjaxUrl + "?action=lead:reorder",
+                    url: mauticAjaxUrl + "?action=lead:reorder&limit=" + mQuery('.pagination-limit').val() + '&page=' + mQuery('.pagination li.active a span').first().text(),
                     data: mQuery(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });
