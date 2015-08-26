@@ -20,7 +20,9 @@ if (!empty($userId)) {
 }
 $view['slots']->set("headerTitle", $header);
 
-$selectTemplate = $view['form']->row($form['properties_select_template']);
+$selectTemplate      = $view['form']->row($form['properties_select_template']);
+$defaultTemplate     = $view['form']->widget($form['default_template']);
+$defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -126,7 +128,14 @@ $selectTemplate = $view['form']->row($form['properties_select_template']);
 
 <?php if ($isNew): ?>
 <div id="field-templates" class="hide">
+    <div class="default">
+        <?php echo $defaultTemplate; ?>
+    </div>
+    <div class="default_bool">
+        <?php echo $defaultBoolTemplate; ?>
+    </div>
 <?php
+    echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(

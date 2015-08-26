@@ -225,7 +225,7 @@ class LeadType extends AbstractType
                             'required'    => $required,
                             'label'       => $field['label'],
                             'label_attr'  => array('class' => 'control-label'),
-                            'data'        => $value,
+                            'data'        => ($type == 'boolean') ? (int) $value : $value,
                             'attr'        => $attr,
                             'mapped'      => false,
                             'multiple'    => false,

@@ -349,6 +349,27 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     } else {
         mQuery('#leadfield_isListable').closest('.row').removeClass('hide');
     }
+
+    // Switch default field if applicable
+    var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
+
+    if (selectedVal == 'boolean') {
+        if (defaultFieldType == 'text') {
+            // Convert to a select
+            var newDiv      = mQuery('<div id="leadfield_defaultValue"></div>');
+            var defaultBool = mQuery('#field-templates .default_bool').html();
+            defaultBool     = defaultBool.replace(/default_bool_template/g, 'defaultValue');
+
+            mQuery(defaultBool).appendTo(newDiv);
+
+            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+        }
+    } else if (defaultFieldType == 'radio') {
+        // Convert to input
+        var html = mQuery('#field-templates .default').html();
+        html     = html.replace(/default_template/g, 'defaultValue');
+        mQuery('#leadfield_defaultValue').replaceWith(html);
+    }
 };
 
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
