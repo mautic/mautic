@@ -282,6 +282,8 @@ var Mautic = {
             mQuery('#' + prefix + '_list div.list-sortable').sortable({
                 items: 'div.sortable',
                 handle: 'span.postaddon',
+                axis: 'y',
+                containment: '#' + prefix + '_list',
                 stop: function (i) {
                     var order = 0;
                     mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {

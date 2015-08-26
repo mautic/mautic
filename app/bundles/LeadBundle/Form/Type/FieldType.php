@@ -15,8 +15,10 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
@@ -94,12 +96,58 @@ class FieldType extends AbstractType
             'required'    => false
         ));
 
-        $builder->add('properties', 'collection', array(
-            'required'       => false,
-            'allow_add'      => true,
-            'error_bubbling' => false
-        ));
+        $builder->add(
+            'properties_select_template',
+            'sortablelist',
+            array(
+                'mapped' => false,
+                'label' => 'mautic.lead.field.form.properties.select',
+                'option_required' => false
+            )
+        );
 
+        $builder->add(
+            'properties',
+            'collection',
+            array(
+                'required'       => false,
+                'allow_add'      => true,
+                'error_bubbling' => false,
+                'data'           => array()
+            )
+        );
+
+        $formModifier = function(FormEvent $event, $eventName) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
+
+            if ($type == 'select' || $type == 'lookup') {
+                $properties = $data->getProperties();
+
+                if (isset($properties['list']) && is_string($properties['list'])) {
+                    $properties['list'] = array_map('trim', explode('|', $properties['list']));
+                }
+
+                $form->add(
+                    'properties',
+                    'sortablelist',
+                    array(
+                        'required' => false,
+                        'label'    => 'mautic.lead.field.form.properties.select',
+                        'data'     => $properties
+                    )
+                );
+            }
+        };
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function(FormEvent $event) use ($formModifier) {
+                $formModifier($event, FormEvents::PRE_SET_DATA);
+            }
+        );
         $builder->add('defaultValue', 'text', array(
             'label'      => 'mautic.core.defaultvalue',
             'label_attr' => array('class' => 'control-label'),

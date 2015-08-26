@@ -318,6 +318,7 @@ Mautic.leadfieldOnLoad = function (container) {
             helper: fixHelper,
             scroll: false,
             axis: 'y',
+            containment: container + ' .leadfield-list',
             stop: function(i) {
                 // Get the page and limit
                 mQuery.ajax({
@@ -331,10 +332,14 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
-    if (mQuery('#field-templates .'+selectedVal).length) {
-        mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
+    if (selectedVal == 'lookup') {
+        // Use select
+        selectedVal = 'select';
+    }
 
-        mQuery("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
+    if (mQuery('#field-templates .'+selectedVal).length) {
+        mQuery('#leadfield_properties').html('');
+        mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
     } else {
         mQuery('#leadfield_properties').html('');
     }

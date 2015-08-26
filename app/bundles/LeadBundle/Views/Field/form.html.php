@@ -11,12 +11,16 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadfield');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
+    $isNew   = false;
     $field   = $form->vars['data']->getLabel();
-    $header = $view['translator']->trans('mautic.lead.field.header.edit', array("%name%" => $field));
+    $header  = $view['translator']->trans('mautic.lead.field.header.edit', array("%name%" => $field));
 } else {
+    $isNew  = true;
     $header = $view['translator']->trans('mautic.lead.field.header.new');
 }
 $view['slots']->set("headerTitle", $header);
+
+$selectTemplate = $view['form']->row($form['properties_select_template']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -66,11 +70,6 @@ $view['slots']->set("headerTitle", $header);
                                 'no'  => isset($properties['no'])  ? $properties['no'] : ''
                             ));
                             break;
-                        case 'lookup':
-                            echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php', array(
-                                'value' => isset($properties['list']) ? $properties['list'] : ''
-                            ));
-                            break;
                         case 'number':
                             echo $view->render('MauticLeadBundle:Field:properties_number.html.php', array(
                                 'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
@@ -78,8 +77,10 @@ $view['slots']->set("headerTitle", $header);
                             ));
                             break;
                         case 'select':
+                        case 'lookup':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
-                                'value' => isset($properties['list']) ? $properties['list'] : ''
+                                'form'           => $form['properties'],
+                                'selectTemplate' => $selectTemplate
                             ));
                             break;
                         endswitch;
@@ -123,10 +124,14 @@ $view['slots']->set("headerTitle", $header);
 </div>
 <?php echo $view['form']->end($form); ?>
 
-
+<?php if ($isNew): ?>
 <div id="field-templates" class="hide">
-<?php echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php'); ?>
-<?php echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php'); ?>
-<?php echo $view->render('MauticLeadBundle:Field:properties_number.html.php'); ?>
-<?php echo $view->render('MauticLeadBundle:Field:properties_select.html.php'); ?>
+<?php
+    echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
+    echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
+        'selectTemplate' => $selectTemplate
+    ));
+?>
 </div>
+<?php endif; ?>

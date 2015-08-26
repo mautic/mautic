@@ -118,9 +118,17 @@ class FieldModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        if ($entity->getType() == 'time') {
+        $type = $entity->getType();
+        if ($type == 'time') {
             //time does not work well with list filters
             $entity->setIsListable(false);
+        } elseif ($type == 'select' || $type == 'lookup') {
+            // Convert to a string
+            $properties = $entity->getProperties();
+            if (isset($properties['list']) && is_array($properties['list'])) {
+                $properties['list'] = implode('|', array_map('trim', $properties['list']));
+            }
+            $entity->setProperties($properties);
         }
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
