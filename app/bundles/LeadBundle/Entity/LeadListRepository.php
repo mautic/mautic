@@ -869,8 +869,8 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'like':
                         case 'notLike':
-                            if (strpos($parameters[$parameter], '%') === false) {
-                                $parameters[$parameter] = '%'.$parameters[$parameter].'%';
+                            if (strpos($details['filter'], '%') === false) {
+                                $details['filter'] = '%'.$details['filter'].'%';
                             }
                         default:
                             $useExpr->add($q->expr()->$func($field, $exprParameter));
