@@ -13,8 +13,6 @@ use Joomla\Http\Http;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\LeadBundle\Entity\Lead;
-
 
 class AjaxController extends CommonAjaxController
 {
@@ -22,6 +20,7 @@ class AjaxController extends CommonAjaxController
     {
         $url = InputHelper::clean($request->request->get('url'));
 
+        // validate the URL
         if ($url == '' || ! $url) {
             // default to an error message
             $dataArray = array(
@@ -35,36 +34,21 @@ class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse($dataArray);
         }
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
+        // get the selected types
+        $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
 
-        // create a new lead
-        $lead = new Lead();
-
-        // add some sample data
-        $leadModel->setFieldValues($lead, array('email' => 'example@email.com',
-                                                'firstname' => 'Hello',
-                                                'lastname' => 'World'));
-
-        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model = $this->factory->getModel('webhook');
-
-        $payload = array('lead' => $lead);
-        $serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
-
-        // serialize the payload
-        $serializedPayload = $model->serializeData($payload, $serializerGroups);
+        $payloadPaths = $this->getPayloadPaths($selectedTypes);
+        $payloads = $this->loadPayloads($payloadPaths);
 
         $now = new \DateTime;
 
-        $queuePayload = json_decode($serializedPayload, true);
-        $queuePayload['timestamp'] = $now->format('c');
+        $payloads['timestamp'] = $now->format('c');
 
         // instantiate new http class
         $http = new Http();
 
         // set the response
-        $response = $http->post($url, json_encode(array('mautic.lead_post_save' => $queuePayload)));
+        $response = $http->post($url, json_encode($payloads));
 
         // default to an error message
         $dataArray = array(
@@ -84,5 +68,71 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /*
+     * Get an array of all the payload paths we need to load
+     *
+     * @param $types array
+     * @return array
+     */
+    public function getPayloadPaths($types)
+    {
+        $payloadPaths = array();
+
+        foreach ($types as $type)
+        {
+            // takes an input like mautic.lead_on_something
+            // converts to array pieces using _
+            $typePath = explode('_', $type);
+
+            // pull the prefix into its own variable
+            $prefix = $typePath[0];
+
+            // now that we have the remove it from the array
+            unset($typePath[0]);
+
+            // build the event name by putting the pieces back together
+            $eventName = implode('_', $typePath);
+
+            // default the path to core
+            $payloadPath = $this->factory->getSystemPath('bundles', true);
+
+            // if plugin is in first part of the string this is an addon
+            // input is plugin.bundlename or mautic.bundlename
+            if (strpos('plugin.', $prefix)) {
+                $payloadPath = $this->factory->getSystemPath('plugins', true);
+            }
+
+            $prefixParts = explode('.', $prefix);
+
+            $bundleName = (array_pop($prefixParts));
+
+            $payloadPath .= '/' . ucfirst($bundleName) . 'Bundle/Assets/WebhookPayload/' . $bundleName . '_' . $eventName . '.json';
+
+            $payloadPaths[$type] = $payloadPath;
+        }
+
+        return $payloadPaths;
+    }
+
+    /*
+     * Iterate through the paths and get the json payloads
+     *
+     * @param  $paths array
+     * @return $payload array
+     */
+    public function loadPayloads($paths)
+    {
+        $payloads = array();
+
+        foreach ($paths as $key => $path)
+        {
+            if (file_exists($path)) {
+                $payloads[$key] = json_decode(file_get_contents($path), true);
+            }
+        }
+
+        return $payloads;
     }
 }

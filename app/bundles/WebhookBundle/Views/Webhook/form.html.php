@@ -43,7 +43,7 @@ $view['slots']->set("headerTitle", $header);
                     </div>
 
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" id="event-types">
                     <?php echo $view['form']->row($form['events']); ?>
                 </div>
             </div>

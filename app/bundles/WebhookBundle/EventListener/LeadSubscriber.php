@@ -59,13 +59,13 @@ class LeadSubscriber extends WebhookSubscriberBase
         // get the leads
         if ($event->isNew()) {
             // get our new lead webhook events first
-            $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.new');
+            $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '_new');
             $this->webhookModel->QueueWebhooks($webhookEvents, $payload, $serializerGroups, true);
         }
 
         // now deal with webhooks for the update event
         if (! $event->isNew()) {
-            $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '.update');
+            $webhookEvents = $this->getEventWebooksByType(LeadEvents::LEAD_POST_SAVE . '_update');
             $this->webhookModel->QueueWebhooks($webhookEvents, $payload, $serializerGroups, true);
         }
     }

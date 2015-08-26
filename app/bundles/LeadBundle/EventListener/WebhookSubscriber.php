@@ -45,7 +45,7 @@ class WebhookSubscriber extends CommonSubscriber
         );
 
         // add it to the list
-        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '.new', $newLead);
+        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '_new', $newLead);
 
         // checkbox for lead updates
         $updatedLead = array(
@@ -54,7 +54,7 @@ class WebhookSubscriber extends CommonSubscriber
         );
 
         // add it to the list
-        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '.update', $updatedLead);
+        $event->addEvent(LeadEvents::LEAD_POST_SAVE . '_update', $updatedLead);
 
         // add a checkbox for points
         $leadPoints = array(
