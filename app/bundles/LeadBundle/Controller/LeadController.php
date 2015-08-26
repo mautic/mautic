@@ -821,6 +821,49 @@ class LeadController extends FormController
             return $this->isLocked($postActionVars, $mainLead, 'lead.lead');
         }
 
+        //Order the leads
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+
+        $search = $this->request->get('search', $session->get('mautic.lead.filter', ''));
+        $session->set('mautic.lead.filter', $search);
+
+
+        //do some default filtering
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        $filter      = array('string' => $search, 'force' => '');
+        $limit = $session->get('mautic.lead.limit', $this->factory->getParameter('default_pagelimit'));
+        
+        if ($search !== ""){
+            $leads = $model->getEntities(
+                array(
+                    'limit'          => $limit,
+                    'filter'         => $filter,
+                    'orderBy'        => $orderBy,
+                    'orderByDir'     => $orderByDir,
+                    'withTotalCount' => false
+                )
+            );
+        } else {
+            $leads = array();
+        }
+
+        //Remove the already selected lead
+        if(($key = array_search($mainLead, $leads)) !== false) {
+            unset($leads[$key]);
+        }
+
+
+$action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
+        
+        $form = $this->get('form.factory')->create(
+                    'lead_merge',
+                    array(),
+                    array('action'  => $action, 
+                        'data_class' => null,
+                        'data'      => $leads)
+                );
         
 
         if ($this->request->getMethod() == 'POST') {
@@ -902,51 +945,9 @@ class LeadController extends FormController
       	else {
 
 
-      	//Order the leads
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
-
-        $search = $this->request->get('search', $session->get('mautic.lead.filter', ''));
-        $session->set('mautic.lead.filter', $search);
-
-
-        //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
-        $filter      = array('string' => $search, 'force' => '');
-        $limit = $session->get('mautic.lead.limit', $this->factory->getParameter('default_pagelimit'));
       	
-        if ($search !== ""){
-        	$leads = $model->getEntities(
-            	array(
-                	'limit'          => $limit,
-                	'filter'         => $filter,
-                	'orderBy'        => $orderBy,
-                	'orderByDir'     => $orderByDir,
-                	'withTotalCount' => false
-            	)
-        	);
-		} else {
-			$leads = array();
-		}
 
-
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $objectId));
-        $form = $this->get('form.factory')->create(
-                    'lead_merge',
-                    array(),
-                    array('action'  => $action, 
-                        'data_class' => null,
-                        'data'      => $leads)
-                );
-
-        //Remove the already selected lead
-        if(($key = array_search($mainLead, $leads)) !== false) {
-            unset($leads[$key]);
-        }
-           $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
-
-        	return $this->delegateView(array(
+        return $this->delegateView(array(
                 	'viewParameters'  => array(
                     'leads'     => $leads,
                     'searchValue'	=> $search,
@@ -955,9 +956,9 @@ class LeadController extends FormController
                 	   ),
                 	'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php',
                      'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_merge',
-                    'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl(
+                        'activeLink'    => '#mautic_lead_merge',
+                        'mauticContent' => 'lead',
+                        'route'         => $this->generateUrl(
                             'mautic_lead_action',
                             array(
                                 'objectAction' => 'merge',
