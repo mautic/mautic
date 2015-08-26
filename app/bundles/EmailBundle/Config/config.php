@@ -116,7 +116,10 @@ return array(
             ),
             'mautic.email.search.subscriber'         => array(
                 'class' => 'Mautic\EmailBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.email.webhook.subscriber'                => array(
+                'class' => 'Mautic\EmailBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.email'                      => array(

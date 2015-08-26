@@ -179,7 +179,10 @@ return array(
             ),
             'mautic.lead.search.subscriber'         => array(
                 'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.webhook.subscriber'                => array(
+                'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'   => array(
             'mautic.form.type.lead'                           => array(
