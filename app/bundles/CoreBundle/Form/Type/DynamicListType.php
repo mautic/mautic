@@ -103,7 +103,7 @@ class DynamicListType extends AbstractType
                             'min'        => 1
                         )
                     )
-                ) : '';
+                ) : array();
             },
             'error_bubbling' => false
         ));
