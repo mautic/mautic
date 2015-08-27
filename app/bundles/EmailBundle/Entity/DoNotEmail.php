@@ -55,6 +55,11 @@ class DoNotEmail
     /**
      * @var bool
      */
+    private $manual = false;
+
+    /**
+     * @var bool
+     */
     private $bounced = false;
 
     /**
@@ -90,6 +95,8 @@ class DoNotEmail
         $builder->addField('unsubscribed', 'boolean');
 
         $builder->addField('bounced', 'boolean');
+
+        $builder->addNullableField('manual', 'boolean');
 
         $builder->createField('comments', 'text')
             ->nullable()
@@ -214,5 +221,25 @@ class DoNotEmail
     public function setUnsubscribed ($unsubscribed = true)
     {
         $this->unsubscribed = $unsubscribed;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isManual()
+    {
+        return $this->manual;
+    }
+
+    /**
+     * @param boolean $manual
+     *
+     * @return DoNotEmail
+     */
+    public function setManual($manual = true)
+    {
+        $this->manual = $manual;
+
+        return $this;
     }
 }

@@ -179,7 +179,10 @@ return array(
             ),
             'mautic.lead.search.subscriber'         => array(
                 'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.webhook.subscriber'                => array(
+                'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'   => array(
             'mautic.form.type.lead'                           => array(
@@ -275,6 +278,14 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.form.type.lead_batch'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\BatchType',
+                'alias'     => 'lead_batch'
+            ),
+            'mautic.form.type.lead_batch_dnc'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
+                'alias'     => 'lead_batch_dnc'
             )
         ),
         'other'   => array(

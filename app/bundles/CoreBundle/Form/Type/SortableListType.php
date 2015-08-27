@@ -58,7 +58,7 @@ class SortableListType extends AbstractType
                     'minMessage' => 'mautic.form.lists.count',
                     'min'        => 1
                 ))
-            ) : '',
+            ) : array(),
             'error_bubbling' => false
         ));
 

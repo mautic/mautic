@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
@@ -154,7 +155,7 @@ class LeadType extends AbstractType
             if ($type == 'number') {
                 if (empty($properties['precision'])) {
                     $properties['precision'] = null;
-                } //ensure deafult locale is used
+                } //ensure default locale is used
                 else {
                     $properties['precision'] = (int) $properties['precision'];
                 }
@@ -184,19 +185,25 @@ class LeadType extends AbstractType
                     'label_attr'  => array('class' => 'control-label'),
                     'widget'      => 'single_text',
                     'attr'        => $attr,
-                    'data'        => $value,
                     'mapped'      => false,
-                    'constraints' => $constraints,
-                    'input'       => 'string'
+                    'input'       => 'string',
+                    'html5'       => false,
+                    'constraints' => $constraints
                 );
 
-                if ($type == 'date' || $type == 'time') {
-                    $opts['input'] = 'string';
-                    $builder->add($alias, $type, $opts);
-                } else {
+                $dtHelper = new DateTimeHelper($value, null, 'local');
+
+                if ($type == 'datetime') {
                     $opts['model_timezone'] = 'UTC';
                     $opts['view_timezone']  = date_default_timezone_get();
                     $opts['format']         = 'yyyy-MM-dd HH:mm';
+                    $opts['with_seconds']   = false;
+
+                    $opts['data'] = $dtHelper->toLocalString('Y-m-d H:i:s');
+                } elseif ($type == 'date') {
+                    $opts['data'] = $dtHelper->toLocalString('Y-m-d');
+                } else {
+                    $opts['data'] = $dtHelper->toLocalString('H:i:s');
                 }
 
                 $builder->add($alias, $type, $opts);
@@ -225,7 +232,7 @@ class LeadType extends AbstractType
                             'required'    => $required,
                             'label'       => $field['label'],
                             'label_attr'  => array('class' => 'control-label'),
-                            'data'        => $value,
+                            'data'        => ($type == 'boolean') ? (int) $value : $value,
                             'attr'        => $attr,
                             'mapped'      => false,
                             'multiple'    => false,

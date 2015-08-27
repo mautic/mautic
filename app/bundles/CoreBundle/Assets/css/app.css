@@ -1616,6 +1616,16 @@ ul.dropdown-menu-form {
   max-height: 300px;
   overflow-y: auto;
 }
+@media (max-width: 767px) {
+  .table-responsive .dropdown-menu {
+    position: static !important;
+  }
+}
+@media (min-width: 768px) {
+  .table-responsive {
+    overflow: visible;
+  }
+}
 .nav > li > a {
   font-weight: normal;
 }
@@ -4306,17 +4316,38 @@ lesshat-selector { -lh-property: 0 ;
   width: 100%;
 }
 .builder-content {
+  position: fixed;
   left: 0;
   top: 0;
   right: 300px;
   height: 100%;
-  position: fixed;
 }
 .builder-panel .panel a.btn {
   white-space: normal;
 }
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
+}
+@media (max-width: 767px) {
+  .builder .builder-panel {
+    width: 100%;
+    bottom: 0;
+    top: auto;
+    height: 35%;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    border-top: 1px solid #757575;
+  }
+  .builder .builder-content {
+    right: 0;
+  }
+  .builder .builder-panel-top {
+    position: relative;
+    width: 100%;
+  }
+  .builder .builder-tokens {
+    margin-top: 10px;
+  }
 }
 .mautic-editable {
   min-height: 75px;
@@ -4489,4 +4520,12 @@ body.noscroll {
   position: fixed;
   overflow-y: scroll;
   width: 100%;
+}
+.form-select-modal .panel-body {
+  min-height: 150px;
+}
+@media (max-width: 768px) {
+  .form-select-modal .panel-body {
+    min-height: 0;
+  }
 }

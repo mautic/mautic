@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
-
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 /**
  * Class Stat
  *
@@ -209,6 +209,37 @@ class Stat
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('stat')
+            ->addProperties(
+                array(
+                    'id',
+                    'emailAddress',
+                    'ipAddress',
+                    'dateSent',
+                    'isRead',
+                    'isFailed',
+                    'dateRead',
+                    'retryCount',
+                    'source',
+                    'openCount',
+                    'lastOpened',
+                    'sourceId',
+                    'trackingHash',
+                    'viewedInBrowser',
+                    'lead',
+                    'email'
+                )
+            )
+            ->build();
     }
 
     /**
