@@ -51,7 +51,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
     ),
     'routeBase'  => 'email',
-    'customButtons' => $customButtons
+    'preCustomButtons' => $customButtons
 )));
 ?>
 

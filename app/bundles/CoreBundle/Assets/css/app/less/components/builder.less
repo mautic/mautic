@@ -86,7 +86,6 @@
   top: 0;
   right: 300px;
   height: 100%;
-  position: fixed;
 }
 
 .builder-panel .panel a.btn {
@@ -95,6 +94,31 @@
 
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
+}
+
+
+@media (max-width: 767px) {
+  .builder {
+    .builder-panel {
+      width: 100%;
+      bottom: 0;
+      top: auto;
+      height: 35%;
+      padding-left: 30px !important;
+      padding-right: 30px !important;
+      border-top: 1px solid #757575;
+    }
+    .builder-content {
+      right: 0;
+    }
+    .builder-panel-top {
+      position: relative;
+      width: 100%;
+    }
+    .builder-tokens {
+      margin-top: 10px;
+    }
+  }
 }
 
 @import "../../../../builder/builder.less";

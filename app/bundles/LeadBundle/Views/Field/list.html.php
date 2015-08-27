@@ -11,7 +11,7 @@ if ($tmpl == 'index')
 ?>
 <?php if (count($items)): ?>
 <div class="table-responsive">
-    <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable">
+    <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable" class="overflow:auto">
         <thead>
             <tr>
                 <th class="col-leadfield-orderhandle"></th>
@@ -26,7 +26,7 @@ if ($tmpl == 'index')
                 <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.group'); ?></th>
                 <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.type'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.core.id'); ?></th>
-                <th class="visible-md visible-lg col-leadfield-statusicons"></th>
+                <th class="visible-sm visible-md visible-lg col-leadfield-statusicons"></th>
             </tr>
         </thead>
         <tbody>
@@ -51,14 +51,14 @@ if ($tmpl == 'index')
                 <td>
                     <span class="ellipsis">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field')); ?>
-                        <?php echo $item->getLabel(); ?>
+                        <a href="<?php echo $view['router']->generate('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"><?php echo $item->getLabel(); ?></a>
                     </span>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>
                 <td><?php echo $view['translator']->transConditional('mautic.core.type.'.$item->getType(), 'mautic.lead.field.type.'.$item->getType()); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                <td>
+                <td class="visible-sm visible-md visible-lg">
                     <?php if ($item->isRequired()): ?>
                         <i class="fa fa-asterisk" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.required'); ?>"></i>
                     <?php endif; ?>
@@ -86,11 +86,10 @@ if ($tmpl == 'index')
 </div>
 <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => $totalItems,
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_leadfield_index',
-        "baseUrl"         => $view['router']->generate('mautic_leadfield_index'),
+        'totalItems'      => $totalItems,
+        'page'            => $page,
+        'limit'           => $limit,
+        'baseUrl'         => $view['router']->generate('mautic_leadfield_index'),
         'sessionVar'      => 'leadfield'
     )); ?>
 </div>

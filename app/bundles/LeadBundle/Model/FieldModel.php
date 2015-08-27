@@ -27,9 +27,7 @@ class FieldModel extends FormModel
 {
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getRepository()
     {
@@ -120,9 +118,17 @@ class FieldModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        if ($entity->getType() == 'time') {
+        $type = $entity->getType();
+        if ($type == 'time') {
             //time does not work well with list filters
             $entity->setIsListable(false);
+        } elseif ($type == 'select' || $type == 'lookup') {
+            // Convert to a string
+            $properties = $entity->getProperties();
+            if (isset($properties['list']) && is_array($properties['list'])) {
+                $properties['list'] = implode('|', array_map('trim', $properties['list']));
+            }
+            $entity->setProperties($properties);
         }
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
@@ -222,13 +228,14 @@ class FieldModel extends FormModel
      * Reorders fields by a list of field ids
      *
      * @param array $list
+     * @param int   $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list)
+    public function reorderFieldsByList(array $list, $start = 1)
     {
         $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
-                $order = ((int) array_search($field->getId(), $list) + 1);
+                $order = ((int) array_search($field->getId(), $list) + $start);
                 $field->setOrder($order);
                 $this->em->persist($field);
             }
@@ -400,6 +407,8 @@ class FieldModel extends FormModel
      *
      * @param       $group
      * @param array $filters
+     *
+     * @return array
      */
     public function getGroupFields($group, $filters = array('isPublished' => true))
     {
