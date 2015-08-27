@@ -608,6 +608,7 @@ Mautic.removeBounceStatus = function (el, dncId) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+        mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
 };
@@ -745,4 +746,24 @@ Mautic.createLeadTag = function(el) {
 
         Mautic.removeLabelLoadingIndicator();
     });
+};
+
+Mautic.leadBatchSubmit = function() {
+    if (Mautic.batchActionPrecheck()) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length) {
+            var ids = Mautic.getCheckedListIds(false, true);
+
+            if (mQuery('#lead_batch_ids').length) {
+                mQuery('#lead_batch_ids').val(ids);
+            } else if (mQuery('#lead_batch_dnc_reason').length) {
+                mQuery('#lead_batch_dnc_ids').val(ids);
+            }
+
+            return true;
+        }
+    }
+
+    mQuery('#MauticSharedModal').modal('hide');
+
+    return false;
 };

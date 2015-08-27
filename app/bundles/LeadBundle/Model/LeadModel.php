@@ -775,19 +775,19 @@ class LeadModel extends FormModel
     /**
      * Add a do not contact entry for the lead
      *
-     * @param Lead      $lead
-     * @param string    $emailAddress
-     * @param string    $reason
-     * @param bool|true $persist
+     * @param Lead       $lead
+     * @param string     $emailAddress
+     * @param string     $reason
+     * @param bool|true  $persist
+     * @param bool|false $manual
      *
      * @return DoNotEmail|bool
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
+    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
         if (empty($emailAddress)) {
-            $fields = $lead->getFields();
-            $emailAddress = $fields['core']['email']['value'];
+            $emailAddress = $lead->getEmail();
 
             if (empty($emailAddress)) {
                 return false;
@@ -802,6 +802,7 @@ class LeadModel extends FormModel
             $dnc->setEmailAddress($emailAddress);
             $dnc->setDateAdded(new \DateTime());
             $dnc->setUnsubscribed();
+            $dnc->setManual($manual);
             $dnc->setComments($reason);
 
             if ($persist) {

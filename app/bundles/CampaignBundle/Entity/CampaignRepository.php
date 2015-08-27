@@ -28,7 +28,7 @@ class CampaignRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias() . ', cat')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias())
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias() . '.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
