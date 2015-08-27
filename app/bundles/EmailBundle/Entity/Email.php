@@ -319,6 +319,7 @@ class Email extends FormEntity
         $builder->createOneToMany('variantChildren', 'Email')
             ->setIndexBy('id')
             ->mappedBy('variantParent')
+            ->fetchLazy()
             ->build();
 
         $builder->createField('variantSettings', 'array')
@@ -590,7 +591,7 @@ class Email extends FormEntity
     public function getReadCount ($includeVariants = false)
     {
         $count = $this->readCount;
-
+return $count;
         if ($includeVariants && $this->isVariant()) {
             $parent = $this->getVariantParent();
             if ($parent) {
@@ -959,7 +960,7 @@ class Email extends FormEntity
     public function getSentCount ($includeVariants = false)
     {
         $count = $this->sentCount;
-
+return $count;
         if ($includeVariants && $this->isVariant()) {
             $parent = $this->getVariantParent();
             if ($parent) {

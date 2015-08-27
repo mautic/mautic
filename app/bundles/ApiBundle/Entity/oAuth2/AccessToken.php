@@ -60,7 +60,8 @@ class AccessToken extends BaseAccessToken
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('oauth2_accesstokens');
+        $builder->setTable('oauth2_accesstokens')
+            ->addIndex(array('token'), 'token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 
+use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
@@ -39,22 +40,54 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     {
         $schema = $args->getSchema();
 
-        if (!$schema->hasTable(MAUTIC_TABLE_PREFIX . 'lead_fields')) {
-            return;
-        }
-
-        $table = $schema->getTable( MAUTIC_TABLE_PREFIX . 'leads');
-
         try {
+            if (!$schema->hasTable(MAUTIC_TABLE_PREFIX.'lead_fields')) {
+                return;
+            }
+
+            $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
+
             //get a list of fields
             $fields = $this->factory->getModel('lead.field')->getRepository()->getFieldAliases();
 
+            // Compile which ones are unique identifiers
+            $uniqueFields = array();
+
             foreach ($fields as $f) {
-                $table->addColumn($f['alias'], 'text', array('notnull' => false));
+                if ($f['is_unique'] ) {
+                    $uniqueFields[$f['alias']] = $f['alias'];
+                }
+
+                if (in_array($f['alias'], array('country', 'email'))) {
+                    $table->addColumn($f['alias'], 'string', array('notnull' => false));
+                    $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
+                } elseif ($f['is_unique']) {
+                    $table->addColumn($f['alias'], 'string', array('notnull' => false));
+                } else {
+                    $table->addColumn($f['alias'], 'text', array('notnull' => false));
+                }
             }
+
+            // Only allow indexes for string types
+            $columns = $table->getColumns();
+            /** @var \Doctrine\DBAL\Schema\Column $column */
+            foreach ($columns as $column) {
+                $type = $column->getType();
+                $name = $column->getName();
+
+                if (!$type instanceof StringType) {
+                    unset($uniqueFields[$name]);
+                }
+            }
+
+            if (!empty($uniqueFields)) {
+                $table->addIndex(array_values($uniqueFields), MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+            }
+
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
             error_log($e->getMessage());
+            die(var_dump($e->getMessage()));
         }
     }
 }

@@ -74,7 +74,8 @@ class Submission
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_submissions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository');
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
+            ->addIndex(array('tracking_id'), 'tracking_search');
 
         $builder->addId();
 

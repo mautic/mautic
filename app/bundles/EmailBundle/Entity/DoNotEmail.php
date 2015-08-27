@@ -70,7 +70,8 @@ class DoNotEmail
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_donotemail')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository');
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository')
+            ->addIndex(array('address'), 'search');
 
         $builder->addId();
 

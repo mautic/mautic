@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
@@ -772,8 +773,6 @@ class InstallController extends CommonController
     /**
      * Installs data fixtures for the application
      *
-     * @param array $dbParams
-     *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function performFixtureInstall ()
@@ -801,6 +800,12 @@ class InstallController extends CommonController
             $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
             $executor = new ORMExecutor($entityManager, $purger);
             $executor->execute($fixtures, true);
+
+            // Add email and country indexes
+            $indexHelper = new IndexSchemaHelper($entityManager->getConnection(), MAUTIC_TABLE_PREFIX);
+            $indexHelper->setName('leads');
+            $indexHelper->addIndex('email', 'email_search');
+            $indexHelper->addIndex('country', 'country_search');
         } catch (\Exception $exception) {
             return array(
                 'type'    => 'error',

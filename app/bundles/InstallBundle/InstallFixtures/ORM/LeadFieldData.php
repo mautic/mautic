@@ -140,7 +140,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             //add the column to the leads table
             $leadsSchema->addColumn(array(
                 'name' => $name,
-                'type' => 'text',
+                'type' => ($name == 'country') ? 'string' : 'text',
                 'options' => array(
                     'notnull' => false
                 )

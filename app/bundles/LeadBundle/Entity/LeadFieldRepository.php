@@ -108,7 +108,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
-        return $qb->select('f.alias')->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')->execute()->fetchAll();
+        return $qb->select('f.alias, f.is_unique_identifer as is_unique')->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')->execute()->fetchAll();
     }
 
 }

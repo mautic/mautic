@@ -173,7 +173,8 @@ class Page extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
+            ->addIndex(array('alias'), 'alias_search');
 
         $builder->addId();
 

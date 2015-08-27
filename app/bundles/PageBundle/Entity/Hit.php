@@ -150,7 +150,11 @@ class Hit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+            ->addIndex(array('ip_id'),'ip_search')
+            ->addIndex(array('tracking_id'), 'tracking_search')
+            ->addIndex(array('code'), 'code_search')
+            ->addIndex(array('source', 'source_id'), 'source_search');
 
         $builder->addId();
 

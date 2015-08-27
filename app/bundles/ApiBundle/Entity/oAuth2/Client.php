@@ -84,7 +84,8 @@ class Client extends BaseClient
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_clients')
-            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth2\ClientRepository');
+            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth2\ClientRepository')
+            ->addIndex(array('random_id'), 'client_id_search');
 
         $builder->addIdColumns('name', false);
 

@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Exception;
 
 
-class SchemaUpdateException extends \Exception
+class SchemaException extends \Exception
 {
     public function __construct($message = 'Could not perform schema change.', $code = 0, \Exception $previous = null)
     {

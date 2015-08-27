@@ -134,7 +134,8 @@ class Field
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_fields')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FieldRepository');
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FieldRepository')
+            ->addIndex(array('type'), 'type_search');
 
         $builder->addId();
 

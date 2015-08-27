@@ -132,7 +132,12 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository');
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
+            ->addIndex(array('email_id', 'lead_id'), 'search')
+            ->addIndex(array('is_failed'), 'failed_search')
+            ->addIndex(array('is_read'), 'read_search')
+            ->addIndex(array('tracking_hash'), 'hash_search')
+            ->addIndex(array('source', 'source_id'), 'source_search');
 
         $builder->addId();
 
