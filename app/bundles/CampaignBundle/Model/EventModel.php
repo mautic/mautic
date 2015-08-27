@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignDecisionTriggerEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -27,6 +28,24 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class EventModel extends CommonFormModel
 {
+    /**
+     * @var
+     */
+    private $batchSleepTime;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        parent::__construct($factory);
+
+        $eventSleepTime = $factory->getParameter('batch_event_sleep_time', false);
+        if ($eventSleepTime === false) {
+            $eventSleepTime = $factory->getParameter('batch_sleep_time', 1);
+        }
+        $this->batchSleepTime = $eventSleepTime;
+    }
 
     /**
      * {@inheritdoc}
@@ -451,6 +470,8 @@ class EventModel extends CommonFormModel
         }
 
         $continue = true;
+
+        $sleepBatchCount = 0;
         while ($continue && $eventCount < $maxCount) {
             // Get list of all campaign leads
             $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
@@ -483,15 +504,7 @@ class EventModel extends CommonFormModel
                 break;
             }
 
-            // Keep CPU down
-            sleep(2);
-
             foreach ($leads as $lead) {
-                sleep(1);
-
-                // Keep CPU down
-                usleep(500);
-
                 $logger->debug('CAMPAIGN: Current Lead ID: '. $lead->getId());
 
                 if ($eventCount >= $maxCount) {
@@ -502,6 +515,14 @@ class EventModel extends CommonFormModel
                 $leadModel->setSystemCurrentLead($lead);
 
                 foreach ($events as $event) {
+                    if ($sleepBatchCount == $limit) {
+                        // Keep CPU down
+                        sleep($this->batchSleepTime);
+                        $sleepBatchCount = 0;
+                    } else {
+                        $sleepBatchCount++;
+                    }
+
                     $eventCount++;
 
                     if (!isset($eventSettings['action'][$event['type']])) {
@@ -677,6 +698,7 @@ class EventModel extends CommonFormModel
             }
         }
 
+        $sleepBatchCount = 0;
         while ($eventCount < $totalScheduledCount) {
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
@@ -703,6 +725,12 @@ class EventModel extends CommonFormModel
                 )
             );
 
+            if (!count($leads)) {
+                // Just a precaution in case non-existent leads are lingering in the campaign leads table
+
+                break;
+            }
+
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
                     continue;
@@ -718,8 +746,13 @@ class EventModel extends CommonFormModel
                 $persist = array();
 
                 foreach ($leadEvents as $log) {
-                    // Keep CPU down
-                    sleep(1);
+                    if ($sleepBatchCount == $limit) {
+                        // Keep CPU down
+                        sleep($this->batchSleepTime);
+                        $sleepBatchCount = 0;
+                    } else {
+                        $sleepBatchCount++;
+                    }
 
                     $event = $campaignEvents[$log['event_id']];
 
@@ -894,10 +927,9 @@ class EventModel extends CommonFormModel
                 }
             }
 
-            while ($start <= $leadCount) {
-                // Keep CPU down
-                sleep(1);
+            $sleepBatchCount = 0;
 
+            while ($start <= $leadCount) {
                 // Get batched campaign ids
                 $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit);
 
@@ -941,12 +973,10 @@ class EventModel extends CommonFormModel
                     );
 
                     if (!count($leads)) {
-                        // Somehow ran out of leads so break out
-                        break;
-                    }
+                        // Just a precaution in case non-existent leads are lingering in the campaign leads table
 
-                    $pauseBatchCount = 0;
-                    $pauseBatch      = 5;
+                        continue;
+                    }
 
                     // Loop over the non-actions and determine if it has been processed for this lead
                     foreach ($leads as $l) {
@@ -957,13 +987,6 @@ class EventModel extends CommonFormModel
 
                         // Prevent path if lead has already gone down this path
                         if (!array_key_exists($parentId, $leadLog[$l->getId()])) {
-                            if ($pauseBatchCount == $pauseBatch) {
-                                // Keep CPU down
-                                sleep(2);
-                                $pauseBatchCount = 0;
-                            } else {
-                                $pauseBatchCount++;
-                            }
 
                             // Get date to compare against
                             $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
@@ -974,6 +997,14 @@ class EventModel extends CommonFormModel
                             $eventTiming   = array();
                             $executeAction = false;
                             foreach ($events as $id => $e) {
+                                if ($sleepBatchCount == $limit) {
+                                    // Keep CPU down
+                                    sleep($this->batchSleepTime);
+                                    $sleepBatchCount = 0;
+                                } else {
+                                    $sleepBatchCount++;
+                                }
+
                                 if (array_key_exists($id, $leadLog[$l->getId()])) {
                                     $logger->debug('CAMPAIGN: Event (ID #'.$id.') has already been executed');
                                     unset($e);
@@ -1095,14 +1126,6 @@ class EventModel extends CommonFormModel
 
                         } else {
                             $logger->debug('CAMPAIGN: Decision has already been executed.');
-
-                            $pauseBatchCount++;
-
-                            if ($pauseBatchCount == $pauseBatch) {
-                                // Keep CPU down
-                                sleep(2);
-                                $pauseBatchCount = 0;
-                            }
                         }
 
                         $currentCount = ($max) ? $totalEventCount : $leadProcessedCount;

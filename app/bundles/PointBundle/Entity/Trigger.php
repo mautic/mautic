@@ -58,7 +58,7 @@ class Trigger extends FormEntity
     /**
      * @var string
      */
-    private $color;
+    private $color = 'a0acb8';
 
     /**
      * @var bool

@@ -392,6 +392,7 @@ var Mautic = {
                         var id = mQuery(this).attr('id');
                         var button = mQuery("<button type='button' />")
                             .addClass(mQuery(this).attr('class'))
+                            .addClass('btn-copy')
                             .html(mQuery(this).html())
                             .appendTo(container + ' .modal-form-buttons')
                             .on('click.ajaxform', function (event) {
@@ -442,6 +443,7 @@ var Mautic = {
 
                         mQuery("<button type='button' />")
                             .addClass(mQuery(this).attr('class'))
+                            .addClass('btn-copy')
                             .attr('id', mQuery(this).attr('id') + '_toolbar')
                             .html(mQuery(this).html())
                             .on('click.ajaxform', buttonClick)
@@ -1157,7 +1159,7 @@ var Mautic = {
         var action = form.attr('action');
 
         if (!inMain) {
-            Mautic.startModalLoadingBar();
+            Mautic.startModalLoadingBar('#' + mQuery(modalParent).attr('id'));
         }
         var showLoading = (!inMain || form.attr('data-hide-loadingbar')) ? false : true;
 
@@ -1306,10 +1308,56 @@ var Mautic = {
      */
     ajaxifyForm: function (formName) {
         //prevent enter submitting form and instead jump to next line
-        mQuery('form[name="' + formName + '"] input').off('keydown.ajaxform');
-        mQuery('form[name="' + formName + '"] input').on('keydown.ajaxform', function (e) {
-            if (e.keyCode == 13) {
-                var inputs = mQuery(this).parents("form").eq(0).find(":input");
+        var form = 'form[name="' + formName + '"]';
+        mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
+        mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
+            if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)) {
+                if (MauticVars.formSubmitInProgress) {
+                    return false;
+                }
+
+                // Find save button first then apply
+                var saveButton = mQuery(form).find('button.btn-save');
+                var applyButton = mQuery(form).find('button.btn-apply');
+
+                var modalParent = mQuery(form).closest('.modal');
+                var inMain      = mQuery(modalParent).length > 0 ? false : true;
+
+                if (mQuery(saveButton).length) {
+                    if (inMain) {
+                        if (mQuery(form).find('button.btn-save.btn-copy').length) {
+                            mQuery(mQuery(form).find('button.btn-save.btn-copy')).trigger('click');
+
+                            return;
+                        }
+                    } else {
+                        if (mQuery(modalParent).find('button.btn-save.btn-copy').length) {
+                            mQuery(mQuery(modalParent).find('button.btn-save.btn-copy')).trigger('click');
+
+                            return;
+                        }
+                    }
+
+                    mQuery(saveButton).trigger('click');
+                } else if (mQuery(applyButton).length) {
+                    if (inMain) {
+                        if (mQuery(form).find('button.btn-apply.btn-copy').length) {
+                            mQuery(mQuery(form).find('button.btn-apply.btn-copy')).trigger('click');
+
+                            return;
+                        }
+                    } else {
+                        if (mQuery(modalParent).find('button.btn-apply.btn-copy').length) {
+                            mQuery(mQuery(modalParent).find('button.btn-apply.btn-copy')).trigger('click');
+
+                            return;
+                        }
+                    }
+
+                    mQuery(applyButton).trigger('click');
+                }
+            } else if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
+                var inputs = mQuery(this).parents('form').eq(0).find(':input');
                 if (inputs[inputs.index(this) + 1] != null) {
                     inputs[inputs.index(this) + 1].focus();
                 }
@@ -1319,7 +1367,7 @@ var Mautic = {
         });
 
         //activate the submit buttons so symfony knows which were clicked
-        mQuery('form[name="' + formName + '"] :submit').each(function () {
+        mQuery(form + ' :submit').each(function () {
             mQuery(this).off('click.ajaxform');
             mQuery(this).on('click.ajaxform', function () {
                 if (mQuery(this).attr('name') && !mQuery("input[name='" + mQuery(this).attr('name') + "']").length) {
@@ -1332,14 +1380,25 @@ var Mautic = {
                 }
             });
         });
+
         //activate the forms
-        mQuery('form[name="' + formName + '"]').off('submit.ajaxform');
-        mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
+        mQuery(form).off('submit.ajaxform');
+        mQuery(form).on('submit.ajaxform', (function (e) {
             e.preventDefault();
 
             if (MauticVars.formSubmitInProgress) {
                 return false;
             } else {
+                var callback = mQuery(this).data('submit-callback');
+
+                // Allow a callback to do stuff before submit and abort if needed
+                if (callback && typeof Mautic[callback] == 'function') {
+                    if (!Mautic[callback]()) {
+
+                        return false;
+                    }
+                }
+
                 MauticVars.formSubmitInProgress = true;
             }
 
@@ -1808,20 +1867,8 @@ var Mautic = {
             // Action is currently being executed
             return;
         }
-        var checkboxes = 'input[class=list-checkbox]:checked';
 
-        // Check for a target
-        if (typeof el != 'undefined') {
-            var target = mQuery(el).data('target');
-            if (target) {
-                checkboxes = target + ' ' + checkboxes;
-            }
-        }
-
-        // Retrieve all of the selected items
-        var items = JSON.stringify(mQuery(checkboxes).map(function () {
-            return mQuery(this).val();
-        }).get());
+        var items = Mautic.getCheckedListIds(el, true);
 
         var queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
 
@@ -1830,6 +1877,36 @@ var Mautic = {
 
         // Hand over processing to the executeAction method
         Mautic.executeAction(action);
+    },
+
+    /**
+     * Retrieves the IDs of the items checked in a list
+     *
+     * @param el
+     * @param stringify
+     * @returns {*}
+     */
+    getCheckedListIds: function(el, stringify) {
+        var checkboxes = 'input[class=list-checkbox]:checked';
+
+        // Check for a target
+        if (typeof el != 'undefined' && el) {
+            var target = mQuery(el).data('target');
+            if (target) {
+                checkboxes = target + ' ' + checkboxes;
+            }
+        }
+
+        // Retrieve all of the selected items
+        var items = mQuery(checkboxes).map(function () {
+            return mQuery(this).val();
+        }).get();
+
+        if (stringify) {
+            items = JSON.stringify(items);
+        }
+
+        return items;
     },
 
     /**
