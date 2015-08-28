@@ -327,10 +327,14 @@ Mautic.leadfieldOnLoad = function (container) {
         mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
             helper: fixHelper,
+            scroll: false,
+            axis: 'y',
+            containment: container + ' .leadfield-list',
             stop: function(i) {
+                // Get the page and limit
                 mQuery.ajax({
                     type: "POST",
-                    url: mauticAjaxUrl + "?action=lead:reorder",
+                    url: mauticAjaxUrl + "?action=lead:reorder&limit=" + mQuery('.pagination-limit').val() + '&page=' + mQuery('.pagination li.active a span').first().text(),
                     data: mQuery(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });
@@ -339,10 +343,14 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
-    if (mQuery('#field-templates .'+selectedVal).length) {
-        mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
+    if (selectedVal == 'lookup') {
+        // Use select
+        selectedVal = 'select';
+    }
 
-        mQuery("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
+    if (mQuery('#field-templates .'+selectedVal).length) {
+        mQuery('#leadfield_properties').html('');
+        mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
     } else {
         mQuery('#leadfield_properties').html('');
     }
@@ -352,6 +360,37 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     } else {
         mQuery('#leadfield_isListable').closest('.row').removeClass('hide');
     }
+
+    // Switch default field if applicable
+    var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
+
+    if (selectedVal == 'boolean') {
+        if (defaultFieldType == 'text') {
+            // Convert to a select
+            var newDiv      = mQuery('<div id="leadfield_defaultValue"></div>');
+            var defaultBool = mQuery('#field-templates .default_bool').html();
+            defaultBool     = defaultBool.replace(/default_bool_template/g, 'defaultValue');
+
+            mQuery(defaultBool).appendTo(newDiv);
+
+            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+        }
+    } else if (defaultFieldType == 'radio') {
+        // Convert to input
+        var html = mQuery('#field-templates .default').html();
+        html     = html.replace(/default_template/g, 'defaultValue');
+        mQuery('#leadfield_defaultValue').replaceWith(html);
+    }
+};
+
+/**
+ *
+ * @param label
+ */
+Mautic.updateLeadFieldBooleanLabels = function(el, label) {
+    mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
+        mQuery(el).val()
+    );
 };
 
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
