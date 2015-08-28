@@ -39,7 +39,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $monitoredHideOn = ($options['mailbox'] == 'general') ? '{}'
+        $monitoredShowOn = ($options['mailbox'] == 'general') ? '{}'
             : '{"config_emailconfig_monitored_email_'.$options['mailbox'].'_override_settings_1": "checked"}';
 
         $builder->add(
@@ -51,7 +51,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'attr'        => array(
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.monitored_email_address.tooltip',
-                    'data-show-on' => $monitoredHideOn
+                    'data-show-on' => $monitoredShowOn
                 ),
                 'constraints' => array(
                     new Email(
@@ -73,7 +73,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'attr'       => array(
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.monitored_email_host.tooltip',
-                    'data-show-on' => $monitoredHideOn
+                    'data-show-on' => $monitoredShowOn
                 ),
                 'required'   => false
             )
@@ -88,7 +88,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'attr'       => array(
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.monitored_email_port.tooltip',
-                    'data-show-on' => $monitoredHideOn
+                    'data-show-on' => $monitoredShowOn
                 ),
                 'required'   => false,
                 'data'       => (array_key_exists('port', $options['data']))
@@ -103,15 +103,15 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 array(
                     'choices'     => array(
                         '/ssl' => 'mautic.email.config.mailer_encryption.ssl',
-                        '/ssl/no-validate' => 'mautic.email.config.monitored_email_encryption.ssl_novalidate',
+                        '/ssl/novalidate-cert' => 'mautic.email.config.monitored_email_encryption.ssl_novalidate',
                         '/tls' => 'mautic.email.config.mailer_encryption.tls',
-                        '/tls/no-validate' => 'mautic.email.config.monitored_email_encryption.tls_novalidate'
+                        '/tls/novalidate-cert' => 'mautic.email.config.monitored_email_encryption.tls_novalidate'
                     ),
                     'label'       => 'mautic.email.config.monitored_email_encryption',
                     'required'    => false,
                     'attr'        => array(
                         'class'        => 'form-control',
-                        'data-show-on' => $monitoredHideOn,
+                        'data-show-on' => $monitoredShowOn,
                         'tooltip'      => 'mautic.email.config.monitored_email_encryption.tooltip'
                     ),
                     'empty_value' => 'mautic.email.config.mailer_encryption.none',
@@ -130,7 +130,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.monitored_email_user.tooltip',
                     'autocomplete' => 'off',
-                    'data-show-on' => $monitoredHideOn
+                    'data-show-on' => $monitoredShowOn
                 ),
                 'required'   => false
             )
@@ -148,7 +148,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                     'preaddon'     => 'fa fa-lock',
                     'tooltip'      => 'mautic.email.config.monitored_email_password.tooltip',
                     'autocomplete' => 'off',
-                    'data-show-on' => $monitoredHideOn
+                    'data-show-on' => $monitoredShowOn
                 ),
                 'required'   => false
             )
