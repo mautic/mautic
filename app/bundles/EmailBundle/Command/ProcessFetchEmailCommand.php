@@ -117,6 +117,11 @@ EOT
             unset($mailIds, $messages);
         }
 
+        if (empty($searchMailboxes)) {
+
+            $output->writeln('No mailboxes are configured.');
+        }
+
         return 0;
     }
 }
