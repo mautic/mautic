@@ -1161,13 +1161,18 @@ var Mautic = {
         var action = form.attr('action');
 
         if (!inMain) {
-            Mautic.startModalLoadingBar('#' + mQuery(modalParent).attr('id'));
+            var modalTarget = '#' + mQuery(modalParent).attr('id');
+            Mautic.startModalLoadingBar(modalTarget);
         }
         var showLoading = (!inMain || form.attr('data-hide-loadingbar')) ? false : true;
 
         form.ajaxSubmit({
             showLoadingBar: showLoading,
             success: function (data) {
+                if (!inMain) {
+                    Mautic.stopModalLoadingBar(modalTarget);
+                }
+
                 if (data.redirect) {
                     Mautic.redirectWithBackdrop(data.redirect);
                 } else {
