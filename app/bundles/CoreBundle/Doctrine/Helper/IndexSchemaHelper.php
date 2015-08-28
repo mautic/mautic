@@ -62,7 +62,6 @@ class IndexSchemaHelper
         $this->db     = $db;
         $this->prefix = $prefix;
         $this->sm     = $this->db->getSchemaManager();
-        $this->schema = $this->sm->createSchema();
     }
 
     public function setName($name)
@@ -71,6 +70,7 @@ class IndexSchemaHelper
             throw new SchemaException("Table $name does not exist!");
         }
 
+        $this->table                = $this->sm->listTableDetails($this->prefix.$name);
         $this->tableDiff            = new TableDiff($this->prefix.$name);
         $this->tableDiff->fromTable = $this->table;
     }
@@ -84,20 +84,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $table
-     *
-     * @throws SchemaException
-     */
-    public function setTable($table)
-    {
-        if (!$this->checkTableExists($table)) {
-            throw new SchemaException("Table $table not found");
-        }
-
-        $this->table = $this->schema->getTable($table);
-    }
-
-    /**
      * Add or update an index to the table
      *
      * @param       $columns
@@ -108,9 +94,12 @@ class IndexSchemaHelper
      */
     public function addIndex($columns, $name, $options = array())
     {
+        if (!is_array($columns)) {
+            $columns = array($columns);
+        }
         foreach ($columns as $column) {
-            if (!in_array($this->allowedColumns)) {
-                $columnSchema = $this->schema->getColumn($column);
+            if (!in_array($column, $this->allowedColumns)) {
+                $columnSchema = $this->table->getColumn($column);
 
                 $type = $columnSchema->getType();
                 if ($type instanceof StringType) {

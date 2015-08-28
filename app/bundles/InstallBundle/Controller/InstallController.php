@@ -14,6 +14,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\TableDiff;
@@ -668,7 +669,7 @@ class InstallController extends CommonController
                 foreach ($oldRestraints as $or) {
                     $foreignTable     = $or->getForeignTableName();
                     $foreignTableName = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $foreignTable);
-                    $r                = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(
+                    $r                = new ForeignKeyConstraint(
                         $or->getLocalColumns(),
                         $foreignTableName,
                         $or->getForeignColumns(),
@@ -800,12 +801,6 @@ class InstallController extends CommonController
             $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
             $executor = new ORMExecutor($entityManager, $purger);
             $executor->execute($fixtures, true);
-
-            // Add email and country indexes
-            $indexHelper = new IndexSchemaHelper($entityManager->getConnection(), MAUTIC_TABLE_PREFIX);
-            $indexHelper->setName('leads');
-            $indexHelper->addIndex('email', 'email_search');
-            $indexHelper->addIndex('country', 'country_search');
         } catch (\Exception $exception) {
             return array(
                 'type'    => 'error',
