@@ -10,9 +10,14 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\DateType;
+use Doctrine\DBAL\Types\FloatType;
+use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\TextType;
+use Doctrine\DBAL\Types\TimeType;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -609,24 +614,25 @@ class LeadListRepository extends CommonRepository
 
             $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
             $columnType = $column->getType();
+
             switch ($details['type']) {
                 case 'datetime':
-                    if ($columnType instanceof TextType) {
+                    if (!$columnType instanceof UTCDateTimeType) {
                         $field = $formatter->toDateTime($field);
                     }
                     break;
                 case 'date':
-                    if ($columnType instanceof TextType) {
+                    if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
                         $field = $formatter->toDate($field);
                     }
                     break;
                 case 'time':
-                    if ($columnType instanceof TextType) {
+                    if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
                         $field = $formatter->toTime($field);
                     }
                     break;
                 case 'number':
-                    if ($columnType instanceof TextType) {
+                    if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
                         $field = $formatter->toNumeric($field);
                     }
                     break;
@@ -661,88 +667,171 @@ class LeadListRepository extends CommonRepository
             $exprParameter    = ":$parameter";
             $ignoreAutoFilter = false;
 
-            // Special handling of today/tomorrow values
+            // Special handling of relative date strings
             if ($details['type'] == 'datetime' || $details['type'] == 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
+                // Check if the column type is a date/time stamp
+                $isTimestamp = ($columnType instanceof UTCDateTimeType || $details['type'] == 'datetime');
+                $getDate     = function(&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $not) {
+                    $key             = array_search($string, $relativeDateStrings);
+                    $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
+                    $requiresBetween = (in_array($func, array('eq', 'neq')) && $isTimestamp);
 
-                $getDate = function(&$string) use ($relativeDateStrings, &$details, &$func, $not) {
-                    $key      = array_search($string, $relativeDateStrings);
-                    $dtHelper = new DateTimeHelper('midnight today', null, 'local');
+                    $timeframe  = str_replace('mautic.lead.list.', '', $key);
+                    $modifier   = false;
+                    $isRelative = true;
 
-                    switch ($key) {
-                        case 'mautic.lead.list.today':
-                            $startDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $startDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
+                    switch ($timeframe) {
+                        case 'today':
+                        case 'tomorrow':
+                        case 'yesterday':
+                            if ($timeframe == 'yesterday') {
+                                $dtHelper->modify('-1 day');
+                            } elseif ($timeframe == 'tomorrow') {
+                                $dtHelper->modify('+1 day');
+                            }
 
-                            $dtHelper->modify('+86399 seconds');
+                            // Today = 2015-08-28 00:00:00
+                            if ($requiresBetween) {
+                                // eq:
+                                //  field >= 2015-08-28 00:00:00
+                                //  field < 2015-08-29 00:00:00
 
-                            $endDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $endDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
+                                // neq:
+                                // field < 2015-08-28 00:00:00
+                                // field >= 2015-08-29 00:00:00
+                                $modifier = '+1 day';
+                            } else {
+                                // lt:
+                                //  field < 2015-08-28 00:00:00
+                                // gt:
+                                //  field > 2015-08-28 23:59:59
+
+                                // lte:
+                                //  field <= 2015-08-28 23:59:59
+                                // gte:
+                                //  field >= 2015-08-28 00:00:00
+                                if (in_array($func, array('gt', 'lte'))) {
+                                    $modifier = '+1 day -1 second';
+                                }
+                            }
                             break;
-
-                        case 'mautic.lead.list.tomorrow':
-                        case 'mautic.lead.list.yesterday':
-                            $interval = ($key == 'mautic.lead.list.tomorrow') ? '+1 day' : '-1 day';
-                            $dtHelper->modify($interval);
-
-                            $startDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $startDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
-
-                            $dtHelper->modify('+86399 seconds');
-
-                            $endDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $endDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
-                            break;
-
-                        case 'mautic.lead.list.week_last':
-                        case 'mautic.lead.list.week_next':
-                        case 'mautic.lead.list.week_this':
-                            $interval = substr($key, -4);
+                        case 'week_last':
+                        case 'week_next':
+                        case 'week_this':
+                            $interval = str_replace('week_', '', $timeframe);
                             $dtHelper->setDateTime('midnight monday ' . $interval .' week', null);
-                            $startDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $startDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
 
-                            $dtHelper->modify('+1 week');
+                            // This week: Monday 2015-08-24 00:00:00
+                            if ($requiresBetween) {
+                                // eq:
+                                //  field >= Mon 2015-08-24 00:00:00
+                                //  field <  Mon 2015-08-31 00:00:00
 
-                            $endDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $endDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
+                                // neq:
+                                // field <  Mon 2015-08-24 00:00:00
+                                // field >= Mon 2015-08-31 00:00:00
+                                $modifier = '+1 week';
+                            } else {
+                                // lt:
+                                //  field < Mon 2015-08-24 00:00:00
+                                // gt:
+                                //  field > Sun 2015-08-30 23:59:59
+
+                                // lte:
+                                //  field <= Sun 2015-08-30 23:59:59
+                                // gte:
+                                //  field >= Mon 2015-08-24 00:00:00
+                                if (in_array($func, array('gt', 'lte'))) {
+                                    $modifier = '+1 week -1 second';
+                                }
+                            }
                             break;
 
-                        case 'mautic.lead.list.month_last':
-                        case 'mautic.lead.list.month_next':
-                        case 'mautic.lead.list.month_this':
+                        case 'month_last':
+                        case 'month_next':
+                        case 'month_this':
                             $interval = substr($key, -4);
                             $dtHelper->setDateTime('midnight first day of ' . $interval . ' month', null);
-                            $startDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $startDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
 
-                            $dtHelper->modify('+1 month');
+                            // This month: 2015-08-01 00:00:00
+                            if ($requiresBetween) {
+                                // eq:
+                                //  field >= 2015-08-01 00:00:00
+                                //  field <  2015-09:01 00:00:00
 
-                            $endDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $endDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
+                                // neq:
+                                // field <  2015-08-01 00:00:00
+                                // field >= 2016-09-01 00:00:00
+                                $modifier = '+1 month';
+                            } else {
+                                // lt:
+                                //  field < 2015-08-01 00:00:00
+                                // gt:
+                                //  field > 2015-08-31 23:59:59
 
+                                // lte:
+                                //  field <= 2015-08-31 23:59:59
+                                // gte:
+                                //  field >= 2015-08-01 00:00:00
+                                if (in_array($func, array('gt', 'lte'))) {
+                                    $modifier = '+1 month -1 second';
+                                }
+                            }
                             break;
-                        case 'mautic.lead.list.year_last':
-                        case 'mautic.lead.list.year_next':
-                        case 'mautic.lead.list.year_this':
+                        case 'year_last':
+                        case 'year_next':
+                        case 'year_this':
                             $interval = substr($key, -4);
                             $dtHelper->setDateTime('midnight first day of ' . $interval . ' year', null);
-                            $startDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $startDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
 
-                            $dtHelper->modify('+1 year');
+                            // This year: 2015-01-01 00:00:00
+                            if ($requiresBetween) {
+                                // eq:
+                                //  field >= 2015-01-01 00:00:00
+                                //  field <  2016-01-01 00:00:00
 
-                            $endDateString     = $dtHelper->toUtcString('Y-m-d');
-                            $endDateTimeString = $dtHelper->toUtcString('Y-m-d H:i:s');
+                                // neq:
+                                // field <  2015-01-01 00:00:00
+                                // field >= 2016-01-01 00:00:00
+                                $modifier = '+1 year';
+                            } else {
+                                // lt:
+                                //  field < 2015-01-01 00:00:00
+                                // gt:
+                                //  field > 2015-12-31 23:59:59
 
-                             break;
+                                // lte:
+                                //  field <= 2015-12-31 23:59:59
+                                // gte:
+                                //  field >= 2015-01-01 00:00:00
+                                if (in_array($func, array('gt', 'lte'))) {
+                                    $modifier = '+1 year -1 second';
+                                }
+                            }
+                            break;
+                        default:
+                            $isRelative = false;
+                            break;
                     }
 
-                    if (!empty($startDateTimeString)) {
-                        // Use a between statement
-                        $func = ($func == 'neq') ? 'notBetween' : 'between';
+                    if ($isRelative) {
+                        if ($requiresBetween) {
+                            $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
 
-                        $details['filter'] = ($details['type'] == 'date') ? array($startDateString, $endDateString) : array($startDateTimeString, $endDateTimeString);
+                            $dtHelper->modify($modifier);
+                            $endWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
+
+                            // Use a between statement
+                            $func              = ($func == 'neq') ? 'notBetween' : 'between';
+                            $details['filter'] = array($startWith, $endWith);
+                        } else {
+                            if ($modifier) {
+                                $dtHelper->modify($modifier);
+                            }
+
+                            $details['filter'] = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
+                        }
                     }
                 };
 
@@ -816,28 +905,28 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'between':
                         case 'notBetween':
-                            // Filter should be saved with double || to separate options
-                            $parameter2              = $this->generateRandomParameterName();
-                            $parameters[$parameter]  = $details['filter'][0];
-                            $parameters[$parameter2] = $details['filter'][1];
-                            $exprParameter2          = ":$parameter2";
-                            $ignoreAutoFilter        = true;
+                        // Filter should be saved with double || to separate options
+                        $parameter2              = $this->generateRandomParameterName();
+                        $parameters[$parameter]  = $details['filter'][0];
+                        $parameters[$parameter2] = $details['filter'][1];
+                        $exprParameter2          = ":$parameter2";
+                        $ignoreAutoFilter        = true;
 
-                            if ($func == 'between') {
-                                $useExpr->add(
-                                    $q->expr()->andX(
-                                        $q->expr()->gte($field, $exprParameter),
-                                        $q->expr()->lte($field, $exprParameter2)
-                                    )
-                                );
-                            } else {
-                                $useExpr->add(
-                                    $q->expr()->andX(
-                                        $q->expr()->lte($field, $exprParameter),
-                                        $q->expr()->gte($field, $exprParameter2)
-                                    )
-                                );
-                            }
+                        if ($func == 'between') {
+                            $useExpr->add(
+                                $q->expr()->andX(
+                                    $q->expr()->gte($field, $exprParameter),
+                                    $q->expr()->lt($field, $exprParameter2)
+                                )
+                            );
+                        } else {
+                            $useExpr->add(
+                                $q->expr()->andX(
+                                    $q->expr()->lt($field, $exprParameter),
+                                    $q->expr()->gte($field, $exprParameter2)
+                                )
+                            );
+                        }
 
                             break;
                         case 'notEmpty':
