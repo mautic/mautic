@@ -411,8 +411,18 @@ class Lead extends FormEntity
      */
     public function getName ($lastFirst = false)
     {
-        $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
-        $lastName  = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
+        if (isset($this->updatedFields['firstname'])) {
+            $firstName = $this->updatedFields['firstname'];
+        } else {
+            $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
+        }
+
+        if (isset($this->updatedFields['lastname'])) {
+            $lastName = $this->updatedFields['lastname'];
+        } else {
+            $lastName = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
+        }
+
         $fullName  = "";
         if ($lastFirst && !empty($firstName) && !empty($lastName)) {
             $fullName = $lastName.", ".$firstName;
@@ -434,6 +444,11 @@ class Lead extends FormEntity
      */
     public function getCompany()
     {
+        if (isset($this->updatedFields['company'])) {
+
+            return $this->updatedFields['company'];
+        }
+
         if (!empty($this->fields['core']['company']['value'])) {
 
             return $this->fields['core']['company']['value'];
@@ -443,18 +458,55 @@ class Lead extends FormEntity
     }
 
     /**
-     * Get company
+     * Get email
      *
      * @return string
      */
     public function getEmail()
     {
+        if (isset($this->updatedFields['email'])) {
+
+            return $this->updatedFields['email'];
+        }
+
         if (!empty($this->fields['core']['email']['value'])) {
 
             return $this->fields['core']['email']['value'];
         }
 
         return '';
+    }
+
+    /**
+     * Get lead field value
+     *
+     * @param      $field
+     * @param null $group
+     *
+     * @return bool
+     */
+    public function getFieldValue($field, $group = null)
+    {
+        if (isset($this->updatedFields[$field])) {
+
+            return $this->updatedFields[$field];
+        }
+
+        if (!empty($group) && isset($this->fields[$group][$field])) {
+
+            return $this->fields[$group][$field]['value'];
+        }
+
+        foreach ($this->fields as $group => $groupFields) {
+            foreach ($groupFields as $name => $details) {
+                if ($name == $field) {
+
+                    return $details['value'];
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,6 +36,21 @@ class ListModel extends FormModel
      * @var array
      */
     private $leadChangeLists = array();
+
+    /**
+     * @var
+     */
+    private $batchSleepTime;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        parent::__construct($factory);
+
+        $this->batchSleepTime = $factory->getParameter('batch_sleep_time', 1);
+    }
 
     /**
      * {@inheritdoc}
@@ -453,8 +469,8 @@ class ListModel extends FormModel
 
             // Add leads
             while ($start < $leadCount) {
-                // Keep CPU down
-                sleep(2);
+                // Keep CPU down for large lists; sleep per $limit batch
+                sleep($this->batchSleepTime);
 
                 $newLeadList = $this->getLeadsByList(
                     $list,
@@ -475,14 +491,14 @@ class ListModel extends FormModel
                 }
 
                 foreach ($newLeadList[$id] as $l) {
-                    // Keep RAM down
-                    usleep(500);
-
                     $this->addLead($l, $entity, false, true, -1, $localDateTime);
 
                     unset($l);
 
                     $leadsProcessed++;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setCurrent($leadsProcessed);
+                    }
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         break;
@@ -491,15 +507,8 @@ class ListModel extends FormModel
 
                 $start += $limit;
 
-                if ($output && $leadsProcessed < $maxCount) {
-                    $progress->setCurrent($leadsProcessed);
-                }
-
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    // Keep RAM down
-                    sleep(2);
-
                     $event = new ListChangeEvent($newLeadList[$id], $entity, true);
                     $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
 
@@ -569,8 +578,8 @@ class ListModel extends FormModel
 
             // Remove leads
             while ($start < $leadCount) {
-                // Keep CPU down
-                sleep(2);
+                // Keep CPU down for large lists; sleep per $limit batch
+                sleep($this->batchSleepTime);
 
                 $removeLeadList = $this->getLeadsByList(
                     $list,
@@ -589,12 +598,13 @@ class ListModel extends FormModel
                 }
 
                 foreach ($removeLeadList[$id] as $l) {
-                    // Keep RAM down
-                    usleep(500);
 
                     $this->removeLead($l, $entity, false, true, true);
 
                     $leadsProcessed++;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setCurrent($leadsProcessed);
+                    }
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         break;
@@ -603,9 +613,6 @@ class ListModel extends FormModel
 
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    // Keep RAM down
-                    sleep(2);
-
                     $event = new ListChangeEvent($removeLeadList[$id], $entity, false);
                     $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
 
@@ -613,11 +620,6 @@ class ListModel extends FormModel
                 }
 
                 $start += $limit;
-
-                if ($output && $leadsProcessed < $maxCount) {
-                    $progress->setCurrent($leadsProcessed);
-                }
-
 
                 unset($removeLeadList);
 

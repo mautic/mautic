@@ -31,9 +31,6 @@ if ($tmpl == 'index') {
             <ul class="list-group">
                 <?php foreach ($majors as $message) : ?>
                     <?php switch ($message) :
-                        case 'mautic.install.minimum.php.version': ?>
-                            <li class="list-group-item"> <?php echo $view['translator']->trans($message, array('%minimum%' => '5.3.7', '%installed' => PHP_VERSION)); ?></li>
-                            <?php break;
                         case 'mautic.install.cache.unwritable': ?>
                             <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/cache')); ?></li>
                             <?php break;
@@ -82,6 +79,12 @@ if ($tmpl == 'index') {
                         <?php switch ($message) :
                             case 'mautic.install.pcre.version': ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
+                                <?php break;
+                            case 'mautic.install.php.version.not.supported': ?>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%phpversion%' => PHP_VERSION)); ?></li>
+                                <?php break;
+                            case 'mautic.install.php.version.has.only.security.support': ?>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%phpversion%' => PHP_VERSION)); ?></li>
                                 <?php break;
                             default: ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>

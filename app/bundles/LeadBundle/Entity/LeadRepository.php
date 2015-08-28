@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -26,6 +25,11 @@ class LeadRepository extends CommonRepository
     private $availableSocialFields = array();
 
     /**
+     * @var array
+     */
+    private $availableSearchFields = array();
+
+    /**
      * Used by search functions to search social profiles
      *
      * @param array $fields
@@ -33,6 +37,16 @@ class LeadRepository extends CommonRepository
     public function setAvailableSocialFields(array $fields)
     {
         $this->availableSocialFields = $fields;
+    }
+
+    /**
+     * Used by search functions to search using aliases as commands
+     *
+     * @param array $fields
+     */
+    public function setAvailableSearchFields(array $fields)
+    {
+        $this->availableSearchFields = $fields;
     }
 
     /**
@@ -474,6 +488,8 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
         $this->buildWhereClause($dq, $args);
+
+         // Why is this here?
         $dq->andWhere(
             $dq->expr()->orX(
                 $dq->expr()->isNull('ll.manually_removed'),
@@ -481,7 +497,6 @@ class LeadRepository extends CommonRepository
             )
         )
             ->setParameter('false', false, 'boolean');
-
         //get a total count
         $result = $dq->execute()->fetchAll();
         $total  = $result[0]['count'];
@@ -707,22 +722,16 @@ class LeadRepository extends CommonRepository
                 );
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.core.searchcommand.email'):
-                $expr = $q->expr()->$likeFunc('l.email', ":$unique");
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
-                $expr = $q->expr()->$likeFunc('l.company', ":$unique");
-                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
                 $expr = $q->expr()->$xFunc(
-                    $q->expr()->$likeFunc('u.firstName', ':'.$unique),
-                    $q->expr()->$likeFunc('u.lastName', ':'.$unique)
+                    $q->expr()->$likeFunc('LOWER(u.firstName)', ':'.$unique),
+                    $q->expr()->$likeFunc('LOWER(u.lastName)', ':'.$unique)
                 );
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $expr = $q->expr()->$xFunc(
-                    $q->expr()->$likeFunc('l.firstname', ":$unique"),
-                    $q->expr()->$likeFunc('l.lastname', ":$unique")
+                    $q->expr()->$likeFunc('LOWER(l.firstname)', ":$unique"),
+                    $q->expr()->$likeFunc('LOWER(l.lastname)', ":$unique")
                 );
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
@@ -775,6 +784,15 @@ class LeadRepository extends CommonRepository
                 }
                 $expr = $q->expr()->in('l.id', $leadIds);
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.email'):
+                $expr = $q->expr()->$likeFunc('LOWER(l.email)', ":$unique");
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
+                $expr = $q->expr()->$likeFunc('LOWER(l.company)', ":$unique");
+                break;
+            default:
+                $expr = $q->expr()->$likeFunc('LOWER(l.' . $command .')', ":$unique");
+                break;
         }
 
         $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -795,7 +813,7 @@ class LeadRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        $commands = array(
             'mautic.lead.lead.searchcommand.isanonymous',
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
@@ -807,6 +825,12 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag'
         );
+
+        if (!empty($this->availableSearchFields)) {
+            $commands = array_merge($commands, $this->availableSearchFields);
+        }
+
+        return $commands;
     }
 
     /**

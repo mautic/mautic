@@ -110,6 +110,17 @@ Mautic.leadOnLoad = function (container) {
             }, 500);
         });
     }
+
+    if (mQuery('#anonymousLeadButton').length) {
+        var searchValue = mQuery('#list-search').typeahead('val').toLowerCase();
+        var string      = mQuery('#anonymousLeadButton').data('anonymous').toLowerCase();
+
+        if (searchValue.indexOf(string) >= 0 && searchValue.indexOf('!' + string) == -1) {
+            mQuery('#anonymousLeadButton').addClass('btn-primary');
+        } else {
+            mQuery('#anonymousLeadButton').removeClass('btn-primary');
+        }
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -406,10 +417,14 @@ Mautic.leadfieldOnLoad = function (container) {
         mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
             helper: fixHelper,
+            scroll: false,
+            axis: 'y',
+            containment: container + ' .leadfield-list',
             stop: function(i) {
+                // Get the page and limit
                 mQuery.ajax({
                     type: "POST",
-                    url: mauticAjaxUrl + "?action=lead:reorder",
+                    url: mauticAjaxUrl + "?action=lead:reorder&limit=" + mQuery('.pagination-limit').val() + '&page=' + mQuery('.pagination li.active a span').first().text(),
                     data: mQuery(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });
@@ -418,10 +433,14 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
-    if (mQuery('#field-templates .'+selectedVal).length) {
-        mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
+    if (selectedVal == 'lookup') {
+        // Use select
+        selectedVal = 'select';
+    }
 
-        mQuery("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
+    if (mQuery('#field-templates .'+selectedVal).length) {
+        mQuery('#leadfield_properties').html('');
+        mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
     } else {
         mQuery('#leadfield_properties').html('');
     }
@@ -431,6 +450,37 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     } else {
         mQuery('#leadfield_isListable').closest('.row').removeClass('hide');
     }
+
+    // Switch default field if applicable
+    var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
+
+    if (selectedVal == 'boolean') {
+        if (defaultFieldType == 'text') {
+            // Convert to a select
+            var newDiv      = mQuery('<div id="leadfield_defaultValue"></div>');
+            var defaultBool = mQuery('#field-templates .default_bool').html();
+            defaultBool     = defaultBool.replace(/default_bool_template/g, 'defaultValue');
+
+            mQuery(defaultBool).appendTo(newDiv);
+
+            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+        }
+    } else if (defaultFieldType == 'radio') {
+        // Convert to input
+        var html = mQuery('#field-templates .default').html();
+        html     = html.replace(/default_template/g, 'defaultValue');
+        mQuery('#leadfield_defaultValue').replaceWith(html);
+    }
+};
+
+/**
+ *
+ * @param label
+ */
+Mautic.updateLeadFieldBooleanLabels = function(el, label) {
+    mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
+        mQuery(el).val()
+    );
 };
 
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
@@ -687,6 +737,7 @@ Mautic.removeBounceStatus = function (el, dncId) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+        mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
 };
@@ -757,6 +808,28 @@ Mautic.updateLeadList = function () {
     });
 };
 
+Mautic.toggleAnonymousLeads = function() {
+    var searchValue = mQuery('#list-search').typeahead('val');
+    var string      = mQuery('#anonymousLeadButton').data('anonymous').toLowerCase();
+
+    if (searchValue.toLowerCase().indexOf('!' + string) == 0) {
+        searchValue = searchValue.replace('!' + string, string);
+        mQuery('#anonymousLeadButton').addClass('btn-primary');
+    } else if (searchValue.toLowerCase().indexOf(string) == -1) {
+        if (searchValue) {
+            searchValue = searchValue + ' ' + string;
+        } else {
+            searchValue = string;
+        }
+        mQuery('#anonymousLeadButton').addClass('btn-primary');
+    } else {
+        searchValue = mQuery.trim(searchValue.replace(string, ''));
+        mQuery('#anonymousLeadButton').removeClass('btn-primary');
+    }
+    searchValue = searchValue.replace("  ", " ");
+    Mautic.setSearchFilter(null, 'list-search', searchValue);
+};
+
 Mautic.getLeadEmailContent = function (el) {
     Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
@@ -802,4 +875,24 @@ Mautic.createLeadTag = function(el) {
 
         Mautic.removeLabelLoadingIndicator();
     });
+};
+
+Mautic.leadBatchSubmit = function() {
+    if (Mautic.batchActionPrecheck()) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length) {
+            var ids = Mautic.getCheckedListIds(false, true);
+
+            if (mQuery('#lead_batch_ids').length) {
+                mQuery('#lead_batch_ids').val(ids);
+            } else if (mQuery('#lead_batch_dnc_reason').length) {
+                mQuery('#lead_batch_dnc_ids').val(ids);
+            }
+
+            return true;
+        }
+    }
+
+    mQuery('#MauticSharedModal').modal('hide');
+
+    return false;
 };

@@ -73,6 +73,16 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->params      = $factory->getSystemParameters();
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
+
+        $this->init();
+    }
+
+    /**
+     * Post __construct setup so that inheriting classes don't have to pass all the arguments
+     */
+    protected function init()
+    {
+
     }
 
     /**

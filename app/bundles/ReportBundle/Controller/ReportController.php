@@ -10,6 +10,7 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\HttpFoundation;
 
 /**
@@ -144,13 +145,11 @@ class ReportController extends FormController
                 return $this->accessDenied();
             }
 
-            $clone = clone $entity;
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+            $entity = clone $entity;
+            $entity->setIsPublished(false);
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($entity);
     }
 
     /**
@@ -399,9 +398,11 @@ class ReportController extends FormController
     /**
      * Generates new form and processes post data
      *
+     * @param  \Mautic\ReportBundle\Entity\Report|null $entity
+     *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction ($entity = null)
     {
         if (!$this->factory->getSecurity()->isGranted('report:reports:create')) {
             return $this->accessDenied();
@@ -409,7 +410,12 @@ class ReportController extends FormController
 
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model   = $this->factory->getModel('report');
-        $entity  = $model->getEntity();
+
+        if (!($entity instanceof Report)) {
+            /** @var \Mautic\ReportBundle\Entity\Report $entity */
+            $entity  = $model->getEntity();
+        }
+
         $session = $this->factory->getSession();
         $page    = $session->get('mautic.report.page', 1);
 

@@ -14,22 +14,25 @@ $text = html_entity_decode($properties['text']);
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
     array(
-        'deleted' => (!empty($deleted)) ? $deleted : false,
-        'id'      => $id,
-        'formId'  => $formId
+        'deleted'  => (!empty($deleted)) ? $deleted : false,
+        'id'       => $id,
+        'formId'   => $formId,
+        'formName' => $formName
     )) : '';
 
 $label = (!$field['showLabel']) ? '' :
 <<<HTML
 
-                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input_{$field['alias']}">{$view->escape($field['label'])}</h3>
+                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input_{$formName}_{$field['alias']}">
+                    {$view->escape($field['label'])}
+                </h3>
 HTML;
 
 
 $html = <<<HTML
 
             <div $containerAttr>{$formButtons}{$label}
-                <div $inputAttr id="mauticform_input_{$field['alias']}">
+                <div $inputAttr id="mauticform_input_{$formName}_{$field['alias']}">
                     $text
                 </div>
             </div>

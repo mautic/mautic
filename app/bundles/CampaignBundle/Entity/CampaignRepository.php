@@ -28,7 +28,7 @@ class CampaignRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias() . ', cat')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias())
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias() . '.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -83,7 +83,9 @@ class CampaignRepository extends CommonRepository
         $q   = $this->_em->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
-        if ($forList) {
+        if ($forList && $leadId) {
+            $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
+        } elseif ($forList) {
             $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
             $q->select('c, l, partial ll.{id}')

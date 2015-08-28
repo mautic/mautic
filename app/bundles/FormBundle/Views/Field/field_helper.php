@@ -17,14 +17,18 @@ if (!isset($defaultLabelClass)) {
     $defaultLabelClass = 'label';
 }
 
+if (!isset($formName)) {
+    $formName = '';
+}
+
 $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
 $name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
-$value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : '';
+$value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
 if (empty($ignoreId)) {
-    $inputId = 'id="mauticform_input_'.$field['alias'].'"';
-    $labelId = 'id="mauticform_label_'.$field['alias'].'" for="mauticform_input_'.$field['alias'].'"';
+    $inputId = 'id="mauticform_input_'.$formName.'_'.$field['alias'].'"';
+    $labelId = 'id="mauticform_label_'.$formName.'_'.$field['alias'].'" for="mauticform_input_'.$formName.'_'.$field['alias'].'"';
 } else {
     $inputId = $labelId = '';
 }
@@ -63,12 +67,12 @@ if (!empty($inForm)) {
 }
 
 // Container
-$containerAttr         = 'id="mauticform_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+$containerAttr         = 'id="mauticform_'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
 $validationMessage     = '';
-if ($field['isRequired']) {
+if (isset($field['isRequired']) && $field['isRequired']) {
     $defaultContainerClass .= ' mauticform-required';
     $validationMessage = $field['validationMessage'];
     if (empty($validationMessage)) {

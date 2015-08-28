@@ -36,30 +36,6 @@ class UserApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of users
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific user
-     *
-     * @param int $id User ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction ($id)
-    {
-        return parent::getEntityAction($id);
-    }
-
-
-    /**
      * Obtains the logged in user's data
      *
      * @return \Symfony\Component\HttpFoundation\Response

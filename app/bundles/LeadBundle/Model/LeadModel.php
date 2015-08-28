@@ -44,17 +44,28 @@ class LeadModel extends FormModel
      */
     public function getRepository()
     {
-        static $socialFieldsSet;
+        static $repoSetup;
 
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
 
-        if (!$socialFieldsSet) {
-            $fields = $this->factory->getModel('lead.field')->getGroupFields('social');
-            if (!empty($fields)) {
-                $socialFields = array_keys($fields);
-                $repo->setAvailableSocialFields($socialFields);
+        if (!$repoSetup) {
+            $repoSetup = true;
+
+            //set the point trigger model in order to get the color code for the lead
+            $repo->setTriggerModel($this->factory->getModel('point.trigger'));
+
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->factory->getModel('lead.field');
+            $fields     = $fieldModel->getFieldList(true, false);
+
+            $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : array();
+            $repo->setAvailableSocialFields($socialFields);
+
+            $searchFields = array();
+            foreach ($fields as $group => $groupFields) {
+                $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
-            $socialFieldsSet = true;
+            $repo->setAvailableSearchFields($searchFields);
         }
 
         return $repo;
@@ -88,21 +99,6 @@ class LeadModel extends FormModel
     public function getNameGetter()
     {
         return "getPrimaryIdentifier";
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $args [start, limit, filter, orderBy, orderByDir]
-     * @return mixed
-     */
-    public function getEntities(array $args = array())
-    {
-        //set the point trigger model in order to get the color code for the lead
-        $repo = $this->getRepository();
-        $repo->setTriggerModel($this->factory->getModel('point.trigger'));
-
-        return parent::getEntities($args);
     }
 
     /**
@@ -779,24 +775,25 @@ class LeadModel extends FormModel
     /**
      * Add a do not contact entry for the lead
      *
-     * @param Lead      $lead
-     * @param string    $emailAddress
-     * @param string    $reason
-     * @param bool|true $persist
+     * @param Lead       $lead
+     * @param string     $emailAddress
+     * @param string     $reason
+     * @param bool|true  $persist
+     * @param bool|false $manual
      *
-     * @return DoNotEmail|void
+     * @return DoNotEmail|bool
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
+    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
         if (empty($emailAddress)) {
-            $fields = $lead->getFields();
-            $emailAddress = $fields['core']['email']['value'];
+            $emailAddress = $lead->getEmail();
 
             if (empty($emailAddress)) {
-                return;
+                return false;
             }
         }
+
         $em   = $this->factory->getEntityManager();
         $repo = $em->getRepository('MauticEmailBundle:Email');
         if (!$repo->checkDoNotEmail($emailAddress)) {
@@ -805,15 +802,19 @@ class LeadModel extends FormModel
             $dnc->setEmailAddress($emailAddress);
             $dnc->setDateAdded(new \DateTime());
             $dnc->setUnsubscribed();
+            $dnc->setManual($manual);
             $dnc->setComments($reason);
 
             if ($persist) {
                 $repo->saveEntity($dnc);
             } else {
+                $lead->addDoNotEmailEntry($dnc);
 
                 return $dnc;
             }
         }
+
+        return false;
     }
 
     /**
@@ -921,8 +922,8 @@ class LeadModel extends FormModel
                 $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
-                $dnc = $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
-                $lead->addDoNotEmailEntry($dnc);
+
+                $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
             }
         }
         unset($fields['doNotEmail']);

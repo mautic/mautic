@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,6 +30,17 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CampaignModel extends CommonFormModel
 {
+    private $batchSleepTime;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        parent::__construct($factory);
+
+        $this->batchSleepTime = $factory->getParameter('batch_sleep_time', 1);
+    }
 
     /**
      * {@inheritdoc}
@@ -843,8 +855,8 @@ class CampaignModel extends CommonFormModel
 
             // Add leads
             while ($start < $leadCount) {
-                // Keep CPU down
-                sleep(2);
+                // Keep CPU down for large lists; sleep per $limit batch
+                sleep($this->batchSleepTime);
 
                 // Get a count of new leads
                 $newLeadList = $repo->getCampaignLeadsFromLists(
@@ -860,12 +872,14 @@ class CampaignModel extends CommonFormModel
                 $start += $limit;
 
                 foreach ($newLeadList as $l) {
-
                     $this->addLeads($campaign, array($l), false, true, -1);
 
-                    unset($l);
-
                     $leadsProcessed++;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setCurrent($leadsProcessed);
+                    }
+
+                    unset($l);
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
@@ -875,11 +889,6 @@ class CampaignModel extends CommonFormModel
 
                         return $leadsProcessed;
                     }
-                }
-
-
-                if ($output && $leadsProcessed < $maxCount) {
-                    $progress->setCurrent($leadsProcessed);
                 }
 
                 unset($newLeadList);
@@ -921,8 +930,8 @@ class CampaignModel extends CommonFormModel
 
             // Remove leads
             while ($start < $leadCount) {
-                // Keep CPU down
-                sleep(2);
+                // Keep CPU down for large lists; sleep per $limit batch
+                sleep($this->batchSleepTime);
 
                 $removeLeadList = $repo->getCampaignOrphanLeads(
                     $campaign->getId(),
@@ -934,12 +943,12 @@ class CampaignModel extends CommonFormModel
                 );
 
                 foreach ($removeLeadList as $l) {
-                    // Keep RAM down
-                    usleep(500);
-
                     $this->removeLeads($campaign, array($l), false, true, true);
 
                     $leadsProcessed++;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setCurrent($leadsProcessed);
+                    }
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
                         // done for this round, bye bye
@@ -950,10 +959,6 @@ class CampaignModel extends CommonFormModel
                 }
 
                 $start += $limit;
-
-                if ($output && $leadsProcessed < $maxCount) {
-                   $progress->setCurrent($leadsProcessed);
-                }
 
                 unset($removeLeadList);
 
