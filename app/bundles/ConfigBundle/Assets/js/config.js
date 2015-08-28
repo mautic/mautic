@@ -21,7 +21,7 @@ Mautic.hideSpecificConfigFields = function() {
 	    mQuery.each(showOn, function(fieldId, condition) {
 			if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
 				if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-					if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || condition == '' && !mQuery('#' + fieldId).is(':checked')) {
+					if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
 						fields[field.attr('id')] = true;
 					} else {
 						fields[field.attr('id')] = false;
@@ -44,7 +44,7 @@ Mautic.hideSpecificConfigFields = function() {
 		var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
 		mQuery.each(hideOn, function(fieldId, condition) {
 			if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-				if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || condition == '' && !mQuery('#' + fieldId).is(':checked')) {
+				if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
 					fields[field.attr('id')] = false;
 				} else {
 					fields[field.attr('id')] = true;
