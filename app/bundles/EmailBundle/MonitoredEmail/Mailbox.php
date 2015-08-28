@@ -332,7 +332,7 @@ class Mailbox
 
             if (!empty($tempFolders)) {
                 foreach ($tempFolders as $key => $folder) {
-                    $folder            = str_replace($this->imapPath, "", imap_utf7_decode($folder));
+                    $folder            = str_replace($this->imapPath, "", imap_utf8($folder));
                     $tempFolders[$key] = $folder;
                 }
             } else {
