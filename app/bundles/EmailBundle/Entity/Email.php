@@ -591,7 +591,7 @@ class Email extends FormEntity
     public function getReadCount ($includeVariants = false)
     {
         $count = $this->readCount;
-return $count;
+
         if ($includeVariants && $this->isVariant()) {
             $parent = $this->getVariantParent();
             if ($parent) {
@@ -960,7 +960,7 @@ return $count;
     public function getSentCount ($includeVariants = false)
     {
         $count = $this->sentCount;
-return $count;
+
         if ($includeVariants && $this->isVariant()) {
             $parent = $this->getVariantParent();
             if ($parent) {

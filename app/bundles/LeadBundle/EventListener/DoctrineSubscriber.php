@@ -54,11 +54,11 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             $uniqueFields = array();
 
             foreach ($fields as $f) {
-                if ($f['is_unique'] ) {
+                if ($f['is_unique']) {
                     $uniqueFields[$f['alias']] = $f['alias'];
                 }
 
-                if (in_array($f['alias'], array('country', 'email'))) {
+                if (in_array($f['alias'], array('country', 'email')) || $f['is_unique']) {
                     $table->addColumn($f['alias'], 'string', array('notnull' => false));
                     $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                 } elseif ($f['is_unique']) {
