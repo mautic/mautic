@@ -10,12 +10,13 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
  * Class DoctrineEventsSubscriber
  */
-class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
+class DoctrineEventsSubscriber implements EventSubscriber
 {
     /**
      * {@inheritdoc}

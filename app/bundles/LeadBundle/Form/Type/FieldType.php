@@ -315,10 +315,11 @@ class FieldType extends AbstractType
             'isUniqueIdentifer',
             'yesno_button_group',
             array(
-                'label' => 'mautic.lead.field.form.isuniqueidentifer',
-                'attr'  => array(
+                'label'    => 'mautic.lead.field.form.isuniqueidentifer',
+                'attr'     => array(
                     'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip'
-                )
+                ),
+                'disabled' => ($options['data']->getId()) ? true : false
             )
         );
 

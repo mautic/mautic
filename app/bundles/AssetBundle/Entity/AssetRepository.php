@@ -185,17 +185,16 @@ class AssetRepository extends CommonRepository
      */
     public function getPopularAssets($limit = 10)
     {
-        $q = $this->createQueryBuilder('a');
-
-        $q->select('a.id, a.title, a.downloadCount')
-            ->where('a.downloadCount > 0')
+        $q  = $this->createQueryBuilder('a');
+        $q->select("partial a.{id, title, downloadCount}")
             ->orderBy('a.downloadCount', 'DESC')
-            ->groupBy('a.id, a.title, a.downloadCount')
+            ->where('a.downloadCount > 0')
             ->setMaxResults($limit);
 
-        $results = $q->getQuery()->getArrayResult();
+        $expr = $this->getPublishedByDateExpression($q, 'a');
+        $q->andWhere($expr);
 
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**
