@@ -45,7 +45,7 @@ $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
         <?php $value = (isset($filters[$filterBy])) ? $filters[$filterBy]['value'] : ''; ?>
         <div class="input-group">
             <?php $toggle = (!empty($dataToggle)) ? ' data-toggle="'.$dataToggle.'"' : ""; ?>
-            <input type="text" placeholder="<?php echo $view['translator']->trans('mautic.core.form.thead.filter'); ?>" autocomplete="off" class="form-control input-sm" value="<?php echo $value; ?>"<?php echo $toggle; ?> onchange="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);" />
+            <input type="text" placeholder="<?php echo $view['translator']->trans('mautic.core.form.thead.filter'); ?>" autocomplete="false" class="form-control input-sm" value="<?php echo $value; ?>"<?php echo $toggle; ?> onchange="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);" />
             <?php $inputClass =  (!empty($value)) ? 'fa-times' : 'fa-filter'; ?>
             <span class="input-group-btn">
                 <button class="btn btn-default btn-sm" onclick="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',<?php echo (!empty($value)) ? "''," : "this.value,"; ?>'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">

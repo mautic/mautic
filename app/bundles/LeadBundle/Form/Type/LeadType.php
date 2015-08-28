@@ -178,7 +178,6 @@ class LeadType extends AbstractType
                 );
             } elseif (in_array($type, array('date', 'datetime', 'time'))) {
                 $attr['data-toggle'] = $type;
-
                 $opts = array(
                     'required'    => $required,
                     'label'       => $field['label'],
@@ -199,11 +198,11 @@ class LeadType extends AbstractType
                     $opts['format']         = 'yyyy-MM-dd HH:mm';
                     $opts['with_seconds']   = false;
 
-                    $opts['data'] = $dtHelper->toLocalString('Y-m-d H:i:s');
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
                 } elseif ($type == 'date') {
-                    $opts['data'] = $dtHelper->toLocalString('Y-m-d');
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                 } else {
-                    $opts['data'] = $dtHelper->toLocalString('H:i:s');
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                 }
 
                 $builder->add($alias, $type, $opts);

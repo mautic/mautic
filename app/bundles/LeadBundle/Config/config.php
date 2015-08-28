@@ -200,9 +200,10 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadlist_choices'
             ),
-            'mautic.form.type.leadlist_filters'               => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\FilterType',
-                'alias' => 'leadlist_filters'
+            'mautic.form.type.leadlist_filter'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'alias'     => 'leadlist_filter',
+                'arguments' => 'mautic.factory',
             ),
             'mautic.form.type.leadfield'                      => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',

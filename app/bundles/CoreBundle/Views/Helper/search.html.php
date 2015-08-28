@@ -23,7 +23,7 @@ $tmpl        = (empty($tmpl)) ? 'list' : $tmpl;
     </div>
     <?php endif; ?>
 
-    <input type="search" class="form-control search" id="<?php echo $id; ?>" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="off" data-toggle="livesearch" data-target="<?php echo $target; ?>" data-tmpl="<?php echo $tmpl; ?>" data-action="<?php echo $action; ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
+    <input type="search" class="form-control search" id="<?php echo $id; ?>" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="false" data-toggle="livesearch" data-target="<?php echo $target; ?>" data-tmpl="<?php echo $tmpl; ?>" data-action="<?php echo $action; ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
     <div class="input-group-btn">
         <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="<?php echo $id; ?>">
             <i class="fa fa-search fa-fw"></i>
