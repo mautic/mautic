@@ -37,4 +37,19 @@ class CampaignEventHelper
 
         return true;
     }
+
+    /**
+     * Determine if this campaign applies
+     *
+     * @param $eventDetails
+     * @param $event
+     *
+     * @return bool
+     */
+    public static function validateFormValue(Form $eventDetails = null, $event)
+    {
+        // @todo implement this
+
+        return true;
+    }
 }
