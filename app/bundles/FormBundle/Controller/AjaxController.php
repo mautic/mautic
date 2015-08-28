@@ -70,4 +70,29 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateFormFieldsAction(Request $request)
+    {
+        $formId    = InputHelper::int($request->request->get('formId'));
+        $dataArray = array('success' => 0);
+        $model = $this->factory->getModel('form');
+        $entity = $model->getEntity($formId);
+        $formFields = $entity->getFields();
+        $fields = array();
+
+        foreach ($formFields as $field) {
+            if ($field->getType() != 'button') {
+                $fields[$field->getId()] = $field->getLabel();
+            }
+        }
+
+        $dataArray['fields'] = $fields;
+        $dataArray['success']  = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

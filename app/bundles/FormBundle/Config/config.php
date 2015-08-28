@@ -183,6 +183,11 @@ return array(
                 'class' => 'Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType',
                 'alias' => 'campaignevent_formsubmit'
             ),
+            'mautic.form.type.campaignevent_form_field_value'  => array(
+                'class' => 'Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'campaignevent_form_field_value'
+            ),
             'mautic.form.type.form_submitaction_sendemail'  => array(
                 'class'     => 'Mautic\FormBundle\Form\Type\SubmitActionEmailType',
                 'arguments' => 'mautic.factory',

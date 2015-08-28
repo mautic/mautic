@@ -62,6 +62,22 @@ Mautic.formOnLoad = function (container) {
     }
 };
 
+Mautic.updateFormFields = function () {
+    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
+    var formId = mQuery('#campaignevent_properties_form').val();
+    Mautic.ajaxActionRequest('form:updateFormFields', {'formId': formId}, function(response) {
+        if (response.fields) {
+            var select = mQuery('#campaignevent_properties_field');
+            select.find('option').remove();
+            mQuery.each(response.fields, function(key, value) {
+                 select.append(mQuery("<option></option>").attr("value", key).text(value));
+            });
+            select.trigger('chosen:updated');
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
 Mautic.formOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.formSubmissionChart;
