@@ -64,9 +64,9 @@ class DefaultController extends CommonController
         $popularAssets        = array();
         foreach ($popularAssetEntities as $asset) {
             $popularAssets[] = array(
-                'id'      => $asset->getId(),
-                'title'   => $asset->getTitle(),
-                'hits'    => $asset->getDownloadCount()
+                'id'            => $asset->getId(),
+                'title'         => $asset->getTitle(),
+                'downloadCount' => $asset->getDownloadCount()
             );
         }
 

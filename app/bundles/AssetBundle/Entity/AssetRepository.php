@@ -188,6 +188,7 @@ class AssetRepository extends CommonRepository
         $q  = $this->createQueryBuilder('a');
         $q->select("partial a.{id, title, downloadCount}")
             ->orderBy('a.downloadCount', 'DESC')
+            ->where('a.downloadCount > 0')
             ->setMaxResults($limit);
 
         $expr = $this->getPublishedByDateExpression($q, 'a');
