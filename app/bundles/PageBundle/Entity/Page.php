@@ -174,7 +174,7 @@ class Page extends FormEntity
 
         $builder->setTable('pages')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
-            ->addIndex(array('alias'), 'alias_search');
+            ->addIndex(array('alias'), 'page_alias_search');
 
         $builder->addId();
 

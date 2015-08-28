@@ -71,7 +71,7 @@ class Action
 
         $builder->setTable('form_actions')
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\ActionRepository')
-            ->addIndex(array('type'), 'type_search');
+            ->addIndex(array('type'), 'form_action_type_search');
 
         $builder->addIdColumns();
 

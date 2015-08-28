@@ -135,7 +135,7 @@ class Field
 
         $builder->setTable('form_fields')
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FieldRepository')
-            ->addIndex(array('type'), 'type_search');
+            ->addIndex(array('type'), 'form_field_type_search');
 
         $builder->addId();
 

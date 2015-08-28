@@ -85,7 +85,7 @@ class TriggerEvent
 
         $builder->setTable('point_trigger_events')
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerEventRepository')
-            ->addIndex(array('type'), 'type_search');
+            ->addIndex(array('type'), 'trigger_type_search');
 
         $builder->addIdColumns();
 

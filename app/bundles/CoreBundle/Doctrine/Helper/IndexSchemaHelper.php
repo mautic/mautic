@@ -39,11 +39,6 @@ class IndexSchemaHelper
     protected $schema;
 
     /**
-     * @var TableDiff
-     */
-    protected $tableDiff;
-
-    /**
      * @var Table
      */
     protected $table;
@@ -52,6 +47,21 @@ class IndexSchemaHelper
      * @var array
      */
     protected $allowedColumns = array();
+
+    /**
+     * @var array
+     */
+    protected $changedIndexes = array();
+
+    /**
+     * @var array
+     */
+    protected $addedIndexes = array();
+
+    /**
+     * @var array
+     */
+    protected $dropIndexes = array();
 
     /**
      * @param Connection $db
@@ -70,9 +80,7 @@ class IndexSchemaHelper
             throw new SchemaException("Table $name does not exist!");
         }
 
-        $this->table                = $this->sm->listTableDetails($this->prefix.$name);
-        $this->tableDiff            = new TableDiff($this->prefix.$name);
-        $this->tableDiff->fromTable = $this->table;
+        $this->table = $this->sm->listTableDetails($this->prefix.$name);
     }
 
     /**
@@ -116,9 +124,9 @@ class IndexSchemaHelper
             $index = new Index($this->prefix.$name, $columns, false, false, $options);
 
             if ($this->table->hasIndex($this->prefix.$name)) {
-                $this->tableDiff->changedIndexes[] = $index;
+                $this->changedIndexes[] = $index;
             } else {
-                $this->tableDiff->addedIndexes[] = $index;
+                $this->addedIndexes[] = $index;
             }
         }
     }
@@ -128,6 +136,32 @@ class IndexSchemaHelper
      */
     public function executeChanges()
     {
-        $this->sm->alterTable($this->tableDiff);
+        $platform = $this->sm->getDatabasePlatform();
+
+        $sql = array();
+        if (count($this->changedIndexes)) {
+            foreach ($this->changedIndexes as $index) {
+                $sql[] = $platform->getDropIndexSQL($index);
+                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            }
+        }
+
+        if (count($this->dropIndexes)) {
+            foreach ($this->dropIndexes as $index) {
+                $sql[] = $platform->getDropIndexSQL($index);
+            }
+        }
+
+        if (count($this->addedIndexes)) {
+            foreach ($this->addedIndexes as $index) {
+                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            }
+        }
+
+        if (count($sql)) {
+            foreach ($sql as $query) {
+                $this->db->executeUpdate($query);
+            }
+        }
     }
 }

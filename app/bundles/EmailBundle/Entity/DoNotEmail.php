@@ -76,7 +76,7 @@ class DoNotEmail
 
         $builder->setTable('email_donotemail')
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository')
-            ->addIndex(array('address'), 'search');
+            ->addIndex(array('address'), 'dnc_search');
 
         $builder->addId();
 

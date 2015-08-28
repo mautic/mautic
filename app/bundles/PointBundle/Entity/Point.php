@@ -99,7 +99,7 @@ class Point extends FormEntity
 
         $builder->setTable('points')
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
-            ->addIndex(array('type'), 'type_search');
+            ->addIndex(array('type'), 'point_type_search');
 
         $builder->addIdColumns();
 

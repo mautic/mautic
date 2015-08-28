@@ -61,7 +61,7 @@ class AccessToken implements AccessTokenInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth1_access_tokens')
-            ->addIndex(array('token'), 'token_search');
+            ->addIndex(array('token'), 'oauth1_access_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

@@ -66,7 +66,7 @@ class RequestToken implements RequestTokenInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth1_request_tokens')
-            ->addIndex(array('token'), 'token_search');
+            ->addIndex(array('token'), 'oauth1_request_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

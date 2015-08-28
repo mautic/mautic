@@ -61,7 +61,7 @@ class RefreshToken extends BaseRefreshToken
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_refreshtokens')
-            ->addIndex(array('token'), 'token_search');
+            ->addIndex(array('token'), 'oauth2_refresh_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

@@ -166,7 +166,7 @@ class Asset extends FormEntity
 
         $builder->setTable('assets')
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
-            ->addIndex(array('alias'), 'alias_search');
+            ->addIndex(array('alias'), 'asset_alias_search');
 
         $builder->addIdColumns('title');
 

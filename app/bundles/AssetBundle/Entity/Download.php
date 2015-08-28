@@ -85,8 +85,8 @@ class Download
 
         $builder->setTable('asset_downloads')
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository')
-            ->addIndex(array('tracking_id'), 'tracking_search')
-            ->addIndex(array('source', 'source_id'), 'source_search');
+            ->addIndex(array('tracking_id'), 'download_tracking_search')
+            ->addIndex(array('source', 'source_id'), 'download_source_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

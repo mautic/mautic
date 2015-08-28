@@ -155,11 +155,14 @@ class FieldModel extends FormModel
                 if ($isUnique) {
                     // Get list of current uniques
                     $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
-                    $indexColumns           = array_keys($uniqueIdentifierFields);
-                    $indexColumns[]         = $alias;
 
-                    // MySQL only allows 16 key parts
-                    array_splice($indexColumns, 16);
+                    // Always use email
+                    $indexColumns   = array('email');
+                    $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                    $indexColumns[] = $alias;
+
+                    // Only use three to prevent max key length errors
+                    $indexColumns = array_slice($indexColumns, 0, 3);
 
                     try {
                         // Update the unique_identifier_search index
@@ -167,10 +170,11 @@ class FieldModel extends FormModel
                         $modifySchema = $this->factory->getSchemaHelper('index', 'leads');
                         $modifySchema->allowColumn($alias);
                         $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        $modifySchema->addIndex(array($alias), $alias.'_search');
+                        $modifySchema->addIndex(array($alias), 'lead_field'.$alias.'_search');
                         $modifySchema->executeChanges();
                     } catch (\Exception $e) {
                         error_log($e);
+                        die(var_dump($e));
                     }
                 }
             }
@@ -410,7 +414,6 @@ class FieldModel extends FormModel
             } else {
                 $leadFields[$f->getAlias()] = $f->getLabel();
             }
-
         }
 
         if ($alphabetical) {

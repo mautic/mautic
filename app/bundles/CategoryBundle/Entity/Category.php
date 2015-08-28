@@ -63,7 +63,7 @@ class Category extends FormEntity
 
         $builder->setTable('categories')
             ->setCustomRepositoryClass('Mautic\CategoryBundle\Entity\CategoryRepository')
-            ->addIndex(array('alias'), 'alias_search');
+            ->addIndex(array('alias'), 'category_alias_search');
 
         $builder->addIdColumns('title');
 

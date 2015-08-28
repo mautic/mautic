@@ -51,16 +51,17 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             $fields = $this->factory->getModel('lead.field')->getRepository()->getFieldAliases();
 
             // Compile which ones are unique identifiers
-            $uniqueFields = array();
+            // Email will always be included first
+            $uniqueFields = array('email' => 'email');
 
             foreach ($fields as $f) {
-                if ($f['is_unique']) {
+                if ($f['is_unique'] && $f['alias'] != 'email') {
                     $uniqueFields[$f['alias']] = $f['alias'];
                 }
 
                 if (in_array($f['alias'], array('country', 'email')) || $f['is_unique']) {
                     $table->addColumn($f['alias'], 'string', array('notnull' => false));
-                    $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
+                    $table->addIndex(array($f['alias']), 'lead_field'.MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                 } elseif ($f['is_unique']) {
                     $table->addColumn($f['alias'], 'string', array('notnull' => false));
                 } else {
@@ -77,17 +78,20 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                 if (!$type instanceof StringType) {
                     unset($uniqueFields[$name]);
+                } elseif (isset($uniqueFields[$name])) {
+                    $uniqueFields[$name] = $uniqueFields[$name];
                 }
             }
 
-            if (!empty($uniqueFields)) {
-                $table->addIndex(array_values($uniqueFields), MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+            if (count($uniqueFields) > 1) {
+                // Only use three to prevent max key length errors
+                $uniqueFields = array_slice($uniqueFields, 0, 3);
+                $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
             }
 
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
             error_log($e->getMessage());
-            die(var_dump($e->getMessage()));
         }
     }
 }
