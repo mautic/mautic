@@ -306,6 +306,7 @@ class AjaxController extends CommonAjaxController
             $helper = $this->factory->getHelper('mailbox');
 
             try {
+                imap_timeout(IMAP_OPENTIMEOUT, 15);
                 $helper->setMailboxSettings($settings, false);
                 $folders = $helper->getListingFolders('');
                 if (!empty($folders)) {
