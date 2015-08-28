@@ -46,8 +46,9 @@ class PageRepository extends CommonRepository
     {
         $q  = $this->createQueryBuilder('p');
 
-        $q->select("partial p.{id, title, hits}")
+        $q->select("partial p.{id, title, hits, alias}")
             ->orderBy('p.hits', 'DESC')
+            ->where('p.hits > 0')
             ->setMaxResults($limit);
 
         $expr = $this->getPublishedByDateExpression($q, 'p');
