@@ -177,14 +177,16 @@ class ConfigMonitoredMailboxesType extends AbstractType
             $mailbox->setMailboxSettings($settings);
 
             // Check for IMAP connection and get a folder list
-            try {
-                $folders = $mailbox->getListingFolders();
-                $choices = array_combine($folders, $folders);
-            } catch (\Exception $e) {
-                $choices = array(
-                    'INBOX' => 'INBOX',
-                    'Trash' => 'Trash'
-                );
+            $choices = array(
+                'INBOX' => 'INBOX',
+                'Trash' => 'Trash'
+            );
+
+            if ($mailbox->isConfigured()) {
+                try {
+                    $folders = $mailbox->getListingFolders();
+                    $choices = array_combine($folders, $folders);
+                } catch (\Exception $e) {}
             }
 
             $builder->add(
