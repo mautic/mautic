@@ -43,6 +43,15 @@ $customButtons[] = array(
     'btnText'   => 'mautic.email.send.example'
 );
 
+$customButtons[] = array(
+    'attr' => array(
+        'data-toggle' => 'ajax',
+        'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
+        ),
+        'iconClass' => 'fa fa-copy',
+        'btnText'   => 'mautic.core.form.clone'
+);
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(

@@ -195,6 +195,7 @@ class PublicController extends CommonFormController
             'template' => $template,
             'message'  => $message,
             'type'     => 'notice',
+            'name'     => $translator->trans('mautic.email.unsubscribe')
         );
         $contentTemplate = 'MauticCoreBundle::message.html.php';
 
