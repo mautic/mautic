@@ -4,7 +4,8 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
         port:       mQuery('#config_emailconfig_monitored_email_' + mailbox + '_port').val(),
         encryption: mQuery('#config_emailconfig_monitored_email_' + mailbox + '_encryption').val(),
         user:       mQuery('#config_emailconfig_monitored_email_' + mailbox + '_user').val(),
-        password:   mQuery('#config_emailconfig_monitored_email_' + mailbox + '_password').val()
+        password:   mQuery('#config_emailconfig_monitored_email_' + mailbox + '_password').val(),
+        mailbox:    mailbox
     };
 
     var abortCall = false;

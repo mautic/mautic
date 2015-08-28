@@ -299,14 +299,16 @@ class AjaxController extends CommonAjaxController
             $settings = $request->request->all();
 
             if (empty($settings['password'])) {
-                $settings['password'] = $this->factory->getParameter('monitored_email_password');
+                $existingMonitoredSettings = $this->factory->getParameter('monitored_email');
+                if (is_array($existingMonitoredSettings) && (!empty($existingMonitoredSettings[$settings['mailbox']]['password']))) {
+                    $settings['password'] = $existingMonitoredSettings[$settings['mailbox']]['password'];
+                }
             }
 
             /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $helper */
             $helper = $this->factory->getHelper('mailbox');
 
             try {
-                imap_timeout(IMAP_OPENTIMEOUT, 15);
                 $helper->setMailboxSettings($settings, false);
                 $folders = $helper->getListingFolders('');
                 if (!empty($folders)) {

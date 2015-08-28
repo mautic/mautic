@@ -68,6 +68,21 @@ class Mailbox
     }
 
     /**
+     * Returns if the mailbox is configured
+     *
+     * @return bool
+     */
+    public function isConfigured() {
+
+        return (
+            !empty($this->settings['host']) &&
+            !empty($this->settings['port']) &&
+            !empty($this->settings['user']) &&
+            !empty($this->settings['password'])
+        );
+    }
+
+    /**
      * Switch to another configured monitored mailbox
      *
      * @param        $bundle
@@ -218,7 +233,7 @@ class Mailbox
         if (!$this->isConnected()) {
             $this->imapStream = $this->initImapStream();
         } else {
-            imap_reopen($this->imapStream, $this->imapFullPath);
+            @imap_reopen($this->imapStream, $this->imapFullPath);
         }
 
         return $this->imapStream;
@@ -230,6 +245,7 @@ class Mailbox
      */
     protected function initImapStream()
     {
+        imap_timeout(IMAP_OPENTIMEOUT, 15);
         $imapStream = @imap_open(
             $this->imapFullPath,
             $this->settings['user'],
@@ -252,7 +268,7 @@ class Mailbox
      */
     protected function isConnected()
     {
-        return ($this->imapStream && is_resource($this->imapStream) && imap_ping($this->imapStream));
+        return ($this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream));
     }
 
     /**
@@ -311,12 +327,16 @@ class Mailbox
     {
         static $folders = array();
 
-        if (!isset($folders[$this->imapFullPath])) {
-            $tempFolders = imap_list($this->getImapStream(), $this->imapPath, "*");
+        if (!isset($folders[$this->imapFullPath]) && $this->isConfigured()) {
+            $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, "*");
 
-            foreach ($tempFolders as $key => $folder) {
-                $folder            = str_replace($this->imapPath, "", imap_utf7_decode($folder));
-                $tempFolders[$key] = $folder;
+            if (!empty($tempFolders)) {
+                foreach ($tempFolders as $key => $folder) {
+                    $folder            = str_replace($this->imapPath, "", imap_utf7_decode($folder));
+                    $tempFolders[$key] = $folder;
+                }
+            } else {
+                $tempFolders = array();
             }
 
             $folders[$this->imapFullPath] = $tempFolders;
@@ -931,7 +951,7 @@ class Mailbox
     protected function disconnect()
     {
         if ($this->isConnected()) {
-            imap_close($this->imapStream, CL_EXPUNGE);
+            @imap_close($this->imapStream, CL_EXPUNGE);
         }
     }
 
