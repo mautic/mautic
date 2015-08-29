@@ -68,11 +68,18 @@ class Mailbox
     }
 
     /**
-     * Returns if the mailbox is configured
+     * Returns if a mailbox is configured
+     *
+     * @param null $bundleKey
+     * @param null $folderKey
      *
      * @return bool
+     * @throws \Exception
      */
-    public function isConfigured() {
+    public function isConfigured($bundleKey = null, $folderKey = null) {
+        if ($bundleKey !== null) {
+            $this->switchMailbox($bundleKey, $folderKey);
+        }
 
         return (
             !empty($this->settings['host']) &&
@@ -175,8 +182,13 @@ class Mailbox
      * @return mixed
      * @throws \Exception
      */
-    public function getMailboxSettings($bundle, $mailbox = '')
+    public function getMailboxSettings($bundle = null, $mailbox = '')
     {
+        if ($bundle == null) {
+
+            return $this->settings;
+        }
+
         $key = $bundle . (!empty($mailbox) ? '_' . $mailbox : '');
 
         if (isset($this->mailboxes[$key])) {

@@ -596,7 +596,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = MauticMessage::newInstance();
+            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
 
             return $message;
         } catch (\Exception $e) {
@@ -1493,16 +1493,16 @@ class MailHelper
      * @param $bundleKey
      * @param $folderKey
      *
-     * @return bool
+     * @return bool|array
      */
     public function isMontoringEnabled($bundleKey, $folderKey)
     {
-        $host             = $this->factory->getParameter('monitored_email_host');
-        $monitoredFolders = $this->factory->getParameter('monitored_email_folders');
-        $key              = $bundleKey.'_'.$folderKey;
-        if ($host && is_array($monitoredFolders) && !empty($monitoredFolders[$key])) {
+        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
+        $mailboxHelper = $this->factory->getHelper('mailbox');
 
-            return true;
+        if ($mailboxHelper->isConfigured($bundleKey, $folderKey)) {
+
+            return $mailboxHelper->getMailboxSettings();
         }
 
         return false;
@@ -1512,19 +1512,14 @@ class MailHelper
      * Generate bounce email for the lead
      *
      * @param null $idHash
-     * @param null $monitoredEmail
      *
      * @return bool|mixed|null|string
      */
-    protected function generateBounceEmail($idHash = null, $monitoredEmail = null)
+    protected function generateBounceEmail($idHash = null)
     {
-        if ($monitoredEmail == null) {
-            $monitoredEmail = $this->factory->getParameter('monitored_email_address');
-        }
-
-        if ($monitoredEmail && $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+        if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
-            list ($email, $domain) = explode('@', $monitoredEmail);
+            list ($email, $domain) = explode('@', $settings['address']);
             $email .= '+bounce';
             if ($idHash) {
                 $email .= '_'.$this->idHash;
@@ -1539,19 +1534,14 @@ class MailHelper
      * Generate an unsubscribe email for the lead
      *
      * @param null $idHash
-     * @param null $monitoredEmail
      *
      * @return bool|mixed|null|string
      */
-    protected function generateUnsubscribeEmail($idHash = null, $monitoredEmail = null)
+    protected function generateUnsubscribeEmail($idHash = null)
     {
-        if ($monitoredEmail == null) {
-            $monitoredEmail = $this->factory->getParameter('monitored_email_address');
-        }
-
-        if ($monitoredEmail && $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+        if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
-            list ($email, $domain) = explode('@', $monitoredEmail);
+            list ($email, $domain) = explode('@', $settings['address']);
             $email .= '+unsubscribe';
             if ($idHash) {
                 $email .= '_'.$this->idHash;
