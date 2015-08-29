@@ -98,7 +98,8 @@ class Point extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository');
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
+            ->addIndex(array('type'), 'point_type_search');
 
         $builder->addIdColumns();
 

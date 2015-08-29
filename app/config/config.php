@@ -275,28 +275,30 @@ if ($container->getParameter('mautic.api_enabled')) {
         ),
         'disable_csrf_role' => 'ROLE_API'
     ));
-
-    //JMS Serializer
-    $container->loadFromExtension('jms_serializer', array(
-        'handlers' => array(
-            'datetime' => array(
-                'default_format'   => 'c',
-                'default_timezone' => 'UTC'
-            )
-        ),
-        'property_naming' => array(
-            'separator'  => '',
-            'lower_case' => false
-        ),
-        'metadata'       => array(
-            'cache'          => 'none',
-            'auto_detection' => false,
-            'directories'    => $serializerMappings
-        )
-    ));
-
-    $container->setParameter(
-        'jms_serializer.camel_case_naming_strategy.class',
-        'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
-    );
 }
+
+// load the serializer
+
+//JMS Serializer
+$container->loadFromExtension('jms_serializer', array(
+    'handlers' => array(
+        'datetime' => array(
+            'default_format'   => 'c',
+            'default_timezone' => 'UTC'
+        )
+    ),
+    'property_naming' => array(
+        'separator'  => '',
+        'lower_case' => false
+    ),
+    'metadata'       => array(
+        'cache'          => 'none',
+        'auto_detection' => false,
+        'directories'    => $serializerMappings
+    )
+));
+
+$container->setParameter(
+    'jms_serializer.camel_case_naming_strategy.class',
+    'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
+);

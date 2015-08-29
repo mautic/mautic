@@ -20,7 +20,9 @@ $configKeys = array_keys($form->children);
     <!-- step container -->
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
-
+            <?php if (!$isWritable): ?>
+            <div class="alert alert-danger"><?php echo $view['translator']->trans('mautic.config.notwritable'); ?></div>
+            <?php endif; ?>
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
             <?php foreach ($configKeys as $i => $key) : ?>

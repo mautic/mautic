@@ -12,7 +12,7 @@ include 'action_button_helper.php';
 ?>
 <div class="panel-body">
     <div class="box-layout">
-        <div class="col-xs-8 col-lg-10 va-m form-inline">
+        <div class="col-xs-6 col-lg-8 va-m form-inline">
             <?php if (isset($searchValue)): ?>
             <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
                     'searchId'    => (empty($searchId)) ? null : $searchId,
@@ -33,7 +33,7 @@ include 'action_button_helper.php';
             <?php endif; ?>
         </div>
 
-        <div class="col-xs-4 col-lg-2 va-m text-right">
+        <div class="col-xs-6 col-lg-4 va-m text-right">
             <?php //TODO - Support more buttons
             include 'action_button_helper.php';
             $buttonCount = 0;

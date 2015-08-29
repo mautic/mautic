@@ -51,26 +51,6 @@ final class CoreEvents
     const BUILD_COMMAND_LIST = 'mautic.build_command_list';
 
     /**
-     * The mautic.on_email_failed event is thrown when an email has failed to clear the queue and is about to be deleted
-     * in order to give a bundle a chance to do an action based on failed email if required
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\EmailEvent instance.
-     *
-     * @var string
-     */
-    const EMAIL_FAILED = 'mautic.on_email_failed';
-
-    /**
-     * The mautic.on_email_resend event is thrown when an attempt to resend an email occurs
-     * in order to give a bundle a chance to do an action based on failed email if required
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\EmailEvent instance.
-     *
-     * @var string
-     */
-    const EMAIL_RESEND = 'mautic.on_email_resend';
-
-    /**
      * The mautic.on_fetch_icons event is thrown to fetch icons of menu items.
      *
      * The event listener receives a Mautic\CoreBundle\Event\IconEvent instance.

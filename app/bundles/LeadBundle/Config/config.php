@@ -179,7 +179,10 @@ return array(
             ),
             'mautic.lead.search.subscriber'         => array(
                 'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.webhook.subscriber'                => array(
+                'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'   => array(
             'mautic.form.type.lead'                           => array(
@@ -197,9 +200,10 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadlist_choices'
             ),
-            'mautic.form.type.leadlist_filters'               => array(
-                'class' => 'Mautic\LeadBundle\Form\Type\FilterType',
-                'alias' => 'leadlist_filters'
+            'mautic.form.type.leadlist_filter'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'alias'     => 'leadlist_filter',
+                'arguments' => 'mautic.factory',
             ),
             'mautic.form.type.leadfield'                      => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
@@ -275,6 +279,14 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.form.type.lead_batch'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\BatchType',
+                'alias'     => 'lead_batch'
+            ),
+            'mautic.form.type.lead_batch_dnc'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
+                'alias'     => 'lead_batch_dnc'
             ),
             'mautic.form.type.lead_merge'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',

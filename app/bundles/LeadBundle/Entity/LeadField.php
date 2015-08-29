@@ -541,6 +541,31 @@ class LeadField extends FormEntity
         return $this;
     }
 
+
+    /**
+     * Wrapper for incorrectly spelled setIsUniqueIdentifer
+     *
+     * @return boolean
+     */
+    public function getIsUniqueIdentifier()
+    {
+        return $this->isUniqueIdentifer;
+    }
+
+    /**
+     * Wrapper for incorrectly spelled setIsUniqueIdentifer
+     *
+     * @param mixed $isUniqueIdentifier
+     *
+     * @return LeadField
+     */
+    public function setIsUniqueIdentifier($isUniqueIdentifier)
+    {
+        $this->isUniqueIdentifer = $isUniqueIdentifer;
+
+        return $this;
+    }
+
     /**
      * Set alias
      *

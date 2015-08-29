@@ -105,7 +105,10 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    abstract public function getSupportedFeatures ();
+    public function getSupportedFeatures ()
+    {
+        return array();
+    }
 
     /**
      * Returns the field the integration needs in order to find the user
