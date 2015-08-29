@@ -61,7 +61,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                 if (in_array($f['alias'], array('country', 'email')) || $f['is_unique']) {
                     $table->addColumn($f['alias'], 'string', array('notnull' => false));
-                    $table->addIndex(array($f['alias']), 'lead_field'.MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
+                    $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.'lead_field'.$f['alias'].'_search');
                 } elseif ($f['is_unique']) {
                     $table->addColumn($f['alias'], 'string', array('notnull' => false));
                 } else {
