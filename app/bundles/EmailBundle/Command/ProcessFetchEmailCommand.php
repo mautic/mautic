@@ -88,7 +88,7 @@ EOT
                 $processed = 0;
                 if (count($mailIds)) {
                     foreach ($mailIds as $id) {
-                        $messages[] = $imapHelper->getMail($id, false);
+                        $messages[] = $imapHelper->getMail($id);
                         $counter++;
                         $processed++;
 
