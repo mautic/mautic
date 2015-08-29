@@ -30,10 +30,6 @@ if (!$isAnonymous) {
 $view['slots']->set('headerTitle',
        $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
-$view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id' => 'leadModal'
-)));
-
 $groups = array_keys($fields);
 $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
@@ -52,7 +48,7 @@ if ($edit) {
         'attr'      => array(
             'id'          => 'addNoteButton',
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#leadModal',
+            'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
             'href'        => $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId()))
         ),
@@ -78,9 +74,10 @@ if (!empty($fields['core']['email']['value'])) {
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'ajaxmodal',
-        'data-target' => '#leadModal',
+        'data-target' => '#MauticSharedModal',
         'data-header' => $view['translator']->trans('mautic.lead.lead.header.lists', array('%name%' => $lead->getPrimaryIdentifier())),
-        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list"))
+        'data-footer' => 'false',
+        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list")),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-list'
@@ -90,8 +87,9 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#leadModal',
+            'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans('mautic.lead.lead.header.campaigns', array('%name%' => $lead->getPrimaryIdentifier())),
+            'data-footer' => 'false',
             'href'        => $view['router']->generate('mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "campaign"))
         ),
         'btnText'   => $view['translator']->trans('mautic.campaign.campaigns'),
@@ -114,7 +112,7 @@ if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissio
     $buttons[] = array(
         'attr' => array(
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#leadModal',
+            'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans('mautic.lead.lead.header.merge', array('%name%' => $lead->getPrimaryIdentifier())),
             'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "merge"))
         ),
