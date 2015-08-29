@@ -46,12 +46,23 @@ if (!isset($args['repackage'])) {
 
     // Checkout the version tag into the packaging space
     chdir(dirname(__DIR__));
-    system($systemGit.' archive '.$version.' | tar -x -C '.__DIR__.'/packaging');
+    system($systemGit.' archive '.$version.' | tar -x -C '.__DIR__.'/packaging', $result);
+
+    if ($result !== 0) {
+        exit;
+    }
+
     chdir(__DIR__);
-    system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
+    system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..', $result);
+    if ($result !== 0) {
+        exit;
+    }
 
     // Generate the bootstrap.php.cache file
-    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
+    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php', $result);
+    if ($result !== 0) {
+        exit;
+    }
 
     // Common steps
     include_once __DIR__.'/processfiles.php';
