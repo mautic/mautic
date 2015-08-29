@@ -290,8 +290,7 @@ return array(
             ),
             'mautic.form.type.lead_merge'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
-                'alias'     => 'lead_merge',
-                'arguments' => 'mautic.factory'
+                'alias'     => 'lead_merge'
             )
         ),
         'other'   => array(
