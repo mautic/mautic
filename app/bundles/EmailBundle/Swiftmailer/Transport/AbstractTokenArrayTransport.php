@@ -7,11 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\MailHelper;
-use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractTokenArrayTransport
@@ -97,6 +97,8 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
     /**
      * Get the metadata from a MauticMessage
+     *
+     * @return array
      */
     public function getMetadata()
     {
@@ -104,14 +106,24 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
     }
 
     /**
+     * Get attachments from a MauticMessage
+     *
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : array();
+    }
+
+    /**
      * Converts \Swift_Message into associative array
      *
      * @param array          $search   If the mailer requires tokens in another format than Mautic's, pass array of Mautic tokens to replace
      * @param array          $replace  If the mailer requires tokens in another format than Mautic's, pass array of replacement tokens
-     *
+     * @param bool|false     $binaryAttachments True to convert file attachments to binary
      * @return array|\Swift_Message
      */
-    protected function messageToArray($search = array(), $replace = array())
+    protected function messageToArray($search = array(), $replace = array(), $binaryAttachments = false)
     {
         if (!empty($search)) {
             MailHelper::searchReplaceTokens($search, $replace, $this->message);
@@ -193,7 +205,54 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
                 );
             }
         }
-        $message['attachments'] = $attachments;
+
+        if ($binaryAttachments) {
+            // Convert attachments to binary if applicable
+            $message['attachments'] = $attachments;
+
+            $fileAttachments = $this->getAttachments();
+            if (!empty($fileAttachments)) {
+                foreach ($fileAttachments as $attachment) {
+                    if (file_exists($attachment['filePath']) && is_readable($attachment['filePath'])) {
+                        try {
+                            $swiftAttachment = \Swift_Attachment::fromPath($attachment['filePath']);
+
+                            if (!empty($attachment['fileName'])) {
+                                $swiftAttachment->setFilename($attachment['fileName']);
+                            }
+
+                            if (!empty($attachment['contentType'])) {
+                                $swiftAttachment->setContentType($attachment['contentType']);
+                            }
+
+                            if (!empty($attachment['inline'])) {
+                                $swiftAttachment->setDisposition('inline');
+                            }
+
+                            $message['attachments'] = array(
+                                'type'    => $swiftAttachment->getContentType(),
+                                'name'    => $swiftAttachment->getFilename(),
+                                'content' => $swiftAttachment->getEncoder()->encodeString($child->getBody())
+                            );
+                        } catch (\Exception $e) {
+                            error_log($e);
+                        }
+                    }
+                }
+            }
+        } else {
+            $message['binary_attachments'] = $attachments;
+            $message['file_attachments']   = $this->getAttachments();
+        }
+
+        $message['headers'] = array();
+        $headers = $this->message->getHeaders()->getAll();
+        /** @var \Swift_Mime_Header $header */
+        foreach ($headers as $header) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+                $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
+            }
+        }
 
         return $message;
     }

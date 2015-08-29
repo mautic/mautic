@@ -275,7 +275,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return Email
      */
     public function getEmail ()
     {
@@ -299,7 +299,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return IpAddress
      */
     public function getIpAddress ()
     {
@@ -339,7 +339,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead ()
     {
@@ -371,7 +371,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\LeadList
      */
     public function getList ()
     {

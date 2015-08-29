@@ -7,10 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Command;
+namespace Mautic\EmailBundle\Command;
 
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\EmailEvent;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -101,24 +101,25 @@ EOT
                     }
 
                     //rename the file so no other process tries to find it
-                    $tmpFilename = $failedFile . '.finalretry';
+                    $tmpFilename = str_replace(array('.finalretry','.sending','.tryagain'), '', $failedFile);
+                    $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
 
                     $tryAgain = false;
-                    if ($dispatcher->hasListeners(CoreEvents::EMAIL_RESEND)) {
-                        $event = new EmailEvent($message);
-                        $dispatcher->dispatch(CoreEvents::EMAIL_RESEND, $event);
+                    if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
+                        $event = new QueueEmailEvent($message);
+                        $dispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
                         $tryAgain = $event->shouldTryAgain();
                     }
 
                     try {
                         $transport->send($message);
                     } catch (\Swift_TransportException $e) {
-                        if ($dispatcher->hasListeners(CoreEvents::EMAIL_FAILED)) {
-                            $event = new EmailEvent($message);
-                            $dispatcher->dispatch(CoreEvents::EMAIL_FAILED, $event);
+                        if ($dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                            $event = new QueueEmailEvent($message);
+                            $dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
                         }
                     }
 

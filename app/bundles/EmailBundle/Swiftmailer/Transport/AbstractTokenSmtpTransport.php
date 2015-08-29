@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractBatchTransport
@@ -25,6 +25,13 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * Do whatever is necessary to $this->message in order to deliver a batched payload. i.e. add custom headers, etc
+     *
+     * @return void
+     */
+    abstract protected function prepareMessage();
 
     /**
      * @param \Swift_Mime_Message $message
@@ -43,18 +50,23 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
     }
 
     /**
-     * Do whatever is necessary to $this->message in order to deliver a batched payload. i.e. add custom headers, etc
-     *
-     * @return void
-     */
-    abstract protected function prepareMessage();
-
-    /**
      * Get the metadata from a MauticMessage
+     *
+     * @return array
      */
     public function getMetadata()
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : array();
+    }
+
+    /**
+     * Get attachments from a MauticMessage
+     *
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : array();
     }
 
     /**

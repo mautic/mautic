@@ -7,10 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Swiftmailer\Transport;
+namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -40,7 +40,10 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
             }
         }
 
-        $message = $this->messageToArray($mauticTokens, $mandrillMergePlaceholders);
+        $message = $this->messageToArray($mauticTokens, $mandrillMergePlaceholders, true);
+
+        // Not used ATM
+        unset($message['headers']);
 
         $message['from_email'] = $message['from']['email'];
         $message['from_name']  = $message['from']['name'];

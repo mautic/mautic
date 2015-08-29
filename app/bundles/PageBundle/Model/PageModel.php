@@ -637,7 +637,12 @@ class PageModel extends FormModel
         }
 
         $this->em->persist($hit);
-        $this->em->flush();
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            error_log($e);
+        }
 
         //save hit to the cookie to use to update the exit time
         $this->factory->getHelper('cookie')->setCookie('mautic_referer_id', $hit->getId());
