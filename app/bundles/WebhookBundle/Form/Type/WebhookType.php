@@ -92,7 +92,7 @@ class WebhookType extends AbstractType
             $choices[$type] = $event['label'];
         }
 
-        $builder->add('events', 'choice',  array(
+        $builder->add('event', 'choice',  array(
                 'choices' => $choices,
                 'multiple' => false,
                 'expanded' => false,
@@ -102,7 +102,7 @@ class WebhookType extends AbstractType
             )
         );
 
-        $builder->get('events')->addModelTransformer(new EventsToArrayTransformer($options['data']));
+        $builder->get('event')->addModelTransformer(new EventsToArrayTransformer($options['data']));
 
         $builder->add('buttons', 'form_buttons');
 
