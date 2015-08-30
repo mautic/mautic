@@ -31,13 +31,9 @@ class EventsToArrayTransformer implements DataTransformerInterface
      *
      * @return array
      */
-    public function transform($events)
+    public function transform($event)
     {
-        $eventArray = array();
-        foreach ($events as $event) {
-            $eventArray[] = $event->getEventType();
-        }
-        return $eventArray;
+        return $event->getEventType();
     }
 
     /**
@@ -47,33 +43,11 @@ class EventsToArrayTransformer implements DataTransformerInterface
      */
     public function reverseTransform($submittedArray)
     {
-        // Get a list of existing events and types
+        // Set the webhoook and event type, basically update the selected event   
+        $event = new Event();
+        $event->setWebhook($this->webhook)->setEventType($submittedArray);
+        $this->webhook->setEvent($event);
 
-        /** @var PersistentCollection $events */
-        $events     = $this->webhook->getEvents();
-        $eventTypes = $events->getKeys();
-
-        // Check to see what events have been removed
-        $removed = array_diff($eventTypes, $submittedArray);
-        if ($removed) {
-            foreach ($removed as $type) {
-                $this->webhook->removeEvent($events[$type]);
-            }
-        }
-
-        // Now check to see what events have been added
-        $added = array_diff($submittedArray, $eventTypes);
-        if ($added) {
-            foreach ($added as $type) {
-                // Create a new entity
-                $event = new Event();
-                $event->setWebhook($this->webhook)->setEventType($type);
-                $events[] = $event;
-            }
-        }
-
-        $this->webhook->setEvents($events);
-
-        return $events;
+        return $event;
     }
 }

@@ -326,18 +326,12 @@ class WebhookModel extends FormModel
 
                 /** @var \Mautic\WebhookBundle\Entity\Event $event */
                 $event = $queue->getEvent();
-                $type  = $event->getEventType();
-
-                // create new array level for each unique event type
-                if (!isset($payload[$type])) {
-                    $payload[$type] = array();
-                }
 
                 $queuePayload = json_decode($queue->getPayload(), true);
                 $queuePayload['timestamp'] = $queue->getDateAdded()->format('c');
 
                 // its important to decode the payload form the DB as we re-encode it with the
-                $payload[$type][] = $queuePayload;
+                $payload = $queuePayload;
 
                 $this->webhookQueueIdList[] = $queue->getId();
                 $this->em->clear($queue);

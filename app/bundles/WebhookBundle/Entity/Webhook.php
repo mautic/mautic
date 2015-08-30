@@ -44,9 +44,9 @@ class Webhook extends FormEntity
      **/
     private $category;
     /**
-     * @var ArrayCollection
+     * @var \Mautic\WebhookBundle\Entity\Event
      */
-    private $events;
+    private $event;
     /**
      * @var ArrayCollection
      */
@@ -56,12 +56,10 @@ class Webhook extends FormEntity
      */
     private $logs;
 
-    private $removedEvents = array();
     /*
      * Constructor
      */
     public function __construct() {
-        $this->events  = new ArrayCollection();
         $this->queues  = new ArrayCollection();
         $this->logs    = new ArrayCollection();
     }
@@ -77,10 +75,9 @@ class Webhook extends FormEntity
         $builder->addIdColumns();
         // categories
         $builder->addCategory();
-        // 1:M for events
-        $builder->createOneToMany('events', 'Event')
+        // M:1 for events
+        $builder->createOneToOne('event', 'Event')
             ->orphanRemoval()
-            ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
             ->build();
@@ -232,45 +229,36 @@ class Webhook extends FormEntity
     /**
      * @return mixed
      */
-    public function getEvents()
+    public function getEvent()
     {
-        return $this->events;
+        return $this->event;
     }
     /**
-     * @param mixed $events
+     * @param mixed $event
      */
-    public function setEvents($events)
+    public function setEvent($event)
     {
-        $this->isChanged('events', $events);
-        $this->events = $events;
-        /**  @var \Mautic\WebhookBundle\Entity\Event $event */
-        foreach ($events as $event) {
-            $event->setWebhook($this);
-        }
+        $this->isChanged('event', $event);
+        $this->event = $event;
+
+        $event->setWebhook($this);
+
         return $this;
     }
     public function addEvent(Event $event)
     {
-        $this->isChanged('events', $event);
-        $this->events[] = $event;
+        $this->isChanged('event', $event);
+        $this->event = $event;
 
         return $this;
     }
 
-    public function removeEvent(Event $event)
-    {
-        $this->isChanged('events', $event);
-        $this->removedEvents[] = $event;
-        $this->events->removeElement($event);
-
-        return $this;
-    }
     public function getQueues()
     {
         return $this->queues;
     }
     /**
-     * @param mixed $events
+     * @param mixed $event
      */
     public function addQueues($queues)
     {
@@ -302,7 +290,7 @@ class Webhook extends FormEntity
         return $this->logs;
     }
     /**
-     * @param mixed $events
+     * @param mixed $event
      */
     public function addLogs($logs)
     {
@@ -341,7 +329,7 @@ class Webhook extends FormEntity
             if ($currentId != $newId) {
                 $this->changes[$prop] = array($currentId, $newId);
             }
-        } elseif ($prop == 'events') {
+        } elseif ($prop == 'event') {
             $this->changes[$prop] = array();
         } elseif ($current != $val) {
             $this->changes[$prop] = array($current, $val);
