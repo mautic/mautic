@@ -44,7 +44,7 @@ class Webhook extends FormEntity
      **/
     private $category;
     /**
-     * @var ArrayCollection
+     * @var \Mautic\WebhookBundle\Entity\Event
      */
     private $events;
     /**
@@ -78,9 +78,9 @@ class Webhook extends FormEntity
         // categories
         $builder->addCategory();
         // 1:M for events
-        $builder->createOneToMany('events', 'Event')
-            ->orphanRemoval()
-            ->setIndexBy('event_type')
+        $builder->createManyToOne('events', 'Event')
+            // ->orphanRemoval()
+            // ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
             ->build();
@@ -239,14 +239,17 @@ class Webhook extends FormEntity
     /**
      * @param mixed $events
      */
-    public function setEvents($events)
+    public function setEvent($event)
     {
-        $this->isChanged('events', $events);
-        $this->events = $events;
+        $this->isChanged('events', $event);
+        $this->events = $event;
+
+        $event->setWebhook($this);
+
         /**  @var \Mautic\WebhookBundle\Entity\Event $event */
-        foreach ($events as $event) {
-            $event->setWebhook($this);
-        }
+        // foreach ($events as $event) {
+        //     $event->setWebhook($this);
+        // }
         return $this;
     }
     public function addEvent(Event $event)
