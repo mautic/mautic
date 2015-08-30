@@ -28,7 +28,7 @@ class CampaignRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias() . ', cat')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias())
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias() . '.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -83,7 +83,9 @@ class CampaignRepository extends CommonRepository
         $q   = $this->_em->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
-        if ($forList) {
+        if ($forList && $leadId) {
+            $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
+        } elseif ($forList) {
             $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
             $q->select('c, l, partial ll.{id}')
@@ -310,8 +312,7 @@ class CampaignRepository extends CommonRepository
 
         $q->select('count(cl.ip_id) as hits, c.id AS campaign_id, c.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
-            ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'cl.event_id = ce.id')
-            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'ce.campaign_id = c.id')
+            ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'cl.campaign_id = c.id')
             ->orderBy('hits', 'DESC')
             ->groupBy('c.id, c.name')
             ->setMaxResults($limit);

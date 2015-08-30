@@ -10,6 +10,7 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -111,12 +112,18 @@ class PointController extends FormController
     /**
      * Generates new form and processes post data
      *
+     * @param  \Mautic\PointBundle\Entity\Point $entity
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction()
+    public function newAction($entity = null)
     {
         $model   = $this->factory->getModel('point');
-        $entity  = $model->getEntity();
+
+        if (!($entity instanceof Point)) {
+            /** @var \Mautic\PointBundle\Entity\Point $entity */
+            $entity  = $model->getEntity();
+        }
 
         if (!$this->factory->getSecurity()->isGranted('point:points:create')) {
             return $this->accessDenied();
@@ -348,13 +355,11 @@ class PointController extends FormController
                 return $this->accessDenied();
             }
 
-            $clone = clone $entity;
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+            $entity = clone $entity;
+            $entity->setIsPublished(false);
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($entity);
     }
 
     /**

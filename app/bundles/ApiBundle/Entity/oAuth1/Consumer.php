@@ -72,7 +72,8 @@ class Consumer implements ConsumerInterface
 
         $builder->setTable('oauth1_consumers')
             ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository')
-            ->addLifecycleEvent('createConsumerKeys', 'prePersist');
+            ->addLifecycleEvent('createConsumerKeys', 'prePersist')
+            ->addIndex(array('consumer_key'), 'consumer_search');
 
         $builder->addIdColumns('name', false);
 

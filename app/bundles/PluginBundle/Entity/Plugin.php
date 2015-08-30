@@ -38,11 +38,6 @@ class Plugin extends CommonEntity
     /**
      * @var bool
      */
-    private $isEnabled = true;
-
-    /**
-     * @var bool
-     */
     private $isMissing = false;
 
     /**

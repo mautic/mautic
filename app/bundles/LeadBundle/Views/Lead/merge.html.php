@@ -8,24 +8,29 @@
  */
 ?>
 
-<div class="bundle-form">
-
-    <label class="control-label required" for="list-search"><?php echo $view['translator']->trans('mautic.lead.merge.search'); ?></label>
-    
-
+<?php if ($tmpl == 'index'): ?>
+<div class="lead-merge-form">
     <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
-                    'searchId'    => (empty($searchId)) ? null : $searchId,
-                    'searchValue' => $searchValue,
-                    'action'      => $currentRoute,
-                    'searchHelp'  => false,
-                    'target'      => '.bundle-form',
-                    'tmpl'        => (empty($tmpl)) ? null : $tmpl
-                )); ?>
+        'searchId'      => (empty($searchId)) ? null : $searchId,
+        'searchValue'   => $searchValue,
+        'action'        => $currentRoute,
+        'searchHelp'    => false,
+        'target'        => '.lead-merge-options',
+        'tmpl'          => 'update'
+    )); ?>
 
+    <div class="lead-merge-options mt-sm">
+<?php endif; ?>
 
-    <?php echo $view['form']->start($form); ?>
+        <?php echo $view['form']->start($form); ?>
 
-    <?php echo $view['form']->end($form); ?>
+        <div class="hide">
+            <?php echo $view['form']->row($form['buttons']); ?>
+        </div>
 
+        <?php echo $view['form']->end($form); ?>
 
+<?php if ($tmpl == 'index'): ?>
+    </div>
 </div>
+<?php endif; ?>

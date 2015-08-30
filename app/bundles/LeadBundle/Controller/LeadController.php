@@ -85,10 +85,12 @@ class LeadController extends FormController
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
-        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-        if ($indexMode != 'list') {
+        $anonymousShowing = false;
+        if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
+        } elseif (strpos($search, $anonymous) !== false && strpos($search, '!'.$anonymous) === false) {
+            $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
@@ -173,20 +175,21 @@ class LeadController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'searchValue'   => $search,
-                    'items'         => $leads,
-                    'page'          => $page,
-                    'totalItems'    => $count,
-                    'limit'         => $limit,
-                    'permissions'   => $permissions,
-                    'tmpl'          => $tmpl,
-                    'indexMode'     => $indexMode,
-                    'lists'         => $lists,
-                    'currentList'   => $list,
-                    'security'      => $this->factory->getSecurity(),
-                    'inSingleList'  => $inSingleList,
-                    'noContactList' => $emailRepo->getDoNotEmailList(),
-                    'maxLeadId'     => $maxLeadId
+                    'searchValue'      => $search,
+                    'items'            => $leads,
+                    'page'             => $page,
+                    'totalItems'       => $count,
+                    'limit'            => $limit,
+                    'permissions'      => $permissions,
+                    'tmpl'             => $tmpl,
+                    'indexMode'        => $indexMode,
+                    'lists'            => $lists,
+                    'currentList'      => $list,
+                    'security'         => $this->factory->getSecurity(),
+                    'inSingleList'     => $inSingleList,
+                    'noContactList'    => $emailRepo->getDoNotEmailList(),
+                    'maxLeadId'        => $maxLeadId,
+                    'anonymousShowing' => $anonymousShowing
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => array(
@@ -774,13 +777,9 @@ class LeadController extends FormController
     public function mergeAction ($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model  = $this->factory->getModel('lead');
-        $mainLead  = $model->getEntity($objectId);
-
-        //set the page we came from
-                $session = $this->factory->getSession();
-
-        $page = $this->factory->getSession()->get('mautic.lead.page', 1);
+        $model    = $this->factory->getModel('lead');
+        $mainLead = $model->getEntity($objectId);
+        $page     = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
@@ -798,7 +797,7 @@ class LeadController extends FormController
         if ($mainLead === null) {
             return $this->postActionRedirect(
                 array_merge(
-                	$postActionVars,
+                    $postActionVars,
                     array(
                         'flashes' => array(
                             array(
@@ -810,165 +809,139 @@ class LeadController extends FormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'lead:leads:editown',
-            'lead:leads:editother',
-            $mainLead->getOwner())
-        ) {
-            return $this->accessDenied();
-        } elseif ($model->isLocked($mainLead)) {
-            //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $mainLead, 'lead.lead');
         }
-
-        //Order the leads
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
-
-        $search = $this->request->get('search', $session->get('mautic.lead.filter', ''));
-        $session->set('mautic.lead.filter', $search);
 
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
-        $filter      = array('string' => $search, 'force' => '');
-        $limit = $session->get('mautic.lead.limit', $this->factory->getParameter('default_pagelimit'));
-        
-        if ($search !== ""){
-            $leads = $model->getEntities(
+        $session = $this->factory->getSession();
+        $search  = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
+        $session->set('mautic.lead.merge.filter', $search);
+
+        $filter = array(
+            'string' => $search,
+            'force'  => array(
                 array(
-                    'limit'          => $limit,
-                    'filter'         => $filter,
-                    'orderBy'        => $orderBy,
-                    'orderByDir'     => $orderByDir,
-                    'withTotalCount' => false
+                    'column' => 'l.date_identified',
+                    'expr'   => 'isNotNull',
+                    'value'  => $mainLead->getId()
+                ),
+                array(
+                    'column' => 'l.id',
+                    'expr'   => 'neq',
+                    'value'  => $mainLead->getId()
                 )
-            );
-        } else {
-            $leads = array();
+            )
+        );
+
+        $leads = $model->getEntities(
+            array(
+                'limit'          => 25,
+                'filter'         => $filter,
+                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
+                'orderByDir'     => 'ASC',
+                'withTotalCount' => false
+            )
+        );
+
+        $leadChoices = array();
+        foreach ($leads as $l) {
+            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
         }
 
-        //Remove the already selected lead
-        if(($key = array_search($mainLead, $leads)) !== false) {
-            unset($leads[$key]);
-        }
+        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
 
-
-$action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
-        
         $form = $this->get('form.factory')->create(
-                    'lead_merge',
-                    array(),
-                    array('action'  => $action, 
-                        'data_class' => null,
-                        'data'      => $leads)
-                );
-        
+            'lead_merge',
+            array(),
+            array(
+                'action' => $action,
+                'leads'  => $leadChoices
+            )
+        );
 
         if ($this->request->getMethod() == 'POST') {
             if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $data = $this->request->request->get('lead');
+                if ($valid = $this->isFormValid($form)) {
+                    $data = $form->getData();
+                    $secLeadId = $data['lead_to_merge'];
+                    $secLead   = $model->getEntity($secLeadId);
 
-                    //pull the data from the form in order to apply the form's formatting
-                    foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
-                        
-
-                        $secLeadId = $data['lead_to_merge'];
-                        $retLeads = $model->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(array(),$secLeadId);
-                        $secLead = $retLeads[0] ;
-                        //$secLead = $model->getEntity($secLeadId);
-
-                        if ($secLead === null) {
-            				return $this->postActionRedirect(
-                				array_merge(
-                    				$postActionVars,
-                    				array(
-                        				'flashes' => array(
-                            				array(
-                                				'type'    => 'error',
-                                				'msg'     => 'mautic.lead.lead.error.notfound',
-                                				'msgVars' => array('%id%' => $secLead->getId())
-                            				)
-                        				)
-                    				)
-                				)
-            				);
-        				} elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            				'lead:leads:editown',
-            				'lead:leads:editother',
-            				$mainLead->getOwner())
-        				) {
-            				return $this->accessDenied();
-        				} elseif ($model->isLocked($secLead)) {
-            				//deny access if the entity is locked
-            				return $this->isLocked($postActionVars, $secLead, 'lead.lead');
-        				}
-
-                        if ($mainLead->getDateAdded() > $secLead->getDateAdded()){
-                            list($secLead,$mainLead) = array($mainLead,$secLead);
-                        }
-
-        				//Both leads are good so now we merge them
-                        $mainLead = $model->mergeLeads($mainLead, $secLead);
-                        $model->saveEntity($mainLead);
-                    }       
-                }
-            } 
-
-         	$route          = 'mautic_lead_action';  
-       		$func           = 'view';
-				
-			$viewParameters = array(
-					'objectId'     => $mainLead->getId(),
-                    'objectAction' => 'view',
-            );
-
-            return $this->postActionRedirect(
-                array(
-                    'returnUrl'       => $this->generateUrl($route, $viewParameters),
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
-                    'passthroughVars' => array(
-                        'mauticContent' => 'lead',
-                        'closeModal'    => 1
-                    )
-                )
-            );
-      	}
-
-      	else {
-
-
-      	
-
-        return $this->delegateView(array(
-                	'viewParameters'  => array(
-                    'leads'     => $leads,
-                    'searchValue'	=> $search,
-                    'action'	=> $action,
-                    'form' => $form->createView()
-                	   ),
-                	'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php',
-                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_merge',
-                        'mauticContent' => 'lead',
-                        'route'         => $this->generateUrl(
-                            'mautic_lead_action',
-                            array(
-                                'objectAction' => 'merge',
-                                'objectId'  => $mainLead->getId()
+                    if ($secLead === null) {
+                        return $this->postActionRedirect(
+                            array_merge(
+                                $postActionVars,
+                                array(
+                                    'flashes' => array(
+                                        array(
+                                            'type'    => 'error',
+                                            'msg'     => 'mautic.lead.lead.error.notfound',
+                                            'msgVars' => array('%id%' => $secLead->getId())
+                                        )
+                                    )
+                                )
                             )
-                        ),                )
-            		)
-         		);
+                        );
+                    } elseif (
+                        !$this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getOwner()) ||
+                        !$this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getOwner())
+                    ) {
+                        return $this->accessDenied();
+                    } elseif ($model->isLocked($mainLead)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $secLead, 'lead');
+                    } elseif ($model->isLocked($secLead)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $secLead, 'lead');
+                    }
 
-    	}
+                    //Both leads are good so now we merge them
+                    $mainLead = $model->mergeLeads($mainLead, $secLead, false);
+                }
+            };
+
+            if ($valid) {
+                $viewParameters = array(
+                    'objectId'     => $mainLead->getId(),
+                    'objectAction' => 'view',
+                );
+
+                return $this->postActionRedirect(
+                    array(
+                        'returnUrl'       => $this->generateUrl('mautic_lead_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                        'passthroughVars' => array(
+                            'closeModal' => 1
+                        )
+                    )
+                );
+            }
+        }
+
+        $tmpl = $this->request->get('tmpl', 'index');
+        return $this->delegateView(
+            array(
+                'viewParameters'   => array(
+                    'tmpl'         => $tmpl,
+                    'leads'        => $leads,
+                    'searchValue'  => $search,
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_lead_action',
+                        array(
+                            'objectAction' => 'merge',
+                            'objectId'     => $mainLead->getId()
+                        )
+                    ),
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php',
+                'passthroughVars' => array(
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.lead-merge-options' : null
+                )
+            )
+        );
     }
 
     /**
@@ -1306,6 +1279,8 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
                                 continue;
                             }
 
+                            $lineNumber++;
+
                             // Increase progress count
                             $progress[0]++;
 
@@ -1315,9 +1290,18 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
                             if (is_array($data) && $dataCount = count($data)) {
                                 // Ensure the number of headers are equal with data
                                 $headerCount = count($headers);
+
                                 if ($headerCount !== $dataCount) {
+                                    $diffCount = ($headerCount - $dataCount);
+
+                                    if ($diffCount < 0) {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.header_mismatch');
+
+                                        continue;
+                                    }
                                     // Fill in the data with empty string
-                                    $fill = array_fill($dataCount, ($headerCount - $dataCount), '');
+                                    $fill = array_fill($dataCount, $diffCount, '');
                                     $data = $data + $fill;
                                 }
 
@@ -1333,10 +1317,11 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
-                                    $stats['failures'][] = $e->getMessage();
+                                    $stats['failures'][$lineNumber] = $e->getMessage();
                                 }
                             } else {
                                 $stats['ignored']++;
+                                $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
                             }
                         }
 
@@ -1545,6 +1530,7 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
         $session->set('mautic.lead.import.defaultlist', null);
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', array());
+
         unlink($filepath);
     }
 
@@ -1633,11 +1619,18 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
                                 )
                             );
                         } else {
-                            $this->addFlash(
-                                'mautic.lead.email.error.failed',
-                                array(
-                                    '%subject%' => $subject,
-                                    '%email%'   => $leadEmail
+                            $errors = $mailer->getErrors();
+                            $form->addError(
+                                new FormError(
+                                    $this->factory->getTranslator()->trans(
+                                        'mautic.lead.email.error.failed',
+                                        array(
+                                            '%subject%' => $subject,
+                                            '%email%'   => $leadEmail,
+                                            '%error%'  => (is_array($errors)) ? implode('<br />', $errors) : $errors
+                                        ),
+                                        'flashes'
+                                    )
                                 )
                             );
                             $valid = false;
@@ -1695,5 +1688,323 @@ $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merg
                 )
             )
         );
+    }
+
+    /**
+     * Bulk edit lead lists
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchListsAction($objectId = 0)
+    {
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->factory->getModel('lead');
+            $data  = $this->request->request->get('lead_batch', array(), true);
+            $ids   = json_decode($data['ids'], true);
+
+            $entities  = array();
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                )
+                            ),
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+            }
+
+            $count = 0;
+            foreach ($entities as $lead) {
+                if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                    $count++;
+
+                    if (!empty($data['add'])) {
+                        $model->addToLists($lead, $data['add']);
+                    }
+
+                    if (!empty($data['remove'])) {
+                        $model->removeFromLists($lead, $data['remove']);
+                    }
+                }
+            }
+
+            $this->addFlash('mautic.lead.batch_leads_affected',
+                array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+
+            return new JsonResponse(
+                array(
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                )
+            );
+        } else {
+            // Get a list of lists
+            /** @var \Mautic\LeadBundle\Model\ListModel $model */
+            $model = $this->factory->getModel('lead.list');
+            $lists = $model->getUserLists();
+            $items = array();
+            foreach ($lists as $list) {
+                $items[$list['id']] = $list['name'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_lead_action',
+                array(
+                    'objectAction' => 'batchLists'
+                )
+            );
+
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'form' => $this->createForm(
+                            'lead_batch',
+                            array(),
+                            array(
+                                'items'  => $items,
+                                'action' => $route
+                            )
+                        )->createView()
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_lead_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    )
+                )
+            );
+        }
+    }
+
+    /**
+     * Bulk edit lead campaigns
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchCampaignsAction($objectId = 0)
+    {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel = $this->factory->getModel('campaign');
+
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->factory->getModel('lead');
+            $data  = $this->request->request->get('lead_batch', array(), true);
+            $ids   = json_decode($data['ids'], true);
+
+            $entities  = array();
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                )
+                            )
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+            }
+
+            foreach ($entities as $key => $lead) {
+                if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+
+                    unset($entities[$key]);
+                }
+            }
+
+            $add    = (!empty($data['add'])) ? $data['add'] : array();
+            $remove = (!empty($data['remove'])) ? $data['remove'] : array();
+
+            if ($count = count($entities)) {
+                $campaigns = $campaignModel->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'c.id',
+                                    'expr'   => 'in',
+                                    'value'  => array_merge($add, $remove)
+                                )
+                            )
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+
+                if (!empty($add)) {
+                    foreach ($add as $cid) {
+                        $campaignModel->addLeads($campaigns[$cid], $entities, true);
+                    }
+                }
+
+                if (!empty($remove)) {
+                    foreach ($remove as $cid) {
+                        $campaignModel->removeLeads($campaigns[$cid], $entities, true);
+                    }
+                }
+            }
+
+            $this->addFlash('mautic.lead.batch_leads_affected',
+                array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+
+            return new JsonResponse(
+                array(
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                )
+            );
+        } else {
+            // Get a list of campaigns
+            $campaigns = $campaignModel->getPublishedCampaigns(true);
+            $items = array();
+            foreach ($campaigns as $campaign) {
+                $items[$campaign['id']] = $campaign['name'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_lead_action',
+                array(
+                    'objectAction' => 'batchCampaigns'
+                )
+            );
+
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'form' => $this->createForm(
+                            'lead_batch',
+                            array(),
+                            array(
+                                'items'  => $items,
+                                'action' => $route
+                            )
+                        )->createView()
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_lead_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    )
+                )
+            );
+        }
+    }
+
+    /**
+     * Bulk add leads to the DNC list
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchDncAction($objectId = 0)
+    {
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->factory->getModel('lead');
+            $data  = $this->request->request->get('lead_batch_dnc', array(), true);
+            $ids   = json_decode($data['ids'], true);
+
+            $entities  = array();
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                )
+                            ),
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+            }
+
+            if ($count = count($entities)) {
+                $dncEntities = array();
+                foreach ($entities as $lead) {
+                    if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+
+                        if ($dnc = $model->setDoNotContact($lead, null, $data['reason'], false, true)) {
+                            $dncEntities[] = $dnc;
+                        }
+                    }
+                }
+
+                // Save entities
+                $this->factory->getModel('email')->getRepository()->saveEntities($dncEntities);
+            }
+
+            $this->addFlash('mautic.lead.batch_leads_affected',
+                array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+
+            return new JsonResponse(
+                array(
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                )
+            );
+        } else {
+            $route = $this->generateUrl(
+                'mautic_lead_action',
+                array(
+                    'objectAction' => 'batchDnc'
+                )
+            );
+
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'form' => $this->createForm(
+                            'lead_batch_dnc',
+                            array(),
+                            array(
+                                'action' => $route
+                            )
+                        )->createView()
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_lead_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    )
+                )
+            );
+        }
     }
 }

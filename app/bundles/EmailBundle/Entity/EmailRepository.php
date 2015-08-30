@@ -51,7 +51,7 @@ class EmailRepository extends CommonRepository
     public function checkDoNotEmail($email)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id, unsubscribed, bounced, comments}')
+        $q->select('partial e.{id, unsubscribed, bounced, manual, comments}')
             ->from('MauticEmailBundle:DoNotEmail', 'e')
             ->where('e.emailAddress = :email')
             ->setParameter('email', $email);
@@ -98,7 +98,6 @@ class EmailRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from('MauticEmailBundle:Email', 'e', 'e.id');
-
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
@@ -199,7 +198,7 @@ class EmailRepository extends CommonRepository
 
         // Has an email
         $q->andWhere(
-            $q->expr()->orX(
+            $q->expr()->andX(
                 $q->expr()->isNotNull('l.email'),
                 $q->expr()->neq('l.email', $q->expr()->literal(''))
             )

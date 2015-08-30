@@ -43,6 +43,15 @@ $customButtons[] = array(
     'btnText'   => 'mautic.email.send.example'
 );
 
+$customButtons[] = array(
+    'attr' => array(
+        'data-toggle' => 'ajax',
+        'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
+        ),
+        'iconClass' => 'fa fa-copy',
+        'btnText'   => 'mautic.core.form.clone'
+);
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(
@@ -51,7 +60,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
     ),
     'routeBase'  => 'email',
-    'customButtons' => $customButtons
+    'preCustomButtons' => $customButtons
 )));
 ?>
 
@@ -184,6 +193,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         'header'  => 'mautic.email.click_tracks.header_none',
                         'message' => 'mautic.email.click_tracks.none'
                     )); ?>
+                    <div class="clearfix"></div>
                 <?php endif; ?>
             </div>
 
@@ -293,7 +303,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             <div class="col-xs-11">
                                                 <?php if ($isWinner): ?>
                                                     <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.abtest.makewinner'); ?>">
-                                                        <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getName() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                                        <a class="btn btn-warning"
+                                                           data-toggle="confirmation"
+                                                           href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>"
+                                                           data-toggle="confirmation"
+                                                           data-mesasge="<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.confirmmakewinner", array("%name%" => $variant->getName()))); ?>"
+                                                           data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.email.abtest.makewinner")); ?>"
+                                                           data-confirm-callback="executeAction"
+                                                           data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
                                                             <i class="fa fa-trophy"></i>
                                                         </a>
                                                     </div>

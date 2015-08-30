@@ -106,6 +106,14 @@ class FormType extends AbstractType
             )
         ));
 
+        $builder->add('renderStyle', 'yesno_button_group', array(
+            'label'       => 'mautic.form.form.renderstyle',
+            'data'       => (array_key_exists('renderstyle', $options['data']) && empty($options['data']['renderstyle'])) ? false : true,
+            'attr'        => array(
+                'tooltip' => 'mautic.form.form.renderstyle.tooltip'
+            )
+        ));
+
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',

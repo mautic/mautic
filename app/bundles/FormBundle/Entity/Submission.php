@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -74,7 +75,8 @@ class Submission
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_submissions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository');
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
+            ->addIndex(array('tracking_id'), 'form_submission_tracking_search');
 
         $builder->addId();
 
@@ -101,6 +103,30 @@ class Submission
         $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('submission')
+            ->addProperties(
+                array(
+                    'id',
+                    'ipAddress',
+                    'form',
+                    'lead',
+                    'trackingId',
+                    'dateSubmitted',
+                    'referer',
+                    'page',
+                    'results'
+                )
+            )
             ->build();
     }
 

@@ -10,7 +10,8 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Exception\SchemaUpdateException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
  * Class TableSchemaHelper
@@ -57,7 +58,7 @@ class TableSchemaHelper
 
     /**
      * @param Connection         $db
-     * @param string             $prefix
+     * @param                    $prefix
      * @param ColumnSchemaHelper $columnHelper
      */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
@@ -66,7 +67,7 @@ class TableSchemaHelper
         $this->sm            = $db->getSchemaManager();
         $this->prefix        = $prefix;
         $this->columnHelper  = $columnHelper;
-        $this->schema        = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
+        $this->schema        = new Schema(array(), array(), $this->sm->createSchemaConfig());
     }
 
     /**
@@ -85,14 +86,14 @@ class TableSchemaHelper
      * @param array $tables
      *
      * @return void
-     * @throws SchemaUpdateException
+     * @throws SchemaException
      */
     public function addTables(array $tables)
     {
         //ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
             if (empty($table['name'])) {
-                throw new SchemaUpdateException('Table is missing required name key.');
+                throw new SchemaException('Table is missing required name key.');
             }
 
             $this->checkTableExists($table['name'], true);
@@ -128,12 +129,12 @@ class TableSchemaHelper
      * @param $dropExisting
      *
      * @return void
-     * @throws SchemaUpdateException
+     * @throws SchemaException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false)
     {
         if (empty($table['name'])) {
-            throw new SchemaUpdateException('Table is missing required name key.');
+            throw new SchemaException('Table is missing required name key.');
         }
 
         if ($checkExists || $dropExisting) {
@@ -155,7 +156,7 @@ class TableSchemaHelper
             $columnsAdded = array();
             foreach ($columns as $column) {
                 if (empty($column['name'])) {
-                    throw new SchemaUpdateException('A column is missing required name key.');
+                    throw new SchemaException('A column is missing required name key.');
                 }
 
                 if (!isset($columns[$column['name']])) {
@@ -212,7 +213,7 @@ class TableSchemaHelper
         }
 
         //reset schema
-        $this->schema     = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
+        $this->schema     = new Schema(array(), array(), $this->sm->createSchemaConfig());
         $this->dropTables = $this->addTables = array();
     }
 
@@ -223,13 +224,13 @@ class TableSchemaHelper
      * @param bool   $throwException
      *
      * @return bool
-     * @throws SchemaUpdateException
+     * @throws SchemaException
      */
     public function checkTableExists($table, $throwException = false)
     {
         if ($this->sm->tablesExist($this->prefix . $table)) {
             if ($throwException) {
-                throw new SchemaUpdateException($this->prefix . "$table already exists");
+                throw new SchemaException($this->prefix . "$table already exists");
             }
 
             return true;

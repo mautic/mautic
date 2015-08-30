@@ -49,11 +49,6 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
      */
     public function handle(GetResponseEvent $event)
     {
-        $apiMode = $this->factory->getParameter('api_mode');
-        if ($apiMode != 'oauth1') {
-            return;
-        }
-
         $request = $event->getRequest();
 
         if (false === $request->attributes->get('oauth_request_parameters', false)) {

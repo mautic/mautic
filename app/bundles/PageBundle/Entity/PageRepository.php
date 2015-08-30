@@ -44,20 +44,17 @@ class PageRepository extends CommonRepository
      */
     public function getPopularPages($limit = 10)
     {
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->createQueryBuilder('p');
 
-        $q->select('count(h.id) as hits, h.page_id, p.title, h.url')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
-            ->orderBy('hits', 'DESC')
-            ->groupBy('h.page_id, p.title, h.url')
-            ->where('h.page_id > 0')
+        $q->select("partial p.{id, title, hits, alias}")
+            ->orderBy('p.hits', 'DESC')
+            ->where('p.hits > 0')
             ->setMaxResults($limit);
 
         $expr = $this->getPublishedByDateExpression($q, 'p');
         $q->andWhere($expr);
 
-        return $q->execute()->fetchAll();
+        return $q->getQuery()->getResult();
     }
 
     /**

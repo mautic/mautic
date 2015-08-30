@@ -29,6 +29,7 @@ class LeadImportType extends AbstractType
         $builder->add('file', 'file', array(
             'label' => 'mautic.lead.import.file',
             'attr'  => array(
+                'accept' => '.csv',
                 'class' => 'form-control'
             )
         ));

@@ -153,6 +153,11 @@ class Asset extends FormEntity
     private $size;
 
     /**
+     * @var
+     */
+    private $downloadUrl;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -160,7 +165,8 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository');
+            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
+            ->addIndex(array('alias'), 'asset_alias_search');
 
         $builder->addIdColumns('title');
 
@@ -243,7 +249,8 @@ class Asset extends FormEntity
                     'revision',
                     'extension',
                     'mime',
-                    'size'
+                    'size',
+                    'downloadUrl'
                 )
             )
             ->build();
@@ -876,6 +883,10 @@ class Asset extends FormEntity
      */
     public function getFileType()
     {
+        if (!empty($this->extension)) {
+            return $this->extension;
+        }
+
         if ($this->getStorageLocation() == 'remote') {
             return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
         }
@@ -1342,5 +1353,25 @@ class Asset extends FormEntity
         }
 
         return number_format($size) . " bytes";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDownloadUrl()
+    {
+        return $this->downloadUrl;
+    }
+
+    /**
+     * @param mixed $downloadUrl
+     *
+     * @return Asset
+     */
+    public function setDownloadUrl($downloadUrl)
+    {
+        $this->downloadUrl = $downloadUrl;
+
+        return $this;
     }
 }

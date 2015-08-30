@@ -34,7 +34,7 @@ class ClientModel extends FormModel
      */
     public function initialize()
     {
-        $this->apiMode = $this->factory->getParameter('api_mode');
+        $this->apiMode = $this->factory->getRequest()->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
     }
 
     /**

@@ -457,6 +457,11 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function updateLeadTagsAction(Request $request)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
@@ -535,5 +540,29 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($data);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function reorderAction(Request $request)
+    {
+        $dataArray   = array('success' => 0);
+        $order       = InputHelper::clean($request->request->get('field'));
+        $page        = InputHelper::int($request->get('page'));
+        $limit       = InputHelper::int($request->get('limit'));
+
+        if (!empty($order)) {
+            /** @var \Mautic\LeadBundle\Model\FieldModel $model */
+            $model = $this->factory->getModel('lead.field');
+
+            $startAt = ($page > 1) ? ($page * $limit) + 1 : 1;
+            $model->reorderFieldsByList($order, $startAt);
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
     }
 }

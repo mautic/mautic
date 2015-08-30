@@ -36,23 +36,22 @@ $container->loadFromExtension("monolog", array(
             "handler"      => "nested",
             "channels" => array(
                 "!mautic"
-            ),
+            )
         ),
         "nested"  => array(
-            "type"  => "stream",
+            "type"  => "rotating_file",
             "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
-            "level" => ($debugMode) ? "debug" : "error"
-        ),
-        "console" => array(
-            "type" => "console"
+            "level" => ($debugMode) ? "debug" : "error",
+            "max_files" => 7
         ),
         "mautic"    => array(
-            "type"  => "stream",
+            "type"  => "rotating_file",
             "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
-            "level" => ($debugMode) ? "debug" : "error",
+            "level" => ($debugMode) ? "debug" : "notice",
             'channels' => array(
                 'mautic',
             ),
+            "max_files" => 7
         )
     )
 ));

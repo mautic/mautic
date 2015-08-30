@@ -10,10 +10,9 @@
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 /**
  * Class EmailSendEvent
@@ -68,6 +67,11 @@ class EmailSendEvent extends CommonEvent
     private $internalSend = false;
 
     /**
+     * @var array
+     */
+    private $textHeaders = array();
+
+    /**
      * @param MailHelper $helper
      * @param array      $args
      */
@@ -107,6 +111,10 @@ class EmailSendEvent extends CommonEvent
             $this->internalSend = $args['internalSend'];
         } elseif ($helper !== null) {
             $this->internalSend = $helper->isInternalSend();
+        }
+
+        if (isset($args['textHeaders'])) {
+            $this->textHeaders = $args['textHeaders'];
         }
     }
 
@@ -203,6 +211,34 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
+     * @return string
+     */
+    public function getSubject()
+    {
+        if ($this->helper !== null) {
+
+            return $this->helper->getSubject();
+        } else {
+
+            return $this->subject;
+        }
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return EmailSendEvent
+     */
+    public function setSubject($subject)
+    {
+        if ($this->helper !== null) {
+            $this->helper->setSubject($subject);
+        } else {
+            $this->subject = $subject;
+        }
+    }
+
+    /**
      * Get the MailHelper object
      *
      * @return MailHelper
@@ -261,5 +297,26 @@ class EmailSendEvent extends CommonEvent
     public function getTokens()
     {
         return $this->tokens;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    public function addTextHeader($name, $value)
+    {
+        if ($this->helper !== null) {
+            $this->helper->addCustomHeader($name, $value);
+        } else {
+            $this->textHeaders[$name] = $value;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getTextHeaders()
+    {
+        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->headers;
     }
 }

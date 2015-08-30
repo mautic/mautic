@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
  * Class Hit
@@ -150,7 +151,11 @@ class Hit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+            ->addIndex(array('ip_id'),'page_hit_ip_search')
+            ->addIndex(array('tracking_id'), 'page_hit_tracking_search')
+            ->addIndex(array('code'), 'page_hit_code_search')
+            ->addIndex(array('source', 'source_id'), 'page_hit_source_search');
 
         $builder->addId();
 
@@ -245,6 +250,44 @@ class Hit
         $builder->createField('sourceId', 'integer')
             ->columnName('source_id')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('hit')
+            ->addProperties(
+                array(
+                    'dateHit',
+                    'dateLeft',
+                    'page',
+                    'redirect',
+                    'email',
+                    'lead',
+                    'ipAddress',
+                    'country',
+                    'region',
+                    'city',
+                    'isp',
+                    'organization',
+                    'code',
+                    'referer',
+                    'url',
+                    'urlTitle',
+                    'userAgent',
+                    'remoteHost',
+                    'pageLanguage',
+                    'browserLanguages',
+                    'trackingId',
+                    'source',
+                    'sourceId'
+                )
+            )
             ->build();
     }
 

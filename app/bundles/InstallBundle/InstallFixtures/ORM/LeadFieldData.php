@@ -140,7 +140,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             //add the column to the leads table
             $leadsSchema->addColumn(array(
                 'name' => $name,
-                'type' => 'text',
+                'type' => in_array($name, array('email','country')) ? 'string' : 'text',
                 'options' => array(
                     'notnull' => false
                 )
@@ -149,6 +149,14 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             $this->addReference('leadfield-'.$name, $entity);
         }
         $leadsSchema->executeChanges();
+
+        $indexHelper = $this->container->get('mautic.factory')->getSchemaHelper('index', 'leads');
+
+        // Add email and country indexes
+        $indexHelper->setName('leads');
+        $indexHelper->addIndex('email', 'email_search');
+        $indexHelper->addIndex('country', 'country_search');
+        $indexHelper->executeChanges();
     }
 
     /**

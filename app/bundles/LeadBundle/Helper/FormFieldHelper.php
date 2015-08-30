@@ -21,6 +21,9 @@ class FormFieldHelper
         'text'     => array(
             'properties' => array()
         ),
+        'textarea'     => array(
+            'properties' => array()
+        ),
         'select'   => array(
             'properties' => array(
                 'list' => array(

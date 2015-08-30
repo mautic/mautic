@@ -283,7 +283,13 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <div class="col-xs-11">
                                         <?php if ($isWinner): ?>
                                         <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.abtest.makewinner'); ?>">
-                                            <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.confirmmakewinner", array("%name%" => $variant->getTitle() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                            <a class="btn btn-warning"
+                                               data-toggle="confirmation"
+                                               href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>"
+                                               data-message="<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.confirmmakewinner", array("%name%" => $variant->getTitle()))); ?>"
+                                               data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.makewinner")); ?>"
+                                               data-confirm-callback="executeAction"
+                                               data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
                                                 <i class="fa fa-trophy"></i>
                                             </a>
                                         </div>

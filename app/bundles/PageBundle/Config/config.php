@@ -112,7 +112,10 @@ return array(
             ),
             'mautic.page.search.subscriber'         => array(
                 'class' => 'Mautic\PageBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.page.webhook.subscriber'                => array(
+                'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.page'                     => array(

@@ -97,6 +97,13 @@ class Form extends FormEntity
     private $inKioskMode = false;
 
     /**
+     * @var bool
+     */
+    private $renderStyle = false;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      * @var ArrayCollection
      */
     private $submissions;
@@ -188,6 +195,11 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->createField('renderStyle', 'boolean')
+            ->columnName('render_style')
+            ->nullable()
+            ->build();
+
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(array('dateSubmitted' => 'DESC'))
             ->mappedBy('form')
@@ -272,6 +284,7 @@ class Form extends FormEntity
                     'template',
                     'submissionCount',
                     'inKioskMode',
+                    'renderStyle',
                     'formType'
                 )
             )
@@ -384,6 +397,16 @@ class Form extends FormEntity
     public function getCachedHtml ()
     {
         return $this->cachedHtml;
+    }
+
+    /**
+     * Get render style
+     *
+     * @return string
+     */
+    public function getRenderStyle()
+    {
+        return $this->renderStyle;
     }
 
     /**
@@ -687,6 +710,14 @@ class Form extends FormEntity
     public function setInKioskMode($inKioskMode)
     {
         $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @param mixed $renderStyle
+     */
+    public function setRenderStyle($renderStyle)
+    {
+        $this->renderStyle = $renderStyle;
     }
 
     /**

@@ -123,3 +123,7 @@ ul.tag-cloud li {
 .lead-avatar-panel .img-responsive {
     min-width: 100%;
 }
+
+.lead-merge-options {
+    position: relative;
+}
