@@ -31,13 +31,14 @@ class EventsToArrayTransformer implements DataTransformerInterface
      *
      * @return array
      */
-    public function transform($events)
+    public function transform($event)
     {
-        $eventArray = array();
-        foreach ($events as $event) {
-            $eventArray[] = $event->getEventType();
-        }
-        return $eventArray;
+        // $eventArray = array();
+        // foreach ($events as $event) {
+        //     $eventArray[] = $event->getEventType();
+        // }
+        return $event->getEventType();
+        //return 'tst';
     }
 
     /**
@@ -51,29 +52,35 @@ class EventsToArrayTransformer implements DataTransformerInterface
 
         /** @var PersistentCollection $events */
         $events     = $this->webhook->getEvents();
-        $eventTypes = $events->getKeys();
+        //$eventTypes = $events->getKeys();
+        
+        print_r($submittedArray);
+        
+        $event = new Event();
+        $event->setWebhook($this->webhook)->setEventType($submittedArray);
+        $this->webhook->setEvent($event);
 
-        // Check to see what events have been removed
-        $removed = array_diff($eventTypes, $submittedArray);
-        if ($removed) {
-            foreach ($removed as $type) {
-                $this->webhook->removeEvent($events[$type]);
-            }
-        }
+        // // Check to see what events have been removed
+        // $removed = array_diff($eventTypes, $submittedArray);
+        // if ($removed) {
+        //     foreach ($removed as $type) {
+        //         $this->webhook->removeEvent($events[$type]);
+        //     }
+        // }
 
-        // Now check to see what events have been added
-        $added = array_diff($submittedArray, $eventTypes);
-        if ($added) {
-            foreach ($added as $type) {
-                // Create a new entity
-                $event = new Event();
-                $event->setWebhook($this->webhook)->setEventType($type);
-                $events[] = $event;
-            }
-        }
+        // // Now check to see what events have been added
+        // $added = array_diff($submittedArray, $eventTypes);
+        // if ($added) {
+        //     foreach ($added as $type) {
+        //         // Create a new entity
+        //         $event = new Event();
+        //         $event->setWebhook($this->webhook)->setEventType($type);
+        //         $events[] = $event;
+        //     }
+        // }
 
-        $this->webhook->setEvents($events);
+       // $this->webhook->setEvent($event);
 
-        return $events;
+        return $event;
     }
 }
