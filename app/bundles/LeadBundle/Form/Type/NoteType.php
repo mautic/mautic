@@ -85,9 +85,8 @@ class NoteType extends AbstractType
         ));
 
         $builder->add('buttons', 'form_buttons', array(
-            'container_class' => 'lead-note-buttons',
-            'apply_text'      => false,
-            'save_text'       => 'mautic.core.form.save'
+            'apply_text' => false,
+            'save_text'  => 'mautic.core.form.save'
         ));
 
         if (!empty($options["action"])) {
