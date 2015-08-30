@@ -94,8 +94,8 @@ class WebhookType extends AbstractType
 
         $builder->add('events', 'choice',  array(
                 'choices' => $choices,
-                'multiple' => true,
-                'expanded' => true,
+                'multiple' => false,
+                'expanded' => false,
                 'label'      => 'mautic.webhook.form.webhook.events',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => ''),
