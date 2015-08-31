@@ -19,6 +19,8 @@
 	                        <h3>
 	                            <?php if ($event['eventType'] == 'decision') : ?>
 	                                <span class="fa fa-bullseye text-danger"></span>
+	                            <?php elseif ($event['eventType'] == 'condition') : ?>
+	                                <span class="fa fa fa-share-alt text-danger"></span>
 	                            <?php else : ?>
 	                                <span class="fa fa-rocket text-success"></span>
 	                            <?php endif; ?>

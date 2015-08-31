@@ -301,7 +301,7 @@ class EventModel extends CommonFormModel
                             //this child event has already been fired for this lead so move on to the next event
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' already triggered');
                             continue;
-                        } elseif ($child['eventType'] != 'action') {
+                        } elseif ($child['eventType'] == 'decision') {
                             //hit a triggering type event so move on
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' is a decision');
                             continue;
