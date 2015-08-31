@@ -35,6 +35,11 @@ class AssetsHelper extends CoreAssetsHelper
     protected $assets;
 
     /**
+     * @var
+     */
+    protected $version;
+
+    /**
      * Gets asset prefix
      *
      * @param bool $includeEndingSlash
@@ -198,8 +203,8 @@ class AssetsHelper extends CoreAssetsHelper
         if (empty($editorLoaded)) {
             $editorLoaded = true;
             $this->addScript(array(
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js',
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js'
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version,
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version
             ));
         }
     }
@@ -383,15 +388,15 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Output system scripts
      *
-     * @return void
+     * @param bool|false $includeEditor
      */
     public function outputSystemScripts($includeEditor = false)
     {
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js';
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js';
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
         }
 
         if (isset($assets['js'])) {
@@ -405,6 +410,7 @@ class AssetsHelper extends CoreAssetsHelper
      * Fetch system scripts
      *
      * @param bool $render If true, a string will be returned of rendered script for header
+     * @param bool $includeEditor
      *
      * @return array|string
      */
@@ -413,8 +419,8 @@ class AssetsHelper extends CoreAssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js';
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js';
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
+            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
         }
 
         if ($render) {
@@ -538,6 +544,7 @@ class AssetsHelper extends CoreAssetsHelper
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
+        $this->version = $factory->getVersion();
     }
 
     /**

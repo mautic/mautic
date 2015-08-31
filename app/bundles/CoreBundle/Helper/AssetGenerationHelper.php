@@ -24,11 +24,17 @@ class AssetGenerationHelper
     private $factory;
 
     /**
+     * @var
+     */
+    private $version;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
+        $this->version = $this->factory->getVersion();
     }
 
     /**
@@ -171,12 +177,12 @@ class AssetGenerationHelper
                 //return prod generated assets
                 $assets = array(
                     'css' => array(
-                        "{$assetsPath}/css/libraries.css",
-                        "{$assetsPath}/css/app.css"
+                        "{$assetsPath}/css/libraries.css?v{$this->version}",
+                        "{$assetsPath}/css/app.css?v{$this->version}"
                     ),
                     'js'  => array(
-                        "{$assetsPath}/js/libraries.js",
-                        "{$assetsPath}/js/app.js"
+                        "{$assetsPath}/js/libraries.js?v{$this->version}",
+                        "{$assetsPath}/js/app.js?v{$this->version}"
                     )
                 );
             } else {
