@@ -15,6 +15,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.enterMode = CKEDITOR.ENTER_P;
     config.fillEmptyBlocks = false;
     config.filebrowserImageBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images';
+    config.filebrowserBrowseUrl = mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html';
 
     config.toolbar =
         [
@@ -65,7 +66,7 @@ CKEDITOR.editorConfig = function( config ) {
         [
             { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
             { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-            { name: 'insert', items : [ 'Image','Table' ] },
+            { name: 'insert', items : [ 'Image', 'Filemanager', 'Table' ] },
             { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl' ] },
             { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
             '/',

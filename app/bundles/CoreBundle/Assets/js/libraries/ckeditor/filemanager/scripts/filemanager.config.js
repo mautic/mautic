@@ -36,35 +36,15 @@
             "gif",
             "png",
             "svg",
-            "txt",
-            "pdf",
-            "odp",
-            "ods",
-            "odt",
-            "rtf",
-            "doc",
-            "docx",
-            "xls",
-            "xlsx",
-            "ppt",
-            "pptx",
-            "csv",
-            "ogv",
-            "mp4",
-            "webm",
-            "m4v",
-            "ogg",
-            "mp3",
-            "wav",
-            "zip",
-            "rar"
+            "css",
+            "js"
         ]
     },
     "upload": {
             "multiple": true,
             "number": 10,
             "overwrite": false,
-            "imagesOnly": true,
+            "imagesOnly": false,
             "fileSizeLimit": 16
     },
     "exclude": {
