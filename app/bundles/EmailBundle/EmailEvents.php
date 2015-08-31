@@ -89,7 +89,6 @@ final class EmailEvents
      */
     const EMAIL_PRE_DELETE   = 'mautic.email_pre_delete';
 
-
     /**
      * The mautic.email_post_delete event is thrown after a email is deleted.
      *
@@ -99,4 +98,42 @@ final class EmailEvents
      * @var string
      */
     const EMAIL_POST_DELETE   = 'mautic.email_post_delete';
+
+    /**
+     * The mautic.monitored_email_config event is dispatched during the configuration in order to inject custom folder locations
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\MonitoredEmailEvent instance.
+     *
+     * @var string
+     */
+    const MONITORED_EMAIL_CONFIG = 'mautic.monitored_email_config';
+
+    /**
+     * The mautic.on_email_parse event is thrown when a monitored email box retrieves messages.
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\ParseEmailEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_PARSE = 'mautic.on_email_parse';
+
+    /**
+     * The mautic.on_email_failed event is thrown when an email has failed to clear the queue and is about to be deleted
+     * in order to give a bundle a chance to do an action based on failed email if required
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\QueueEmailEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_FAILED = 'mautic.on_email_failed';
+
+    /**
+     * The mautic.on_email_resend event is thrown when an attempt to resend an email occurs
+     * in order to give a bundle a chance to do an action based on failed email if required
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\QueueEmailEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_RESEND = 'mautic.on_email_resend';
 }

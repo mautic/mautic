@@ -36,9 +36,7 @@ class ConfigBuilderEvent extends Event
     private $factory;
 
     /**
-     * Consctructor
-     *
-     * @param MauticFactory
+     * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
     {

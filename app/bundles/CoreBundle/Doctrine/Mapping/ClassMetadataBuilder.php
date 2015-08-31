@@ -257,4 +257,31 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
 
         $field->build();
     }
+
+    /**
+     * Add partial index
+     *
+     * @param array $columns
+     * @param       $name
+     * @param       $where
+     *
+     * @return $this
+     */
+    public function addPartialIndex(array $columns, $name, $where)
+    {
+        $cm = $this->getClassMetadata();
+
+        if (!isset($cm->table['indexes'])) {
+            $cm->table['indexes'] = array();
+        }
+
+        $cm->table['indexes'][$name] = array('
+            columns'  => $columns,
+            'options' => array(
+                'where' => $where
+            )
+        );
+
+        return $this;
+    }
 }

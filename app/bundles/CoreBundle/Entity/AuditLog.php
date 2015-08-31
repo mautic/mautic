@@ -78,7 +78,9 @@ class AuditLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('audit_log')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository');
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository')
+            ->addIndex(array('object', 'object_id'), 'object_search')
+            ->addIndex(array('bundle', 'object', 'action', 'object_id'), 'timeline_search');
 
         $builder->addId();
 
