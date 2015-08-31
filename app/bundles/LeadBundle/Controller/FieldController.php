@@ -161,7 +161,7 @@ class FieldController extends FormController
                                 ))
                             ));
                         } catch (\Exception $e) {
-                            $form['alias']->addError(new FormError($this->get('translator')->trans('mautic.lead.field.failed', array(), 'validators')));
+                            $form['alias']->addError(new FormError($this->get('translator')->trans('mautic.lead.field.failed', array('%error%' => $e->getMessage()), 'validators')));
                             $valid = false;
                         }
                     }

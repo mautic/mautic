@@ -134,6 +134,7 @@ class ListController extends FormController
 
         //retrieve the entity
         $list     = new LeadList();
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model      =$this->factory->getModel('lead.list');
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
@@ -179,9 +180,7 @@ class ListController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $form->createView(),
-                'choices'         => $model->getChoiceFields(),
-                'operatorOptions' => $model->getFilterExpressionFunctions()
+                'form'            => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter')
             ),
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => array(
@@ -195,7 +194,10 @@ class ListController extends FormController
     /**
      * Generate's edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param            $objectId
+     * @param bool|false $ignorePost
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction ($objectId, $ignorePost = false)
     {
@@ -279,9 +281,7 @@ class ListController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $form->createView(),
-                'choices'         => $model->getChoiceFields(),
-                'operatorOptions' => $model->getFilterExpressionFunctions()
+                'form'            => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter')
             ),
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => array(
@@ -441,8 +441,9 @@ class ListController extends FormController
 
     /**
      * @param $listId
+     * @param $action
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function changeList($listId, $action) {
         $page        = $this->factory->getSession()->get('mautic.lead.page', 1);

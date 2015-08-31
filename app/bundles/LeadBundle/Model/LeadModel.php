@@ -10,7 +10,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;

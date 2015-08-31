@@ -11,7 +11,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -434,7 +434,7 @@ class EmailModel extends FormModel
     /**
      * @param $idHash
      *
-     * @return mixed
+     * @return Stat
      */
     public function getEmailStatus ($idHash)
     {
@@ -727,7 +727,10 @@ class EmailModel extends FormModel
         $options       = array(
             'source'        => array('email', $email->getId()),
             'emailSettings' => $emailSettings,
-            'allowResends'  => false
+            'allowResends'  => false,
+            'customHeaders' => array(
+                'Precedence' => 'Bulk'
+            )
         );
 
         $failed      = array();
@@ -873,6 +876,7 @@ class EmailModel extends FormModel
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : array();
+        $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : array();
 
         if (!$email->getId()) {
             return false;
@@ -1010,6 +1014,10 @@ class EmailModel extends FormModel
                 $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
+
+                if (!empty($customHeaders)) {
+                    $mailer->setCustomHeaders($customHeaders);
+                }
             }
 
             $idHash = uniqid();
@@ -1322,5 +1330,32 @@ class EmailModel extends FormModel
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Get the settings for a monitored mailbox if enabled
+     *
+     * @param $bundleKey
+     * @param $folderKey
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function getMonitoredMailbox($bundleKey, $folderKey)
+    {
+        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
+        $mailboxHelper = $this->factory->getHelper('mailbox');
+
+        if ($folderKey) {
+            $bundleKey .= '_' . $folderKey;
+        }
+
+        $config = $mailboxHelper->getMailboxSettings($bundleKey);
+        if (empty($config['host']) || empty($config['folder']) || empty($config['address'])) {
+
+            return false;
+        }
+
+         return $config;
     }
 }

@@ -1443,11 +1443,18 @@ class LeadController extends FormController
                                 )
                             );
                         } else {
-                            $this->addFlash(
-                                'mautic.lead.email.error.failed',
-                                array(
-                                    '%subject%' => $subject,
-                                    '%email%'   => $leadEmail
+                            $errors = $mailer->getErrors();
+                            $form->addError(
+                                new FormError(
+                                    $this->factory->getTranslator()->trans(
+                                        'mautic.lead.email.error.failed',
+                                        array(
+                                            '%subject%' => $subject,
+                                            '%email%'   => $leadEmail,
+                                            '%error%'  => (is_array($errors)) ? implode('<br />', $errors) : $errors
+                                        ),
+                                        'flashes'
+                                    )
                                 )
                             );
                             $valid = false;

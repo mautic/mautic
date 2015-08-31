@@ -10,12 +10,18 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Class ConfigEvent
  */
 class ConfigEvent extends CommonEvent
 {
+    /**
+     * @var array
+     */
+    private $preserve = array();
+
     /**
      * @param array $config
      */
@@ -27,9 +33,10 @@ class ConfigEvent extends CommonEvent
     private $post;
 
     /**
-     * @param array $config
+     * @param array        $config
+     * @param ParameterBag $post
      */
-    public function __construct(array $config, \Symfony\Component\HttpFoundation\ParameterBag $post)
+    public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
         $this->post   = $post;
@@ -38,10 +45,16 @@ class ConfigEvent extends CommonEvent
     /**
      * Returns the config array
      *
+     * @param string $key
+     *
      * @return array
      */
-    public function getConfig()
+    public function getConfig($key = null)
     {
+        if ($key) {
+            return (isset($this->config[$key])) ? $this->config[$key] : array();
+        }
+
         return $this->config;
     }
 
@@ -49,10 +62,15 @@ class ConfigEvent extends CommonEvent
      * Sets the config array
      *
      * @param array $config
+     * @param null  $key
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config, $key = null)
     {
-        $this->config = $config;
+        if ($key) {
+            $this->config[$key] = $config;
+        } else {
+            $this->config = $config;
+        }
     }
 
     /**
@@ -63,5 +81,31 @@ class ConfigEvent extends CommonEvent
     public function getPost()
     {
         return $this->post;
+    }
+
+    /**
+     * Set fields such as passwords that will not overwrite existing values
+     * if the current is empty
+     *
+     * @param array|string $fields
+     */
+    public function unsetIfEmpty($fields)
+    {
+        if (!is_array($fields)) {
+            $fields = array($fields);
+        }
+
+        $this->preserve = array_merge($this->preserve, $fields);
+    }
+
+    /**
+     * Return array of fields to unset if empty so that existing values are not
+     * overwritten if empty
+     *
+     * @return array
+     */
+    public function getPreservedFields()
+    {
+        return $this->preserve;
     }
 }

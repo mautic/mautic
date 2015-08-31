@@ -80,8 +80,11 @@ class DateTimeHelper
             $this->datetime = $datetime;
             $this->string = $this->datetime->format($fromFormat);
         } elseif (empty($datetime)) {
-            $this->datetime = new \DateTime("now", new \DateTimeZone($this->timezone));
+            $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
             $this->string = $this->datetime->format($fromFormat);
+        } elseif ($fromFormat == null) {
+            $this->string   = $datetime;
+            $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
         } else {
             $this->string = $datetime;
 
@@ -110,7 +113,7 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = $this->datetime->setTimezone($this->utc);
+            $utc = ($this->timezone == 'UTC') ? $this->datetime : $this->datetime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
@@ -206,8 +209,9 @@ class DateTimeHelper
     /**
      * Gets a difference
      *
-     * @param string $from
-     * @param null   $format
+     * @param string     $compare
+     * @param null       $format
+     * @param bool|false $resetTime
      *
      * @return bool|\DateInterval|string
      */
@@ -227,6 +231,70 @@ class DateTimeHelper
         $interval = $compare->diff($with);
 
         return ($format == null) ? $interval : $interval->format($format);
+    }
+
+    /**
+     * Add to datetime
+     *
+     * @param            $intervalString
+     * @param bool|false $clone             If true, return a new \DateTime rather than update current one
+     *
+     * @return \DateTime
+     */
+    public function add($intervalString, $clone = false)
+    {
+        $interval = new \DateInterval($intervalString);
+
+        if ($clone) {
+            $dt = clone $this->datetime;
+            $dt->add($interval);
+
+            return $dt;
+        } else {
+            $this->datetime->add($interval);
+        }
+    }
+
+    /**
+     * Subtract from datetime
+     *
+     * @param            $intervalString
+     * @param bool|false $clone             If true, return a new \DateTime rather than update current one
+     *
+     * @return \DateTime
+     */
+    public function sub($intervalString, $clone = false)
+    {
+        $interval = new \DateInterval($intervalString);
+
+        if ($clone) {
+            $dt = clone $this->datetime;
+            $dt->sub($interval);
+
+            return $dt;
+        } else {
+            $this->datetime->sub($interval);
+        }
+    }
+
+    /**
+     * Modify datetime
+     *
+     * @param            $string
+     * @param bool|false $clone    If true, return a new \DateTime rather than update current one
+     *
+     * @return \DateTime
+     */
+    public function modify($string, $clone = false)
+    {
+        if ($clone) {
+            $dt = clone $this->datetime;
+            $dt->modify($string);
+
+            return $dt;
+        } else {
+            $this->datetime->modify($string);
+        }
     }
 
     /**

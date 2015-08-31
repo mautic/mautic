@@ -135,18 +135,48 @@ class FieldModel extends FormModel
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
 
+        $isUnique = $entity->getIsUniqueIdentifier();
+
         if ($entity->getId()) {
             //create the field as its own column in the leads table
             $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
-                $leadsSchema->addColumn(array(
-                    'name' => $alias,
-                    'type' => 'text',
-                    'options' => array(
-                        'notnull' => false
+                $leadsSchema->addColumn(
+                    array(
+                        'name'    => $alias,
+                        'type'    => (in_array($alias, array('country', 'email') ) || $isUnique) ? 'string' : 'text',
+                        'options' => array(
+                            'notnull' => false
+                        )
                     )
-                ));
+                );
                 $leadsSchema->executeChanges();
+
+                if ($isUnique) {
+                    // Get list of current uniques
+                    $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+                    // Always use email
+                    $indexColumns   = array('email');
+                    $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                    $indexColumns[] = $alias;
+
+                    // Only use three to prevent max key length errors
+                    $indexColumns = array_slice($indexColumns, 0, 3);
+
+                    try {
+                        // Update the unique_identifier_search index
+                        /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+                        $modifySchema = $this->factory->getSchemaHelper('index', 'leads');
+                        $modifySchema->allowColumn($alias);
+                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
+                        $modifySchema->addIndex(array($alias), 'lead_field'.$alias.'_search');
+                        $modifySchema->executeChanges();
+                    } catch (\Exception $e) {
+                        error_log($e);
+                        die(var_dump($e));
+                    }
+                }
             }
         }
 
@@ -384,7 +414,6 @@ class FieldModel extends FormModel
             } else {
                 $leadFields[$f->getAlias()] = $f->getLabel();
             }
-
         }
 
         if ($alphabetical) {
@@ -456,5 +485,15 @@ class FieldModel extends FormModel
         $fields = $this->getFieldList(false, true, $filters);
 
         return $fields;
+    }
+
+    /*
+     * Wrapper for misspelled getUniqueIdentiferFields
+     *
+     * @return array
+     */
+    public function getUniqueIdentifierFields()
+    {
+        return $this->getUniqueIdentiferFields();
     }
 }

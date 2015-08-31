@@ -21,8 +21,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
  */
 class BuilderSubscriber extends CommonSubscriber
 {
-
-
     /**
      * @return array
      */
@@ -35,6 +33,9 @@ class BuilderSubscriber extends CommonSubscriber
         );
     }
 
+    /**
+     * @param EmailBuilderEvent $event
+     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokenSectionsRequested()) {
@@ -84,6 +85,9 @@ class BuilderSubscriber extends CommonSubscriber
         }
     }
 
+    /**
+     * @param EmailSendEvent $event
+     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $idHash  = $event->getIdHash();
@@ -92,28 +96,24 @@ class BuilderSubscriber extends CommonSubscriber
             $idHash = uniqid();
         }
         $model = $this->factory->getModel('email');
-        $event->addToken(
-            '{unsubscribe_text}',
-            $this->translator->trans(
-                'mautic.email.unsubscribe.text',
-                array(
-                    '%link%' => $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
-                )
-            )
-        );
+
+        $unsubscribeText = $this->factory->getParameter('unsubscribe_text');
+        if (!$unsubscribeText) {
+            $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', array('%link%' => '|URL|'));
+        }
+        $unsubscribeText = str_replace('|URL|', $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)), $unsubscribeText);
+        $event->addToken('{unsubscribe_text}', $unsubscribeText);
 
         $event->addToken('{unsubscribe_url}', $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)));
 
-        $event->addToken(
-            '{webview_text}',
-            $this->translator->trans(
-                'mautic.email.webview.text',
-                array(
-                    '%link%' => $model->buildUrl('mautic_email_webview', array('idHash' => $idHash))
-                )
-            )
-        );
+        $webviewText = $this->factory->getParameter('webview_text');
+        if (!$webviewText) {
+            $webviewText = $this->translator->trans('mautic.email.webview.text', array('%link%' => '|URL|'));
+        }
+        $webviewText = str_replace('|URL|', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
+        $event->addToken('{webview_text}', $webviewText);
 
         $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+
     }
 }

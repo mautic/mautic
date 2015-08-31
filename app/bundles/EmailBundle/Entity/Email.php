@@ -319,6 +319,7 @@ class Email extends FormEntity
         $builder->createOneToMany('variantChildren', 'Email')
             ->setIndexBy('id')
             ->mappedBy('variantParent')
+            ->fetchLazy()
             ->build();
 
         $builder->createField('variantSettings', 'array')

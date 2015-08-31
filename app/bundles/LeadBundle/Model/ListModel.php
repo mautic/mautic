@@ -59,7 +59,12 @@ class ListModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadList');
+        /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
+        $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
+
+        $repo->setTranslator($this->translator);
+
+        return $repo;
     }
 
     /**
@@ -223,54 +228,153 @@ class ListModel extends FormModel
      */
     public function getChoiceFields()
     {
+        $operators = array(
+            'text' => array(
+                'include' => array(
+                    '=',
+                    '!=',
+                    'empty',
+                    '!empty',
+                    'like',
+                    '!like'
+                )
+            ),
+            'select' => array(
+                'include' => array(
+                    '=',
+                    '!=',
+                    'empty',
+                    '!empty',
+                    'like',
+                    '!like',
+                    'in',
+                    '!in'
+                )
+            ),
+            'bool' => array(
+                'include' => array(
+                    '=',
+                    '!='
+                )
+            ),
+            'default' => array(
+                'exclude' => array(
+                    'in',
+                    '!in'
+                )
+            )
+        );
+
         //field choices
         $choices = array(
             'date_added' => array(
-                'label'       => $this->translator->trans('mautic.core.date.added'),
-                'properties'  => array('type' => 'date')
+                'label'      => $this->translator->trans('mautic.core.date.added'),
+                'properties' => array('type' => 'date'),
+                'operators'  => $operators['default']
             ),
-            'owner_id'     => array(
+            'date_identified' => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
+                'properties' => array('type' => 'date'),
+                'operators'  => $operators['default']
+            ),
+            'last_active' => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
+                'properties' => array('type' => 'date'),
+                'operators'  => $operators['default']
+            ),
+            'owner_id'   => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
                 'properties' => array(
                     'type'     => 'lookup_id',
                     'callback' => 'activateLeadFieldTypeahead'
-                )
+                ),
+                'operators'  => $operators['text']
             ),
             'points'     => array(
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
-                'properties' => array('type' => 'number')
+                'properties' => array('type' => 'number'),
+                'operators'  => $operators['default']
+            ),
+            'leadlist'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
+                'properties' => array(
+                    'type' => 'leadlist'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        'in',
+                        '!in'
+                    )
+                )
+            ),
+            'dnc_bounced'        => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
+                'properties' => array(
+                    'type' => 'boolean',
+                    'list' => array(
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes')
+                    )
+                ),
+                'operators'  => $operators['bool']
+            ),
+            'dnc_unsubscribed'   => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
+                'properties' => array(
+                    'type' => 'boolean',
+                    'list' => array(
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes')
+                    )
+                ),
+                'operators'  => $operators['bool']
             )
         );
 
         //get list of custom fields
         $fields = $this->factory->getModel('lead.field')->getEntities(
-            array('filter' => array(
-                'isListable'  => true,
-                'isPublished' => true
-            ))
+            array(
+                'filter' => array(
+                    'isListable'  => true,
+                    'isPublished' => true
+                )
+            )
         );
         foreach ($fields as $field) {
-            $type = $field->getType();
-            $properties = $field->getProperties();
+            $type               = $field->getType();
+            $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, array('lookup', 'select', 'boolean'))) {
-                $properties['callback'] = 'activateLeadFieldTypeahead';
+            if (in_array($type, array('lookup', 'boolean'))) {
                 if ($type == 'boolean') {
                     //create a lookup list with ID
-                    $properties['list'] = $properties['yes'].'|'.$properties['no'] . '||1|0';
+                    $properties['list'] = $properties['yes'].'|'.$properties['no'].'||1|0';
+                } else {
+                    $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
             }
             $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
                 'properties' => $properties
             );
+
+            // Set operators allowed
+            if ($type == 'boolean') {
+                $choices[$field->getAlias()]['operators'] = $operators['bool'];
+            } elseif ($type == 'select') {
+                $choices[$field->getAlias()]['operators'] = $operators['select'];
+            } elseif (in_array($type, array('lookup', 'lookup_id', 'select', 'text', 'email', 'url', 'timezone', 'email', 'tel', 'country', 'region'))) {
+                $choices[$field->getAlias()]['operators'] = $operators['text'];
+            } else {
+                $choices[$field->getAlias()]['operators'] = $operators['default'];
+            }
         }
 
         $cmp = function ($a, $b) {
-            return strcmp($a["label"], $b["label"]);
+            return strcmp($a['label'], $b['label']);
         };
 
         uasort($choices, $cmp);
+
         return $choices;
     }
 
@@ -316,12 +420,15 @@ class ListModel extends FormModel
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
-        $id   = $entity->getId();
-        $list = array('id' => $id, 'filters' => $entity->getFilters());
+        $id       = $entity->getId();
+        $list     = array('id' => $id, 'filters' => $entity->getFilters());
+        $dtHelper = $this->factory->getDate();
 
         $batchLimiters = array(
-            'dateTime' => $this->factory->getDate()->toUtcString()
+            'dateTime' => $dtHelper->toUtcString()
         );
+
+        $localDateTime = $dtHelper->getLocalDateTime();
 
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
@@ -384,7 +491,7 @@ class ListModel extends FormModel
                 }
 
                 foreach ($newLeadList[$id] as $l) {
-                    $this->addLead($l, $entity, false, true, -1);
+                    $this->addLead($l, $entity, false, true, -1, $localDateTime);
 
                     unset($l);
 
@@ -546,11 +653,16 @@ class ListModel extends FormModel
      * @param bool              $manuallyAdded
      * @param bool              $batchProcess
      * @param int               $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
+     * @param \DateTime         $dateManipulated
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
+    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
     {
+        if ($dateManipulated == null) {
+            $dateManipulated = new \DateTime();
+        }
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
@@ -640,7 +752,7 @@ class ListModel extends FormModel
                 $listLead->setList($this->leadChangeLists[$listid]);
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
-                $listLead->setDateAdded(new \DateTime());
+                $listLead->setDateAdded($dateManipulated);
 
                 $persistLists[] = $listLead;
             }
@@ -674,11 +786,11 @@ class ListModel extends FormModel
     /**
      * Remove a lead from lists
      *
-     * @param      $lead
-     * @param      $lists
-     * @param bool $manuallyRemoved
-     * @param bool $batchProcess
-     * @param bool $skipFindOne
+     * @param           $lead
+     * @param           $lists
+     * @param bool      $manuallyRemoved
+     * @param bool      $batchProcess
+     * @param bool      $skipFindOne
      *
      * @throws \Doctrine\ORM\ORMException
      */
