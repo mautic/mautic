@@ -28,6 +28,11 @@ class CampaignBuilderEvent extends Event
     /**
      * @var array
      */
+    private $leadConditions  = array();
+
+    /**
+     * @var array
+     */
     private $actions      = array();
 
     /**
@@ -44,7 +49,7 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Add an lead action to the list of available .
+     * Add an lead decision to the list of available .
      *
      * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $action - can contain the following keys:
@@ -82,7 +87,7 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get lead actions
+     * Get lead decisions
      *
      * @return array
      */
@@ -99,6 +104,64 @@ class CampaignBuilderEvent extends Event
         }
 
         return $this->leadDecisions;
+    }
+
+    /**
+     * Add an lead condition to the list of available conditions.
+     *
+     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $condition - can contain the following keys:
+     *                        'label'       => (required) what to display in the list
+     *                        'description' => (optional) short description of event
+     *                        'formType'    => (optional) name of the form type SERVICE for the action
+     *                        'formTypeOptions' => (optional) array of options to pass to the formType service
+     *                        'formTheme'   => (optional) form theme
+     *                        'callback'    => (optional) callback function that will be passed when the event is triggered
+     *                            The callback function should return a bool to determine if the trigger's actions
+     *                            should be executed.  For example, only trigger actions for specific entities.
+     *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *                              mixed $eventDetails Whatever the bundle passes when triggering the event
+     *                              Mautic\CoreBundle\Factory\MauticFactory $factory
+     *                              Mautic\LeadBundle\Entity\Lead $lead
+     *                              array $event
+     */
+    public function addLeadCondition ($key, array $event)
+    {
+        if (array_key_exists($key, $this->leadConditions)) {
+            throw new InvalidArgumentException("The key, '$key' is already used by another lead action. Please use a different key.");
+        }
+
+        //check for required keys and that given functions are callable
+        $this->verifyComponent(
+            array('label'),
+            array('callback'),
+            $event
+        );
+
+        $event['label']       = $this->translator->trans($event['label']);
+        $event['description'] = (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
+
+        $this->leadConditions[$key] = $event;
+    }
+
+    /**
+     * Get lead conditions
+     *
+     * @return array
+     */
+    public function getLeadConditions ()
+    {
+        static $sorted = false;
+
+        if (empty($sorted)) {
+            uasort($this->leadConditions, function ($a, $b) {
+                return strnatcasecmp(
+                    $a['label'], $b['label']);
+            });
+            $sorted = true;
+        }
+
+        return $this->leadConditions;
     }
 
     /**

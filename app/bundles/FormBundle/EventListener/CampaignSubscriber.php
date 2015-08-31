@@ -54,7 +54,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'    => 'campaignevent_form_field_value',
             'callback'    => array('\\Mautic\\FormBundle\\Helper\\CampaignEventHelper', 'validateFormValue')
         );
-        $event->addLeadDecision('form.field_value', $trigger);
+        $event->addLeadCondition('form.field_value', $trigger);
     }
 
     /**
