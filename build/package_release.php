@@ -15,18 +15,17 @@
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
-$args            = getopt('b::', array('repackage'));
-$versionLocation = (isset($args['b'])) ? ' ' : ' tags/';
+$args             = getopt('b::', array('repackage'));
+$gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 
 // We need the version number so get the app kernel
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/app/AppKernel.php';
 
-if (!empty($args['b'])) {
-    $version = $args['b'];
-} else {
-    $version = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
-}
+$appVersion = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
+
+// Use branch if applicable otherwise a version tag
+$gitSource = (!empty($args['b'])) ? $args['b'] : $appVersion;
 
 if (!isset($args['repackage'])) {
     // Preparation - Remove previous packages
@@ -46,12 +45,23 @@ if (!isset($args['repackage'])) {
 
     // Checkout the version tag into the packaging space
     chdir(dirname(__DIR__));
-    system($systemGit.' archive '.$version.' | tar -x -C '.__DIR__.'/packaging');
+    system($systemGit.' archive '.$gitSource.' | tar -x -C '.__DIR__.'/packaging', $result);
+
+    if ($result !== 0) {
+        exit;
+    }
+
     chdir(__DIR__);
-    system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..');
+    system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..', $result);
+    if ($result !== 0) {
+        exit;
+    }
 
     // Generate the bootstrap.php.cache file
-    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php');
+    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php', $result);
+    if ($result !== 0) {
+        exit;
+    }
 
     // Common steps
     include_once __DIR__.'/processfiles.php';
@@ -65,7 +75,7 @@ if (!isset($args['repackage'])) {
     // Get the list of modified files from the initial tag
     // TODO - Hardcode this to the 1.0.0 tag when we're there
     ob_start();
-    passthru($systemGit.' diff tags/'.$tags[0].$versionLocation.$version.' --name-status', $fileDiff);
+    passthru($systemGit.' diff tags/'.$tags[0].$gitSourceLocation.$gitSource.' --name-status', $fileDiff);
     $fileDiff = explode("\n", trim(ob_get_clean()));
 
     // Only add deleted files to our list; new and modified files will be covered by the archive
@@ -132,10 +142,10 @@ if (!isset($args['repackage'])) {
 // Post-processing - ZIP it up
 chdir(__DIR__ . '/packaging');
 
-system("rm -f ../packages/{$version}.zip ../packages/{$version}-update.zip");
+system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/' . $version . '.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/' . $appVersion . '.zip . -x@../excludefiles.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/' . $version . '-update.zip -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/' . $appVersion . '-update.zip -@ < modified_files.txt > /dev/null');

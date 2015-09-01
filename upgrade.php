@@ -93,7 +93,7 @@ function copy_directory($src, $dest)
 
     // Make sure the destination exists
     if (!is_dir($dest)) {
-        if (!@mkdir($dest, 0755)) {
+        if (!@mkdir($dest, 0755, true)) {
             return sprintf('Could not move files from %s to production since the folder could not be created.', str_replace(MAUTIC_UPGRADE_ROOT, '', $src));
         }
     }
@@ -171,7 +171,7 @@ function move_mautic_bundles(array $status)
     $errorLog = array();
 
     // First, we will move any addon bundles into position
-    if (is_dir(MAUTIC_UPGRADE_ROOT . '/plugins') && !$status['updateState']['addonComplete']) {
+    if (is_dir(MAUTIC_UPGRADE_ROOT . '/plugins') && !$status['updateState']['pluginComplete']) {
         $iterator = new DirectoryIterator(MAUTIC_UPGRADE_ROOT . '/plugins');
 
         // Sanity check, make sure there are actually directories here to process
@@ -213,7 +213,7 @@ function move_mautic_bundles(array $status)
 
         process_error_log($errorLog);
 
-        $status['updateState']['addonComplete'] = true;
+        $status['updateState']['pluginComplete'] = true;
 
         // Finished with plugins, get a response back to the app so we can iterate to the next part
         return $status;
@@ -616,7 +616,7 @@ function copy_directories($dir, &$errorLog, $createDest = true) {
     // Ensure the destination directory exists
     $exists = file_exists(MAUTIC_ROOT . $dir);
     if ($createDest && !$exists) {
-        mkdir(MAUTIC_ROOT . $dir, 0755);
+        mkdir(MAUTIC_ROOT . $dir, 0755, true);
     } elseif (!$exists) {
         $errorLog[] = sprintf('%s does not exist.', MAUTIC_ROOT . $dir);
         return false;
@@ -773,6 +773,16 @@ function remove_mautic_deleted_files(array $status)
                         'Failed removing the file at %s from the production path.  As this is a deleted file, you can manually remove this file.',
                         $file
                     );
+                } else {
+                    // Check to see if directory is now empty and if so, delete it
+                    $dirpath = dirname($path);
+                    if (file_exists($dirpath) && !glob($dirpath . '/*')) {
+                        @chmod($dirpath, 0777);
+                        if (!@unlink($dirpath)) {
+                            // Failed to delete, reset the permissions to 644 for safety
+                            @chmod($dirpath, 0644);
+                        }
+                    }
                 }
             }
         }
@@ -807,7 +817,7 @@ $state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
 
 // Prime the state if it's empty
 if (empty($state)) {
-    $state['addonComplete']  = false;
+    $state['pluginComplete']  = false;
     $state['bundleComplete'] = false;
     $state['cacheComplete']  = false;
     $state['coreComplete']   = false;
