@@ -916,7 +916,7 @@ class CommonRepository extends EntityRepository
 
         $q->select($prefix.$valueColumn . ' as value, '.$prefix.$labelColumn.' as label')
             ->from($tableName, $alias)
-            ->orderBy($prefix.$valueColumn);
+            ->orderBy($prefix.$labelColumn);
 
         if ($expr !== null && $expr->count()) {
             $q->where($expr);

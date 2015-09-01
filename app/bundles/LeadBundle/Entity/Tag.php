@@ -33,7 +33,7 @@ class Tag
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\TagRepository')
-            ->addIndex(array('tag'), 'tag_search');
+            ->addIndex(array('tag'), 'lead_tag_search');
 
         $builder->addId();
         $builder->addField('tag', 'string');

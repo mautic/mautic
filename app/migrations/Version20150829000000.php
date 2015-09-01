@@ -18,9 +18,14 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20150829000000 extends AbstractMauticMigration
 {
+    /**
+     * @param Schema $schema
+     *
+     * @throws SkipMigrationException
+     */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix . '' . $this->prefix . 'lead_tags')) {
+        if ($schema->hasTable($this->prefix . 'lead_tags')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

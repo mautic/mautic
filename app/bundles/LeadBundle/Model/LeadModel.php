@@ -1058,4 +1058,12 @@ class LeadModel extends FormModel
 
         $this->saveEntity($lead);
     }
+
+    /**
+     * Get array of available lead tags
+     */
+    public function getTagList()
+    {
+        return $this->getTagRepository()->getSimpleList(null, array(), 'tag', 'id');
+    }
 }
