@@ -88,7 +88,7 @@ class UpdateController extends CommonController
             $failed = true;
         } elseif ($this->request->get('update', 0)) {
             // This was a retry from the update so call up the finalizeAction to finish the process
-            $this->forward('MauticCoreBundle:Ajax:updateFinalizationAction',
+            $this->forward('MauticCoreBundle:Ajax:updateFinalization',
                 array(
                     'request'  => $this->request
                 )
