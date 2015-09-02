@@ -48,8 +48,10 @@ class CampaignEventHelper
      */
     public static function validateFormValue(Form $eventDetails = null, $event)
     {
-        // @todo implement this
-
+        if ($event['properties']['value'])
+        \Doctrine\Common\Util\Debug::dump($eventDetails);
+        \Doctrine\Common\Util\Debug::dump($event);
+        die;
         return true;
     }
 }

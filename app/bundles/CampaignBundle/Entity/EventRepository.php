@@ -130,7 +130,10 @@ class EventRepository extends CommonRepository
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
                     $q->expr()->isNull('e.parent'),
-                    $q->expr()->eq('e.eventType', $q->expr()->literal('action'))
+                    $q->expr()->orX(
+                        $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
+                        $q->expr()->eq('e.eventType', $q->expr()->literal('condition'))
+                    )
                 )
             );
 

@@ -525,7 +525,11 @@ class EventModel extends CommonFormModel
 
                     $eventCount++;
 
-                    if (!isset($eventSettings['action'][$event['type']])) {
+                    if (isset($eventSettings['action'][$event['type']])) {
+                        $thisEventSettings = $eventSettings['action'][$event['type']];
+                    } elseif (isset($eventSettings['condition'][$event['type']])) {
+                        $thisEventSettings = $eventSettings['condition'][$event['type']];
+                    } else {
                         unset($event);
 
                         continue;
@@ -563,7 +567,7 @@ class EventModel extends CommonFormModel
 
 
                         //trigger the action
-                        $response = $this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true);
+                        $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true);
                         if ($response === false) {
                             // Something failed so remove the log
                             $repo->deleteEntity($log);

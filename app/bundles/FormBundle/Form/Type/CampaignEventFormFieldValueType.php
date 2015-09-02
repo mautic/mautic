@@ -47,7 +47,7 @@ class CampaignEventFormFieldValueType extends AbstractType
         $leadModel = $this->factory->getModel('lead.list');
         $operators = $leadModel->getFilterExpressionFunctions();
         $choices   = array();
-// \Doctrine\Common\Util\Debug::dump();
+
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
         }
