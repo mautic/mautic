@@ -277,7 +277,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
-            <?php if ($leadActualName || $leadCompany): ?>
+            <?php if (!$lead->isAnonymous()): ?>
             <div class="lead-avatar-panel">
                 <div class="avatar-collapser hr-expand nm">
                     <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
@@ -390,7 +390,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         </div>
         <?php endif; ?>
         <div class="pa-sm">
-            <?php echo $view['form']->form($tagForm); ?>
+            <?php $tags = $lead->getTags(); ?>
+            <?php foreach ($tags as $tag): ?>
+            <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span></h5>
+            <?php endforeach; ?>
+            <div class="clearfix"></div>
         </div>
     </div>
     <!--/ right section -->
