@@ -537,9 +537,6 @@ class AjaxController extends CommonController
             $application->setAutoExit(false);
             $output      = new BufferedOutput();
             $result      = $application->run($input, $output);
-
-            // Force failure
-            $result = 1;
         }
 
         if ($result !== 0) {
@@ -547,7 +544,7 @@ class AjaxController extends CommonController
             $this->factory->getLogger()->error('UPGRADE ERROR: ' . $output->fetch());
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.tryagain') . '</a>';
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.retry') . '</a>';
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
