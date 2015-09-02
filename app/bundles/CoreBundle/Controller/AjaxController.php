@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -535,13 +535,19 @@ class AjaxController extends CommonController
             $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
-            $output      = new NullOutput();
+            $output      = new BufferedOutput();
             $result      = $application->run($input, $output);
+
+            // Force failure
+            $result = 1;
         }
 
         if ($result !== 0) {
+            // Log the output
+            $this->factory->getLogger()->error('UPGRADE ERROR: ' . $output->fetch());
+
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.tryagain') . '</a>';
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php

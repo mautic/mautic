@@ -263,7 +263,8 @@ Mautic.processUpdate = function (container, step, state) {
                     }
                 },
                 error: function (request, textStatus, errorThrown) {
-                    Mautic.processAjaxError(request, textStatus, errorThrown);
+                    // Redirect to the update/schema page in a last ditch attempt instead of just failing
+                    window.location = mauticBaseUrl + '/s/update/schema';
                 }
             });
             break;
