@@ -25,9 +25,14 @@ if ($failed) {
 <div class="panel panel-default mnb-5 bdr-t-wdh-0">
     <div id="update-panel" class="panel-body">
         <div class="col-sm-offset-2 col-sm-8">
-            <div class="alert alert-<?php echo $class; ?>">
+            <div class="alert alert-<?php echo $class; ?> mb-sm">
                 <?php echo $view['translator']->trans($message); ?>
             </div>
+            <?php if (!$failed): ?>
+                <div class="text-center">
+                    <a href="<?php echo $view['router']->generate('mautic_dashboard_index'); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.go_to_dashboard'); ?></a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
