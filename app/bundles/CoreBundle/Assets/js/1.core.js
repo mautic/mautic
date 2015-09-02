@@ -755,9 +755,10 @@ var Mautic = {
             type = 'datetime';
         }
 
+        var format = mQuery(el).data('format');
         if (type == 'datetime') {
             mQuery(el).datetimepicker({
-                format: 'Y-m-d H:i',
+                format: (format) ? format : 'Y-m-d H:i',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,
@@ -766,7 +767,7 @@ var Mautic = {
         } else if(type == 'date') {
             mQuery(el).datetimepicker({
                 timepicker: false,
-                format: 'Y-m-d',
+                format: (format) ? format : 'Y-m-d',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,
@@ -776,7 +777,7 @@ var Mautic = {
         } else if (type == 'time') {
             mQuery(el).datetimepicker({
                 datepicker: false,
-                format: 'H:i',
+                format: (format) ? format : 'H:i',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,

@@ -307,6 +307,18 @@ class ListModel extends FormModel
                     )
                 )
             ),
+            'tags'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'properties' => array(
+                    'type' => 'tags'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        'in',
+                        '!in'
+                    )
+                )
+            ),
             'dnc_bounced'        => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => array(

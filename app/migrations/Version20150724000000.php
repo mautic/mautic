@@ -46,15 +46,16 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_access_tokens', 'fk', 'A76ED395'));
         $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_access_tokens', 'idx', 'A76ED395') . ' ON ' . $this->prefix . 'oauth1_access_tokens');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE user_id user_id INT NOT NULL, CHANGE expiresat expires_at BIGINT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_access_tokens (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_consumers (id) ON DELETE CASCADE');
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_access_tokens', 'idx', array('consumer_id')) . ' ON ' . $this->prefix . 'oauth1_consumers (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('user_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'users (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('user_id')) . ' FOREIGN KEY (user_id) REFERENCES ' . $this->prefix . 'users (id) ON DELETE CASCADE');
+
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_access_tokens', 'idx', array('user_id')) . ' ON ' . $this->prefix . 'oauth1_access_tokens (user_id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_request_tokens', 'fk', '37FDBD6D'));
         $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_request_tokens', 'idx', '37FDBD6D') . ' ON ' . $this->prefix . 'oauth1_request_tokens');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE expiresat expires_at BIGINT NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_request_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_request_tokens (id) ON DELETE CASCADE');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_request_tokens', 'idx', array('consumer_id')) . ' ON ' . $this->prefix . 'oauth1_consumers (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_request_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_consumers (id) ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_request_tokens', 'idx', array('consumer_id')) . ' ON ' . $this->prefix . 'oauth1_consumers (id)');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_accesstokens CHANGE expires_at expires_at BIGINT DEFAULT NULL');

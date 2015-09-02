@@ -407,17 +407,6 @@ class LeadController extends FormController
                             'ignoreAjax' => 1
                         )
                     )->getContent(),
-                    'tagForm'           => $this->createForm(
-                        'lead_tags',
-                        $lead,
-                        array(
-                            'allow_edit' => $this->factory->getSecurity()->hasEntityAccess(
-                                'lead:leads:editown',
-                                'lead:leads:editother',
-                                $lead->getOwner()
-                            )
-                        )
-                    )->createView()
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
                 'passthroughVars' => array(
