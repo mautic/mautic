@@ -64,7 +64,8 @@ class SecurityController extends CommonController
                 return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
                     array(
                         'request'  => $this->request
-                    ));
+                    )
+                );
             }
 
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
