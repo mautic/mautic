@@ -10,6 +10,8 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\FormBundle\Entity\Form;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 
 class CampaignEventHelper
 {
@@ -46,12 +48,26 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateFormValue(Form $eventDetails = null, $event)
+    public static function validateFormValue(MauticFactory $factory, $event, Lead $lead)
     {
-        if ($event['properties']['value'])
-        \Doctrine\Common\Util\Debug::dump($eventDetails);
-        \Doctrine\Common\Util\Debug::dump($event);
-        die;
-        return true;
+        if (!$lead || !$lead->getId()) {
+            return false;
+        }
+
+        $operators = $factory->getModel('lead.list')->getRepository()->getFilterExpressionFunctions();
+        $form      = $factory->getModel('form')->getRepository()->findOneById($event['properties']['form']);
+
+        if (!$form || !$form->getId()) {
+            return false;
+        }
+
+        return $factory->getModel('form.submission')->getRepository()->compareLastValue(
+            $lead->getId(),
+            $form->getId(),
+            $form->getAlias(),
+            $event['properties']['field'],
+            $event['properties']['value'],
+            $operators[$event['properties']['operator']]['expr']
+        );
     }
 }

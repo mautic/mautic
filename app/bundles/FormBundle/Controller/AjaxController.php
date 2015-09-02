@@ -86,7 +86,7 @@ class AjaxController extends CommonAjaxController
 
         foreach ($formFields as $field) {
             if ($field->getType() != 'button') {
-                $fields[$field->getId()] = $field->getLabel();
+                $fields[$field->getAlias()] = $field->getLabel();
             }
         }
 
