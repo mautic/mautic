@@ -82,7 +82,7 @@ class CommonController extends Controller implements MauticController
             );
         }
 
-        if (isset($args['passthroughVars']['route'])) {
+        if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
 
