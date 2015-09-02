@@ -601,7 +601,7 @@ class LeadListRepository extends CommonRepository
         $useExpr =& $expr;
 
         foreach ($filters as $k => $details) {
-            $column = $leadTable[$details['field']];
+            $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
 
             //DBAL does not have a not() function so we have to use the opposite
             $func  = (!$not)
@@ -611,31 +611,32 @@ class LeadListRepository extends CommonRepository
             $field = "l.{$details['field']}";
 
             // Format the field based on platform specific functions that DBAL doesn't support natively
+            if ($column) {
+                $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
+                $columnType = $column->getType();
 
-            $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
-            $columnType = $column->getType();
-
-            switch ($details['type']) {
-                case 'datetime':
-                    if (!$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toDateTime($field);
-                    }
-                    break;
-                case 'date':
-                    if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toDate($field);
-                    }
-                    break;
-                case 'time':
-                    if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toTime($field);
-                    }
-                    break;
-                case 'number':
-                    if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
-                        $field = $formatter->toNumeric($field);
-                    }
-                    break;
+                switch ($details['type']) {
+                    case 'datetime':
+                        if (!$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toDateTime($field);
+                        }
+                        break;
+                    case 'date':
+                        if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toDate($field);
+                        }
+                        break;
+                    case 'time':
+                        if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toTime($field);
+                        }
+                        break;
+                    case 'number':
+                        if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
+                            $field = $formatter->toNumeric($field);
+                        }
+                        break;
+                }
             }
 
             //the next one will determine the group
@@ -885,6 +886,26 @@ class LeadListRepository extends CommonRepository
                         );
                     $useExpr->add(
                         $q->expr()->comparison('l.id', $func, sprintf('(%s)', $subqb->getSQL()))
+                    );
+                    break;
+                case 'tags':
+                    // Tag filter
+                    $ignoreAutoFilter = true;
+
+                    $func = (in_array($func, array('neq', 'notIn'))) ? 'NOT IN' : 'IN';
+                    foreach ($details['filter'] as &$value) {
+                        $value = (int) $value;
+                    }
+
+                    $alias = $this->generateRandomParameterName();
+                    $sq = $this->_em->getConnection()->createQueryBuilder();
+                    $sq->select($alias.'.lead_id')
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', $alias)
+                        ->where(
+                            $sq->expr()->in($alias.'.tag_id', $details['filter'])
+                        );
+                    $useExpr->add(
+                        $q->expr()->comparison('l.id', $func, sprintf('(%s)', $sq->getSQL()))
                     );
                     break;
                 default:
