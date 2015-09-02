@@ -44,11 +44,14 @@
 
         "sensio/distribution-bundle": "~2.3",
 
-        "doctrine/orm": "~2.3,<2.5",
+        "doctrine/annotations": "1.2.*,>=1.2.7",
+        "doctrine/cache": "1.4.*,>=1.4.2",
+        "doctrine/common": "2.4.*,>=2.4.3",
         "doctrine/dbal": "2.4.*",
+        "doctrine/migrations": "dev-master",
+        "doctrine/orm": "2.4.*,>=2.4.8",
         "doctrine/doctrine-bundle": "~1.2",
         "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
-        "doctrine/migrations": "dev-master",
         "doctrine/doctrine-migrations-bundle": "~1.0",
 
         "knplabs/gaufrette": "dev-master",

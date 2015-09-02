@@ -147,6 +147,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.mcrypt';
         }
 
+        if (!function_exists('finfo_open')) {
+            $messages[] = 'mautic.install.extension.fileinfo';
+        }
+
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
             $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
 

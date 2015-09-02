@@ -370,9 +370,10 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
+            ->orderBy('f.field_order', 'asc')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
@@ -387,13 +388,16 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->where('l.id = :leadId')
             ->setParameter('leadId', $id);
-        $leadValues = $q->execute()->fetchAll();
-        $this->removeNonFieldColumns($leadValues[0]);
+        $leadValues = $q->execute()->fetch();
+        $this->removeNonFieldColumns($leadValues);
+
+        // Reorder leadValues based on field order
+        $leadValues = array_merge(array_flip(array_keys($fields)), $leadValues);
 
         $fieldValues = array();
 
         //loop over results to put fields in something that can be assigned to the entities
-        foreach ($leadValues[0] as $k => $r) {
+        foreach ($leadValues as $k => $r) {
             if (isset($fields[$k])) {
                 if ($byGroup) {
                     $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
