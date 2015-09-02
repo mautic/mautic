@@ -83,7 +83,9 @@ class UpdateController extends CommonController
 
         if ($result !== 0) {
             // Log the output
-            $this->factory->getLogger()->error('UPGRADE ERROR: '. $outputBuffer);
+            $outputBuffer = trim(preg_replace('/\n\s*\n/s', " \\ ", $outputBuffer));
+            $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
+            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code ' . $result . '; ' . $outputBuffer);
 
             $failed = true;
         } elseif ($this->request->get('update', 0)) {

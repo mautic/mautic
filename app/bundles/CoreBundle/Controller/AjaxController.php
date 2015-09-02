@@ -541,7 +541,9 @@ class AjaxController extends CommonController
 
         if ($result !== 0) {
             // Log the output
-            $this->factory->getLogger()->error('UPGRADE ERROR: ' . $output->fetch());
+            $outputBuffer = trim(preg_replace('/\n\s*\n/s', " \\ ", $output->fetch()));
+            $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
+            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code ' . $result . '; ' . $outputBuffer);
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.retry') . '</a>';
