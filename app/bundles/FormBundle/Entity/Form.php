@@ -11,150 +11,117 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Form
- * @ORM\Table(name="forms")
- * @ORM\Entity(repositoryClass="Mautic\FormBundle\Entity\FormRepository")
- * @Serializer\ExclusionPolicy("all")
+ *
+ * @package Mautic\FormBundle\Entity
+ *
  */
 class Form extends FormEntity
 {
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
-     */
-    private $alias;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails", "formList"})
+     * @var string
+     */
+    private $alias;
+
+    /**
+     * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
 
     /**
-     * @ORM\Column(name="cached_html", type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $cachedHtml;
 
     /**
-     * @ORM\Column(name="post_action", type="string")
+     * @var string
      */
     private $postAction;
 
     /**
-     * @ORM\Column(name="post_action_property", type="string", nullable=true)
+     * @var string
      */
     private $postActionProperty;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var \DateTime
      */
     private $publishUp;
 
     /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var \DateTime
      */
     private $publishDown;
 
     /**
-     * @ORM\OneToMany(targetEntity="Field", mappedBy="form", cascade={"all"}, indexBy="id")
-     * @ORM\OrderBy({"order" = "ASC"})
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var ArrayCollection
      */
     private $fields;
 
     /**
-     * @ORM\OneToMany(targetEntity="Action", mappedBy="form", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"order" = "ASC"})
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var ArrayCollection
      */
     private $actions;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var string
      */
     private $template;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true, name="in_kiosk_mode")
+     * @var bool
      */
     private $inKioskMode = false;
 
     /**
+     * @var bool
+     */
+    private $renderStyle = false;
+
+    /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
+     * @var ArrayCollection
      */
     private $submissions;
 
     /**
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
+     * @var int
      */
     public $submissionCount;
 
     /**
-     * @ORM\Column(type="string", nullable=true, name="form_type")
+     * @var string
      */
     private $formType;
 
     /**
      * @return void
      */
-    public function __clone()
+    public function __clone ()
     {
         $this->id = null;
 
@@ -162,27 +129,90 @@ class Form extends FormEntity
     }
 
     /**
-     * @param $prop
-     * @param $val
-     *
-     * @return void
+     * Construct
      */
-    protected function isChanged($prop, $val)
+    public function __construct ()
     {
-        $getter  = "get" . ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'actions' || $prop == 'fields') {
-            //changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
-        }
+        $this->fields      = new ArrayCollection();
+        $this->actions     = new ArrayCollection();
+        $this->submissions = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('forms')
+            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
+
+        $builder->addIdColumns();
+
+        $builder->addField('alias', 'string');
+
+        $builder->addCategory();
+
+        $builder->createField('cachedHtml', 'text')
+            ->columnName('cached_html')
+            ->nullable()
+            ->build();
+
+        $builder->createField('postAction', 'string')
+            ->columnName('post_action')
+            ->build();
+
+        $builder->createField('postActionProperty', 'string')
+            ->columnName('post_action_property')
+            ->nullable()
+            ->build();
+
+        $builder->addPublishDates();
+
+        $builder->createOneToMany('fields', 'Field')
+            ->setIndexBy('id')
+            ->setOrderBy(array('order' => 'ASC'))
+            ->mappedBy('form')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('actions', 'Action')
+            ->setIndexBy('id')
+            ->setOrderBy(array('order' => 'ASC'))
+            ->mappedBy('form')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('template', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('inKioskMode', 'boolean')
+            ->columnName('in_kiosk_mode')
+            ->nullable()
+            ->build();
+
+        $builder->createField('renderStyle', 'boolean')
+            ->columnName('render_style')
+            ->nullable()
+            ->build();
+
+        $builder->createOneToMany('submissions', 'Submission')
+            ->setOrderBy(array('dateSubmitted' => 'DESC'))
+            ->mappedBy('form')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->addNullableField('formType', 'string', 'form_type');
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required',
@@ -210,7 +240,7 @@ class Form extends FormEntity
      *
      * @return array
      */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups (\Symfony\Component\Form\Form $form)
     {
         $data   = $form->getData();
         $groups = array('form');
@@ -228,11 +258,63 @@ class Form extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('form')
+            ->addListProperties(
+                array(
+                    'id',
+                    'name',
+                    'alias',
+                    'category'
+                )
+            )
+            ->addProperties(
+                array(
+                    'description',
+                    'cachedHtml',
+                    'publishUp',
+                    'publishDown',
+                    'fields',
+                    'actions',
+                    'template',
+                    'submissionCount',
+                    'inKioskMode',
+                    'renderStyle',
+                    'formType'
+                )
+            )
+            ->build();
+    }
+
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
+    protected function isChanged ($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($prop == 'actions' || $prop == 'fields') {
+            //changes are already computed so just add them
+            $this->changes[$prop][$val[0]] = $val[1];
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -244,7 +326,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -257,7 +339,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -269,7 +351,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setDescription($description)
+    public function setDescription ($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -282,7 +364,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getDescription($truncate = false, $length = 45)
+    public function getDescription ($truncate = false, $length = 45)
     {
         if ($truncate) {
             if (strlen($this->description) > $length) {
@@ -300,7 +382,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setCachedHtml($cachedHtml)
+    public function setCachedHtml ($cachedHtml)
     {
         $this->cachedHtml = $cachedHtml;
 
@@ -312,9 +394,19 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getCachedHtml()
+    public function getCachedHtml ()
     {
         return $this->cachedHtml;
+    }
+
+    /**
+     * Get render style
+     *
+     * @return string
+     */
+    public function getRenderStyle()
+    {
+        return $this->renderStyle;
     }
 
     /**
@@ -324,7 +416,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setPostAction($postAction)
+    public function setPostAction ($postAction)
     {
         $this->isChanged('postAction', $postAction);
         $this->postAction = $postAction;
@@ -337,7 +429,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getPostAction()
+    public function getPostAction ()
     {
         return $this->postAction;
     }
@@ -349,7 +441,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setPostActionProperty($postActionProperty)
+    public function setPostActionProperty ($postActionProperty)
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -362,7 +454,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getPostActionProperty()
+    public function getPostActionProperty ()
     {
         return $this->postActionProperty;
     }
@@ -370,7 +462,7 @@ class Form extends FormEntity
     /**
      * Get result count
      */
-    public function getResultCount()
+    public function getResultCount ()
     {
         return count($this->submissions);
     }
@@ -382,7 +474,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp ($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -395,7 +487,7 @@ class Form extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishUp()
+    public function getPublishUp ()
     {
         return $this->publishUp;
     }
@@ -407,7 +499,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown ($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -420,18 +512,9 @@ class Form extends FormEntity
      *
      * @return \DateTime
      */
-    public function getPublishDown()
+    public function getPublishDown ()
     {
         return $this->publishDown;
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->fields  = new ArrayCollection();
-        $this->actions = new ArrayCollection();
     }
 
     /**
@@ -442,7 +525,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function addField($key, Field $field)
+    public function addField ($key, Field $field)
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', array($key, $changes));
@@ -471,7 +554,7 @@ class Form extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFields()
+    public function getFields ()
     {
         return $this->fields;
     }
@@ -483,7 +566,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function setAlias($alias)
+    public function setAlias ($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -496,7 +579,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias ()
     {
         return $this->alias;
     }
@@ -508,7 +591,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function addSubmission(Submission $submissions)
+    public function addSubmission (Submission $submissions)
     {
         $this->submissions[] = $submissions;
 
@@ -520,7 +603,7 @@ class Form extends FormEntity
      *
      * @param Submission $submissions
      */
-    public function removeSubmission(Submission $submissions)
+    public function removeSubmission (Submission $submissions)
     {
         $this->submissions->removeElement($submissions);
     }
@@ -530,7 +613,7 @@ class Form extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getSubmissions()
+    public function getSubmissions ()
     {
         return $this->submissions;
     }
@@ -543,7 +626,7 @@ class Form extends FormEntity
      *
      * @return Form
      */
-    public function addAction($key, Action $action)
+    public function addAction ($key, Action $action)
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', array($key, $changes));
@@ -558,7 +641,7 @@ class Form extends FormEntity
      *
      * @param Action $actions
      */
-    public function removeAction(Action $actions)
+    public function removeAction (Action $actions)
     {
         $this->actions->removeElement($actions);
     }
@@ -576,7 +659,7 @@ class Form extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getActions()
+    public function getActions ()
     {
         return $this->actions;
     }
@@ -584,7 +667,7 @@ class Form extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory()
+    public function getCategory ()
     {
         return $this->category;
     }
@@ -592,7 +675,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory ($category)
     {
         $this->category = $category;
     }
@@ -627,6 +710,14 @@ class Form extends FormEntity
     public function setInKioskMode($inKioskMode)
     {
         $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @param mixed $renderStyle
+     */
+    public function setRenderStyle($renderStyle)
+    {
+        $this->renderStyle = $renderStyle;
     }
 
     /**

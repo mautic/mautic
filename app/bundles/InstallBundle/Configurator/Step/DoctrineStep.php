@@ -10,7 +10,6 @@
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Doctrine Step.
@@ -22,7 +21,6 @@ class DoctrineStep implements StepInterface
     /**
      * Database driver
      *
-     * @Assert\Choice(callback="getDriverKeys")
      */
     public $driver = 'pdo_mysql';
 
@@ -92,8 +90,8 @@ class DoctrineStep implements StepInterface
         foreach ($parameters as $key => $value) {
             if (0 === strpos($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
-                $key = substr($key, 3);
-                $this->$key = $value;
+                $key                         = substr($key, 3);
+                $this->$key                  = $value;
             }
         }
     }
@@ -143,7 +141,7 @@ class DoctrineStep implements StepInterface
         foreach ($data as $key => $value) {
             // Exclude backup params from the config
             if (substr($key, 0, 6) != 'backup') {
-                $parameters['db_' . $key] = $value;
+                $parameters['db_'.$key] = $value;
             }
         }
 
@@ -176,9 +174,9 @@ class DoctrineStep implements StepInterface
     public static function getDrivers()
     {
         $mauticSupported = array(
-            'pdo_mysql'  => 'MySQL PDO (Recommended)',
-            'mysqli'     => 'MySQLi',
-            'pdo_pgsql'  => 'PostgreSQL',
+            'pdo_mysql' => 'MySQL PDO (Recommended)',
+            'mysqli'    => 'MySQLi',
+            'pdo_pgsql' => 'PostgreSQL',
             //'pdo_sqlite' => 'SQLite',
             //'pdo_sqlsrv' => 'SQL Server',
             //'pdo_oci'    => 'Oracle (PDO)',
@@ -194,8 +192,8 @@ class DoctrineStep implements StepInterface
             $pdoDrivers = \PDO::getAvailableDrivers();
 
             foreach ($pdoDrivers as $driver) {
-                if (array_key_exists('pdo_' . $driver, $mauticSupported)) {
-                    $supported['pdo_' . $driver] = $mauticSupported['pdo_' . $driver];
+                if (array_key_exists('pdo_'.$driver, $mauticSupported)) {
+                    $supported['pdo_'.$driver] = $mauticSupported['pdo_'.$driver];
                 }
             }
         }

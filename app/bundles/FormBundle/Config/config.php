@@ -131,7 +131,10 @@ return array(
             ),
             'mautic.form.search.subscriber'         => array(
                 'class' => 'Mautic\FormBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.form.webhook.subscriber'                => array(
+                'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.form'                      => array(

@@ -95,7 +95,7 @@ if ($tmpl == 'index')
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                             <?php echo $item->getName(); ?>
                             <?php if ($item->getFormType() == 'campaign'): ?>
-                                <i class="fa fa-fw fa-cube"></i>
+                                <span  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.form.icon_tooltip.campaign_form'); ?>"><i class="fa fa-fw fa-cube"></i></span>
                             <?php endif; ?>
                         </a>
                     </div>

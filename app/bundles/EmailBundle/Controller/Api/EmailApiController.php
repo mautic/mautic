@@ -30,7 +30,7 @@ class EmailApiController extends CommonApiController
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->permissionBase   = 'email:emails';
-        $this->serializerGroups = array("emailDetails", "categoryList", "publishDetails");
+        $this->serializerGroups = array("emailDetails", "categoryList", "publishDetails", "assetList");
     }
 
     /**

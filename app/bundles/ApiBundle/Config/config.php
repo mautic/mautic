@@ -144,6 +144,8 @@ return array(
             'bazinga.oauth.security.authentication.listener.class'    => 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener',
             'bazinga.oauth.event_listener.request.class'              => 'Mautic\ApiBundle\EventListener\OAuth1\OAuthRequestListener',
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
+            'jms_serializer.metadata.annotation_driver.class'         => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
+            'jms_serializer.metadata.php_driver.class'                => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
 
             'mautic.validator.oauthcallback' => array(
                 'class'     => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
@@ -155,7 +157,6 @@ return array(
 
     'parameters' => array(
         "api_enabled"                       => false,
-        "api_mode"                          => "oauth1", //oauth1 or oauth2
         "api_oauth2_access_token_lifetime"  => 60,
         "api_oauth2_refresh_token_lifetime" => 14
     )

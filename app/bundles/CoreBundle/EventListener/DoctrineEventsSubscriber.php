@@ -10,12 +10,13 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
  * Class DoctrineEventsSubscriber
  */
-class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
+class DoctrineEventsSubscriber implements EventSubscriber
 {
     /**
      * {@inheritdoc}
@@ -94,18 +95,6 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
                         $newDefinition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
-                }
-            }
-
-            $reader = new AnnotationReader();
-            $class = $classMetadata->getReflectionClass();
-
-            $annotation = $reader->getClassAnnotation($class, 'Mautic\CoreBundle\Doctrine\Annotation\LoadClassMetadataCallback');
-
-            if (null !== $annotation) {
-                if (method_exists($class->getName(), $annotation->functionName['value'])) {
-                    $func = $class->getName() . '::' . $annotation->functionName['value'];
-                    call_user_func($func, $args);
                 }
             }
         }

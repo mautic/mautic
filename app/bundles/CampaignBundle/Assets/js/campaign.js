@@ -85,15 +85,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
     Mautic.campaignBuilderUpdateLabel(domEventId);
 
     if (response.deleted) {
-        //remove the connections
-        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
-
-        mQuery('.' + domEventId).each(function () {
-            mQuery(this).remove();
-        });
-
-        //remove the div
-        mQuery(eventId).remove();
+        Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
     } else if (response.updateHtml) {
 
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
@@ -174,11 +166,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
     var eventId = '#' + domEventId;
 
     if (response.deleted) {
-        //remove the connections
-        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
-
-        //remove the div
-        mQuery(eventId).remove();
+        Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
 
         mQuery('#campaignLeadSource_' + response.sourceType).removeClass('disabled');
     } else if (response.updateHtml) {
@@ -563,7 +551,7 @@ Mautic.launchCampaignEditor = function() {
 
         //enable drag and drop
         Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-event"), Mautic.campaignDragOptions);
-        mQuery('#CampaignCanvas .list-campaign-source').draggable(Mautic.campaignDragOptions);
+        Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-source"), Mautic.campaignDragOptions);
 
         //activate existing connections
         Mautic.campaignBuilderReconnectEndpoints();
@@ -610,8 +598,12 @@ Mautic.closeCampaignBuilder = function() {
         height: "100%"
     };
 
-    var spinnerLeft = (mQuery(document).width() - 300) / 2;
-    var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
+        panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
+        spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
+        spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+
+    var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
     var nodes       = [];
 
     mQuery("#CampaignCanvas .list-campaign-event").each(function (idx, elem) {
@@ -655,6 +647,7 @@ Mautic.closeCampaignBuilder = function() {
     var campaignId     = mQuery('#campaignId').val();
     var query          = "action=campaign:updateConnections&campaignId=" + campaignId;
 
+    mQuery('.btn-close-builder').prop('disabled', true);
     mQuery.ajax({
         url: mauticAjaxUrl + '?' + query,
         type: "POST",
@@ -666,6 +659,7 @@ Mautic.closeCampaignBuilder = function() {
             if (response.success) {
                 mQuery('.builder').addClass('hide');
             }
+            mQuery('.btn-close-builder').prop('disabled', false);
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);

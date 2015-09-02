@@ -83,10 +83,10 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                                 if ($hasVariants || $hasTranslations): ?>
                                     <span>
                                 <?php if ($hasVariants): ?>
-                                    <i class="fa fa-fw fa-sitemap"></i>
+                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
                                 <?php endif; ?>
                                         <?php if ($hasTranslations): ?>
-                                            <i class="fa fa-fw fa-language"></i>
+                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.icon_tooltip.translation'); ?>"><i class="fa fa-fw fa-language"></i></span>
                                         <?php endif; ?>
                                  </span>
                                 <?php endif; ?>

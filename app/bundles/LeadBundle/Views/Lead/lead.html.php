@@ -30,10 +30,6 @@ if (!$isAnonymous) {
 $view['slots']->set('headerTitle',
        $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
-$view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id' => 'leadModal'
-)));
-
 $groups = array_keys($fields);
 $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
@@ -52,7 +48,7 @@ if ($edit) {
         'attr'      => array(
             'id'          => 'addNoteButton',
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#leadModal',
+            'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
             'href'        => $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId()))
         ),
@@ -78,9 +74,10 @@ if (!empty($fields['core']['email']['value'])) {
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'ajaxmodal',
-        'data-target' => '#leadModal',
+        'data-target' => '#MauticSharedModal',
         'data-header' => $view['translator']->trans('mautic.lead.lead.header.lists', array('%name%' => $lead->getPrimaryIdentifier())),
-        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list"))
+        'data-footer' => 'false',
+        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list")),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-list'
@@ -90,8 +87,9 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajaxmodal',
-            'data-target' => '#leadModal',
+            'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans('mautic.lead.lead.header.campaigns', array('%name%' => $lead->getPrimaryIdentifier())),
+            'data-footer' => 'false',
             'href'        => $view['router']->generate('mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "campaign"))
         ),
         'btnText'   => $view['translator']->trans('mautic.campaign.campaigns'),
@@ -108,6 +106,21 @@ if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permission
         )
     );
 }
+
+if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
+
+    $buttons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.lead.lead.header.merge', array('%name%' => $lead->getPrimaryIdentifier())),
+            'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "merge"))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.merge'),
+        'iconClass' => 'fa fa-user'
+    );
+}
+
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $lead,
@@ -277,7 +290,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
-            <?php if ($leadActualName || $leadCompany): ?>
+            <?php if (!$lead->isAnonymous()): ?>
             <div class="lead-avatar-panel">
                 <div class="avatar-collapser hr-expand nm">
                     <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
@@ -319,9 +332,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if ($doNotContact['unsubscribed']): ?>
-                            <span class="label label-danger">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                            </span>
+                                <span class="label label-<?php echo (!empty($doNotContact['manual']) ? 'warning' : 'danger'); ?>" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                    <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                                    <?php if (!empty($doNotContact['manual'])): ?>
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
+                                    <?php endif; ?>
+                                </span>
                             <?php elseif ($doNotContact['bounced']): ?>
                             <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
@@ -364,7 +380,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <?php if ($upcomingEvents) : ?>
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
             </div>
@@ -386,7 +402,13 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
         </div>
         <?php endif; ?>
-
+        <div class="pa-sm">
+            <?php $tags = $lead->getTags(); ?>
+            <?php foreach ($tags as $tag): ?>
+            <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span></h5>
+            <?php endforeach; ?>
+            <div class="clearfix"></div>
+        </div>
     </div>
     <!--/ right section -->
 </div>

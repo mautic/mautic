@@ -43,6 +43,8 @@ class FormController extends CommonController
     /**
      * Checks to see if the form was applied or saved
      *
+     * @param $form
+     *
      * @return bool
      */
     protected function isFormApplied($form)
@@ -200,6 +202,9 @@ class FormController extends CommonController
     ) {
         $this->modelName      = $modelName;
         $this->permissionBase = $permissionBase;
+        if (strpos($sessionBase, 'mautic.') !== 0) {
+            $sessionBase = 'mautic.' . $sessionBase;
+        }
         $this->sessionBase    = $sessionBase;
         $this->routeBase      = $routeBase;
         $this->langStringBase = $langStringBase;

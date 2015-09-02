@@ -44,13 +44,20 @@ class ClientType extends AbstractType
     private $apiMode;
 
     /**
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     */
+    private $router;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
         $this->validator  = $factory->getValidator();
-        $this->apiMode    = $factory->getParameter('api_mode');
+        $this->apiMode    = $factory->getRequest()->get('api_mode', $factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $this->router     = $factory->getRouter();
+
     }
 
     /**
@@ -61,6 +68,29 @@ class ClientType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
 
+        if (!$options['data']->getId()) {
+            $builder->add(
+                'api_mode',
+                'choice',
+                array(
+                    'mapped'      => false,
+                    'label'       => 'mautic.api.client.form.auth_protocol',
+                    'label_attr'  => array('class' => 'control-label'),
+                    'attr'        => array(
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.refreshApiClientForm(\'' . $this->router->generate('mautic_client_action', array('objectAction' => 'new')) . '\', this)'
+                    ),
+                    'choices'     => array(
+                        'oauth1a' => 'OAuth 1.0a',
+                        'oauth2'  => 'OAuth 2'
+                    ),
+                    'required'    => false,
+                    'empty_value' => false,
+                    'data'        => $this->apiMode
+                )
+            );
+        }
+
         $builder->add(
             'name',
             'text',
@@ -70,7 +100,6 @@ class ClientType extends AbstractType
                 'attr'       => array('class' => 'form-control')
             )
         );
-
 
         if ($this->apiMode == 'oauth2') {
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();

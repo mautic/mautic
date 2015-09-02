@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SortableListType
+ *
+ * @deprecated Use DynamicListType instead
  */
 class SortableListType extends AbstractType
 {
@@ -58,7 +60,7 @@ class SortableListType extends AbstractType
                     'minMessage' => 'mautic.form.lists.count',
                     'min'        => 1
                 ))
-            ) : '',
+            ) : array(),
             'error_bubbling' => false
         ));
 

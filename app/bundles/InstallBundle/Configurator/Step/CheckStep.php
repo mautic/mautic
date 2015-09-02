@@ -87,10 +87,6 @@ class CheckStep implements StepInterface
     {
         $messages = array();
 
-        if (version_compare(PHP_VERSION, '5.3.7', '<')) {
-            $messages[] = 'mautic.install.minimum.php.version';
-        }
-
         if (version_compare(PHP_VERSION, '5.3.16', '==')) {
             $messages[] = 'mautic.install.buggy.php.version';
         }
@@ -111,17 +107,16 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
-        if (version_compare(PHP_VERSION, '5.3.7', '>=')) {
-            $timezones = array();
-            foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
-                foreach ($abbreviations as $abbreviation) {
-                    $timezones[$abbreviation['timezone_id']] = true;
-                }
-            }
+        $timezones = array();
 
-            if (!isset($timezones[date_default_timezone_get()])) {
-                $messages[] = 'mautic.install.timezone.not.supported';
+        foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
+            foreach ($abbreviations as $abbreviation) {
+                $timezones[$abbreviation['timezone_id']] = true;
             }
+        }
+
+        if (!isset($timezones[date_default_timezone_get()])) {
+            $messages[] = 'mautic.install.timezone.not.supported';
         }
 
         if (get_magic_quotes_gpc()) {
@@ -146,6 +141,14 @@ class CheckStep implements StepInterface
 
         if (!function_exists('simplexml_import_dom')) {
             $messages[] = 'mautic.install.function.simplexml';
+        }
+
+        if (!extension_loaded('mcrypt')) {
+            $messages[] = 'mautic.install.extension.mcrypt';
+        }
+
+        if (!function_exists('finfo_open')) {
+            $messages[] = 'mautic.install.extension.fileinfo';
         }
 
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
@@ -195,7 +198,47 @@ class CheckStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
+        $phpSupportData = array(
+            '5.3' => array(
+                'security' => '2013-07-11',
+                'eos'      => '2014-08-14',
+            ),
+            '5.4' => array(
+                'security' => '2014-09-14',
+                'eos'      => '2015-09-14',
+            ),
+            '5.5' => array(
+                'security' => '2015-07-10',
+                'eos'      => '2016-07-10'
+            ),
+            '5.6' => array(
+                'security' => '2016-08-28',
+                'eos'      => '2017-08-28'
+            ),
+        );
+
         $messages = array();
+
+        // Check the PHP version's support status
+        $activePhpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
+
+        // Do we have the PHP version's data?
+        if (isset($phpSupportData[$activePhpVersion])) {
+            // First check if the version has reached end of support
+            $today = new \DateTime();
+            $phpEndOfSupport = new \DateTime($phpSupportData[$activePhpVersion]['eos']);
+
+            if ($phpNotSupported = $today > $phpEndOfSupport) {
+                $messages[] = 'mautic.install.php.version.not.supported';
+            }
+
+            // If the version is still supported, check if it has reached security support only
+            $phpSecurityOnlyDate = new \DateTime($phpSupportData[$activePhpVersion]['security']);
+
+            if (!$phpNotSupported && $today > $phpSecurityOnlyDate) {
+                $messages[] = 'mautic.install.php.version.has.only.security.support';
+            }
+        }
 
         if (version_compare(PHP_VERSION, '5.3.8', '<')) {
             $messages[] = 'mautic.install.php.version.annotations';
@@ -234,10 +277,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.module.phpxml';
         }
 
-        if (!extension_loaded('mcrypt')) {
-            $messages[] = 'mautic.install.extension.mcrypt';
-        }
-
         if (!function_exists('mb_strlen')) {
             $messages[] = 'mautic.install.function.mbstring';
         }
@@ -248,6 +287,10 @@ class CheckStep implements StepInterface
 
         if (!function_exists('utf8_decode')) {
             $messages[] = 'mautic.install.function.xml';
+        }
+
+        if (function_exists('imap_open')) {
+            $messages[] = 'mautic.install.extension.imap';
         }
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {

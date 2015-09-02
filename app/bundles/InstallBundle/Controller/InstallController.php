@@ -12,7 +12,9 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\TableDiff;
@@ -20,6 +22,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
@@ -666,7 +669,7 @@ class InstallController extends CommonController
                 foreach ($oldRestraints as $or) {
                     $foreignTable     = $or->getForeignTableName();
                     $foreignTableName = $this->generateBackupName($dbParams['table_prefix'], $backupPrefix, $foreignTable);
-                    $r                = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(
+                    $r                = new ForeignKeyConstraint(
                         $or->getLocalColumns(),
                         $foreignTableName,
                         $or->getForeignColumns(),
@@ -770,8 +773,6 @@ class InstallController extends CommonController
 
     /**
      * Installs data fixtures for the application
-     *
-     * @param array $dbParams
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
@@ -891,7 +892,7 @@ class InstallController extends CommonController
                 $entityPath = $b['directory'] . '/Entity';
                 if (file_exists($entityPath)) {
                     $paths[] = $entityPath;
-                    if ($b['isAddon']) {
+                    if ($b['isPlugin']) {
                         $namespaces[$b['bundle']] = $b['namespace'] . '\Entity';
                     } else {
                         $namespaces['Mautic' . $b['bundle']] = $b['namespace'] . '\Entity';
@@ -899,7 +900,12 @@ class InstallController extends CommonController
                 }
             }
 
-            $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
+            $driver = new StaticPHPDriver($paths);
+            $config = Setup::createConfiguration();
+            $config->setMetadataDriverImpl(
+                $driver
+            );
+
             $config->setEntityNamespaces($namespaces);
 
             //set the table prefix

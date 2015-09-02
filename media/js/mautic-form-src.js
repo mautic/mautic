@@ -126,24 +126,62 @@
             return null;
         };
 
+        Form.prepareForms = function() {
+            var forms = document.getElementsByTagName('form');
+            for (var i = 0, n = forms.length; i < n; i++) {
+                var formId = forms[i].getAttribute('data-mautic-form');
+                if (formId !== null) {
+                    Form.prepareMessengerForm(formId);
+                }
+            }
+        };
+
+        Form.prepareMessengerForm = function(formId) {
+            var theForm = document.getElementById('mauticform_' + formId);
+
+            // Check for an onsubmit attribute
+            if (!theForm.getAttribute('onsubmit')) {
+                theForm.onsubmit = function (event) {
+                    event.preventDefault();
+
+                    Core.validateForm(formId, true);
+                }
+            }
+
+            // Check to see if the iframe exists
+            if (!document.getElementById('mauticiframe_' + formId)) {
+                // Likely an editor has stripped out the iframe so let's dynamically create it
+                var ifrm = document.createElement("IFRAME");
+                ifrm.style.display = "none";
+                ifrm.style.margin = 0;
+                ifrm.style.padding = 0;
+                ifrm.style.border = "none";
+                ifrm.style.width = 0;
+                ifrm.style.heigh = 0;
+                ifrm.setAttribute( 'id', 'mauticiframe_' + formId);
+                ifrm.setAttribute('name', 'mauticiframe_' + formId);
+                document.body.appendChild(ifrm);
+
+                theForm.target = 'mauticiframe_' + formId;
+            }
+
+            if (!document.getElementById('mauticform_' + formId + '_messenger')) {
+                var messengerInput = document.createElement('INPUT');
+                messengerInput.type = 'hidden';
+                messengerInput.setAttribute('name', 'mauticform[messenger]');
+                messengerInput.setAttribute('id', 'mauticform_' + formId + '_messenger');
+                messengerInput.value = 1;
+
+                theForm.appendChild(messengerInput);
+            }
+        };
+
         Form.validator = function(formId) {
             var validator = {
-                validateForm: function () {
-                    // Check to see if the iframe exists
-                    if (!document.getElementById('mauticiframe_' + formId) && document.getElementById('mauticform_' + formId + '_messenger')) {
-                        // Likely an editor has stripped out the iframe so let's dynmamically create it
-                        var ifrm = document.createElement("IFRAME");
-                        ifrm.style.display = "none";
-                        ifrm.style.margin = 0;
-                        ifrm.style.padding = 0;
-                        ifrm.style.border = "none";
-                        ifrm.style.width = 0;
-                        ifrm.style.heigh = 0;
-                        ifrm.setAttribute('id', 'mauticiframe_' + formId);
-                        ifrm.setAttribute('name', 'mauticiframe_' + formId);
-                        document.body.appendChild(ifrm);
+                validateForm: function (submitForm) {
+                    if (!submitForm) {
+                        Form.prepareMessengerForm(formId);
                     }
-
                     function validateOptions(elOptions) {
                         if (typeof elOptions === 'undefined') {
                             return;
@@ -217,13 +255,18 @@
                                     break;
                             }
 
+                            var containerId = 'mauticform_' + formId + '_' + fieldKey;
+                            if (!document.getElementById(containerId)) {
+                                containerId = 'mauticform_' + fieldKey;
+                            }
+
                             if (!valid) {
-                                validator.markError('mauticform_' + fieldKey, valid);
+                                validator.markError(containerId, valid);
                                 formValid = false;
 
                                 validator.enableSubmitButton();
                             } else {
-                                validator.clearError('mauticform_' + fieldKey);
+                                validator.clearError(containerId);
                             }
                         }
 
@@ -233,6 +276,10 @@
                     }
 
                     Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
+
+                    if (formValid && submitForm) {
+                        elForm.submit();
+                    }
 
                     return formValid;
                 },
@@ -291,6 +338,12 @@
                 },
 
                 parseFormResponse: function (response) {
+                    // Reset the iframe so that back doesn't repost for some browsers
+                    var ifrm = document.getElementById('mauticiframe_' + formId);
+                    if (ifrm) {
+                        ifrm.src = 'about:blank';
+                    }
+
                     // If true, a callback handled response parsing
                     if (!Form.customCallbackHandler(formId, 'onResponse', response)) {
 
@@ -406,9 +459,16 @@
             return Form.validator(formId);
         };
 
-        Core.validateForm = function(formId) {
-            return Core.getValidator(formId).validateForm();
+        Core.validateForm = function(formId, submit) {
+            if (typeof submit == 'undefined') {
+                submit = false;
+            }
+            return Core.getValidator(formId).validateForm(submit);
         };
+
+        Core.prepareForm = function(formId) {
+            return Form.prepareForm(formId);
+        }
 
         Modal.loadStyle = function() {
             if (typeof(config.modal_css) != 'undefined' && parseInt(config.modal_css) != 'Nan' && config.modal_css == 0) {
@@ -553,6 +613,7 @@
         };
 
         Core.onLoad = function() {
+            Form.prepareForms();
             Form.registerFormMessenger();
         };
 

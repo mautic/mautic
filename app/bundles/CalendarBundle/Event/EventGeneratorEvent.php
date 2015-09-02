@@ -43,7 +43,7 @@ class EventGeneratorEvent extends Event
     private $contentTemplate;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $access = false;
 

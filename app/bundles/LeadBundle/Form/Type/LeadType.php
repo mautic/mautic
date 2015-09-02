@@ -13,12 +13,14 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class LeadType
@@ -50,6 +52,19 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
+            $builder->add(
+                'tags',
+                'lead_tag',
+                array(
+                    'attr' => array(
+                        'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                        'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                        'data-allow-add'        => 'true',
+                        'onchange'              => 'Mautic.createLeadTag(this)'
+                    )
+                )
+            );
+
             $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
                 $this->factory->getEntityManager(),
                 'MauticUserBundle:User'
@@ -134,14 +149,14 @@ class LeadType extends AbstractType
                 $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
             $constraints = array();
             if ($required) {
-                $constraints[] = new \Symfony\Component\Validator\Constraints\NotBlank(
+                $constraints[] = new NotBlank(
                     array('message' => 'mautic.lead.customfield.notblank')
                 );
             }
             if ($type == 'number') {
                 if (empty($properties['precision'])) {
                     $properties['precision'] = null;
-                } //ensure deafult locale is used
+                } //ensure default locale is used
                 else {
                     $properties['precision'] = (int) $properties['precision'];
                 }
@@ -164,26 +179,31 @@ class LeadType extends AbstractType
                 );
             } elseif (in_array($type, array('date', 'datetime', 'time'))) {
                 $attr['data-toggle'] = $type;
-
                 $opts = array(
                     'required'    => $required,
                     'label'       => $field['label'],
                     'label_attr'  => array('class' => 'control-label'),
                     'widget'      => 'single_text',
                     'attr'        => $attr,
-                    'data'        => $value,
                     'mapped'      => false,
-                    'constraints' => $constraints,
-                    'input'       => 'string'
+                    'input'       => 'string',
+                    'html5'       => false,
+                    'constraints' => $constraints
                 );
 
-                if ($type == 'date' || $type == 'time') {
-                    $opts['input'] = 'string';
-                    $builder->add($alias, $type, $opts);
-                } else {
+                $dtHelper = new DateTimeHelper($value, null, 'local');
+
+                if ($type == 'datetime') {
                     $opts['model_timezone'] = 'UTC';
                     $opts['view_timezone']  = date_default_timezone_get();
                     $opts['format']         = 'yyyy-MM-dd HH:mm';
+                    $opts['with_seconds']   = false;
+
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
+                } elseif ($type == 'date') {
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                } else {
+                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                 }
 
                 $builder->add($alias, $type, $opts);
@@ -212,7 +232,7 @@ class LeadType extends AbstractType
                             'required'    => $required,
                             'label'       => $field['label'],
                             'label_attr'  => array('class' => 'control-label'),
-                            'data'        => $value,
+                            'data'        => ($type == 'boolean') ? (int) $value : $value,
                             'attr'        => $attr,
                             'mapped'      => false,
                             'multiple'    => false,

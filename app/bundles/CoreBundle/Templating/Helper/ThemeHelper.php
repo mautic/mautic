@@ -49,6 +49,7 @@ class ThemeHelper
      * @param MauticFactory $factory
      * @param string        $theme
      *
+     * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
     public function __construct(MauticFactory $factory, $theme = 'current')
@@ -59,7 +60,7 @@ class ThemeHelper
             $this->theme = 'Mauve';
         }
         $this->themeDir  = $factory->getSystemPath('themes') . '/' . $this->theme;
-        $this->themePath = $factory->getSystemPath('root') . '/' . $this->themeDir;
+        $this->themePath = $factory->getSystemPath('themes_root') . '/' . $this->themeDir;
 
         //check to make sure the theme exists
         if (!file_exists($this->themePath)) {

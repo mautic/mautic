@@ -154,6 +154,7 @@ $isStandalone = $activeForm->isStandalone();
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
             echo $view['form']->row($form['inKioskMode']);
+            echo $view['form']->row($form['renderStyle']);
             echo $view['form']->row($form['template']);
             ?>
         </div>

@@ -127,8 +127,8 @@ $colspan = 12/$cols;
                                         <?php foreach ($popularPages as $page) : ?>
                                             <tr>
                                                 <td>
-                                                <?php if ($page['page_id']) : ?>
-                                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['page_id'])); ?>" data-toggle="ajax">
+                                                <?php if ($page['id']) : ?>
+                                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id'])); ?>" data-toggle="ajax">
                                                         <?php echo $page['title']; ?>
                                                     </a>
                                                 <?php else : ?>

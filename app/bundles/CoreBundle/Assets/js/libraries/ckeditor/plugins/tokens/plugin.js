@@ -175,8 +175,9 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
     var startOffset = parseInt(range.startOffset - str.length) || 0;
     var element = range.startContainer.$;
     var tokenAction = $('#' + element_id).data('token-callback');
+    var tokenVisual = $('#' + element_id).data('token-visual');
 
-    $.get(CKEDITOR_tokens.ajaxUrl + '?action=' + tokenAction, {query: str}, function (rsp) {
+    $.get(CKEDITOR_tokens.ajaxUrl + '?action=' + tokenAction, {query: str, visual: tokenVisual}, function (rsp) {
         var ckel = $('#' + element_id);
         var par  = ckel.parent();
 
@@ -327,6 +328,18 @@ CKEDITOR_tokens.prototype.timeout_callback = function (args) {
             } else {
                 var tokenContent = document.createTextNode($(this).data('token'));
             }
+
+            tokenContent.addEventListener("dblclick", function(event) {
+                var selEl = new CKEDITOR.dom.element( event.target );
+                var rangeObjForSelection = new CKEDITOR.dom.range( editor.document );
+                rangeObjForSelection.selectNodeContents( selEl );
+                editor.getSelection().selectRanges( [ rangeObjForSelection ] );
+
+                // Remove contenteditable=false to make it deletable
+                mQuery(event.target).prop('contenteditable', true);
+
+                editor.focus();
+            });
 
             // Insert link after text node
             // this is used when the link is inserted not at the end of the text

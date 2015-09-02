@@ -27,9 +27,5 @@ if (!empty($userId)) {
     </div>
 </div>
 
-<div class="row mt-sm">
-    <div class="col-xs-12 form-group">
-        <?php echo $view['form']->widget($form['buttons']); ?>
-    </div>
-</div>
+<?php echo $view['form']->row($form['buttons']); ?>
 <?php echo $view['form']->end($form); ?>

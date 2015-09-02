@@ -9,20 +9,20 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Mautic\CoreBundle\Helper\MailHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\EmailBundle\Entity\DoNotEmail;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
-use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -44,20 +44,41 @@ class LeadModel extends FormModel
      */
     public function getRepository()
     {
-        static $socialFieldsSet;
+        static $repoSetup;
 
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
 
-        if (!$socialFieldsSet) {
-            $fields = $this->factory->getModel('lead.field')->getGroupFields('social');
-            if (!empty($fields)) {
-                $socialFields = array_keys($fields);
-                $repo->setAvailableSocialFields($socialFields);
+        if (!$repoSetup) {
+            $repoSetup = true;
+
+            //set the point trigger model in order to get the color code for the lead
+            $repo->setTriggerModel($this->factory->getModel('point.trigger'));
+
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->factory->getModel('lead.field');
+            $fields     = $fieldModel->getFieldList(true, false);
+
+            $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : array();
+            $repo->setAvailableSocialFields($socialFields);
+
+            $searchFields = array();
+            foreach ($fields as $group => $groupFields) {
+                $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
-            $socialFieldsSet = true;
+            $repo->setAvailableSearchFields($searchFields);
         }
 
         return $repo;
+    }
+
+    /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\TagRepository
+     */
+    public function getTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:Tag');
     }
 
     /**
@@ -78,21 +99,6 @@ class LeadModel extends FormModel
     public function getNameGetter()
     {
         return "getPrimaryIdentifier";
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $args [start, limit, filter, orderBy, orderByDir]
-     * @return mixed
-     */
-    public function getEntities(array $args = array())
-    {
-        //set the point trigger model in order to get the color code for the lead
-        $repo = $this->getRepository();
-        $repo->setTriggerModel($this->factory->getModel('point.trigger'));
-
-        return parent::getEntities($args);
     }
 
     /**
@@ -121,7 +127,7 @@ class LeadModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
-     * @return null|object
+     * @return null|Lead
      */
     public function getEntity($id = null)
     {
@@ -698,10 +704,11 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param Lead $lead2
+     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
      *
      * @return Lead
      */
-    public function mergeLeads(Lead $lead, Lead $lead2)
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
         $leadId  = $lead->getId();
         $lead2Id = $lead2->getId();
@@ -711,9 +718,14 @@ class LeadModel extends FormModel
             return $lead;
         }
 
-        //which lead is the oldest?
-        $mergeWith  = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
-        $mergeFrom  = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+        if ($autoMode) {
+            //which lead is the oldest?
+            $mergeWith = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
+            $mergeFrom = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+        } else {
+            $mergeWith = $lead2;
+            $mergeFrom = $lead;
+        }
 
         //dispatch pre merge event
         $event = new LeadMergeEvent($mergeWith, $mergeFrom);
@@ -751,6 +763,11 @@ class LeadModel extends FormModel
         $mergeFromPoints = $mergeFrom->getPoints();
         $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
 
+        //merge tags
+        $mergeFromTags = $mergeFrom->getTags();
+        $addTags       = $mergeFromTags->getKeys();
+        $this->modifyTags($mergeWith, $addTags, null, false);
+
         //save the updated lead
         $this->saveEntity($mergeWith, false);
 
@@ -769,24 +786,25 @@ class LeadModel extends FormModel
     /**
      * Add a do not contact entry for the lead
      *
-     * @param Lead      $lead
-     * @param string    $emailAddress
-     * @param string    $reason
-     * @param bool|true $persist
+     * @param Lead       $lead
+     * @param string     $emailAddress
+     * @param string     $reason
+     * @param bool|true  $persist
+     * @param bool|false $manual
      *
-     * @return DoNotEmail|void
+     * @return DoNotEmail|bool
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true)
+    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
         if (empty($emailAddress)) {
-            $fields = $lead->getFields();
-            $emailAddress = $fields['core']['email']['value'];
+            $emailAddress = $lead->getEmail();
 
             if (empty($emailAddress)) {
-                return;
+                return false;
             }
         }
+
         $em   = $this->factory->getEntityManager();
         $repo = $em->getRepository('MauticEmailBundle:Email');
         if (!$repo->checkDoNotEmail($emailAddress)) {
@@ -795,15 +813,19 @@ class LeadModel extends FormModel
             $dnc->setEmailAddress($emailAddress);
             $dnc->setDateAdded(new \DateTime());
             $dnc->setUnsubscribed();
+            $dnc->setManual($manual);
             $dnc->setComments($reason);
 
             if ($persist) {
                 $repo->saveEntity($dnc);
             } else {
+                $lead->addDoNotEmailEntry($dnc);
 
                 return $dnc;
             }
         }
+
+        return false;
     }
 
     /**
@@ -811,13 +833,14 @@ class LeadModel extends FormModel
      * @param      $data
      * @param null $owner
      * @param null $list
+     * @param null $tags
      * @param bool $persist Persist to the database; otherwise return entity
      *
      * @return bool
      * @throws \Doctrine\ORM\ORMException
      * @throws \Swift_RfcComplianceException
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
@@ -910,14 +933,18 @@ class LeadModel extends FormModel
                 $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
-                $dnc = $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
-                $lead->addDoNotEmailEntry($dnc);
+
+                $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
             }
         }
         unset($fields['doNotEmail']);
 
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
+        }
+
+        if ($tags !== null) {
+            $this->modifyTags($lead, $tags, null, false);
         }
 
         foreach ($fields as $leadField => $importField) {
@@ -938,5 +965,119 @@ class LeadModel extends FormModel
         }
 
         return $merged;
+    }
+
+    /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setTags(Lead $lead, array $tags, $removeOrphans = false)
+    {
+        $currentTags  = $lead->getTags();
+        $leadModified = $tagsDeleted = false;
+
+        foreach ($currentTags as $tagName => $tag) {
+            if (!in_array($tag->getId(), $tags)) {
+                // Tag has been removed
+                $lead->removeTag($tag);
+                $leadModified = $tagsDeleted = true;
+            } else {
+                // Remove tag so that what's left are new tags
+                $key = array_search($tag->getId(), $tags);
+                unset($tags[$key]);
+            }
+        }
+
+        if (!empty($tags)) {
+            foreach($tags as $tag) {
+                if (is_numeric($tag)) {
+                    // Existing tag being added to this lead
+                    $lead->addTag(
+                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
+                    );
+                } else {
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag(InputHelper::clean($tag));
+                    $lead->addTag($newTag);
+                }
+            }
+            $leadModified = true;
+        }
+
+        if ($leadModified) {
+            $this->saveEntity($lead);
+
+            // Delete orphaned tags
+            if ($tagsDeleted && $removeOrphans) {
+                $this->getTagRepository()->deleteOrphans();
+            }
+        }
+    }
+
+    /**
+     * Modify tags with support to remove via a prefixed minus sign
+     *
+     * @param Lead $lead
+     * @param      $tags
+     * @param      $removeTags
+     * @param      $persist
+     */
+    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
+    {
+        $leadTags = $lead->getTags();
+
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+
+        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+        // See which tags already exist
+        $foundTags = $this->getTagRepository()->getTagsByName($tags);
+        foreach ($tags as $tag) {
+            if (strpos($tag, '-') === 0) {
+                // Tag to be removed
+                $tag = substr($tag, 1);
+
+                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                    $lead->removeTag($foundTags[$tag]);
+                }
+            } else {
+                // Tag to be added
+                if (!array_key_exists($tag, $foundTags)) {
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag($tag);
+                    $lead->addTag($newTag);
+                } elseif (!$leadTags->contains($foundTags[$tag])) {
+                    $lead->addTag($foundTags[$tag]);
+                }
+            }
+        }
+
+        if ($removeTags !== null) {
+            foreach ($removeTags as $tag) {
+                // Tag to be removed
+                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                    $lead->removeTag($foundTags[$tag]);
+                }
+            }
+        }
+
+        if ($persist) {
+            $this->saveEntity($lead);
+        }
+    }
+
+    /**
+     * Get array of available lead tags
+     */
+    public function getTagList()
+    {
+        return $this->getTagRepository()->getSimpleList(null, array(), 'tag', 'id');
     }
 }

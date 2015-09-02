@@ -32,7 +32,7 @@ class ClientController extends FormController
 
         //set limits
         $limit = $this->factory->getSession()->get('mautic.client.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page-1) * $limit);
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -40,8 +40,10 @@ class ClientController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.client.orderby', 'c.name');
         $orderByDir = $this->factory->getSession()->get('mautic.client.orderbydir', 'ASC');
         $filter     = $this->request->get('search', $this->factory->getSession()->get('mautic.client.filter', ''));
+        $api_mode   = $this->factory->getRequest()->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
         $this->factory->getSession()->set('mautic.client.filter', $filter);
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $clients = $this->factory->getModel('api.client')->getEntities(
             array(
@@ -50,24 +52,27 @@ class ClientController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($clients);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->factory->getSession()->set('mautic.client.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_client_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_client_index', array('page' => $lastPage));
 
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('page' => $lastPage),
-                'contentTemplate' => 'MauticApiBundle:Client:index',
-                'passthroughVars' => array(
-                    'activeLink'    => 'mautic_client_index',
-                    'mauticContent' => 'client'
+            return $this->postActionRedirect(
+                array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => array('page' => $lastPage),
+                    'contentTemplate' => 'MauticApiBundle:Client:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => 'mautic_client_index',
+                        'mauticContent' => 'client'
+                    )
                 )
-            ));
+            );
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
@@ -80,23 +85,38 @@ class ClientController extends FormController
             'delete' => $this->factory->getSecurity()->isGranted('api:clients:deleteother'),
         );
 
+        // filters
+        $filters = array();
+
+        // api options
+        $apiOptions = array();
+        $apiOptions['oauth1'] = 'OAuth 1';
+        $apiOptions['oauth2'] = 'OAuth 2';
+        $filters['api_mode'] = array(
+            'values'  => array($api_mode),
+            'options' => $apiOptions
+        );
+
         $parameters = array(
             'items'       => $clients,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
-            'searchValue' => $filter
+            'searchValue' => $filter,
+            'filters'     => $filters
         );
 
-        return $this->delegateView(array(
-            'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
-            'passthroughVars' => array(
-                'route'          => $this->generateUrl('mautic_client_index', array('page' => $page)),
-                'mauticContent'  => 'client'
+        return $this->delegateView(
+            array(
+                'viewParameters'  => $parameters,
+                'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
+                'passthroughVars' => array(
+                    'route'         => $this->generateUrl('mautic_client_index', array('page' => $page)),
+                    'mauticContent' => 'client'
+                )
             )
-        ));
+        );
     }
 
     /**
@@ -122,7 +142,7 @@ class ClientController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model   = $this->factory->getModel('api.client');
+            $model = $this->factory->getModel('api.client');
 
             $client = $model->getEntity($clientId);
 
@@ -147,26 +167,31 @@ class ClientController extends FormController
             }
         }
 
-        return $this->postActionRedirect(array(
-            'returnUrl'       => $this->generateUrl('mautic_user_account'),
-            'contentTemplate' => 'MauticUserBundle:Profile:index',
-            'passthroughVars' => array(
-                'success'       => $success
-            ),
-            'flashes'         => $flashes
-        ));
+        return $this->postActionRedirect(
+            array(
+                'returnUrl'       => $this->generateUrl('mautic_user_account'),
+                'contentTemplate' => 'MauticUserBundle:Profile:index',
+                'passthroughVars' => array(
+                    'success' => $success
+                ),
+                'flashes'         => $flashes
+            )
+        );
     }
 
     /**
-     * Generate's form and processes new post data
+     * @param mixed $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction($objectId = 0)
     {
         if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
+
+        $api_mode = ($objectId === 0) ? $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model = $this->factory->getModel('api.client');
@@ -195,41 +220,54 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client);
-                    $this->addFlash('mautic.api.client.notice.created', array(
-                        '%name%'         => $client->getName(),
-                        '%clientId%'     => $client->getPublicId(),
-                        '%clientSecret%' => $client->getSecret(),
-                        '%url%'          => $this->generateUrl('mautic_client_action', array(
-                            'objectAction' => 'edit',
-                            'objectId'     => $client->getId()
-                        ))
-                    ));
+                    $this->addFlash(
+                        'mautic.api.client.notice.created',
+                        array(
+                            '%name%'         => $client->getName(),
+                            '%clientId%'     => $client->getPublicId(),
+                            '%clientSecret%' => $client->getSecret(),
+                            '%url%'          => $this->generateUrl(
+                                'mautic_client_action',
+                                array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $client->getId()
+                                )
+                            )
+                        )
+                    );
                 }
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'contentTemplate' => 'MauticApiBundle:Client:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => '#mautic_client_index',
-                        'mauticContent' => 'client'
+                return $this->postActionRedirect(
+                    array(
+                        'returnUrl'       => $returnUrl,
+                        'contentTemplate' => 'MauticApiBundle:Client:index',
+                        'passthroughVars' => array(
+                            'activeLink'    => '#mautic_client_index',
+                            'mauticContent' => 'client'
+                        )
                     )
-                ));
+                );
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($client->getId(), false);
+                return $this->editAction($client->getId(), true);
             }
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  => array('form' => $form->createView()),
-            'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_client_new',
-                'route'         => $action,
-                'mauticContent' => 'client'
+        return $this->delegateView(
+            array(
+                'viewParameters'  => array(
+                    'form' => $form->createView(),
+                    'tmpl' => $this->request->get('tmpl', 'form')
+                ),
+                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_client_new',
+                    'route'         => $action,
+                    'mauticContent' => 'client'
+                )
             )
-        ));
+        );
     }
 
     /**
@@ -262,14 +300,17 @@ class ClientController extends FormController
         //client not found
         if ($client === null) {
             return $this->postActionRedirect(
-                array_merge($postActionVars, array(
-                    'flashes' => array(
-                        array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.api.client.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
+                array_merge(
+                    $postActionVars,
+                    array(
+                        'flashes' => array(
+                            array(
+                                'type'    => 'error',
+                                'msg'     => 'mautic.api.client.error.notfound',
+                                'msgVars' => array('%id%' => $objectId)
+                            )
                         )
-                    ))
+                    )
                 )
             );
         } elseif ($model->isLocked($client)) {
@@ -280,20 +321,29 @@ class ClientController extends FormController
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($client, $this->get('form.factory'), $action);
 
+        // remove api_mode field
+        $form->remove('api_mode');
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client, $form->get('buttons')->get('save')->isClicked());
-                    $this->addFlash('mautic.core.notice.updated', array(
-                        '%name%'      => $client->getName(),
-                        '%menu_link%' => 'mautic_client_index',
-                        '%url%'       => $this->generateUrl('mautic_client_action', array(
-                            'objectAction' => 'edit',
-                            'objectId'     => $client->getId()
-                        ))
-                    ));
+                    $this->addFlash(
+                        'mautic.core.notice.updated',
+                        array(
+                            '%name%'      => $client->getName(),
+                            '%menu_link%' => 'mautic_client_index',
+                            '%url%'       => $this->generateUrl(
+                                'mautic_client_action',
+                                array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $client->getId()
+                                )
+                            )
+                        )
+                    );
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         return $this->postActionRedirect($postActionVars);
@@ -302,6 +352,7 @@ class ClientController extends FormController
             } else {
                 //unlock the entity
                 $model->unlockEntity($client);
+
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
@@ -309,15 +360,20 @@ class ClientController extends FormController
             $model->lockEntity($client);
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  => array('form' => $form->createView()),
-            'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_client_index',
-                'route'         => $action,
-                'mauticContent' => 'client'
+        return $this->delegateView(
+            array(
+                'viewParameters'  => array(
+                    'form' => $form->createView(),
+                    'tmpl' => $this->request->get('tmpl', 'form')
+                ),
+                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_client_index',
+                    'route'         => $action,
+                    'mauticContent' => 'client'
+                )
             )
-        ));
+        );
     }
 
     /**
@@ -353,8 +409,8 @@ class ClientController extends FormController
             $entity = $model->getEntity($objectId);
             if ($entity === null) {
                 $flashes[] = array(
-                    'type' => 'error',
-                    'msg'  => 'mautic.api.client.error.notfound',
+                    'type'    => 'error',
+                    'msg'     => 'mautic.api.client.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif ($model->isLocked($entity)) {
@@ -375,9 +431,12 @@ class ClientController extends FormController
         }
 
         return $this->postActionRedirect(
-            array_merge($postActionVars, array(
-                'flashes' => $flashes
-            ))
+            array_merge(
+                $postActionVars,
+                array(
+                    'flashes' => $flashes
+                )
+            )
         );
     }
 }

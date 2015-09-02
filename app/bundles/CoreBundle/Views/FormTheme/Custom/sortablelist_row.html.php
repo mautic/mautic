@@ -7,7 +7,7 @@ $datePrototype = (isset($list->vars['prototype'])) ?
 $feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
 ?>
 <div class="row">
-    <div data-toggle="sortablelist" data-prefix="<?php echo $form->vars['id']; ?>" class="form-group col-xs-12 <?php echo $feedbackClass; ?>" id="<?php echo $form->vars['id']; ?>_list">
+    <div data-toggle="sortablelist" data-prefix="<?php echo $form->vars['id']; ?>" class="form-group col-xs-12 <?php echo $feedbackClass; ?>" id="<?php echo $form->vars['id']; ?>_list" style="overflow:auto">
         <?php echo $view['form']->label($form, $label) ?>
         <a  data-prototype="<?php echo $datePrototype; ?>"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="<?php echo $form->vars['id']; ?>_additem">

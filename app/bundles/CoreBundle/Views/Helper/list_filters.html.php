@@ -41,9 +41,8 @@
             $attr[] = 'data-prefix-exceptions="' . implode(',', $filter['prefix-exceptions']) . '"';
         }
         ?>
-
+        <select <?php echo implode(' ', $attr); ?>>
             <?php if (isset($filter['groups'])): ?>
-            <select <?php echo implode(' ', $attr); ?>>
             <?php foreach ($filter['groups'] as $groupLabel => $groupFilter): ?>
             <optgroup label="<?php echo $view['translator']->trans($groupLabel); ?>"<?php if (isset($groupFilter['prefix'])) echo ' data-prefix="' . $groupFilter['prefix'] . '"'; ?>>
                 <?php if (isset($groupFilter['options'])): ?>
@@ -72,7 +71,7 @@
                     $label = (!empty($label['label'])) ? $label['label'] : (!empty($label['title']) ? $label['title'] : $label['name']);
                 endif;
 
-                $selected = (isset($groupFilter['values']) && in_array($value, $groupFilter['values'])) ? ' selected' : '';
+                $selected = (isset($filter['values']) && in_array($value, $filter['values'])) ? ' selected' : '';
                 ?>
                 <option value="<?php echo $value; ?>"<?php echo $selected; ?>><?php echo $label; ?></option>
             <?php endforeach; ?>

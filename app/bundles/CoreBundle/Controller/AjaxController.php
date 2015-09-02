@@ -13,13 +13,9 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport;
-use Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport;
-use Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport;
-use Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -67,12 +63,12 @@ class AjaxController extends CommonController
                 //call the specified bundle's ajax action
                 $parts = explode(":", $action);
                 $namespace = 'Mautic';
-                $isAddon = false;
-
-                if ($parts[0] == 'addon' && count($parts) == 3) {
-                    $namespace = 'MauticAddon';
+                $isPlugin = false;
+                // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
+                if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
+                    $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
                     array_shift($parts);
-                    $isAddon = true;
+                    $isPlugin = true;
                 }
 
                 if (count($parts) == 2) {
@@ -80,7 +76,7 @@ class AjaxController extends CommonController
                     $action     = $parts[1];
 
                     if (class_exists($namespace . '\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
-                        if (!$isAddon) {
+                        if (!$isPlugin) {
                             $bundle = 'Mautic' . $bundle;
                         }
                         return $this->forward("{$bundle}Bundle:Ajax:executeAjax", array(
@@ -432,19 +428,26 @@ class AjaxController extends CommonController
             $cookieHelper->delete('mautic_update');
         } else {
             // Extract the archive file now
-            $zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
-            $zipper->close();
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
+                $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+                $dataArray['message']    = $translator->trans(
+                    'mautic.core.update.error',
+                    array('%error%' => $translator->trans('mautic.core.update.error_extracting_package'))
+                );
+            } else {
+                $zipper->close();
 
-            $dataArray['success']        = 1;
-            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
-            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
-            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+                $dataArray['success']        = 1;
+                $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+                $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.moving.package');
+                $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
 
-            // A way to keep the upgrade from failing if the session is lost after
-            // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
+                // A way to keep the upgrade from failing if the session is lost after
+                // the cache is cleared by upgrade.php
+                /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+                $cookieHelper = $this->factory->getHelper('cookie');
+                $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
+            }
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -532,13 +535,18 @@ class AjaxController extends CommonController
             $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
-            $output      = new NullOutput();
+            $output      = new BufferedOutput();
             $result      = $application->run($input, $output);
         }
 
         if ($result !== 0) {
+            // Log the output
+            $outputBuffer = trim(preg_replace('/\n\s*\n/s', " \\ ", $output->fetch()));
+            $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
+            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code ' . $result . '; ' . $outputBuffer);
+
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration')));
+            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.retry') . '</a>';
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
@@ -651,87 +659,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * Tests mail transport settings
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function testEmailServerConnectionAction(Request $request)
-    {
-        $dataArray = array('success' => 0, 'error' => '');
-
-        if ($this->factory->getUser()->isAdmin()) {
-            $settings = $request->request->all();
-
-            $transport = $settings['transport'];
-
-            switch($transport) {
-                case 'mautic.transport.mandrill':
-                    $mailer = new MandrillTransport();
-                    break;
-                case 'mautic.transport.sendgrid':
-                    $mailer = new SendgridTransport();
-                    break;
-                case 'mautic.transport.amazon':
-                    $mailer = new AmazonTransport();
-                    break;
-                case 'mautic.transport.postmark':
-                    $mailer = new PostmarkTransport();
-                    break;
-                case 'gmail':
-                    $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
-                    break;
-                case 'smtp':
-                    $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
-                    break;
-            }
-
-            if (method_exists($mailer, 'setMauticFactory')) {
-                $mailer->setMauticFactory($this->factory);
-            }
-
-            if (!empty($mailer)) {
-                if (empty($settings['password'])) {
-                    $settings['password'] = $this->factory->getParameter('mailer_password');
-                }
-                $mailer->setUsername($settings['user']);
-                $mailer->setPassword($settings['password']);
-
-                $logger = new \Swift_Plugins_Loggers_ArrayLogger();
-                $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
-
-                try {
-                    $mailer->start();
-                    $translator = $this->factory->getTranslator();
-
-                    if ($settings['send_test'] == 'true') {
-                        $message = new \Swift_Message(
-                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.subject'),
-                            $translator->trans('mautic.core.config.form.mailer.transport.test_send.body')
-                        );
-
-                        $user = $this->factory->getUser();
-
-                        $message->setFrom(array($settings['from_email'] => $settings['from_name']));
-                        $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
-
-                        $mailer->send($message);
-                    }
-
-                    $dataArray['success'] = 1;
-                    $dataArray['message'] = $translator->trans('mautic.core.success');
-
-                } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
      * @param Request $request
      *
      * @return JsonResponse
@@ -742,11 +669,13 @@ class AjaxController extends CommonController
 
         if (method_exists($this, 'getBuilderTokens')) {
             $query = $request->get('query');
+            $visual = $request->get('visual');
+
             if ($query && $query !== '{' && $query !== '{@') {
                 $tokenList = $this->getBuilderTokens($query);
 
                 $tokens       = (isset($tokenList['tokens'])) ? $tokenList['tokens'] : array();
-                $visualTokens = (isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
+                $visualTokens = ($visual !== 'false' && isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
 
                 if (!empty($tokens)) {
                     asort($tokens);

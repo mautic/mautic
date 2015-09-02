@@ -33,9 +33,9 @@ class MauticCoreExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $core    = $container->getParameter('mautic.bundles');
-        $addons  = $container->getParameter('mautic.addon.bundles');
-        $bundles = array_merge($core, $addons);
-        unset($core, $addons);
+        $plugins  = $container->getParameter('mautic.plugin.bundles');
+        $bundles = array_merge($core, $plugins);
+        unset($core, $plugins);
 
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {

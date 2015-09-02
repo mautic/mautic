@@ -48,4 +48,19 @@ class AssetApiController extends CommonApiController
 
         return parent::getEntitiesAction();
     }
+
+    /**
+     * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer
+     *
+     * @param        $entity
+     * @param string $action
+     *
+     * @return mixed
+     */
+    protected function preSerializeEntity(&$entity, $action = 'view')
+    {
+        $entity->setDownloadUrl(
+            $this->model->generateUrl($entity, true)
+        );
+    }
 }

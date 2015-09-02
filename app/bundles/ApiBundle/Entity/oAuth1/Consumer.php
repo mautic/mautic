@@ -11,54 +11,93 @@ namespace Mautic\ApiBundle\Entity\oAuth1;
 
 use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
 use Bazinga\OAuthServerBundle\Util\Random;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository")
- * @ORM\Table(name="oauth1_consumers")
- * @ORM\HasLifecycleCallbacks
+ * Class Consumer
+ *
+ * @package Mautic\ApiBundle\Entity\oAuth1
  */
 class Consumer implements ConsumerInterface
 {
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $name;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $consumerKey;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $consumerSecret;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     protected $callback;
 
     /**
-     * @ORM\OneToMany(targetEntity="AccessToken", mappedBy="consumer", indexBy="id", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
      */
     protected $accessTokens;
 
     /**
+     * Construct
+     */
+    public function __construct ()
+    {
+        $this->accessTokens = new ArrayCollection();
+    }
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('oauth1_consumers')
+            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository')
+            ->addLifecycleEvent('createConsumerKeys', 'prePersist')
+            ->addIndex(array('consumer_key'), 'consumer_search');
+
+        $builder->addIdColumns('name', false);
+
+        $builder->createField('consumerKey', 'string')
+            ->columnName('consumer_key')
+            ->build();
+
+        $builder->createField('consumerSecret', 'string')
+            ->columnName('consumer_secret')
+            ->build();
+
+        $builder->addField('callback', 'string');
+
+        $builder->createOneToMany('accessTokens', 'AccessToken')
+            ->setIndexBy('id')
+            ->mappedBy('consumer')
+            ->fetchExtraLazy()
+            ->build();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.core.name.required')
@@ -70,7 +109,7 @@ class Consumer implements ConsumerInterface
      *
      * @return mixed
      */
-    public function getRandomId()
+    public function getRandomId ()
     {
         return $this->consumerKey;
     }
@@ -80,7 +119,7 @@ class Consumer implements ConsumerInterface
      *
      * @return mixed
      */
-    public function getPublicId()
+    public function getPublicId ()
     {
         return $this->consumerKey;
     }
@@ -90,15 +129,15 @@ class Consumer implements ConsumerInterface
      *
      * @return mixed
      */
-    public function getSecret()
+    public function getSecret ()
     {
         return $this->consumerSecret;
     }
 
     /**
-     * @ORM\PrePersist
+     * Create consumer keys
      */
-    public function createConsumerKeys()
+    public function createConsumerKeys ()
     {
         if (empty($this->consumerKey)) {
             $this->consumerKey    = Random::generateToken();
@@ -111,7 +150,7 @@ class Consumer implements ConsumerInterface
      *
      * @return array
      */
-    public function getRedirectUris()
+    public function getRedirectUris ()
     {
         return array($this->callback);
     }
@@ -119,7 +158,7 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -127,7 +166,7 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName ()
     {
         return $this->name;
     }
@@ -135,16 +174,17 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function setName($name)
+    public function setName ($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getConsumerKey()
+    public function getConsumerKey ()
     {
         return $this->consumerKey;
     }
@@ -152,16 +192,17 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function setConsumerKey($consumerKey)
+    public function setConsumerKey ($consumerKey)
     {
         $this->consumerKey = $consumerKey;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getConsumerSecret()
+    public function getConsumerSecret ()
     {
         return $this->consumerSecret;
     }
@@ -169,16 +210,17 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function setConsumerSecret($consumerSecret)
+    public function setConsumerSecret ($consumerSecret)
     {
         $this->consumerSecret = $consumerSecret;
+
         return $this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getCallback()
+    public function getCallback ()
     {
         return $this->callback;
     }
@@ -186,9 +228,10 @@ class Consumer implements ConsumerInterface
     /**
      * {@inheritDoc}
      */
-    public function setCallback($callback)
+    public function setCallback ($callback)
     {
         $this->callback = $callback;
+
         return $this;
     }
 }

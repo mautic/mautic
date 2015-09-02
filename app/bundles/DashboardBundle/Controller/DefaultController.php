@@ -27,11 +27,16 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
+        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepo */
         $hitRepo        = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $emailStatRepo */
         $emailStatRepo  = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        /** @var \Mautic\CoreBundle\Entity\IpAddressRepository $ipAddressRepo */
         $ipAddressRepo  = $this->factory->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo      = $this->factory->getModel('email')->getRepository();
 
-        $sentReadCount        = $this->factory->getModel('email')->getRepository()->getSentReadCount();
+        $sentReadCount        = $emailRepo->getSentReadCount();
         $clickthroughCount    = $hitRepo->countEmailClickthrough();
         $newReturningVisitors = array(
             'returning' => $hitRepo->countReturningIp(),
@@ -40,18 +45,42 @@ class DefaultController extends CommonController
         $weekVisitors         = $hitRepo->countVisitors(604800);
         $allTimeVisitors      = $hitRepo->countVisitors(0);
         $allSentEmails        = $emailStatRepo->getSentCount();
-        $popularPages         = $this->factory->getModel('page')->getRepository()->getPopularPages();
-        $popularAssets        = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
-        $popularCampaigns     = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
+
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel            = $this->factory->getModel('page');
+        $popularPageEntites   = $pageModel->getRepository()->getPopularPages();
+
+        $popularPages         = array();
+        foreach ($popularPageEntites as $page) {
+            $popularPages[] = array(
+                'id'      => $page->getId(),
+                'title'   => $page->getTitle(),
+                'hits'    => $page->getHits(),
+                'url'     => $pageModel->generateUrl($page)
+            );
+        }
+
+        $popularAssetEntities = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
+        $popularAssets        = array();
+        foreach ($popularAssetEntities as $asset) {
+            $popularAssets[] = array(
+                'id'            => $asset->getId(),
+                'title'         => $asset->getTitle(),
+                'downloadCount' => $asset->getDownloadCount()
+            );
+        }
+
+        $popularCampaigns = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 
         $returnRate = 0;
-        if ($totalVisits = array_sum($newReturningVisitors)) {
+        $totalVisits = array_sum($newReturningVisitors);
+        if ($totalVisits > 0) {
             $returnRate = round($newReturningVisitors['returning'] / $totalVisits * 100);
         }
 
         $clickRate = 0;
 
-        if ($sentReadCount['read_count']) {
+        if ($sentReadCount['sent_count'] > 0) {
             $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
@@ -81,6 +110,10 @@ class DefaultController extends CommonController
                     $item  = $model->getEntity($log['objectId']);
                     if (method_exists($item, $model->getNameGetter())) {
                         $log['objectName'] = $item->{$model->getNameGetter()}();
+
+                        if ($log['bundle'] == 'lead' && $log['objectName'] == 'mautic.lead.lead.anonymous') {
+                            $log['objectName'] = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+                        }
                     } else {
                         $log['objectName'] = '';
                     }

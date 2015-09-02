@@ -105,7 +105,7 @@ EOT
     {
         $files = array();
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
-        $addonBundles  = $this->getContainer()->getParameter('mautic.addon.bundles');
+        $pluginBundles  = $this->getContainer()->getParameter('mautic.plugin.bundles');
 
         foreach ($mauticBundles as $bundle) {
             // Parse the namespace into a filepath
@@ -125,7 +125,7 @@ EOT
             }
         }
 
-        foreach ($addonBundles as $bundle) {
+        foreach ($pluginBundles as $bundle) {
             // Parse the namespace into a filepath
             $translationsDir = $bundle['directory'] . '/Translations/en_US';
 
