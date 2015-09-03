@@ -567,7 +567,7 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * Execute an event. Condition events are executed recursivly
+     * Execute or schedule an event. Condition events are executed recursivly
      *
      * @param  array    $eventSettings
      * @param  array    $event
@@ -585,12 +585,14 @@ class EventModel extends CommonFormModel
 
         if (isset($eventSettings['action'][$event['type']])) {
             $thisEventSettings = $eventSettings['action'][$event['type']];
+            $allowNo = false;
         } elseif (isset($eventSettings['condition'][$event['type']])) {
             $thisEventSettings = $eventSettings['condition'][$event['type']];
+            $allowNo = true;
         } else {
             unset($event);
 
-            continue;
+            return;
         }
 
         // Set campaign ID
@@ -601,7 +603,7 @@ class EventModel extends CommonFormModel
 
         $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
 
-        $timing = $this->checkEventTiming($event, new \DateTime());
+        $timing = $this->checkEventTiming($event, new \DateTime(), $allowNo);
         if ($timing instanceof \DateTime) {
             $processedCount++;
 
@@ -627,24 +629,7 @@ class EventModel extends CommonFormModel
             //trigger the action
             $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true);
 
-            if ($event['eventType'] == 'condition') {
-                if ($response === true) {
-                    $decisionPath = 'yes';
-                } else {
-                    $decisionPath = 'no';
-                }
-                $childEvent = $repo->findOneBy(
-                    array('parent' => $event['id'], 'decisionPath' => $decisionPath)
-                );
-
-                if ($childEvent && $childEvent->getId()) {
-                    // Trigger child event recursivly
-                    $eventArray = $childEvent->convertToArray();
-                    $this->executeEvent($eventSettings, $eventArray, $campaign, $lead, $processedCount, $totalEventCount);
-                }
-            }
-
-            if ($response === false) {
+            if ($response === false && $event['eventType'] == 'action') {
                 // Something failed so remove the log
                 $repo->deleteEntity($log);
 
@@ -658,6 +643,26 @@ class EventModel extends CommonFormModel
                 }
 
                 $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+            }
+
+            if ($event['eventType'] == 'condition') {
+                if ($response === true) {
+                    $decisionPath = 'yes';
+                } else {
+                    $decisionPath = 'no';
+                }
+
+                $childEvents = $repo->findBy(
+                    array('parent' => $event['id'], 'decisionPath' => $decisionPath)
+                );
+
+                foreach ($childEvents as $childEvent) {
+                    if ($childEvent && $childEvent->getId()) {
+                        // Trigger child event recursivly
+                        $eventArray = $childEvent->convertToArray();
+                        $this->executeEvent($eventSettings, $eventArray, $campaign, $lead, $processedCount, $totalEventCount);
+                    }
+                }
             }
         } else {
             //else do nothing
@@ -929,7 +934,7 @@ class EventModel extends CommonFormModel
         // Get an array of events that are non-action based
         $nonActionEvents = array();
         foreach ($campaignEvents as $id => $e) {
-            if ($e['decisionPath'] == 'no') {
+            if ($e['decisionPath'] == 'no' && $e['eventType'] == 'action') {
                 $nonActionEvents[$e['parent_id']][$id] = $e;
             }
         }
