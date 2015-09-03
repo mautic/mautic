@@ -44,6 +44,15 @@ class CacheHelper
 
         ini_set('memory_limit', '128M');
 
+        // Clear opcaches before rebuilding the cache incase the config file is updated
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        if (function_exists('apc_clear_cache')) {
+            apc_clear_cache('user');
+        }
+
         //attempt to squash command output
         ob_start();
 
