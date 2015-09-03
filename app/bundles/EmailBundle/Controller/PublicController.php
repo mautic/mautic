@@ -23,12 +23,11 @@ class PublicController extends CommonFormController
     public function indexAction($idHash)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->factory->getModel('email');
-        $translator = $this->get('translator');
-        $stat       = $model->getEmailStatus($idHash);
+        $model = $this->factory->getModel('email');
+        $stat  = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
-            $entity   = $stat->getEmail();
+            $entity = $stat->getEmail();
             $model->hitEmail($stat, $this->request, true);
 
             // Check for stored copy
@@ -56,12 +55,12 @@ class PublicController extends CommonFormController
                     $response = $this->render(
                         'MauticEmailBundle::public.html.php',
                         array(
-                            'inBrowser'       => true,
-                            'slots'           => $slots,
-                            'content'         => $entity->getContent(),
-                            'email'           => $entity,
-                            'lead'            => $lead,
-                            'template'        => $template
+                            'inBrowser' => true,
+                            'slots'     => $slots,
+                            'content'   => $entity->getContent(),
+                            'email'     => $entity,
+                            'lead'      => $lead,
+                            'template'  => $template
                         )
                     );
 
@@ -77,13 +76,16 @@ class PublicController extends CommonFormController
                 // Override tracking_pixel so as to not cause a double hit
                 $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
-                $event = new EmailSendEvent(array(
-                    'content' => $content,
-                    'lead'    => $lead,
-                    'email'   => $entity,
-                    'idHash'  => $idHash,
-                    'tokens'  => $tokens
-                ));
+                $event = new EmailSendEvent(
+                    null,
+                    array(
+                        'content' => $content,
+                        'lead'    => $lead,
+                        'email'   => $entity,
+                        'idHash'  => $idHash,
+                        'tokens'  => $tokens
+                    )
+                );
                 $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
                 $content = $event->getContent(true);
             }

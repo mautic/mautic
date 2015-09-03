@@ -63,6 +63,12 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
+    // Compile prod assets
+    system('php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
+    if ($result !== 0) {
+        exit;
+    }
+
     // Common steps
     include_once __DIR__.'/processfiles.php';
 
@@ -124,6 +130,16 @@ if (!isset($args['repackage'])) {
     // Add our update files to the $modifiedFiles array so they get packaged
     $modifiedFiles['deleted_files.txt'] = true;
     $modifiedFiles['upgrade.php']       = true;
+
+    // Include assets just in case they weren't
+    $assetFiles = array(
+        'media/css/app.css' => true,
+        'media/css/libraries.css' => true,
+        'media/js/app.js' => true,
+        'media/js/libraries.js' => true,
+        'media/js/mautic-form.js' => true
+    );
+    $modifiedFiles = $modifiedFiles + $assetFiles;
 
     // Package the vendor folder if the lock changed
     if ($vendorsChanged) {
