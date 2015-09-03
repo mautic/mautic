@@ -154,9 +154,6 @@ class SubmissionModel extends CommonFormModel
                 $value = implode(", ", $value);
             }
 
-            //save the result
-            $results[$alias] = $value;
-
             $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
