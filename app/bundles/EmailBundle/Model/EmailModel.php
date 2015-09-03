@@ -736,6 +736,7 @@ class EmailModel extends FormModel
         $failed      = array();
         $sentCount   = 0;
         $failedCount = 0;
+
         foreach ($lists as $list) {
             if ($limit !== null && $limit <= 0) {
                 // Hit the max for this batch
@@ -971,6 +972,7 @@ class EmailModel extends FormModel
         $contentGenerated = false;
 
         $flushQueue = function($reset = true) use (&$mailer, &$saveEntities, &$errors, $sendBatchMail) {
+
             if ($sendBatchMail) {
                 $flushResult = $mailer->flushQueue();
                 if (!$flushResult) {
@@ -1342,9 +1344,14 @@ class EmailModel extends FormModel
      */
     public function getMonitoredMailbox($bundleKey, $folderKey)
     {
-        /** @var \Mautic\EmailBundle\Helper\MailHelper $mailHelper */
-        $mailHelper = $this->factory->getMailer();
+        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
+        $mailboxHelper = $this->factory->getHelper('mailbox');
 
-        return $mailHelper->isMontoringEnabled($bundleKey, $folderKey);
+        if ($mailboxHelper->isConfigured($bundleKey, $folderKey)) {
+
+            return $mailboxHelper->getMailboxSettings();
+        }
+
+        return false;
     }
 }
