@@ -567,7 +567,16 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * @todo write method comment
+     * Execute an event. Condition events are executed recursivly
+     *
+     * @param  array    $eventSettings
+     * @param  array    $event
+     * @param  Campaign $campaign
+     * @param  Lead     $lead
+     * @param  integer  $processedCount
+     * @param  integer  $totalEventCount
+     *
+     * @return void
      */
     public function executeEvent($eventSettings, $event, $campaign, $lead, &$processedCount = 0, &$totalEventCount = 0)
     {
