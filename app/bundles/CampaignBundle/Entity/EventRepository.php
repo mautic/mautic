@@ -360,7 +360,8 @@ class EventRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
                 $q->expr()->eq('e.campaign_id', (int) $campaignId)
-            );
+            )
+            ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled');
 
         if (!empty($leads)) {
             $q->andWhere(
