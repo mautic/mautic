@@ -420,12 +420,14 @@ class SubmissionRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param integer $lead ID
-     * @param integer $form ID
-     * @param string  $formAlias
-     * @param integer $field alias
-     * @param string  $value to compare with
-     * @param string  $operatorExpr for WHERE clause
+     * @param  integer $lead ID
+     * @param  integer $form ID
+     * @param  string  $formAlias
+     * @param  integer $field alias
+     * @param  string  $value to compare with
+     * @param  string  $operatorExpr for WHERE clause
+     *
+     * @return boolean
      */
     public function compareLastValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
     {
