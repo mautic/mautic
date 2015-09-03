@@ -1333,29 +1333,18 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Get the settings for a monitored mailbox if enabled
+     * Get the settings for a monitored mailbox or false if not enabled
      *
      * @param $bundleKey
      * @param $folderKey
      *
-     * @return bool
-     * @throws \Exception
+     * @return bool|array
      */
     public function getMonitoredMailbox($bundleKey, $folderKey)
     {
-        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
-        $mailboxHelper = $this->factory->getHelper('mailbox');
+        /** @var \Mautic\EmailBundle\Helper\MailHelper $mailHelper */
+        $mailHelper = $this->factory->getHelper('mailbox');
 
-        if ($folderKey) {
-            $bundleKey .= '_' . $folderKey;
-        }
-
-        $config = $mailboxHelper->getMailboxSettings($bundleKey);
-        if (empty($config['host']) || empty($config['folder']) || empty($config['address'])) {
-
-            return false;
-        }
-
-         return $config;
+        return $mailHelper->isMontoringEnabled($bundleKey, $folderKey);
     }
 }
