@@ -343,7 +343,7 @@ class EventModel extends CommonFormModel
 
                         //trigger the action
                         $response = $this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered);
-                        if ($response !== false) {
+                        if ($response !== false || $event['eventType'] == 'condition') {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' successfully executed and logged.');
                             $log = $this->getLogEntity($child['id'], $child['campaign']['id'], $lead, $ipAddress, $systemTriggered);
 
@@ -360,6 +360,8 @@ class EventModel extends CommonFormModel
                         } else {
                             $logger->debug('CAMPAIGN: ID# '.$child['id'].' execution failed.');
                         }
+
+                        $this->handleCondition($response, $availableEvents, $child, $campaignModel->getEntity($campaignId), $lead);
                     }
 
                     if ($childrenTriggered) {
@@ -645,25 +647,7 @@ class EventModel extends CommonFormModel
                 $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
             }
 
-            if ($event['eventType'] == 'condition') {
-                if ($response === true) {
-                    $decisionPath = 'yes';
-                } else {
-                    $decisionPath = 'no';
-                }
-
-                $childEvents = $repo->findBy(
-                    array('parent' => $event['id'], 'decisionPath' => $decisionPath)
-                );
-
-                foreach ($childEvents as $childEvent) {
-                    if ($childEvent && $childEvent->getId()) {
-                        // Trigger child event recursivly
-                        $eventArray = $childEvent->convertToArray();
-                        $this->executeEvent($eventSettings, $eventArray, $campaign, $lead, $processedCount, $totalEventCount);
-                    }
-                }
-            }
+            $this->handleCondition($response, $eventSettings, $event, $campaign, $lead, $processedCount, $totalEventCount);
         } else {
             //else do nothing
 
@@ -679,6 +663,50 @@ class EventModel extends CommonFormModel
         }
 
         unset($timing, $event);
+    }
+
+    /**
+     * Handles condition type events
+     *
+     * @param  boolean  $response
+     * @param  array    $eventSettings
+     * @param  array    $event
+     * @param  Campaign $campaign
+     * @param  Lead     $lead
+     * @param  integer  $processedCount
+     * @param  integer  $totalEventCount
+     *
+     * @return void
+     */
+    public function handleCondition($response, $eventSettings, $event, $campaign, $lead, &$processedCount = 0, &$totalEventCount = 0)
+    {
+        if (empty($event['eventType']) || $event['eventType'] != 'condition') {
+            return;
+        }
+
+        $logger = $this->factory->getLogger();
+        $repo = $this->getRepository();
+
+        if ($response === true) {
+            $decisionPath = 'yes';
+        } else {
+            $decisionPath = 'no';
+        }
+
+        $childEvents = $repo->findBy(
+            array('parent' => $event['id'], 'decisionPath' => $decisionPath)
+        );
+
+        $logger->debug('CAMPAIGN: condition ID# '.$event['id'].' triggered with '.$decisionPath.' decision. Has '.count($childEvents).' child event(s).');
+
+        if (is_array($childEvents) && $childEvents) {
+            foreach ($childEvents as $childEvent) {
+                if ($childEvent && $childEvent->getId()) {
+                    // Trigger child event recursivly
+                    $this->executeEvent($eventSettings, $childEvent->convertToArray(), $campaign, $lead, $processedCount, $totalEventCount);
+                }
+            }
+        }
     }
 
     /**
