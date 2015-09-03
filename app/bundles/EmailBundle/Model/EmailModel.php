@@ -1343,7 +1343,7 @@ class EmailModel extends FormModel
     public function getMonitoredMailbox($bundleKey, $folderKey)
     {
         /** @var \Mautic\EmailBundle\Helper\MailHelper $mailHelper */
-        $mailHelper = $this->factory->getHelper('mailbox');
+        $mailHelper = $this->factory->getMailer();
 
         return $mailHelper->isMontoringEnabled($bundleKey, $folderKey);
     }
