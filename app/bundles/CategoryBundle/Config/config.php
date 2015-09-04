@@ -12,11 +12,27 @@ return array(
         'main' => array(
             'mautic_category_index'  => array(
                 'path'       => '/categories/{bundle}/{page}',
-                'controller' => 'MauticCategoryBundle:Category:index'
+                'controller' => 'MauticCategoryBundle:Category:index',
+                'defaults'   => array(
+                    'bundle' => 'category'
+                )
             ),
             'mautic_category_action' => array(
                 'path'       => '/categories/{bundle}/{objectAction}/{objectId}',
-                'controller' => 'MauticCategoryBundle:Category:executeCategory'
+                'controller' => 'MauticCategoryBundle:Category:executeCategory',
+                'defaults'   => array(
+                    'bundle' => 'category'
+                )
+            )
+        )
+    ),
+
+    'menu' => array(
+        'admin' => array(
+            'mautic.category.menu.index' => array(
+                'route'           => 'mautic_category_index',
+                'iconClass'       => 'fa-folder',
+                'id'              => 'mautic_category_index'
             )
         )
     ),
@@ -37,6 +53,11 @@ return array(
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'category_form'
+            ),
+            'mautic.form.type.category_bundles_form' => array(
+                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'category_bundles_form'
             )
         )
     )
