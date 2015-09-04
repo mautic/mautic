@@ -529,13 +529,13 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param        $message
+     * @param string $message
      * @param array  $messageVars
      * @param string $type
      * @param string $domain
      * @param bool   $addNotification
      */
-    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    public function addTranslatedFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
     {
         if ($domain == null) {
             $domain = 'flashes';
