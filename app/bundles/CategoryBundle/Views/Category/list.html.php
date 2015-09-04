@@ -38,7 +38,7 @@ if ($tmpl == 'index')
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'category',
                     'orderBy'    => 'c.bundle',
-                    'text'       => 'mautic.core.bundle',
+                    'text'       => 'mautic.core.type',
                     'class'      => 'visible-md visible-lg col-page-bundle'
                 ));
 

@@ -42,6 +42,6 @@ class CategoryBundlesEvent extends CommonEvent
      */
     public function addBundle($bundle)
     {
-        $this->bundles[$bundle] = $bundle;
+        $this->bundles[$bundle] = 'mautic.' . $bundle . '.' . $bundle;
     }
 }

@@ -125,15 +125,15 @@ class CategoryController extends FormController
             ));
         }
 
+        $bundles = array('category' => $this->get('translator')->trans('mautic.core.select'));
+
         $dispatcher = $this->factory->getDispatcher();
         if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryBundlesEvent;
             $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
-            $bundles = $event->getBundles();
-        } else {
-            $bundles = array();
+            $bundles = array_merge($bundles, $event->getBundles());
         }
-// var_dump($bundle);die;
+
         //set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.category.page', $page);
 

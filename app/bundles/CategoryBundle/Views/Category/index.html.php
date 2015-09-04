@@ -34,7 +34,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'filters'     => array(
             'bundle' => array(
                 'options' => $bundles,
-                'values'  => array($bundle)
+                'values'  => array($bundle),
+                'translateLabels' => true
             )
         ),
         'action'      => $currentRoute,
