@@ -962,7 +962,7 @@ class EventModel extends CommonFormModel
         // Get an array of events that are non-action based
         $nonActionEvents = array();
         foreach ($campaignEvents as $id => $e) {
-            if ($e['decisionPath'] == 'no' && $e['eventType'] == 'action') {
+            if ($e['decisionPath'] == 'no' && $campaignEvents[$e['parent_id']]['eventType'] != 'condition') {
                 $nonActionEvents[$e['parent_id']][$id] = $e;
             }
         }
