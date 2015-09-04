@@ -71,17 +71,10 @@ return array(
             'priority' => 15,
             'items'    => array(
                 'mautic.email.emails' => array(
+                    'route'     => 'mautic_email_index',
                     'id'        => 'mautic_email_root',
                     'iconClass' => 'fa-send',
-                    'access'    => array('email:emails:viewown', 'email:emails:viewother'),
-                    'children'  => array(
-                        'mautic.email.menu.index'    => array(
-                            'route' => 'mautic_email_index'
-                        ),
-                        'mautic.category.menu.index' => array(
-                            'bundle' => 'email'
-                        )
-                    )
+                    'access'    => array('email:emails:viewown', 'email:emails:viewother')
                 )
             )
         )

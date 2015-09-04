@@ -58,17 +58,10 @@ return array(
             'priority' => 10,
             'items'    => array(
                 'mautic.campaign.campaigns' => array(
+                    'route'     => 'mautic_campaign_index',
                     'id'        => 'mautic_campaigns_root',
                     'iconClass' => 'fa-clock-o',
-                    'access'    => 'campaign:campaigns:view',
-                    'children'  => array(
-                        'mautic.campaign.menu.index'     => array(
-                            'route' => 'mautic_campaign_index'
-                        ),
-                        'mautic.category.menu.index' => array(
-                            'bundle' => 'campaign'
-                        )
-                    )
+                    'access'    => 'campaign:campaigns:view'
                 )
             )
         )

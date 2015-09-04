@@ -68,17 +68,10 @@ return array(
             'priority' => 30,
             'items'    => array(
                 'mautic.page.pages' => array(
+                    'route' => 'mautic_page_index',
                     'id'        => 'mautic_page_root',
                     'iconClass' => 'fa-file-text-o',
-                    'access'    => array('page:pages:viewown', 'page:pages:viewother'),
-                    'children'  => array(
-                        'mautic.page.menu.index'     => array(
-                            'route' => 'mautic_page_index',
-                        ),
-                        'mautic.category.menu.index' => array(
-                            'bundle' => 'page'
-                        )
-                    )
+                    'access'    => array('page:pages:viewown', 'page:pages:viewother')
                 )
             )
         )

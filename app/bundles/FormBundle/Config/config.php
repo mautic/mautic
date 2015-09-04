@@ -87,17 +87,10 @@ return array(
             'priority' => 20,
             'items'    => array(
                 'mautic.form.forms' => array(
+                    'route'     => 'mautic_form_index',
                     'id'        => 'mautic_form_root',
                     'iconClass' => 'fa-pencil-square-o',
-                    'access'    => array('form:forms:viewown', 'form:forms:viewother'),
-                    'children'  => array(
-                        'mautic.form.form.menu.index' => array(
-                            'route' => 'mautic_form_index'
-                        ),
-                        'mautic.category.menu.index'  => array(
-                            'bundle' => 'form'
-                        )
-                    )
+                    'access'    => array('form:forms:viewown', 'form:forms:viewother')
                 )
             )
         )

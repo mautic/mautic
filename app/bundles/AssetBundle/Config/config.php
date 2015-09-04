@@ -53,17 +53,10 @@ return array(
             'priority' => 35,
             'items'    => array(
                 'mautic.asset.assets' => array(
+                    'route'     => 'mautic_asset_index',
                     'id'        => 'mautic_asset_root',
                     'iconClass' => 'fa-folder-open-o',
-                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
-                    'children'  => array(
-                        'mautic.asset.asset.menu.index' => array(
-                            'route' => 'mautic_asset_index',
-                        ),
-                        'mautic.category.menu.index' => array(
-                            'bundle' => 'asset'
-                        )
-                    )
+                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother')
                 )
             )
         )
