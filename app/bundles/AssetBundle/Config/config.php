@@ -106,6 +106,9 @@ return array(
             ),
             'oneup_uploader.pre_upload' => array(
                 'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber'
+            ),
+            'mautic.asset.category.subscriber'                => array(
+                'class' => 'Mautic\AssetBundle\EventListener\CategorySubscriber'
             )
         ),
         'forms' => array(
