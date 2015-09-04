@@ -120,6 +120,9 @@ return array(
             ),
             'mautic.email.configbundle.subscriber'   => array(
                 'class' => 'Mautic\EmailBundle\EventListener\ConfigSubscriber'
+            ),
+            'mautic.email.category.subscriber'                => array(
+                'class' => 'Mautic\EmailBundle\EventListener\CategorySubscriber'
             )
         ),
         'forms'  => array(
