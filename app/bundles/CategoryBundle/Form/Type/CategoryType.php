@@ -43,6 +43,19 @@ class CategoryType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
+        if ($options['data']->getId()) {
+            $builder->add('bundle', 'hidden', array(
+                'data' => $options['bundle']
+            ));
+        } else {
+            $builder->add('bundle', 'category_bundles_form', array(
+                'label'      => 'mautic.core.type',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => true,
+            ));
+        }
+
         $builder->add('title', 'text', array(
             'label'      => 'mautic.core.title',
             'label_attr' => array('class' => 'control-label'),
@@ -77,10 +90,6 @@ class CategoryType extends AbstractType
         ));
 
         $builder->add('isPublished', 'yesno_button_group');
-
-        $builder->add('bundle', 'hidden', array(
-            'data' => $options['bundle']
-        ));
 
         $builder->add('inForm', 'hidden', array(
             'mapped' => false

@@ -56,6 +56,8 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
+                        $bundleName = $view['translator']->trans('mautic.' . $item->getBundle() . '.' . $item->getBundle());
+                        $title = $view['translator']->trans('mautic.category.header.edit', array("%type%" => $bundleName, "%name%" => $item->getTitle()));
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'            => $item,
                             'templateButtons' => array(
@@ -65,7 +67,7 @@ if ($tmpl == 'index')
                             'editMode'        => 'ajaxmodal',
                             'editAttr'        => array(
                                 'data-target' => '#MauticSharedModal',
-                                'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
+                                'data-header' => $title,
                             ),
                             'routeBase'       => 'category',
                             'query'           => array(
@@ -81,7 +83,7 @@ if ($tmpl == 'index')
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'category', 'query' => 'bundle=' . $bundle)); ?>
                             <?php if ($permissions[$bundle . ':categories:edit']): ?>
-                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
+                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
                             <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
                             <?php if ($permissions[$bundle . ':categories:edit']): ?>

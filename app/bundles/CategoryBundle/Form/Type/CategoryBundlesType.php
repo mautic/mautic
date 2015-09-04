@@ -35,7 +35,6 @@ class CategoryBundlesType extends AbstractType
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
         $this->dispatcher = $factory->getDispatcher();
-        $this->canViewOther = $factory->getSecurity()->isGranted('category:categories:viewother');
     }
 
     /**
@@ -43,11 +42,10 @@ class CategoryBundlesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $canViewOther = $this->canViewOther;
         $dispatcher = $this->dispatcher;
 
         $resolver->setDefaults(array(
-            'choices'       => function (Options $options) use ($dispatcher, $canViewOther) {
+            'choices'       => function (Options $options) use ($dispatcher) {
                 if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
                     $event = new CategoryBundlesEvent;
                     $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
