@@ -116,6 +116,9 @@ return array(
             'mautic.page.webhook.subscriber'                => array(
                 'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber'
             ),
+            'mautic.page.category.subscriber'                => array(
+                'class' => 'Mautic\PageBundle\EventListener\CategorySubscriber'
+            )
         ),
         'forms'  => array(
             'mautic.form.type.page'                     => array(
