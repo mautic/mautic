@@ -34,7 +34,7 @@
         "symfony/validator": "2.6.*",
         "symfony/yaml": "2.6.*",
 
-        "symfony/framework-bundle": "2.5.*",
+        "symfony/framework-bundle": "2.6.*",
         "symfony/monolog-bundle": "~2.4",
         "symfony/security-bundle": "2.6.*",
         "symfony/swiftmailer-bundle": "~2.3",
