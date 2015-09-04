@@ -37,6 +37,13 @@ if ($tmpl == 'index')
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'category',
+                    'orderBy'    => 'c.bundle',
+                    'text'       => 'mautic.core.bundle',
+                    'class'      => 'visible-md visible-lg col-page-bundle'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'category',
                     'orderBy'    => 'c.id',
                     'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-page-id'
@@ -87,6 +94,7 @@ if ($tmpl == 'index')
                         </div>
                         <?php endif; ?>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getBundle(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

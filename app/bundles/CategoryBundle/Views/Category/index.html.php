@@ -31,6 +31,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
         'searchValue' => $searchValue,
         'searchHelp'  => 'mautic.category.help.searchcommands',
+        'filters'     => array(
+            'bundle' => array(
+                'options' => $bundles,
+                'values'  => array($bundle)
+            )
+        ),
         'action'      => $currentRoute,
         'routeBase'   => 'category',
         'templateButtons' => array(
@@ -40,6 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             'bundle' => $bundle
         )
     )); ?>
+
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>
