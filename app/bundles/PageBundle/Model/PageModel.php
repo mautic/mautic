@@ -338,8 +338,11 @@ class PageModel extends FormModel
      */
     public function hitPage ($page, $request, $code = '200')
     {
+        
+        $clickthrough = $request->get('ct', false);
+        
         //don't skew results with in-house hits
-        if (!$this->factory->getSecurity()->isAnonymous()) {
+        if (!$this->factory->getSecurity()->isAnonymous() && empty($clickthrough)) {
             return;
         }
 
@@ -355,10 +358,8 @@ class PageModel extends FormModel
         $leadModel = $this->factory->getModel('lead');
 
         //check for any clickthrough info
-        $clickthrough = $request->get('ct', false);
         if (!empty($clickthrough)) {
             $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-
             if (!empty($clickthrough['lead'])) {
                 $lead = $leadModel->getEntity($clickthrough['lead']);
                 if ($lead !== null) {
