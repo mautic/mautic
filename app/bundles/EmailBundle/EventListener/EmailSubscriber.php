@@ -108,21 +108,11 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailSend(Events\EmailSendEvent $event)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
-        if ($config = $model->getMonitoredMailbox('EmailBundle', 'unsubscribes')) {
-            $headers  = $event->getTextHeaders();
-            $existing = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
-
-            $append = 'unsubscribe';
-            $idHash = $event->getIdHash();
-            if ($idHash) {
-                $append .= "_{$idHash}";
-            }
-
-            list($email, $domain) = explode('@', $config['address']);
-            $unsubscribeEmail     = "<mailto:$email+$append@$domain>";
-            $updatedHeader        = ($existing) ? $unsubscribeEmail . ", " . $existing : $unsubscribeEmail;
+        if ($unsubscribeEmail = $event->getHelper()->generateUnsubscribeEmail()) {
+            $headers          = $event->getTextHeaders();
+            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
+            $updatedHeader    = ($existing) ? $unsubscribeEmail.", ".$existing : $unsubscribeEmail;
 
             $event->addTextHeader('List-Unsubscribe', $updatedHeader);
         }
