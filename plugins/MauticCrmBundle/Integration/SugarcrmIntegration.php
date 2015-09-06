@@ -11,7 +11,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -158,7 +157,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @param array $settings
+     *
+     * @return array
+     * @throws \Exception
      */
     public function getAvailableLeadFields($settings = array())
     {
@@ -235,6 +237,31 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
+     *
+     * @return array
+     */
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    {
+        if ($authType == 'oauth2' && empty($settings['authorize_session'])) {
+
+            // Append the access token as the oauth-token header
+            $headers                   = array(
+                "oauth-token: {$this->keys['access_token']}"
+            );
+
+            return array($parameters, $headers);
+        } else {
+
+            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -295,7 +322,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param FormBuilder|Form $builder
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
