@@ -1021,9 +1021,15 @@ class EventModel extends CommonFormModel
                     // Get only leads who have had the action prior to the decision executed
                     $grandParentId = $campaignEvents[$parentId]['parent_id'];
 
+                    if ($grandParentId) {
+                        $havingEvents = array($grandParentId);
+                    } else {
+                        $havingEvents = array();
+                    }
+
                     // Get the lead log for this batch of leads limiting to those that have already triggered
                     // the decision's parent and haven't executed this level in the path yet
-                    $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
+                    $leadLog = $repo->getEventLog($campaignId, $campaignLeads, $havingEvents, array_keys($events));
 
                     $applicableLeads = array_keys($leadLog);
                     if (empty($applicableLeads)) {
