@@ -268,6 +268,10 @@ class CheckStep implements StepInterface
             }
         }
 
+        if (!extension_loaded('zip')) {
+            $messages[] = 'mautic.install.extension.zip';
+        }
+
         // We set a default timezone in the app bootstrap, but advise the user if their PHP config is missing it
         if (!ini_get('date.timezone')) {
             $messages[] = 'mautic.install.date.timezone.not.set';
