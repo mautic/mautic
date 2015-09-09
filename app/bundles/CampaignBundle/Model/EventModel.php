@@ -1021,17 +1021,19 @@ class EventModel extends CommonFormModel
                     // Get only leads who have had the action prior to the decision executed
                     $grandParentId = $campaignEvents[$parentId]['parent_id'];
 
-                    if ($grandParentId) {
-                        $havingEvents = array($grandParentId);
-                    } else {
-                        $havingEvents = array();
-                    }
-
                     // Get the lead log for this batch of leads limiting to those that have already triggered
                     // the decision's parent and haven't executed this level in the path yet
-                    $leadLog = $repo->getEventLog($campaignId, $campaignLeads, $havingEvents, array_keys($events));
+                    if ($grandParentId) {
+                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
+                        $applicableLeads = array_keys($leadLog);
+                    } else {
+                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array(), array(), array($campaignEvents[$parentId]['id']));
+                        $unapplicableLeads = array_keys($leadLog);
 
-                    $applicableLeads = array_keys($leadLog);
+                        // Get unique values from both arrays
+                        $applicableLeads = array_merge(array_diff($unapplicableLeads, $campaignLeads), array_diff($campaignLeads, $unapplicableLeads));
+                    }
+
                     if (empty($applicableLeads)) {
                         $logger->debug('CAMPAIGN: No events are applicable');
 
@@ -1072,7 +1074,19 @@ class EventModel extends CommonFormModel
                         if (!array_key_exists($parentId, $leadLog[$l->getId()])) {
 
                             // Get date to compare against
-                            $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
+                            if ($grandParentId) {
+                                $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
+                            } else {
+                                $leadCampaignRef = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead')->findOneBy(
+                                    array(
+                                        'lead' => $l->getId(),
+                                        'campaign' => $campaign->getId(),
+                                        'manuallyRemoved' => false
+                                    )
+                                );
+                                $utcDateString = $leadCampaignRef->getDateAdded();
+                            }
+
                             // Convert to local DateTime
                             $grandParentDate = $this->factory->getDate($utcDateString, 'Y-m-d H:i:s', 'UTC')->getLocalDateTime();
 
