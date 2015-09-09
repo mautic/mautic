@@ -1027,7 +1027,9 @@ class EventModel extends CommonFormModel
                         $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
                         $applicableLeads = array_keys($leadLog);
                     } else {
-                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array(), array(), array($campaignEvents[$parentId]['id']));
+                        $notInEvents = array_keys($events);
+                        $notInEvents[] = $campaignEvents[$parentId]['id'];
+                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array(), array(), $notInEvents);
                         $unapplicableLeads = array_keys($leadLog);
 
                         // Get unique values from both arrays
@@ -1071,7 +1073,7 @@ class EventModel extends CommonFormModel
                         $logger->debug('CAMPAIGN: Lead ID #'.$l->getId());
 
                         // Prevent path if lead has already gone down this path
-                        if (!array_key_exists($parentId, $leadLog[$l->getId()])) {
+                        if (!isset($leadLog[$l->getId()]) || !array_key_exists($parentId, $leadLog[$l->getId()])) {
 
                             // Get date to compare against
                             if ($grandParentId) {
@@ -1102,13 +1104,17 @@ class EventModel extends CommonFormModel
                                     $sleepBatchCount++;
                                 }
 
-                                if (array_key_exists($id, $leadLog[$l->getId()])) {
+                                if (isset($leadLog[$l->getId()]) && array_key_exists($id, $leadLog[$l->getId()])) {
                                     $logger->debug('CAMPAIGN: Event (ID #'.$id.') has already been executed');
                                     unset($e);
                                     continue;
                                 }
 
-                                if (!isset($eventSettings['action'][$e['type']])) {
+                                if (isset($eventSettings['action'][$e['type']])) {
+                                    $thisEventSettings = $eventSettings['action'][$e['type']];
+                                } elseif (isset($eventSettings['condition'][$e['type']])) {
+                                    $thisEventSettings = $eventSettings['condition'][$e['type']];
+                                } else {
                                     $logger->debug('CAMPAIGN: Event (ID #'.$id.') no longer exists');
                                     unset($e);
                                     continue;
@@ -1171,7 +1177,7 @@ class EventModel extends CommonFormModel
 
                                     $repo->saveEntity($log);
 
-                                    $response = $this->invokeEventCallback($e, $eventSettings['action'][$e['type']], $l, null, true);
+                                    $response = $this->invokeEventCallback($e, $thisEventSettings, $l, null, true);
                                     if ($response === false) {
                                         $repo->deleteEntity($log);
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');

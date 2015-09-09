@@ -404,7 +404,7 @@ class EventRepository extends CommonRepository
                 $q->expr()->notIn('e.event_id', $notInEvents)
             );
         }
-
+var_dump($notInEvents, $q->getSql());
         $results = $q->execute()->fetchAll();
 
         $log = array();
