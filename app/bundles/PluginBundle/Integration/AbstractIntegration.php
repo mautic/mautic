@@ -520,6 +520,10 @@ abstract class AbstractIntegration
                 }
             }
 
+            if (isset($settings['stringify_params'])) {
+                $parameters = http_build_query($parameters);
+            }
+
             curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
         }
 
