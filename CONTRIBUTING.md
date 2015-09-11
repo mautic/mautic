@@ -4,11 +4,11 @@ Development is open and available to any member of the Mautic community. All fix
 
 ### Core Feature Development Procedures
 
-Pull Requests with additional features should be created with the Mautic Core Roadmap in consideration. Any features that are created for core that don’t follow the roadmap may not be included. 
+Pull Requests with additional features should be created with the Mautic Core goals in consideration. Any features that are created for core that don’t follow the overall goals may not be included. 
 
-In addition to following the general direction of the development roadmap, the pull request code must be well-formed following coding standards and guidelines. If you wish to target a specific release version number for the feature, its best to make the pull request early so any feedback from the core team can be implemented and adequate testing can be performed. 
+In addition to following the general direction of the development goals, the pull request code must be well-formed following coding standards and guidelines. If you wish to target a specific release version number for the feature, its best to make the pull request early so any feedback from the core team can be implemented and adequate testing can be performed. 
 
-Features that are determined not to fit within the direction of the roadmap are more than welcome to be created as plugins instead.
+Features that are determined not to fit within the direction of the Mautic Core goals are more than welcome to be created as plugins instead.
 
 ### Coding Standards
 
