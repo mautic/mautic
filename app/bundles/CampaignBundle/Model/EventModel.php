@@ -1027,13 +1027,13 @@ class EventModel extends CommonFormModel
                         $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
                         $applicableLeads = array_keys($leadLog);
                     } else {
-                        $notInEvents = array_keys($events);
-                        $notInEvents[] = $campaignEvents[$parentId]['id'];
-                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array(), array(), $notInEvents);
+                        // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
+                        // already executed the "non-action" events then exclude them
+                        $leadLog           = $repo->getEventLog($campaignId, $campaignLeads, array_keys($events));
                         $unapplicableLeads = array_keys($leadLog);
 
-                        // Get unique values from both arrays
-                        $applicableLeads = array_merge(array_diff($unapplicableLeads, $campaignLeads), array_diff($campaignLeads, $unapplicableLeads));
+                        // Only use apply to leads that are not applicable
+                        $applicableLeads = array_diff($campaignLeads, $unapplicableLeads);
                     }
 
                     if (empty($applicableLeads)) {
