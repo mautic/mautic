@@ -610,4 +610,45 @@ class CampaignRepository extends CommonRepository
 
         return $leads;
     }
+
+    /**
+     * Get lead data of a campaign
+     *
+     * @param       $campaignId
+     * @param int   $start
+     * @param bool  $limit
+     * @param array $ignoreLeads
+     *
+     * @return array
+     */
+    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $ignoreLeads = array(), $select = array('cl.lead_id'))
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select($select)
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if (!empty($ignoreLeads)) {
+            $q->andWhere(
+                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
+            );
+        }
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

@@ -1008,7 +1008,16 @@ class EventModel extends CommonFormModel
 
             while ($start <= $leadCount) {
                 // Get batched campaign ids
-                $campaignLeads = $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit);
+                $campaignLeads = $campaignRepo->getCampaignLeads($campaignId, $start, $limit, array(), array('cl.lead_id, cl.date_added'));
+
+                $campaignLeadIds = array();
+                $campaignLeadDates = array();
+                foreach ($campaignLeads as $r) {
+                    $campaignLeadIds[] = $r['lead_id'];
+                    $campaignLeadDates[$r['lead_id']] = $r['date_added'];
+                }
+
+                unset($campaignLeads);
 
                 foreach ($nonActionEvents as $parentId => $events) {
                     // Just a check to ensure this is an appropriate action
@@ -1024,16 +1033,16 @@ class EventModel extends CommonFormModel
                     // Get the lead log for this batch of leads limiting to those that have already triggered
                     // the decision's parent and haven't executed this level in the path yet
                     if ($grandParentId) {
-                        $leadLog = $repo->getEventLog($campaignId, $campaignLeads, array($grandParentId), array_keys($events));
+                        $leadLog = $repo->getEventLog($campaignId, $campaignLeadIds, array($grandParentId), array_keys($events));
                         $applicableLeads = array_keys($leadLog);
                     } else {
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the "non-action" events then exclude them
-                        $leadLog           = $repo->getEventLog($campaignId, $campaignLeads, array_keys($events));
+                        $leadLog           = $repo->getEventLog($campaignId, $campaignLeadIds, array_keys($events), array(), true);
                         $unapplicableLeads = array_keys($leadLog);
 
                         // Only use apply to leads that are not applicable
-                        $applicableLeads = array_diff($campaignLeads, $unapplicableLeads);
+                        $applicableLeads = array_diff($campaignLeadIds, $unapplicableLeads);
                     }
 
                     if (empty($applicableLeads)) {
@@ -1079,14 +1088,7 @@ class EventModel extends CommonFormModel
                             if ($grandParentId) {
                                 $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
                             } else {
-                                $leadCampaignRef = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead')->findOneBy(
-                                    array(
-                                        'lead' => $l->getId(),
-                                        'campaign' => $campaign->getId(),
-                                        'manuallyRemoved' => false
-                                    )
-                                );
-                                $utcDateString = $leadCampaignRef->getDateAdded();
+                                $utcDateString = new \DateTime($campaignLeadDates[$l->getId()]);
                             }
 
                             // Convert to local DateTime
@@ -1181,10 +1183,10 @@ class EventModel extends CommonFormModel
                                     if ($response === false) {
                                         $repo->deleteEntity($log);
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');
-
-                                        $logDecision = true;
                                     } else {
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' successfully executed and logged.');
+
+                                        $logDecision = true;
 
                                         if ($response !== true) {
                                             $log->setMetadata($response);
@@ -1246,13 +1248,13 @@ class EventModel extends CommonFormModel
                 // Next batch
                 $start += $limit;
 
-                $leadProcessedCount += count($campaignLeads);
+                $leadProcessedCount += count($campaignLeadIds);
 
                 // Save RAM
                 $this->em->clear('MauticLeadBundle:Lead');
                 $this->em->clear('MauticUserBundle:User');
 
-                unset($leads, $campaignLeads, $leadLog);
+                unset($leads, $campaignLeadIds, $leadLog);
 
                 $currentCount = ($max) ? $eventCount : $leadProcessedCount;
                 if ($output && $currentCount < $maxCount) {
