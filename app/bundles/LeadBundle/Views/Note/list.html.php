@@ -33,6 +33,3 @@ if ($tmpl == 'index') {
         'sessionVar'      => 'leadnote'
     )); ?>
 </div>
-<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'leadModal'
-)); ?>
