@@ -29,9 +29,13 @@ class SysinfoController extends FormController
      */
     public function indexAction ($page = 1)
     {
+        /** @var \Mautic\SysinfoBundle\Model\SysinfoModel $model */
+        $model   = $this->factory->getModel('sysinfo.sysinfo');
+        $phpInfo = $model->getPhpInfo();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
+                'phpInfo' => $phpInfo
             ),
             'contentTemplate' => 'MauticSysinfoBundle:Sysinfo:index.html.php',
             'passthroughVars' => array(
