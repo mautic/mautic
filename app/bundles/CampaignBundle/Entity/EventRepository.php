@@ -352,7 +352,7 @@ class EventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEventLog($campaignId, $leads = array(), $havingEvents = array(), $excludeEvents = array(), $notInEvents = array())
+    public function getEventLog($campaignId, $leads = array(), $havingEvents = array(), $excludeEvents = array())
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -399,12 +399,6 @@ class EventRepository extends CommonRepository
             );
         }
 
-        if (!empty($notInEvents)) {
-            $q->andWhere(
-                $q->expr()->notIn('e.event_id', $notInEvents)
-            );
-        }
-var_dump($notInEvents, $q->getSql());
         $results = $q->execute()->fetchAll();
 
         $log = array();
