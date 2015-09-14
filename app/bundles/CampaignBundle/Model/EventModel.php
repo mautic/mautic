@@ -959,6 +959,8 @@ class EventModel extends CommonFormModel
         // Get events to avoid large number of joins
         $campaignEvents = $repo->getCampaignEvents($campaignId);
 
+        $dt = $this->factory->getDate();
+
         // Get an array of events that are non-action based
         $nonActionEvents = array();
         foreach ($campaignEvents as $id => $e) {
@@ -1088,7 +1090,6 @@ class EventModel extends CommonFormModel
                             if ($grandParentId) {
                                 $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
                             } else {
-                                $dt = $this->factory->getDate();
                                 $utcDateString = $dt->setDateTime($campaignLeadDates[$l->getId()], 'Y-m-d H:i:s', 'utc');
                             }
 
@@ -1181,7 +1182,7 @@ class EventModel extends CommonFormModel
                                     $repo->saveEntity($log);
 
                                     $response = $this->invokeEventCallback($e, $thisEventSettings, $l, null, true);
-                                    if ($response === false) {
+                                    if ($response === false && $e['eventType'] == 'action') {
                                         $repo->deleteEntity($log);
                                         $logger->debug('CAMPAIGN: ID# '.$e['id'].' execution failed.');
                                     } else {
@@ -1194,6 +1195,8 @@ class EventModel extends CommonFormModel
                                             $repo->saveEntity($log);
                                         }
                                     }
+
+                                    $this->handleCondition($response, $eventSettings, $e, $campaign, $l);
                                 }
 
                                 if (!empty($log)) {
