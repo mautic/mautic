@@ -1088,7 +1088,8 @@ class EventModel extends CommonFormModel
                             if ($grandParentId) {
                                 $utcDateString = $leadLog[$l->getId()][$grandParentId]['date_triggered'];
                             } else {
-                                $utcDateString = new \DateTime($campaignLeadDates[$l->getId()]);
+                                $dt = $this->factory->getDate();
+                                $utcDateString = $dt->setDateTime($campaignLeadDates[$l->getId()], 'Y-m-d H:i:s', 'utc');
                             }
 
                             // Convert to local DateTime
