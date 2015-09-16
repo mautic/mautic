@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SysinfoBundle\Model;
+namespace Mautic\ConfigBundle\Model;
 
 use Mautic\CoreBundle\Model\CommonModel;
 
@@ -23,7 +23,7 @@ class SysinfoModel extends CommonModel
      */
     public function getPermissionBase()
     {
-        return 'sysinfo:sysinfo';
+        return 'config:sysinfo';
     }
 
     /**

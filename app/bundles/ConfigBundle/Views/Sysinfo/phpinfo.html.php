@@ -7,15 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SysinfoBundle;
+$view->extend('MauticConfigBundle:Sysinfo:index.html.php');
+?>
 
-/**
- * Class SysinfoEvents
- * Events available for SysinfoBundle
- *
- * @package Mautic\SysinfoBundle
- */
-final class SysinfoEvents
-{
-
-}
+<?php echo $phpInfo; ?>

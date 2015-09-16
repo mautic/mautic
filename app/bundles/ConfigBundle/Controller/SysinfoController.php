@@ -7,12 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SysinfoBundle\Controller;
+namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\SysinfoBundle\Event\ConfigEvent;
-use Mautic\SysinfoBundle\Event\ConfigBuilderEvent;
-use Mautic\SysinfoBundle\SysinfoEvents;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\FormError;
 
@@ -29,15 +26,15 @@ class SysinfoController extends FormController
      */
     public function indexAction ($page = 1)
     {
-        /** @var \Mautic\SysinfoBundle\Model\SysinfoModel $model */
-        $model   = $this->factory->getModel('sysinfo.sysinfo');
+        /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
+        $model   = $this->factory->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'phpInfo' => $phpInfo
             ),
-            'contentTemplate' => 'MauticSysinfoBundle:Sysinfo:index.html.php',
+            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_sysinfo_index',
                 'mauticContent' => 'sysinfo',
