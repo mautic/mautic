@@ -20,14 +20,6 @@ class SysinfoModel extends CommonModel
     protected $folders;
 
     /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
-    {
-        return 'config:sysinfo';
-    }
-
-    /**
 	 * Method to get the PHP info
 	 *
 	 * @return string
