@@ -24,6 +24,11 @@ $view['slots']->set("headerTitle", $view['translator']->trans('System Info'));
                         <?php echo $view['translator']->trans('mautic.sysinfo.tab.phpinfo'); ?>
                     </a>
                 </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.folders'); ?>
+                    </a>
+                </li>
             </ul>
 
         </div>
@@ -37,6 +42,24 @@ $view['slots']->set("headerTitle", $view['translator']->trans('System Info'));
             <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php echo $phpInfo;// $view->render('MauticConfigBundle:Sysinfo:phpinfo.html.php', array('phpInfo' => $phpInfo)); ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.folder.path'); ?></th>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.is.writable'); ?></th>
+                            </tr>
+                        </thead>
+                        <?php foreach($folders as $folder => $isWritable) : ?>
+                            <tr class="<?php echo ($isWritable) ? 'success' : 'danger'; ?>">
+                                <td><?php echo $folder; ?></td>
+                                <td><?php echo ($isWritable) ? $view['translator']->trans('mautic.sysinfo.writable') : $view['translator']->trans('mautic.sysinfo.unwritable');?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
                 </div>
             </div>
         </div>

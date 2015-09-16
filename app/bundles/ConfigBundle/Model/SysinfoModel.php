@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Model\CommonModel;
 class SysinfoModel extends CommonModel
 {
     protected $phpInfo;
+    protected $folders;
 
     /**
      * {@inheritdoc}
@@ -52,5 +53,38 @@ class SysinfoModel extends CommonModel
 		$output = str_replace('</div>', '', $output);
 		$this->phpInfo = $output;
 		return $this->phpInfo;
+	}
+
+    /**
+	 * Method to get the PHP info
+	 *
+	 * @return string
+	 */
+	public function getFolders()
+	{
+		if (!is_null($this->folders))
+		{
+			return $this->folders;
+		}
+
+        $importantFolders = array(
+            'app/cache',
+            'app/config',
+            'app/logs',
+            'app/spool',
+            'media/files',
+            'media/images',
+            'plugins',
+            'themes',
+            'translations'
+        );
+
+        $appRoot = $this->factory->getSystemPath('root');
+
+        foreach ($importantFolders as $folder) {
+            $this->folders[$folder] = is_writable($appRoot . '/' . $folder);
+        }
+
+		return $this->folders;
 	}
 }

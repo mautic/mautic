@@ -29,10 +29,12 @@ class SysinfoController extends FormController
         /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
         $model   = $this->factory->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
+        $folders = $model->getFolders();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'phpInfo' => $phpInfo
+                'phpInfo' => $phpInfo,
+                'folders' => $folders
             ),
             'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
             'passthroughVars' => array(
