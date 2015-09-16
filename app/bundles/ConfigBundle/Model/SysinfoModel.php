@@ -56,9 +56,9 @@ class SysinfoModel extends CommonModel
 	}
 
     /**
-	 * Method to get the PHP info
+	 * Method to get important folders with a writable flag
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function getFolders()
 	{
@@ -87,4 +87,53 @@ class SysinfoModel extends CommonModel
 
 		return $this->folders;
 	}
+
+    /**
+	 * Method to tail (a few last rows) of a file
+	 *
+	 * @return string|null
+	 */
+    public function getLogTail($lines = 10)
+    {
+        $prodLog = $this->factory->getSystemPath('root') . '/app/logs/mautic_prod-' . date('Y-m-d') . '.php';
+
+        if (!file_exists($prodLog)) {
+            return null;
+        }
+
+        return $this->tail($prodLog, $lines);
+    }
+
+    /**
+	 * Method to tail (a few last rows) of a file
+	 *
+	 * @return array
+	 */
+    public function tail($filename, $lines = 10, $buffer = 4096)
+    {
+        $f = fopen($filename, "rb");
+        $output = '';
+        $chunk = '';
+
+        fseek($f, -1, SEEK_END);
+
+        if (fread($f, 1) != "\n") {
+            $lines -= 1;
+        }
+
+        while (ftell($f) > 0 && $lines >= 0) {
+            $seek = min(ftell($f), $buffer);
+            fseek($f, -$seek, SEEK_CUR);
+            $output = ($chunk = fread($f, $seek)).$output;
+            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+            $lines -= substr_count($chunk, "\n");
+        }
+
+        while ($lines++ < 0) {
+            $output = substr($output, strpos($output, "\n") + 1);
+        }
+
+        fclose($f);
+        return $output;
+    }
 }
