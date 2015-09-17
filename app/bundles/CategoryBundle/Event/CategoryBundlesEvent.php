@@ -40,8 +40,12 @@ class CategoryBundlesEvent extends CommonEvent
      *
      * @param string $bundle
      */
-    public function addBundle($bundle)
+    public function addBundle($bundle, $label = null)
     {
-        $this->bundles[$bundle] = 'mautic.' . $bundle . '.' . $bundle;
+        if (!$label) {
+            $label = 'mautic.' . $bundle . '.' . $bundle;
+        }
+        
+        $this->bundles[$bundle] = $label;
     }
 }
