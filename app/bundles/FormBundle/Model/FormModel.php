@@ -247,16 +247,24 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the cached HTML of a form and generates it if missing
      *
-     * @param Form $form
+     * @param Form      $form
+     * @param bool|true $withScript
+     * @param bool|true $useCache
      *
      * @return string
      */
-    public function getContent(Form $form)
+    public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        $cachedHtml = $form->getCachedHtml();
+        if ($useCache) {
+            $cachedHtml = $form->getCachedHtml();
+        }
 
         if (empty($cachedHtml)) {
-            $cachedHtml = $this->generateHtml($form);
+            $cachedHtml = $this->generateHtml($form, $useCache);
+        }
+
+        if ($withScript) {
+            $cachedHtml = $this->getFormScript($form) . "\n\n" . $cachedHtml;
         }
 
         return $cachedHtml;
@@ -428,8 +436,7 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html  = $this->getFormScript($form);
-        $html .= $this->getContent($form);
+        $html = $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
         $search  = array("\n", '"');
@@ -472,7 +479,7 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters($form, &$formHtml)
     {
         $request = $this->factory->getRequest();
-        $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
+        $formName = strtolower(InputHelper::alphanum($form->getName()));
 
         $fields = $form->getFields();
         foreach ($fields as $f) {

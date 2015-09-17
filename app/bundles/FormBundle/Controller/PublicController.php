@@ -242,6 +242,7 @@ class PublicController extends CommonFormController
             $this->notFound();
 
         } else {
+
             $html = $model->getContent($form);
 
             $model->populateValuesWithGetParameters($form, $html);
