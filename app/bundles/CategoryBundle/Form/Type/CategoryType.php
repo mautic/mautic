@@ -45,7 +45,7 @@ class CategoryType extends AbstractType
 
         if ($options['data']->getId()) {
             $builder->add('bundle', 'hidden', array(
-                'data' => $options['bundle']
+                'data' => $options['data']->getBundle()
             ));
         } else {
             $builder->add('bundle', 'category_bundles_form', array(
