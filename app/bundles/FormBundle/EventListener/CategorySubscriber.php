@@ -40,6 +40,6 @@ class CategorySubscriber extends CommonSubscriber
      */
     public function onCategoryBundleListBuild(CategoryBundlesEvent $event)
     {
-        $event->addBundle('form');
+        $event->addCategoryType('form');
     }
 }

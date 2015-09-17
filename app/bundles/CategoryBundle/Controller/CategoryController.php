@@ -131,7 +131,7 @@ class CategoryController extends FormController
         if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryBundlesEvent;
             $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
-            $bundles = array_merge($bundles, $event->getBundles());
+            $bundles = array_merge($bundles, $event->getCategoryTypes());
         }
 
         //set what page currently on so that we can return here after form submission/cancellation

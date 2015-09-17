@@ -25,27 +25,30 @@ class CategoryBundlesEvent extends CommonEvent
     protected $bundles = array();
 
     /**
-     * Returns the array of Bundles
+     * Returns the array of Category Types
      *
      * @return array
      */
-    public function getBundles()
+    public function getCategoryTypes()
     {
         asort($this->bundles);
         return $this->bundles;
     }
 
     /**
-     * Adds the bundle entity
+     * Adds the category type and label
      *
      * @param string $bundle
+     * @param string $label
+     *
+     * @return void
      */
-    public function addBundle($bundle, $label = null)
+    public function addCategoryType($bundle, $label = null)
     {
-        if (!$label) {
+        if ($label === null) {
             $label = 'mautic.' . $bundle . '.' . $bundle;
         }
-        
+
         $this->bundles[$bundle] = $label;
     }
 }
