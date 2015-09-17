@@ -51,7 +51,7 @@ if ($page->getId()) {
 					<dd class="ellipsis"><?php echo $view['assets']->makeLinks($submission->getReferer()); ?></dd>
 				<?php if (is_array($results)) : ?>
 					<?php foreach ($form->getFields() as $field) : ?>
-						<?php if (array_key_exists($field->getAlias(), $results)) : ?>
+						<?php if (array_key_exists($field->getAlias(), $results) && $results[$field->getAlias()] != '' && $results[$field->getAlias()] != null && $results[$field->getAlias()] != array()) : ?>
 							<dt><?php echo $field->getLabel(); ?></dt>
 							<dd class="ellipsis"><?php echo $results[$field->getAlias()]; ?></dd>
 						<?php endif; ?>

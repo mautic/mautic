@@ -166,7 +166,7 @@ class AssetModel extends FormModel
 
         $download->setTrackingId($trackingId);
 
-        if (!empty($asset)) {
+        if (!empty($asset) && empty($systemEntry)) {
             $download->setAsset($asset);
 
             $downloadCount = $asset->getDownloadCount();
@@ -174,7 +174,7 @@ class AssetModel extends FormModel
             $asset->setDownloadCount($downloadCount);
 
             //check for a download count from tracking id
-            $countById = ($systemEntry) ? 0 : $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
+            $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
             if (empty($countById)) {
                 $uniqueDownloadCount = $asset->getUniqueDownloadCount();
                 $uniqueDownloadCount++;
@@ -192,7 +192,27 @@ class AssetModel extends FormModel
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
         $this->em->persist($download);
-        $this->em->flush();
+
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            error_log($e);
+        }
+    }
+
+    /**
+     * Increase the download count
+     *
+     * @param            $asset
+     * @param int        $increaseBy
+     * @param bool|false $unique
+     */
+    public function upDownloadCount($asset, $increaseBy = 1, $unique = false)
+    {
+        $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
+
+        $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
     /**

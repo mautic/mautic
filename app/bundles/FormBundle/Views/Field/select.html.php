@@ -30,9 +30,10 @@ if (isset($list['list'])) {
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
     array(
-        'deleted' => (!empty($deleted)) ? $deleted : false,
-        'id'      => $id,
-        'formId'  => $formId
+        'deleted'  => (!empty($deleted)) ? $deleted : false,
+        'id'       => $id,
+        'formId'   => $formId,
+        'formName' => $formName
     )) : '';
 
 

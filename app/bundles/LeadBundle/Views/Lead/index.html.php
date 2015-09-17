@@ -51,6 +51,74 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons'    => $buttons,
     'extraHtml'        => $extraHtml
 )));
+
+$customButtons = array(
+    array(
+        'attr'      => array(
+            'class'   => 'hidden-xs btn btn-default btn-sm btn-nospin',
+            'href'    => 'javascript: void(0)',
+            'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
+            'id'      => 'liveModeButton',
+            'data-toggle' => false,
+            'data-max-id' => $maxLeadId
+        ),
+        'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
+        'iconClass' => 'fa fa-bolt'
+    )
+);
+
+if ($indexMode == 'list') {
+    $customButtons[] = array(
+        'attr'      => array(
+            'class'          => 'hidden-xs btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),
+            'href'           => 'javascript: void(0)',
+            'onclick'        => 'Mautic.toggleAnonymousLeads();',
+            'id'             => 'anonymousLeadButton',
+            'data-anonymous' => $view['translator']->trans('mautic.lead.lead.searchcommand.isanonymous')
+        ),
+        'tooltip'   => $view['translator']->trans('mautic.lead.lead.anonymous_leads'),
+        'iconClass' => 'fa fa-user-secret'
+    );
+}
+
+$customButtons = array_merge(
+    $customButtons,
+    array(
+        array(
+            'attr'      => array(
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
+            ),
+            'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
+            'iconClass' => 'fa fa-list'
+        ),
+        array(
+            'attr'      => array(
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            ),
+            'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            'iconClass' => 'fa fa-clock-o'
+        ),
+        array(
+            'attr'      => array(
+                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+            ),
+            'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
+            'iconClass' => 'fa fa-send text-danger'
+        )
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
@@ -60,20 +128,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
         'routeBase'   => 'lead',
-        'preCustomButtons' => array(
-            array(
-                'attr'      => array(
-                    'class'   => 'btn btn-default btn-sm btn-nospin',
-                    'href'    => 'javascript: void(0)',
-                    'onclick' => 'Mautic.toggleLiveLeadListUpdate();',
-                    'id'      => 'liveModeButton',
-                    'data-toggle' => false,
-                    'data-max-id' => $maxLeadId
-                ),
-                'tooltip' => $view['translator']->trans('mautic.lead.lead.live_update'),
-                'iconClass' => 'fa fa-bolt'
-            )
-        ),
+        'preCustomButtons' => $customButtons,
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
         )

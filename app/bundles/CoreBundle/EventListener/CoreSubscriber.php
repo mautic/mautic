@@ -29,7 +29,6 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class CoreSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
@@ -180,7 +179,7 @@ class CoreSubscriber extends CommonSubscriber
 
                 /** @var \Mautic\UserBundle\Model\UserModel $userModel */
                 $userModel = $this->factory->getModel('user');
-                if ($user instanceof User && $user->getLastActive() < $delay) {
+                if ($user instanceof User && $user->getLastActive() < $delay && $user->getId()) {
                     $userModel->getRepository()->setLastActive($user);
                 }
 

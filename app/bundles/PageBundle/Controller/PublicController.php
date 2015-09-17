@@ -16,7 +16,6 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Class PublicController
@@ -51,7 +50,8 @@ class PublicController extends CommonFormController
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
                 } else {
                     $model->hitPage($entity, $this->request, 401);
-                    throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
+
+                    return $this->accessDenied();
                 }
             }
 
@@ -265,7 +265,8 @@ class PublicController extends CommonFormController
         }
 
         $model->hitPage($entity, $this->request, 404);
-        throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+
+        $this->notFound();
     }
 
     /**
@@ -277,12 +278,11 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id)
     {
-        $model      = $this->factory->getModel('page');
-        $entity     = $model->getEntity($id);
-        $translator = $this->get('translator');
+        $model  = $this->factory->getModel('page');
+        $entity = $model->getEntity($id);
 
         if ($entity === null || !$entity->isPublished(false)) {
-            throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+            $this->notFound();
         }
 
         $template = $entity->getTemplate();
@@ -343,7 +343,7 @@ class PublicController extends CommonFormController
         $redirectModel = $this->factory->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        if (empty($redirect)) {
+        if (empty($redirect) || !$redirect->isPublished(false)) {
             throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
         }
 

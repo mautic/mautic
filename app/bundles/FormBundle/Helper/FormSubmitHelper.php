@@ -10,32 +10,28 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\FormBundle\Entity\Action;
+use Mautic\LeadBundle\Entity\Lead;
 
 class FormSubmitHelper
 {
-	/**
-     * @param       $action
-     *
-     * @return array
+    /**
+     * @param               $tokens
+     * @param               $config
+     * @param MauticFactory $factory
+     * @param Lead          $lead
      */
-    public static function sendEmail($tokens, $config, MauticFactory $factory, $lead)
+    public static function sendEmail($tokens, $config, MauticFactory $factory, Lead $lead)
     {
         $mailer = $factory->getMailer();
         $emails = (!empty($config['to'])) ? explode(',', $config['to']) : array();
 
-        $fields = $lead->getFields();
-        $email  = $fields['core']['email']['value'];
-
-        if (!empty($email)) {
-            if ($config['copy_lead']) {
-                $emails[] = $email;
-            }
-
-            $mailer->setReplyTo($email);
-        }
-
         $mailer->setTo($emails);
+
+        $leadEmail = $lead->getEmail();
+        if (!empty($leadEmail)) {
+            // Reply to lead for user convenience
+            $mailer->setReplyTo($leadEmail);
+        }
 
         if (!empty($config['cc'])) {
             $emails = explode(',', $config['cc']);
@@ -54,5 +50,19 @@ class FormSubmitHelper
         $mailer->parsePlainText($config['message']);
 
         $mailer->send();
+
+        if ($config['copy_lead'] && !empty($leadEmail)) {
+            // Send copy to lead
+            $mailer->reset();
+
+            $mailer->setTo($leadEmail);
+
+            $mailer->setSubject($config['subject']);
+            $mailer->setTokens($tokens);
+            $mailer->setBody($config['message']);
+            $mailer->parsePlainText($config['message']);
+
+            $mailer->send();
+        }
     }
 }

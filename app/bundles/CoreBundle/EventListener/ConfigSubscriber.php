@@ -46,17 +46,8 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $values = $event->getConfig();
 
-        $passwords = array(
-            'mailer_password',
-            'transifex_password'
-        );
-
-        foreach ($passwords as $key) {
-            // Check to ensure we don't save a blank password to the config which may remove the user's old password
-            if (array_key_exists($key, $values['coreconfig']) && empty($values['coreconfig'][$key])) {
-                unset($values['coreconfig'][$key]);
-            }
-        }
+        // Preserve existing value
+        $event->unsetIfEmpty('transifex_password');
 
         // Check if the selected locale has been downloaded already, fetch it if not
         $installedLanguages = $this->factory->getParameter('supported_languages');

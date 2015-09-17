@@ -24,32 +24,24 @@ $img = $view['lead_avatar']->getAvatar($lead);
                <!-- step container -->
         <div class="col-md-3 bg-white height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <?php if ($lead->getId()): ?>
-                    <div class="media">
-                        <div class="pull-left">
-                            <img class="img-rounded img-bordered media-object" src="<?php echo $img; ?>" alt="" width="65px">
-                        </div>
-                        <div class="media-body">
-                            <h4><?php echo $header; ?></h4>
-                            <div style="max-width:200px;" class="mt-md">
-                                <p class="text-muted clearfix nm">
-                                    <span class="pull-left">
-                                        <?php
-                                        $color = $lead->getColor();
-
-                                        $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
-                                        ?>
-                                        <span class="label label-default"<?php echo $style; ?>>
-                                            <?php echo $view['translator']->transChoice('mautic.lead.points.count', $lead->getPoints(), array('%points%' => $lead->getPoints())); ?>
-                                        </span>
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
+                <div class="media">
+                    <div class="media-body">
+                        <img class="img-rounded img-bordered img-responsive media-object" src="<?php echo $img; ?>" alt="">
                     </div>
+                </div>
 
-                    <hr />
-                <?php endif; ?>
+                <div class="row mt-xs">
+                    <div class="col-sm-12">
+                        <?php echo $view['form']->label($form['preferred_profile_image']); ?>
+                        <?php echo $view['form']->widget($form['preferred_profile_image']); ?>
+                    </div>
+                    <div class="col-sm-12<?php if ($view['form']->containsErrors($form['custom_avatar'])) echo ' has-error'; ?>" id="customAvatarContainer" style="<?php if ($form['preferred_profile_image']->vars['data'] != 'custom') echo 'display: none;'; ?>">
+                        <?php echo $view['form']->widget($form['custom_avatar']); ?>
+                        <?php echo $view['form']->errors($form['custom_avatar']); ?>
+                    </div>
+                </div>
+
+                <hr />
 
                 <ul class="list-group list-group-tabs">
                     <?php $step = 1; ?>
@@ -73,34 +65,17 @@ $img = $view['lead_avatar']->getAvatar($lead);
             <!-- Tab panes act as a form -->
             <?php echo $view['form']->start($form, array('attr' => array('class' => 'tab-content'))); ?>
                 <!-- pane -->
-                <?php $first = ' in active'; ?>
-                <?php foreach ($fields as $group => $groupFields): ?>
-                <?php if (!empty($groupFields)): ?>
-                    <div class="tab-pane fade<?php echo $first; ?> bdr-rds-0 bdr-w-0" id="<?php echo $group; ?>">
+                <?php
+                foreach ($groups as $key => $group):
+                if (isset($fields[$group])):
+                    $groupFields = $fields[$group];
+                    if (!empty($groupFields)): ?>
+                    <div class="tab-pane fade<?php if ($key === 0) echo ' in active'; ?> bdr-rds-0 bdr-w-0" id="<?php echo $group; ?>">
                         <div class="pa-md bg-auto bg-light-xs bdr-b">
                             <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $group); ?></h4>
                         </div>
                         <div class="pa-md">
                         <?php if ($group == 'core'): ?>
-                            <div class="form-group mb-0">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <?php echo $view['form']->label($form['owner']); ?>
-                                        <?php echo $view['form']->widget($form['owner']); ?>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <?php echo $view['form']->label($form['preferred_profile_image']); ?>
-                                        <?php echo $view['form']->widget($form['preferred_profile_image']); ?>
-                                    </div>
-                                </div>
-                                <div class="row<?php if ($view['form']->containsErrors($form['custom_avatar'])) echo ' has-error'; ?>" id="customAvatarContainer" style="<?php if ($form['preferred_profile_image']->vars['data'] != 'custom') echo 'display: none;'; ?>">
-                                    <div class="col-sm-offset-4 col-sm-4 mt-sm">
-                                        <?php echo $view['form']->widget($form['custom_avatar']); ?>
-                                        <?php echo $view['form']->errors($form['custom_avatar']); ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr class="mnr-md mnl-md">
 
                             <div class="form-group mb-0">
                                 <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.name'); ?></label>
@@ -171,18 +146,39 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 </div>
                             </div>
                             <hr class="mnr-md mnl-md">
-                            <?php
-                            endif;
+                            <?php endif; ?>
 
-                            foreach ($groupFields as $alias => $field):
-                                echo $view['form']->row($form[$alias]);
-                            endforeach;
-                            ?>
+                            <div class="row">
+                            <?php foreach ($groupFields as $alias => $field): ?>
+                            <?php if ($form[$alias]->isRendered()) continue; ?>
+                                <div class="col-sm-8">
+                                    <?php echo $view['form']->row($form[$alias]); ?>
+                                </div>
+                            <?php endforeach; ?>
+                            </div>
+
+                            <?php if ($group == 'core'): ?>
+
+                            <hr class="mnr-md mnl-md">
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <?php echo $view['form']->label($form['owner']); ?>
+                                    <?php echo $view['form']->widget($form['owner']); ?>
+                                </div>
+                                <div class="col-sm-4">
+                                    <?php echo $view['form']->label($form['tags']); ?>
+                                    <?php echo $view['form']->widget($form['tags']); ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
-                <?php $first = ''; ?>
-                <?php endif; ?>
-                <?php endforeach; ?>
+                <?php
+                    endif;
+                    endif;
+                    endforeach;
+                ?>
                 <!--/ #pane -->
             <?php echo $view['form']->end($form); ?>
             <!--/ Tab panes act as a form -->

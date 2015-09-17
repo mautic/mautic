@@ -805,9 +805,9 @@
             this._callbacks = this._callbacks || {};
             while (type = types.shift()) {
                 this._callbacks[type] = this._callbacks[type] || {
-                    sync: [],
-                    async: []
-                };
+                        sync: [],
+                        async: []
+                    };
                 this._callbacks[type][method].push(cb);
             }
             return this;
@@ -1066,8 +1066,8 @@
                     }
                 }
             },
-            setInputValue: function setInputValue(value, silent) {
-                if (this.multiple) {
+            setInputValue: function setInputValue(value, silent, setFull) {
+                if (this.multiple && value && !setFull) {
                     var existing = this.$input.val();
                     var array = existing.split(" ");
                     if (array.length > 1) {
@@ -1092,15 +1092,19 @@
                 }
             },
             setHint: function setHint(value) {
-                if (this.multiple) {
-                    var existing = this.$input.val();
-                    var array = existing.split(" ");
-                    if (array.length > 1) {
-                        array.pop();
-                        value = array.join(" ") + " " + value;
+                if (!value) {
+                    this.$hint.val(value);
+                } else if (!this.hasOverflow()) {
+                    if (this.multiple && value) {
+                        var existing = this.$input.val();
+                        var array = existing.split(" ");
+                        if (array.length > 1) {
+                            array.pop();
+                            value = array.join(" ") + " " + value;
+                        }
                     }
+                    this.$hint.val(value);
                 }
-                this.$hint.val(value);
             },
             clearHint: function clearHint() {
                 this.setHint("");
@@ -1118,7 +1122,7 @@
             },
             hasOverflow: function hasOverflow() {
                 var constraint = this.$input.width() - 2;
-                this.$overflowHelper.text(this.getInputValue());
+                this.$overflowHelper.text(this.getInputValue(true));
                 return this.$overflowHelper.width() >= constraint;
             },
             isCursorAtEnd: function () {
@@ -1500,8 +1504,8 @@
                 $e.preventDefault();
             });
             this.eventBus = o.eventBus || new EventBus({
-                el: $input
-            });
+                    el: $input
+                });
             this.dropdown = new Dropdown({
                 menu: $menu,
                 datasets: o.datasets
@@ -1648,17 +1652,17 @@
             close: function close() {
                 this.dropdown.close();
             },
-            setVal: function setVal(val) {
+            setVal: function setVal(val, setFull) {
                 if (this.isActivated) {
-                    this.input.setInputValue(val);
+                    this.input.setInputValue(val, false, setFull);
                 } else {
                     this.input.setQuery(val);
-                    this.input.setInputValue(val, true);
+                    this.input.setInputValue(val, true, setFull);
                 }
                 this._setLanguageDirection();
             },
             getVal: function getVal() {
-                return this.input.getQuery();
+                return this.input.getInputValue(true);
             },
             destroy: function destroy() {
                 this.input.destroy();
@@ -1768,7 +1772,7 @@
                 function setVal() {
                     var $input = $(this), typeahead;
                     if (typeahead = $input.data(typeaheadKey)) {
-                        typeahead.setVal(newVal);
+                        typeahead.setVal(newVal, true);
                     }
                 }
 

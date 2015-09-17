@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Templating\DelegatingEngine;
 
 /**
@@ -81,7 +82,7 @@ class CommonController extends Controller implements MauticController
             );
         }
 
-        if (isset($args['passthroughVars']['route'])) {
+        if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
 
@@ -314,25 +315,47 @@ class CommonController extends Controller implements MauticController
      * Generates access denied message
      *
      * @param bool   $batch Flag if a batch action is being performed
-     * @param string $msg   Message to display to the user
+     * @param string $msg   Message that is logged
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.error.accessdenied')
+    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
     {
         $anonymous = $this->factory->getSecurity()->isAnonymous();
 
         if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException($this->get('translator')->trans($msg, array(), 'flashes'));
+            throw new AccessDeniedHttpException(
+                $this->factory->getTranslator()->trans($msg,
+                    array(
+                        '%url%' => $this->request->getRequestUri()
+                    )
+                )
+            );
         }
 
         if ($batch) {
             return array(
                 'type' => 'error',
-                'msg'  => $msg
+                'msg'  => $this->factory->getTranslator()->trans('mautic.core.error.accessdenied', array(), 'flashes')
             );
         }
+    }
+
+    /**
+     * Generate 404 not found message
+     *
+     * @param string $msg Message to log
+     */
+    public function notFound($msg = 'mautic.core.url.error.404')
+    {
+        throw new NotFoundHttpException(
+            $this->factory->getTranslator()->trans($msg,
+                array(
+                    '%url%' => $this->request->getRequestUri()
+                )
+            )
+        );
     }
 
     /**
@@ -491,11 +514,12 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param      $message
-     * @param null $type
-     * @param bool $isRead
-     * @param null $header
-     * @param null $iconClass
+     * @param                $message
+     * @param null           $type
+     * @param bool|true      $isRead
+     * @param null           $header
+     * @param null           $iconClass
+     * @param \DateTime|null $datetime
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {

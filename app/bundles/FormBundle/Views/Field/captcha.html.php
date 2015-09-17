@@ -16,6 +16,7 @@ echo $view->render(
         'id'       => $id,
         'deleted'  => (!empty($deleted)) ? true : false,
         'required' => true,
-        'formId'   => (isset($formId)) ? $formId : 0
+        'formId'   => (isset($formId)) ? $formId : 0,
+        'formName'  => (isset($formName)) ? $formName : ''
     )
 );

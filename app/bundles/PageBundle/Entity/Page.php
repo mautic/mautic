@@ -173,7 +173,8 @@ class Page extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
+            ->addIndex(array('alias'), 'page_alias_search');
 
         $builder->addId();
 
@@ -358,10 +359,10 @@ class Page extends FormEntity
                     'translationChildren'
                 )
             )
-            ->setMaxDepth('variantParent', 1)
-            ->setMaxDepth('variantChildren', 1)
-            ->setMaxDepth('translationParent', 1)
-            ->setMaxDepth('translationChildren', 1)
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
+            ->setMaxDepth(1, 'translationParent')
+            ->setMaxDepth(1, 'translationChildren')
             ->build();
     }
 

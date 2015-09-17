@@ -351,7 +351,7 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
@@ -516,7 +516,7 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));
@@ -723,7 +723,7 @@ class AssetController extends FormController
     public function remoteAction ()
     {
         // Check for integrations to cloud providers
-        /** @var \Mautic\AddonBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrations = $integrationHelper->getIntegrationObjects(null, array('cloud_storage'));

@@ -17,7 +17,7 @@ $item = $event['extra']['stats'];
 	    <div class="panel-body">
 	    	<h3>
 	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
-				    <?php echo (!empty($item['subject'])) ? $item['subject'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
+				    <?php echo (!empty($item['name'])) ? $item['name'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
 				</a>
 			</h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
@@ -40,6 +40,18 @@ $item = $event['extra']['stats'];
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.list', array('%list%' => $item['list_name'])); ?>
 	            <?php endif; ?>
 	            </p>
+		        <?php if (isset($item['openDetails']['bounces'])): ?>
+		        <?php unset($item['openDetails']['bounces']); ?>
+		        <?php endif; ?>
+
+		        <?php if (!empty($item['openDetails'])): ?>
+		        <div class="small">
+		        <?php foreach ($item['openDetails'] as $detail): ?>
+                    <hr />
+					<strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br /><?php echo $detail['useragent']; ?>
+			        <?php endforeach; ?>
+		        </div>
+		        <?php endif; ?>
 	        </div>
 	    <?php endif; ?>
 	</div>

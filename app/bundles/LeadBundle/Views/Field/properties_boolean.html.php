@@ -16,18 +16,18 @@ $no  = (isset($no)) ? $no : $view['translator']->trans('mautic.core.form.no');
     <div class="row">
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <div class="input-group">
-                <span class="input-group-addon">
-                    <i class="fa fa-lg fa-fw fa-check"></i>
+                <span class="input-group-addon text-danger">
+                    <i class="fa fa-lg fa-fw fa-times"></i>
                 </span>
-                <input type="text" autocomplete="off" class="form-control" name="leadfield[properties][yes]" value="<?php echo $yes; ?>">
+                <input type="text" autocomplete="false" class="form-control" name="leadfield[properties][no]" value="<?php echo $no; ?>" onkeyup="Mautic.updateLeadFieldBooleanLabels(this, 0);">
             </div>
         </div>
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <div class="input-group">
-                <span class="input-group-addon">
-                    <i class="fa fa-lg fa-fw fa-times"></i>
+                <span class="input-group-addon text-success">
+                    <i class="fa fa-lg fa-fw fa-check"></i>
                 </span>
-                <input type="text" autocomplete="off" class="form-control" name="leadfield[properties][no]" value="<?php echo $no; ?>">
+                <input type="text" autocomplete="false" class="form-control" name="leadfield[properties][yes]" value="<?php echo $yes; ?>" onkeyup="Mautic.updateLeadFieldBooleanLabels(this, 1);">
             </div>
         </div>
     </div>

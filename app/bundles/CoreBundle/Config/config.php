@@ -9,16 +9,20 @@
 
 return array(
     'routes'     => array(
-        'main' => array(
-            'mautic_core_ajax'             => array(
+        'main'   => array(
+            'mautic_core_ajax'        => array(
                 'path'       => '/ajax',
                 'controller' => 'MauticCoreBundle:Ajax:delegateAjax'
             ),
-            'mautic_core_update'           => array(
+            'mautic_core_update'      => array(
                 'path'       => '/update',
                 'controller' => 'MauticCoreBundle:Update:index'
             ),
-            'mautic_core_form_action'      => array(
+            'mautic_core_update_schema'      => array(
+                'path'       => '/update/schema',
+                'controller' => 'MauticCoreBundle:Update:schema'
+            ),
+            'mautic_core_form_action' => array(
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
                 'controller' => 'MauticCoreBundle:Form:execute',
                 'defaults'   => array(
@@ -27,17 +31,17 @@ return array(
             )
         ),
         'public' => array(
-            'mautic_base_index' => array(
-                'path' => '/',
-                'controller'   => 'MauticCoreBundle:Default:index'
+            'mautic_base_index'            => array(
+                'path'       => '/',
+                'controller' => 'MauticCoreBundle:Default:index'
             ),
-            'mautic_secure_root' => array(
-                'path'         => '/s',
-                'controller'   => 'MauticCoreBundle:Default:redirectSecureRoot'
+            'mautic_secure_root'           => array(
+                'path'       => '/s',
+                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot'
             ),
-            'mautic_secure_root_slash' => array(
-                'path'         => '/s/',
-                'controller'   => 'MauticCoreBundle:Default:redirectSecureRoot'
+            'mautic_secure_root_slash'     => array(
+                'path'       => '/s/',
+                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot'
             ),
             'mautic_remove_trailing_slash' => array(
                 'path'         => '/{url}',
@@ -47,30 +51,29 @@ return array(
                     'url' => '.*/$'
                 )
             ),
-            'mautic_public_bc_redirect' => array(
+            'mautic_public_bc_redirect'    => array(
                 'path'         => '/p/{url}',
                 'controller'   => 'MauticCoreBundle:Default:publicBcRedirect',
                 'requirements' => array(
                     'url' => '.+'
                 )
             ),
-            'mautic_ajax_bc_redirect' => array(
+            'mautic_ajax_bc_redirect'      => array(
                 'path'         => '/ajax{url}',
                 'controller'   => 'MauticCoreBundle:Default:ajaxBcRedirect',
                 'requirements' => array(
                     'url' => '.+'
                 ),
-                'defaults' =>  array(
+                'defaults'     => array(
                     'url' => ''
                 )
             ),
-            'mautic_update_bc_redirect' => array(
-                'path'         => '/update',
-                'controller'   => 'MauticCoreBundle:Default:updateBcRedirect'
+            'mautic_update_bc_redirect'    => array(
+                'path'       => '/update',
+                'controller' => 'MauticCoreBundle:Default:updateBcRedirect'
             )
         )
     ),
-
     'menu'       => array(
         'main'  => array(
             'priority' => -1000,
@@ -87,7 +90,6 @@ return array(
             )
         )
     ),
-
     'services'   => array(
         'events'  => array(
             'mautic.core.subscriber'              => array(
@@ -130,9 +132,13 @@ return array(
                 'alias'     => 'hidden_entity',
                 'arguments' => 'doctrine.orm.entity_manager'
             ),
-            'mautic.form.type.list'               => array(
+            'mautic.form.type.sortablelist'        => array(
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
                 'alias' => 'sortablelist'
+            ),
+            'mautic.form.type.dynamiclist'         => array(
+                'class' => 'Mautic\CoreBundle\Form\Type\DynamicListType',
+                'alias' => 'dynamiclist'
             ),
             'mautic.form.type.coreconfig'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ConfigType',
@@ -166,7 +172,7 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'gravatar'
             ),
-            'mautic.helper.template.analytics'  => array(
+            'mautic.helper.template.analytics' => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'analytics'
@@ -190,23 +196,31 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'formatter'
             ),
-            'mautic.helper.template.security' => array(
+            'mautic.helper.template.security'  => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'security'
-            )
+            ),
         ),
         'other'   => array(
+            // Error handler
+            'mautic.core.errorhandler.subscriber' => array(
+                'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
+                'arguments' => array(
+                    '%kernel.environment%',
+                    'monolog.logger.mautic'
+                ),
+                'tag' => 'kernel.event_subscriber'
+            ),
+
             // Template helper overrides
             'templating.helper.assets.class'     => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
             'templating.helper.slots.class'      => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
             'templating.name_parser.class'       => 'Mautic\CoreBundle\Templating\TemplateNameParser',
             'templating.helper.form.class'       => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
-
             // Translator overrides
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
-
             // System uses
             'mautic.factory'                     => array(
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
@@ -257,7 +271,6 @@ return array(
                     )
                 )
             ),
-
             // Helpers
             'mautic.helper.assetgeneration'      => array(
                 'class'     => 'Mautic\CoreBundle\Helper\AssetGenerationHelper',
@@ -287,42 +300,6 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
                 'arguments' => 'mautic.factory'
             ),
-
-            // Mailers
-            'mautic.transport.amazon'            => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\AmazonTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.mandrill'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\MandrillTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername'      => array('%mautic.mailer_user%'),
-                    'setPassword'      => array('%mautic.mailer_password%'),
-                    'setMauticFactory' => array('mautic.factory')
-                )
-            ),
-            'mautic.transport.sendgrid'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.postmark'          => array(
-                'class'        => 'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-
             // Menu
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
@@ -357,70 +334,53 @@ return array(
                 'alias'          => 'admin'
             ),
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler'
+            'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
         )
     ),
-
     'parameters' => array(
-        'site_url'                     => '',
-        'webroot'                      => '',
-        'cache_path'                   => '%kernel.root_dir%/cache',
-        'log_path'                     => '%kernel.root_dir%/logs',
-        'image_path'                   => 'media/images',
-        'theme'                        => 'Mauve',
-        'db_driver'                    => 'pdo_mysql',
-        'db_host'                      => 'localhost',
-        'db_port'                      => 3306,
-        'db_name'                      => '',
-        'db_user'                      => '',
-        'db_password'                  => '',
-        'db_table_prefix'              => '',
-        'db_path'                      => '',
-        'mailer_from_name'             => 'Mautic',
-        'mailer_from_email'            => 'email@yoursite.com',
-        'mailer_return_path'           => null,
-        'mailer_transport'             => 'mail',
-        'mailer_host'                  => '',
-        'mailer_port'                  => null,
-        'mailer_user'                  => null,
-        'mailer_password'              => null,
-        'mailer_encryption'            => null, //tls or ssl,
-        'mailer_auth_mode'             => null, //plain, login or cram-md5
-        'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'            => '%kernel.root_dir%/spool',
-        'mailer_spool_msg_limit'       => null,
-        'mailer_spool_time_limit'      => null,
-        'mailer_spool_recover_timeout' => 900,
-        'mailer_spool_clear_timeout'   => 1800,
-        'locale'                       => 'en_US',
-        'secret_key'                   => '',
-        'trusted_hosts'                => null,
-        'trusted_proxies'              => null,
-        'rememberme_key'               => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'          => 31536000, //365 days in seconds
-        'rememberme_path'              => '/',
-        'rememberme_domain'            => '',
-        'default_pagelimit'            => 30,
-        'default_timezone'             => 'UTC',
-        'date_format_full'             => 'F j, Y g:i a T',
-        'date_format_short'            => 'D, M d',
-        'date_format_dateonly'         => 'F j, Y',
-        'date_format_timeonly'         => 'g:i a',
-        'ip_lookup_service'            => 'telize',
+        'site_url'                       => '',
+        'webroot'                        => '',
+        'cache_path'                     => '%kernel.root_dir%/cache',
+        'log_path'                       => '%kernel.root_dir%/logs',
+        'image_path'                     => 'media/images',
+        'theme'                          => 'Mauve',
+        'db_driver'                      => 'pdo_mysql',
+        'db_host'                        => 'localhost',
+        'db_port'                        => 3306,
+        'db_name'                        => '',
+        'db_user'                        => '',
+        'db_password'                    => '',
+        'db_table_prefix'                => '',
+        'db_path'                        => '',
+        'locale'                         => 'en_US',
+        'secret_key'                     => '',
+        'trusted_hosts'                  => null,
+        'trusted_proxies'                => null,
+        'rememberme_key'                 => hash('sha1', uniqid(mt_rand())),
+        'rememberme_lifetime'            => 31536000, //365 days in seconds
+        'rememberme_path'                => '/',
+        'rememberme_domain'              => '',
+        'default_pagelimit'              => 30,
+        'default_timezone'               => 'UTC',
+        'date_format_full'               => 'F j, Y g:i a T',
+        'date_format_short'              => 'D, M d',
+        'date_format_dateonly'           => 'F j, Y',
+        'date_format_timeonly'           => 'g:i a',
+        'ip_lookup_service'              => 'telize',
         //telize (free with no limit at this time)
         //freegeoip (free with 10000/hr limit)
         //geobytes ( free 20/hr limit or paid account restricted to calls from single IP
         //ipinfodb (paid; api key required)
         //geoips (paid; api key required)
         //maxmind_country, maxmind_precision, or maxmind_omni (paid; username/license key required)
-        'ip_lookup_auth'               => '',
-        'transifex_username'           => '',
-        'transifex_password'           => '',
-        'update_stability'             => 'stable',
-        'cookie_path'                  => '/',
-        'cookie_domain'                => '',
-        'cookie_secure'                => null,
-        'cookie_httponly'              => false,
-        'ignore_ips'                   => null
+        'ip_lookup_auth'                 => '',
+        'transifex_username'             => '',
+        'transifex_password'             => '',
+        'update_stability'               => 'stable',
+        'cookie_path'                    => '/',
+        'cookie_domain'                  => '',
+        'cookie_secure'                  => null,
+        'cookie_httponly'                => false,
+        'ignore_ips'                     => null,
     )
 );

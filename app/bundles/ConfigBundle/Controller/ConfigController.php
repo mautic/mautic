@@ -14,6 +14,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Symfony\Component\Form\FormError;
 
 /**
  * Class ConfigController
@@ -54,12 +55,15 @@ class ConfigController extends FormController
             'doNotChangeDisplayMode' => $doNotChangeDisplayMode
         ));
 
+        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        $configurator = $this->get('mautic.configurator');
+        $isWritabale  = $configurator->isFileWritable();
+
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($isValid = $this->isFormValid($form)) {
-                    /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-                    $configurator = $this->get('mautic.configurator');
+                $isValid = false;
+                if ($isWritabale && $isValid = $this->isFormValid($form)) {
 
                     // Bind request to the form
                     $post     = $this->request->request;
@@ -70,8 +74,18 @@ class ConfigController extends FormController
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
+                    // Prevent these from getting overwritten with empty values
+                    $unsetIfEmpty = $configEvent->getPreservedFields();
+
                     // Merge each bundle's updated configuration into the local configuration
                     foreach ($formValues as $object) {
+                        $checkThese = array_intersect(array_keys($object), $unsetIfEmpty);
+                        foreach ($checkThese as $checkMe) {
+                            if (empty($object[$checkMe])) {
+                                unset($object[$checkMe]);
+                            }
+                        }
+
                         $configurator->mergeParameters($object);
                     }
 
@@ -89,10 +103,14 @@ class ConfigController extends FormController
                         // We must clear the application cache for the updated values to take effect
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                         $cacheHelper = $this->factory->getHelper('cache');
-                        $cacheHelper->clearCache();
+                        $cacheHelper->clearCache(false, true);
                     } catch (RuntimeException $exception) {
                         $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
                     }
+                } elseif (!$isWritabale) {
+                    $form->addError(new FormError(
+                        $this->factory->getTranslator()->trans('mautic.config.notwritable')
+                    ));
                 }
             }
 
@@ -113,8 +131,8 @@ class ConfigController extends FormController
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
                 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
-                'formConfigs' => $formConfigs
-
+                'formConfigs' => $formConfigs,
+                'isWritable'  => $isWritabale
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(

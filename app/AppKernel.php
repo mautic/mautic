@@ -31,14 +31,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 1;
+    const MINOR_VERSION = 2;
 
     /**
      * Patch version number
      *
      * @const integer
      */
-    const PATCH_VERSION = 4;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier
@@ -53,7 +53,7 @@ class AppKernel extends Kernel
     /**
      * @var array
      */
-    private $addonBundles  = array();
+    private $pluginBundles  = array();
 
     /**
      * {@inheritdoc}
@@ -146,17 +146,38 @@ class AppKernel extends Kernel
             $class    = '\\Mautic' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
                 $bundleInstance = new $class();
-                if (method_exists($bundleInstance, 'isEnabled')) {
-                    if ($bundleInstance->isEnabled()) {
-                        $bundles[] = $bundleInstance;
-                    }
-                } else {
-                    $bundles[] = $bundleInstance;
-                }
+                $bundles[]      = $bundleInstance;
+
+                unset($bundleInstance);
             }
         }
 
-        //dynamically register Mautic Addon Bundles
+        //dynamically register Mautic Plugin Bundles
+        $searchPath = dirname(__DIR__) . '/plugins';
+        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder->files()
+            ->followLinks()
+            ->depth('1')
+            ->in($searchPath)
+            ->name('*Bundle.php');
+
+        foreach ($finder as $file) {
+            $dirname  = basename($file->getRelativePath());
+            $filename = substr($file->getFilename(), 0, -4);
+
+            $class = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
+            if (class_exists($class)) {
+                $plugin = new $class();
+
+                if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    $bundles[] = $plugin;
+                }
+
+                unset($plugin);
+            }
+        }
+
+        // @deprecated 1.1.4; bc support for MauticAddon namespace; to be removed in 2.0
         $searchPath = dirname(__DIR__) . '/addons';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
@@ -168,9 +189,16 @@ class AppKernel extends Kernel
         foreach ($finder as $file) {
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
-            $class    = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
+
+            $class = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
             if (class_exists($class)) {
-                $bundles[] = new $class();
+                $addon = new $class();
+
+                if ($addon instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    $bundles[] = $addon;
+                }
+
+                unset($addon);
             }
         }
 
@@ -227,69 +255,14 @@ class AppKernel extends Kernel
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
-        $registeredAddonBundles = $this->container->getParameter('mautic.addon.bundles');
+        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
 
-        $addonBundles = array();
         foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
-                //boot after it's been check to see if it's enabled
-                $addonBundles[$name] = $bundle;
-
-                //set the container for the addon helper
-                $bundle->setContainer($this->container);
-            } else {
-                $bundle->setContainer($this->container);
-                $bundle->boot();
-            }
+            $bundle->setContainer($this->container);
+            $bundle->boot();
         }
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $this->container->get('mautic.factory');
-
-        $dispatcher = $factory->getDispatcher();
-
-        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled then deal with them accordingly
-        foreach ($addonBundles as $name => $bundle) {
-            if (!$bundle->isEnabled()) {
-                unset($this->bundles[$name]);
-                unset($this->bundleMap[$name]);
-
-                // remove listeners as well
-                if (isset($registeredAddonBundles[$name]['config']['services'])) {
-                    foreach ($registeredAddonBundles[$name]['config']['services'] as $serviceGroup => $services) {
-                        foreach ($services as $serviceName => $details) {
-                            if ($serviceGroup == 'events') {
-                                $details['tag'] = 'kernel.event_subscriber';
-                            }
-
-                            if (isset($details['tag'])) {
-                                if ($details['tag'] == 'kernel.event_subscriber') {
-                                    $service = $this->container->get($serviceName);
-                                    $dispatcher->removeSubscriber($service);
-                                } elseif ($details['tag'] == 'kernel.event_listener') {
-                                    $service = $this->container->get($serviceName);
-                                    $dispatcher->removeListener($details['tagArguments']['event'], $service);
-                                }
-                            } elseif (isset($details['tags'])) {
-                                foreach ($details['tags'] as $k => $tag) {
-                                    if ($tag == 'kernel.event_listener') {
-                                        $service = $this->container->get($serviceName);
-                                        $dispatcher->removeListener($details['tagArguments'][$k]['event'], $service);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                unset($registeredAddonBundles[$name]);
-            } else {
-                // boot the bundle
-                $bundle->boot();
-            }
-        }
-
-        $this->addonBundles = $registeredAddonBundles;
+        $this->pluginBundles = $registeredPluginBundles;
 
         $this->booted = true;
     }
@@ -299,9 +272,9 @@ class AppKernel extends Kernel
      *
      * @return array
      */
-    public function getAddonBundles()
+    public function getPluginBundles()
     {
-        return $this->addonBundles;
+        return $this->pluginBundles;
     }
 
     /**

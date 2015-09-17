@@ -154,9 +154,6 @@ class SubmissionModel extends CommonFormModel
                 $value = implode(", ", $value);
             }
 
-            //save the result
-            $results[$alias] = $value;
-
             $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
@@ -349,59 +346,93 @@ class SubmissionModel extends CommonFormModel
 
         //set the mapped data
         $leadFields = $this->factory->getModel('lead.field')->getRepository()->getAliases(null, true, false);
-        $data       = array();
-
         $inKioskMode = $form->isInKioskMode();
 
         if (!$inKioskMode) {
+            // Default to currently tracked lead
             $lead          = $model->getCurrentLead();
             $leadId        = $lead->getId();
-            $currentFields = $lead->getFields();
+            $currentFields = $model->flattenFields($lead->getFields());
         } else {
+            // Default to a new lead in kiosk mode
             $lead = new Lead();
             $lead->setNewlyCreated(true);
+            $currentFields = $leadFieldMatches;
 
             $leadId = null;
         }
 
-        $uniqueLeadFields     = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
-        $uniqueFieldsWithData = array();
+        $uniqueLeadFields = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
 
-        foreach ($leadFields as $alias) {
-            $data[$alias] = '';
+        // Closure to get data and unique fields
+        $getData = function($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
+            $uniqueFieldsWithData = $data = array();
+            foreach ($leadFields as $alias) {
+                $data[$alias] = '';
 
-            if (isset($leadFieldMatches[$alias])) {
-                $value        = $leadFieldMatches[$alias];
-                $data[$alias] = $value;
+                if (isset($currentFields[$alias])) {
+                    $value        = $currentFields[$alias];
+                    $data[$alias] = $value;
 
-                // make sure the value is actually there and the field is one of our uniques
-                if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
-                    $uniqueFieldsWithData[$alias] = $value;
+                    // make sure the value is actually there and the field is one of our uniques
+                    if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
+                        $uniqueFieldsWithData[$alias] = $value;
+                    }
                 }
             }
-        }
 
-        //update the lead rather than creating a new one if there is for sure identifier match ($leadId is to exclude lead from getCurrentLead())
+            return ($uniqueOnly) ? $uniqueFieldsWithData : array($data, $uniqueFieldsWithData);
+        };
+
+        // Closure to help search for a conflict
+        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
+            // Find conflicts
+            $diff = array_diff($fieldSet1, $fieldSet2);
+            // Remove empty values
+            $diff = array_filter($diff);
+
+            return (count($diff));
+        };
+
+        // Get data for the form submission
+        list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+
+        // Check for duplicate lead
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
         $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
 
+        $uniqueFieldsCurrent = $getData($currentFields, true);
         if (count($leads)) {
-            //merge with current lead if not in kiosk mode
-            $lead = ($inKioskMode) ? $leads[0] : $model->mergeLeads($lead, $leads[0]);
-        } elseif (!$inKioskMode) {
-            // Flatten current fields
-            $currentFields = $model->flattenFields($currentFields);
+            /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
+            $foundLead = $leads[0];
 
-            // Create a new lead if unique identifiers differ from getCurrentLead() and submitted data
-            foreach ($uniqueLeadFields as $alias => $value) {
-                //create a new lead if details differ
-                $currentValue = $currentFields[$alias];
-                if (!empty($currentValue) && strtolower($currentValue) != strtolower($value)) {
-                    //for sure a different lead so create a new one
-                    $lead = new Lead();
-                    $lead->setNewlyCreated(true);
-                    break;
-                }
+            // Check for a conflict with the currently tracked lead
+            $foundLeadFields =  $model->flattenFields($foundLead->getFields());
+
+            // Get unique identifier fields for the found lead then compare with the lead currently tracked
+            $uniqueFieldsFound = $getData($foundLeadFields, true);
+            $hasConflict       = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+
+            if ($inKioskMode || $hasConflict) {
+                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
+                $lead = $foundLead;
+            } else {
+                // Merge the found lead with currently tracked lead
+                $lead = $model->mergeLeads($lead, $foundLead);
+            }
+
+            // Update unique fields data for comparison with submitted data
+            $currentFields       = $model->flattenFields($lead->getFields());
+            $uniqueFieldsCurrent = $getData($currentFields, true);
+        }
+
+        if (!$inKioskMode) {
+            // Check for conflicts with the submitted data and the currently tracked lead
+            $hasConflict = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            if ($hasConflict) {
+                // There's a conflict so create a new lead
+                $lead = new Lead();
+                $lead->setNewlyCreated(true);
             }
         }
 

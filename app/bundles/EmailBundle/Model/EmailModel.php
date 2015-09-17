@@ -11,7 +11,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -434,7 +434,7 @@ class EmailModel extends FormModel
     /**
      * @param $idHash
      *
-     * @return mixed
+     * @return Stat
      */
     public function getEmailStatus ($idHash)
     {
@@ -727,12 +727,16 @@ class EmailModel extends FormModel
         $options       = array(
             'source'        => array('email', $email->getId()),
             'emailSettings' => $emailSettings,
-            'allowResends'  => false
+            'allowResends'  => false,
+            'customHeaders' => array(
+                'Precedence' => 'Bulk'
+            )
         );
 
         $failed      = array();
         $sentCount   = 0;
         $failedCount = 0;
+
         foreach ($lists as $list) {
             if ($limit !== null && $limit <= 0) {
                 // Hit the max for this batch
@@ -809,7 +813,7 @@ class EmailModel extends FormModel
                             if (isset($slots[$template])) {
                                 $useSlots = $slots[$template];
                             } else {
-                                $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
+                                $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
                                 $useSlots         = $slots[$template];
                             }
                             $variantSettings = $child->getVariantSettings();
@@ -873,6 +877,7 @@ class EmailModel extends FormModel
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : array();
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : array();
+        $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : array();
 
         if (!$email->getId()) {
             return false;
@@ -967,6 +972,7 @@ class EmailModel extends FormModel
         $contentGenerated = false;
 
         $flushQueue = function($reset = true) use (&$mailer, &$saveEntities, &$errors, $sendBatchMail) {
+
             if ($sendBatchMail) {
                 $flushResult = $mailer->flushQueue();
                 if (!$flushResult) {
@@ -1010,6 +1016,10 @@ class EmailModel extends FormModel
                 $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
+
+                if (!empty($customHeaders)) {
+                    $mailer->setCustomHeaders($customHeaders);
+                }
             }
 
             $idHash = uniqid();
@@ -1322,5 +1332,26 @@ class EmailModel extends FormModel
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Get the settings for a monitored mailbox or false if not enabled
+     *
+     * @param $bundleKey
+     * @param $folderKey
+     *
+     * @return bool|array
+     */
+    public function getMonitoredMailbox($bundleKey, $folderKey)
+    {
+        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
+        $mailboxHelper = $this->factory->getHelper('mailbox');
+
+        if ($mailboxHelper->isConfigured($bundleKey, $folderKey)) {
+
+            return $mailboxHelper->getMailboxSettings();
+        }
+
+        return false;
     }
 }

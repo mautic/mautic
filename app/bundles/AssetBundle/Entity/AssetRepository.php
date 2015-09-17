@@ -185,17 +185,16 @@ class AssetRepository extends CommonRepository
      */
     public function getPopularAssets($limit = 10)
     {
-        $q = $this->createQueryBuilder('a');
-
-        $q->select('a.id, a.title, a.downloadCount')
-            ->where('a.downloadCount > 0')
+        $q  = $this->createQueryBuilder('a');
+        $q->select("partial a.{id, title, downloadCount}")
             ->orderBy('a.downloadCount', 'DESC')
-            ->groupBy('a.id, a.title, a.downloadCount')
+            ->where('a.downloadCount > 0')
             ->setMaxResults($limit);
 
-        $results = $q->getQuery()->getArrayResult();
+        $expr = $this->getPublishedByDateExpression($q, 'a');
+        $q->andWhere($expr);
 
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -237,5 +236,25 @@ class AssetRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         return (int) $result[0]['total_size'];
+    }
+
+    /**
+     * @param            $id
+     * @param int        $increaseBy
+     * @param bool|false $unique
+     */
+    public function upDownloadCount($id, $increaseBy = 1, $unique = false)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'assets')
+            ->set('download_count', 'download_count + ' . (int) $increaseBy)
+            ->where('id = ' . (int) $id);
+
+        if ($unique) {
+            $q->set('unique_download_count', 'unique_download_count + ' + (int) $increaseBy);
+        }
+
+        $q->execute();
     }
 }

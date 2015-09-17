@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
-
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 /**
  * Class Stat
  *
@@ -132,7 +132,12 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository');
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
+            ->addIndex(array('email_id', 'lead_id'), 'stat_email_search')
+            ->addIndex(array('is_failed'), 'stat_email_failed_search')
+            ->addIndex(array('is_read'), 'stat_email_read_search')
+            ->addIndex(array('tracking_hash'), 'stat_email_hash_search')
+            ->addIndex(array('source', 'source_id'), 'stat_email_source_search');
 
         $builder->addId();
 
@@ -207,6 +212,37 @@ class Stat
     }
 
     /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('stat')
+            ->addProperties(
+                array(
+                    'id',
+                    'emailAddress',
+                    'ipAddress',
+                    'dateSent',
+                    'isRead',
+                    'isFailed',
+                    'dateRead',
+                    'retryCount',
+                    'source',
+                    'openCount',
+                    'lastOpened',
+                    'sourceId',
+                    'trackingHash',
+                    'viewedInBrowser',
+                    'lead',
+                    'email'
+                )
+            )
+            ->build();
+    }
+
+    /**
      * @return mixed
      */
     public function getDateRead ()
@@ -239,7 +275,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return Email
      */
     public function getEmail ()
     {
@@ -263,7 +299,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return IpAddress
      */
     public function getIpAddress ()
     {
@@ -303,7 +339,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead ()
     {
@@ -335,7 +371,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\LeadList
      */
     public function getList ()
     {

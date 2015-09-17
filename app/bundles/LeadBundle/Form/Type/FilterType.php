@@ -9,9 +9,15 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FilterType
@@ -20,49 +26,308 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FilterType extends AbstractType
 {
+    private $operatorChoices;
+    private $translator;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+        $listModel       = $factory->getModel('lead.list');
+        $operatorChoices = $listModel->getFilterExpressionFunctions();
+
+        $this->operatorChoices = array();
+        foreach ($operatorChoices as $key => $value) {
+            if (empty($value['hide'])) {
+                $this->operatorChoices[$key] = $value['label'];
+            }
+        }
+
+        $this->translator = $factory->getTranslator();
+    }
 
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('glue', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+        $builder->add(
+            'glue',
+            'choice',
+            array(
+                'label'   => false,
+                'choices' => array(
+                    'and' => 'mautic.lead.list.form.glue.and',
+                    'or'  => 'mautic.lead.list.form.glue.or'
+                ),
+                'attr'    => array(
+                    'class' => 'form-control not-chosen'
+                )
+            )
+        );
 
-        $builder->add('operator', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+        $translator      = $this->translator;
+        $operatorChoices = $this->operatorChoices;
 
-        $builder->add('filter', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $options) {
+            $data      = $event->getData();
+            $form      = $event->getForm();
+            $options   = $form->getConfig()->getOptions();
+            $fieldType = $data['type'];
+            $fieldName = $data['field'];
 
-        $builder->add('display', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+            $type        = 'text';
+            $attr        = array(
+                'class' => 'form-control'
+            );
+            $displayType = 'hidden';
+            $displayAttr = array();
 
-        $builder->add('field', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+            $customOptions = array();
+            switch ($fieldType) {
+                case 'leadlist':
+                    if (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+                    $customOptions['choices']  = $options['lists'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
+                case 'tags':
+                    if (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+                    $customOptions['choices']  = $options['tags'];
+                    $customOptions['multiple'] = true;
+                    $attr = array_merge($attr, array(
+                            'data-placeholder'      => $translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text'  => $translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'        => 'true',
+                            'onchange'              => 'Mautic.createLeadTag(this)'
+                        )
+                    );
+                    $type                      = 'choice';
+                    break;
+                case 'timezone':
+                    $customOptions['choices']  = $options['timezones'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
+                    break;
+                case 'country':
+                    $customOptions['choices']  = $options['countries'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
+                    break;
+                case 'region':
+                    $customOptions['choices']  = $options['regions'];
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    $type                      = 'choice';
+                    break;
+                case 'time':
+                case 'date':
+                case 'datetime':
+                    $attr['data-toggle'] = $fieldType;
+                    break;
+                case 'lookup_id':
+                    $type        = 'hidden';
+                    $displayType = 'text';
+                    $displayAttr = array_merge(
+                        $displayAttr,
+                        array(
+                            'class'       => 'form-control',
+                            'data-toggle' => 'field-lookup',
+                            'data-target' => $data['field'],
+                            'placeholder' => $translator->trans(
+                                'mautic.lead.list.form.filtervalue'
+                            )
+                        )
+                    );
 
-        $builder->add('type', 'collection', array(
-            'allow_add'    => true,
-            'allow_delete' => true
-        ));
+                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                        $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    }
+
+                    break;
+                case 'select':
+                case 'boolean':
+                    $type = 'choice';
+                    $attr = array_merge(
+                        $attr,
+                        array(
+                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue')
+                        )
+                    );
+
+                    if (in_array($data['operator'], array('in', '!in'))) {
+                        $customOptions['multiple'] = true;
+                        if (!is_array($data['filter'])) {
+                            $data['filter'] = array($data['filter']);
+                        }
+                    }
+
+                    $list  = $options['fields'][$fieldName]['properties']['list'];
+                    if (!is_array($list)) {
+                        $parts = explode('||', $list);
+                        if (count($parts) > 1) {
+                            $labels  = explode('|', $parts[0]);
+                            $values  = explode('|', $parts[1]);
+                            $choices = array_combine($values, $labels);
+                        } else {
+                            $list    = explode('|', $list);
+                            $choices = array_combine($list, $list);
+                        }
+                    } else {
+                        $choices = $list;
+                    }
+
+                    if ($fieldType == 'select') {
+                        array_unshift($choices, array('' => ''));
+                    }
+
+                    $customOptions['choices'] = $choices;
+                    break;
+                case 'lookup':
+                default:
+                    $attr = array_merge(
+                        $attr,
+                        array(
+                            'data-toggle' => 'field-lookup',
+                            'data-target' => $data['field'],
+                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue')
+                        )
+                    );
+
+                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                        $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    }
+
+                    break;
+            }
+
+            // @todo implement in UI
+            if (in_array($data['operator'], array('between', '!between'))) {
+                $form->add(
+                    'filter',
+                    'collection',
+                    array(
+                        'type'    => $type,
+                        'options' => array(
+                            'label' => false,
+                            'attr'  => $attr
+                        ),
+                        'label'   => false
+                    )
+                );
+            } else {
+                $form->add(
+                    'filter',
+                    $type,
+                    array_merge(
+                        array(
+                            'label' => false,
+                            'attr'  => $attr,
+                            'data'  => $data['filter']
+                        ),
+                        $customOptions
+                    )
+                );
+            }
+
+            $form->add(
+                'display',
+                $displayType,
+                array(
+                    'label' => false,
+                    'attr'  => $displayAttr,
+                    'data'  => $data['display']
+                )
+            );
+
+            $choices = $operatorChoices;
+            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+                // Inclusive operators
+                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
+            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                // Inclusive operators
+                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+            }
+
+            $form->add(
+                'operator',
+                'choice',
+                array(
+                    'label'   => false,
+                    'choices' => $choices,
+                    'attr'    => array(
+                        'class'    => 'form-control not-chosen',
+                        'onchange' => 'Mautic.convertLeadFilterInput(this)'
+                    )
+                )
+            );
+
+            if ($eventName == FormEvents::PRE_SUBMIT) {
+                $event->setData($data);
+            }
+        };
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $formModifier($event, FormEvents::PRE_SET_DATA);
+            }
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($formModifier) {
+                $formModifier($event, FormEvents::PRE_SUBMIT);
+            }
+        );
+
+        $builder->add('field', 'hidden');
+
+        $builder->add('type', 'hidden');
+    }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setRequired(
+            array(
+                'timezones',
+                'countries',
+                'regions',
+                'fields',
+                'lists',
+                'tags'
+            )
+        );
+
+        $resolver->setDefaults(
+            array(
+                'label' => false
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['fields'] = $options['fields'];
     }
 
     /**
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
-        return "leadlist_filters";
+        return "leadlist_filter";
     }
 }

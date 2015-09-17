@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -404,99 +405,144 @@ class PageModel extends FormModel
                         $decoded = true;
                     }
 
-                    if (isset($query['page_url'])) {
-                        $pageURL = $query['page_url'];
-                        if (!$decoded) {
-                            $pageURL = urldecode($pageURL);
-                        }
-                    } elseif (isset($query['url'])) {
-                        $pageURL = $query['url'];
-                        if (!$decoded) {
-                            $pageURL = urldecode($pageURL);
-                        }
-                    }
-
-                    if (isset($query['page_referrer'])) {
-                        if (!$decoded) {
-                            $query['page_referrer'] = urldecode($query['page_referrer']);
-                        }
-                        $hit->setReferer($query['page_referrer']);
-                    } elseif (isset($query['referrer'])) {
-                        if (!$decoded) {
-                            $query['referrer'] = urldecode($query['referrer']);
-                        }
-                        $hit->setReferer($query['referrer']);
-                    }
-
-                    if (isset($query['page_language'])) {
-                        if (!$decoded) {
-                            $query['page_language'] = urldecode($query['page_language']);
-                        }
-                        $hit->setPageLanguage($query['page_language']);
-                    } elseif (isset($query['language'])) {
-                        if (!$decoded) {
-                            $query['language'] = urldecode($query['language']);
-                        }
-                        $hit->setPageLanguage($query['language']);
-                    }
-
-                    if (isset($query['page_title'])) {
-                        if (!$decoded) {
-                            $query['page_title'] = urldecode($query['page_title']);
-                        }
-                        $hit->setUrlTitle($query['page_title']);
-                    } elseif (isset($query['title'])) {
-                        if (!$decoded) {
-                            $query['title'] = urldecode($query['title']);
-                        }
-                        $hit->setUrlTitle($query['title']);
-                    }
-
-                    // Update lead fields if some data were sent in the URL query
-                    /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
-                    $leadFieldModel      = $this->factory->getModel('lead.field');
-                    $availableLeadFields = $leadFieldModel->getFieldList(
-                        false,
-                        false,
-                        array(
-                            'isPublished'         => true,
-                            'isPubliclyUpdatable' => true
-                        )
-                    );
-
-                    $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
-                    $uniqueLeadFieldData = array();
-                    $inQuery             = array_intersect_key($query, $availableLeadFields);
-                    foreach ($inQuery as $k => $v) {
-                        if (empty($query[$k])) {
-                            unset($inQuery[$k]);
-                        }
-
-                        if (array_key_exists($k, $uniqueLeadFields)) {
-                            $uniqueLeadFieldData[$k] = $v;
-                        }
-                    }
-
-                    if (count($inQuery)) {
-                        if (count($uniqueLeadFieldData)) {
-                            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
-                                $uniqueLeadFieldData,
-                                $lead->getId()
-                            );
-                            if (!empty($existingLeads)) {
-                                $lead = $leadModel->mergeLeads($lead, $existingLeads[0]);
+                    if (!empty($query)) {
+                        if (isset($query['page_url'])) {
+                            $pageURL = $query['page_url'];
+                            if (!$decoded) {
+                                $pageURL = urldecode($pageURL);
                             }
-                            $leadIpAddresses = $lead->getIpAddresses();
+                        } elseif (isset($query['url'])) {
+                            $pageURL = $query['url'];
+                            if (!$decoded) {
+                                $pageURL = urldecode($pageURL);
+                            }
+                        }
 
-                            if (!$leadIpAddresses->contains($ipAddress)) {
-                                $lead->addIpAddress($ipAddress);
+                        if (isset($query['page_referrer'])) {
+                            if (!$decoded) {
+                                $query['page_referrer'] = urldecode($query['page_referrer']);
+                            }
+                            $hit->setReferer($query['page_referrer']);
+                        } elseif (isset($query['referrer'])) {
+                            if (!$decoded) {
+                                $query['referrer'] = urldecode($query['referrer']);
+                            }
+                            $hit->setReferer($query['referrer']);
+                        }
+
+                        if (isset($query['page_language'])) {
+                            if (!$decoded) {
+                                $query['page_language'] = urldecode($query['page_language']);
+                            }
+                            $hit->setPageLanguage($query['page_language']);
+                        } elseif (isset($query['language'])) {
+                            if (!$decoded) {
+                                $query['language'] = urldecode($query['language']);
+                            }
+                            $hit->setPageLanguage($query['language']);
+                        }
+
+                        if (isset($query['page_title'])) {
+                            if (!$decoded) {
+                                $query['page_title'] = urldecode($query['page_title']);
+                            }
+                            $hit->setUrlTitle($query['page_title']);
+                        } elseif (isset($query['title'])) {
+                            if (!$decoded) {
+                                $query['title'] = urldecode($query['title']);
+                            }
+                            $hit->setUrlTitle($query['title']);
+                        }
+
+                        // Update lead fields if some data were sent in the URL query
+                        /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+                        $leadFieldModel      = $this->factory->getModel('lead.field');
+                        $availableLeadFields = $leadFieldModel->getFieldList(
+                            false,
+                            false,
+                            array(
+                                'isPublished'         => true,
+                                'isPubliclyUpdatable' => true
+                            )
+                        );
+
+                        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+                        $uniqueLeadFieldData = array();
+                        $inQuery             = array_intersect_key($query, $availableLeadFields);
+                        foreach ($inQuery as $k => $v) {
+                            if (empty($query[$k])) {
+                                unset($inQuery[$k]);
                             }
 
-                            $leadModel->setCurrentLead($lead);
+                            if (array_key_exists($k, $uniqueLeadFields)) {
+                                $uniqueLeadFieldData[$k] = $v;
+                            }
                         }
 
-                        $leadModel->setFieldValues($lead, $inQuery);
-                        $leadModel->saveEntity($lead);
+                        $persistLead = false;
+                        if (count($inQuery)) {
+                            if (count($uniqueLeadFieldData)) {
+                                $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
+                                    $uniqueLeadFieldData,
+                                    $lead->getId()
+                                );
+                                if (!empty($existingLeads)) {
+                                    $lead = $leadModel->mergeLeads($lead, $existingLeads[0]);
+                                }
+                                $leadIpAddresses = $lead->getIpAddresses();
+
+                                if (!$leadIpAddresses->contains($ipAddress)) {
+                                    $lead->addIpAddress($ipAddress);
+                                }
+
+                                $leadModel->setCurrentLead($lead);
+                            }
+
+                            $leadModel->setFieldValues($lead, $inQuery);
+
+                            $persistLead = true;
+                        }
+
+                        if (isset($query['tags'])) {
+                            if (!$decoded) {
+                                $query['tags'] = urldecode($query['tags']);
+                            }
+
+                            $leadTags = $lead->getTags();
+
+                            $tags = explode(',', $query['tags']);
+                            array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+                            // See which tags already exist
+                            $foundTags = $leadModel->getTagRepository()->getTagsByName($tags);
+                            foreach ($tags as $tag) {
+                                if (strpos($tag, '-') === 0) {
+                                    // Tag to be removed
+                                    $tag = substr($tag, 1);
+
+                                    if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                                        $lead->removeTag($foundTags[$tag]);
+                                        $persistLead = true;
+                                    }
+                                } else {
+                                    // Tag to be added
+                                    if (!array_key_exists($tag, $foundTags)) {
+                                        // New tag
+                                        $newTag = new Tag();
+                                        $newTag->setTag($tag);
+                                        $lead->addTag($newTag);
+                                        $persistLead = true;
+                                    } elseif (!$leadTags->contains($foundTags[$tag])) {
+                                        $lead->addTag($foundTags[$tag]);
+                                        $persistLead = true;
+                                    }
+                                }
+                            }
+
+                            if ($persistLead) {
+                                $leadModel->saveEntity($lead);
+                            }
+                        }
                     }
                 }
             } else {
@@ -591,7 +637,12 @@ class PageModel extends FormModel
         }
 
         $this->em->persist($hit);
-        $this->em->flush();
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            error_log($e);
+        }
 
         //save hit to the cookie to use to update the exit time
         $this->factory->getHelper('cookie')->setCookie('mautic_referer_id', $hit->getId());

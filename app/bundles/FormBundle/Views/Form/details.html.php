@@ -29,7 +29,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             ),
             'iconClass' => 'fa fa-camera',
             'btnText'   => 'mautic.form.form.preview',
-            'btnClass'  => 'btn-nospin'
+            'btnClass'  => 'btn btn-default btn-nospin'
         ),
         array(
             'attr' => array(

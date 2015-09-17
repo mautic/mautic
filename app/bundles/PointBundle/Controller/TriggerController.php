@@ -10,6 +10,7 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -175,12 +176,19 @@ class TriggerController extends FormController
     /**
      * Generates new form and processes post data
      *
+     * @param  \Mautic\PointBundle\Entity\Trigger $entity
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction()
+    public function newAction($entity = null)
     {
         $model     = $this->factory->getModel('point.trigger');
-        $entity    = $model->getEntity();
+
+        if (!($entity instanceof Trigger)) {
+            /** @var \Mautic\PointBundle\Entity\Trigger $entity */
+            $entity  = $model->getEntity();
+        }
+
         $session   = $this->factory->getSession();
         $sessionId = $this->request->request->get('pointtrigger[sessionId]', sha1(uniqid(mt_rand(), true)), true);
 
@@ -483,13 +491,11 @@ class TriggerController extends FormController
                 return $this->accessDenied();
             }
 
-            $clone = clone $entity;
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
+            $entity = clone $entity;
+            $entity->setIsPublished(false);
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($entity);
     }
 
     /**

@@ -119,6 +119,16 @@ class Event
     }
 
     /**
+     * Clean up after clone
+     */
+    public function __clone()
+    {
+        $this->id       = null;
+        $this->tempId   = null;
+        $this->campaign = null;
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -126,7 +136,8 @@ class Event
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_events')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository');
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
+            ->addIndex(array('type', 'event_type'), 'campaign_event_type_search');
 
         $builder->addIdColumns();
 

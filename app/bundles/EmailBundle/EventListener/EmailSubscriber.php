@@ -11,11 +11,11 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\EmailEvents;
+
 /**
  * Class EmailSubscriber
  *
@@ -32,8 +32,10 @@ class EmailSubscriber extends CommonSubscriber
         return array(
             EmailEvents::EMAIL_POST_SAVE    => array('onEmailPostSave', 0),
             EmailEvents::EMAIL_POST_DELETE  => array('onEmailDelete', 0),
-            CoreEvents::EMAIL_FAILED        => array('onEmailFailed', 0),
-            CoreEvents::EMAIL_RESEND        => array('onEmailResend', 0)
+            EmailEvents::EMAIL_FAILED       => array('onEmailFailed', 0),
+            EmailEvents::EMAIL_ON_SEND      => array('onEmailSend', 0),
+            EmailEvents::EMAIL_RESEND       => array('onEmailResend', 0),
+            EmailEvents::EMAIL_PARSE        => array('onEmailParse', 0)
         );
     }
 
@@ -80,9 +82,9 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * Process if an email has failed
      *
-     * @param MauticEvents\EmailEvent $event
+     * @param Events\QueueEmailEvent $event
      */
-    public function onEmailFailed(MauticEvents\EmailEvent $event)
+    public function onEmailFailed(Events\QueueEmailEvent $event)
     {
         $message = $event->getMessage();
 
@@ -100,11 +102,28 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
+     * Add an unsubscribe email to the List-Unsubscribe header if applicable
+     *
+     * @param Events\EmailSendEvent $event
+     */
+    public function onEmailSend(Events\EmailSendEvent $event)
+    {
+        if ($unsubscribeEmail = $event->getHelper()->generateUnsubscribeEmail()) {
+            $headers          = $event->getTextHeaders();
+            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
+            $updatedHeader    = ($existing) ? $unsubscribeEmail.", ".$existing : $unsubscribeEmail;
+
+            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
+        }
+    }
+
+    /**
      * Process if an email is resent
      *
-     * @param MauticEvents\EmailEvent $event
+     * @param Events\QueueEmailEvent $event
      */
-    public function onEmailResend(MauticEvents\EmailEvent $event)
+    public function onEmailResend(Events\QueueEmailEvent $event)
     {
         $message = $event->getMessage();
 
@@ -129,6 +148,28 @@ class EmailSubscriber extends CommonSubscriber
                 $em = $this->factory->getEntityManager();
                 $em->persist($stat);
                 $em->flush();
+            }
+        }
+    }
+
+    /**
+     * @param Events\ParseEmailEvent $event
+     */
+    public function onEmailParse(Events\ParseEmailEvent $event)
+    {
+        // Listening for bounce_folder and unsubscribe_folder
+        $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
+        $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
+
+        if ($isBounce || $isUnsubscribe) {
+            // Process the messages
+
+            /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
+            $messageHelper = $this->factory->getHelper('message');
+
+            $messages = $event->getMessages();
+            foreach ($messages as $message) {
+                $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
             }
         }
     }

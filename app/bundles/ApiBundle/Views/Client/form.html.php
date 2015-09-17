@@ -18,6 +18,7 @@ if (!empty($id)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
+
 <div class="row">
     <div class="pa-md">
         <div class="col-md-6">

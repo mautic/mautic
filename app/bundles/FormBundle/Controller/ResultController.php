@@ -169,21 +169,12 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
-        $limit = $this->factory->getParameter('default_pagelimit');
-
-        $page = $session->get('mautic.formresult.page', 1);
-        $start = ($page === 1) ? 0 : (($page-1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', array());
 
         $args = array(
-            'start'      => $start,
-            'limit'      => $limit,
+            'limit'      => false,
             'filter'     => array('force' => $filters),
             'orderBy'    => $orderBy,
             'orderByDir' => $orderByDir,

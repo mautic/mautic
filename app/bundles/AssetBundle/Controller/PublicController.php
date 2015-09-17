@@ -13,7 +13,6 @@ use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Class PublicController
@@ -42,7 +41,8 @@ class PublicController extends CommonFormController
             //make sure the asset is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
                 $model->trackDownload($entity, $this->request, 401);
-                throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
+
+                return $this->accessDenied();
             }
 
             //make sure URLs match up
@@ -77,7 +77,8 @@ class PublicController extends CommonFormController
                 $model->trackDownload($entity, $this->request, 200);
             } catch (\Exception $e) {
                 $model->trackDownload($entity, $this->request, 404);
-                throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+
+                return $this->notFound();
             }
 
             $response = new Response();
@@ -93,6 +94,7 @@ class PublicController extends CommonFormController
 
         }
         $model->trackDownload($entity, $this->request, 404);
-        throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+
+        $this->notFound();
     }
 }

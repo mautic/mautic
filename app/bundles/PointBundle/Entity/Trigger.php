@@ -58,7 +58,7 @@ class Trigger extends FormEntity
     /**
      * @var string
      */
-    private $color;
+    private $color = 'a0acb8';
 
     /**
      * @var bool
@@ -74,6 +74,13 @@ class Trigger extends FormEntity
      * @var ArrayCollection
      */
     private $events;
+
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
 
     /**
      * Constructor

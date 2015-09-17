@@ -9,6 +9,7 @@
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -40,8 +41,21 @@ class Version20150724000000 extends AbstractMauticMigration
     public function mysqlUp(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers CHANGE consumerKey consumer_key VARCHAR(255) NOT NULL, CHANGE consumerSecret consumer_secret VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_access_tokens', 'fk', '37FDBD6D'));
+        $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_access_tokens', 'idx', '37FDBD6D') . ' ON ' . $this->prefix . 'oauth1_access_tokens');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_access_tokens', 'fk', 'A76ED395'));
+        $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_access_tokens', 'idx', 'A76ED395') . ' ON ' . $this->prefix . 'oauth1_access_tokens');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE user_id user_id INT NOT NULL, CHANGE expiresat expires_at BIGINT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_consumers (id) ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_access_tokens', 'idx', array('consumer_id')) . ' ON ' . $this->prefix . 'oauth1_consumers (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_access_tokens', 'fk', array('user_id')) . ' FOREIGN KEY (user_id) REFERENCES ' . $this->prefix . 'users (id) ON DELETE CASCADE');
+
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_access_tokens', 'idx', array('user_id')) . ' ON ' . $this->prefix . 'oauth1_access_tokens (user_id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_request_tokens', 'fk', '37FDBD6D'));
+        $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_request_tokens', 'idx', '37FDBD6D') . ' ON ' . $this->prefix . 'oauth1_request_tokens');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens CHANGE consumer_id consumer_id INT NOT NULL, CHANGE expiresat expires_at BIGINT NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ADD CONSTRAINT ' . $this->generatePropertyName('oauth1_request_tokens', 'fk', array('consumer_id')) . ' FOREIGN KEY (consumer_id) REFERENCES ' . $this->prefix . 'oauth1_consumers (id) ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('oauth1_request_tokens', 'idx', array('consumer_id')) . ' ON ' . $this->prefix . 'oauth1_consumers (id)');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_accesstokens CHANGE expires_at expires_at BIGINT DEFAULT NULL');
@@ -64,11 +78,16 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats CHANGE retry_count retry_count INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields CHANGE form_id form_id INT NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP FOREIGN KEY ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref ADD CONSTRAINT ' . $this->generatePropertyName('lead_ips_xref', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes DROP FOREIGN KEY ' . $this->findPropertyName('lead_notes', 'fk', '1755458D'));
+        $this->addSql('DROP INDEX ' . $this->findPropertyName('lead_notes', 'idx', '1755458D') . ' ON ' . $this->prefix . 'lead_notes');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes CHANGE lead_id lead_id INT NOT NULL, CHANGE text text LONGTEXT NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes ADD CONSTRAINT ' . $this->generatePropertyName('lead_notes', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('lead_notes', 'idx', array('lead_id')) . ' ON ' . $this->prefix . 'leads (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log DROP FOREIGN KEY ' . $this->findPropertyName('lead_points_change_log', 'fk', '6955458D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log CHANGE event_name event_name VARCHAR(255) NOT NULL, CHANGE action_name action_name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log ADD CONSTRAINT ' . $this->generatePropertyName('lead_points_change_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
@@ -90,7 +109,11 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'points CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'point_triggers CHANGE name name VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'point_trigger_events CHANGE name name VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'users DROP FOREIGN KEY ' . $this->findPropertyName('users', 'fk', 'D60322AC'));
+        $this->addSql('DROP INDEX ' . $this->findPropertyName('users', 'idx', 'D60322AC') . ' ON ' . $this->prefix . 'users');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'users CHANGE role_id role_id INT NOT NULL, CHANGE username username VARCHAR(255) NOT NULL, CHANGE first_name first_name VARCHAR(255) NOT NULL, CHANGE last_name last_name VARCHAR(255) NOT NULL, CHANGE email email VARCHAR(255) NOT NULL, CHANGE position position VARCHAR(255) DEFAULT NULL, CHANGE timezone timezone VARCHAR(255) DEFAULT NULL, CHANGE locale locale VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ADD CONSTRAINT ' . $this->generatePropertyName('users', 'fk', array('role_id')) . ' FOREIGN KEY (role_id) REFERENCES ' . $this->prefix . 'roles (id)');
+        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('users', 'idx', array('role_id')) . ' ON ' . $this->prefix . 'roles (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions DROP FOREIGN KEY ' . $this->findPropertyName('permissions', 'fk', 'D60322AC'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions CHANGE role_id role_id INT NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions ADD CONSTRAINT ' . $this->generatePropertyName('permissions', 'fk', array('role_id')) . ' FOREIGN KEY (role_id) REFERENCES ' . $this->prefix . 'roles (id) ON DELETE CASCADE');
@@ -141,6 +164,7 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count DROP DEFAULT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count TYPE integer USING (trim(retry_count)::integer)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name TYPE VARCHAR(255)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER form_id SET NOT NULL');

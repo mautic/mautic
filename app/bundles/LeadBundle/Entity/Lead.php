@@ -133,6 +133,11 @@ class Lead extends FormEntity
     public $imported = false;
 
     /**
+     * @var ArrayCollection
+     */
+    private $tags;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -210,6 +215,18 @@ class Lead extends FormEntity
             ->columnName('preferred_profile_image')
             ->nullable()
             ->build();
+
+        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+            ->setJoinTable('lead_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(array('tag' => 'ASC'))
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
     /**
@@ -234,6 +251,7 @@ class Lead extends FormEntity
                     'lastActive',
                     'owner',
                     'ipAddresses',
+                    'tags',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -242,7 +260,8 @@ class Lead extends FormEntity
     }
 
     /**
-     * Constructor
+     * @param string $prop
+     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
@@ -261,6 +280,13 @@ class Lead extends FormEntity
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
+        } elseif ($prop == 'tags') {
+            if ($val instanceof Tag) {
+                $this->changes['tags']['added'][] = $val->getTag();
+            } else {
+                $this->changes['tags']['removed'][] = $val;
+            }
+
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -274,6 +300,7 @@ class Lead extends FormEntity
         $this->ipAddresses     = new ArrayCollection();
         $this->doNotEmail      = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
+        $this->tags            = new ArrayCollection();
     }
 
     /**
@@ -384,8 +411,18 @@ class Lead extends FormEntity
      */
     public function getName ($lastFirst = false)
     {
-        $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
-        $lastName  = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
+        if (isset($this->updatedFields['firstname'])) {
+            $firstName = $this->updatedFields['firstname'];
+        } else {
+            $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
+        }
+
+        if (isset($this->updatedFields['lastname'])) {
+            $lastName = $this->updatedFields['lastname'];
+        } else {
+            $lastName = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
+        }
+
         $fullName  = "";
         if ($lastFirst && !empty($firstName) && !empty($lastName)) {
             $fullName = $lastName.", ".$firstName;
@@ -407,6 +444,11 @@ class Lead extends FormEntity
      */
     public function getCompany()
     {
+        if (isset($this->updatedFields['company'])) {
+
+            return $this->updatedFields['company'];
+        }
+
         if (!empty($this->fields['core']['company']['value'])) {
 
             return $this->fields['core']['company']['value'];
@@ -416,18 +458,55 @@ class Lead extends FormEntity
     }
 
     /**
-     * Get company
+     * Get email
      *
      * @return string
      */
     public function getEmail()
     {
+        if (isset($this->updatedFields['email'])) {
+
+            return $this->updatedFields['email'];
+        }
+
         if (!empty($this->fields['core']['email']['value'])) {
 
             return $this->fields['core']['email']['value'];
         }
 
         return '';
+    }
+
+    /**
+     * Get lead field value
+     *
+     * @param      $field
+     * @param null $group
+     *
+     * @return bool
+     */
+    public function getFieldValue($field, $group = null)
+    {
+        if (isset($this->updatedFields[$field])) {
+
+            return $this->updatedFields[$field];
+        }
+
+        if (!empty($group) && isset($this->fields[$group][$field])) {
+
+            return $this->fields[$group][$field]['value'];
+        }
+
+        foreach ($this->fields as $group => $groupFields) {
+            foreach ($groupFields as $name => $details) {
+                if ($name == $field) {
+
+                    return $details['value'];
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -865,5 +944,55 @@ class Lead extends FormEntity
     public function setAvailableSocialFields(array $availableSocialFields)
     {
         $this->availableSocialFields = $availableSocialFields;
+    }
+
+    /**
+     * Add tag
+     *
+     * @param Tag $tag
+     *
+     * @return Lead
+     */
+    public function addTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag);
+        $this->tags[$tag->getTag()] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * Remove tag
+     *
+     * @param Tag $tag
+     */
+    public function removeTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag->getTag());
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getTags ()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }

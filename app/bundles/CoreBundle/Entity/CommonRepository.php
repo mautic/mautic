@@ -504,16 +504,16 @@ class CommonRepository extends EntityRepository
         foreach ($commands as $k => $c) {
             if (is_array($c)) {
                 //subcommands
-                if ($this->translator->trans($k) == $command) {
+                if (strtolower($this->translator->trans($k)) == $command) {
                     foreach ($c as $subc) {
-                        if ($this->translator->trans($subc) == $subcommand) {
+                        if (strtolower($this->translator->trans($subc)) == $subcommand) {
                             return true;
                         }
                     }
                 }
-            } elseif ($this->translator->trans($c) == $command) {
+            } elseif (strtolower($this->translator->trans($c)) == $command) {
                 return true;
-            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}") {
+            } elseif (strtolower($this->translator->trans($c)) == "{$command}:{$subcommand}") {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
 
@@ -916,7 +916,7 @@ class CommonRepository extends EntityRepository
 
         $q->select($prefix.$valueColumn . ' as value, '.$prefix.$labelColumn.' as label')
             ->from($tableName, $alias)
-            ->orderBy($prefix.$valueColumn);
+            ->orderBy($prefix.$labelColumn);
 
         if ($expr !== null && $expr->count()) {
             $q->where($expr);

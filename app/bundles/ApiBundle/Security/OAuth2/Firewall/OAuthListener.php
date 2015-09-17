@@ -37,11 +37,6 @@ class OAuthListener extends \FOS\OAuthServerBundle\Security\Firewall\OAuthListen
      */
     public function handle(GetResponseEvent $event)
     {
-        $apiMode = $this->factory->getParameter('api_mode');
-        if ($apiMode != 'oauth2') {
-            return;
-        }
-
         parent::handle($event);
     }
 }
