@@ -33,7 +33,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'searchHelp'  => 'mautic.category.help.searchcommands',
         'filters'     => array(
             'bundle' => array(
-                'options' => $bundles,
+                'options' => $categoryTypes,
                 'values'  => array($bundle),
                 'translateLabels' => true
             )

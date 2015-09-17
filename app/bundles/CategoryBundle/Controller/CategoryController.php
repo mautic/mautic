@@ -125,13 +125,13 @@ class CategoryController extends FormController
             ));
         }
 
-        $bundles = array('category' => $this->get('translator')->trans('mautic.core.select'));
+        $categoryTypes = array('category' => $this->get('translator')->trans('mautic.core.select'));
 
         $dispatcher = $this->factory->getDispatcher();
         if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryBundlesEvent;
             $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
-            $bundles = array_merge($bundles, $event->getCategoryTypes());
+            $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
@@ -141,15 +141,15 @@ class CategoryController extends FormController
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
-            'viewParameters'  => array(
-                'bundle'      => $bundle,
-                'searchValue' => $search,
-                'items'       => $entities,
-                'page'        => $page,
-                'limit'       => $limit,
-                'permissions' => $permissions,
-                'tmpl'        => $tmpl,
-                'bundles'     => $bundles
+            'viewParameters'    => array(
+                'bundle'        => $bundle,
+                'searchValue'   => $search,
+                'items'         => $entities,
+                'page'          => $page,
+                'limit'         => $limit,
+                'permissions'   => $permissions,
+                'tmpl'          => $tmpl,
+                'categoryTypes' => $categoryTypes
             ),
             'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
             'passthroughVars' => array(
