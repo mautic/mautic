@@ -11,7 +11,7 @@ namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CategoryBundle\CategoryEvents;
-use Mautic\CategoryBundle\Event\CategoryBundlesEvent;
+use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CategoryController extends FormController
@@ -129,7 +129,7 @@ class CategoryController extends FormController
 
         $dispatcher = $this->factory->getDispatcher();
         if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
-            $event = new CategoryBundlesEvent;
+            $event = new CategoryTypesEvent;
             $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }

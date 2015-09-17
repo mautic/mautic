@@ -9,7 +9,7 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CategoryBundle\CategoryEvents;
-use Mautic\CategoryBundle\Event\CategoryBundlesEvent;
+use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -34,11 +34,11 @@ class CategorySubscriber extends CommonSubscriber
     /**
      * Add bundle to the category
      *
-     * @param CategoryBundlesEvent $event
+     * @param CategoryTypesEvent $event
      *
      * @return void
      */
-    public function onCategoryBundleListBuild(CategoryBundlesEvent $event)
+    public function onCategoryBundleListBuild(CategoryTypesEvent $event)
     {
         $event->addCategoryType('campaign');
     }

@@ -62,7 +62,7 @@ final class CategoryEvents
      * The mautic.category_on_bundle_list_build event is thrown when a list of bundles supporting categories is build.
      *
      * The event listener receives a
-     * Mautic\CategoryBundle\Event\CategoryBundlesEvent instance.
+     * Mautic\CategoryBundle\Event\CategoryTypesEvent instance.
      *
      * @var string
      */

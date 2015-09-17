@@ -13,16 +13,16 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CategoryBundle\Entity\Category;
 
 /**
- * Class CategoryBundlesEvent
+ * Class CategoryTypesEvent
  *
  * @package Mautic\CategoryBundle\Event
  */
-class CategoryBundlesEvent extends CommonEvent
+class CategoryTypesEvent extends CommonEvent
 {
     /**
-     * @var array $bundles
+     * @var array $types
      */
-    protected $bundles = array();
+    protected $types = array();
 
     /**
      * Returns the array of Category Types
@@ -31,24 +31,24 @@ class CategoryBundlesEvent extends CommonEvent
      */
     public function getCategoryTypes()
     {
-        asort($this->bundles);
-        return $this->bundles;
+        asort($this->types);
+        return $this->types;
     }
 
     /**
      * Adds the category type and label
      *
-     * @param string $bundle
+     * @param string $type
      * @param string $label
      *
      * @return void
      */
-    public function addCategoryType($bundle, $label = null)
+    public function addCategoryType($type, $label = null)
     {
         if ($label === null) {
-            $label = 'mautic.' . $bundle . '.' . $bundle;
+            $label = 'mautic.' . $type . '.' . $type;
         }
 
-        $this->bundles[$bundle] = $label;
+        $this->types[$type] = $label;
     }
 }
