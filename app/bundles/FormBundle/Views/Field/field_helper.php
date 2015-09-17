@@ -21,10 +21,20 @@ if (!isset($formName)) {
     $formName = '';
 }
 
+$properties = $field['properties'];
+
 $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
-$name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
+$name = '';
+if (empty($ignoreName)) {
+    $inputName = 'mauticform['.$field['alias'].']';
+    if (!empty($properties['multiple'])) {
+        $inputName .= '[]';
+    }
+    $name = ' name="'. $inputName . '"';
+}
+
 $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
 if (empty($ignoreId)) {
     $inputId = 'id="mauticform_input_'.$formName.'_'.$field['alias'].'"';
@@ -36,7 +46,6 @@ if (empty($ignoreId)) {
 $inputAttr = $inputId.$name.$value;
 $labelAttr = $labelId;
 
-$properties = $field['properties'];
 if (!empty($properties['placeholder'])) {
     $inputAttr .= ' placeholder="'.$properties['placeholder'].'"';
 }
@@ -82,18 +91,15 @@ if (isset($field['isRequired']) && $field['isRequired']) {
         $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
     }
 
-    $name = $field['alias'];
-    if ((in_array($field['type'], array('select', 'country')) && !empty($properties['multiple'])))
-        $name .= '[]';
-    $containerAttr .= " data-validate=\"$name\" data-validation-type=\"{$field['type']}\"";
+    $containerAttr .= " data-validate=\"{$field['alias']}\" data-validation-type=\"{$field['type']}\"";
 
-    $inputAttr .= " required";
+    if (!empty($properties['multiple'])) {
+        $containerAttr .= " data-validate-multiple=\"true\"";
+    }
 } elseif (!empty($required)) {
     // Forced to be required
     $defaultContainerClass .= ' mauticform-required';
-    $inputAttr             .= " required";
 }
-
 
 // Add container class
 if (!empty($deleted)) {

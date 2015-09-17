@@ -13,12 +13,9 @@ $containerType         = 'select';
 
 include __DIR__.'/field_helper.php';
 
-$name = 'mauticform['.$field['alias'].']';
 if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
-    $name .= '[]';
 }
-$inputAttr .= ' name="'.$name.'"';;
 
 if (!isset($list)) {
     $list = $properties['list'];

@@ -178,12 +178,13 @@
         };
 
         Form.prepareValidation = function(formId) {
-            if (typeof MauticFormValidations == 'undefined') {
-                var MauticFormValidations  = {};
+
+            if (typeof window.MauticFormValidations == 'undefined') {
+                window.MauticFormValidations  = {};
             }
 
-            if (typeof MauticFormValidations[formId] == 'undefined') {
-                MauticFormValidations[formId] = {};
+            if (typeof window.MauticFormValidations[formId] == 'undefined') {
+                window.MauticFormValidations[formId] = {};
 
                 var theForm = document.getElementById('mauticform_' + formId);
 
@@ -191,9 +192,10 @@
                 var validations = theForm.querySelectorAll('[data-validate]');
                 [].forEach.call(validations, function (container) {
                     var alias = container.getAttribute('data-validate');
-                    MauticFormValidations[formId][alias] = {
+                    window.MauticFormValidations[formId][alias] = {
                         type: container.getAttribute('data-validation-type'),
-                        name: alias
+                        name: alias,
+                        multiple: container.getAttribute('data-validate-multiple'),
                     }
                 });
             }
@@ -257,25 +259,33 @@
                         // Find each required element
                         for (var fieldKey in MauticFormValidations[formId]) {
                             var field = MauticFormValidations[formId][fieldKey];
-                            var name = 'mauticform[' + field.name + ']';
-                            switch (field.type) {
-                                case 'radiogrp':
-                                    var elOptions = elForm.elements[name];
-                                    var valid = validateOptions(elOptions);
-                                    break;
+                            var name  = 'mauticform[' + field.name + ']';
 
-                                case 'checkboxgrp':
-                                    var elOptions = elForm.elements[name + '[]'];
-                                    var valid = validateOptions(elOptions);
-                                    break;
+                            if (field.multiple == 'true') {
+                                name = name + '[]';
+                            }
 
-                                case 'email':
-                                    var valid = validateEmail(elForm.elements[name].value);
-                                    break;
+                            var valid = true;
+                            if (typeof elForm.elements[name] != 'undefined') {
+                                switch (field.type) {
+                                    case 'radiogrp':
+                                        var elOptions = elForm.elements[name];
+                                        valid = validateOptions(elOptions);
+                                        break;
 
-                                default:
-                                    var valid = (elForm.elements[name].value != '')
-                                    break;
+                                    case 'checkboxgrp':
+                                        var elOptions = elForm.elements[name + '[]'];
+                                        valid = validateOptions(elOptions);
+                                        break;
+
+                                    case 'email':
+                                        valid = validateEmail(elForm.elements[name].value);
+                                        break;
+
+                                    default:
+                                        valid = (elForm.elements[name].value != '')
+                                        break;
+                                }
                             }
 
                             var containerId = 'mauticform_' + formId + '_' + fieldKey;
