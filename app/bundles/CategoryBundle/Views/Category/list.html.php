@@ -110,7 +110,7 @@ if ($tmpl == 'index')
                 "limit"      => $limit,
                 "menuLinkId" => 'mautic_category_index',
                 "baseUrl"    => $view['router']->generate('mautic_category_index', array(
-                    'bundle' => $bundle
+                    'bundle' => ($bundle == 'category') ? 'all' : $bundle
                 )),
                 'sessionVar' => 'category'
             )); ?>

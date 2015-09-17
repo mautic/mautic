@@ -51,6 +51,11 @@ class CategoryController extends FormController
             $session->set('mautic.category.type', $bundle);
         }
 
+        // hack to make pagination work for default list view
+        if ($bundle == 'all') {
+            $bundle = 'category';
+        }
+
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
