@@ -26,12 +26,14 @@ class CategoryType extends AbstractType
 {
 
     private $translator;
+    private $session;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
+        $this->session = $factory->getSession();
     }
 
     /**
@@ -48,11 +50,13 @@ class CategoryType extends AbstractType
                 'data' => $options['data']->getBundle()
             ));
         } else {
+            $selected = $this->session->get('mautic.category.type', 'category');
             $builder->add('bundle', 'category_bundles_form', array(
                 'label'      => 'mautic.core.type',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => true,
+                'data'       => $selected
             ));
         }
 

@@ -49,14 +49,13 @@ class CategoryBundlesType extends AbstractType
                 if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
                     $event = new CategoryTypesEvent;
                     $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
-                    $bundles = $event->getCategoryTypes();
+                    $types = $event->getCategoryTypes();
                 } else {
-                    $bundles = array();
+                    $types = array();
                 }
 
-                return $bundles;
+                return $types;
             },
-            'empty_value'   => false,
             'expanded'      => false,
             'multiple'      => false,
             'required'      => false

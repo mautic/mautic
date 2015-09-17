@@ -45,8 +45,12 @@ class CategoryController extends FormController
         $session = $this->factory->getSession();
 
         $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $this->request->get('bundle', $session->get('mautic.category.bundle', ''));
-        $session->set('mautic.category.bundle', $bundle);
+        $bundle = $this->request->get('bundle', $session->get('mautic.category.type', ''));
+
+        if ($bundle) {
+            $session->set('mautic.category.type', $bundle);
+        }
+
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
