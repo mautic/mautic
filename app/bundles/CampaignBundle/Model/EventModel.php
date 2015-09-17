@@ -580,14 +580,13 @@ class EventModel extends CommonFormModel
      *
      * @return void
      */
-    public function executeEvent($eventSettings, $event, $campaign, $lead, &$processedCount = 0, &$totalEventCount = 0)
+    public function executeEvent($eventSettings, $event, $campaign, $lead, &$processedCount = 0, &$totalEventCount = 0, $allowNo = false)
     {
         $repo   = $this->getRepository();
         $logger = $this->factory->getLogger();
 
         if (isset($eventSettings['action'][$event['type']])) {
             $thisEventSettings = $eventSettings['action'][$event['type']];
-            $allowNo = false;
         } elseif (isset($eventSettings['condition'][$event['type']])) {
             $thisEventSettings = $eventSettings['condition'][$event['type']];
             $allowNo = true;
@@ -606,6 +605,7 @@ class EventModel extends CommonFormModel
         $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
 
         $timing = $this->checkEventTiming($event, new \DateTime(), $allowNo);
+
         if ($timing instanceof \DateTime) {
             $processedCount++;
 
@@ -703,7 +703,7 @@ class EventModel extends CommonFormModel
             foreach ($childEvents as $childEvent) {
                 if ($childEvent && $childEvent->getId()) {
                     // Trigger child event recursivly
-                    $this->executeEvent($eventSettings, $childEvent->convertToArray(), $campaign, $lead, $processedCount, $totalEventCount);
+                    $this->executeEvent($eventSettings, $childEvent->convertToArray(), $campaign, $lead, $processedCount, $totalEventCount, true);
                 }
             }
         }
