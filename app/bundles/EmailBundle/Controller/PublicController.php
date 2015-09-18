@@ -148,10 +148,12 @@ class PublicController extends CommonFormController
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
-            // Set the lead as current lead
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $leadModel->setCurrentLead($lead);
+            if ($lead) {
+                // Set the lead as current lead
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leadModel->setCurrentLead($lead);
+            }
 
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
 
@@ -235,20 +237,20 @@ class PublicController extends CommonFormController
     {
         //find the email
         $model      = $this->factory->getModel('email');
-        $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
-            // Set the lead as current lead
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $leadModel->setCurrentLead($lead);
+            if ($lead) {
+                // Set the lead as current lead
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leadModel->setCurrentLead($lead);
+            }
 
             $model->removeDoNotContact($stat->getEmailAddress());
-
 
             $message = $this->factory->getParameter('resubscribe_message');
             if (!$message) {
