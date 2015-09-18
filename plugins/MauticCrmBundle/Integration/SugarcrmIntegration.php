@@ -185,7 +185,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         //7.x
                         foreach ($leadObject['fields'] as $fieldInfo) {
                             if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
-                                $sugarFields[$fieldInfo['name']] = array(
+                                $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
+
+                                $sugarFields[$fieldName] = array(
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['comment'],
                                     'required' => !empty($fieldInfo['required'])
@@ -302,6 +304,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             return (empty($error));
         } else {
+            if ($this->isConfigured()) {
+                // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+                $this->authCallback();
+            }
+
             return parent::isAuthorized();
         }
     }
@@ -351,7 +358,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getFormSettings()
     {
         return array(
-            'requires_callback'      => true,
+            'requires_callback'      => false,
             'requires_authorization' => true
         );
     }
