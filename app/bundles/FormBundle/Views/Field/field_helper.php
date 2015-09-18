@@ -67,7 +67,11 @@ if (!empty($inForm)) {
 }
 
 // Container
-$containerAttr         = 'id="mauticform_'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+if ($formName) {
+    $containerAttr = 'id="mauticform_'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+} else {
+    $containerAttr = 'id="mauticform_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+}
 if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
