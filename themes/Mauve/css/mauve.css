@@ -36,4 +36,9 @@ h1 {
 
 .mauticform-selectbox, .mauticform-input, .mauticform-textarea {
   width: 100% !important;
+  color: #000000;
+}
+
+.mauticform-button {
+  color: #000000;
 }
