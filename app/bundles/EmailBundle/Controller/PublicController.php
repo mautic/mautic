@@ -159,7 +159,7 @@ class PublicController extends CommonFormController
 
             $message = $this->factory->getParameter('unsubscribe_message');
             if (!$message) {
-                $message = $this->factory->getTranslator()->trans(
+                $message = $translator->trans(
                     'mautic.email.unsubscribed.success',
                     array(
                         '%resubscribeUrl%' => '|URL|',
@@ -192,7 +192,7 @@ class PublicController extends CommonFormController
             }
         } else {
             $email   = $lead = false;
-            $message = '';
+            $message = $translator->trans('mautic.email.stat_record.not_found');
         }
 
         if (empty($template) && empty($formTemplate)) {
@@ -274,7 +274,8 @@ class PublicController extends CommonFormController
             );
 
         } else {
-            $email = $lead = false;
+            $email   = $lead = false;
+            $message = $this->factory->getTranslator()->trans('mautic.email.stat_record.not_found');
         }
 
         $template = ($email !== null) ? $email->getTemplate() : $this->factory->getParameter('theme');
