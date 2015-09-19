@@ -227,7 +227,7 @@ class BuilderTokenHelper
      * @param $content
      * @param $encodeTokensInUrls
      */
-    static public function replaceVisualPlaceholdersWithTokens(&$content, $encodeTokensInUrls = array('leadfields'))
+    static public function replaceVisualPlaceholdersWithTokens(&$content, $encodeTokensInUrls = array('leadfield'))
     {
         if (is_array($content)) {
             foreach ($content as &$slot) {
@@ -267,13 +267,13 @@ class BuilderTokenHelper
         };
 
         // Special handling for leadfield tokens in URLs
-        $foundMatches = preg_match_all('/<a.*?href=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
+        $foundMatches = preg_match_all('/<a.*?href=["\'].*?({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
         if ($foundMatches) {
             $processMatches($matches[0]);
         }
 
         // Special handling for leadfield tokens in image src
-        $foundMatches = preg_match_all('/<img.*?src=["\'].*?=({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
+        $foundMatches = preg_match_all('/<img.*?src=["\'].*?({['.implode('|', $tokenKeys).'].*?}).*?["\']/i', $content, $matches);
         if ($foundMatches) {
             $processMatches($matches[0]);
         }
