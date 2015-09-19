@@ -631,17 +631,17 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
+        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
+            $event = new PageHitEvent($hit, $request, $code, $clickthrough);
+            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+        }
+
         $this->em->persist($hit);
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->flush();
         } catch (\Exception $e) {
             error_log($e);
-        }
-
-        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
 
         //save hit to the cookie to use to update the exit time
