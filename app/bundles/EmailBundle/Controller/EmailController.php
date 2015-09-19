@@ -1215,11 +1215,17 @@ class EmailController extends FormController
             return $this->viewAction($objectId);
         }
 
-        // Grab a random lead
-        $lead = $this->factory->getModel('lead')->getRepository()->getRandomLead();
+        // Prepare a fake lead
+        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+        $fieldModel   = $this->factory->getModel('lead.field');
+        $fields       = $fieldModel->getFieldList(false, false);
+        array_walk($fields, function(&$field) {
+            $field = "[$field]";
+        });
+        $fields['id'] = 0;
 
         // Send to current user
-        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $lead, array(), array(), false);
+        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $fields, array(), array(), false);
 
         $this->addFlash('mautic.email.notice.test_sent.success');
 

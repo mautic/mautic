@@ -861,29 +861,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Grabs a random lead
-     */
-    public function getRandomLead()
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('*')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->neq('l.firstname', $q->expr()->literal('')),
-                    $q->expr()->neq('l.lastname', $q->expr()->literal('')),
-                    $q->expr()->neq('l.email', $q->expr()->literal(''))
-                )
-            )
-            ->orderBy('l.last_active');
-        $q->setMaxResults(1);
-
-        $result = $q->execute()->fetchAll();
-
-        return (count($result)) ? $result[0] : null;
-    }
-
-    /**
      * Gets the ID of the latest ID
      */
     public function getMaxLeadId()
