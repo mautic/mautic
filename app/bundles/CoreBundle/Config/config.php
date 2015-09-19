@@ -18,6 +18,10 @@ return array(
                 'path'       => '/update',
                 'controller' => 'MauticCoreBundle:Update:index'
             ),
+            'mautic_core_update_schema'      => array(
+                'path'       => '/update/schema',
+                'controller' => 'MauticCoreBundle:Update:schema'
+            ),
             'mautic_core_form_action' => array(
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
                 'controller' => 'MauticCoreBundle:Form:execute',

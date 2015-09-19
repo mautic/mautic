@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class CacheHelper
@@ -35,14 +36,19 @@ class CacheHelper
      * Clear the application cache and run the warmup routine for the current environment
      *
      * @param bool $noWarmup Skips the warmup routine
-     *
+     * @param bool $configSave True if clearing the cache after saving the configuration
      * @return void
      */
-    public function clearCache($noWarmup = false)
+    public function clearCache($noWarmup = false, $configSave = false)
     {
         $this->clearSessionItems();
 
-        ini_set('memory_limit', '128M');
+        $memoryLimit = ini_get('memory_limit');
+        if ((int) substr($memoryLimit, 0, -1) < 128) {
+            ini_set('memory_limit', '128M');
+        }
+
+        $this->clearOpcaches($configSave);
 
         //attempt to squash command output
         ob_start();
@@ -78,7 +84,7 @@ class CacheHelper
 
         $cacheDir = $this->factory->getSystemPath('cache', true);
 
-        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs = new Filesystem();
         $fs->remove($cacheDir);
     }
 
@@ -87,6 +93,8 @@ class CacheHelper
      */
     public function clearCacheFile()
     {
+        $this->clearOpcaches(true);
+
         $env      = $this->factory->getEnvironment();
         $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
         $cacheDir = $this->factory->getSystemPath('cache', true);
@@ -107,5 +115,29 @@ class CacheHelper
         $session = $this->factory->getSession();
         $session->remove('mautic.menu.items');
         $session->remove('mautic.menu.icons');
+    }
+
+    /**
+     * Clear opcaches
+     *
+     * @param bool|false $configSave
+     */
+    protected function clearOpcaches($configSave = false)
+    {
+        // Clear opcaches before rebuilding the cache to ensure latest filechanges are used
+        if (function_exists('opcache_reset')) {
+            if ($configSave) {
+                // Clear the cached config file
+                $configFile = $this->factory->getLocalConfigFile(false);
+                opcache_invalidate($configFile);
+            } else {
+                // Clear the entire cache as anything could have been affected
+                opcache_reset();
+            }
+        }
+
+        if (function_exists('apc_clear_cache')) {
+            apc_clear_cache('user');
+        }
     }
 }

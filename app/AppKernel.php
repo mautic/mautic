@@ -31,14 +31,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 1;
+    const MINOR_VERSION = 2;
 
     /**
      * Patch version number
      *
      * @const integer
      */
-    const PATCH_VERSION = 4;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier
@@ -121,6 +121,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\MonologBundle\MonologBundle(),
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+            new Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
