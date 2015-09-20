@@ -442,6 +442,27 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Search for an email stat by email and lead IDs
+     *
+     * @param $emailId
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getEmailStati ($emailId, $leadId)
+    {
+        return $this->getStatRepository()->findBy(
+            array(
+                'email' => (int) $emailId,
+                'lead'  => (int) $leadId
+            ),
+            array(
+                array('dateSent', 'DESC')
+            )
+        );
+    }
+
+    /**
      * Get the variant parent/children
      *
      * @param Email $email

@@ -278,7 +278,8 @@ class BuilderSubscriber extends CommonSubscriber
                 //what entity is sending the email?
                 'source' => $source,
                 //the email being sent to be logged in page hit if applicable
-                'email'  => ($email != null) ? $email->getId() : null
+                'email'  => ($email != null) ? $email->getId() : null,
+                'stat'   => $event->getIdHash()
             );
             $lead         = $event->getLead();
             if ($lead !== null) {

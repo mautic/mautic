@@ -38,10 +38,36 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageHit(Events\PageHitEvent $event)
     {
-        $hit    = $event->getHit();
-        $source = $hit->getSource();
-        if ($source == 'email') {
+        $hit      = $event->getHit();
+        $redirect = $hit->getRedirect();
 
+        if ($redirect && $email = $hit->getEmail()) {
+            // Check for an email stat
+            /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+            $model = $this->factory->getModel('email');
+
+            $clickthrough = $event->getClickthroughData();
+            if (isset($clickthrough['stat'])) {
+                $stat = $model->getEmailStatus($clickthrough['stat']);
+            }
+
+            if (empty($stat)) {
+                if ($lead = $hit->getLead()) {
+                    // Try searching by email and lead IDs
+                    $stats = $model->getEmailStati($hit->getSourceId(), $lead->getId());
+                    if (count($stats)) {
+                        $stat = $stats[0];
+                    }
+                }
+            }
+
+            if (!empty($stat)) {
+                // Check to see if it has been marked as opened
+                if (!$stat->isRead()) {
+                    // Mark it as read
+                    $model->hitEmail($stat, $this->request);
+                }
+            }
         }
     }
 }
