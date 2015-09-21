@@ -60,21 +60,18 @@ class SysinfoModel extends CommonModel
 		}
 
         $importantFolders = array(
-            'app/cache',
-            'app/config',
-            'app/logs',
-            'app/spool',
-            'media/files',
-            'media/images',
-            'plugins',
-            'themes',
-            'translations'
+            $this->factory->getSystemPath('local_config'),
+            $this->factory->getParameter('cache_path'),
+            $this->factory->getParameter('log_path'),
+            $this->factory->getParameter('mailer_spool_path'),
+            $this->factory->getParameter('upload_dir'),
+            $this->factory->getSystemPath('images', true),
+            $this->factory->getSystemPath('translations', true),
         );
 
-        $appRoot = $this->factory->getSystemPath('root');
-
         foreach ($importantFolders as $folder) {
-            $this->folders[$folder] = is_writable($appRoot . '/' . $folder);
+            $folder = realpath($folder);
+            $this->folders[$folder] = is_writable($folder);
         }
 
 		return $this->folders;
