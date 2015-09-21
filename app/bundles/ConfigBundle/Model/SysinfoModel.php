@@ -84,13 +84,13 @@ class SysinfoModel extends CommonModel
 	 */
     public function getLogTail($lines = 10)
     {
-        $prodLog = $this->factory->getSystemPath('root') . '/app/logs/mautic_prod-' . date('Y-m-d') . '.php';
+        $log = $this->factory->getParameter('log_path') . '/mautic_' . $this->factory->getEnvironment() . '-' . date('Y-m-d') . '.php';
 
-        if (!file_exists($prodLog)) {
+        if (!file_exists($log)) {
             return null;
         }
 
-        return $this->tail($prodLog, $lines);
+        return $this->tail($log, $lines);
     }
 
     /**
