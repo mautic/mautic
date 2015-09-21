@@ -46,10 +46,17 @@ class CategoryType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
         if ($options['data']->getId()) {
+            // Edit existing category from category manager - do not allow to edit bundle
             $builder->add('bundle', 'hidden', array(
                 'data' => $options['data']->getBundle()
             ));
+        } elseif (!empty($options['bundle'])) {
+            // Create new category directly from another bundle - preset bundle
+            $builder->add('bundle', 'hidden', array(
+                'data' => $options['bundle']
+            ));
         } else {
+            // Create new category from category bundle - let user select the bundle
             $selected = $this->session->get('mautic.category.type', 'category');
             $builder->add('bundle', 'category_bundles_form', array(
                 'label'      => 'mautic.core.type',
