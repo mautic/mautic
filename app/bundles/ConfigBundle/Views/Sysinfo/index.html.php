@@ -46,7 +46,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('System Info'));
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <?php echo $phpInfo;// $view->render('MauticConfigBundle:Sysinfo:phpinfo.html.php', array('phpInfo' => $phpInfo)); ?>
+                    <?php echo $phpInfo; ?>
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
