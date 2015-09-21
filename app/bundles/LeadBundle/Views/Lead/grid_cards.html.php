@@ -32,7 +32,7 @@
                                 <div class="pull-right">
                                     <div class="checkbox-inline custom-primary mnr-10">
                                         <label class="mb-0">
-                                            <input type="checkbox" value="1">
+                                            <input class="list-checkbox" type="checkbox" value="<?php echo $item->getId(); ?>">
                                             <span></span>
                                         </label>
                                     </div>
