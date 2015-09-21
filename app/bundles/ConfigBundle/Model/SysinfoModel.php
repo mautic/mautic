@@ -30,20 +30,28 @@ class SysinfoModel extends CommonModel
 		{
 			return $this->phpInfo;
 		}
-		ob_start();
-		date_default_timezone_set('UTC');
-		phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES);
-		$phpInfo = ob_get_contents();
-		ob_end_clean();
-		preg_match_all('#<body[^>]*>(.*)</body>#siU', $phpInfo, $output);
-		$output = preg_replace('#<table[^>]*>#', '<table class="table table-striped">', $output[1][0]);
-		$output = preg_replace('#(\w),(\w)#', '\1, \2', $output);
-		$output = preg_replace('#<hr />#', '', $output);
-		$output = str_replace('<div class="center">', '', $output);
-		$output = preg_replace('#<tr class="h">(.*)<\/tr>#', '<thead><tr class="h">$1</tr></thead><tbody>', $output);
-		$output = str_replace('</table>', '</tbody></table>', $output);
-		$output = str_replace('</div>', '', $output);
-		$this->phpInfo = $output;
+
+        if (function_exists('phpinfo')) {
+    		ob_start();
+    		date_default_timezone_set('UTC');
+    		phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES);
+    		$phpInfo = ob_get_contents();
+    		ob_end_clean();
+    		preg_match_all('#<body[^>]*>(.*)</body>#siU', $phpInfo, $output);
+    		$output = preg_replace('#<table[^>]*>#', '<table class="table table-striped">', $output[1][0]);
+    		$output = preg_replace('#(\w),(\w)#', '\1, \2', $output);
+    		$output = preg_replace('#<hr />#', '', $output);
+    		$output = str_replace('<div class="center">', '', $output);
+    		$output = preg_replace('#<tr class="h">(.*)<\/tr>#', '<thead><tr class="h">$1</tr></thead><tbody>', $output);
+    		$output = str_replace('</table>', '</tbody></table>', $output);
+    		$output = str_replace('</div>', '', $output);
+    		$this->phpInfo = $output;
+        } elseif (function_exists('phpversion')) {
+             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.phpversion', array('%phpversion%' => phpversion()));
+        } else {
+             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.missing');
+        }
+
 		return $this->phpInfo;
 	}
 
