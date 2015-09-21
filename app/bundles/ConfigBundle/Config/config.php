@@ -34,7 +34,12 @@ return array(
                 'route'           => 'mautic_sysinfo_index',
                 'iconClass'       => 'fa-life-ring',
                 'id'              => 'mautic_sysinfo_index',
-                'access'          => 'admin'
+                'access'          => 'admin',
+                'checks'    => array(
+                   'parameters' => array(
+                       'sysinfo_disabled' => false
+                   )
+                )
             )
         )
     ),

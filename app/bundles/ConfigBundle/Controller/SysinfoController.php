@@ -26,10 +26,10 @@ class SysinfoController extends FormController
      */
     public function indexAction ($page = 1)
     {
-        if (!$this->factory->getUser()->isAdmin()) {
+        if (!$this->factory->getUser()->isAdmin() || $this->factory->getParameter('sysinfo_disabled')) {
             return $this->accessDenied();
         }
-        
+
         /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
         $model   = $this->factory->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
