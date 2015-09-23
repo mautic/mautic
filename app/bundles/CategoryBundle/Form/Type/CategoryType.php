@@ -50,20 +50,20 @@ class CategoryType extends AbstractType
             $builder->add('bundle', 'hidden', array(
                 'data' => $options['data']->getBundle()
             ));
-        } elseif (!empty($options['bundle'])) {
+        } elseif ($options['show_bundle_select'] == true) {
+           // Create new category from category bundle - let user select the bundle
+           $selected = $this->session->get('mautic.category.type', 'category');
+           $builder->add('bundle', 'category_bundles_form', array(
+               'label'      => 'mautic.core.type',
+               'label_attr' => array('class' => 'control-label'),
+               'attr'       => array('class' => 'form-control'),
+               'required'   => true,
+               'data'       => $selected
+           ));
+       } else {
             // Create new category directly from another bundle - preset bundle
             $builder->add('bundle', 'hidden', array(
                 'data' => $options['bundle']
-            ));
-        } else {
-            // Create new category from category bundle - let user select the bundle
-            $selected = $this->session->get('mautic.category.type', 'category');
-            $builder->add('bundle', 'category_bundles_form', array(
-                'label'      => 'mautic.core.type',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => true,
-                'data'       => $selected
             ));
         }
 
@@ -119,7 +119,8 @@ class CategoryType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\CategoryBundle\Entity\Category'
+            'data_class' => 'Mautic\CategoryBundle\Entity\Category',
+            'show_bundle_select' => false
         ));
 
         $resolver->setRequired(array('bundle'));

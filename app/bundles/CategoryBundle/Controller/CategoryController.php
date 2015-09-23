@@ -183,6 +183,7 @@ class CategoryController extends FormController
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
         $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
         if (!$this->factory->getSecurity()->isGranted($bundle . ':categories:create')) {
@@ -193,7 +194,7 @@ class CategoryController extends FormController
             'objectAction' => 'new',
             'bundle'       => $bundle
         ));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle, 'show_bundle_select' => $showSelect));
         $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
         if ($method == 'POST') {

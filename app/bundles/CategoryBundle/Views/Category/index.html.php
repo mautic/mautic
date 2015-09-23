@@ -16,7 +16,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
        'new'    => $permissions[$bundle.':categories:create']
     ),
     'routeBase' => 'category',
-    'query'     => array('bundle' => $bundle),
+    'query'     => array('bundle' => $bundle, 'show_bundle_select' => true),
     'editMode'  => 'ajaxmodal',
     'editAttr'  => 'data-target="#MauticSharedModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"'
 )));
