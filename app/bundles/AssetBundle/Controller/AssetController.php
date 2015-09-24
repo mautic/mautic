@@ -108,7 +108,7 @@ class AssetController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('asset')->getLookupResults('category', '', 0);
+        $categories = $this->factory->getModel('asset')->getLookupResults('category', '', 0, $this->factory->getSecurity()->isGranted('asset:categories:viewother'));
 
         return $this->delegateView(array(
             'viewParameters'  => array(
