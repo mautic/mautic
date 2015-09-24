@@ -45,8 +45,7 @@ class CampaignEventFormFieldValueType extends AbstractType
         ));
 
         $formModel = $this->factory->getModel('form.form');
-        $leadModel = $this->factory->getModel('lead.list');
-        $operators = $leadModel->getFilterExpressionFunctions();
+        $operators = $formModel->getFilterExpressionFunctions();
         $choices   = array();
 
         foreach ($operators as $key => $operator) {
