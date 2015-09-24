@@ -58,7 +58,7 @@ class FormRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(f.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('f.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

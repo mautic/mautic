@@ -506,6 +506,7 @@ class CampaignModel extends CommonFormModel
 
                 $viewOther = $this->factory->getSecurity()->isGranted('form:forms:viewother');
                 $repo      = $this->factory->getModel('form')->getRepository();
+                $repo->setCurrentUser($this->factory->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
                 foreach ($forms as $form) {
