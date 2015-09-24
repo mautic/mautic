@@ -87,8 +87,9 @@ class EmailController extends FormController
         }
 
         //retrieve a list of categories
+        $this->factory->getModel('category')->getRepository()->setCurrentUser($this->factory->getUser());
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
-            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
+            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0, $this->factory->getSecurity()->isGranted('email:categories:viewother')),
             'prefix'   => 'category'
         );
 
