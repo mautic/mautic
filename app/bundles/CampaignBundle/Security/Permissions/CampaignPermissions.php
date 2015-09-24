@@ -28,7 +28,7 @@ class CampaignPermissions extends AbstractPermissions
         parent::__construct($params);
 
         $this->addStandardPermissions('campaigns');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
     }
 
     /**
@@ -44,7 +44,7 @@ class CampaignPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('campaign', 'categories', $builder, $data);
+        $this->addExtendedFormFields('campaign', 'categories', $builder, $data);
         $this->addStandardFormFields('campaign', 'campaigns', $builder, $data);
     }
 }

@@ -52,8 +52,8 @@ if ($tmpl == 'index')
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'            => $item,
                             'templateButtons' => array(
-                                'edit'   => $permissions[$bundle . ':categories:edit'],
-                                'delete' => $permissions[$bundle . ':categories:delete'],
+                                'edit'   => $security->hasEntityAccess($permissions[$bundle . ':categories:editown'], $permissions[$bundle . ':categories:editother'], $item->getCreatedBy()),
+                                'delete' => $security->hasEntityAccess($permissions[$bundle . ':categories:deleteown'], $permissions[$bundle . ':categories:deleteother'], $item->getCreatedBy()),
                             ),
                             'editMode'        => 'ajaxmodal',
                             'editAttr'        => array(
@@ -73,11 +73,11 @@ if ($tmpl == 'index')
                     <td>
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'category', 'query' => 'bundle=' . $bundle)); ?>
-                            <?php if ($permissions[$bundle . ':categories:edit']): ?>
+                            <?php if ($permissions[$bundle . ':categories:editown'] || $permissions[$bundle . ':categories:editother']): ?>
                             <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())); ?>"
                             <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
-                            <?php if ($permissions[$bundle . ':categories:edit']): ?>
+                            <?php if ($permissions[$bundle . ':categories:editown'] || $permissions[$bundle . ':categories:editother']): ?>
                             </a>
                             <?php endif; ?>
                         </div>

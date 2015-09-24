@@ -25,7 +25,7 @@ class FormPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('forms');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
     }
 
     /**
@@ -41,7 +41,7 @@ class FormPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('form', 'categories', $builder, $data);
+        $this->addExtendedFormFields('form', 'categories', $builder, $data);
         $this->addExtendedFormFields('form', 'forms', $builder, $data);
     }
 }

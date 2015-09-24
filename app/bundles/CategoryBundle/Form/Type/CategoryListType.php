@@ -31,6 +31,10 @@ class CategoryListType extends AbstractType
     private $translator;
 
     private $router;
+    
+    private $user;
+    
+    private $security;
 
     /**
      * @param MauticFactory $factory
@@ -40,6 +44,8 @@ class CategoryListType extends AbstractType
         $this->translator = $factory->getTranslator();
         $this->model      = $factory->getModel('category');
         $this->router     = $factory->getRouter();
+        $this->user       = $factory->getUser();
+        $this->security   = $factory->getSecurity();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -54,12 +60,13 @@ class CategoryListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $model = $this->model;
+        $model->getRepository()->setCurrentUser($this->user);
         $createNew = $this->translator->trans('mautic.category.createnew');
         $modalHeader = $this->translator->trans('mautic.category.header.new');
         $router     = $this->router;
         $resolver->setDefaults(array(
             'choices'    =>  function (Options $options) use ($model, $createNew, $modalHeader) {
-                $categories = $model->getLookupResults($options['bundle'], '', 0);
+                $categories = $model->getLookupResults($options['bundle'], '', 0, $this->security->isGranted($options['bundle'] . ':categories:viewother'));
                 $choices = array();
                 foreach ($categories as $l) {
                     $choices[$l['id']] = $l['title'];

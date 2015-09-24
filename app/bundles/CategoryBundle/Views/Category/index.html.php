@@ -34,7 +34,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'action'      => $currentRoute,
         'routeBase'   => 'category',
         'templateButtons' => array(
-            'delete' => $permissions[$bundle . ':categories:delete'],
+            'delete' => $permissions[$bundle . ':categories:deleteown'] || $permissions[$bundle . ':categories:deleteother'],
         ),
         'query'       => array(
             'bundle' => $bundle

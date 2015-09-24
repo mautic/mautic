@@ -25,7 +25,7 @@ class PagePermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('pages');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
     }
 
     /**
@@ -41,7 +41,7 @@ class PagePermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('page', 'categories', $builder, $data);
+        $this->addExtendedFormFields('page', 'categories', $builder, $data);
         $this->addExtendedFormFields('page', 'pages', $builder, $data);
     }
 }
