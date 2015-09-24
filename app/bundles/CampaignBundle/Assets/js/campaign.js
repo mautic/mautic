@@ -399,6 +399,11 @@ Mautic.launchCampaignEditor = function() {
                     return false;
                 }
 
+                //ensure that a condition is not connecting into action
+                if (mQuery('#' + params.sourceId).hasClass('list-campaign-action') && mQuery('#' + params.targetId).hasClass('list-campaign-condition')) {
+                    return false;
+                }
+
                 return true
             }
         };
