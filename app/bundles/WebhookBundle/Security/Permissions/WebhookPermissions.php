@@ -25,7 +25,7 @@ class WebhookPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('webhooks');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
     }
 
     /**
@@ -42,7 +42,7 @@ class WebhookPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('webhook', 'categories', $builder, $data);
+        $this->addExtendedFormFields('webhook', 'categories', $builder, $data);
         $this->addExtendedFormFields('webhook', 'webhooks', $builder, $data);
     }
 }

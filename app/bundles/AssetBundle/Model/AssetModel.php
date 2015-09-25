@@ -332,7 +332,7 @@ class AssetModel extends FormModel
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10, $viewOther = false)
     {
         $results = array();
         switch ($type) {
@@ -343,7 +343,9 @@ class AssetModel extends FormModel
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $repo = $this->factory->getModel('category.category')->getRepository();
+                $repo->setCurrentUser($this->factory->getUser());
+                $results = $repo->getCategoryList($filter, $limit, 0, $viewOther);
                 break;
         }
 

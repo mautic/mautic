@@ -45,7 +45,7 @@ class CategoryRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
+    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, $viewOther = false)
     {
         $q = $this->createQueryBuilder('c');
         $q->select('partial c.{id, title, alias, color}');
@@ -54,6 +54,11 @@ class CategoryRepository extends CommonRepository
             ->setParameter('true', true, 'boolean');
         $q->andWhere('c.bundle = :bundle')
             ->setParameter('bundle', $bundle);
+        
+        if (!$viewOther) {
+            $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
+                ->setParameter('id', $this->currentUser->getId());
+        }
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('c.title', ':search'))

@@ -26,7 +26,7 @@ class EmailPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
         $this->addExtendedPermissions('emails');
     }
 
@@ -47,7 +47,7 @@ class EmailPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('email', 'categories', $builder, $data);
+        $this->addExtendedFormFields('email', 'categories', $builder, $data);
         $this->addExtendedFormFields('email', 'emails', $builder, $data);
     }
 }

@@ -206,11 +206,12 @@ class CategoryModel extends FormModel
      * @param $bundle
      * @param $filter
      * @param $limit
+     * @param $viewOther
      * @return array
      */
-    public function getLookupResults($bundle, $filter = '', $limit = 10)
+    public function getLookupResults($bundle, $filter = '', $limit = 10, $viewOther = false)
     {
-        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0, $viewOther);
         return $results;
     }
 }

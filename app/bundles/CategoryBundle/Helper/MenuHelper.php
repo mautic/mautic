@@ -22,7 +22,7 @@ class MenuHelper
      */
     public static function addCategoryMenuItems(&$items, $bundleName, CorePermissions $security)
     {
-        if (!$security->isGranted($bundleName . ':categories:view')) {
+        if (!$security->isGranted($bundleName . ':categories:viewown') && !$security->isGranted($bundleName . ':categories:viewother')) {
             return;
         }
 

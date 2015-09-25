@@ -44,13 +44,18 @@ class CategoryController extends FormController
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
-            $bundle . ':categories:view',
+            $bundle . ':categories:viewown',
+            $bundle . ':categories:viewother',
             $bundle . ':categories:create',
-            $bundle . ':categories:edit',
-            $bundle . ':categories:delete'
+            $bundle . ':categories:editown',
+            $bundle . ':categories:editother',
+            $bundle . ':categories:deleteown',
+            $bundle . ':categories:deleteother',
+            $bundle . ':categories:publishown',
+            $bundle . ':categories:publishother'
         ), "RETURN_ARRAY");
 
-        if (!$permissions[$bundle . ':categories:view']) {
+        if (!$permissions[$bundle . ':categories:viewown'] && !$permissions[$bundle . ':categories:viewother']) {
             return $this->accessDenied();
         }
 
@@ -80,6 +85,10 @@ class CategoryController extends FormController
                 'value'  => $bundle
             )
         ));
+        
+        if (!$permissions[$bundle . ':categories:viewother']) {
+            $filter['force'][] = array('column' => 'c.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+        }
 
         $orderBy    = $this->factory->getSession()->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->factory->getSession()->get('mautic.category.orderbydir', 'DESC');
@@ -120,6 +129,8 @@ class CategoryController extends FormController
         $session->set('mautic.category.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        
+        $security = $this->factory->getSecurity();
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
@@ -130,7 +141,8 @@ class CategoryController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl
+                'tmpl'        => $tmpl,
+                'security'    => $security
             ),
             'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
             'passthroughVars' => array(
@@ -254,9 +266,11 @@ class CategoryController extends FormController
         //not found
         if ($entity === null) {
             $closeModal = true;
-        } elseif (!$this->factory->getSecurity()->isGranted($bundle . ':categories:view')) {
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            $bundle . ':categories:viewown', $bundle . ':categories:viewother', $entity->getCreatedBy()
+        )) {
             return $this->modalAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($model->isLocked($entity))  {
             return $this->modalAccessDenied();
         }
 
@@ -403,7 +417,11 @@ class CategoryController extends FormController
                     'msg'     => 'mautic.category.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted($bundle . ':categories:delete')) {
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                $bundle . ':categories:deleteown',
+                $bundle . ':categories:deleteother',
+                $entity->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
@@ -471,7 +489,11 @@ class CategoryController extends FormController
                         'msg'     => 'mautic.category.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted($bundle . ':categories:delete')) {
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    $bundle . ':categories:deleteown',
+                    $bundle . ':categories:deleteother',
+                    $entity->getCreatedBy()
+                )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);

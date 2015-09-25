@@ -27,7 +27,7 @@ class PointPermissions extends AbstractPermissions
 
         $this->addStandardPermissions('points');
         $this->addStandardPermissions('triggers');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('categories');
     }
 
     /**
@@ -43,7 +43,7 @@ class PointPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('point', 'categories', $builder, $data);
+        $this->addExtendedFormFields('point', 'categories', $builder, $data);
         $this->addStandardFormFields('point', 'points', $builder, $data);
         $this->addStandardFormFields('point', 'triggers', $builder, $data);
     }
