@@ -4533,3 +4533,7 @@ body.noscroll {
   font-size: 10px;
   line-height: 1em;
 }
+.table .input-group-sm .dropdown-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
