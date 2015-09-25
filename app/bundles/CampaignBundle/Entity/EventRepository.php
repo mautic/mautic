@@ -327,15 +327,13 @@ class EventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignActionEvents($campaignId)
+    public function getCampaignActionAndConditionEvents($campaignId)
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('e')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where(
-                $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            );
+            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
+            ->andWhere($q->expr()->in('e.eventType', array('action', 'condition')));
 
         $events = $q->getQuery()->getArrayResult();
 

@@ -756,7 +756,7 @@ class EventModel extends CommonFormModel
         }
 
         // Get events to avoid joins
-        $campaignEvents = $repo->getCampaignActionEvents($campaignId);
+        $campaignEvents = $repo->getCampaignActionAndConditionEvents($campaignId);
 
         // Event settings
         $eventSettings = $campaignModel->getEvents();
@@ -839,7 +839,11 @@ class EventModel extends CommonFormModel
                         'name' => $campaignName
                     );
 
-                    if (!isset($eventSettings['action'][$event['type']])) {
+                    if (isset($eventSettings['action'][$event['type']])) {
+                        $thisEventSettings = $eventSettings['action'][$event['type']];
+                    } elseif (isset($eventSettings['condition'][$event['type']])) {
+                        $thisEventSettings = $eventSettings['condition'][$event['type']];
+                    } else {
                         unset($event);
                         $eventCount++;
                         $totalEventCount++;
@@ -848,8 +852,8 @@ class EventModel extends CommonFormModel
                     }
 
                     //trigger the action
-                    $response = $this->invokeEventCallback($event, $eventSettings['action'][$event['type']], $lead, null, true);
-                    if ($response !== false) {
+                    $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true);
+                    if ($response !== false || $event['eventType'] == 'condition') {
                         $processedEvents++;
 
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
@@ -871,6 +875,8 @@ class EventModel extends CommonFormModel
                     } else {
                         $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
                     }
+
+                    $this->handleCondition($response, $eventSettings, $event, $campaign, $lead);
 
                     $eventCount++;
                     $totalEventCount++;
@@ -918,7 +924,7 @@ class EventModel extends CommonFormModel
             gc_collect_cycles();
         }
 
-        if($output) {
+        if ($output) {
             $progress->finish();
             $output->writeln('');
         }
