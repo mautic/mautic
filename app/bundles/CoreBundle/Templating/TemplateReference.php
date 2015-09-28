@@ -100,11 +100,15 @@ class TemplateReference extends BaseTemplateReference
             }
         } else {
             $themes = $this->factory->getInstalledThemes();
-            if (isset($themes[$controller])) {
-                //this is a file in a specific Mautic theme folder
-                $theme = $this->factory->getTheme($controller);
+            foreach ($themes as $theme) {
+                if ($theme['basename'] == $controller) {
+                    //this is a file in a specific Mautic theme folder
+                    $theme = $this->factory->getTheme($controller);
 
-                $template = $theme->getThemePath().'/html/'.$fileName;
+                    $template = $theme->getThemePath().'/html/'.$fileName;
+
+                    break;
+                }
             }
         }
 

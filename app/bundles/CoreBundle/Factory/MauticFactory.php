@@ -538,10 +538,18 @@ class MauticFactory
                     $config = include $theme->getRealPath().'/config.php';
                     if ($specificFeature != 'all') {
                         if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                            $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                            $themes[$specificFeature][] = [
+                                'basename' => $theme->getBasename(),
+                                'name' => $config['name'],
+                                'category' => !empty($config['category']) ? $config['category'] : $this->getTranslator()->trans('mautic.core.form.uncategorized')
+                            ];
                         }
                     } else {
-                        $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                        $themes[$specificFeature][] = [
+                            'basename' => $theme->getBasename(),
+                            'name' => $config['name'],
+                            'category' => !empty($config['category']) ? $config['category'] : $this->getTranslator()->trans('mautic.core.form.uncategorized')
+                        ];
                     }
                 }
             }

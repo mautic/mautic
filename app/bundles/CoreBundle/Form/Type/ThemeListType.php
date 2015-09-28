@@ -42,7 +42,23 @@ class ThemeListType extends AbstractType
         $factory = $this->factory;
         $resolver->setDefaults(array(
             'choices'       => function(Options $options) use ($factory) {
-                return $factory->getInstalledThemes($options['feature']);
+                $choices = array();
+
+                $themes = $factory->getInstalledThemes($options['feature']);
+
+                foreach ($themes as $theme) {
+                    $choices[$theme['category']][$theme['basename']] = $theme['name'];
+                }
+
+                //Sort by category
+                ksort($choices);
+
+                //Sort by theme name
+                foreach ($choices as $category => &$themes) {
+                    ksort($themes);
+                }
+
+                return $choices;
             },
             'expanded'      => false,
             'multiple'      => false,
