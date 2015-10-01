@@ -529,6 +529,43 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
+     * Adds a flash message to the current session for type.
+     *
+     * This method acts as a proxy to support the previous method signature which is now used in the addTranslatedFlash method
+     *
+     * @param string $type    The type
+     * @param string $message The message
+     *
+     * @throws \LogicException
+     */
+    protected function addFlash($type, $message)
+    {
+        // For the legacy signature, $message will be an array
+        if (is_array($message)) {
+            $args = func_get_args();
+
+            switch (count($args)) {
+                case 2:
+                    $this->addTranslatedFlash($args[0], $args[1]);
+                    break;
+                case 3:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2]);
+                    break;
+                case 4:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2], $args[3]);
+                    break;
+                case 5:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2], $args[3], $args[4]);
+                    break;
+            }
+
+            return;
+        }
+
+        parent::addFlash($type, $message);
+    }
+
+    /**
      * @param string $message
      * @param array  $messageVars
      * @param string $type
@@ -552,7 +589,7 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+        $this->addFlash($type, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             switch ($type) {
