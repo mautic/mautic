@@ -428,22 +428,25 @@ class ConfigType extends AbstractType
             )
         );
 
-        // TODO - Write an API endpoint listing our supported services and build this list from that
-        // see CoreBundle\Entity\IpAddress
+        // Search for IP Services
+        $bundles = $this->factory->getMauticBundles(true);
+        $choices = array();
+
+        foreach ($bundles as $bundle) {
+            if (isset($bundle['config']['ip_lookup_services'])) {
+                foreach ($bundle['config']['ip_lookup_services'] as $service => $details) {
+                    $choices[$service] = $details['display_name'];
+                }
+            }
+        }
+
+        natcasesort($choices);
+
         $builder->add(
             'ip_lookup_service',
             'choice',
             array(
-                'choices'    => array(
-                    'telize'            => 'mautic.core.config.ip_lookup_service.telize',
-                    'freegeoip'         => 'mautic.core.config.ip_lookup_service.freegeoip',
-                    'geobytes'          => 'mautic.core.config.ip_lookup_service.geobytes',
-                    'ipinfodb'          => 'mautic.core.config.ip_lookup_service.ipinfodb',
-                    'geoips'            => 'mautic.core.config.ip_lookup_service.geoips',
-                    'maxmind_country'   => 'mautic.core.config.ip_lookup_service.maxmind_country',
-                    'maxmind_precision' => 'mautic.core.config.ip_lookup_service.maxmind_precision',
-                    'maxmind_omni'      => 'mautic.core.config.ip_lookup_service.maxmind_omni'
-                ),
+                'choices'    => $choices,
                 'label'      => 'mautic.core.config.form.ip.lookup.service',
                 'label_attr' => array(
                     'class' => 'control-label'

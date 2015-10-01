@@ -337,6 +337,42 @@ return array(
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
         )
     ),
+
+    'ip_lookup_services' => array(
+        'freegeoip' => array(
+            'display_name' => 'freegeoip.net',
+            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipIpLookup'
+        ),
+        'geobytes' => array(
+            'display_name' => 'Geobytes',
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesIpLookup'
+        ),
+        'geoips' => array(
+            'display_name' => 'GeoIPs',
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsIpLookup'
+        ),
+        'ipinfodb' => array(
+            'display_name' => 'IPInfoDB',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbIpLookup'
+        ),
+        'maxmind_country' => array(
+            'display_name' => 'MaxMind - Country Geolocation',
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryIpLookup'
+        ),
+        'maxmind_omni' => array(
+            'display_name' => 'MaxMind - Insights (formerly Omni)',
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniIpLookup'
+        ),
+        'maxmind_precision' => array(
+            'display_name' => 'MaxMind - GeoIP2 Precision',
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionIpLookup'
+        ),
+        'telize' => array(
+            'display_name' => 'Telize',
+            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeIpLookup'
+        )
+    ),
+
     'parameters' => array(
         'site_url'                       => '',
         'webroot'                        => '',
@@ -367,12 +403,6 @@ return array(
         'date_format_dateonly'           => 'F j, Y',
         'date_format_timeonly'           => 'g:i a',
         'ip_lookup_service'              => 'telize',
-        //telize (free with no limit at this time)
-        //freegeoip (free with 10000/hr limit)
-        //geobytes ( free 20/hr limit or paid account restricted to calls from single IP
-        //ipinfodb (paid; api key required)
-        //geoips (paid; api key required)
-        //maxmind_country, maxmind_precision, or maxmind_omni (paid; username/license key required)
         'ip_lookup_auth'                 => '',
         'transifex_username'             => '',
         'transifex_password'             => '',
