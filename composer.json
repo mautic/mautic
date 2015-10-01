@@ -75,7 +75,7 @@
     },
     "require-dev": {
         "symfony/twig-bundle": "2.5.*",
-        "symfony/web-profiler-bundle": "2.5.*",
+        "symfony/web-profiler-bundle": "2.6.*",
         "liip/functional-test-bundle": "dev-master",
         "sensio/generator-bundle": "~2.3",
         "babdev/transifex": "~1.0",
