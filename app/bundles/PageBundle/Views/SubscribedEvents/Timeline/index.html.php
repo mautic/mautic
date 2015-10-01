@@ -56,11 +56,13 @@ if ($event['extra']['hit']['dateLeft']) {
 					<?php if (isset($event['extra']['hit']['sourceName'])) : ?>
 					<dt><?php echo $view['translator']->trans('mautic.core.source'); ?>:</dt>
 					<dd class="ellipsis">
-						<a href="<?php echo $view['router']->generate('mautic_' . $event['extra']['hit']['source'] . '_action',
-						    array("objectAction" => "view", "objectId" => $event['extra']['hit']['sourceId'])); ?>"
-						   data-toggle="ajax">
+						<?php if (isset($event['extra']['hit']['sourceRoute'])): ?>
+						<a href="<?php echo $event['extra']['hit']['sourceRoute']; ?>" data-toggle="ajax">
 						    <?php echo $event['extra']['hit']['sourceName']; ?>
 						</a>
+						<?php else: ?>
+						<?php echo $event['extra']['hit']['sourceName']; ?>
+						<?php endif; ?>
 					</dd>
 					<?php endif; ?>
 				</dl>
