@@ -152,7 +152,7 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list);
 
-                    $this->addFlash('mautic.core.notice.created',  array(
+                    $this->addTranslatedFlash('mautic.core.notice.created',  array(
                         '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
                         '%menu_link%' => 'mautic_leadlist_index',
                         '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
@@ -252,7 +252,7 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated',  array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated',  array(
                         '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
                         '%menu_link%' => 'mautic_leadlist_index',
                         '%url%'       => $this->generateUrl('mautic_leadlist_action', array(

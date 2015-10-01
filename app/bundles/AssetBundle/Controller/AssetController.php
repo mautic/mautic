@@ -310,7 +310,7 @@ class AssetController extends FormController
                     //remove the asset from request
                     $this->request->files->remove('asset');
 
-                    $this->addFlash('mautic.core.notice.created', array(
+                    $this->addTranslatedFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_asset_index',
                         '%url%'       => $this->generateUrl('mautic_asset_action', array(
@@ -474,7 +474,7 @@ class AssetController extends FormController
                     //remove the asset from request
                     $this->request->files->remove('asset');
 
-                    $this->addFlash('mautic.core.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_asset_index',
                         '%url%'       => $this->generateUrl('mautic_asset_action', array(

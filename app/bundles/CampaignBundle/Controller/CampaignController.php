@@ -503,7 +503,7 @@ class CampaignController extends FormController
                         //update canvas settings with new event IDs then save
                         $model->setCanvasSettings($entity, $connections);
 
-                        $this->addFlash(
+                        $this->addTranslatedFlash(
                             'mautic.core.notice.created',
                             array(
                                 '%name%'      => $entity->getName(),
@@ -735,7 +735,7 @@ class CampaignController extends FormController
                             $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                         }
 
-                        $this->addFlash(
+                        $this->addTranslatedFlash(
                             'mautic.core.notice.updated',
                             array(
                                 '%name%'      => $entity->getName(),

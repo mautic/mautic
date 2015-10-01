@@ -40,7 +40,7 @@ class PublicController extends FormController
                     $encoder = $this->get('security.encoder_factory')->getEncoder($user);
                     $model->resetPassword($user, $encoder);
 
-                    $this->addFlash('mautic.user.user.notice.passwordreset', array(), 'notice', null, false);
+                    $this->addTranslatedFlash('mautic.user.user.notice.passwordreset', array(), 'notice', null, false);
 
                     return $this->redirect($this->generateUrl('login'));
                 }

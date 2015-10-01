@@ -145,7 +145,7 @@ class RoleController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', array(
+                    $this->addTranslatedFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', array(
@@ -254,7 +254,7 @@ class RoleController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', array(

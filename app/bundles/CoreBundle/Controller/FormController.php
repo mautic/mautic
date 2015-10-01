@@ -167,7 +167,7 @@ class FormController extends CommonController
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
 
-            $this->addFlash(
+            $this->addTranslatedFlash(
                 'mautic.core.action.entity.unlocked',
                 array(
                     '%name%' => urldecode($this->request->get('name'))
@@ -622,7 +622,7 @@ class FormController extends CommonController
                             $this->afterSaveEntity($entity, $form, 'new');
                         }
 
-                        $this->addFlash(
+                        $this->addTranslatedFlash(
                             'mautic.core.notice.updated',
                             array(
                                 '%name%'      => $entity->getName(),

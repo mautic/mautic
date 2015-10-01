@@ -374,7 +374,7 @@ class PageController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->addFlash('mautic.core.notice.created', array(
+                    $this->addTranslatedFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_page_index',
                         '%url%'       => $this->generateUrl('mautic_page_action', array(
@@ -524,7 +524,7 @@ class PageController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->addFlash('mautic.core.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_page_index',
                         '%url%'       => $this->generateUrl('mautic_page_action', array(

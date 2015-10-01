@@ -486,7 +486,7 @@ class LeadController extends FormController
 
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.core.notice.created',
                         array(
                             '%name%'      => $identifier,
@@ -671,7 +671,7 @@ class LeadController extends FormController
 
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.core.notice.updated',
                         array(
                             '%name%'      => $identifier,
@@ -1600,7 +1600,7 @@ class LeadController extends FormController
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true)) {
                             $mailer->createLeadEmailStat();
-                            $this->addFlash(
+                            $this->addTranslatedFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(
                                     '%subject%' => $subject,
@@ -1727,7 +1727,7 @@ class LeadController extends FormController
                 }
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected',
+            $this->addTranslatedFlash('mautic.lead.batch_leads_affected',
                 array(
                     'pluralCount' => $count,
                     '%count%'     => $count
@@ -1855,7 +1855,7 @@ class LeadController extends FormController
                 }
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected',
+            $this->addTranslatedFlash('mautic.lead.batch_leads_affected',
                 array(
                     'pluralCount' => $count,
                     '%count%'     => $count
@@ -1954,7 +1954,7 @@ class LeadController extends FormController
                 $this->factory->getModel('email')->getRepository()->saveEntities($dncEntities);
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected',
+            $this->addTranslatedFlash('mautic.lead.batch_leads_affected',
                 array(
                     'pluralCount' => $count,
                     '%count%'     => $count

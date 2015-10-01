@@ -41,7 +41,7 @@ class SecurityController extends CommonController
                 $msg = $error->getMessage();
             }
 
-            $this->addFlash($msg, array(), 'error', null, false);
+            $this->addTranslatedFlash($msg, array(), 'error', null, false);
         }
 
         return $this->render(

@@ -303,7 +303,7 @@ class FormController extends CommonFormController
                                 $model->setActions($entity, $actions, $fields);
                             }
 
-                            $this->addFlash('mautic.core.notice.created', array(
+                            $this->addTranslatedFlash('mautic.core.notice.created', array(
                                 '%name%'      => $entity->getName(),
                                 '%menu_link%' => 'mautic_form_index',
                                 '%url%'       => $this->generateUrl('mautic_form_action', array(
@@ -528,7 +528,7 @@ class FormController extends CommonFormController
                         // Delete fields
                         $this->factory->getModel('form.field')->deleteEntities($deletedFields);
 
-                        $this->addFlash(
+                        $this->addTranslatedFlash(
                             'mautic.core.notice.updated',
                             array(
                                 '%name%'      => $entity->getName(),

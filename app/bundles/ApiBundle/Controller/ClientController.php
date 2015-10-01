@@ -220,7 +220,7 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client);
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.api.client.notice.created',
                         array(
                             '%name%'         => $client->getName(),
@@ -330,7 +330,7 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client, $form->get('buttons')->get('save')->isClicked());
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.core.notice.updated',
                         array(
                             '%name%'      => $client->getName(),
