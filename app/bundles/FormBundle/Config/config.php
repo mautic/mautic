@@ -96,7 +96,7 @@ return array(
         )
     ),
 
-    'category' => array(
+    'categories' => array(
         'form' => null
     ),
 

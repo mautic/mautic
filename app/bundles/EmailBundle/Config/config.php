@@ -79,7 +79,7 @@ return array(
             )
         )
     ),
-    'category' => array(
+    'categories' => array(
         'email' => null
     ),
     'services'   => array(

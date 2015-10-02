@@ -77,7 +77,7 @@ return array(
         )
     ),
 
-    'category' => array(
+    'categories' => array(
         'page' => null
     ),
 

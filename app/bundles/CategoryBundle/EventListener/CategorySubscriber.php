@@ -46,8 +46,8 @@ class CategorySubscriber extends CommonSubscriber
         $bundles = $this->factory->getMauticBundles(true);
 
         foreach ($bundles as $bundle) {
-            if (!empty($bundle['config']['category'])) {
-                foreach ($bundle['config']['category'] as $type => $label) {
+            if (!empty($bundle['config']['categories'])) {
+                foreach ($bundle['config']['categories'] as $type => $label) {
                     $event->addCategoryType($type, $label);
                 }
             }

@@ -74,7 +74,7 @@ return array(
         )
     ),
 
-    'category' => array(
+    'categories' => array(
         'point' => null
     ),
 

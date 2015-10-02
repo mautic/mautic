@@ -62,7 +62,7 @@ return array(
         )
     ),
 
-    'category' => array(
+    'categories' => array(
         'asset' => null
     ),
 

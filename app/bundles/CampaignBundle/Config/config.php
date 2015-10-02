@@ -67,7 +67,7 @@ return array(
         )
     ),
 
-    'category' => array(
+    'categories' => array(
         'campaign' => null
     ),
 
