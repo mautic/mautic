@@ -67,13 +67,6 @@ abstract class AbstractIpLookup
     abstract protected function parseData($response);
 
     /**
-     * Get the URL to communicate with
-     *
-     * @return mixed
-     */
-    abstract protected function getUrl();
-
-    /**
      * Construct
      *
      * @param $ip
@@ -105,4 +98,15 @@ abstract class AbstractIpLookup
             }
         }
     }
+
+    /**
+     * Get the URL to communicate with
+     *
+     * @return mixed
+     */
+    protected function getUrl()
+    {
+        return '';
+    }
+
 }
