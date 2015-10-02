@@ -67,6 +67,10 @@ return array(
         )
     ),
 
+    'category' => array(
+        'campaign' => null
+    ),
+
     'services' => array(
         'events' => array(
             'mautic.campaign.subscriber'                => array(
@@ -83,9 +87,6 @@ return array(
             ),
             'mautic.campaign.search.subscriber'         => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
-            ),
-            'mautic.campaign.category.subscriber'                => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\CategorySubscriber'
             )
         ),
         'forms'  => array(

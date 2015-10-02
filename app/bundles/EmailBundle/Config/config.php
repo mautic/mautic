@@ -79,6 +79,9 @@ return array(
             )
         )
     ),
+    'category' => array(
+        'email' => null
+    ),
     'services'   => array(
         'events' => array(
             'mautic.email.subscriber'                => array(
@@ -113,9 +116,6 @@ return array(
             ),
             'mautic.email.configbundle.subscriber'   => array(
                 'class' => 'Mautic\EmailBundle\EventListener\ConfigSubscriber'
-            ),
-            'mautic.email.category.subscriber'                => array(
-                'class' => 'Mautic\EmailBundle\EventListener\CategorySubscriber'
             )
         ),
         'forms'  => array(

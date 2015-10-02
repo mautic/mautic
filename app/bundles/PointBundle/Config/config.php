@@ -74,6 +74,10 @@ return array(
         )
     ),
 
+    'category' => array(
+        'point' => null
+    ),
+
     'services' => array(
         'events' => array(
             'mautic.point.subscriber'            => array(
@@ -84,9 +88,6 @@ return array(
             ),
             'mautic.point.search.subscriber'     => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
-            ),
-            'mautic.point.category.subscriber'                => array(
-                'class' => 'Mautic\PointBundle\EventListener\CategorySubscriber'
             )
         ),
         'forms'  => array(

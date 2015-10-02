@@ -96,6 +96,10 @@ return array(
         )
     ),
 
+    'category' => array(
+        'form' => null
+    ),
+
     'services' => array(
         'events' => array(
             'mautic.form.subscriber'                => array(
@@ -127,10 +131,7 @@ return array(
             ),
             'mautic.form.webhook.subscriber'                => array(
                 'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber'
-            ),
-            'mautic.form.category.subscriber'                => array(
-                'class' => 'Mautic\FormBundle\EventListener\CategorySubscriber'
-            ),
+            )
         ),
         'forms'  => array(
             'mautic.form.type.form'                      => array(
