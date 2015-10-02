@@ -71,11 +71,15 @@ class SysinfoModel extends CommonModel
             $this->factory->getSystemPath('local_config'),
             $this->factory->getParameter('cache_path'),
             $this->factory->getParameter('log_path'),
-            $this->factory->getParameter('mailer_spool_path'),
             $this->factory->getParameter('upload_dir'),
             $this->factory->getSystemPath('images', true),
             $this->factory->getSystemPath('translations', true),
         );
+
+        // Show the spool folder only if the email queue is configured
+        if ($this->factory->getParameter('mailer_spool_type') == 'file') {
+            $importantFolders[] = $this->factory->getParameter('mailer_spool_path');
+        }
 
         foreach ($importantFolders as $folder) {
             $folder = realpath($folder);
