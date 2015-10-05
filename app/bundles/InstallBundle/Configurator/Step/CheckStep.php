@@ -289,7 +289,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.xml';
         }
 
-        if (function_exists('imap_open')) {
+        if (!function_exists('imap_open')) {
             $messages[] = 'mautic.install.extension.imap';
         }
 
