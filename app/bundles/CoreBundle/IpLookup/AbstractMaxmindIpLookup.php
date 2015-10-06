@@ -12,24 +12,24 @@ namespace Mautic\CoreBundle\IpLookup;
 /**
  * Class AbstractMaxmindLookup
  */
-abstract class AbstractMaxmindLookup extends AbstractIpLookup
+abstract class AbstractMaxmindIpLookup extends AbstractIpLookup
 {
     /**
      * @return string
      */
     protected function getUrl()
     {
-        $url = "https://{$this->auth}@geoip.maxmind.com/geoip/v2.0/";
+        $url = "https://{$this->auth}@geoip.maxmind.com/geoip/v2.1/";
 
         switch ($this->getName()) {
             case 'maxmind_country':
                 $url .= 'country';
                 break;
             case 'maxmind_precision':
-                $url .= 'city_isp_org';
+                $url .= 'city';
                 break;
             case 'maxmind_omni':
-                $url .= 'omni';
+                $url .= 'insights';
                 break;
         }
 
@@ -45,12 +45,13 @@ abstract class AbstractMaxmindLookup extends AbstractIpLookup
     {
         $data = json_decode($response);
 
-        if ($data) {
+        if ($data && empty($data->error)) {
             $this->city      = $data->city->names->en;
             $this->region    = $data->subdivisions->names->en;
             $this->country   = $data->country->names->en;
             $this->latitude  = $data->location->latitude;
             $this->longitude = $data->location->longitude;
+            $this->timezone = $data->location->time_zone;
 
             if (isset($data->traits->isp)) {
                 $this->isp = $data->traits->isp;
@@ -59,8 +60,6 @@ abstract class AbstractMaxmindLookup extends AbstractIpLookup
             if (isset($data->traits->organization)) {
                 $this->organization = $data->traits->organization;
             }
-
-            $this->timezone = $data->location->time_zone;
         }
     }
 }
