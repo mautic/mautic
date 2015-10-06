@@ -17,27 +17,17 @@ class GeobytesIpLookup extends AbstractIpLookup
      */
     protected function getUrl()
     {
-        return "http://www.geobytes.com/IpLocator.htm?GetLocation&template=php3.txt&IpAddress={$this->ip}";
+        return "http://getcitydetails.geobytes.com/GetCityDetails?fqcn={$this->ip}";
     }
 
     /**
-     * {@inheritdoc}
+     * @param $response
      */
-    public function getData()
+    public function parseData($response)
     {
-        $tags = get_meta_tags($this->getUrl());
-
-        if ($tags && $tags['city'] != 'Limit Exceeded') {
-            $this->parseData($tags);
-        }
-    }
-
-    /**
-     * @param  $data
-     */
-    public function parseData($data)
-    {
+        $data = json_decode($response);
         foreach ($data as $key => $value) {
+            $key = str_replace('geobytes', '', $key);
             $this->$key = $value;
         }
     }
