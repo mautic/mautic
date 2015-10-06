@@ -10,14 +10,14 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 
-class GeoIpsIpLookup extends AbstractIpLookup
+class GeoipsIpLookup extends AbstractIpLookup
 {
     /**
      * @return string
      */
     protected function getUrl()
     {
-        return "http://api.geoips.com/ip/{$this->ip}/key/{$this->auth}/output/json";
+        return "http://api.geoips.com/ip/{$this->ip}/key/ec9e4bbc7ac82d809c20c51c9ad2441f/output/json";
     }
 
     /**
@@ -27,8 +27,8 @@ class GeoIpsIpLookup extends AbstractIpLookup
     {
         $data = json_decode($response);
 
-        if ($data) {
-            foreach ($data as $key => $value) {
+        if ($data && !empty($data->response->location)) {
+            foreach ($data->response->location as $key => $value) {
                 switch ($key) {
                     case 'city_name':
                         $key = 'city';
@@ -38,6 +38,9 @@ class GeoIpsIpLookup extends AbstractIpLookup
                         break;
                     case 'country_name':
                         $key = 'country';
+                        break;
+                    case 'owner':
+                        $key = 'isp';
                         break;
                 }
 
