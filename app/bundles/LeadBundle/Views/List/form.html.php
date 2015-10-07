@@ -64,43 +64,35 @@ $templates = array(
                         <div class="tab-pane fade bdr-w-0" id="filters">
                             <div class="form-group">
                                 <?php echo $view['form']->errors($form['filters']); ?>
-                                <div class="available-filters mb-md" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                            <?php echo $view['translator']->trans('mautic.lead.list.form.filters.add'); ?>
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" role="menu">
-                                            <?php
-                                            foreach ($fields as $value => $params):
-                                                $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                                if (!is_array($list) && strpos($list, '|') !== false):
-                                                    $parts = explode('||', $list);
-                                                    if (count($parts) > 1):
-                                                        $labels = explode('|', $parts[0]);
-                                                        $values = explode('|', $parts[1]);
-                                                        $list = array_combine($values, $labels);
-                                                    else:
-                                                        $list = explode('|', $list);
-                                                        $list = array_combine($list, $list);
-                                                    endif;
+                                <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
+                                    <select class="chosen form-control" id="available_filters">
+                                        <option value=""></option>
+                                        <?php
+                                        foreach ($fields as $value => $params):
+                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
+                                            if (!is_array($list) && strpos($list, '|') !== false):
+                                                $parts = explode('||', $list);
+                                                if (count($parts) > 1):
+                                                    $labels = explode('|', $parts[0]);
+                                                    $values = explode('|', $parts[1]);
+                                                    $list = array_combine($values, $labels);
+                                                else:
+                                                    $list = explode('|', $list);
+                                                    $list = array_combine($list, $list);
                                                 endif;
-                                                $list      = json_encode($list);
-                                                $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                                $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
-                                                ?>
-                                                <li>
-                                                    <a id="available_<?php echo $value; ?>" class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>">
-                                                        <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
-                                                    </a>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
-                                    </div>
+                                            endif;
+                                            $list      = json_encode($list);
+                                            $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
+                                            $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
+                                            ?>
+                                            <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                                <div class="selected-filters" id="leadlist_filters">
-                                    <?php echo $view['form']->widget($form['filters']); ?>
-                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="selected-filters" id="leadlist_filters">
+                                <?php echo $view['form']->widget($form['filters']); ?>
                             </div>
                         </div>
                     </div>

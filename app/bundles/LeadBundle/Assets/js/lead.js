@@ -183,6 +183,13 @@ Mautic.leadlistOnLoad = function(container) {
     }
 
     if (mQuery('#leadlist_filters').length) {
+        mQuery('#available_filters').on('change', function() {
+            if (mQuery(this).val()) {
+                Mautic.addLeadListFilter(mQuery(this).val());
+                mQuery(this).val('');
+                mQuery(this).trigger('chosen:updated');
+            }
+        });
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
                 mQuery(this).closest('.panel').animate(
@@ -262,7 +269,7 @@ Mautic.convertLeadFilterInput = function(el) {
 
 Mautic.addLeadListFilter = function (elId) {
     var filterId = '#available_' + elId;
-    var label    = mQuery(filterId + ' span.leadlist-filter-name').text();
+    var label    = mQuery(filterId).text();
 
     //create a new filter
 
