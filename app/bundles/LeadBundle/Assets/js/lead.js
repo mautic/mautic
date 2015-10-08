@@ -324,7 +324,7 @@ Mautic.addLeadListFilter = function (elId) {
             var fieldOptions = mQuery(filterId).data("field-list");
 
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(val).text(val).appendTo(filterEl);
+                mQuery('<option>').val(index).text(val).appendTo(filterEl);
             });
         }
         mQuery(filter).attr('data-placeholder', label);
@@ -473,10 +473,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-/**
- *
- * @param label
- */
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
         mQuery(el).val()
