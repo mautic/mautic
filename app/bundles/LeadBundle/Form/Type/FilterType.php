@@ -93,8 +93,7 @@ class FilterType extends AbstractType
                 case 'leadlist':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
-                    }
-                    if (!is_array($data['filter'])) {
+                    } elseif (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
                     $customOptions['choices']  = $options['lists'];
@@ -104,8 +103,7 @@ class FilterType extends AbstractType
                 case 'tags':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
-                    }
-                    if (!is_array($data['filter'])) {
+                    } elseif (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
                     $customOptions['choices']  = $options['tags'];
@@ -171,7 +169,9 @@ class FilterType extends AbstractType
 
                     if (in_array($data['operator'], array('in', '!in'))) {
                         $customOptions['multiple'] = true;
-                        if (!is_array($data['filter'])) {
+                        if (!isset($data['filter'])) {
+                            $data['filter'] = array();
+                        } elseif (!is_array($data['filter'])) {
                             $data['filter'] = array($data['filter']);
                         }
                     }
