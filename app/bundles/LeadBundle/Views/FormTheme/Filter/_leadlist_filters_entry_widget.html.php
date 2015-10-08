@@ -26,9 +26,12 @@ $filterType  = $form['field']->vars['value'];
             <?php echo $view['form']->widget($form['operator']); ?>
         </div>
 
-        <div class="col-xs-10 col-sm-5 padding-none">
+        <?php $hasErrors = count($form['filter']->vars['errors']) || count($form['display']->vars['errors']); ?>
+        <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors) echo " has-error"; ?>">
             <?php echo $view['form']->widget($form['filter']); ?>
+            <?php echo $view['form']->errors($form['filter']); ?>
             <?php echo $view['form']->widget($form['display']); ?>
+            <?php echo $view['form']->errors($form['display']); ?>
         </div>
 
         <div class="col-xs-2 col-sm-1">

@@ -225,6 +225,12 @@ Mautic.convertLeadFilterInput = function(el) {
     var filterNum = matches[1];
     var filterId  = '#leadlist_filters_' + filterNum + '_filter';
 
+    // Reset has-error
+    if (mQuery(filterId).parent().hasClass('has-error')) {
+        mQuery(filterId).parent().find('div.help-block').hide();
+        mQuery(filterId).parent().removeClass('has-error');
+    }
+
     var disabled = (operator == 'empty' || operator == '!empty') ? true : false;
     mQuery(filterId).prop('disabled', disabled);
 
@@ -233,8 +239,9 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     if (mQuery(filterId).is('select')) {
-        var isMultiple = mQuery(filterId).attr('multiple');
-        var multiple   = (operator == 'in' || operator == '!in') ? true : false;
+        var isMultiple  = mQuery(filterId).attr('multiple');
+        var multiple    = (operator == 'in' || operator == '!in') ? true : false;
+        var placeholder = mQuery(filterId).attr('data-placeholder');
 
         if (multiple && !isMultiple) {
             mQuery(filterId).attr('multiple', 'multiple');
@@ -243,11 +250,7 @@ Mautic.convertLeadFilterInput = function(el) {
             var newName =  mQuery(filterId).attr('name') + '[]';
             mQuery(filterId).attr('name', newName);
 
-            // Destroy the chosen and recreate
-            mQuery(filterId).chosen('destroy');
-            mQuery(filterId).chosen({
-                width: "100%"
-            });
+            placeholder = mauticLang['chosenChooseMore'];
         } else if (!multiple && isMultiple) {
             mQuery(filterId).removeAttr('multiple');
 
@@ -255,15 +258,28 @@ Mautic.convertLeadFilterInput = function(el) {
             var newName =  mQuery(filterId).attr('name').replace(/[\[\]']+/g,'')
             mQuery(filterId).attr('name', newName);
 
-            // Destroy the chosen and recreate
-            mQuery(filterId).chosen('destroy');
-            mQuery(filterId).chosen({
-                width: "100%",
-                allow_single_deselect: true
-            });
+            placeholder = mauticLang['chosenChooseOne'];
         }
 
-        mQuery(filterId).trigger('chosen:updated');
+        if (multiple) {
+            // Remove empty option
+            mQuery(filterId).find('option[value=""]').remove();
+
+            // Make sure none are selected
+            mQuery(filterId + ' option:selected').removeAttr('selected');
+        } else {
+            // Add empty option
+            mQuery(filterId).prepend("<option value='' selected></option>");
+        }
+
+        // Destroy the chosen and recreate
+        if (mQuery(filterId + '_chosen').length) {
+            mQuery(filterId).chosen('destroy');
+        }
+
+        mQuery(filterId).attr('data-placeholder', placeholder);
+
+        Mautic.activateChosenSelect(mQuery(filterId));
     }
 };
 
@@ -334,11 +350,6 @@ Mautic.addLeadListFilter = function (elId) {
                 mQuery('<option>').val(val).text(val).appendTo(filterEl);
             });
         }
-        mQuery(filter).attr('data-placeholder', label);
-        mQuery(filter).chosen({
-            width: "100%",
-            allow_single_deselect: true
-        });
     } else if (fieldType == 'lookup') {
         var fieldCallback = mQuery(filterId).data("field-callback");
         if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {

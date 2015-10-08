@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class FilterType
@@ -87,8 +88,12 @@ class FilterType extends AbstractType
             $displayAttr = array();
 
             $customOptions = array();
+
             switch ($fieldType) {
                 case 'leadlist':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    }
                     if (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
@@ -97,6 +102,9 @@ class FilterType extends AbstractType
                     $type                      = 'choice';
                     break;
                 case 'tags':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    }
                     if (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
@@ -207,6 +215,18 @@ class FilterType extends AbstractType
                     break;
             }
 
+            if (in_array($data['operator'], array('empty', '!empty'))) {
+                $attr['disabled'] = 'disabled';
+            } else {
+                $customOptions['constraints'] = array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
+                );
+            }
+
             // @todo implement in UI
             if (in_array($data['operator'], array('between', '!between'))) {
                 $form->add(
@@ -229,7 +249,8 @@ class FilterType extends AbstractType
                         array(
                             'label' => false,
                             'attr'  => $attr,
-                            'data'  => $data['filter']
+                            'data'  => isset($data['filter']) ? $data['filter'] : '',
+                            'error_bubbling' => false,
                         ),
                         $customOptions
                     )
@@ -242,7 +263,8 @@ class FilterType extends AbstractType
                 array(
                     'label' => false,
                     'attr'  => $displayAttr,
-                    'data'  => $data['display']
+                    'data'  => $data['display'],
+                    'error_bubbling' => false
                 )
             );
 
@@ -310,7 +332,8 @@ class FilterType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'label' => false
+                'label' => false,
+                'error_bubbling' => false
             )
         );
     }

@@ -245,8 +245,6 @@ class ListModel extends FormModel
                     '!=',
                     'empty',
                     '!empty',
-                    'like',
-                    '!like',
                     'in',
                     '!in'
                 )
@@ -372,9 +370,9 @@ class ListModel extends FormModel
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getAlias()]['operators'] = $operators['bool'];
-            } elseif ($type == 'select') {
+            } elseif (in_array($type, array('select', 'country', 'timezone', 'region'))) {
                 $choices[$field->getAlias()]['operators'] = $operators['select'];
-            } elseif (in_array($type, array('lookup', 'lookup_id', 'select', 'text', 'email', 'url', 'timezone', 'email', 'tel', 'country', 'region'))) {
+            } elseif (in_array($type, array('lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'))) {
                 $choices[$field->getAlias()]['operators'] = $operators['text'];
             } else {
                 $choices[$field->getAlias()]['operators'] = $operators['default'];
