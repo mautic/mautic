@@ -76,10 +76,9 @@ class PageModel extends FormModel
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
-                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, '-'));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+                $alias = $entity->getTitle();
             }
+            $alias = $this->cleanAlias($alias, '', false, '-');
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();

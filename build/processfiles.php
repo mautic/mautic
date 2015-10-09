@@ -507,6 +507,16 @@ system('rm vendor/webfactory/exceptions-bundle/phpunit.xml.dist');
 system('rm vendor/webfactory/exceptions-bundle/README.md');
 system('rm vendor/webfactory/exceptions-bundle/UPGRADING.md');
 
+// jbroadway/urlify
+system('rm -rf vendor/jbroadway/urlify/tests');
+system('rm vendor/jbroadway/urlify/.gitignore');
+system('rm vendor/jbroadway/urlify/.travis.yml');
+system('rm vendor/jbroadway/urlify/composer.json');
+system('rm vendor/jbroadway/urlify/INSTALL');
+system('rm vendor/jbroadway/urlify/LICENSE');
+system('rm vendor/jbroadway/urlify/phpunit.xml');
+system('rm vendor/jbroadway/urlify/README.md');
+
 // Find any .git directories and nuke them
 system('find . -type d -name .git -exec rm -rf {} \\;');
 
