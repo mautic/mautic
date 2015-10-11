@@ -286,7 +286,6 @@ class Lead extends FormEntity
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
-
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -677,6 +676,14 @@ class Lead extends FormEntity
      */
     public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
     {
+        if ($doNotEmail->getBounced()) {
+            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
+        } elseif ($doNotEmail->getUnsubscribed()) {
+            $type = 'unsubscribed';
+        }
+        $reason = "$type: ".$doNotEmail->getComments();
+        $this->changes['dnc_status'] = $reason;
+
         $this->doNotEmail[] = $doNotEmail;
 
         return $this;
@@ -687,6 +694,8 @@ class Lead extends FormEntity
      */
     public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
     {
+        $this->changes['dnc_status'] = 'removed';
+
         $this->doNotEmail->removeElement($doNotEmail);
     }
 
