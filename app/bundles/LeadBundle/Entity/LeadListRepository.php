@@ -316,7 +316,7 @@ class LeadListRepository extends CommonRepository
             if ($dynamic && $filters) {
                 $q          = $this->_em->getConnection()->createQueryBuilder();
                 $parameters = array();
-                $expr       = $this->getListFilterExpr($filters, $parameters, $q, false, $l);
+                $expr       = $this->getListFilterExpr($filters, $parameters, $q, false);
 
                 if ($countOnly) {
                     $select = $includeManual ? 'l.id, count(distinct(l.id)) as lead_count' : 'count(distinct(l.id)) as lead_count, max(id) as max_id';
@@ -585,10 +585,11 @@ class LeadListRepository extends CommonRepository
      * @param                                   $parameters
      * @param \Doctrine\DBAL\Query\QueryBuilder $q
      * @param bool|false                        $not
+     * @param null|int                          $leadId
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
      */
-    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false)
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null)
     {
         // Get table columns
         $schema    = $this->_em->getConnection()->getSchemaManager();
@@ -860,10 +861,27 @@ class LeadListRepository extends CommonRepository
                         ->where(
                             $subqb->expr()->eq($alias . '.' . $column, $exprParameter)
                         );
-                    $inFunc = (in_array($func, array('neq', 'notIn'))) ? 'NOT IN' : 'IN';
+
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere(
+                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
+                        );
+                    }
+
+                    if ($func == 'eq') {
+                        $inFunc = ($details['filter']) ? 'IN' : 'NOT IN';
+                    } else {
+                        $inFunc = ($details['filter']) ? 'NOT IN' : 'IN';
+                    }
+
                     $useExpr->add(
                         $q->expr()->comparison('l.id', $inFunc, sprintf('(%s)', $subqb->getSQL()))
                     );
+
+                    // Always equal true as it'll be the expr that makes the difference
+                    $details['filter'] = true;
+
                     break;
 
                 case 'leadlist':
@@ -884,6 +902,14 @@ class LeadListRepository extends CommonRepository
                         ->where(
                             $subqb->expr()->in($alias . '.leadlist_id', $details['filter'])
                         );
+
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere(
+                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
+                        );
+                    }
+
                     $useExpr->add(
                         $q->expr()->comparison('l.id', $func, sprintf('(%s)', $subqb->getSQL()))
                     );
@@ -904,6 +930,14 @@ class LeadListRepository extends CommonRepository
                         ->where(
                             $sq->expr()->in($alias.'.tag_id', $details['filter'])
                         );
+
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $sq->andWhere(
+                            $sq->expr()->eq($alias.'.lead_id', $leadId)
+                        );
+                    }
+
                     $useExpr->add(
                         $q->expr()->comparison('l.id', $func, sprintf('(%s)', $sq->getSQL()))
                     );
