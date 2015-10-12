@@ -613,7 +613,10 @@ class PageModel extends FormModel
         }
 
         $hit->setCode($code);
-        $hit->setReferer($request->server->get('HTTP_REFERER'));
+        if (!$hit->getReferer()) {
+            $hit->setReferer($request->server->get('HTTP_REFERER'));
+        }
+
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
