@@ -73,7 +73,7 @@ class FilterType extends AbstractType
         $translator      = $this->translator;
         $operatorChoices = $this->operatorChoices;
 
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $options) {
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices) {
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
@@ -97,6 +97,7 @@ class FilterType extends AbstractType
                         $data['filter'] = array($data['filter']);
                     }
                     $customOptions['choices']  = $options['lists'];
+                    array_unshift($customOptions['choices'], array('' => ''));
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
@@ -108,29 +109,39 @@ class FilterType extends AbstractType
                     }
                     $customOptions['choices']  = $options['tags'];
                     $customOptions['multiple'] = true;
-                    $attr = array_merge($attr, array(
-                            'data-placeholder'      => $translator->trans('mautic.lead.tags.select_or_create'),
-                            'data-no-results-text'  => $translator->trans('mautic.lead.tags.enter_to_create'),
-                            'data-allow-add'        => 'true',
-                            'onchange'              => 'Mautic.createLeadTag(this)'
+                    $attr                      = array_merge(
+                        $attr,
+                        array(
+                            'data-placeholder'     => $translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text' => $translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'       => 'true',
+                            'onchange'             => 'Mautic.createLeadTag(this)'
                         )
                     );
                     $type                      = 'choice';
                     break;
                 case 'timezone':
-                    $customOptions['choices']  = $options['timezones'];
-                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    $type                      = 'choice';
-                    break;
                 case 'country':
-                    $customOptions['choices']  = $options['countries'];
-                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    $type                      = 'choice';
-                    break;
                 case 'region':
-                    $customOptions['choices']  = $options['regions'];
-                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    switch ($fieldType) {
+                        case 'timezone':
+                            $choiceKey = 'timezones';
+                            break;
+                        case 'country':
+                            $choiceKey = 'countries';
+                            break;
+                        case 'region':
+                            $choiceKey = 'regions';
+                            break;
+                    }
+
                     $type                      = 'choice';
+                    $customOptions['choices']  = $options[$choiceKey];
+                    array_unshift($customOptions['choices'], array('' => ''));
+                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
+                    if (!isset($data['filter']) && $customOptions['multiple']) {
+                        $data['filter'] = array();
+                    }
                     break;
                 case 'time':
                 case 'date':
@@ -176,7 +187,7 @@ class FilterType extends AbstractType
                         }
                     }
 
-                    $list  = $options['fields'][$fieldName]['properties']['list'];
+                    $list = $options['fields'][$fieldName]['properties']['list'];
                     if (!is_array($list)) {
                         $parts = explode('||', $list);
                         if (count($parts) > 1) {
@@ -247,9 +258,9 @@ class FilterType extends AbstractType
                     $type,
                     array_merge(
                         array(
-                            'label' => false,
-                            'attr'  => $attr,
-                            'data'  => isset($data['filter']) ? $data['filter'] : '',
+                            'label'          => false,
+                            'attr'           => $attr,
+                            'data'           => isset($data['filter']) ? $data['filter'] : '',
                             'error_bubbling' => false,
                         ),
                         $customOptions
@@ -261,9 +272,9 @@ class FilterType extends AbstractType
                 'display',
                 $displayType,
                 array(
-                    'label' => false,
-                    'attr'  => $displayAttr,
-                    'data'  => $data['display'],
+                    'label'          => false,
+                    'attr'           => $displayAttr,
+                    'data'           => $data['display'],
                     'error_bubbling' => false
                 )
             );
@@ -332,7 +343,7 @@ class FilterType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'label' => false,
+                'label'          => false,
                 'error_bubbling' => false
             )
         );
