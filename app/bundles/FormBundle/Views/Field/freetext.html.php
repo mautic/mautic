@@ -23,7 +23,7 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
 $label = (!$field['showLabel']) ? '' :
 <<<HTML
 
-                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input_{$formName}_{$field['alias']}">
+                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input{$formName}_{$field['alias']}">
                     {$view->escape($field['label'])}
                 </h3>
 HTML;
@@ -32,7 +32,7 @@ HTML;
 $html = <<<HTML
 
             <div $containerAttr>{$formButtons}{$label}
-                <div $inputAttr id="mauticform_input_{$formName}_{$field['alias']}">
+                <div $inputAttr id="mauticform_input{$formName}_{$field['alias']}">
                     $text
                 </div>
             </div>
