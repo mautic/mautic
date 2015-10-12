@@ -190,6 +190,7 @@ Mautic.leadlistOnLoad = function(container) {
                 mQuery(this).trigger('chosen:updated');
             }
         });
+
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
                 mQuery(this).closest('.panel').animate(
@@ -347,7 +348,7 @@ Mautic.addLeadListFilter = function (elId) {
             var fieldOptions = mQuery(filterId).data("field-list");
 
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(val).text(val).appendTo(filterEl);
+                mQuery('<option>').val(index).text(val).appendTo(filterEl);
             });
         }
     } else if (fieldType == 'lookup') {
@@ -491,10 +492,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-/**
- *
- * @param label
- */
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
         mQuery(el).val()
