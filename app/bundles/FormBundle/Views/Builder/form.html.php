@@ -7,7 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$formName = '_' . strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
+$formName = '_' . strtolower(
+    InputHelper::alphanum(
+        InputHelper::transliterate(
+            $form->getName()
+        )
+    )
+);
 $fields   = $form->getFields();
 $required = array();
 ?>
