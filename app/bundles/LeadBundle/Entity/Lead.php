@@ -944,7 +944,8 @@ class Lead extends FormEntity
      */
     public function setLastActive($lastActive)
     {
-        $this->lastActive = $lastActive;
+        $this->changes['dateLastActive'] = array($this->lastActive, $lastActive);
+        $this->lastActive                = $lastActive;
     }
 
     /**
