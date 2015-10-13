@@ -134,6 +134,8 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         endforeach;
                         echo "</optgroup>\n";
                     else:
+                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId))
+                            continue;
                         echo "<option value=\"$value\">$label</option>\n";
                     endif;
                 endforeach;
