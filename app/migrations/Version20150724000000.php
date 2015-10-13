@@ -169,7 +169,9 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name TYPE VARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields DROP CONSTRAINT ' . $this->findPropertyName('form_id', 'fk', '5FF69B7D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER form_id SET NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD CONSTRAINT ' . $this->generatePropertyName('form_fields', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP CONSTRAINT ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref ADD CONSTRAINT ' . $this->generatePropertyName('lead_ips_xref', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes ALTER lead_id SET NOT NULL');
