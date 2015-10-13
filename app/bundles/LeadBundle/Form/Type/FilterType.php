@@ -29,6 +29,7 @@ class FilterType extends AbstractType
 {
     private $operatorChoices;
     private $translator;
+    private $currentListId;
 
     /**
      * @param MauticFactory $factory
@@ -46,7 +47,8 @@ class FilterType extends AbstractType
             }
         }
 
-        $this->translator = $factory->getTranslator();
+        $this->translator    = $factory->getTranslator();
+        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
     }
 
     /**
@@ -72,8 +74,9 @@ class FilterType extends AbstractType
 
         $translator      = $this->translator;
         $operatorChoices = $this->operatorChoices;
+        $currentListId   = $this->currentListId;
 
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices) {
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $currentListId) {
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
@@ -96,8 +99,13 @@ class FilterType extends AbstractType
                     } elseif (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
+
+                    // Don't show the current list ID in the choices
+                    if (!empty($currentListId)) {
+                        unset($options['lists'][$currentListId]);
+                    }
+
                     $customOptions['choices']  = $options['lists'];
-                    array_unshift($customOptions['choices'], array('' => ''));
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
@@ -135,13 +143,19 @@ class FilterType extends AbstractType
                             break;
                     }
 
-                    $type                      = 'choice';
-                    $customOptions['choices']  = $options[$choiceKey];
-                    array_unshift($customOptions['choices'], array('' => ''));
+                    $type                     = 'choice';
+                    $customOptions['choices'] = $options[$choiceKey];
+
                     $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    if (!isset($data['filter']) && $customOptions['multiple']) {
-                        $data['filter'] = array();
+
+                    if ($customOptions['multiple']) {
+                        array_unshift($customOptions['choices'], array('' => ''));
+
+                        if (!isset($data['filter'])) {
+                            $data['filter'] = array();
+                        }
                     }
+
                     break;
                 case 'time':
                 case 'date':
