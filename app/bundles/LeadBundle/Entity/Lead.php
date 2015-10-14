@@ -681,8 +681,8 @@ class Lead extends FormEntity
         } elseif ($doNotEmail->getUnsubscribed()) {
             $type = 'unsubscribed';
         }
-        $reason = "$type: ".$doNotEmail->getComments();
-        $this->changes['dnc_status'] = $reason;
+
+        $this->changes['dnc_status'] = array($type, $doNotEmail->getComments());
 
         $this->doNotEmail[] = $doNotEmail;
 
@@ -694,7 +694,13 @@ class Lead extends FormEntity
      */
     public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
     {
-        $this->changes['dnc_status'] = 'removed';
+        if ($doNotEmail->getBounced()) {
+            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
+        } elseif ($doNotEmail->getUnsubscribed()) {
+            $type = 'unsubscribed';
+        }
+
+        $this->changes['dnc_status'] = array('removed', $type);
 
         $this->doNotEmail->removeElement($doNotEmail);
     }
