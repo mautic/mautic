@@ -320,7 +320,21 @@ class AjaxController extends CommonAjaxController
         $dncId     = $request->request->get('id');
 
         if (!empty($dncId)) {
-            $this->factory->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+            /** @var \Mautic\EmailBundle\Entity\DoNotEmail $dnc */
+            $dnc = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:DoNotEmail')->findOneBy(
+                array(
+                    'id' => $dncId
+                )
+            );
+
+            $lead = $dnc->getLead();
+            if ($lead) {
+                // Use lead model to trigger listeners
+                $lead->removeDoNotEmailEntry($dnc);
+                $this->factory->getModel('lead')->saveEntity($lead);
+            } else {
+                $this->factory->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+            }
 
             $dataArray['success'] = 1;
         }
@@ -436,10 +450,10 @@ class AjaxController extends CommonAjaxController
         $email    = $model->getEntity($emailId);
 
         if ($email !== null && $this->factory->getSecurity()->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
-            $email->getCreatedBy()
-        )
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $email->getCreatedBy()
+            )
         ) {
 
             $mailer = $this->factory->getMailer();
