@@ -170,6 +170,7 @@ class Lead extends FormEntity
             ->build();
 
         $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+            ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
             ->fetchExtraLazy()
