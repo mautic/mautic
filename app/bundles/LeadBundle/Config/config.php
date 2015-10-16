@@ -287,6 +287,10 @@ return array(
             'mautic.form.type.lead_batch_dnc'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
                 'alias'     => 'lead_batch_dnc'
+            ),
+            'mautic.form.type.lead_merge'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
+                'alias'     => 'lead_merge'
             )
         ),
         'other'   => array(

@@ -103,8 +103,8 @@ class ConfigController extends FormController
                         // We must clear the application cache for the updated values to take effect
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                         $cacheHelper = $this->factory->getHelper('cache');
-                        $cacheHelper->clearCache();
-                    } catch (RuntimeException $exception) {
+                        $cacheHelper->clearCache(false, true);
+                    } catch (\RuntimeException $exception) {
                         $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
                     }
                 } elseif (!$isWritabale) {

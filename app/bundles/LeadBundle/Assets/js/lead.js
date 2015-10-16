@@ -271,7 +271,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -324,7 +324,7 @@ Mautic.addLeadListFilter = function (elId) {
             var fieldOptions = mQuery(filterId).data("field-list");
 
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(val).text(val).appendTo(filterEl);
+                mQuery('<option>').val(index).text(val).appendTo(filterEl);
             });
         }
         mQuery(filter).attr('data-placeholder', label);
@@ -473,10 +473,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-/**
- *
- * @param label
- */
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
         mQuery(el).val()

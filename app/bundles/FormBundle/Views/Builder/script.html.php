@@ -31,7 +31,7 @@ $fields   = $form->getFields();
     }
 
     /** This is needed for each form **/
-    MauticFormValidations['<?php echo $formName; ?>'] = {
+    MauticFormValidations['<?php echo ltrim($formName, '_'); ?>'] = {
 <?php
 foreach($fields as $f):
 if (!$f->isRequired()) continue;

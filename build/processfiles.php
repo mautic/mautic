@@ -174,7 +174,6 @@ system('rm vendor/friendsofsymfony/rest-bundle/FOS/RestBundle/UPGRADING.md');
 
 // guzzle/guzzle
 system('rm -rf vendor/guzzle/guzzle/docs');
-system('rm -rf vendor/guzzle/guzzle/src');
 system('rm -rf vendor/guzzle/guzzle/tests');
 system('rm vendor/guzzle/guzzle/.gitignore');
 system('rm vendor/guzzle/guzzle/.travis.yml');

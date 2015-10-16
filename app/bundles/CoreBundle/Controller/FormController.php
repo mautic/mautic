@@ -509,7 +509,7 @@ class FormController extends CommonController
                         )
                     )
                 );
-            } elseif ($this->isFormApplied($form)) {
+            } elseif ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($entity->getId(), true);
             }
         }

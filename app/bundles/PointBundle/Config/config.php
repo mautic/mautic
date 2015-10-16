@@ -67,14 +67,15 @@ return array(
                         'mautic.point.trigger.menu.index' => array(
                             'route'  => 'mautic_pointtrigger_index',
                             'access' => 'point:triggers:view'
-                        ),
-                        'mautic.category.menu.index'     => array(
-                            'bundle' => 'point'
                         )
                     )
                 )
             )
         )
+    ),
+
+    'categories' => array(
+        'point' => null
     ),
 
     'services' => array(

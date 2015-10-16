@@ -267,12 +267,7 @@ class ListController extends FormController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'viewParameters'  => array('objectId' => $list->getId()),
-                        'contentTemplate' => 'MauticLeadBundle:List:index'
-                    ))
-                );
+                return $this->postActionRedirect($postActionVars);
             }
         } else {
             //lock the entity

@@ -174,7 +174,6 @@ class FieldModel extends FormModel
                         $modifySchema->executeChanges();
                     } catch (\Exception $e) {
                         error_log($e);
-                        die(var_dump($e));
                     }
                 }
             }

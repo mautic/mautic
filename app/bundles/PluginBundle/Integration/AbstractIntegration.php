@@ -9,6 +9,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Joomla\Http\HttpFactory;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -175,9 +176,11 @@ abstract class AbstractIntegration
     /**
      * Merge api keys
      *
-     * @param $mergeKeys
-     * @param $withKeys
-     * @param $return   Returns the key array rather than setting them
+     * @param             $mergeKeys
+     * @param             $withKeys
+     * @param bool|false  $return   Returns the key array rather than setting them
+     *
+     * @return void|array
      *
      */
     public function mergeApiKeys ($mergeKeys, $withKeys = array(), $return = false)
@@ -402,7 +405,11 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Generic error parser
+     *
      * @param $response
+     *
+     * @return string
      */
     public function getErrorsFromResponse($response)
     {
@@ -494,16 +501,6 @@ abstract class AbstractIntegration
             $headers[] = "Content-type: {$settings['content_type']}";
         }
 
-        $ch = curl_init();
-
-        if ($method == 'POST') {
-            curl_setopt($ch, CURLOPT_POST, 1);
-        } elseif ($method == 'PUT') {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        } elseif ($method == 'DELETE') {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-        }
-
         if ($method !== 'GET') {
             if (!empty($parameters)) {
                 if ($authType == 'oauth1a') {
@@ -519,50 +516,70 @@ abstract class AbstractIntegration
                     }
                 }
             }
-
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
-        }
-
-        $headers = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
-        if (!empty($headers)) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        }
-
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        if (!empty($settings['ssl_verifypeer'])) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $settings['ssl_verifypeer']);
-        }
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-
-        if (isset($settings['curl_options'])) {
-            foreach ($settings['curl_options'] as $k => $v) {
-                curl_setopt($ch, $k, $v);
-            }
         }
 
         $referer = $this->getRefererUrl();
-        curl_setopt($ch, CURLOPT_REFERER, $referer);
-        curl_setopt($ch, CURLOPT_URL, $url);
+        $options = array(
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_HEADER         => 1,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_FOLLOWLOCATION => 0,
+            CURLOPT_REFERER        => $referer
+        );
 
-        $result    = curl_exec($ch);
-        $curlError = curl_error($ch);
-
-        if ($curlError) {
-            return array('error' => array('message' => $curlError));
+        if (isset($settings['curl_options'])) {
+            $options = array_merge($options, $settings['curl_options']);
         }
 
-        $responseArray = explode("\r\n\r\n", $result);
-        $result        = array_pop($responseArray);
+        if (isset($settings['ssl_verifypeer'])) {
+            $options[CURLOPT_SSL_VERIFYPEER] = $settings['ssl_verifypeer'];
+        }
 
-        curl_close($ch);
+        $connector = HttpFactory::getHttp(
+            array(
+                'transport.curl' => $options
+            )
+        );
+
+        $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
+
+        // HTTP library requires that headers are in key => value pairs
+        $headers = array();
+        foreach ($parseHeaders as $key => $value) {
+            if (strpos($value, ':') !== false) {
+                list($key, $value) = explode(':', $value);
+                $key   = trim($key);
+                $value = trim($value);
+            }
+
+            $headers[$key] = $value;
+        }
+
+        try {
+            switch ($method) {
+                case 'GET':
+                    $result = $connector->get($url, $headers, 10);
+                    break;
+                case 'POST':
+                case 'PUT':
+                case 'PATCH':
+                    $connectorMethod = strtolower($method);
+                    $result          = $connector->$connectorMethod($url, $parameters, $headers, 10);
+                    break;
+                case 'DELETE':
+                    $result = $connector->delete($url, $headers, 10);
+                    break;
+            }
+        } catch (\Exception $exception) {
+
+            return array('error' => array('message' => $exception->getMessage(), 'code' => $exception->getCode()));
+        }
 
         if (!empty($settings['return_raw'])) {
 
             return $result;
         } else {
-            $response = $this->parseCallbackResponse($result, !empty($settings['authorize_session']));
+            $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
 
             return $response;
         }
@@ -607,10 +624,10 @@ abstract class AbstractIntegration
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey : $settings[$clientSecretKey];
                         $parameters         = array_merge($parameters, array(
-                                $useClientIdKey     => $this->keys[$clientIdKey],
-                                $useClientSecretKey => $this->keys[$clientSecretKey],
-                                'grant_type'        => $grantType
-                            ));
+                            $useClientIdKey     => $this->keys[$clientIdKey],
+                            $useClientSecretKey => $this->keys[$clientSecretKey],
+                            'grant_type'        => $grantType
+                        ));
 
                         if (!empty($settings['refresh_token']) && !empty($this->keys[$settings['refresh_token']])) {
                             $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
@@ -773,6 +790,7 @@ abstract class AbstractIntegration
      * Extacts the auth keys from response and saves entity
      *
      * @param $data
+     * @param $tokenOverride
      *
      * @return bool|string false if no error; otherwise the error string
      */
@@ -1045,7 +1063,7 @@ abstract class AbstractIntegration
      * Match lead data with integration fields
      *
      * @param $lead
-     * @param $featureSettings
+     * @param $config
      *
      * @return array
      */

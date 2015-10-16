@@ -25,10 +25,16 @@ $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
 $name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
-$value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
+
+if ($field['type'] == 'checkboxgrp' || $field['type'] == 'radiogrp') {
+    $value = '';
+} else {
+    $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
+}
+
 if (empty($ignoreId)) {
-    $inputId = 'id="mauticform_input_'.$formName.'_'.$field['alias'].'"';
-    $labelId = 'id="mauticform_label_'.$formName.'_'.$field['alias'].'" for="mauticform_input_'.$formName.'_'.$field['alias'].'"';
+    $inputId = 'id="mauticform_input'.$formName.'_'.$field['alias'].'"';
+    $labelId = 'id="mauticform_label'.$formName.'_'.$field['alias'].'" for="mauticform_input'.$formName.'_'.$field['alias'].'"';
 } else {
     $inputId = $labelId = '';
 }
@@ -67,7 +73,7 @@ if (!empty($inForm)) {
 }
 
 // Container
-$containerAttr         = 'id="mauticform_'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+$containerAttr         = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;

@@ -100,6 +100,11 @@ class FieldController extends CommonFormController
                     }
                     $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
 
+                    if (empty($formField['alias'])) {
+                        // Likely a bogus label so generate random alias for column name
+                        $formField['alias'] = uniqid('f_');
+                    }
+
                     // Force required for captcha
                     if ($formField['type'] == 'captcha') {
                         $formField['isRequired'] = true;
@@ -116,7 +121,6 @@ class FieldController extends CommonFormController
                     } else {
                         $fields[$keyId] = $formField;
                     }
-
 
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 

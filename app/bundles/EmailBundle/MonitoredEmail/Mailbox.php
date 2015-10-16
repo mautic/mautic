@@ -78,7 +78,12 @@ class Mailbox
      */
     public function isConfigured($bundleKey = null, $folderKey = null) {
         if ($bundleKey !== null) {
-            $this->switchMailbox($bundleKey, $folderKey);
+            try {
+                $this->switchMailbox($bundleKey, $folderKey);
+            } catch (\Exception $e) {
+                
+                return false;
+            }
         }
 
         return (
