@@ -1374,4 +1374,20 @@ class Asset extends FormEntity
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isLocal()
+    {
+        return ($this->storageLocation != 'remote');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRemote()
+    {
+        return ($this->storageLocation == 'remote');
+    }
 }
