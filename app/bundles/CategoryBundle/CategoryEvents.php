@@ -57,4 +57,14 @@ final class CategoryEvents
      * @var string
      */
     const CATEGORY_POST_DELETE   = 'mautic.category_post_delete';
+
+    /**
+     * The mautic.category_on_bundle_list_build event is thrown when a list of bundles supporting categories is build.
+     *
+     * The event listener receives a
+     * Mautic\CategoryBundle\Event\CategoryTypesEvent instance.
+     *
+     * @var string
+     */
+    const CATEGORY_ON_BUNDLE_LIST_BUILD = 'mautic.category_on_bundle_list_build';
 }
