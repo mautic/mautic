@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\EmailBundle\Entity\Email;
@@ -79,6 +80,30 @@ class Redirect extends FormEntity
 
         $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('redirect')
+            ->addListProperties(
+                array(
+                    'id',
+                    'redirectId',
+                    'url'
+                )
+            )
+            ->addProperties(
+                array(
+                    'hits',
+                    'uniqueHits'
+                )
+            )
             ->build();
     }
 
