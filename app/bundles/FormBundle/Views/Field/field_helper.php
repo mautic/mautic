@@ -25,7 +25,13 @@ $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
 $name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
-$value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
+
+if ($field['type'] == 'checkboxgrp' || $field['type'] == 'radiogrp') {
+    $value = '';
+} else {
+    $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
+}
+
 if (empty($ignoreId)) {
     $inputId = 'id="mauticform_input'.$formName.'_'.$field['alias'].'"';
     $labelId = 'id="mauticform_label'.$formName.'_'.$field['alias'].'" for="mauticform_input'.$formName.'_'.$field['alias'].'"';
