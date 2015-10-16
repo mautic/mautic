@@ -86,7 +86,20 @@ class AjaxController extends CommonAjaxController
 
         foreach ($formFields as $field) {
             if ($field->getType() != 'button') {
-                $fields[$field->getAlias()] = $field->getLabel();
+                $properties = $field->getProperties();
+                $options = array();
+
+                if (!empty($properties['list']['list'])) {
+                    $options = $properties['list']['list'];
+                }
+
+                $fields[] = array(
+                    'id'      => $field->getId(),
+                    'label'   => $field->getLabel(),
+                    'alias'   => $field->getAlias(),
+                    'type'    => $field->getType(),
+                    'options' => $options
+                );
             }
         }
 

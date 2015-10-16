@@ -52,14 +52,6 @@ class CampaignEventFormFieldValueType extends AbstractType
             $choices[$key] = $operator['label'];
         }
 
-        $builder->add('value', 'text', array(
-            'label'         => 'mautic.form.field.form.value',
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control'
-            )
-        ));
-
         $builder->add('operator', 'choice', array(
             'choices'  => $choices,
         ));
@@ -81,17 +73,49 @@ class CampaignEventFormFieldValueType extends AbstractType
             } else {
                 $formEntity = $formModel->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
+                $options    = array();
 
                 foreach ($formFields as $field) {
                     if ($field->getType() != 'button') {
                         $fields[$field->getAlias()] = $field->getLabel();
+                        $options[$field->getAlias()] = array();
+                        $properties = $field->getProperties();
+
+                        if (!empty($properties['list']['list'])) {
+                            $options[$field->getAlias()] = $properties['list']['list'];
+                        }
                     }
                 }
             }
 
             $form->add('field', 'choice', array(
                 'choices'  => $fields,
+                'attr'     => array(
+                    'onchange'  => 'Mautic.updateFormFieldValues(this)',
+                    'data-field-options' => json_encode($options)
+                )
             ));
+
+            // Display selectbox for a field with choices, textbox for others
+            if (empty($options[$data['field']])) {
+                $form->add('value', 'text', array(
+                    'label'      => 'mautic.form.field.form.value',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control'
+                    )
+                ));
+            } else {
+                $form->add('value', 'choice', array(
+                    'choices'    => $options[$data['field']],
+                    'label'      => 'mautic.form.field.form.value',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control'
+                    )
+                ));
+            }
+
         };
 
         // Register the function above as EventListener on PreSet and PreBind
