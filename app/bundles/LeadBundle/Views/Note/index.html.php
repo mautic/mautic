@@ -29,7 +29,7 @@
         </form>
 	</div>
 	<div class="col-xs-2 va-t">
-		<a class="btn btn-primary btn-leadnote-add pull-right" href="<?php echo $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> <?php echo $view['translator']->trans('mautic.lead.add.note'); ?></a>
+		<a class="btn btn-primary btn-leadnote-add pull-right" href="<?php echo $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> <?php echo $view['translator']->trans('mautic.lead.add.note'); ?></a>
 	</div>
 </div>
 
