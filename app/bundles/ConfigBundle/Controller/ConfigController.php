@@ -104,7 +104,7 @@ class ConfigController extends FormController
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                         $cacheHelper = $this->factory->getHelper('cache');
                         $cacheHelper->clearCache(false, true);
-                    } catch (RuntimeException $exception) {
+                    } catch (\RuntimeException $exception) {
                         $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
                     }
                 } elseif (!$isWritabale) {
