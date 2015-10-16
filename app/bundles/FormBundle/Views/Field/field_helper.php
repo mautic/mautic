@@ -50,7 +50,7 @@ if (!empty($inForm)) {
     if ($field['labelAttributes'])
         $labelAttr .= ' '.htmlspecialchars_decode($field['labelAttributes']);
 
-    if (stripos($labelAttr, 'class') === false) {
+    if (stripos($labelAttr, 'class=') === false) {
         $labelAttr .= ' class="'.$defaultLabelClass.'"';
     } else {
         $labelAttr = str_ireplace('class="', 'class="'.$defaultLabelClass.' ', $labelAttr);
@@ -59,7 +59,7 @@ if (!empty($inForm)) {
     if ($field['inputAttributes'])
         $inputAttr .= ' '.htmlspecialchars_decode($field['inputAttributes']);
 
-    if (stripos($inputAttr, 'class') === false) {
+    if (stripos($inputAttr, 'class=') === false) {
         $inputAttr .= ' class="'.$defaultInputClass.'"';
     } else {
         $inputAttr = str_ireplace('class="', 'class="'.$defaultInputClass.' ', $inputAttr);
@@ -86,7 +86,7 @@ if (!empty($deleted)) {
     $defaultContainerClass .= ' bg-danger';
 }
 
-if (stripos($containerAttr, 'class') === false) {
+if (stripos($containerAttr, 'class=') === false) {
     $containerAttr .= ' class="'.$defaultContainerClass.'"';
 } else {
     $containerAttr = str_ireplace('class="', 'class="'.$defaultContainerClass.' ', $containerAttr);
