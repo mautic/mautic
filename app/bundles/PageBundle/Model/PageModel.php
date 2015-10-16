@@ -538,10 +538,10 @@ class PageModel extends FormModel
                                     }
                                 }
                             }
+                        }
 
-                            if ($persistLead) {
-                                $leadModel->saveEntity($lead);
-                            }
+                        if ($persistLead) {
+                            $leadModel->saveEntity($lead);
                         }
                     }
                 }
