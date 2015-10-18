@@ -70,5 +70,8 @@ class AssetSubscriber extends CommonSubscriber
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+
+        //In case of batch delete, this method call remove the uploaded file
+        $asset->removeUpload();
     }
 }
