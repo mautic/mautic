@@ -163,7 +163,7 @@ class DateHelper extends Helper
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
-            return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->format('%d')));
+            return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->days));
         }
     }
 
