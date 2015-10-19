@@ -54,8 +54,9 @@ class CampaignEventHelper
             return false;
         }
 
-        $operators = $factory->getModel('lead.list')->getRepository()->getFilterExpressionFunctions();
-        $form      = $factory->getModel('form')->getRepository()->findOneById($event['properties']['form']);
+        $repository = $factory->getModel('form')->getRepository();
+        $operators  = $repository->getFilterExpressionFunctions();
+        $form       = $repository->findOneById($event['properties']['form']);
 
         if (!$form || !$form->getId()) {
             return false;
