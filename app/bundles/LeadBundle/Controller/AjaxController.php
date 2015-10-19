@@ -565,4 +565,28 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateLeadFieldValuesAction(Request $request)
+    {
+        $alias      = InputHelper::clean($request->request->get('alias'));
+        $dataArray  = array('success' => 0);
+        $leadField  = $this->factory->getModel('lead.field')->getRepository()->findOneBy(array('alias' => $alias));
+        $properties = $leadField->getProperties();
+
+        if (!empty($properties['list'])) {
+            // Lookup/Select options
+            $options = explode('|', $properties['list']);
+        } else {
+            $options = $properties;
+        }
+
+        $dataArray['options'] = $options;
+        $dataArray['success']  = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }
