@@ -179,18 +179,18 @@ class Campaign extends FormEntity
                     'id',
                     'name',
                     'category',
-                    'description',
-                    'events',
-                    'leads',
-                    'forms',
-                    'lists',
-                    'canvasSettings'
+                    'description'
                 )
             )
             ->addProperties(
                 array(
                     'publishUp',
-                    'publishDown'
+                    'publishDown',
+                    'events',
+                    'leads',
+                    'forms',
+                    'lists',
+                    'canvasSettings'
                 )
             )
             ->build();
