@@ -60,9 +60,10 @@ class CampaignEventFormFieldValueType extends AbstractType
 
         // function to add 'template' choice field dynamically
         $func = function (FormEvent $e) use ($ff, $formModel) {
-            $data = $e->getData();
-            $form = $e->getForm();
-            $fields = array();
+            $data    = $e->getData();
+            $form    = $e->getForm();
+            $fields  = array();
+            $options = array();
 
             if ($form->has('field')) {
                 $form->remove('field');
@@ -73,7 +74,6 @@ class CampaignEventFormFieldValueType extends AbstractType
             } else {
                 $formEntity = $formModel->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
-                $options    = array();
 
                 foreach ($formFields as $field) {
                     if ($field->getType() != 'button') {
