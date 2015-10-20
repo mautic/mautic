@@ -372,17 +372,28 @@ class AssetModel extends FormModel
 
     /**
      * Determine the max upload size based on PHP restrictions and config
+     *
+     * @param string     $unit              If '', determine the best unit based on the number
+     * @param bool|false $humanReadable     Return as a human readable filesize
+     *
+     * @return float
      */
-    public function getMaxUploadSize()
+    public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
-        $maxAssetSize  = Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M');
-        $maxPostSize   = Asset::convertSizeToBytes(ini_get('post_max_size'));
-        $maxUploadSize = Asset::convertSizeToBytes(ini_get('upload_max_filesize'));
-        $memoryLimit   = Asset::convertSizeToBytes(ini_get('memory_limit'));
+        $maxAssetSize  = $this->factory->getParameter('max_size');
+        $maxAssetSize  = ($maxAssetSize == -1) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxPostSize   = Asset::getIniValue('post_max_size');
+        $maxUploadSize = Asset::getIniValue('upload_max_filesize');
+        $memoryLimit   = Asset::getIniValue('memory_limit');
+        $maxAllowed    = min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
 
-        $maxAllowed    =  min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
+        if ($humanReadable) {
+            $number = Asset::convertBytesToHumanReadable($maxAllowed);
+        } else {
+            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+        }
 
-        return round($maxAllowed / 1048576, 2);
+        return $number;
     }
 
     /**
