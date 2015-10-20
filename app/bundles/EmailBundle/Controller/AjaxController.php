@@ -344,24 +344,17 @@ class AjaxController extends CommonAjaxController
             $transport = $settings['transport'];
 
             switch($transport) {
-                case 'mautic.transport.mandrill':
-                    $mailer = new MandrillTransport();
-                    break;
-                case 'mautic.transport.sendgrid':
-                    $mailer = new SendgridTransport();
-                    break;
-                case 'mautic.transport.amazon':
-                    $mailer = new AmazonTransport();
-                    break;
-                case 'mautic.transport.postmark':
-                    $mailer = new PostmarkTransport();
-                    break;
                 case 'gmail':
                     $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
                     break;
                 case 'smtp':
                     $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
                     break;
+
+                default:
+                    if ($this->container->has($transport)) {
+                        $mailer = $this->container->get($transport);
+                    }
             }
 
             if (method_exists($mailer, 'setMauticFactory')) {
