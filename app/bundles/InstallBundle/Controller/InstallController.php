@@ -271,7 +271,9 @@ class InstallController extends CommonController
                     }
 
                     // Clear the cache one final time with the updated config
-                    $this->clearCacheFile();
+                    /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                    $cacheHelper = $this->factory->getHelper('cache');
+                    $cacheHelper->clearContainerFile();
 
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(

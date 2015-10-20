@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Config\EnvParametersResource;
+use Symfony\Component\HttpKernel\DependencyInjection;
 
 /**
  * Mautic Application Kernel
@@ -433,5 +435,102 @@ class AppKernel extends Kernel
         }
 
         return false;
+    }
+
+    /**
+     * Get the container file name or path
+     *
+     * @param bool|true $fullPath
+     *
+     * @return string
+     */
+    public function getContainerFile($fullPath = true)
+    {
+        $fileName = $this->getContainerClass() . '.php';
+
+        if ($fullPath) {
+            // Override the container class for the local instance
+            $params        = $this->getLocalParams();
+            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
+
+            if (!file_exists($containerPath)) {
+                @mkdir($containerPath, 0755, true);
+            }
+
+            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
+
+            $fileName = $containerPath . '/' . $fileName;
+        }
+
+        return $fileName;
+    }
+
+    /**
+     * Initializes the service container.
+     *
+     * The cached version of the service container is used when fresh, otherwise the
+     * container is built.
+     */
+    protected function initializeContainer()
+    {
+        $class = $this->getContainerClass();
+
+        $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
+        $fresh = true;
+        if (!$cache->isFresh()) {
+            $container = $this->buildContainer();
+            $container->compile();
+            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+
+            $fresh = false;
+        }
+
+        require_once $cache;
+
+        $this->container = new $class();
+        $this->container->set('kernel', $this);
+
+        if (!$fresh && $this->container->has('cache_warmer')) {
+            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+        }
+    }
+
+    /**
+     * Builds the service container.
+     *
+     * @return ContainerBuilder The compiled service container
+     *
+     * @throws \RuntimeException
+     */
+    protected function buildContainer()
+    {
+        foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
+            if (!is_dir($dir)) {
+                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
+                }
+            } elseif (!is_writable($dir)) {
+                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
+            }
+        }
+
+        $container = $this->getContainerBuilder();
+        $container->addObjectResource($this);
+        $this->prepareContainer($container);
+
+        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+            $container->merge($cont);
+        }
+
+        // Only rebuild the classes if it doesn't exist or if the kernel is booted through the console meaning likely cache:clear is used
+        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.map')) {
+            $container->addCompilerPass(new DependencyInjection\AddClassesToCachePass($this));
+        }
+
+        // Environmentally set parameters
+        $container->addResource(new EnvParametersResource('SYMFONY__'));
+        $container->addResource(new EnvParametersResource('MAUTIC__'));
+
+        return $container;
     }
 }
