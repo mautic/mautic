@@ -81,19 +81,17 @@ class RouteLoader extends Loader
         // OneupUploader (added behind our secure /s)
         $secureCollection->addCollection($this->import('.', 'uploader'));
 
-        if ($this->factory->getParameter('api_enabled')) {
-            //API
-            $event = new RouteEvent($this, 'api');
-            $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
-            $apiCollection = $event->getCollection();
-            $apiCollection->addPrefix('/api');
+        //API
+        $event = new RouteEvent($this, 'api');
+        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $apiCollection = $event->getCollection();
+        $apiCollection->addPrefix('/api');
 
-            if ($forceSSL) {
-                $apiCollection->setSchemes('https');
-            }
-
-            $collection->addCollection($apiCollection);
+        if ($forceSSL) {
+            $apiCollection->setSchemes('https');
         }
+
+        $collection->addCollection($apiCollection);
 
         $secureCollection->addPrefix('/s');
         if ($forceSSL) {

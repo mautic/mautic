@@ -373,31 +373,6 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * Clear the application cache and run the warmup routine for the current environment
-     *
-     * @param bool $noWarmup If true, will not run warmup routine
-     *
-     *
-     * @return void
-     */
-    public function clearCache($noWarmup = false)
-    {
-        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-        $cacheHelper = $this->factory->getHelper('cache');
-        $cacheHelper->clearCache($noWarmup);
-    }
-
-    /**
-     * Delete's the file Symfony caches settings in
-     */
-    public function clearCacheFile()
-    {
-        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-        $cacheHelper = $this->factory->getHelper('cache');
-        $cacheHelper->clearCacheFile();
-    }
-
-    /**
      * Updates list filters, order, limit
      *
      * @return void
