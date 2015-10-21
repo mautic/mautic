@@ -229,7 +229,7 @@ class FormModel extends CommonFormModel
         $isNew = ($entity->getId()) ? false : true;
 
         if ($isNew) {
-            $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
+            $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }
 
@@ -443,10 +443,10 @@ class FormModel extends CommonFormModel
      * @param $form
      * @param $formHtml
      */
-    public function populateValuesWithGetParameters($form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $request = $this->factory->getRequest();
-        $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
+        $request  = $this->factory->getRequest();
+        $formName = $form->getAlias();
 
         $fields = $form->getFields();
         foreach ($fields as $f) {

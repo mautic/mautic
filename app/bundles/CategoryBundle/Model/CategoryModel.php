@@ -10,7 +10,6 @@
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\Event\CategoryEvent;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\CategoryEvents;
@@ -52,10 +51,9 @@ class CategoryModel extends FormModel
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, '-'));
-        } else {
-            $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+            $alias = $entity->getTitle();
         }
+        $alias = $this->cleanAlias($alias, '', false, '-');
 
         //make sure alias is not already taken
         $repo      = $this->getRepository();
