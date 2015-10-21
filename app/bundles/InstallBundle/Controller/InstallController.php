@@ -9,6 +9,7 @@
 
 namespace Mautic\InstallBundle\Controller;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\EventManager;
@@ -903,7 +904,7 @@ class InstallController extends CommonController
             }
 
             $driver = new StaticPHPDriver($paths);
-            $config = Setup::createConfiguration();
+            $config = Setup::createConfiguration($this->factory->getEnvironment(), null, new ArrayCache());
             $config->setMetadataDriverImpl(
                 $driver
             );

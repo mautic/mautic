@@ -100,7 +100,11 @@
                     ?>
                     <span class="label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $view['date']->toText($item->getLastActive()); ?></td>
+                <td class="visible-md visible-lg">
+                    <abbr title="<?php echo $view['date']->toFull($item->getLastActive()); ?>">
+                        <?php echo $view['date']->toText($item->getLastActive()); ?>
+                    </abbr>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>

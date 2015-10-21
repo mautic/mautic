@@ -795,7 +795,9 @@ class LeadRepository extends CommonRepository
                 $expr = $q->expr()->$likeFunc('LOWER(l.company)', ":$unique");
                 break;
             default:
-                $expr = $q->expr()->$likeFunc('LOWER(l.' . $command .')', ":$unique");
+                if (in_array($command, $this->availableSearchFields)) {
+                    $expr = $q->expr()->$likeFunc('LOWER(l.'.$command.')', ":$unique");
+                }
                 break;
         }
 
