@@ -517,6 +517,9 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
+        // Ensure the render_style column exists to prevent ORM errors
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
+
         $this->addSql(
             'CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  (email_id), INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  (asset_id), PRIMARY KEY(email_id, asset_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'
         );
@@ -564,6 +567,9 @@ class Version20150521000000 extends AbstractMauticMigration
      */
     public function postgresqlUp(Schema $schema)
     {
+        // Ensure the render_style column exists to prevent ORM errors
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
+
         $this->addSql('CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, PRIMARY KEY(email_id, asset_id))');
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  ON ' . $this->prefix . 'email_assets_xref (email_id)');
         $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)');
