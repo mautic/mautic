@@ -894,3 +894,48 @@ Mautic.leadBatchSubmit = function() {
 
     return false;
 };
+
+Mautic.updateLeadFieldValues = function (field) {
+    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
+
+    field = mQuery(field);
+    var fieldAlias = field.val();
+    Mautic.ajaxActionRequest('lead:updateLeadFieldValues', {'alias': fieldAlias}, function(response) {
+        if (typeof response.options != 'undefined') {
+            var valueField = mQuery('#campaignevent_properties_value');
+            var valueFieldAttrs = {
+                'class': valueField.attr('class'),
+                'id': valueField.attr('id'),
+                'name': valueField.attr('name'),
+                'autocomplete': valueField.attr('autocomplete'),
+                'value': valueField.attr('value')
+            };
+
+            if (!mQuery.isEmptyObject(response.options)) {
+                var newValueField = mQuery('<select/>')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                mQuery.each(response.options, function(optionKey, optionVal) {
+                    var option = mQuery("<option/>")
+                        .attr('value', optionKey)
+                        .text(optionVal);
+                    newValueField.append(option);
+                });
+                valueField.replaceWith(newValueField);
+            } else {
+                var newValueField = mQuery('<input/>')
+                    .attr('type', 'text')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                valueField.replaceWith(newValueField);
+            }
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};

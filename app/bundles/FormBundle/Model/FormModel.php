@@ -229,7 +229,7 @@ class FormModel extends CommonFormModel
         $isNew = ($entity->getId()) ? false : true;
 
         if ($isNew) {
-            $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
+            $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }
 
@@ -443,7 +443,7 @@ class FormModel extends CommonFormModel
      * @param $form
      * @param $formHtml
      */
-    public function populateValuesWithGetParameters($form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $request = $this->factory->getRequest();
         $formName = strtolower(InputHelper::alphanum($form->getName()));
@@ -496,5 +496,66 @@ class FormModel extends CommonFormModel
                 }
             }
         }
+    }
+
+    /**
+     * @param null $operator
+     *
+     * @return array
+     */
+    public function getFilterExpressionFunctions($operator = null)
+    {
+        $operatorOptions = array(
+            '='          =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.equals',
+                    'expr'        => 'eq',
+                    'negate_expr' => 'neq'
+                ),
+            '!='         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.notequals',
+                    'expr'        => 'neq',
+                    'negate_expr' => 'eq'
+                ),
+            'gt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                    'expr'        => 'gt',
+                    'negate_expr' => 'lt'
+                ),
+            'gte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                    'expr'        => 'gte',
+                    'negate_expr' => 'lt'
+                ),
+            'lt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthan',
+                    'expr'        => 'lt',
+                    'negate_expr' => 'gt'
+                ),
+            'lte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                    'expr'        => 'lte',
+                    'negate_expr' => 'gt'
+                ),
+            'like'       =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.islike',
+                    'expr'        => 'like',
+                    'negate_expr' => 'notLike'
+                ),
+            '!like'      =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                    'expr'        => 'notLike',
+                    'negate_expr' => 'like'
+                ),
+        );
+
+        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 }
