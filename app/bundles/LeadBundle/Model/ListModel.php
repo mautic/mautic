@@ -779,12 +779,6 @@ class ListModel extends FormModel
 
         if (!empty($persistLists)) {
             $this->getRepository()->saveEntities($persistLists);
-
-            // Detach the entities to save memory
-            foreach ($persistLists as $listEntity) {
-                $this->em->detach($listEntity);
-                unset($listEntity);
-            }
         }
 
         if ($batchProcess) {
@@ -904,12 +898,6 @@ class ListModel extends FormModel
 
         if (!empty($persistLists)) {
             $this->getRepository()->saveEntities($persistLists);
-
-            // Detach the entities to save memory
-            foreach ($persistLists as $listEntity) {
-                $this->em->detach($listEntity);
-                unset($listEntity);
-            }
         }
 
         if (!empty($deleteLists)) {
