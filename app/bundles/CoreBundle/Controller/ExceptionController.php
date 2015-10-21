@@ -43,7 +43,7 @@ class ExceptionController extends CommonController
                 $dataArray = array(
                     'error' => array(
                         'message' => $exception->getMessage(),
-                        'code'    => $exception->getCode()
+                        'code'    => $code
                     )
                 );
                 if ($env == 'dev') {
