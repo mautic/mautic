@@ -161,11 +161,7 @@ class EmailStepType extends AbstractType
             ),
             'label'       => 'mautic.install.form.email.spool_type',
             'expanded'    => true,
-            'empty_value' => false,
-            'attr'        => array(
-                'onchange' => 'MauticInstaller.toggleSpoolQueue();',
-                'tooltip'  => 'mautic.core.config.form.mailer.spool.type.tooltip'
-            )
+            'empty_value' => false
         ));
 
         $builder->add('mailer_spool_path', 'hidden');
