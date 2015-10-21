@@ -48,21 +48,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $fieldModel  = $this->factory->getModel('lead.field');
         $operators   = $leadModel->getFilterExpressionFunctions();
         $choices     = array();
-        $fieldValues = null;
 
-        if (!empty($options['data']['value'])) {
-            $field = $fieldModel->getRepository()->findOneBy(array('alias' => $options['data']['value']));
-            if ($field) {
-                $properties = $field->getProperties();
-                if (!empty($properties['list'])) {
-                    // Lookup/Select options
-                    $fieldValues = explode('|', $properties['list']);
-                } elseif (!empty($properties)) {
-                    // Boolean options
-                    $fieldValues = $properties;
-                }
-            }
-        }
 
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
@@ -75,9 +61,25 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $ff = $builder->getFormFactory();
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) use ($ff, $fieldValues) {
+        $func = function (FormEvent $e) use ($ff, $fieldModel) {
             $data    = $e->getData();
             $form    = $e->getForm();
+
+            $fieldValues = null;
+
+            if (isset($data['field'])) {
+                $field = $fieldModel->getRepository()->findOneBy(array('alias' => $data['field']));
+                if ($field) {
+                    $properties = $field->getProperties();
+                    if (!empty($properties['list'])) {
+                        // Lookup/Select options
+                        $fieldValues = explode('|', $properties['list']);
+                    } elseif (!empty($properties)) {
+                        // Boolean options
+                        $fieldValues = $properties;
+                    }
+                }
+            }
 
             // Display selectbox for a field with choices, textbox for others
             if (empty($fieldValues)) {
@@ -90,7 +92,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 ));
             } else {
                 $form->add('value', 'choice', array(
-                    'choices'    => $options,
+                    'choices'    => $fieldValues,
                     'label'      => 'mautic.form.field.form.value',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
