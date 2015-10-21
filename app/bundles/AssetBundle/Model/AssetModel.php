@@ -381,7 +381,7 @@ class AssetModel extends FormModel
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->factory->getParameter('max_size');
-        $maxAssetSize  = ($maxAssetSize == -1) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
         $memoryLimit   = Asset::getIniValue('memory_limit');

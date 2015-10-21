@@ -1355,7 +1355,7 @@ class Asset extends FormEntity
     {
         $value = ini_get($setting);
 
-        if ($value == -1) {
+        if ($value == -1 || $value === 0) {
 
             return PHP_INT_MAX;
         }
