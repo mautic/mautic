@@ -445,8 +445,8 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $request = $this->factory->getRequest();
-        $formName = strtolower(InputHelper::alphanum($form->getName()));
+        $request  = $this->factory->getRequest();
+        $formName = $form->generateFormName();
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */

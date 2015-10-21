@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -754,5 +755,19 @@ class Form extends FormEntity
     public function isStandalone()
     {
         return ($this->formType != 'campaign');
+    }
+
+    /**
+     * Generate a form name for HTML attributes
+     */
+    public function generateFormName()
+    {
+        return strtolower(
+            InputHelper::alphanum(
+                InputHelper::transliterate(
+                    $this->name
+                )
+            )
+        );
     }
 }
