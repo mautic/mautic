@@ -24,9 +24,17 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class AssetType extends AbstractType
 {
-
+    /**
+     * @var \Mautic\CoreBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var array
+     */
     private $themes;
+
+    /** @var \Mautic\AssetBundle\Model\AssetModel */
     private $assetModel;
 
     /**
@@ -58,7 +66,7 @@ class AssetType extends AbstractType
             )
         ));
 
-        $maxUploadSize = $this->assetModel->getMaxUploadSize();
+        $maxUploadSize = $this->assetModel->getMaxUploadSize('', true);
         $builder->add('tempName', 'hidden', array(
             'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', array('%max%' => $maxUploadSize)),
             'label_attr' => array('class' => 'control-label'),

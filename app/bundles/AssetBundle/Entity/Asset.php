@@ -160,7 +160,7 @@ class Asset extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -419,6 +419,7 @@ class Asset extends FormEntity
         if ($this->storageLocation === null) {
             $this->storageLocation = 'local';
         }
+
         return $this->storageLocation;
     }
 
@@ -651,7 +652,7 @@ class Asset extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = "get".ucfirst($prop);
         $current = $this->$getter();
 
         parent::isChanged($prop, $val);
@@ -697,14 +698,14 @@ class Asset extends FormEntity
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
-            $filename   = sha1(uniqid(mt_rand(), true));
-            $extension  = $this->getFile()->guessExtension();
+            $filename  = sha1(uniqid(mt_rand(), true));
+            $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {
                 //get it from the original name
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
-            $this->path = $filename . '.' . $extension;
+            $this->path = $filename.'.'.$extension;
         } elseif ($this->getStorageLocation() == 'remote' && $this->getRemotePath() !== null) {
             $fileName = basename($this->getRemotePath());
 
@@ -725,23 +726,24 @@ class Asset extends FormEntity
             // check for the remote and set type data
             if ($this->getStorageLocation() == 'remote') {
                 // get some basic information about the file type
-                $fileInfo   = $this->getFileInfo();
+                $fileInfo = $this->getFileInfo();
 
                 // set the mime and extension column values
                 $this->setExtension($fileInfo['extension']);
                 $this->setMime($fileInfo['mime']);
                 $this->setSize($fileInfo['size']);
             }
+
             return;
         }
 
         // move takes the target directory and then the
         // target filename to move to
         $this->getFile()->move($this->getUploadDir(), $this->path);
-        $filePath = $this->getUploadDir() . '/' . $this->temp;
+        $filePath = $this->getUploadDir().'/'.$this->temp;
 
         // get some basic information about the file type
-        $fileInfo   = $this->getFileInfo();
+        $fileInfo = $this->getFileInfo();
 
         // set the mime and extension column values
         $this->setExtension($fileInfo['extension']);
@@ -767,7 +769,8 @@ class Asset extends FormEntity
     /**
      * Remove a file
      *
-     * @param   boolean     $temp >> regular uploaded file or temporary
+     * @param   boolean $temp >> regular uploaded file or temporary
+     *
      * @return  void
      */
     public function removeUpload($temp = false)
@@ -792,7 +795,7 @@ class Asset extends FormEntity
     {
         return null === $this->path
             ? null
-            : $this->getUploadDir() . '/' . $this->path;
+            : $this->getUploadDir().'/'.$this->path;
     }
 
     /**
@@ -804,7 +807,7 @@ class Asset extends FormEntity
     {
         return null === $this->tempId || null === $this->tempName
             ? null
-            : $this->getAbsoluteTempDir() . '/' . $this->tempName;
+            : $this->getAbsoluteTempDir().'/'.$this->tempName;
     }
 
     /**
@@ -816,7 +819,7 @@ class Asset extends FormEntity
     {
         return null === $this->tempId
             ? null
-            : $this->getUploadDir() . '/tmp/' . $this->tempId;
+            : $this->getUploadDir().'/tmp/'.$this->tempId;
     }
 
     /**
@@ -917,9 +920,9 @@ class Asset extends FormEntity
             curl_exec($ch);
 
             // build an array of handy info
-            $fileInfo['mime']       = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-            $fileInfo['extension']  = $this->getFileType();
-            $fileInfo['size']       = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+            $fileInfo['mime']      = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $fileInfo['extension'] = $this->getFileType();
+            $fileInfo['size']      = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
             return $fileInfo;
         }
@@ -929,9 +932,9 @@ class Asset extends FormEntity
         }
 
         // return an array of file type info
-        $fileInfo['mime']       = $this->loadFile()->getMimeType();
-        $fileInfo['extension']  = $this->getFileType();
-        $fileInfo['size']       = $this->getSize(false, true);
+        $fileInfo['mime']      = $this->loadFile()->getMimeType();
+        $fileInfo['extension'] = $this->getFileType();
+        $fileInfo['size']      = $this->getSize(false, true);
 
         return $fileInfo;
     }
@@ -950,6 +953,7 @@ class Asset extends FormEntity
             curl_setopt($ch, CURLOPT_HEADER, 1);
             curl_setopt($ch, CURLOPT_NOBODY, 1);
             curl_exec($ch);
+
             return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         }
 
@@ -981,7 +985,7 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'fa fa-file-' . $icon . '-o';
+                return 'fa fa-file-'.$icon.'-o';
             }
         }
 
@@ -1019,7 +1023,7 @@ class Asset extends FormEntity
     public function getFileExtensions()
     {
         return array(
-            'excel' => array(
+            'excel'      => array(
                 'xlsx',
                 'xlsm',
                 'xlsb',
@@ -1028,19 +1032,19 @@ class Asset extends FormEntity
                 'xls',
                 'xlt'
             ),
-            'word' => array(
+            'word'       => array(
                 'doc',
                 'docx',
                 'docm',
                 'dotx'
             ),
-            'pdf' => array(
+            'pdf'        => array(
                 'pdf'
             ),
-            'audio' => array(
+            'audio'      => array(
                 'mp3'
             ),
-            'archive' => array(
+            'archive'    => array(
                 'zip',
                 'rar',
                 'iso',
@@ -1048,7 +1052,7 @@ class Asset extends FormEntity
                 'gz',
                 '7z'
             ),
-            'image' => array(
+            'image'      => array(
                 'jpg',
                 'jpeg',
                 'png',
@@ -1057,11 +1061,11 @@ class Asset extends FormEntity
                 'bmp',
                 'psd'
             ),
-            'text' => array(
+            'text'       => array(
                 'txt',
                 'pub'
             ),
-            'code' => array(
+            'code'       => array(
                 'php',
                 'js',
                 'json',
@@ -1082,7 +1086,7 @@ class Asset extends FormEntity
                 'pps',
                 'odp'
             ),
-            'video' => array(
+            'video'      => array(
                 'wmv',
                 'avi',
                 'mp4',
@@ -1143,7 +1147,7 @@ class Asset extends FormEntity
     /**
      * @return mixed
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
@@ -1151,7 +1155,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $description
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -1286,7 +1290,7 @@ class Asset extends FormEntity
             $this->setSize(round($this->loadFile()->getSize()));
         }
 
-        return ($humanReadable) ? static::convertBytesToHumanReadable($this->size, $inUnit) :  $this->size;
+        return ($humanReadable) ? static::convertBytesToHumanReadable($this->size, $inUnit) : $this->size;
     }
 
     /**
@@ -1312,6 +1316,7 @@ class Asset extends FormEntity
     static public function convertSizeToBytes($size)
     {
         if ('' === $size) {
+
             return PHP_INT_MAX;
         }
 
@@ -1325,13 +1330,41 @@ class Asset extends FormEntity
         }
 
         switch (strtolower(substr($size, -1))) {
-            case 't': $max *= 1024;
-            case 'g': $max *= 1024;
-            case 'm': $max *= 1024;
-            case 'k': $max *= 1024;
+            case 't':
+                $max *= 1024;
+            case 'g':
+                $max *= 1024;
+            case 'm':
+                $max *= 1024;
+            case 'k':
+                $max *= 1024;
         }
 
         return $max;
+    }
+
+    /**
+     * Get value from PHP configuration with special handling of -1
+     *
+     * @param string    $setting
+     * @param bool|true $convertToBytes
+     *
+     * @return int
+     */
+    static public function getIniValue($setting, $convertToBytes = true)
+    {
+        $value = ini_get($setting);
+
+        if ($value == -1 || $value === 0) {
+
+            return PHP_INT_MAX;
+        }
+
+        if ($convertToBytes) {
+            $value = self::convertSizeToBytes($value);
+        }
+
+        return (int) $value;
     }
 
     /**
@@ -1340,19 +1373,44 @@ class Asset extends FormEntity
      *
      * @return string
      */
-    static public function convertBytesToHumanReadable($size, $unit = "")
+    static public function convertBytesToHumanReadable($size, $unit = '')
     {
-        if ((!$unit && $size >= 1 << 30) || $unit == "GB") {
-            return number_format($size / (1 << 30), 2). " GB";
+        list($number, $unit) = self::convertBytesToUnit($size, $unit);
+
+        // Format number
+        $number = number_format($number, 2);
+
+        // Remove trailing .00
+        $number = strpos($number,'.') !== false ? rtrim(rtrim($number,'0'),'.') : $number;
+
+        return $number.' '.$unit;
+    }
+
+    /**
+     * @param        $size
+     * @param string $unit
+     *
+     * @return array
+     */
+    static public function convertBytesToUnit($size, $unit = '')
+    {
+        $unit = strtoupper($unit);
+
+        if ((!$unit && $size >= 1 << 30) || $unit == 'GB' || $unit == 'G') {
+
+            return array($size / (1 << 30), 'GB');
         }
-        if ((!$unit && $size >= 1 << 20) || $unit == "MB") {
-            return number_format($size / (1 << 20), 2)." MB";
+        if ((!$unit && $size >= 1 << 20) || $unit == 'MB' || $unit == 'M') {
+
+            return array($size / (1 << 20), 'MB');
         }
-        if ((!$unit && $size >= 1 << 10) || $unit == "KB") {
-            return number_format($size / (1 << 10), 2)." KB";
+        if ((!$unit && $size >= 1 << 10) || $unit == 'KB' || $unit == 'K') {
+
+            return array($size / (1 << 10), 'KB');
         }
 
-        return number_format($size) . " bytes";
+        // Add zero to remove useless .00
+        return array($size, 'bytes');
     }
 
     /**
