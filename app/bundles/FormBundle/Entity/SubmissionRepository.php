@@ -431,7 +431,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return boolean
      */
-    public function compareLastValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
     {
         $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $form . '_' . $formAlias;
 

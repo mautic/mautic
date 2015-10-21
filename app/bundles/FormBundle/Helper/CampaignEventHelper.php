@@ -62,7 +62,7 @@ class CampaignEventHelper
             return false;
         }
 
-        return $factory->getModel('form.submission')->getRepository()->compareLastValue(
+        return $factory->getModel('form.submission')->getRepository()->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),

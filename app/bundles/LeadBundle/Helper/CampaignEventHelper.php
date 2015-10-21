@@ -158,27 +158,17 @@ class CampaignEventHelper
      */
     public static function validateFormValue(MauticFactory $factory, $event, Lead $lead)
     {
-        // @todo imlement this method
-        // if (!$lead || !$lead->getId()) {
-        //     return false;
-        // }
-        //
-        // $model     = $factory->getModel('lead');
-        // $operators = $model->getFilterExpressionFunctions();
-        // var_dump($operators);\Doctrine\Common\Util\Debug::dump($event['properties']['form']);die;
-        // $form      = $model->getRepository()->findOneById($event['properties']['form']);
-        //
-        // if (!$form || !$form->getId()) {
-        //     return false;
-        // }
-        //
-        // return $factory->getModel('form.submission')->getRepository()->compareLastValue(
-        //     $lead->getId(),
-        //     $form->getId(),
-        //     $form->getAlias(),
-        //     $event['properties']['field'],
-        //     $event['properties']['value'],
-        //     $operators[$event['properties']['operator']]['expr']
-        // );
+        if (!$lead || !$lead->getId()) {
+            return false;
+        }
+
+        $operators = $factory->getModel('lead')->getFilterExpressionFunctions();
+
+        return $factory->getModel('lead.field')->getRepository()->compareValue(
+            $lead->getId(),
+            $event['properties']['field'],
+            $event['properties']['value'],
+            $operators[$event['properties']['operator']]['expr']
+        );
     }
 }

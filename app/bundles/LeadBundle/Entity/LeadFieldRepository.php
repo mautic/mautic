@@ -114,4 +114,33 @@ class LeadFieldRepository extends CommonRepository
                 ->execute()->fetchAll();
     }
 
+    /**
+     * Compare a form result value with defined value for defined lead.
+     *
+     * @param  integer $lead ID
+     * @param  integer $field alias
+     * @param  string  $value to compare with
+     * @param  string  $operatorExpr for WHERE clause
+     *
+     * @return boolean
+     */
+    public function compareValue($lead, $field, $value, $operatorExpr)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $q->expr()->$operatorExpr('l.' . $field, ':value')
+                )
+            )
+            ->setParameter('lead', (int) $lead)
+            ->setParameter('value', $value);
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
+    }
+
 }
