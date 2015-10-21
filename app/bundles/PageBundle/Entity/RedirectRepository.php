@@ -101,4 +101,26 @@ class RedirectRepository extends CommonRepository
 
         return $q->getQuery()->getResult();
     }
+
+    /**
+     * Up the hit count
+     *
+     * @param            $id
+     * @param int        $increaseBy
+     * @param bool|false $unique
+     */
+    public function upHitCount($id, $increaseBy = 1, $unique = false)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'page_redirects')
+            ->set('hits', 'hits + ' . (int) $increaseBy)
+            ->where('id = ' . (int) $id);
+
+        if ($unique) {
+            $q->set('unique_hits', 'unique_hits + ' . (int) $increaseBy);
+        }
+
+        $q->execute();
+    }
 }

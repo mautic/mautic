@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
@@ -575,32 +574,33 @@ class PageModel extends FormModel
         }
 
         if (!empty($page)) {
-            $hitCount = $page->getHits();
-            $hitCount++;
-            $page->setHits($hitCount);
-
             //check for a hit from tracking id
             $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
-            if (empty($countById)) {
-                $uniqueHitCount = $page->getUniqueHits();
-                $uniqueHitCount++;
-                $page->setUniqueHits($uniqueHitCount);
-            }
+            $isUnique  = empty($countById);
 
             if ($page instanceof Page) {
                 $hit->setPage($page);
                 $hit->setPageLanguage($page->getLanguage());
 
-                if ($countById) {
-                    $variantHitCount = $page->getVariantHits();
-                    $variantHitCount++;
-                    $page->setVariantHits($variantHitCount);
+                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+
+                try {
+                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+                } catch (\Exception $exception) {
+                    error_log($exception);
                 }
             } elseif ($page instanceof Redirect) {
                 $hit->setRedirect($page);
-            }
 
-            $this->em->persist($page);
+                /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+                $redirectModel = $this->factory->getModel('page.redirect');
+
+                try {
+                    $redirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+                } catch (\Exception $exception) {
+                    error_log($exception);
+                }
+            }
         }
 
         //glean info from the IP address

@@ -205,7 +205,7 @@ class Email extends FormEntity
     }
 
     /**
-     *
+     * Clear stats
      */
     public function clearStats()
     {
@@ -213,7 +213,7 @@ class Email extends FormEntity
     }
 
     /**
-     *
+     * Clear variants
      */
     public function clearVariants()
     {
@@ -1062,30 +1062,6 @@ class Email extends FormEntity
     }
 
     /**
-     * Increase sent counts by one
-     */
-    public function upSentCounts ()
-    {
-        $this->sentCount++;
-        if (!empty($this->variantStartDate)) {
-            $this->variantSentCount++;
-        }
-    }
-
-    /**
-     * Decrease sent counts by one
-     */
-    public function downSentCounts ()
-    {
-        if ($this->sentCount) {
-            $this->sentCount--;
-            if (!empty($this->variantStartDate) && $this->variantSentCount) {
-                $this->variantSentCount--;
-            }
-        }
-    }
-
-    /**
      * @return mixed
      */
     public function getVariantReadCount ()
@@ -1187,7 +1163,6 @@ class Email extends FormEntity
         return $this;
     }
 
-
     /**
      * Add asset
      *
@@ -1221,5 +1196,4 @@ class Email extends FormEntity
     {
         return $this->assetAttachments;
     }
-
 }
