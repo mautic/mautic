@@ -44,6 +44,8 @@ class FieldType extends AbstractType
         $addIsRequired = true;
 
         if (!empty($options['customParameters'])) {
+            $type = 'custom';
+
             $customParams    =& $options['customParameters'];
             $formTypeOptions = array(
                 'required' => false,
@@ -118,7 +120,6 @@ class FieldType extends AbstractType
         if (!empty($options['customParameters'])) {
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
-            $type = $options['data']['type'];
             switch ($type) {
                 case 'select':
                 case 'country':
@@ -195,7 +196,7 @@ class FieldType extends AbstractType
         if ($addDefaultValue) {
             $builder->add(
                 'defaultValue',
-                'text',
+                ($type == 'textarea') ? 'textarea' : 'text',
                 array(
                     'label'      => 'mautic.core.defaultvalue',
                     'label_attr' => array('class' => 'control-label'),

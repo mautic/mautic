@@ -26,7 +26,7 @@ $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
 $name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
 
-if ($field['type'] == 'checkboxgrp' || $field['type'] == 'radiogrp') {
+if (in_array($field['type'], array('checkboxgrp', 'radiogrp', 'textarea'))) {
     $value = '';
 } else {
     $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
