@@ -409,6 +409,12 @@ class AppKernel extends Kernel
                 include $root . '/config/parameters_local.php';
                 $localParameters = array_merge($localParameters, $parameters);
             }
+
+            foreach ($localParameters as $k => &$v) {
+                if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+                    $v = (string) getenv($match[1]);
+                }
+            }
         }
 
         return $localParameters;

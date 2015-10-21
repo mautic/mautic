@@ -81,6 +81,11 @@ foreach ($mauticParams as $k => &$v) {
     // Update the file paths in case $factory->getParameter() is used
     $replaceRootPlaceholder($v);
 
+    // Update with system value if applicable
+    if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+        $v = (string) getenv($match[1]);
+    }
+
     // Add to the container
     $container->setParameter("mautic.{$k}", $v);
 }

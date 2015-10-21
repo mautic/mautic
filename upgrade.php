@@ -36,6 +36,12 @@ if (file_exists("$root/config/parameters_local.php")) {
     $localParameters = array_merge($localParameters, $parameters);
 }
 
+foreach ($localParameters as $k => &$v) {
+    if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+        $v = (string) getenv($match[1]);
+    }
+}
+
 if (isset($localParameters['cache_path'])) {
     $cacheDir = str_replace('%kernel.root_dir%', $root, $localParameters['cache_path'] . '/prod');
 } else {

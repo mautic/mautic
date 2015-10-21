@@ -172,6 +172,13 @@ class InstallController extends CommonController
                             $dbParams['dbname'] = $dbParams['name'];
                             unset($dbParams['name']);
 
+                            // Support for env variables
+                            foreach ($dbParams as $k => &$v) {
+                                if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+                                    $v = (string) getenv($match[1]);
+                                }
+                            }
+
                             $result = $this->performDatabaseInstallation($dbParams);
 
                             if (is_array($result)) {
@@ -882,6 +889,13 @@ class InstallController extends CommonController
 
                 $dbParams['dbname'] = $dbParams['name'];
                 unset($dbParams['name']);
+
+                // Support for env variables
+                foreach ($dbParams as $k => &$v) {
+                    if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+                        $v = (string) getenv($match[1]);
+                    }
+                }
             }
 
             // Ensure UTF8 charset
