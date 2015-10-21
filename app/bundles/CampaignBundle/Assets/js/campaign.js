@@ -100,7 +100,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
         mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
 
-        if (response.eventType == 'decision') {
+        if (response.eventType == 'decision' || response.eventType == 'condition') {
             var theAnchor = Mautic.campaignBuilderTopAnchor;
             theAnchor[6] = 'top ' + domEventId;
             Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_top"}, Mautic.campaignBuilderTopEndpoint);
@@ -399,6 +399,11 @@ Mautic.launchCampaignEditor = function() {
                     return false;
                 }
 
+                //ensure that a condition is not connecting into action
+                if (mQuery('#' + params.sourceId).hasClass('list-campaign-action') && mQuery('#' + params.targetId).hasClass('list-campaign-condition')) {
+                    return false;
+                }
+
                 return true
             }
         };
@@ -513,7 +518,7 @@ Mautic.launchCampaignEditor = function() {
             }, Mautic.campaignBuilderTopEndpoint);
         });
 
-        mQuery("#CampaignCanvas .list-campaign-nondecision").each(function () {
+        mQuery("#CampaignCanvas .list-campaign-event").not('.list-campaign-decision').not('.list-campaign-condition').each(function () {
             var id = mQuery(this).attr('id');
             var theAnchor = Mautic.campaignBuilderBottomAnchor;
             theAnchor[6] = 'bottom ' + id;
@@ -523,7 +528,7 @@ Mautic.launchCampaignEditor = function() {
             }, Mautic.campaignBuilderBottomEndpoint);
         });
 
-        mQuery("#CampaignCanvas .list-campaign-decision").each(function () {
+        mQuery("#CampaignCanvas .list-campaign-decision, #CampaignCanvas .list-campaign-condition").each(function () {
             var id = mQuery(this).attr('id');
             var theAnchor = Mautic.campaignBuilderYesAnchor;
             theAnchor[6] = 'yes ' + id;

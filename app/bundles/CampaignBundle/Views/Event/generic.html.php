@@ -7,15 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//for defining the jsPlumb anchors
-$class = ($event['eventType'] == 'decision') ? 'list-campaign-decision' : 'list-campaign-nondecision list-campaign-' . $event['eventType'];
-
 if (empty($route))
     $route = 'mautic_campaignevent_action';
 
 ?>
 <?php if (empty($update)): ?>
-<div id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event <?php echo $class; ?>">
+<div id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis"><?php echo $event['name']; ?></span></div>
