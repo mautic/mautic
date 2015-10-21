@@ -99,7 +99,7 @@ Mautic.updateFormFieldValues = function (field) {
         'value': valueField.attr('value')
     };
 
-    if (typeof options[fieldValue] !== 'undefined' && options[fieldValue].length) {
+    if (typeof options[fieldValue] !== 'undefined' && !jQuery.isEmptyObject(options[fieldValue])) {
         var newValueField = mQuery('<select/>')
             .attr('class', valueFieldAttrs['class'])
             .attr('id', valueFieldAttrs['id'])

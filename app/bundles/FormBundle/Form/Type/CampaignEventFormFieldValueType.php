@@ -82,7 +82,10 @@ class CampaignEventFormFieldValueType extends AbstractType
                         $properties = $field->getProperties();
 
                         if (!empty($properties['list']['list'])) {
-                            $options[$field->getAlias()] = $properties['list']['list'];
+                            $options[$field->getAlias()] = array();
+                            foreach ($properties['list']['list'] as $option) {
+                                $options[$field->getAlias()][$option] = $option;
+                            }
                         }
                     }
                 }
