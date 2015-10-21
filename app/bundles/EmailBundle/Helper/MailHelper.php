@@ -1407,7 +1407,7 @@ class MailHelper
                     );
                 }
 
-                $assetModel->upDownloadCount($asset, count($this->assetStats));
+                $assetModel->upDownloadCount($asset, count($this->assetStats), true);
             }
         }
 

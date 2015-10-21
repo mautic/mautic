@@ -169,19 +169,10 @@ class AssetModel extends FormModel
         if (!empty($asset) && empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $downloadCount = $asset->getDownloadCount();
-            $downloadCount++;
-            $asset->setDownloadCount($downloadCount);
-
             //check for a download count from tracking id
             $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
-            if (empty($countById)) {
-                $uniqueDownloadCount = $asset->getUniqueDownloadCount();
-                $uniqueDownloadCount++;
-                $asset->setUniqueDownloadCount($uniqueDownloadCount);
-            }
 
-            $this->em->persist($asset);
+            $this->getRepository()->upDownloadCount($asset->getId(), 1, empty($countById));
         }
 
         //check for existing IP
@@ -191,14 +182,15 @@ class AssetModel extends FormModel
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
-        $this->em->persist($download);
-
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
+            $this->em->persist($download);
             $this->em->flush();
         } catch (\Exception $e) {
             error_log($e);
         }
+
+        $this->em->detach($download);
     }
 
     /**
