@@ -721,7 +721,8 @@ class ListModel extends FormModel
             $lists = array($lists);
         }
 
-        $persistLists = $dispatchEvents = array();
+        $persistLists   = array();
+        $dispatchEvents = array();
 
         foreach ($lists as $listId) {
             if (!isset($this->leadChangeLists[$listId])) {
@@ -857,7 +858,10 @@ class ListModel extends FormModel
             $lists = array($lists);
         }
 
-        $persistLists = $deleteLists = $dispatchEvents = array();
+        $persistLists   = array();
+        $deleteLists    = array();
+        $dispatchEvents = array();
+
         foreach ($lists as $listId) {
             if (!isset($this->leadChangeLists[$listId])) {
                 // List no longer exists in the DB so continue to the next
