@@ -560,6 +560,11 @@ class PageModel extends FormModel
 
         $hit->setUrl($pageURL);
 
+        // Store query array
+        $query = $request->query->all();
+        unset($query['d']);
+        $hit->setQuery($query);
+
         list($trackingId, $generated) = $leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
