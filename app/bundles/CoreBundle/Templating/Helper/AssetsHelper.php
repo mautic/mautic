@@ -71,8 +71,18 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
+    public function getUrl($path, $packageName = null, $version = null)
     {
+        // Dirty hack to work around strict notices with parent::getUrl
+        $absolute = $ignorePrefix = false;
+        if (func_num_args() > 3) {
+            $args = func_get_args();
+            $absolute = $args[3];
+            if (isset($args[4])) {
+                $ignorePrefix = $args[4];
+            }
+        }
+
         // if we have http in the url it is absolute and we can just return it
         if (strpos($path, 'http') === 0) {
             return $path;
@@ -213,11 +223,12 @@ class AssetsHelper extends CoreAssetsHelper
      * Loads an addon script
      *
      * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
+     * @param $onLoadCallback Mautic namespaced function to call for the script onload
+     * @param $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
      */
-
-    public function includeScript($assetFilePath)
+    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
     {
-        return  '<script async="async" type="text/javascript">Mautic.loadScript(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+        return  '<script async="async" type="text/javascript">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
 
     /*
@@ -225,7 +236,6 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
      */
-
     public function includeStylesheet($assetFilePath)
     {
         return  '<script async="async" type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
