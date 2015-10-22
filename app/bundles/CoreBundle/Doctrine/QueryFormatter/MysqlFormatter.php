@@ -26,7 +26,7 @@ class MysqlFormatter extends AbstractFormatter
      */
     public function toDateTime($field, $format = 'Y-m-d H:i:s')
     {
-        return "DATETIME($field)";
+        return "DATE($field)";
     }
 
     /**
