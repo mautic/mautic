@@ -82,7 +82,7 @@ class CommonController extends Controller implements MauticController
             );
         }
 
-        if (isset($args['passthroughVars']['route'])) {
+        if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
 
@@ -370,31 +370,6 @@ class CommonController extends Controller implements MauticController
         return new JsonResponse(array(
             'error' => $this->factory->getTranslator()->trans($msg, array(), 'flashes')
         ));
-    }
-
-    /**
-     * Clear the application cache and run the warmup routine for the current environment
-     *
-     * @param bool $noWarmup If true, will not run warmup routine
-     *
-     *
-     * @return void
-     */
-    public function clearCache($noWarmup = false)
-    {
-        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-        $cacheHelper = $this->factory->getHelper('cache');
-        $cacheHelper->clearCache($noWarmup);
-    }
-
-    /**
-     * Delete's the file Symfony caches settings in
-     */
-    public function clearCacheFile()
-    {
-        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-        $cacheHelper = $this->factory->getHelper('cache');
-        $cacheHelper->clearCacheFile();
     }
 
     /**

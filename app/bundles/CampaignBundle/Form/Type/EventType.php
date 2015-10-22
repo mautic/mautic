@@ -37,7 +37,7 @@ class EventType extends AbstractType
             'required'   => false
         ));
 
-        if ($options['data']['eventType'] == 'action') {
+        if ($options['data']['eventType'] == 'action' || $options['data']['eventType'] == 'condition') {
             $triggerMode = (empty($options['data']['triggerMode'])) ? 'immediate' : $options['data']['triggerMode'];
             $builder->add('triggerMode', 'button_group', array(
                 'choices' => array(

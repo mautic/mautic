@@ -271,7 +271,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -324,7 +324,7 @@ Mautic.addLeadListFilter = function (elId) {
             var fieldOptions = mQuery(filterId).data("field-list");
 
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(val).text(val).appendTo(filterEl);
+                mQuery('<option>').val(index).text(val).appendTo(filterEl);
             });
         }
         mQuery(filter).attr('data-placeholder', label);
@@ -473,10 +473,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-/**
- *
- * @param label
- */
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
         mQuery(el).val()
@@ -897,4 +893,49 @@ Mautic.leadBatchSubmit = function() {
     mQuery('#MauticSharedModal').modal('hide');
 
     return false;
+};
+
+Mautic.updateLeadFieldValues = function (field) {
+    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
+
+    field = mQuery(field);
+    var fieldAlias = field.val();
+    Mautic.ajaxActionRequest('lead:updateLeadFieldValues', {'alias': fieldAlias}, function(response) {
+        if (typeof response.options != 'undefined') {
+            var valueField = mQuery('#campaignevent_properties_value');
+            var valueFieldAttrs = {
+                'class': valueField.attr('class'),
+                'id': valueField.attr('id'),
+                'name': valueField.attr('name'),
+                'autocomplete': valueField.attr('autocomplete'),
+                'value': valueField.attr('value')
+            };
+
+            if (!mQuery.isEmptyObject(response.options)) {
+                var newValueField = mQuery('<select/>')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                mQuery.each(response.options, function(optionKey, optionVal) {
+                    var option = mQuery("<option/>")
+                        .attr('value', optionKey)
+                        .text(optionVal);
+                    newValueField.append(option);
+                });
+                valueField.replaceWith(newValueField);
+            } else {
+                var newValueField = mQuery('<input/>')
+                    .attr('type', 'text')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                valueField.replaceWith(newValueField);
+            }
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
 };

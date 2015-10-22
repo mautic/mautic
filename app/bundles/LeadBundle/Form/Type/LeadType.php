@@ -20,6 +20,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class LeadType
@@ -148,7 +149,7 @@ class LeadType extends AbstractType
                 $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
             $constraints = array();
             if ($required) {
-                $constraints[] = new \Symfony\Component\Validator\Constraints\NotBlank(
+                $constraints[] = new NotBlank(
                     array('message' => 'mautic.lead.customfield.notblank')
                 );
             }

@@ -47,7 +47,7 @@ $formId = $form->getId();
                 $fields = $form->getFields();
                 $fieldCount = ($canDelete) ? 4 : 3;
                 foreach ($fields as $f):
-                    if (in_array($f->getType(), array('button', 'freetext')))
+                    if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
                         continue;
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'formresult.'.$formId,

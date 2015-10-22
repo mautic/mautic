@@ -96,6 +96,21 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
+                case 'tags':
+                    if (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+                    $customOptions['choices']  = $options['tags'];
+                    $customOptions['multiple'] = true;
+                    $attr = array_merge($attr, array(
+                            'data-placeholder'      => $translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text'  => $translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'        => 'true',
+                            'onchange'              => 'Mautic.createLeadTag(this)'
+                        )
+                    );
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                     $customOptions['choices']  = $options['timezones'];
                     $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
@@ -288,7 +303,8 @@ class FilterType extends AbstractType
                 'countries',
                 'regions',
                 'fields',
-                'lists'
+                'lists',
+                'tags'
             )
         );
 

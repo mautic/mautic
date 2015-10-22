@@ -755,9 +755,10 @@ var Mautic = {
             type = 'datetime';
         }
 
+        var format = mQuery(el).data('format');
         if (type == 'datetime') {
             mQuery(el).datetimepicker({
-                format: 'Y-m-d H:i',
+                format: (format) ? format : 'Y-m-d H:i',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,
@@ -766,7 +767,7 @@ var Mautic = {
         } else if(type == 'date') {
             mQuery(el).datetimepicker({
                 timepicker: false,
-                format: 'Y-m-d',
+                format: (format) ? format : 'Y-m-d',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,
@@ -776,7 +777,7 @@ var Mautic = {
         } else if (type == 'time') {
             mQuery(el).datetimepicker({
                 datepicker: false,
-                format: 'H:i',
+                format: (format) ? format : 'H:i',
                 lazyInit: true,
                 validateOnBlur: false,
                 allowBlank: true,
@@ -813,7 +814,6 @@ var Mautic = {
 
                 tokens.each(function (i) {
                     mQuery(this).off('dblclick').on('dblclick', function (e) {
-                        console.log(e);
                         var selEl = new CKEDITOR.dom.element(e.target);
                         var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
                         rangeObjForSelection.selectNodeContents(selEl);
@@ -1156,7 +1156,7 @@ var Mautic = {
         var form = mQuery(form);
 
         var modalParent = form.closest('.modal');
-        var inMain = modalParent.length > 0 ? false : true;
+        var inMain = mQuery(modalParent).length > 0 ? false : true;
 
         var action = form.attr('action');
 
@@ -1668,6 +1668,11 @@ var Mautic = {
                         }
                     }
                 }
+            } else if (response.target) {
+                mQuery(response.target).html(response.newContent);
+
+                //activate content specific stuff
+                Mautic.onPageLoad(response.target, response, true);
             } else {
                 //load the content
                 if (mQuery(target + ' .loading-placeholder').length) {
@@ -2006,7 +2011,7 @@ var Mautic = {
             if (overlayEnabled) {
                 mQuery(el).off('blur.livesearchOverlay');
                 mQuery(el).on('blur.livesearchOverlay', function() {
-                    mQuery(overlayTarget + ' .content-overlay').remove();
+                   mQuery(overlayTarget + ' .content-overlay').remove();
                 });
             }
 
@@ -2120,8 +2125,19 @@ var Mautic = {
 
                 var tmplParam = (route.indexOf('tmpl') == -1) ? '&tmpl=' + tmpl : '';
 
+                // In a modal?
+                var checkInModalTarget = (overlayTarget) ? overlayTarget : target;
+                var modalParent        = mQuery(checkInModalTarget).closest('.modal');
+                var inModal            = mQuery(modalParent).length > 0;
+
+                if (inModal) {
+                    var modalTarget = '#' + mQuery(modalParent).attr('id');
+                    Mautic.startModalLoadingBar(modalTarget);
+                }
+                var showLoading = (inModal) ? false : true;
+
                 Mautic.liveSearchXhr = mQuery.ajax({
-                    showLoadingBar: true,
+                    showLoadingBar: showLoading,
                     url: route,
                     type: "GET",
                     data: searchName + "=" + encodeURIComponent(value) + tmplParam,
@@ -2136,8 +2152,6 @@ var Mautic = {
                         response.overlayEnabled = overlayEnabled;
                         response.overlayTarget = overlayTarget;
 
-                        Mautic.processPageContent(response);
-
                         //update the buttons class and action
                         if (mQuery(btn).length) {
                             if (action == 'clear') {
@@ -2149,7 +2163,13 @@ var Mautic = {
                             }
                         }
 
-                        Mautic.stopPageLoadingBar();
+                        if (inModal) {
+                            Mautic.processModalContent(response);
+                            Mautic.stopModalLoadingBar(modalTarget);
+                        } else {
+                            Mautic.processPageContent(response);
+                            Mautic.stopPageLoadingBar();
+                        }
                     },
                     error: function (request, textStatus, errorThrown) {
                         Mautic.processAjaxError(request, textStatus, errorThrown);

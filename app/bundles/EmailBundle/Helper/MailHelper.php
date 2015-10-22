@@ -197,7 +197,6 @@ class MailHelper
 
         $this->from       = (!empty($from)) ? $from : array($factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name'));
         $this->returnPath = $factory->getParameter('mailer_return_path');
-        $this->message    = $this->getMessageInstance();
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
@@ -208,6 +207,8 @@ class MailHelper
         if (method_exists($this->transport, 'setMauticFactory')) {
             $this->transport->setMauticFactory($factory);
         }
+
+        $this->message    = $this->getMessageInstance();
     }
 
     /**
@@ -596,7 +597,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
+            $message = ($this->tokenizationSupported) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
 
             return $message;
         } catch (\Exception $e) {
@@ -1513,10 +1514,12 @@ class MailHelper
      *
      * @param null $idHash
      *
-     * @return bool|mixed|null|string
+     * @return bool|string
      */
-    protected function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null)
     {
+        $monitoredEmail = false;
+
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
             list ($email, $domain) = explode('@', $settings['address']);
@@ -1535,10 +1538,12 @@ class MailHelper
      *
      * @param null $idHash
      *
-     * @return bool|mixed|null|string
+     * @return bool|string
      */
-    protected function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null)
     {
+        $monitoredEmail = false;
+
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
             list ($email, $domain) = explode('@', $settings['address']);

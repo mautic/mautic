@@ -25,7 +25,8 @@ $templates = array(
     'regions'   => 'region-template',
     'timezones' => 'timezone-template',
     'select'    => 'select-template',
-    'lists'     => 'leadlist-template'
+    'lists'     => 'leadlist-template',
+    'tags'      => 'tags-template'
 );
 ?>
 
@@ -117,7 +118,8 @@ $templates = array(
 
 <div class="hide" id="templates">
 <?php foreach ($templates as $dataKey => $template): ?>
-    <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter">
+    <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="' . $view['translator']->trans('mautic.lead.tags.select_or_create') . '" data-no-results-text="' . $view['translator']->trans('mautic.lead.tags.enter_to_create') . '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+    <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
         <option value=""></option>
         <?php
         if (isset($form->vars[$dataKey])):

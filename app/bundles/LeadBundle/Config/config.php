@@ -287,6 +287,20 @@ return array(
             'mautic.form.type.lead_batch_dnc'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
                 'alias'     => 'lead_batch_dnc'
+            ),
+            'mautic.form.type.lead_merge'               => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
+                'alias'     => 'lead_merge'
+            ),
+            'mautic.form.type.campaignevent_lead_field_value'  => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'campaignevent_lead_field_value'
+            ),
+            'mautic.form.type.lead_fields'  => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'leadfields_choices'
             )
         ),
         'other'   => array(

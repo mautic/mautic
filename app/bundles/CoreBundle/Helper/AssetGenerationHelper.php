@@ -207,7 +207,7 @@ class AssetGenerationHelper
      */
     protected function findAssets($dir, $ext, $env, &$assets)
     {
-        $rootPath    = $this->factory->getSystemPath('assets_root') . '/';
+        $rootPath    = str_replace('\\', '/', $this->factory->getSystemPath('assets_root') . '/');
         $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
 
@@ -262,7 +262,7 @@ class AssetGenerationHelper
         $files->sort($sort);
 
         foreach ($files as $file) {
-            $fullPath = $file->getPathname();
+           	$fullPath = str_replace('\\', '/', $file->getPathname());
             $relPath  = str_replace($rootPath, '', $fullPath);
 
             $details = array(

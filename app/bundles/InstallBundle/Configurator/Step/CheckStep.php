@@ -147,6 +147,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.mcrypt';
         }
 
+        if (!function_exists('finfo_open')) {
+            $messages[] = 'mautic.install.extension.fileinfo';
+        }
+
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
             $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
 
@@ -264,6 +268,10 @@ class CheckStep implements StepInterface
             }
         }
 
+        if (!extension_loaded('zip')) {
+            $messages[] = 'mautic.install.extension.zip';
+        }
+
         // We set a default timezone in the app bootstrap, but advise the user if their PHP config is missing it
         if (!ini_get('date.timezone')) {
             $messages[] = 'mautic.install.date.timezone.not.set';
@@ -285,7 +293,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.xml';
         }
 
-        if (function_exists('imap_open')) {
+        if (!function_exists('imap_open')) {
             $messages[] = 'mautic.install.extension.imap';
         }
 

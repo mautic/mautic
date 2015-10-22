@@ -44,11 +44,15 @@
 
         "sensio/distribution-bundle": "~2.3",
 
-        "doctrine/orm": "~2.3,<2.5",
+        "doctrine/annotations": "1.2.*,>=1.2.7",
+        "doctrine/cache": "1.4.*,>=1.4.2",
+        "doctrine/common": "2.4.*,>=2.4.3",
         "doctrine/dbal": "2.4.*",
-        "doctrine/doctrine-bundle": "~1.2",
-        "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
         "doctrine/migrations": "dev-master",
+        "doctrine/orm": "2.4.*,>=2.4.8",
+        "doctrine/doctrine-bundle": "~1.2",
+        "doctrine/doctrine-cache-bundle": "~1.0",
+        "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
         "doctrine/doctrine-migrations-bundle": "~1.0",
 
         "knplabs/gaufrette": "dev-master",
@@ -67,7 +71,8 @@
         "phpoffice/phpexcel": "1.8.0",
         "joomla/http": "~1.1",
         "joomla/filter": "~1.1",
-        "mrclay/minify": "2.2.0"
+        "mrclay/minify": "2.2.0",
+        "jbroadway/urlify": "^1.0"
     },
     "require-dev": {
         "symfony/twig-bundle": "2.5.*",

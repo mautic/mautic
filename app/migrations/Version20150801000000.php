@@ -40,6 +40,7 @@ class Version20150801000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP FOREIGN KEY ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
 
         $this->addSql('RENAME TABLE ' . $this->prefix . 'addons TO ' . $this->prefix . 'plugins');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
 
         $this->addSql('RENAME TABLE ' . $this->prefix . 'addon_integration_settings TO ' . $this->prefix . 'plugin_integration_settings');
@@ -54,6 +55,7 @@ class Version20150801000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP CONSTRAINT ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addons RENAME TO ' . $this->prefix . 'plugins');
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings RENAME TO ' . $this->prefix . 'plugin_integration_settings');
@@ -61,6 +63,13 @@ class Version20150801000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings RENAME COLUMN addon_id TO plugin_id');
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . ' FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addons_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addon_integration_settings_id_seq CASCADE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings DROP CONSTRAINT FK_5CEDE447EC942BCF');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT FK_5CEDE447EC942BCF FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugin_integration_settings_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugins_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
     }
 
     public function postUp(Schema $schema)

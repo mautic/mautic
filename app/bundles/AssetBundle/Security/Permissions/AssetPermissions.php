@@ -26,7 +26,7 @@ class AssetPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->addStandardPermissions('assets');
+        $this->addExtendedPermissions('assets');
         $this->addStandardPermissions('categories');
     }
 
@@ -44,6 +44,6 @@ class AssetPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('asset', 'categories', $builder, $data);
-        $this->addStandardFormFields('asset', 'assets', $builder, $data);
+        $this->addExtendedFormFields('asset', 'assets', $builder, $data);
     }
 }

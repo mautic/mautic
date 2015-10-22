@@ -704,10 +704,11 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param Lead $lead2
+     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
      *
      * @return Lead
      */
-    public function mergeLeads(Lead $lead, Lead $lead2)
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
         $leadId  = $lead->getId();
         $lead2Id = $lead2->getId();
@@ -717,9 +718,14 @@ class LeadModel extends FormModel
             return $lead;
         }
 
-        //which lead is the oldest?
-        $mergeWith  = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
-        $mergeFrom  = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+        if ($autoMode) {
+            //which lead is the oldest?
+            $mergeWith = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
+            $mergeFrom = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+        } else {
+            $mergeWith = $lead2;
+            $mergeFrom = $lead;
+        }
 
         //dispatch pre merge event
         $event = new LeadMergeEvent($mergeWith, $mergeFrom);
@@ -756,6 +762,11 @@ class LeadModel extends FormModel
         $mergeWithPoints = $mergeWith->getPoints();
         $mergeFromPoints = $mergeFrom->getPoints();
         $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
+
+        //merge tags
+        $mergeFromTags = $mergeFrom->getTags();
+        $addTags       = $mergeFromTags->getKeys();
+        $this->modifyTags($mergeWith, $addTags, null, false);
 
         //save the updated lead
         $this->saveEntity($mergeWith, false);
@@ -933,7 +944,7 @@ class LeadModel extends FormModel
         }
 
         if ($tags !== null) {
-            $this->modifyTags($lead, $tags);
+            $this->modifyTags($lead, $tags, null, false);
         }
 
         foreach ($fields as $leadField => $importField) {
@@ -1013,8 +1024,9 @@ class LeadModel extends FormModel
      * @param Lead $lead
      * @param      $tags
      * @param      $removeTags
+     * @param      $persist
      */
-    public function modifyTags(Lead $lead, $tags, array $removeTags = null)
+    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
     {
         $leadTags = $lead->getTags();
 
@@ -1056,6 +1068,77 @@ class LeadModel extends FormModel
             }
         }
 
-        $this->saveEntity($lead);
+        if ($persist) {
+            $this->saveEntity($lead);
+        }
+    }
+
+    /**
+     * Get array of available lead tags
+     */
+    public function getTagList()
+    {
+        return $this->getTagRepository()->getSimpleList(null, array(), 'tag', 'id');
+    }
+
+    /**
+     * @param null $operator
+     *
+     * @return array
+     */
+    public function getFilterExpressionFunctions($operator = null)
+    {
+        $operatorOptions = array(
+            '='          =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.equals',
+                    'expr'        => 'eq',
+                    'negate_expr' => 'neq'
+                ),
+            '!='         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.notequals',
+                    'expr'        => 'neq',
+                    'negate_expr' => 'eq'
+                ),
+            'gt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                    'expr'        => 'gt',
+                    'negate_expr' => 'lt'
+                ),
+            'gte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                    'expr'        => 'gte',
+                    'negate_expr' => 'lt'
+                ),
+            'lt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthan',
+                    'expr'        => 'lt',
+                    'negate_expr' => 'gt'
+                ),
+            'lte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                    'expr'        => 'lte',
+                    'negate_expr' => 'gt'
+                ),
+            'like'       =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.islike',
+                    'expr'        => 'like',
+                    'negate_expr' => 'notLike'
+                ),
+            '!like'      =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                    'expr'        => 'notLike',
+                    'negate_expr' => 'like'
+                ),
+        );
+
+        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 }

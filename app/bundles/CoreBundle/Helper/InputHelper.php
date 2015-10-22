@@ -392,4 +392,16 @@ class InputHelper
 
         return $value;
     }
+
+    /**
+     * Converts UTF8 into Latin
+     *
+     * @param $value
+     *
+     * @return mixed
+     */
+    public static function transliterate($value)
+    {
+        return \URLify::transliterate($value);
+    }
 }

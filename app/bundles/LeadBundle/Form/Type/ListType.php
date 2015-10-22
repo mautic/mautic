@@ -35,6 +35,7 @@ class ListType extends AbstractType
     private $countryChoices;
     private $regionChoices;
     private $listChoices;
+    private $tagChoices;
 
     /**
      * @param MauticFactory $factory
@@ -54,6 +55,12 @@ class ListType extends AbstractType
         $this->listChoices     = array();
         foreach ($lists as $list) {
             $this->listChoices[$list['id']] = $list['name'];
+        }
+
+        $leadModel = $factory->getModel('lead');
+        $tags = $leadModel->getTagList();
+        foreach ($tags as $tag) {
+            $this->tagChoices[$tag['value']] = $tag['label'];
         }
     }
 
@@ -125,7 +132,8 @@ class ListType extends AbstractType
                         'countries' => $this->countryChoices,
                         'regions'   => $this->regionChoices,
                         'fields'    => $this->fieldChoices,
-                        'lists'     => $this->listChoices
+                        'lists'     => $this->listChoices,
+                        'tags'      => $this->tagChoices
                     ),
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -165,6 +173,7 @@ class ListType extends AbstractType
         $view->vars['regions']   = $this->regionChoices;
         $view->vars['timezones'] = $this->timezoneChoices;
         $view->vars['lists']     = $this->listChoices;
+        $view->vars['tags']      = $this->tagChoices;
     }
 
     /**

@@ -54,9 +54,11 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'form_fields', 'f')
             ->where('f.form_id = ' . $form->getId())
             ->andWhere(
-                $fq->expr()->notIn('f.type', array("'button'", "'freetext'"))
+                $fq->expr()->notIn('f.type', array("'button'", "'freetext'")),
+                $fq->expr()->eq('f.save_result', ':saveResult')
             )
-            ->orderBy('f.field_order', 'ASC');
+            ->orderBy('f.field_order', 'ASC')
+            ->setParameter('saveResult', true);
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -415,5 +417,42 @@ class SubmissionRepository extends CommonRepository
         }
 
         return $validIds;
+    }
+
+    /**
+     * Compare a form result value with defined value for defined lead.
+     *
+     * @param  integer $lead ID
+     * @param  integer $form ID
+     * @param  string  $formAlias
+     * @param  integer $field alias
+     * @param  string  $value to compare with
+     * @param  string  $operatorExpr for WHERE clause
+     *
+     * @return boolean
+     */
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
+    {
+        $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $form . '_' . $formAlias;
+
+        //use DBAL to get entity fields
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from($tableName, 'r')
+            ->leftJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 's.id = r.submission_id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('s.lead_id', ':lead'),
+                    $q->expr()->eq('s.form_id', ':form'),
+                    $q->expr()->$operatorExpr('r.' . $field, ':value')
+                )
+            )
+            ->setParameter('lead', (int) $lead)
+            ->setParameter('form', (int) $form)
+            ->setParameter('value', $value);
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
     }
 }
