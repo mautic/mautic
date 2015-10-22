@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -710,11 +711,16 @@ class LeadModel extends FormModel
      */
     public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
+        $logger  = $this->factory->getLogger();
+        $logger->debug('LEAD: Merging leads');
+
         $leadId  = $lead->getId();
         $lead2Id = $lead2->getId();
 
         //if they are the same lead, then just return one
         if ($leadId === $lead2Id) {
+            $logger->debug('LEAD: Leads are the same');
+
             return $lead;
         }
 
@@ -726,6 +732,7 @@ class LeadModel extends FormModel
             $mergeWith = $lead2;
             $mergeFrom = $lead;
         }
+        $logger->debug('LEAD: Lead ID# ' . $mergeFrom->getId() . ' will be merged into ID# ' . $mergeWith->getId());
 
         //dispatch pre merge event
         $event = new LeadMergeEvent($mergeWith, $mergeFrom);
@@ -737,6 +744,8 @@ class LeadModel extends FormModel
         $ipAddresses = $mergeFrom->getIpAddresses();
         foreach ($ipAddresses as $ip) {
             $mergeWith->addIpAddress($ip);
+
+            $logger->debug('LEAD: Associating with IP ' . $ip->getIpAddress());
         }
 
         //merge fields
@@ -746,6 +755,8 @@ class LeadModel extends FormModel
                 //overwrite old lead's data with new lead's if new lead's is not empty
                 if (!empty($details['value'])) {
                     $mergeWith->addUpdatedField($alias, $details['value']);
+
+                    $logger->debug('LEAD: Updated ' . $alias . ' = ' . $details['value']);
                 }
             }
         }
@@ -756,12 +767,15 @@ class LeadModel extends FormModel
 
         if ($oldOwner === null) {
             $mergeWith->setOwner($newOwner);
+
+            $logger->debug('LEAD: New owner is ' . $newOwner->getId());
         }
 
         //sum points
         $mergeWithPoints = $mergeWith->getPoints();
         $mergeFromPoints = $mergeFrom->getPoints();
         $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
+        $logger->debug('LEAD: Adding ' . $mergeFromPoints . ' points to lead');
 
         //merge tags
         $mergeFromTags = $mergeFrom->getTags();
@@ -1028,11 +1042,18 @@ class LeadModel extends FormModel
      */
     public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
     {
+        $logger   = $this->factory->getLogger();
         $leadTags = $lead->getTags();
+
+        if ($leadTags) {
+            $logger->debug('LEAD: Lead currently has tags '.implode(', ', $leadTags->getKeys()));
+        }
 
         if (!is_array($tags)) {
             $tags = explode(',', $tags);
         }
+
+        $logger->debug('LEAD: Adding ' . implode(', ', $tags) . ' to lead ID# ' . $lead->getId());
 
         array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1045,6 +1066,7 @@ class LeadModel extends FormModel
 
                 if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
                     $lead->removeTag($foundTags[$tag]);
+                    $logger->debug('LEAD: Removed ' . $tag);
                 }
             } else {
                 // Tag to be added
@@ -1053,8 +1075,11 @@ class LeadModel extends FormModel
                     $newTag = new Tag();
                     $newTag->setTag($tag);
                     $lead->addTag($newTag);
+                    $logger->debug('LEAD: Added ' . $tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $lead->addTag($foundTags[$tag]);
+
+                    $logger->debug('LEAD: Added ' . $tag);
                 }
             }
         }
@@ -1064,6 +1089,7 @@ class LeadModel extends FormModel
                 // Tag to be removed
                 if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
                     $lead->removeTag($foundTags[$tag]);
+                    $logger->debug('LEAD: Removed ' . $tag);
                 }
             }
         }
