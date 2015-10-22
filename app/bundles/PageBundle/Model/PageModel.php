@@ -76,10 +76,9 @@ class PageModel extends FormModel
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
-                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, '-'));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+                $alias = $entity->getTitle();
             }
+            $alias = $this->cleanAlias($alias, '', false, '-');
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -538,10 +537,10 @@ class PageModel extends FormModel
                                     }
                                 }
                             }
+                        }
 
-                            if ($persistLead) {
-                                $leadModel->saveEntity($lead);
-                            }
+                        if ($persistLead) {
+                            $leadModel->saveEntity($lead);
                         }
                     }
                 }
@@ -614,7 +613,10 @@ class PageModel extends FormModel
         }
 
         $hit->setCode($code);
-        $hit->setReferer($request->server->get('HTTP_REFERER'));
+        if (!$hit->getReferer()) {
+            $hit->setReferer($request->server->get('HTTP_REFERER'));
+        }
+
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
@@ -632,7 +634,7 @@ class PageModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code);
+            $event = new PageHitEvent($hit, $request, $code, $clickthrough);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
 

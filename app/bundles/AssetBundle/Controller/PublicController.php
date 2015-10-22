@@ -12,6 +12,7 @@ namespace Mautic\AssetBundle\Controller;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\AssetBundle\AssetEvents;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -31,7 +32,7 @@ class PublicController extends CommonFormController
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->factory->getModel('asset.asset');
-        $translator = $this->get('translator');
+
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntityBySlugs($slug);
 
@@ -70,29 +71,37 @@ class PublicController extends CommonFormController
                 $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
             }
 
-            try {
-                //set the uploadDir
-                $entity->setUploadDir($this->factory->getParameter('upload_dir'));
-                $contents = $entity->getFileContents();
+            if ($entity->isRemote()) {
                 $model->trackDownload($entity, $this->request, 200);
-            } catch (\Exception $e) {
-                $model->trackDownload($entity, $this->request, 404);
 
-                return $this->notFound();
+                // Redirect to remote URL
+                $response = new RedirectResponse($entity->getRemotePath());
+            } else {
+                try {
+                    //set the uploadDir
+                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $contents = $entity->getFileContents();
+                    $model->trackDownload($entity, $this->request, 200);
+                } catch (\Exception $e) {
+                    $model->trackDownload($entity, $this->request, 404);
+
+                    return $this->notFound();
+                }
+
+                $response = new Response();
+                $response->headers->set('Content-Type', $entity->getFileMimeType());
+
+                $stream = $this->request->get('stream', 0);
+                if (!$stream) {
+                    $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
+                }
+                $response->setContent($contents);
             }
-
-            $response = new Response();
-            $response->headers->set('Content-Type', $entity->getFileMimeType());
-
-            $stream = $this->request->get('stream', 0);
-            if (!$stream) {
-                $response->headers->set('Content-Disposition', 'attachment;filename="' . $entity->getOriginalFileName());
-            }
-            $response->setContent($contents);
 
             return $response;
 
         }
+
         $model->trackDownload($entity, $this->request, 404);
 
         $this->notFound();

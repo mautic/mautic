@@ -174,7 +174,6 @@ system('rm vendor/friendsofsymfony/rest-bundle/FOS/RestBundle/UPGRADING.md');
 
 // guzzle/guzzle
 system('rm -rf vendor/guzzle/guzzle/docs');
-system('rm -rf vendor/guzzle/guzzle/src');
 system('rm -rf vendor/guzzle/guzzle/tests');
 system('rm vendor/guzzle/guzzle/.gitignore');
 system('rm vendor/guzzle/guzzle/.travis.yml');
@@ -507,6 +506,16 @@ system('rm vendor/webfactory/exceptions-bundle/composer.json');
 system('rm vendor/webfactory/exceptions-bundle/phpunit.xml.dist');
 system('rm vendor/webfactory/exceptions-bundle/README.md');
 system('rm vendor/webfactory/exceptions-bundle/UPGRADING.md');
+
+// jbroadway/urlify
+system('rm -rf vendor/jbroadway/urlify/tests');
+system('rm vendor/jbroadway/urlify/.gitignore');
+system('rm vendor/jbroadway/urlify/.travis.yml');
+system('rm vendor/jbroadway/urlify/composer.json');
+system('rm vendor/jbroadway/urlify/INSTALL');
+system('rm vendor/jbroadway/urlify/LICENSE');
+system('rm vendor/jbroadway/urlify/phpunit.xml');
+system('rm vendor/jbroadway/urlify/README.md');
 
 // Find any .git directories and nuke them
 system('find . -type d -name .git -exec rm -rf {} \\;');

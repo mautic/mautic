@@ -10,12 +10,13 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * Class PageType
@@ -37,17 +38,17 @@ class PageType extends AbstractType
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
-    
+
     /**
      * @var \Mautic\PageBundle\Model\PageModel
      */
     private $model;
-    
+
     /**
      * @var \Mautic\UserBundle\Model\UserModel
      */
     private $user;
-    
+
     /**
      * @var bool
      */
@@ -176,7 +177,7 @@ class PageType extends AbstractType
                     'required'   => false
                 )
             );
-            
+
             //Custom field for redirect type
             $redirectType = $options['data']->getRedirectType();
             $builder->add(
@@ -192,31 +193,31 @@ class PageType extends AbstractType
                     'empty_value' => 'mautic.page.form.redirecttype.none'
                 )
             );
-            
+
             //Custom field for redirect URL
             $model = $this->model;
             $model->getRepository()->setCurrentUser($this->user);
             $canViewOther = $this->canViewOther;
-            
+
             $dataOptions = '';
             $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, 'variant', array($options['data']->getId()));
             foreach ($pages as $page) {
                 $dataOptions .= "|{$page['alias']}";
             }
-            
+
             $redirectUrl = $options['data']->getRedirectUrl();
             $builder->add(
-                'redirectUrl', 
+                'redirectUrl',
                 'url',
                 array(
-                      'required'    => true,
+                    'required'    => true,
                     'label'       => 'mautic.page.form.redirecturl',
                     'label_attr'  => array(
                         'class' => 'control-label'
                     ),
                     'attr'        => array(
-                        'class' => 'form-control', 
-                        'maxlength' => 200, 
+                        'class' => 'form-control',
+                        'maxlength' => 200,
                         'tooltip' => 'mautic.page.form.redirecturl.help',
                         'data-toggle' => 'field-lookup',
                         'data-target' => 'redirectUrl',
@@ -266,7 +267,7 @@ class PageType extends AbstractType
                 )
             );
 
-            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+            $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
             $builder->add(
                 $builder->create(
                     'translationParent',
@@ -314,11 +315,7 @@ class PageType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\PageBundle\Entity\Page',
-            'validation_groups' => array(
-                'Mautic\PageBundle\Entity\Page',
-                'determineValidationGroups'
-            )
+            'data_class' => 'Mautic\PageBundle\Entity\Page'
         ));
     }
 

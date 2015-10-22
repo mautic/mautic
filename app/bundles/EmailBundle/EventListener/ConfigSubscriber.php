@@ -55,24 +55,26 @@ class ConfigSubscriber extends CommonSubscriber
 
         // Get the original data so that passwords aren't lost
         $monitoredEmail = $this->factory->getParameter('monitored_email');
-        foreach ($data['monitored_email'] as $key => $monitor) {
-            if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
-                $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
-            }
+        if (isset($data['monitored_email'])) {
+            foreach ($data['monitored_email'] as $key => $monitor) {
+                if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
+                    $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
+                }
 
-            if ($key != 'general') {
-                if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
-                    $data['monitored_email'][$key]['override_settings'] = '';
-                    $data['monitored_email'][$key]['address']           = '';
-                    $data['monitored_email'][$key]['host']              = '';
-                    $data['monitored_email'][$key]['user']              = '';
-                    $data['monitored_email'][$key]['password']          = '';
-                    $data['monitored_email'][$key]['ssl']               = '1';
-                    $data['monitored_email'][$key]['port']              = '993';
+                if ($key != 'general') {
+                    if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
+                        $data['monitored_email'][$key]['override_settings'] = '';
+                        $data['monitored_email'][$key]['address']           = '';
+                        $data['monitored_email'][$key]['host']              = '';
+                        $data['monitored_email'][$key]['user']              = '';
+                        $data['monitored_email'][$key]['password']          = '';
+                        $data['monitored_email'][$key]['ssl']               = '1';
+                        $data['monitored_email'][$key]['port']              = '993';
+                    }
                 }
             }
-        }
 
-        $event->setConfig($data, 'emailconfig');
+            $event->setConfig($data, 'emailconfig');
+        }
     }
 }
