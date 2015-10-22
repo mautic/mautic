@@ -7,6 +7,14 @@ class SugarcrmApi extends CrmApi
 {
     private $module = 'Leads';
 
+    /**
+     * @param        $sMethod
+     * @param array  $data
+     * @param string $method
+     *
+     * @return mixed|string
+     * @throws ApiErrorException
+     */
     public function request($sMethod, $data = array(), $method = 'GET')
     {
         $tokenData = $this->integration->getKeys();
@@ -46,9 +54,8 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param $Object
-     *
-     * @return mixed
+     * @return mixed|string
+     * @throws ApiErrorException
      */
     public function getLeadFields ()
     {
@@ -64,6 +71,7 @@ class SugarcrmApi extends CrmApi
             );
 
             $response = $this->request('metadata', $parameters);
+
             return $response['modules']['Leads'];
         }
     }
@@ -92,7 +100,8 @@ class SugarcrmApi extends CrmApi
 
             return $this->request('set_entry', $parameters, 'POST');
         } else {
-            return $this->request('Lead', $fields, 'POST');
+
+            return $this->request('Leads', $fields, 'POST');
         }
     }
 }

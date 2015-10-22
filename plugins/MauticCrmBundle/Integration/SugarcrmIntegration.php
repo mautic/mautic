@@ -11,7 +11,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -158,7 +157,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @param array $settings
+     *
+     * @return array
+     * @throws \Exception
      */
     public function getAvailableLeadFields($settings = array())
     {
@@ -183,7 +185,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         //7.x
                         foreach ($leadObject['fields'] as $fieldInfo) {
                             if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
-                                $sugarFields[$fieldInfo['name']] = array(
+                                $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
+
+                                $sugarFields[$fieldName] = array(
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['comment'],
                                     'required' => !empty($fieldInfo['required'])
@@ -235,6 +239,31 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
+     *
+     * @return array
+     */
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    {
+        if ($authType == 'oauth2' && empty($settings['authorize_session'])) {
+
+            // Append the access token as the oauth-token header
+            $headers                   = array(
+                "oauth-token: {$this->keys['access_token']}"
+            );
+
+            return array($parameters, $headers);
+        } else {
+
+            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -275,6 +304,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             return (empty($error));
         } else {
+            if ($this->isConfigured()) {
+                // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+                $this->authCallback();
+            }
+
             return parent::isAuthorized();
         }
     }
@@ -295,7 +329,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param FormBuilder|Form $builder
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
@@ -322,7 +358,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getFormSettings()
     {
         return array(
-            'requires_callback'      => true,
+            'requires_callback'      => false,
             'requires_authorization' => true
         );
     }
