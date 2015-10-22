@@ -490,7 +490,7 @@ var Mautic = {
                     if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
                         // Allow full page editing and add tools to update html document
                         settings.fullPage     = true;
-                        settings.extraPlugins = "sourcedialog,docprops";
+                        settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     }
 
                     if (editorClass == 'editor') {
