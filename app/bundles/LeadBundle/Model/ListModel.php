@@ -718,10 +718,11 @@ class ListModel extends FormModel
             $lists = array($lists);
         }
 
-        $persistLists = array();
+        $persistLists   = array();
+        $dispatchEvents = array();
 
-        foreach ($lists as $listid) {
-            if (!isset($this->leadChangeLists[$listid])) {
+        foreach ($lists as $listId) {
+            if (!isset($this->leadChangeLists[$listId])) {
                 // List no longer exists in the DB so continue to the next
                 continue;
             }
@@ -732,14 +733,14 @@ class ListModel extends FormModel
                 $listLead = $this->getListLeadRepository()->findOneBy(
                     array(
                         'lead' => $lead,
-                        'list' => $this->leadChangeLists[$listid]
+                        'list' => $this->leadChangeLists[$listId]
                     )
                 );
             } else {
                 $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
                     array(
                         'lead' => $leadId,
-                        'list' => $listid
+                        'list' => $listId
                     )
                 );
             }
@@ -749,7 +750,8 @@ class ListModel extends FormModel
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
-                    $persistLists[] = $listLead;
+                    $persistLists[]   = $listLead;
+                    $dispatchEvents[] = $listId;
                 } else {
                     // Detach from Doctrine
                     $this->em->detach($listLead);
@@ -758,19 +760,13 @@ class ListModel extends FormModel
                 }
             } else {
                 $listLead = new ListLead();
-                $listLead->setList($this->leadChangeLists[$listid]);
+                $listLead->setList($this->leadChangeLists[$listId]);
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded($dateManipulated);
 
-                $persistLists[] = $listLead;
-            }
-
-            if (!$batchProcess && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listid], true);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-
-                unset($event);
+                $persistLists[]   = $listLead;
+                $dispatchEvents[] = $listId;
             }
         }
 
@@ -781,6 +777,13 @@ class ListModel extends FormModel
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
+            foreach ($dispatchEvents as $listId) {
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+
+                unset($event);
+            }
         }
 
         unset($lead, $persistLists, $lists);
@@ -846,23 +849,24 @@ class ListModel extends FormModel
             $lists = array($lists);
         }
 
-        $persistLists = $deleteLists = array();
-        foreach ($lists as $listid) {
-            if (!isset($this->leadChangeLists[$listid])) {
+        $persistLists   = array();
+        $deleteLists    = array();
+        $dispatchEvents = array();
+
+        foreach ($lists as $listId) {
+            if (!isset($this->leadChangeLists[$listId])) {
                 // List no longer exists in the DB so continue to the next
                 continue;
             }
 
-            $dispatchEvent = false;
-
             $listLead = (!$skipFindOne) ?
                 $this->getListLeadRepository()->findOneBy(array(
                     'lead' => $lead,
-                    'list' => $this->leadChangeLists[$listid]
+                    'list' => $this->leadChangeLists[$listId]
                 )) :
                 $this->em->getReference('MauticLeadBundle:ListLead', array(
                     'lead' => $leadId,
-                    'list' => $listid
+                    'list' => $listId
                 ));
 
             if ($listLead == null) {
@@ -872,25 +876,16 @@ class ListModel extends FormModel
 
             if (($manuallyRemoved && $listLead->wasManuallyAdded()) || (!$manuallyRemoved && !$listLead->wasManuallyAdded())) {
                 //lead was manually added and now manually removed or was not manually added and now being removed
-                $dispatchEvent = true;
-
-                $deleteLists[] = $listLead;
+                $deleteLists[]    = $listLead;
+                $dispatchEvents[] = $listId;
             } elseif ($manuallyRemoved && !$listLead->wasManuallyAdded()) {
-                $dispatchEvent = true;
-
                 $listLead->setManuallyRemoved(true);
 
-                $persistLists[] = $listLead;
+                $persistLists[]   = $listLead;
+                $dispatchEvents[] = $listId;
             }
 
             unset($listLead);
-
-            if (!$batchProcess && $dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
-                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listid], false);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
-
-                unset($event);
-            }
         }
 
         if (!empty($persistLists)) {
@@ -904,6 +899,13 @@ class ListModel extends FormModel
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
+            foreach ($dispatchEvents as $listId) {
+                $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+
+                unset($event);
+            }
         }
 
         unset($lead, $deleteLists, $persistLists, $lists);
