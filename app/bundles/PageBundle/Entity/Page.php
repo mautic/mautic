@@ -273,54 +273,38 @@ class Page extends FormEntity
         )));
 
         $metadata->addConstraint(new Callback(array(
-            'callback' => 'translationParentValidation'
-        )));
+            'callback' => function ($page, ExecutionContextInterface $context) {
+                $translationParent = $page->getTranslationParent();
 
-        $metadata->addPropertyConstraint('redirectUrl',  new Assert\Url(
-                array(
-                    'message' => 'mautic.core.value.required',
-                    'groups'  => array('Redirect')
-                )
-            )
-        );
-    }
+                if ($translationParent !== null) {
+                    $parentsVariantParent = $translationParent->getVariantParent();
+                    if ($parentsVariantParent !== null) {
+                        $context->buildViolation('mautic.page.translationparent.notallowed')
+                            ->atPath('translationParent')
+                            ->addViolation();
+                    }
+                }
 
-    /**
-     * Callback constraint to ensure that a translation parent is not an a/b test
-     *
-     * @param ExecutionContextInterface $context
-     */
-    public function translationParentValidation (ExecutionContextInterface $context)
-    {
-        $translationParent = $this->getTranslationParent();
+                $type = $page->getRedirectType();
+                if (!is_null($type)) {
+                    $validator = $context->getValidator();
+                    $violations = $validator->validate($page->getRedirectUrl(), array(
+                        new Assert\Url(
+                            array(
+                                'message' => 'mautic.core.value.required'
+                            )
+                        )
+                    ));
 
-        if ($translationParent !== null) {
-            $parentsVariantParent = $translationParent->getVariantParent();
-            if ($parentsVariantParent !== null) {
-                $context->buildViolation('mautic.page.translationparent.notallowed')
-                    ->atPath('translationParent')
-                    ->addViolation();
+                    if (count($violations) > 0) {
+                        $string = (string) $violations;
+                        $context->buildViolation($string)
+                            ->atPath('redirectUrl')
+                            ->addViolation();
+                    }
+                }
             }
-        }
-    }
-
-    /**
-     * @param \Symfony\Component\Form\Form $form
-     *
-     * @return array
-     */
-    public static function determineValidationGroups(Form $form)
-    {
-        $data   = $form->getData();
-        $groups = array('Page');
-
-        $redirect = $data->getRedirectType();
-
-        if ($redirect) {
-            $groups[] = 'Redirect';
-        }
-
-        return $groups;
+        )));
     }
 
     /**

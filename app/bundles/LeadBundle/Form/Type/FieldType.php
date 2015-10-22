@@ -173,7 +173,11 @@ class FieldType extends AbstractType
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
             if ($type == 'select' || $type == 'lookup') {
-                $properties = $data->getProperties();
+                if (is_array($data) && isset($data['properties'])) {
+                    $properties = $data['properties'];
+                } else {
+                    $properties = $data->getProperties();
+                }
 
                 if (isset($properties['list']) && is_string($properties['list'])) {
                     $properties['list'] = array_map('trim', explode('|', $properties['list']));

@@ -1012,12 +1012,11 @@ class Filemanager
 
     public function getMaxUploadFileSize()
     {
+        $max_upload   = \Mautic\AssetBundle\Entity\Asset::getIniValue('upload_max_filesize');
+        $max_post     = \Mautic\AssetBundle\Entity\Asset::getIniValue('post_max_size');
+        $memory_limit = \Mautic\AssetBundle\Entity\Asset::getIniValue('memory_limit');
 
-        $max_upload   = (int) ini_get('upload_max_filesize');
-        $max_post     = (int) ini_get('post_max_size');
-        $memory_limit = (int) ini_get('memory_limit');
-
-        $upload_mb = min($max_upload, $max_post, $memory_limit);
+        $upload_mb =  min(array_filter(array($max_upload, $max_post, $memory_limit)));
 
         $this->__log(__METHOD__.' - max upload file size is '.$upload_mb.'Mb');
 

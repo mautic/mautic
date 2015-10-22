@@ -410,6 +410,7 @@ class CampaignModel extends CommonFormModel
             $event  = new Events\CampaignBuilderEvent($this->translator);
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
             $events['decision']     = $event->getLeadDecisions();
+            $events['condition']    = $event->getLeadConditions();
             $events['action']       = $event->getActions();
         }
 
@@ -506,6 +507,7 @@ class CampaignModel extends CommonFormModel
 
                 $viewOther = $this->factory->getSecurity()->isGranted('form:forms:viewother');
                 $repo      = $this->factory->getModel('form')->getRepository();
+                $repo->setCurrentUser($this->factory->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
                 foreach ($forms as $form) {

@@ -1225,7 +1225,18 @@ class EmailController extends FormController
         $fields['id'] = 0;
 
         // Send to current user
-        $model->sendEmailToUser($entity, $this->factory->getUser()->getId(), $fields, array(), array(), false);
+        $user  = $this->factory->getUser();
+        $users = array(
+            array(
+                'id'        => $user->getId(),
+                'firstname' => $user->getFirstName(),
+                'lastname'  => $user->getLastName(),
+                'email'     => $user->getEmail()
+            )
+        );
+
+        // Send to current user
+        $model->sendEmailToUser($entity, $users, $fields, array(), array(), false);
 
         $this->addFlash('mautic.email.notice.test_sent.success');
 
