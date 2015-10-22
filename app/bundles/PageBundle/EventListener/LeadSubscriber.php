@@ -70,7 +70,7 @@ class LeadSubscriber extends CommonSubscriber
         // Add the hits to the event array
         foreach ($hits as $hit) {
             $template      = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
-            $eventTypeName = $this->translator->trans('mautic.page.event.hit');
+            $eventLabel    = $eventTypeName;
 
             if ($hit['source'] && $hit['sourceId']) {
                 $sourceModel = false;
@@ -115,7 +115,7 @@ class LeadSubscriber extends CommonSubscriber
                         }
 
                         if (method_exists($sourceModel, 'getPageHitLeadTimelineLabel')) {
-                            $template = $sourceModel->getPageHitLeadTimelineLabel($hit);
+                            $eventLabel = $sourceModel->getPageHitLeadTimelineLabel($hit);
                         }
                     } catch (\Exception $exception) {
                         // Not found
@@ -126,7 +126,7 @@ class LeadSubscriber extends CommonSubscriber
             $event->addEvent(
                 array(
                     'event'           => $eventTypeKey,
-                    'eventLabel'      => $eventTypeName,
+                    'eventLabel'      => $eventLabel,
                     'timestamp'       => $hit['dateHit'],
                     'extra'           => array(
                         'page' => $model->getEntity($hit['page_id']),
