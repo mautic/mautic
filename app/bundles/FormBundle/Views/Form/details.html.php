@@ -256,6 +256,11 @@ $isStandalone = $activeForm->isStandalone();
                   </div>
                   <div class="panel-body">
                       <p><?php echo $view['translator']->trans('mautic.form.form.help.manualcopy'); ?></p>
+
+                      <h4 class="mt-sm mb-sm"><?php echo $view['translator']->trans('mautic.form.form.help.manualcopy.script'); ?></h4>
+                      <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);"><?php echo $formScript; ?></textarea>
+
+                      <h4 class="mt-sm mb-sm"><?php echo $view['translator']->trans('mautic.form.form.help.manualcopy.body'); ?></h4>
                       <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);"><?php echo $formContent; ?></textarea>
                   </div>
                   <div class="panel-footer text-right">
