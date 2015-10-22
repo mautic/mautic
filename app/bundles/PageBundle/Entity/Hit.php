@@ -144,6 +144,11 @@ class Hit
     private $sourceId;
 
     /**
+     * @var array
+     */
+    private $query = array();
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -251,6 +256,8 @@ class Hit
             ->columnName('source_id')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('query', 'array');
     }
 
     /**
@@ -285,7 +292,8 @@ class Hit
                     'browserLanguages',
                     'trackingId',
                     'source',
-                    'sourceId'
+                    'sourceId',
+                    'query'
                 )
             )
             ->build();
@@ -823,5 +831,25 @@ class Hit
     public function setEmail (Email $email)
     {
         $this->email = $email;
+    }
+
+    /**
+     * @return array
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
+
+        return $this;
     }
 }

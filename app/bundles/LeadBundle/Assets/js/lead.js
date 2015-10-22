@@ -958,3 +958,13 @@ Mautic.updateLeadFieldValues = function (field) {
         Mautic.removeLabelLoadingIndicator();
     });
 };
+
+Mautic.toggleTimelineMoreVisiblity = function(el) {
+    if (mQuery(el).is(':visible')) {
+        mQuery(el).slideUp('fast');
+        mQuery(el).next().text(mauticLang['showMore']);
+    } else {
+        mQuery(el).slideDown('fast');
+        mQuery(el).next().text(mauticLang['hideMore']);
+    }
+};
