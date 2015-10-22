@@ -479,9 +479,6 @@ class SubmissionModel extends CommonFormModel
                 $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
             }
 
-            // last active time
-            $lead->setLastActive(new \DateTime());
-
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {
@@ -498,6 +495,9 @@ class SubmissionModel extends CommonFormModel
             $event->setIpAddress($ipAddress);
             $lead->addPointsChangeLog($event);
         }
+
+        // last active time
+        $lead->setLastActive(new \DateTime());
 
         //create a new lead
         $model->saveEntity($lead, false);
