@@ -82,18 +82,23 @@ class SysinfoModel extends CommonModel
         }
 
         foreach ($importantFolders as $folder) {
-            $folder = realpath($folder);
-            $this->folders[$folder] = is_writable($folder);
+            $folderPath = realpath($folder);
+            $folderKey  = ($folderPath) ? $folderPath : $folder;
+            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+
+            $this->folders[$folderKey] = $isWritable;
         }
 
 		return $this->folders;
 	}
 
     /**
-	 * Method to tail (a few last rows) of a file
-	 *
-	 * @return string|null
-	 */
+     * Method to tail (a few last rows) of a file
+     *
+     * @param int $lines
+     *
+     * @return array|null
+     */
     public function getLogTail($lines = 10)
     {
         $log = $this->factory->getParameter('log_path') . '/mautic_' . $this->factory->getEnvironment() . '-' . date('Y-m-d') . '.php';
@@ -106,10 +111,14 @@ class SysinfoModel extends CommonModel
     }
 
     /**
-	 * Method to tail (a few last rows) of a file
-	 *
-	 * @return array
-	 */
+     * Method to tail (a few last rows) of a file
+     *
+     * @param     $filename
+     * @param int $lines
+     * @param int $buffer
+     *
+     * @return string
+     */
     public function tail($filename, $lines = 10, $buffer = 4096)
     {
         $f = fopen($filename, "rb");
