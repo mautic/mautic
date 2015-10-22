@@ -261,7 +261,7 @@
                             var field = MauticFormValidations[formId][fieldKey];
                             var name  = 'mauticform[' + field.name + ']';
 
-                            if (field.multiple == 'true') {
+                            if (field.multiple == 'true' || field.type == 'checkboxgrp') {
                                 name = name + '[]';
                             }
 
@@ -274,7 +274,7 @@
                                         break;
 
                                     case 'checkboxgrp':
-                                        var elOptions = elForm.elements[name + '[]'];
+                                        var elOptions = elForm.elements[name];
                                         valid = validateOptions(elOptions);
                                         break;
 
