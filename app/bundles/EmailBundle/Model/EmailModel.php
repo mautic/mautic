@@ -1222,7 +1222,9 @@ class EmailModel extends FormModel
             if ($email != null) {
                 $dnc->setEmail($email);
             }
-            $dnc->setLead($lead);
+            if ($lead) {
+                $dnc->setLead($lead);
+            }
             $dnc->setEmailAddress($address);
             $dnc->setDateAdded(new \DateTime());
             $dnc->{"set" . ucfirst($tag)}();
