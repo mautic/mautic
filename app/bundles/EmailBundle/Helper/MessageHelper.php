@@ -96,12 +96,9 @@ class MessageHelper
 
         // Parse the to email if applicable
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
-            if (strstr($parts[1], '_')) {
+            if (strstr($parts[2], '_')) {
                 // Has an ID hash so use it to find the lead
-                list($ignore, $hashId) = explode('_', $parts[1]);
-            }
-            elseif (strstr($parts[2],'_')) {
-            	list($ignore, $hashId) = explode('_', $parts[2]);
+                list($ignore, $hashId) = explode('_', $parts[2]);
             }
         }
 
@@ -491,7 +488,7 @@ class MessageHelper
         elseif (preg_match("/an\s+error\s+occurred\s+while\s+trying\s+to\s+deliver\s+the\s+mail\s+to\s+the\s+following\s+recipients:\r\n\s*(\S+@\S+\w)/is", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0013';
-			$result['bounce_type'] = 'hard';
+            $result['bounce_type'] = 'hard';
             $result['remove']      = 1;                 
             $result['email']    = $match[1];
             $result['email'] = preg_replace("/Reporting\-MTA/","",$result['email']);
