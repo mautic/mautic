@@ -89,8 +89,7 @@ class UploadSubscriber extends CommonSubscriber
     {
         $file       = $event->getFile();
         $extensions = $this->factory->getParameter('allowed_extensions');
-        $maxAllowed = $this->factory->getModel('asset')->getMaxUploadSize();
-        $maxSize    = Asset::convertSizeToBytes($maxAllowed . 'M'); // max size is set in MB
+        $maxSize    = $this->factory->getModel('asset')->getMaxUploadSize('B');
 
         if ($file !== null) {
             if ($file->getSize() > $maxSize) {

@@ -10,6 +10,8 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\FormBundle\Entity\Form;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 
 class CampaignEventHelper
 {
@@ -36,5 +38,37 @@ class CampaignEventHelper
         }
 
         return true;
+    }
+
+    /**
+     * Determine if this campaign applies
+     *
+     * @param $eventDetails
+     * @param $event
+     *
+     * @return bool
+     */
+    public static function validateFormValue(MauticFactory $factory, $event, Lead $lead)
+    {
+        if (!$lead || !$lead->getId()) {
+            return false;
+        }
+
+        $model     = $factory->getModel('form');
+        $operators = $model->getFilterExpressionFunctions();
+        $form      = $model->getRepository()->findOneById($event['properties']['form']);
+
+        if (!$form || !$form->getId()) {
+            return false;
+        }
+
+        return $factory->getModel('form.submission')->getRepository()->compareValue(
+            $lead->getId(),
+            $form->getId(),
+            $form->getAlias(),
+            $event['properties']['field'],
+            $event['properties']['value'],
+            $operators[$event['properties']['operator']]['expr']
+        );
     }
 }

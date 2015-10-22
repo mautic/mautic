@@ -93,11 +93,11 @@ class FieldModel extends FormModel
 
         if ($isNew) {
             if (empty($alias)) {
-                $alias = strtolower(InputHelper::alphanum($entity->getName()));
+                $alias = $entity->getName();
             }
 
             // clean the alias
-            $alias = $this->cleanAlias($alias);
+            $alias = $this->cleanAlias($alias, 'f_', 25);
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -174,7 +174,6 @@ class FieldModel extends FormModel
                         $modifySchema->executeChanges();
                     } catch (\Exception $e) {
                         error_log($e);
-                        die(var_dump($e));
                     }
                 }
             }

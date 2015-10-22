@@ -22,24 +22,28 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CacheHelper
 {
-    private $factory;
+    protected $factory;
+
+    protected $cacheDir;
+
+    protected $env;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory = $factory;
+        $this->factory  = $factory;
+        $this->cacheDir = $factory->getSystemPath('cache', true);
+        $this->env      = $factory->getEnvironment();
     }
 
     /**
      * Clear the application cache and run the warmup routine for the current environment
      *
-     * @param bool $noWarmup Skips the warmup routine
-     * @param bool $configSave True if clearing the cache after saving the configuration
      * @return void
      */
-    public function clearCache($noWarmup = false, $configSave = false)
+    public function clearCache()
     {
         $this->clearSessionItems();
 
@@ -48,20 +52,15 @@ class CacheHelper
             ini_set('memory_limit', '128M');
         }
 
-        $this->clearOpcaches($configSave);
+        $this->clearOpcaches();
 
         //attempt to squash command output
         ob_start();
 
-        $env  = $this->factory->getEnvironment();
-        $args = array('console', 'cache:clear', '--env=' . $env);
+        $args = array('console', 'cache:clear', '--env=' . $this->env);
 
-        if ($env == 'prod') {
+        if ($this->env == 'prod') {
             $args[] = '--no-debug';
-        }
-
-        if ($noWarmup) {
-            $args[] = '--no-warmup';
         }
 
         $input       = new ArgvInput($args);
@@ -82,27 +81,56 @@ class CacheHelper
     {
         $this->clearSessionItems();
 
-        $cacheDir = $this->factory->getSystemPath('cache', true);
-
         $fs = new Filesystem();
-        $fs->remove($cacheDir);
+        $fs->remove($this->cacheDir);
     }
 
     /**
      * Delete's the file Symfony caches settings in
      */
-    public function clearCacheFile()
+    public function clearContainerFile()
     {
         $this->clearOpcaches(true);
 
-        $env      = $this->factory->getEnvironment();
-        $debug    = ($this->factory->getDebugMode()) ? 'Debug' : '';
-        $cacheDir = $this->factory->getSystemPath('cache', true);
+        $containerFile = $this->factory->getKernel()->getContainerFile();
 
-        $cacheFile = "$cacheDir/app".ucfirst($env)."{$debug}ProjectContainer.php";
+        if (file_exists($containerFile)) {
+            unlink($containerFile);
+        }
+    }
 
-        if (file_exists($cacheFile)) {
-            unlink($cacheFile);
+    /**
+     * Clears the cache for translations
+     *
+     * @param null $locale
+     */
+    public function clearTranslationCache($locale = null)
+    {
+        if ($locale) {
+            $localeCache = $this->cacheDir . '/translations/catalogue.' . $locale . '.php';
+            if (file_exists($localeCache)) {
+                unlink($localeCache);
+            }
+        } else {
+            $fs = new Filesystem();
+            $fs->remove($this->cacheDir . '/translations');
+        }
+    }
+
+    /**
+     * Clears the cache for routing
+     */
+    public function clearRoutingCache()
+    {
+        $unlink = array(
+            $this->factory->getKernel()->getContainer()->getParameter('router.options.generator.cache_class'),
+            $this->factory->getKernel()->getContainer()->getParameter('router.options.matcher.cache_class')
+        );
+
+        foreach ($unlink as $file) {
+            if (file_exists($this->cacheDir.'/'.$file.'.php')) {
+                unlink($this->cacheDir.'/'.$file.'.php');
+            }
         }
     }
 

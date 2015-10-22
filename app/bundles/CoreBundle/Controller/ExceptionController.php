@@ -39,11 +39,11 @@ class ExceptionController extends CommonController
             }
 
             // Special handling for oauth and api urls
-            if (strpos($request->getUri(), '/oauth') !== false || strpos($request->getUri(), '/api') !== false) {
+            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) || strpos($request->getUri(), '/api') !== false) {
                 $dataArray = array(
                     'error' => array(
                         'message' => $exception->getMessage(),
-                        'code'    => $exception->getCode()
+                        'code'    => $code
                     )
                 );
                 if ($env == 'dev') {
