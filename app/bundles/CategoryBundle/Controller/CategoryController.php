@@ -10,6 +10,8 @@
 namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CategoryBundle\CategoryEvents;
+use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CategoryController extends FormController
@@ -42,6 +44,20 @@ class CategoryController extends FormController
     {
         $session = $this->factory->getSession();
 
+        $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
+        $bundle = $this->request->get('bundle', $session->get('mautic.category.type', ''));
+
+        if ($bundle) {
+            $session->set('mautic.category.type', $bundle);
+        }
+
+        // hack to make pagination work for default list view
+        if ($bundle == 'all') {
+            $bundle = 'category';
+        }
+
+        $session->set('mautic.category.filter', $search);
+
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             $bundle . ':categories:view',
@@ -70,16 +86,17 @@ class CategoryController extends FormController
             $start = 0;
         }
 
-        $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
-        $session->set('mautic.category.filter', $search);
-
-        $filter = array('string' => $search, 'force' => array(
-            array(
+        if ($bundle == 'category') {
+            $bundleFilter = null;
+        } else {
+            $bundleFilter = array(
                 'column' => 'c.bundle',
                 'expr'   => 'eq',
                 'value'  => $bundle
-            )
-        ));
+            );
+        }
+
+        $filter = array('string' => $search, 'force' => array($bundleFilter));
 
         $orderBy    = $this->factory->getSession()->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->factory->getSession()->get('mautic.category.orderbydir', 'DESC');
@@ -91,7 +108,8 @@ class CategoryController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($entities);
         if ($count && $count < ($start + 1)) {
@@ -116,6 +134,15 @@ class CategoryController extends FormController
             ));
         }
 
+        $categoryTypes = array('category' => $this->get('translator')->trans('mautic.core.select'));
+
+        $dispatcher = $this->factory->getDispatcher();
+        if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
+            $event = new CategoryTypesEvent;
+            $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
+            $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
+        }
+
         //set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.category.page', $page);
 
@@ -123,14 +150,15 @@ class CategoryController extends FormController
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
-            'viewParameters'  => array(
-                'bundle'      => $bundle,
-                'searchValue' => $search,
-                'items'       => $entities,
-                'page'        => $page,
-                'limit'       => $limit,
-                'permissions' => $permissions,
-                'tmpl'        => $tmpl
+            'viewParameters'    => array(
+                'bundle'        => $bundle,
+                'searchValue'   => $search,
+                'items'         => $entities,
+                'page'          => $page,
+                'limit'         => $limit,
+                'permissions'   => $permissions,
+                'tmpl'          => $tmpl,
+                'categoryTypes' => $categoryTypes
             ),
             'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
             'passthroughVars' => array(
@@ -155,6 +183,7 @@ class CategoryController extends FormController
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
         $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
         if (!$this->factory->getSecurity()->isGranted($bundle . ':categories:create')) {
@@ -165,7 +194,7 @@ class CategoryController extends FormController
             'objectAction' => 'new',
             'bundle'       => $bundle
         ));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle, 'show_bundle_select' => $showSelect));
         $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
         if ($method == 'POST') {

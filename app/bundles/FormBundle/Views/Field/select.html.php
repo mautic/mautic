@@ -40,9 +40,9 @@ $label = (!$field['showLabel']) ? '' : <<<HTML
 HTML;
 
 
-$help = (empty($helpMessage)) ? '' : <<<HTML
+$help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
-                <span class="mauticform-helpmessage">{$helpMessage}</span>
+                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
 $emptyOption = (empty($properties['empty_value'])) ? '' : <<<HTML

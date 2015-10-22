@@ -134,7 +134,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <div class="input-group">
                 <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $assetDownloadUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin" onclick="window.location = '<?php echo $assetDownloadUrl; ?>';">
+                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>

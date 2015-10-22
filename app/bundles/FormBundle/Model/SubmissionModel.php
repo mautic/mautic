@@ -518,7 +518,7 @@ class SubmissionModel extends CommonFormModel
                         $translator->trans('mautic.form.result.thead.referrer')
                     );
                     foreach ($fields as $f) {
-                        if (in_array($f->getType(), array('button', 'freetext')))
+                        if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
                             continue;
                         $header[] = $f->getLabel();
                     }
@@ -589,7 +589,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.referrer')
                         );
                         foreach ($fields as $f) {
-                            if (in_array($f->getType(), array('button', 'freetext')))
+                            if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
                                 continue;
                             $header[] = $f->getLabel();
                         }

@@ -12,6 +12,7 @@ namespace Mautic\CategoryBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\CategoryEvents;
+use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 
 /**
  * Class CategorySubscriber
@@ -27,9 +28,30 @@ class CategorySubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CategoryEvents::CATEGORY_POST_SAVE     => array('onCategoryPostSave', 0),
-            CategoryEvents::CATEGORY_POST_DELETE   => array('onCategoryDelete', 0)
+            CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD => array('onCategoryBundleListBuild', 0),
+            CategoryEvents::CATEGORY_POST_SAVE            => array('onCategoryPostSave', 0),
+            CategoryEvents::CATEGORY_POST_DELETE          => array('onCategoryDelete', 0)
         );
+    }
+
+    /**
+     * Add bundle to the category
+     *
+     * @param CategoryTypesEvent $event
+     *
+     * @return void
+     */
+    public function onCategoryBundleListBuild(CategoryTypesEvent $event)
+    {
+        $bundles = $this->factory->getMauticBundles(true);
+
+        foreach ($bundles as $bundle) {
+            if (!empty($bundle['config']['categories'])) {
+                foreach ($bundle['config']['categories'] as $type => $label) {
+                    $event->addCategoryType($type, $label);
+                }
+            }
+        }
     }
 
     /**

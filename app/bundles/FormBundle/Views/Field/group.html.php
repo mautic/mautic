@@ -44,9 +44,9 @@ $label = (!$field['showLabel']) ? '' : <<<HTML
                 <label $labelAttr for="$firstId">{$view->escape($field['label'])}</label>
 HTML;
 
-$help = (empty($helpMessage)) ? '' : <<<HTML
+$help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
-                <span class="mauticform-helpmessage">{$helpMessage}</span>
+                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
 $options = array();

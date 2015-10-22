@@ -103,10 +103,9 @@ class ListModel extends FormModel
 
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName(), false, '-'));
-        } else {
-            $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+            $alias = $entity->getName();
         }
+        $alias = $this->cleanAlias($alias, '', false, '-');
 
         //make sure alias is not already taken
         $repo      = $this->getRepository();
@@ -779,12 +778,6 @@ class ListModel extends FormModel
 
         if (!empty($persistLists)) {
             $this->getRepository()->saveEntities($persistLists);
-
-            // Detach the entities to save memory
-            foreach ($persistLists as $listEntity) {
-                $this->em->detach($listEntity);
-                unset($listEntity);
-            }
         }
 
         if ($batchProcess) {
@@ -904,12 +897,6 @@ class ListModel extends FormModel
 
         if (!empty($persistLists)) {
             $this->getRepository()->saveEntities($persistLists);
-
-            // Detach the entities to save memory
-            foreach ($persistLists as $listEntity) {
-                $this->em->detach($listEntity);
-                unset($listEntity);
-            }
         }
 
         if (!empty($deleteLists)) {
