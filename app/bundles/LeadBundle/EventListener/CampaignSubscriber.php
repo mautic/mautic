@@ -76,5 +76,14 @@ class CampaignSubscriber extends CommonSubscriber
         );
         $event->addAction('lead.changetags', $action);
 
+        $trigger = array(
+            'label'       => 'mautic.lead.lead.events.field_value',
+            'description' => 'mautic.lead.lead.events.field_value_descr',
+            'formType'    => 'campaignevent_lead_field_value',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\FieldValueCondition',
+            'callback'    => '\Mautic\\LeadBundle\\Helper\\CampaignEventHelper::validateFormValue'
+        );
+        $event->addLeadCondition('lead.field_value', $trigger);
+
     }
 }

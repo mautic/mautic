@@ -229,10 +229,10 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
                                 $swiftAttachment->setDisposition('inline');
                             }
 
-                            $message['attachments'] = array(
+                            $message['attachments'][] = array(
                                 'type'    => $swiftAttachment->getContentType(),
                                 'name'    => $swiftAttachment->getFilename(),
-                                'content' => $swiftAttachment->getEncoder()->encodeString($child->getBody())
+                                'content' => $swiftAttachment->getEncoder()->encodeString($swiftAttachment->getBody())
                             );
                         } catch (\Exception $e) {
                             error_log($e);

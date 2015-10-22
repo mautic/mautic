@@ -27,45 +27,57 @@ class ConfigType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('api_enabled', 'yesno_button_group', array(
-            'label'       => 'mautic.api.config.form.api.enabled',
-            'data'        => (bool) $options['data']['api_enabled'],
-            'attr'        => array(
-                'tooltip' => 'mautic.api.config.form.api.enabled.tooltip'
+        $builder->add(
+            'api_enabled',
+            'yesno_button_group',
+            array(
+                'label' => 'mautic.api.config.form.api.enabled',
+                'data'  => (bool) $options['data']['api_enabled'],
+                'attr'  => array(
+                    'tooltip' => 'mautic.api.config.form.api.enabled.tooltip'
+                )
             )
-        ));
+        );
 
-        $builder->add('api_oauth2_access_token_lifetime', 'number', array(
-            'label'       => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
-            'attr'        => array(
-                'tooltip' => 'mautic.api.config.form.api.oauth2_access_token_lifetime.tooltip',
-                'class'   => 'form-control',
-                'data-show-on' => '{"config_apiconfig_api_enabled_1:checked":["1"]}',
-            ),
-            'constraints' => array(
-                new NotBlank(
-                    array(
-                        'message' => 'mautic.core.value.required'
+        $builder->add(
+            'api_oauth2_access_token_lifetime',
+            'number',
+            array(
+                'label'       => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
+                'attr'        => array(
+                    'tooltip'      => 'mautic.api.config.form.api.oauth2_access_token_lifetime.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_apiconfig_api_enabled_1":"checked"}',
+                ),
+                'constraints' => array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
                     )
                 )
             )
-        ));
+        );
 
-        $builder->add('api_oauth2_refresh_token_lifetime', 'number', array(
-            'label'       => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime',
-            'attr'        => array(
-                'tooltip' => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime.tooltip',
-                'class'   => 'form-control',
-                'data-show-on' => '{"config_apiconfig_api_enabled_1:checked":["1"]}',
-            ),
-            'constraints' => array(
-                new NotBlank(
-                    array(
-                        'message' => 'mautic.core.value.required'
+        $builder->add(
+            'api_oauth2_refresh_token_lifetime',
+            'number',
+            array(
+                'label'       => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime',
+                'attr'        => array(
+                    'tooltip'      => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_apiconfig_api_enabled_1":"checked"}',
+                ),
+                'constraints' => array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
                     )
                 )
             )
-        ));
+        );
     }
 
     /**
