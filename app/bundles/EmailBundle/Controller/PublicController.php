@@ -114,18 +114,11 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        $response = TrackingPixelHelper::getResponse($this->request);
+        TrackingPixelHelper::sendResponse($this->request);
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
         $model->hitEmail($idHash, $this->request);
-
-        $size = strlen($response->getContent());
-        $response->headers->set('Content-Length', $size);
-        $response->headers->set('Connection', 'close');
-
-        //generate image
-        return $response;
     }
 
     /**
