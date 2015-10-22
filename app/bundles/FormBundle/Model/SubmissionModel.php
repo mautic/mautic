@@ -445,9 +445,6 @@ class SubmissionModel extends CommonFormModel
                 $lead->addIpAddress($ipAddress);
             }
 
-            // last active time
-            $lead->setLastActive(new \DateTime());
-
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {
@@ -462,6 +459,9 @@ class SubmissionModel extends CommonFormModel
             $event->setIpAddress($ipAddress);
             $lead->addPointsChangeLog($event);
         }
+
+        // last active time
+        $lead->setLastActive(new \DateTime());
 
         //create a new lead
         $model->saveEntity($lead, false);

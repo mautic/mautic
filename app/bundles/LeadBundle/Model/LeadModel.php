@@ -475,6 +475,8 @@ class LeadModel extends FormModel
      * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
      * was just generated or not
      *
+     * @param bool|false $returnTracking
+     *
      * @return Lead|array
      */
     public function getCurrentLead($returnTracking = false)
@@ -572,6 +574,10 @@ class LeadModel extends FormModel
 
         $this->currentLead = $lead;
 
+        // Set last active
+        $this->currentLead->setLastActive(new \DateTime());
+
+        // Update tracking cookies if the lead is different
         if ($oldLead->getId() != $lead->getId()) {
 
             list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
@@ -618,6 +624,8 @@ class LeadModel extends FormModel
 
     /**
      * Get or generate the tracking ID for the current session
+     *
+     * @param bool|false $forceRegeneration
      *
      * @return array
      */
