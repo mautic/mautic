@@ -9,10 +9,7 @@
 
 $formName = '_' . $form->generateFormName();
 $fields   = $form->getFields();
-$required = array();
 ?>
-
-<?php echo $view->render($theme.'MauticFormBundle:Builder:script.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
 <?php if ($form->getRenderStyle()) echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
 

@@ -62,7 +62,7 @@ class HitRepository extends CommonRepository
     public function getLeadHits($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page) AS page_id, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle')
+        $query->select('IDENTITY(h.page) AS page_id, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query')
             ->where('h.lead = ' . (int) $leadId);
 
         if (!empty($options['ipIds'])) {

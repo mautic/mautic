@@ -172,6 +172,13 @@ class InstallController extends CommonController
                             $dbParams['dbname'] = $dbParams['name'];
                             unset($dbParams['name']);
 
+                            // Support for env variables
+                            foreach ($dbParams as $k => &$v) {
+                                if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+                                    $v = (string) getenv($match[1]);
+                                }
+                            }
+
                             $result = $this->performDatabaseInstallation($dbParams);
 
                             if (is_array($result)) {
@@ -272,7 +279,9 @@ class InstallController extends CommonController
                     }
 
                     // Clear the cache one final time with the updated config
-                    $this->clearCacheFile();
+                    /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                    $cacheHelper = $this->factory->getHelper('cache');
+                    $cacheHelper->clearContainerFile();
 
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
@@ -880,6 +889,13 @@ class InstallController extends CommonController
 
                 $dbParams['dbname'] = $dbParams['name'];
                 unset($dbParams['name']);
+
+                // Support for env variables
+                foreach ($dbParams as $k => &$v) {
+                    if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
+                        $v = (string) getenv($match[1]);
+                    }
+                }
             }
 
             // Ensure UTF8 charset

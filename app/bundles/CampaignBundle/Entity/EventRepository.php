@@ -355,6 +355,7 @@ class EventRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
+            ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
                 $q->expr()->eq('e.campaign_id', (int) $campaignId)

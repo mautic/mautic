@@ -50,6 +50,9 @@ class RedirectModel extends FormModel
      */
     public function getRedirectByUrl($url, $forEmail = null, $createEntity = true)
     {
+        // Ensure the URL saved to the database does not have encoded ampersands
+        $url = str_replace('&amp;', '&', $url);
+
         $repo     = $this->getRepository();
         $criteria = array('url' => $url);
 

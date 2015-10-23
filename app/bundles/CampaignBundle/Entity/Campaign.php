@@ -173,27 +173,24 @@ class Campaign extends FormEntity
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('asset')
+        $metadata->setGroupPrefix('campaign')
             ->addListProperties(
                 array(
                     'id',
-                    'title',
-                    'alias',
+                    'name',
                     'category',
                     'description'
                 )
             )
             ->addProperties(
                 array(
-                    'language',
                     'publishUp',
                     'publishDown',
-                    'downloadCount',
-                    'uniqueDownloadCount',
-                    'revision',
-                    'extension',
-                    'mime',
-                    'size'
+                    'events',
+                    'leads',
+                    'forms',
+                    'lists',
+                    'canvasSettings'
                 )
             )
             ->build();

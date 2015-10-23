@@ -21,10 +21,19 @@ if (!isset($formName)) {
     $formName = '';
 }
 
+$properties = $field['properties'];
+
 $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
 
-$name  = (empty($ignoreName)) ? ' name="mauticform['.$field['alias'].']"' : '';
+$name = '';
+if (empty($ignoreName)) {
+    $inputName = 'mauticform['.$field['alias'].']';
+    if (!empty($properties['multiple'])) {
+        $inputName .= '[]';
+    }
+    $name = ' name="'. $inputName . '"';
+}
 
 if (in_array($field['type'], array('checkboxgrp', 'radiogrp', 'textarea'))) {
     $value = '';
@@ -42,7 +51,6 @@ if (empty($ignoreId)) {
 $inputAttr = $inputId.$name.$value;
 $labelAttr = $labelId;
 
-$properties = $field['properties'];
 if (!empty($properties['placeholder'])) {
     $inputAttr .= ' placeholder="'.$properties['placeholder'].'"';
 }
@@ -77,17 +85,28 @@ $containerAttr         = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchar
 if (!isset($containerClass))
     $containerClass = $containerType;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
+
+// Field is required
 $validationMessage     = '';
 if (isset($field['isRequired']) && $field['isRequired']) {
+    $required = true;
     $defaultContainerClass .= ' mauticform-required';
     $validationMessage = $field['validationMessage'];
     if (empty($validationMessage)) {
         $validationMessage = $view['translator']->trans('mautic.form.field.generic.required', array(), 'validators');
     }
+
+    $containerAttr .= " data-validate=\"{$field['alias']}\" data-validation-type=\"{$field['type']}\"";
+
+    if (!empty($properties['multiple'])) {
+        $containerAttr .= " data-validate-multiple=\"true\"";
+    }
 } elseif (!empty($required)) {
+    // Forced to be required
     $defaultContainerClass .= ' mauticform-required';
 }
 
+// Add container class
 if (!empty($deleted)) {
     $defaultContainerClass .= ' bg-danger';
 }
