@@ -33,7 +33,7 @@ abstract class PluginBundleBase extends Bundle
     {
         // BC support; @deprecated 1.1.4; to be removed in 2.0
         if (method_exists(get_called_class(), 'onInstall')) {
-            self::onInstall($factory);
+            static::onInstall($factory);
         }
 
         if ($metadata !== null) {
@@ -96,7 +96,7 @@ abstract class PluginBundleBase extends Bundle
                 ->setName($plugin->getName())
                 ->setVersion($plugin->getVersion());
 
-            self::onUpdate($addon, $factory);
+            static::onUpdate($addon, $factory);
         }
 
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
