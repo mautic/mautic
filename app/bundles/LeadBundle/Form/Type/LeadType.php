@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -52,20 +53,7 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
-            $builder->add(
-                'tags',
-                'lead_tag',
-                array(
-                    'attr' => array(
-                        'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                        'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                        'data-allow-add'        => 'true',
-                        'onchange'              => 'Mautic.createLeadTag(this)'
-                    )
-                )
-            );
-
-            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+            $transformer = new IdToEntityModelTransformer(
                 $this->factory->getEntityManager(),
                 'MauticUserBundle:User'
             );
@@ -295,6 +283,20 @@ class LeadType extends AbstractType
                 );
             }
         }
+
+        $builder->add(
+            'tags',
+            'lead_tag',
+            array(
+                'by_reference' => false,
+                'attr'         => array(
+                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'        => 'true',
+                    'onchange'              => 'Mautic.createLeadTag(this)'
+                )
+            )
+        );
 
         if (!$options['isShortForm']) {
             $builder->add('buttons', 'form_buttons');

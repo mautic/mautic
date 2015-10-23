@@ -228,7 +228,7 @@ class Event
                     'id',
                     'name',
                     'description',
-                    'types',
+                    'type',
                     'eventType',
                     'order',
                     'properties',

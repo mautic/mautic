@@ -6,8 +6,6 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$fields   = $form->getFields();
 ?>
 
 <script type="text/javascript">
@@ -27,24 +25,5 @@ $fields   = $form->getFields();
         var MauticLang   = {
             'submittingMessage': "<?php echo $view['translator']->trans('mautic.form.submission.pleasewait'); ?>"
         }
-        var MauticFormValidations  = {};
     }
-
-    /** This is needed for each form **/
-    MauticFormValidations['<?php echo $formName; ?>'] = {
-<?php
-foreach($fields as $f):
-if (!$f->isRequired()) continue;
-$type       = $f->getType();
-$properties = $f->getProperties();
-$name       = $f->getAlias();
-if ((in_array($type, array('select', 'country')) && !empty($properties['multiple'])))
-    $name .= '[]';
-?>
-        '<?php echo $f->getAlias(); ?>': {
-            type: '<?php echo $f->getType(); ?>',
-            name: '<?php echo $name; ?>'
-        },
-<?php endforeach; ?>
-    };
 </script>

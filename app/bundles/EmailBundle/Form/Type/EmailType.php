@@ -392,11 +392,7 @@ class EmailType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class'        => 'Mautic\EmailBundle\Entity\Email',
-                'validation_groups' => array(
-                    'Mautic\EmailBundle\Entity\Email',
-                    'determineValidationGroups',
-                ),
+                'data_class' => 'Mautic\EmailBundle\Entity\Email'
             )
         );
 

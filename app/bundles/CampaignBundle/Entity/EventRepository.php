@@ -130,7 +130,10 @@ class EventRepository extends CommonRepository
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
                     $q->expr()->isNull('e.parent'),
-                    $q->expr()->eq('e.eventType', $q->expr()->literal('action'))
+                    $q->expr()->orX(
+                        $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
+                        $q->expr()->eq('e.eventType', $q->expr()->literal('condition'))
+                    )
                 )
             );
 
@@ -324,15 +327,13 @@ class EventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignActionEvents($campaignId)
+    public function getCampaignActionAndConditionEvents($campaignId)
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('e')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where(
-                $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            );
+            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
+            ->andWhere($q->expr()->in('e.eventType', array('action', 'condition')));
 
         $events = $q->getQuery()->getArrayResult();
 
@@ -354,10 +355,12 @@ class EventRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
+            ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
                 $q->expr()->eq('e.campaign_id', (int) $campaignId)
-            );
+            )
+            ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled');
 
         if (!empty($leads)) {
             $q->andWhere(

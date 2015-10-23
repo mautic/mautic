@@ -62,6 +62,69 @@ Mautic.formOnLoad = function (container) {
     }
 };
 
+Mautic.updateFormFields = function () {
+    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
+
+    var formId = mQuery('#campaignevent_properties_form').val();
+    Mautic.ajaxActionRequest('form:updateFormFields', {'formId': formId}, function(response) {
+        if (response.fields) {
+            var select = mQuery('#campaignevent_properties_field');
+            select.find('option').remove();
+            var fieldOptions = {};
+            mQuery.each(response.fields, function(key, field) {
+                var option = mQuery('<option></option>')
+                    .attr('value', field.alias)
+                    .text(field.label);
+                select.append(option);
+                fieldOptions[field.alias] = field.options;
+            });
+            select.attr('data-field-options', JSON.stringify(fieldOptions));
+            select.trigger('chosen:updated');
+            Mautic.updateFormFieldValues(select);
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.updateFormFieldValues = function (field) {
+    field = mQuery(field);
+    var fieldValue = field.val();
+    var options = jQuery.parseJSON(field.attr('data-field-options'));
+    var valueField = mQuery('#campaignevent_properties_value');
+    var valueFieldAttrs = {
+        'class': valueField.attr('class'),
+        'id': valueField.attr('id'),
+        'name': valueField.attr('name'),
+        'autocomplete': valueField.attr('autocomplete'),
+        'value': valueField.attr('value')
+    };
+
+    if (typeof options[fieldValue] !== 'undefined' && !mQuery.isEmptyObject(options[fieldValue])) {
+        var newValueField = mQuery('<select/>')
+            .attr('class', valueFieldAttrs['class'])
+            .attr('id', valueFieldAttrs['id'])
+            .attr('name', valueFieldAttrs['name'])
+            .attr('autocomplete', valueFieldAttrs['autocomplete'])
+            .attr('value', valueFieldAttrs['value']);
+        mQuery.each(options[fieldValue], function(key, optionVal) {
+            var option = mQuery("<option></option>")
+                .attr('value', optionVal)
+                .text(optionVal);
+            newValueField.append(option);
+        });
+        valueField.replaceWith(newValueField);
+    } else {
+        var newValueField = mQuery('<input/>')
+            .attr('type', 'text')
+            .attr('class', valueFieldAttrs['class'])
+            .attr('id', valueFieldAttrs['id'])
+            .attr('name', valueFieldAttrs['name'])
+            .attr('autocomplete', valueFieldAttrs['autocomplete'])
+            .attr('value', valueFieldAttrs['value']);
+        valueField.replaceWith(newValueField);
+    }
+};
+
 Mautic.formOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.formSubmissionChart;

@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
@@ -76,10 +75,9 @@ class PageModel extends FormModel
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
-                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, '-'));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+                $alias = $entity->getTitle();
             }
+            $alias = $this->cleanAlias($alias, '', false, '-');
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -355,7 +353,7 @@ class PageModel extends FormModel
         $leadModel = $this->factory->getModel('lead');
 
         //check for any clickthrough info
-        $clickthrough = $request->get('ct', false);
+        $clickthrough = $request->get('ct', array());
         if (!empty($clickthrough)) {
             $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
@@ -538,10 +536,10 @@ class PageModel extends FormModel
                                     }
                                 }
                             }
+                        }
 
-                            if ($persistLead) {
-                                $leadModel->saveEntity($lead);
-                            }
+                        if ($persistLead) {
+                            $leadModel->saveEntity($lead);
                         }
                     }
                 }
@@ -562,6 +560,11 @@ class PageModel extends FormModel
 
         $hit->setUrl($pageURL);
 
+        // Store query array
+        $query = $request->query->all();
+        unset($query['d']);
+        $hit->setQuery($query);
+
         list($trackingId, $generated) = $leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
@@ -576,32 +579,33 @@ class PageModel extends FormModel
         }
 
         if (!empty($page)) {
-            $hitCount = $page->getHits();
-            $hitCount++;
-            $page->setHits($hitCount);
-
             //check for a hit from tracking id
             $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
-            if (empty($countById)) {
-                $uniqueHitCount = $page->getUniqueHits();
-                $uniqueHitCount++;
-                $page->setUniqueHits($uniqueHitCount);
-            }
+            $isUnique  = empty($countById);
 
             if ($page instanceof Page) {
                 $hit->setPage($page);
                 $hit->setPageLanguage($page->getLanguage());
 
-                if ($countById) {
-                    $variantHitCount = $page->getVariantHits();
-                    $variantHitCount++;
-                    $page->setVariantHits($variantHitCount);
+                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+
+                try {
+                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+                } catch (\Exception $exception) {
+                    error_log($exception);
                 }
             } elseif ($page instanceof Redirect) {
                 $hit->setRedirect($page);
-            }
 
-            $this->em->persist($page);
+                /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+                $redirectModel = $this->factory->getModel('page.redirect');
+
+                try {
+                    $redirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+                } catch (\Exception $exception) {
+                    error_log($exception);
+                }
+            }
         }
 
         //glean info from the IP address
@@ -614,7 +618,10 @@ class PageModel extends FormModel
         }
 
         $hit->setCode($code);
-        $hit->setReferer($request->server->get('HTTP_REFERER'));
+        if (!$hit->getReferer()) {
+            $hit->setReferer($request->server->get('HTTP_REFERER'));
+        }
+
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
@@ -631,17 +638,17 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
-        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
-        }
-
         $this->em->persist($hit);
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->flush();
         } catch (\Exception $e) {
             error_log($e);
+        }
+
+        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
+            $event = new PageHitEvent($hit, $request, $code, $clickthrough);
+            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
 
         //save hit to the cookie to use to update the exit time

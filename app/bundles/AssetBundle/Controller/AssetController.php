@@ -65,7 +65,7 @@ class AssetController extends FormController
 
         if (!$permissions['asset:assets:viewother']) {
             $filter['force'][] =
-                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+                array('column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
 
         $orderBy    = $this->factory->getSession()->get('mautic.asset.orderby', 'a.title');

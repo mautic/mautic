@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class FilterType
@@ -28,6 +29,7 @@ class FilterType extends AbstractType
 {
     private $operatorChoices;
     private $translator;
+    private $currentListId;
 
     /**
      * @param MauticFactory $factory
@@ -45,7 +47,8 @@ class FilterType extends AbstractType
             }
         }
 
-        $this->translator = $factory->getTranslator();
+        $this->translator    = $factory->getTranslator();
+        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
     }
 
     /**
@@ -71,8 +74,9 @@ class FilterType extends AbstractType
 
         $translator      = $this->translator;
         $operatorChoices = $this->operatorChoices;
+        $currentListId   = $this->currentListId;
 
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $options) {
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $currentListId) {
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
@@ -87,44 +91,71 @@ class FilterType extends AbstractType
             $displayAttr = array();
 
             $customOptions = array();
+
             switch ($fieldType) {
                 case 'leadlist':
-                    if (!is_array($data['filter'])) {
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    } elseif (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
+
+                    // Don't show the current list ID in the choices
+                    if (!empty($currentListId)) {
+                        unset($options['lists'][$currentListId]);
+                    }
+
                     $customOptions['choices']  = $options['lists'];
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
                 case 'tags':
-                    if (!is_array($data['filter'])) {
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    } elseif (!is_array($data['filter'])) {
                         $data['filter'] = array($data['filter']);
                     }
                     $customOptions['choices']  = $options['tags'];
                     $customOptions['multiple'] = true;
-                    $attr = array_merge($attr, array(
-                            'data-placeholder'      => $translator->trans('mautic.lead.tags.select_or_create'),
-                            'data-no-results-text'  => $translator->trans('mautic.lead.tags.enter_to_create'),
-                            'data-allow-add'        => 'true',
-                            'onchange'              => 'Mautic.createLeadTag(this)'
+                    $attr                      = array_merge(
+                        $attr,
+                        array(
+                            'data-placeholder'     => $translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text' => $translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'       => 'true',
+                            'onchange'             => 'Mautic.createLeadTag(this)'
                         )
                     );
                     $type                      = 'choice';
                     break;
                 case 'timezone':
-                    $customOptions['choices']  = $options['timezones'];
-                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    $type                      = 'choice';
-                    break;
                 case 'country':
-                    $customOptions['choices']  = $options['countries'];
-                    $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    $type                      = 'choice';
-                    break;
                 case 'region':
-                    $customOptions['choices']  = $options['regions'];
+                    switch ($fieldType) {
+                        case 'timezone':
+                            $choiceKey = 'timezones';
+                            break;
+                        case 'country':
+                            $choiceKey = 'countries';
+                            break;
+                        case 'region':
+                            $choiceKey = 'regions';
+                            break;
+                    }
+
+                    $type                     = 'choice';
+                    $customOptions['choices'] = $options[$choiceKey];
+
                     $customOptions['multiple'] = (in_array($data['operator'], array('in', '!in')));
-                    $type                      = 'choice';
+
+                    if ($customOptions['multiple']) {
+                        array_unshift($customOptions['choices'], array('' => ''));
+
+                        if (!isset($data['filter'])) {
+                            $data['filter'] = array();
+                        }
+                    }
+
                     break;
                 case 'time':
                 case 'date':
@@ -163,12 +194,14 @@ class FilterType extends AbstractType
 
                     if (in_array($data['operator'], array('in', '!in'))) {
                         $customOptions['multiple'] = true;
-                        if (!is_array($data['filter'])) {
+                        if (!isset($data['filter'])) {
+                            $data['filter'] = array();
+                        } elseif (!is_array($data['filter'])) {
                             $data['filter'] = array($data['filter']);
                         }
                     }
 
-                    $list  = $options['fields'][$fieldName]['properties']['list'];
+                    $list = $options['fields'][$fieldName]['properties']['list'];
                     if (!is_array($list)) {
                         $parts = explode('||', $list);
                         if (count($parts) > 1) {
@@ -207,6 +240,18 @@ class FilterType extends AbstractType
                     break;
             }
 
+            if (in_array($data['operator'], array('empty', '!empty'))) {
+                $attr['disabled'] = 'disabled';
+            } else {
+                $customOptions['constraints'] = array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
+                );
+            }
+
             // @todo implement in UI
             if (in_array($data['operator'], array('between', '!between'))) {
                 $form->add(
@@ -227,9 +272,10 @@ class FilterType extends AbstractType
                     $type,
                     array_merge(
                         array(
-                            'label' => false,
-                            'attr'  => $attr,
-                            'data'  => $data['filter']
+                            'label'          => false,
+                            'attr'           => $attr,
+                            'data'           => isset($data['filter']) ? $data['filter'] : '',
+                            'error_bubbling' => false,
                         ),
                         $customOptions
                     )
@@ -240,9 +286,10 @@ class FilterType extends AbstractType
                 'display',
                 $displayType,
                 array(
-                    'label' => false,
-                    'attr'  => $displayAttr,
-                    'data'  => $data['display']
+                    'label'          => false,
+                    'attr'           => $displayAttr,
+                    'data'           => $data['display'],
+                    'error_bubbling' => false
                 )
             );
 
@@ -310,7 +357,8 @@ class FilterType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'label' => false
+                'label'          => false,
+                'error_bubbling' => false
             )
         );
     }

@@ -91,6 +91,13 @@ class LeadField extends FormEntity
     private $isUniqueIdentifer = false;
 
     /**
+     * Workaround for incorrectly spelled $isUniqueIdentifer
+     *
+     * @var bool
+     */
+    private $isUniqueIdentifier = false;
+
+    /**
      * @var int
      */
     private $order = 0;
@@ -113,6 +120,7 @@ class LeadField extends FormEntity
     public static function loadMetadata (ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
+        $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
 
         $builder->setTable('lead_fields')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository');
@@ -536,11 +544,10 @@ class LeadField extends FormEntity
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
-        $this->isUniqueIdentifer = $isUniqueIdentifer;
+        $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
         return $this;
     }
-
 
     /**
      * Wrapper for incorrectly spelled setIsUniqueIdentifer
@@ -549,7 +556,7 @@ class LeadField extends FormEntity
      */
     public function getIsUniqueIdentifier()
     {
-        return $this->isUniqueIdentifer;
+        return $this->getIsUniqueIdentifer();
     }
 
     /**
@@ -561,9 +568,7 @@ class LeadField extends FormEntity
      */
     public function setIsUniqueIdentifier($isUniqueIdentifier)
     {
-        $this->isUniqueIdentifer = $isUniqueIdentifer;
-
-        return $this;
+        return $this->setIsUniqueIdentifer($isUniqueIdentifier);
     }
 
     /**
@@ -656,5 +661,13 @@ class LeadField extends FormEntity
     public function setIsPubliclyUpdatable ($isPubliclyUpdatable)
     {
         $this->isPubliclyUpdatable = (bool)$isPubliclyUpdatable;
+    }
+
+    /**
+     * Workaround for mispelled isUniqueIdentifer
+     */
+    public function identifierWorkaround()
+    {
+        $this->isUniqueIdentifier = $this->isUniqueIdentifer;
     }
 }

@@ -490,7 +490,7 @@ var Mautic = {
                     if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
                         // Allow full page editing and add tools to update html document
                         settings.fullPage     = true;
-                        settings.extraPlugins = "sourcedialog,docprops";
+                        settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     }
 
                     if (editorClass == 'editor') {
@@ -993,13 +993,20 @@ var Mautic = {
      * Inserts a new javascript file request into the document head
      *
      * @param url
+     * @param onLoadCallback
+     * @param alreadyLoadedCallback
      */
-    loadScript: function (url) {
+    loadScript: function (url, onLoadCallback, alreadyLoadedCallback) {
         // check if the asset has been loaded
         if (typeof Mautic.headLoadedAssets == 'undefined') {
             Mautic.headLoadedAssets = {};
         } else if (typeof Mautic.headLoadedAssets[url] != 'undefined') {
             // URL has already been appended to head
+
+            if (alreadyLoadedCallback && typeof Mautic[alreadyLoadedCallback] == 'function') {
+                Mautic[alreadyLoadedCallback]();
+            }
+
             return;
         }
 
@@ -1008,8 +1015,10 @@ var Mautic = {
 
         mQuery.getScript(url, function( data, textStatus, jqxhr ) {
             if (textStatus == 'success') {
-                // Likely a page refresh; execute onLoad content
-                if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
+                if (onLoadCallback && typeof Mautic[onLoadCallback] == 'function') {
+                    Mautic[onLoadCallback]();
+                } else if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
+                    // Likely a page refresh; execute onLoad content
                     if (typeof Mautic.loadedContent[mauticContent] == 'undefined') {
                         Mautic.loadedContent[mauticContent] = true;
                         Mautic[mauticContent + "OnLoad"]('#app-content', {});

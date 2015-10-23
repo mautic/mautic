@@ -144,7 +144,7 @@ class DoNotEmail
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead ()
     {
@@ -152,7 +152,7 @@ class DoNotEmail
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
      */
     public function setLead (Lead $lead)
     {

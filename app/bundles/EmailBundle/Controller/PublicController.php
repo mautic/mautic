@@ -114,18 +114,11 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        $response = TrackingPixelHelper::getResponse($this->request);
+        TrackingPixelHelper::sendResponse($this->request);
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->factory->getModel('email');
         $model->hitEmail($idHash, $this->request);
-
-        $size = strlen($response->getContent());
-        $response->headers->set('Content-Length', $size);
-        $response->headers->set('Connection', 'close');
-
-        //generate image
-        return $response;
     }
 
     /**
@@ -148,16 +141,18 @@ class PublicController extends CommonFormController
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
-            // Set the lead as current lead
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $leadModel->setCurrentLead($lead);
+            if ($lead) {
+                // Set the lead as current lead
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leadModel->setCurrentLead($lead);
+            }
 
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
 
             $message = $this->factory->getParameter('unsubscribe_message');
             if (!$message) {
-                $message = $this->factory->getTranslator()->trans(
+                $message = $translator->trans(
                     'mautic.email.unsubscribed.success',
                     array(
                         '%resubscribeUrl%' => '|URL|',
@@ -190,7 +185,7 @@ class PublicController extends CommonFormController
             }
         } else {
             $email   = $lead = false;
-            $message = '';
+            $message = $translator->trans('mautic.email.stat_record.not_found');
         }
 
         if (empty($template) && empty($formTemplate)) {
@@ -235,20 +230,20 @@ class PublicController extends CommonFormController
     {
         //find the email
         $model      = $this->factory->getModel('email');
-        $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
-            // Set the lead as current lead
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-            $leadModel->setCurrentLead($lead);
+            if ($lead) {
+                // Set the lead as current lead
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leadModel->setCurrentLead($lead);
+            }
 
             $model->removeDoNotContact($stat->getEmailAddress());
-
 
             $message = $this->factory->getParameter('resubscribe_message');
             if (!$message) {
@@ -272,7 +267,8 @@ class PublicController extends CommonFormController
             );
 
         } else {
-            $email = $lead = false;
+            $email   = $lead = false;
+            $message = $this->factory->getTranslator()->trans('mautic.email.stat_record.not_found');
         }
 
         $template = ($email !== null) ? $email->getTemplate() : $this->factory->getParameter('theme');
