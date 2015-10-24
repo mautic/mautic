@@ -17,6 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TrackingPixelHelper
 {
+    public static function sendResponse(Request $request)
+    {
+        $response = self::getResponse($request);
+        $response->send();
+    }
+
     /**
      * @param Request $request
      *
@@ -36,12 +42,14 @@ class TrackingPixelHelper
         $response = new Response();
 
         //removing any content encoding like gzip etc.
-        $response->headers->set('Content-encoding', 'none');
+        $response->headers->set('Content-Encoding', 'none');
 
         //check to ses if request is a POST
         if ($request->getMethod() == 'GET') {
+            $response->headers->set('Connection', 'close');
+
             //return 1x1 pixel transparent gif
-            $response->headers->set('Content-type', 'image/gif');
+            $response->headers->set('Content-Type', 'image/gif');
             //avoid cache time on browser side
             $response->headers->set('Content-Length', '42');
             $response->headers->set('Cache-Control', 'private, no-cache, no-cache=Set-Cookie, proxy-revalidate');

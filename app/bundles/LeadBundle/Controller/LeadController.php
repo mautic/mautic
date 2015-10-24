@@ -345,7 +345,7 @@ class LeadController extends FormController
 
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
-            $datetime = \DateTime::createFromFormat('Y-m-d H:i:s', $eventDate);
+            $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
             if ($datetime > $fromDate) {
                 $total++;
                 $allEngagements[] = array(
@@ -1940,18 +1940,18 @@ class LeadController extends FormController
             }
 
             if ($count = count($entities)) {
-                $dncEntities = array();
+                $persistEntities = array();
                 foreach ($entities as $lead) {
                     if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
 
-                        if ($dnc = $model->setDoNotContact($lead, null, $data['reason'], false, true)) {
-                            $dncEntities[] = $dnc;
+                        if ($model->setDoNotContact($lead, null, $data['reason'], false, true)) {
+                            $persistEntities[] = $lead;
                         }
                     }
                 }
 
                 // Save entities
-                $this->factory->getModel('email')->getRepository()->saveEntities($dncEntities);
+                $model->saveEntities($persistEntities);
             }
 
             $this->addFlash('mautic.lead.batch_leads_affected',

@@ -20,6 +20,7 @@
 /composer.phar
 /bundles
 /media/files/*
+!/media/files/.htaccess
 /node_modules
 /build/packaging
 /build/packages/*

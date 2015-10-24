@@ -276,7 +276,8 @@ class ListController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter')
+                'form'            => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'currentListId'   => $objectId,
             ),
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => array(
@@ -483,8 +484,8 @@ class ListController extends FormController
                     'msgVars' => array('%id%' => $list->getId())
                 );
             } elseif (!$list->isGlobal() && !$this->factory->getSecurity()->hasEntityAccess(
-                true, 'lead:lists:viewother', $list->getCreatedBy()
-            )) {
+                    true, 'lead:lists:viewother', $list->getCreatedBy()
+                )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');

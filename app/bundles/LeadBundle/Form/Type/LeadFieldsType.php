@@ -1,0 +1,65 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\LeadBundle\Form\Type;
+
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
+use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+/**
+ * Class LeadFieldsType
+ *
+ * @package Mautic\LeadBundle\Form\Type
+ */
+class LeadFieldsType extends AbstractType
+{
+    private $model;
+
+    /**
+     * @param MauticFactory       $factory
+     */
+    public function __construct(MauticFactory $factory) {
+        $this->model = $factory->getModel('lead.field');
+    }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        /** @var \Mautic\LeadBundle\Model\FieldModel $model */
+        $model = $this->model;
+        $resolver->setDefaults(array(
+            'choices' => function (Options $options) use ($model) {
+                return $model->getFieldList();
+            },
+            'global_only' => false,
+            'required'    => false
+        ));
+    }
+
+    /**
+     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     */
+    public function getParent()
+    {
+        return 'choice';
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return "leadfields_choices";
+    }
+}

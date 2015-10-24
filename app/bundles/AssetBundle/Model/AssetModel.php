@@ -35,10 +35,9 @@ class AssetModel extends FormModel
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
-                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), false, '-'));
-            } else {
-                $alias = strtolower(InputHelper::alphanum($alias, false, '-'));
+                $alias = $entity->getTitle();
             }
+            $alias = $this->cleanAlias($alias, '', false, '-');
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -169,19 +168,10 @@ class AssetModel extends FormModel
         if (!empty($asset) && empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $downloadCount = $asset->getDownloadCount();
-            $downloadCount++;
-            $asset->setDownloadCount($downloadCount);
-
             //check for a download count from tracking id
             $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
-            if (empty($countById)) {
-                $uniqueDownloadCount = $asset->getUniqueDownloadCount();
-                $uniqueDownloadCount++;
-                $asset->setUniqueDownloadCount($uniqueDownloadCount);
-            }
 
-            $this->em->persist($asset);
+            $this->getRepository()->upDownloadCount($asset->getId(), 1, empty($countById));
         }
 
         //check for existing IP
@@ -191,14 +181,15 @@ class AssetModel extends FormModel
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
-        $this->em->persist($download);
-
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
+            $this->em->persist($download);
             $this->em->flush();
         } catch (\Exception $e) {
             error_log($e);
         }
+
+        $this->em->detach($download);
     }
 
     /**
@@ -372,17 +363,28 @@ class AssetModel extends FormModel
 
     /**
      * Determine the max upload size based on PHP restrictions and config
+     *
+     * @param string     $unit              If '', determine the best unit based on the number
+     * @param bool|false $humanReadable     Return as a human readable filesize
+     *
+     * @return float
      */
-    public function getMaxUploadSize()
+    public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
-        $maxAssetSize  = Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M');
-        $maxPostSize   = Asset::convertSizeToBytes(ini_get('post_max_size'));
-        $maxUploadSize = Asset::convertSizeToBytes(ini_get('upload_max_filesize'));
-        $memoryLimit   = Asset::convertSizeToBytes(ini_get('memory_limit'));
+        $maxAssetSize  = $this->factory->getParameter('max_size');
+        $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxPostSize   = Asset::getIniValue('post_max_size');
+        $maxUploadSize = Asset::getIniValue('upload_max_filesize');
+        $memoryLimit   = Asset::getIniValue('memory_limit');
+        $maxAllowed    = min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
 
-        $maxAllowed    =  min(array_filter(array($maxAssetSize, $maxPostSize, $maxUploadSize, $memoryLimit)));
+        if ($humanReadable) {
+            $number = Asset::convertBytesToHumanReadable($maxAllowed);
+        } else {
+            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+        }
 
-        return round($maxAllowed / 1048576, 2);
+        return $number;
     }
 
     /**

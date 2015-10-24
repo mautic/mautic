@@ -29,7 +29,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class EmailModel extends FormModel
 {
-
     /**
      * {@inheritdoc}
      *
@@ -348,14 +347,10 @@ class EmailModel extends FormModel
 
             // Only up counts if associated with both an email and lead
             if ($email && $lead) {
-                $readCount = $email->getReadCount();
-                $readCount++;
-                $email->setReadCount($readCount);
-
-                if ($email->isVariant()) {
-                    $variantReadCount = $email->getVariantReadCount();
-                    $variantReadCount++;
-                    $email->setVariantReadCount($variantReadCount);
+                try {
+                    $this->getRepository()->upCount($email->getId(), 'read', 1, $email->isVariant());
+                } catch (\Exception $exception) {
+                    error_log($exception);
                 }
             }
         }
@@ -439,6 +434,27 @@ class EmailModel extends FormModel
     public function getEmailStatus ($idHash)
     {
         return $this->getStatRepository()->getEmailStatus($idHash);
+    }
+
+    /**
+     * Search for an email stat by email and lead IDs
+     *
+     * @param $emailId
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getEmailStati ($emailId, $leadId)
+    {
+        return $this->getStatRepository()->findBy(
+            array(
+                'email' => (int) $emailId,
+                'lead'  => (int) $leadId
+            ),
+            array(
+                array('dateSent', 'DESC')
+            )
+        );
     }
 
     /**
@@ -965,13 +981,14 @@ class EmailModel extends FormModel
         $useEmail = reset($emailSettings);
         $errors   = array();
         // Store stat entities
-        $saveEntities = array();
+        $saveEntities    = array();
+        $emailSentCounts = array();
 
         $mailer = $this->factory->getMailer(!$sendBatchMail);
 
         $contentGenerated = false;
 
-        $flushQueue = function($reset = true) use (&$mailer, &$saveEntities, &$errors, $sendBatchMail) {
+        $flushQueue = function($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 
             if ($sendBatchMail) {
                 $flushResult = $mailer->flushQueue();
@@ -986,7 +1003,8 @@ class EmailModel extends FormModel
                             $errors[$saveEntities[$failedEmail]->getLead()->getId()] = $failedEmail;
 
                             // Down sent counts
-                            $saveEntities[$failedEmail]->getEmail()->downSentCounts();
+                            $emailId = $saveEntities[$failedEmail]->getEmail()->getId();
+                            $emailSentCounts[$emailId]++;
 
                             // Delete the stat
                             unset($saveEntities[$failedEmail]);
@@ -1080,8 +1098,12 @@ class EmailModel extends FormModel
 
             $saveEntities[$lead['email']] = $stat;
 
-            // Down sent counts
-            $saveEntities[$lead['email']]->getEmail()->upSentCounts();
+            // Up sent counts
+            $emailId = $useEmail['entity']->getId();
+            if (!isset($emailSentCounts[$emailId])) {
+                $emailSentCounts[$emailId] = 0;
+            }
+            $emailSentCounts[$emailId]++;
 
             // Save RAM
             unset($stat);
@@ -1102,13 +1124,24 @@ class EmailModel extends FormModel
         // Persist stats
         $statRepo->saveEntities($saveEntities);
 
+        // Update sent counts
+        foreach($emailSentCounts as $emailId => $count) {
+            $isVariant = $emailSettings[$emailId]['entity']->getVariantStartDate();
+
+            try {
+                $this->getRepository()->upCount($emailId, 'sent', $count, !empty($isVariant));
+            } catch (\Exception $exception) {
+                error_log($exception);
+            }
+        }
+
         // Free RAM
         foreach ($saveEntities as $stat) {
             $this->em->detach($stat);
             unset($stat);
         }
 
-        unset($emailSettings, $options, $tokens, $useEmail, $sendTo);
+        unset($emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
         return $singleEmail ? (empty($errors)) : $errors;
     }
@@ -1222,7 +1255,9 @@ class EmailModel extends FormModel
             if ($email != null) {
                 $dnc->setEmail($email);
             }
-            $dnc->setLead($lead);
+            if ($lead) {
+                $dnc->setLead($lead);
+            }
             $dnc->setEmailAddress($address);
             $dnc->setDateAdded(new \DateTime());
             $dnc->{"set" . ucfirst($tag)}();

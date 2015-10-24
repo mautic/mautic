@@ -229,7 +229,7 @@ class FormModel extends CommonFormModel
         $isNew = ($entity->getId()) ? false : true;
 
         if ($isNew) {
-            $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
+            $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }
 
@@ -247,16 +247,24 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the cached HTML of a form and generates it if missing
      *
-     * @param Form $form
+     * @param Form      $form
+     * @param bool|true $withScript
+     * @param bool|true $useCache
      *
      * @return string
      */
-    public function getContent(Form $form)
+    public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        $cachedHtml = $form->getCachedHtml();
+        if ($useCache) {
+            $cachedHtml = $form->getCachedHtml();
+        }
 
         if (empty($cachedHtml)) {
-            $cachedHtml = $this->generateHtml($form);
+            $cachedHtml = $this->generateHtml($form, $useCache);
+        }
+
+        if ($withScript) {
+            $cachedHtml = $this->getFormScript($form) . "\n\n" . $cachedHtml;
         }
 
         return $cachedHtml;
@@ -438,15 +446,40 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * @param Form $form
+     *
+     * @return string
+     */
+    public function getFormScript(Form $form)
+    {
+        $templating = $this->factory->getTemplating();
+        $theme      = $form->getTemplate();
+
+        if (!empty($theme)) {
+            $theme .= '|';
+        }
+
+        $script = $templating->render(
+            $theme.'MauticFormBundle:Builder:script.html.php',
+            array(
+                'form'  => $form,
+                'theme' => $theme,
+            )
+        );
+
+        return $script;
+    }
+
+    /**
      * Writes in form values from get parameters
      *
      * @param $form
      * @param $formHtml
      */
-    public function populateValuesWithGetParameters($form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $request = $this->factory->getRequest();
-        $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
+        $formName = strtolower(InputHelper::alphanum($form->getName()));
 
         $fields = $form->getFields();
         foreach ($fields as $f) {
@@ -461,5 +494,66 @@ class FormModel extends CommonFormModel
                 }
             }
         }
+    }
+
+    /**
+     * @param null $operator
+     *
+     * @return array
+     */
+    public function getFilterExpressionFunctions($operator = null)
+    {
+        $operatorOptions = array(
+            '='          =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.equals',
+                    'expr'        => 'eq',
+                    'negate_expr' => 'neq'
+                ),
+            '!='         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.notequals',
+                    'expr'        => 'neq',
+                    'negate_expr' => 'eq'
+                ),
+            'gt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                    'expr'        => 'gt',
+                    'negate_expr' => 'lt'
+                ),
+            'gte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                    'expr'        => 'gte',
+                    'negate_expr' => 'lt'
+                ),
+            'lt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthan',
+                    'expr'        => 'lt',
+                    'negate_expr' => 'gt'
+                ),
+            'lte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                    'expr'        => 'lte',
+                    'negate_expr' => 'gt'
+                ),
+            'like'       =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.islike',
+                    'expr'        => 'like',
+                    'negate_expr' => 'notLike'
+                ),
+            '!like'      =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                    'expr'        => 'notLike',
+                    'negate_expr' => 'like'
+                ),
+        );
+
+        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 }

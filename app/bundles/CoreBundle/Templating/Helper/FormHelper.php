@@ -79,16 +79,21 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Checks to see if the form and its children has an error
      *
-     * @param $form
+     * @param FormView $form
+     * @param array    $exluding
      *
      * @return bool
      */
-    public function containsErrors (FormView $form) {
+    public function containsErrors (FormView $form, array $exluding = array()) {
         if (count($form->vars['errors'])) {
             return true;
         }
-        foreach ($form->children as $child) {
-            if (count($child->vars['errors'])) {
+        foreach ($form->children as $key => $child) {
+            if (in_array($key, $exluding)) {
+                continue;
+            }
+
+            if (isset($child->vars['errors']) && count($child->vars['errors'])) {
                return true;
             }
 

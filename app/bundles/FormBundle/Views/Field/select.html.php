@@ -13,12 +13,9 @@ $containerType         = 'select';
 
 include __DIR__.'/field_helper.php';
 
-$name = 'mauticform['.$field['alias'].']';
 if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
-    $name .= '[]';
 }
-$inputAttr .= ' name="'.$name.'"';;
 
 if (!isset($list)) {
     $list = $properties['list'];
@@ -43,9 +40,9 @@ $label = (!$field['showLabel']) ? '' : <<<HTML
 HTML;
 
 
-$help = (empty($helpMessage)) ? '' : <<<HTML
+$help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
-                <span class="mauticform-helpmessage">{$helpMessage}</span>
+                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
 $emptyOption = (empty($properties['empty_value'])) ? '' : <<<HTML
