@@ -26,7 +26,6 @@ class Version20150801000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-
         if ($schema->hasTable($this->prefix . 'plugins')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
