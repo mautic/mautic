@@ -237,7 +237,11 @@ $isStandalone = $activeForm->isStandalone();
                   </div>
                   <div class="modal-body">
                       <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
-                      <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->generate('mautic_form_generateform', array('id' => $activeForm->getId()), true); ?>"&gt;&lt;/script&gt;</textarea>
+                      <h3><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.js'); ?></h3>
+                      <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->generate('mautic_form_generateform', array('id' => $activeForm->getId()), true); ?>"&gt;&lt;/script&gt;</textarea>
+                      <h3 class="pt-lg"><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.iframe'); ?></h3>
+                      <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->generate('mautic_form_preview', array('id' => $activeForm->getId()), true); ?>" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
+                      <i><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.iframe.note'); ?></i>
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
