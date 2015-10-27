@@ -478,19 +478,54 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $request = $this->factory->getRequest();
-        $formName = strtolower(InputHelper::alphanum($form->getName()));
+        $request  = $this->factory->getRequest();
+        $formName = $form->generateFormName();
 
         $fields = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
             if ($request->query->has($alias)) {
-                preg_match('/<input id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match);
-                if (!empty($match)) {
+                $value = $request->query->get($alias);
 
-                    //replace value with GET
-                    $replace = '<input id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[1] . 'value="' . urldecode($request->query->get($alias)) . '"' . $match[3] . '/>';
-                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                switch ($f->getType()) {
+                    case 'text':
+                        if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
+                            $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
+                    case 'textarea':
+                        if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                            $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
+                    case 'checkboxgrp':
+                        if (!is_array($value)) {
+                            $value = array($value);
+                        }
+                        foreach ($value as $val) {
+                            $val = urldecode($val);
+                            if (preg_match(
+                                '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
+                                $formHtml,
+                                $match
+                            )) {
+                                $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                                    .$match[4].' checked />';
+                                $formHtml = str_replace($match[0], $replace, $formHtml);
+                            }
+                        }
+                        break;
+                    case 'radiogrp':
+                        $value = urldecode($value);
+                        if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
+                            $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
+                                .' checked />';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
                 }
             }
         }
