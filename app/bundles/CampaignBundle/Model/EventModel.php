@@ -1622,7 +1622,7 @@ class EventModel extends CommonFormModel
             return;
         }
 
-        if ($eventSleepTime < 0) {
+        if ($eventSleepTime < 1) {
             usleep($eventSleepTime * 1000);
         } else {
             sleep($eventSleepTime);
