@@ -924,7 +924,7 @@ class ListModel extends FormModel
             return;
         }
 
-        if ($leadSleepTime < 0) {
+        if ($leadSleepTime < 1) {
             usleep($leadSleepTime * 1000);
         } else {
             sleep($leadSleepTime);
