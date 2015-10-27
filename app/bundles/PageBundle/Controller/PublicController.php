@@ -321,13 +321,12 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        // Send response to keep from slowing down a website
-        TrackingPixelHelper::sendResponse($this->request);
-
         //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page');
         $model->hitPage(null, $this->request);
+
+        return TrackingPixelHelper::getResponse($this->request);
     }
 
     /**

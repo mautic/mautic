@@ -104,7 +104,7 @@ class CampaignModel extends CommonFormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return null|Campaign
      */
     public function getEntity ($id = null)
     {

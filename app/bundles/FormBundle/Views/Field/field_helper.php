@@ -35,7 +35,7 @@ if (empty($ignoreName)) {
     $name = ' name="'. $inputName . '"';
 }
 
-if ($field['type'] == 'checkboxgrp' || $field['type'] == 'radiogrp') {
+if (in_array($field['type'], array('checkboxgrp', 'radiogrp', 'textarea'))) {
     $value = '';
 } else {
     $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';

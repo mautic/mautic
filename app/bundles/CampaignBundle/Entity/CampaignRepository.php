@@ -535,10 +535,11 @@ class CampaignRepository extends CommonRepository
      *
      * @param       $campaignId
      * @param array $ignoreLeads
+     * @param int   $leadId       Optional lead ID to check if lead is part of campaign
      *
      * @return mixed
      */
-    public function getCampaignLeadCount($campaignId, $ignoreLeads = array())
+    public function getCampaignLeadCount($campaignId, $ignoreLeads = array(), $leadId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -555,6 +556,12 @@ class CampaignRepository extends CommonRepository
         if (!empty($ignoreLeads)) {
             $q->andWhere(
                 $q->expr()->notIn('cl.lead_id', $ignoreLeads)
+            );
+        }
+
+        if ($leadId) {
+            $q->andWhere(
+                $q->expr()->eq('cl.lead_id', (int) $leadId)
             );
         }
 

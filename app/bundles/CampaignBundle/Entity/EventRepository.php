@@ -114,13 +114,42 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get the top level actions for a campaign
+     * Get array of events by parent
      *
-     * @param $id
+     * @param      $parentId
+     * @param null $decisionPath
      *
      * @return array
      */
-    public function getRootLevelActions($id)
+    public function getEventsByParent($parentId, $decisionPath = null)
+    {
+        $q = $this->_em->createQueryBuilder();
+
+        $q->select('e')
+            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->where(
+                $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
+            );
+
+        if ($decisionPath != null) {
+            $q->andWhere(
+                $q->expr()->eq('e.decisionPath', ':decisionPath')
+            )
+                ->setParameter('decisionPath', $decisionPath);
+        }
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Get the top level events for a campaign
+     *
+     * @param $id
+     * @param $includeDecisions
+     *
+     * @return array
+     */
+    public function getRootLevelEvents($id, $includeDecisions = false)
     {
         $q = $this->_em->createQueryBuilder();
 
@@ -129,13 +158,15 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
-                    $q->expr()->isNull('e.parent'),
-                    $q->expr()->orX(
-                        $q->expr()->eq('e.eventType', $q->expr()->literal('action')),
-                        $q->expr()->eq('e.eventType', $q->expr()->literal('condition'))
-                    )
+                    $q->expr()->isNull('e.parent')
                 )
             );
+
+        if (!$includeDecisions) {
+            $q->andWhere(
+                $q->expr()->neq('e.eventType', $q->expr()->literal('decision'))
+            );
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -146,10 +177,11 @@ class EventRepository extends CommonRepository
      * Gets ids of leads who have already triggered the event
      *
      * @param $events
+     * @param $leadId
      *
      * @return array
      */
-    public function getEventLogLeads($events)
+    public function getEventLogLeads($events, $leadId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -159,6 +191,12 @@ class EventRepository extends CommonRepository
                 $q->expr()->in('e.event_id', $events)
             )
             ->setParameter('false', false, 'boolean');
+
+        if ($leadId) {
+            $q->andWhere(
+                $q->expr()->eq('e.lead_id', (int) $leadId)
+            );
+        }
 
         $results = $q->execute()->fetchAll();
 
