@@ -9,7 +9,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -773,7 +772,7 @@ class LeadModel extends FormModel
         $oldOwner = $mergeWith->getOwner();
         $newOwner = $mergeFrom->getOwner();
 
-        if ($oldOwner === null) {
+        if ($oldOwner === null && $newOwner !== null) {
             $mergeWith->setOwner($newOwner);
 
             $logger->debug('LEAD: New owner is ' . $newOwner->getId());
