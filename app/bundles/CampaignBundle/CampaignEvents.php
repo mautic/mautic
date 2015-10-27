@@ -88,12 +88,23 @@ final class CampaignEvents
     const ON_EVENT_EXECUTION = 'mautic.campaign_on_event_execution';
 
     /**
-     * The mautic.campaign_on_event_decision_trigger event is dispatched after a lead decision triggers a set of actions.
+     * The mautic.campaign_on_event_decision_trigger event is dispatched after a lead decision triggers a set of actions or if the decision is set
+     * as a root level event
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignDecisionTriggerEvent instance.
+     * Mautic\CampaignBundle\Event\CampaignDecisionEvent instance.
      *
      * @var string
      */
     const ON_EVENT_DECISION_TRIGGER = 'matuic.campaign_on_event_decision_trigger';
+
+    /**
+     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignScheduledEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_SCHEDULED = 'matuic.campaign_on_event_scheduled';
 }
