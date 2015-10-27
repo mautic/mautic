@@ -1582,7 +1582,7 @@ class LeadController extends FormController
 
                         $mailer->setFrom(
                             $email['from'],
-                            (strtolower($user->getEmail()) !== strtolower($email['from'])) ? null : $user->getFirstName().' '.$user->getLastName()
+                            (strtolower($user->getEmail()) !== strtolower($email['from'])) ? $email['fromname'] : $user->getFirstName().' '.$user->getLastName()
                         );
 
                         // Set Content

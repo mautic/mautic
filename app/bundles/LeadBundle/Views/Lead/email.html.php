@@ -9,6 +9,7 @@
 
 echo $view['form']->start($form);
 
+echo $view['form']->row($form['fromname']);
 echo $view['form']->row($form['from']);
 echo $view['form']->row($form['subject']);
 echo $view['form']->row($form['body']);
