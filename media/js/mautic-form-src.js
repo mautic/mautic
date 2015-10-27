@@ -178,11 +178,6 @@
         };
 
         Form.prepareValidation = function(formId) {
-
-            if (typeof window.MauticFormValidations == 'undefined') {
-                window.MauticFormValidations  = {};
-            }
-
             if (typeof window.MauticFormValidations[formId] == 'undefined') {
                 window.MauticFormValidations[formId] = {};
 
@@ -663,5 +658,8 @@
             MauticSDK.initialize(sParts[0]);
             break;
         }
+    }
+    if (typeof window.MauticFormValidations == 'undefined') {
+        window.MauticFormValidations = {};
     }
 })( window );

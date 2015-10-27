@@ -12,9 +12,9 @@ namespace Mautic\CampaignBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignExecutionEvent
+ * Class CampaignScheduledEvent
  */
-class CampaignExecutionEvent extends Event
+class CampaignScheduledEvent extends Event
 {
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
@@ -42,9 +42,9 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool
+     * @var \DateTime
      */
-    protected $result;
+    protected $dateScheduled;
 
     /**
      * @var array
@@ -55,17 +55,16 @@ class CampaignExecutionEvent extends Event
      * Construct
      *
      * @param $args
-     * @param $result
      */
-    public function __construct($args, $result)
+    public function __construct($args)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
+        $this->dateScheduled   = $args['dateScheduled'];
         $this->eventSettings   = $args['eventSettings'];
-        $this->result          = $result;
     }
 
     /**
@@ -109,11 +108,11 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return bool
+     * @return \DateTime
      */
-    public function getResult()
+    public function getDateScheduled()
     {
-        return $this->result;
+        return $this->dateScheduled;
     }
 
     /**
