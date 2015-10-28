@@ -89,13 +89,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         return 'key';
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
-    {
-        return true;
-    }
+
     /**
      * @return string
      */
