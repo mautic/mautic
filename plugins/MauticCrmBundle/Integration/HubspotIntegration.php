@@ -45,29 +45,14 @@ class HubspotIntegration extends CrmAbstractIntegration
         return 'hapikey';
     }
 
-    // *
-    //  * Get the array key for the auth token
-    //  *
-    //  * @return string
+    /**
+     * Get the array key for the auth token.
+     *
+     * @return string
+     */
     public function getAuthTokenKey()
     {
         return 'hapikey';
-    }
-    /**
-     * Amend mapped lead data before pushing to CRM.
-     *
-     * @param $mappedData
-     */
-    public function amendLeadDataBeforePush(&$mappedData)
-    {
-        $leadData = $mappedData;
-        $mappedData = array();
-        foreach ($leadData as $field => $value) {
-            $mappedData['properties'][] = array(
-                'property' => $field,
-                'value' => $value,
-            );
-        }
     }
 
     /**
@@ -129,6 +114,27 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         return $hubsFields;
+    }
+
+    /**
+     * Format the lead data to the structure that HubSpot requires for the createOrUpdate request.
+     *
+     * @param array $leadData All the lead fields mapped
+     *
+     * @return array
+     */
+    public function formatLeadDataForCreateOrUpdate($leadData = array())
+    {
+        $formattedLeadData = array();
+
+        foreach ($leadData as $field => $value) {
+            $formattedLeadData['properties'][] = array(
+                'property' => $field,
+                'value' => $value,
+            );
+        }
+
+        return $formattedLeadData;
     }
 
     /**
