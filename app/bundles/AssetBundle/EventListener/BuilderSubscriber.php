@@ -105,8 +105,7 @@ class BuilderSubscriber extends CommonSubscriber
      */
     private function generateTokensFromContent($event, $leadId, $source = array(), $emailId = null)
     {
-        $content       = $event->getContent();
-        $pagelinkRegex = '/'.$this->assetToken.'/';
+        $content = $event->getContent();
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->factory->getModel('asset');
@@ -126,9 +125,9 @@ class BuilderSubscriber extends CommonSubscriber
 
         $tokens = array();
 
-        preg_match_all($pagelinkRegex, $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $assetId) {
+        preg_match_all('/({|%7B)assetlink=(.*?)(}|%7D)/', $content, $matches);
+        if (!empty($matches[2])) {
+            foreach ($matches[2] as $key => $assetId) {
                 $token = $matches[0][$key];
 
                 if (isset($tokens[$token])) {
