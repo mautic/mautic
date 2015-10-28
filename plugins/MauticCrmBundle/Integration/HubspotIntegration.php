@@ -1,20 +1,20 @@
 <?php
+
 /**
- * @package     Mautic
  * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 /**
- * Class HubspotIntegration
+ * Class HubspotIntegration.
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
-
     /**
      * {@inheritdoc}
      *
@@ -33,7 +33,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return array(
-            $this->getApiKey()   => 'mautic.hubspot.form.apikey'
+            $this->getApiKey() => 'mautic.hubspot.form.apikey',
         );
     }
 
@@ -54,7 +54,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return 'hapikey';
     }
     /**
-     * Amend mapped lead data before pushing to CRM
+     * Amend mapped lead data before pushing to CRM.
      *
      * @param $mappedData
      */
@@ -62,10 +62,10 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         $leadData = $mappedData;
         $mappedData = array();
-        foreach($leadData as $field => $value) {
-            $mappedData["properties"][] = array(
-                "property" => $field,
-                "value" => $value,
+        foreach ($leadData as $field => $value) {
+            $mappedData['properties'][] = array(
+                'property' => $field,
+                'value' => $value,
             );
         }
     }
@@ -76,8 +76,8 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getFormSettings()
     {
         return array(
-            'requires_callback'      => false,
-            'requires_authorization' => false
+            'requires_callback' => false,
+            'requires_authorization' => false,
         );
     }
     /**
@@ -107,13 +107,13 @@ class HubspotIntegration extends CrmAbstractIntegration
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadFields  = $this->getApiHelper()->getLeadFields();
+                $leadFields = $this->getApiHelper()->getLeadFields();
 
                 if (isset($leadFields)) {
                     foreach ($leadFields as $fieldInfo) {
                         $hubsFields[$fieldInfo['name']] = array(
-                            'type'     => 'string',
-                            'label'    => $fieldInfo['label']
+                            'type' => 'string',
+                            'label' => $fieldInfo['label'],
                         );
                     }
                 }
@@ -139,11 +139,14 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function isAuthorized()
     {
         $keys = $this->getKeys();
+
         return isset($keys[$this->getAuthTokenKey()]);
     }
 
-    public function getHubSpotApiKey(){
+    public function getHubSpotApiKey()
+    {
         $tokenData = $this->getKeys();
+
         return $tokenData[$this->getAuthTokenKey()];
     }
 }
