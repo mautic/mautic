@@ -67,7 +67,7 @@ class FeatureSettingsType extends AbstractType
             list ($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
 
             /**
-             * Auto Match Integration Fields with Mautic Fields
+             * Auto Match Integration Fields with Mautic Fields.
              */
             $flattenLeadFields = array();
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
@@ -76,7 +76,7 @@ class FeatureSettingsType extends AbstractType
             $fieldsIntersection = array_intersect(array_keys($fields), array_keys($flattenLeadFields));
 
             $autoMatchedFields = array();
-            foreach($fieldsIntersection as $field){
+            foreach ($fieldsIntersection as $field) {
               $autoMatchedFields[$field] = $field;
             }
 
