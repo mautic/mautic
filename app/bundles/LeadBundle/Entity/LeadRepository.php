@@ -60,8 +60,6 @@ class LeadRepository extends CommonRepository
      * Sets trigger model
      *
      * @param TriggerModel $triggerModel
-     *
-     * @return void
      */
     public function setTriggerModel(TriggerModel $triggerModel)
     {
@@ -322,7 +320,6 @@ class LeadRepository extends CommonRepository
      *
      * @param $entity
      * @param $flush
-     * @return void
      */
     public function saveEntity($entity, $flush = true)
     {
@@ -342,8 +339,6 @@ class LeadRepository extends CommonRepository
      * Persist an array of entities
      *
      * @param array $entities
-     *
-     * @return void
      */
     public function saveEntities($entities)
     {
