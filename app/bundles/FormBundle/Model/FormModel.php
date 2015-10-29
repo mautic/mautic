@@ -490,7 +490,6 @@ class FormModel extends CommonFormModel
 
                 switch ($f->getType()) {
                     case 'text':
-                    case 'email':
                         if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
                             $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
                             $formHtml = str_replace($match[0], $replace, $formHtml);
