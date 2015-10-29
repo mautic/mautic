@@ -37,7 +37,7 @@ foreach ($slots as $slot => $slotConfig) {
 
     if ($slotConfig['type'] == 'html' || $slotConfig['type'] == 'text') {
         $value = isset($content[$slot]) ? $content[$slot] : "";
-        $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.builder.addcontent')}\">{$value}</div>");
+        $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans($slotConfig['placeholder'])}\">{$value}</div>");
     }
 
     if ($slotConfig['type'] == 'slideshow') {
