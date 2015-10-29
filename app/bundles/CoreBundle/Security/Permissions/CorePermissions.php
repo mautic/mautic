@@ -214,8 +214,9 @@ class CorePermissions
                 $entity->setBundle(strtolower($bundle));
                 $entity->setName(strtolower($name));
 
-                $bit   = 0;
-                $class = $this->getPermissionObject($bundle);
+		$bit   = 0;
+		$pluginBundles = $this->getPluginBundles();
+                $class = $this->getPermissionObject($bundle, true, array_key_exists(ucfirst($bundle) . "Bundle", $pluginBundles));
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
