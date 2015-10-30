@@ -302,7 +302,7 @@ class HitRepository extends CommonRepository
         $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
 
         // Get the total number of hits
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('p.id, p.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->in('p.id', $inIds));
@@ -318,7 +318,7 @@ class HitRepository extends CommonRepository
         }
 
         // Find what sessions were bounces
-        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('b.tracking_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
             ->leftJoin('b', MAUTIC_TABLE_PREFIX.'pages', 'p', 'b.page_id = p.id')
@@ -338,15 +338,33 @@ class HitRepository extends CommonRepository
         // Include if a single hit to page or multiple hits to the same page
         $sq->having('count(distinct(b.page_id)) = 1');
 
+        // Load this data into a temporary table
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $tempTableName = $platform->getTemporaryTableName('tmp_0');
+        $sql = $platform->getCreateTemporaryTableSnippetSQL().' '.$tempTableName.' AS ('.$sq->getSQL().');';
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->execute();
+
         // Now group bounced sessions by page_id to get the number of bounces per page
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->where('h.tracking_id IN ' . sprintf('(%s)', $sq->getSQL()))
-            ->andWhere($q->expr()->in('h.page_id', $inIds))
+            ->innerJoin(
+                'h',
+                $tempTableName,
+                't',
+                $q->expr()->andx(
+                    $q->expr()->eq('h.tracking_id', 't.tracking_id'),
+                    $q->expr()->in('h.page_id', $inIds)
+                )
+            )
             ->groupBy('h.page_id');
 
         $results = $q->execute()->fetchAll();
+
+        // Drop the temporary table now
+        $stmt = $this->getEntityManager()->getConnection()->prepare($platform->getDropTemporaryTableSQL($tempTableName));
+        $stmt->execute();
 
         foreach ($results as $r) {
             $return[$r['page_id']]['bounces'] = (int) $r['bounces'];
