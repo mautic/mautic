@@ -73,7 +73,11 @@ class FeatureSettingsType extends AbstractType
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields,$fieldsWithoutGroups);
             }
-            $fieldsIntersection = array_intersect(array_keys($fields), array_keys($flattenLeadFields));
+            
+            $integrationFields  = array_keys($fields);
+            $flattenLeadFields  = array_keys($flattenLeadFields);
+            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, "strcasecmp");
+
 
             $autoMatchedFields = array();
             foreach ($fieldsIntersection as $field) {
