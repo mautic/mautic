@@ -81,12 +81,13 @@ $container->loadFromExtension('security', array(
         ),
         'main'                 => array(
             'pattern'     => "^/s/",
-            'form_login'  => array(
-                'csrf_provider' => 'form.csrf_provider',
+            'simple_form'  => array(
+                'authenticator'   => 'mautic.user.form_authenticator',
+                'csrf_provider'   => 'form.csrf_provider',
                 'success_handler' => 'mautic.security.authentication_handler',
                 'failure_handler' => 'mautic.security.authentication_handler',
-                'login_path' => '/s/login',
-                'check_path' => '/s/login_check'
+                'login_path'      => '/s/login',
+                'check_path'      => '/s/login_check'
             ),
             'logout'      => array(
                 'handlers' => array(
@@ -101,7 +102,8 @@ $container->loadFromExtension('security', array(
                 'path'     => '%mautic.rememberme_path%',
                 'domain'   => '%mautic.rememberme_domain%'
             ),
-            'context'     => 'mautic'
+            'mautic_plugin' => true,
+            'context'       => 'mautic'
         ),
         'public'               => array(
             'pattern'   => '^/',

@@ -44,7 +44,7 @@ class LogoutHandler implements LogoutHandlerInterface
 
         $dispatcher = $this->factory->getDispatcher();
         if ($dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
-            $event = new LogoutEvent($this->factory);
+            $event = new LogoutEvent($this->factory->getUser());
             $dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
         }
 

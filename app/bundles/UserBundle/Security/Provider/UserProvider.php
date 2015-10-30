@@ -9,9 +9,16 @@
 
 namespace Mautic\UserBundle\Security\Provider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -22,14 +29,13 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
  */
 class UserProvider implements UserProviderInterface
 {
-
     /**
-     * @var ObjectRepository
+     * @var UserRepository
      */
     protected $userRepository;
 
     /**
-     * @var ObjectRepository
+     * @var PermissionRepository
      */
     protected $permissionRepository;
 
@@ -39,14 +45,34 @@ class UserProvider implements UserProviderInterface
     protected $session;
 
     /**
-     * @param ObjectRepository $userRepository
-     * @param ObjectRepository $permissionRepository
-     * @param Session          $session
+     * @var EventDispatcherInterface
      */
-    public function __construct(ObjectRepository $userRepository, ObjectRepository $permissionRepository, Session $session){
+    protected $dispatcher;
+
+    /**
+     * @var EncoderFactory
+     */
+    protected $encoder;
+
+    /**
+     * @param UserRepository           $userRepository
+     * @param PermissionRepository     $permissionRepository
+     * @param Session                  $session
+     * @param EventDispatcherInterface $dispatcher
+     * @param EncoderFactory           $encoder
+     */
+    public function __construct(
+        UserRepository $userRepository,
+        PermissionRepository $permissionRepository,
+        Session $session,
+        EventDispatcherInterface $dispatcher,
+        EncoderFactory $encoder
+    ) {
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
         $this->session              = $session;
+        $this->dispatcher           = $dispatcher;
+        $this->encoder              = $encoder;
     }
 
     /**
@@ -81,9 +107,9 @@ class UserProvider implements UserProviderInterface
             }
             $user->setActivePermissions($permissions);
         }
+
         return $user;
     }
-
 
     /**
      * {@inheritdoc}
@@ -110,5 +136,48 @@ class UserProvider implements UserProviderInterface
     {
         return $this->userRepository->getClassName() === $class
         || is_subclass_of($class, $this->userRepository->getClassName());
+    }
+
+    /**
+     * @param User $user
+     */
+    public function createUserIfNotExists(User $user)
+    {
+        if (!$user->getId()) {
+            $this->updateUser($user, true);
+        }
+    }
+
+    /**
+     * @param User       $user
+     * @param bool|false $isNew
+     */
+    public function updateUser(User $user, $isNew = false)
+    {
+        // Check for plain password
+        $plainPassword = $user->getPlainPassword();
+        if ($plainPassword) {
+            // Encode plain text
+            $user->setPassword(
+                $this->encoder->getEncoder($user)->encodePassword($plainPassword, $user->getSalt())
+            );
+        } elseif (!$password = $user->getPassword()) {
+            // Generate and encode a random password
+            $user->setPassword(
+                $this->encoder->getEncoder($user)->encodePassword(EncryptionHelper::generateKey(), $user->getSalt())
+            );
+        }
+
+        $event = new UserEvent($user, $isNew);
+
+        if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
+            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+        }
+
+        $this->userRepository->saveEntity($user);
+
+        if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
+            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+        }
     }
 }

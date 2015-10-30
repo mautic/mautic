@@ -1,0 +1,67 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
+
+use OpenCloud\Common\Exceptions\RebuildError;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+
+class PluginFactory implements SecurityFactoryInterface
+{
+    /**
+     * @param ContainerBuilder $container
+     * @param                  $id
+     * @param                  $config
+     * @param                  $userProvider
+     * @param                  $defaultEntryPoint
+     *
+     * @return array
+     */
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    {
+        $providerId = 'security.authentication.provider.mautic.'.$id;
+        $container->setDefinition($providerId, new DefinitionDecorator('mautic.user.preauth_authenticator'))
+            ->replaceArgument(1, new Reference($userProvider))
+            ->replaceArgument(2, $id);
+
+
+        $listenerId = 'security.authentication.listener.mautic.'.$id;
+        $container->setDefinition($listenerId, new DefinitionDecorator('mautic.security.authentication_listener'))
+            ->replaceArgument(2, $id);
+
+        return array($providerId, $listenerId, $defaultEntryPoint);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosition()
+    {
+        return 'pre_auth';
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return 'mautic-plugin';
+    }
+
+    /**
+     * @param NodeDefinition $node
+     */
+    public function addConfiguration(NodeDefinition $node)
+    {
+    }
+}

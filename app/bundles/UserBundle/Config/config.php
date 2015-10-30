@@ -158,13 +158,40 @@ return array(
                 'factoryService' => 'mautic.permission.manager',
                 'factoryMethod'  => 'getRepository'
             ),
+            'mautic.user.form_authenticator' => array(
+                'class'  => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
+                'arguments' => array(
+                    'security.password_encoder',
+                    'event_dispatcher'
+                )
+            ),
+            'mautic.user.preauth_authenticator' => array(
+                'class'     => 'Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator',
+                'arguments' => array(
+                    'event_dispatcher',
+                    '', // providerKey
+                    '' // User provider
+                ),
+                'public'    => false
+            ),
             'mautic.user.provider'                   => array(
                 'class'     => 'Mautic\UserBundle\Security\Provider\UserProvider',
                 'arguments' => array(
                     'mautic.user.repository',
                     'mautic.permission.repository',
-                    'session'
+                    'session',
+                    'event_dispatcher',
+                    'security.encoder_factory'
                 )
+            ),
+            'mautic.security.authentication_listener' => array(
+                'class' => 'Mautic\UserBundle\Security\Firewall\AuthenticationListener',
+                'arguments' => array(
+                    'security.token_storage',
+                    'security.authentication.manager',
+                    '' // providerKey
+                ),
+                'public' => false
             ),
             'mautic.security.authentication_handler' => array(
                 'class'     => 'Mautic\UserBundle\Security\Authentication\AuthenticationHandler',

@@ -82,7 +82,10 @@ class MauticCoreExtension extends Extension
                         }
 
                         foreach ($details['arguments'] as $argument) {
-                            if (is_array($argument) || is_object($argument)) {
+                            if ($argument === '') {
+                                // To be added during compilation
+                                $definitionArguments[] = '';
+                            } elseif (is_array($argument) || is_object($argument)) {
                                 foreach ($argument as $k => &$v) {
                                     if (strpos($v, '%') === 0) {
                                         $v = $container->getParameter(substr($v, 1, -1));
@@ -106,6 +109,10 @@ class MauticCoreExtension extends Extension
                             $details['class'],
                             $definitionArguments
                         ));
+
+                        if (isset($details['public'])) {
+                            $definition->setPublic($details['public']);
+                        }
 
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
@@ -156,7 +163,10 @@ class MauticCoreExtension extends Extension
                             foreach ($details['methodCalls'] as $method => $methodArguments) {
                                 $methodCallArguments = array();
                                 foreach ($methodArguments as $argument) {
-                                    if (is_array($argument) || is_object($argument)) {
+                                    if ($argument === '') {
+                                        // To be added during compilation
+                                        $methodCallArguments[] = '';
+                                    } elseif (is_array($argument) || is_object($argument)) {
                                         foreach ($argument as $k => &$v) {
                                             if (strpos($v, '%') === 0) {
                                                 $v = $container->getParameter(substr($v, 1, -1));
