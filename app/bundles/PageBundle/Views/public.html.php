@@ -23,16 +23,6 @@ foreach ($slots as $slot => $slotConfig) {
         $slotConfig = array();
     }
 
-    // define default config if does not exist
-    if (!isset($slotConfig['type'])) {
-        $slotConfig['type'] = 'html';
-    }
-
-    if ($slotConfig['type'] == 'html' || $slotConfig['type'] == 'text') {
-	    $value = isset($content[$slot]) ? $content[$slot] : "";
-	    $view['slots']->set($slot, $value);
-	}
-
 	if ($slotConfig['type'] == 'slideshow') {
 		if (isset($content[$slot])) {
 			$options = json_decode($content[$slot], true);
@@ -76,5 +66,9 @@ foreach ($slots as $slot => $slotConfig) {
 		$options['public'] = true;
 
         $view['slots']->set($slot, $view->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+    } else {
+        // Fallback for other types like html, text, textarea and all unknown
+	    $value = isset($content[$slot]) ? $content[$slot] : "";
+	    $view['slots']->set($slot, $value);
     }
 }

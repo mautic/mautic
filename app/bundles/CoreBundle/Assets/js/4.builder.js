@@ -194,6 +194,7 @@ Mautic.closeBuilder = function(model) {
     if (Mautic.builderMode == 'template') {
         // Save content
         var editors = Mautic.getBuilderEditorInstance();
+        var fields  = Mautic.getBuilderEditorFields();
         var content = {};
 
         var builderContents = mQuery('#builder-template-content').contents();
@@ -207,6 +208,13 @@ Mautic.closeBuilder = function(model) {
         mQuery.each(editors, function (slot, editor) {
             slot = slot.replace("slot-", "");
             content[slot] = editor.getData();
+        });
+
+        // Get the content of each field
+        mQuery.each(fields, function (key, field) {
+            field = mQuery(field);
+            slot = field.attr('id').replace("slot-", "");
+            content[slot] = field.val();
         });
 
         Mautic.saveBuilderContent(model, builderContents.find('#builder_entity_id').val(), content, function (response) {
@@ -364,6 +372,18 @@ Mautic.getBuilderEditorInstance = function (id) {
     } else {
         return editors;
     }
+};
+
+/**
+ * Get ckeditor instance
+ *
+ * @param id
+ * @returns {*}
+ */
+Mautic.getBuilderEditorFields = function (id) {
+    return (Mautic.builderMode == 'template') ?
+        mQuery('#builder-template-content').contents().find('input.mautic-editable, textarea.mautic-editable') :
+        [];
 };
 
 /**
