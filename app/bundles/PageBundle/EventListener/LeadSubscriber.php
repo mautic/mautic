@@ -40,7 +40,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'page.hit';
+        $eventTypeKey  = 'page.hit';
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
@@ -69,26 +69,72 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the hits to the event array
         foreach ($hits as $hit) {
+            $template      = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+            $eventLabel    = $eventTypeName;
+
             if ($hit['source'] && $hit['sourceId']) {
-                $sourceModel = $this->factory->getModel($hit['source'] . '.' . $hit['source']);
-                $sourceEntity = $sourceModel->getEntity($hit['sourceId']);
-                if (method_exists($sourceEntity, 'getName')) {
-                    $hit['sourceName'] = $sourceEntity->getName();
+                $sourceModel = false;
+                try {
+                    $sourceModel = $this->factory->getModel($hit['source']);
+                } catch (\Exception $exception) {
+                    // Try a plugin
+
+                    try {
+                        $sourceModel = $this->factory->getModel('plugin.'.$hit['source']);
+                    } catch (\Exception $exception) {
+                        // No model found
+                    }
                 }
-                if (method_exists($sourceEntity, 'getTitle')) {
-                    $hit['sourceName'] = $sourceEntity->getTitle();
+
+                if ($sourceModel) {
+                    try {
+                        $sourceEntity = $sourceModel->getEntity($hit['sourceId']);
+                        if (method_exists($sourceEntity, $sourceModel->getNameGetter())) {
+                            $hit['sourceName'] = $sourceEntity->{$sourceModel->getNameGetter()}();
+                        }
+
+                        $baseRouteName = str_replace('.', '_', $hit['source']);
+                        if (method_exists($sourceModel, 'getActionRouteBase')) {
+                            $baseRouteName = $sourceModel->getActionRouteBase();
+                        }
+                        $routeSourceName = 'mautic_'.$baseRouteName.'_action';
+
+                        if ($this->factory->getRouter()->getRouteCollection()->get($routeSourceName) !== null) {
+                            $hit['sourceRoute'] = $this->factory->getRouter()->generate(
+                                $routeSourceName,
+                                array(
+                                    'objectAction' => 'view',
+                                    'objectId'     => $hit['sourceId']
+                                )
+                            );
+                        }
+
+                        // Allow a custom template if applicable
+                        if (method_exists($sourceModel, 'getPageHitLeadTimelineTemplate')) {
+                            $template = $sourceModel->getPageHitLeadTimelineTemplate($hit);
+                        }
+
+                        if (method_exists($sourceModel, 'getPageHitLeadTimelineLabel')) {
+                            $eventLabel = $sourceModel->getPageHitLeadTimelineLabel($hit);
+                        }
+                    } catch (\Exception $exception) {
+                        // Not found
+                    }
                 }
             }
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $hit['dateHit'],
-                'extra'     => array(
-                    'page' => $model->getEntity($hit['page_id']),
-                    'hit'  => $hit
-                ),
-                'contentTemplate' => 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php'
-            ));
+
+            $event->addEvent(
+                array(
+                    'event'           => $eventTypeKey,
+                    'eventLabel'      => $eventLabel,
+                    'timestamp'       => $hit['dateHit'],
+                    'extra'           => array(
+                        'page' => $model->getEntity($hit['page_id']),
+                        'hit'  => $hit
+                    ),
+                    'contentTemplate' => $template
+                )
+            );
         }
     }
 
@@ -105,7 +151,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {

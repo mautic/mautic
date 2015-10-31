@@ -16,7 +16,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
        'new'    => $permissions[$bundle.':categories:create']
     ),
     'routeBase' => 'category',
-    'query'     => array('bundle' => $bundle),
+    'query'     => array('bundle' => $bundle, 'show_bundle_select' => true),
     'editMode'  => 'ajaxmodal',
     'editAttr'  => 'data-target="#MauticSharedModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"'
 )));
@@ -31,6 +31,13 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
         'searchValue' => $searchValue,
         'searchHelp'  => 'mautic.category.help.searchcommands',
+        'filters'     => array(
+            'bundle' => array(
+                'options' => $categoryTypes,
+                'values'  => array($bundle),
+                'translateLabels' => true
+            )
+        ),
         'action'      => $currentRoute,
         'routeBase'   => 'category',
         'templateButtons' => array(
@@ -40,6 +47,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             'bundle' => $bundle
         )
     )); ?>
+
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>

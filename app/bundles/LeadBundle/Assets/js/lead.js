@@ -183,6 +183,14 @@ Mautic.leadlistOnLoad = function(container) {
     }
 
     if (mQuery('#leadlist_filters').length) {
+        mQuery('#available_filters').on('change', function() {
+            if (mQuery(this).val()) {
+                Mautic.addLeadListFilter(mQuery(this).val());
+                mQuery(this).val('');
+                mQuery(this).trigger('chosen:updated');
+            }
+        });
+
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
                 mQuery(this).closest('.panel').animate(
@@ -218,6 +226,12 @@ Mautic.convertLeadFilterInput = function(el) {
     var filterNum = matches[1];
     var filterId  = '#leadlist_filters_' + filterNum + '_filter';
 
+    // Reset has-error
+    if (mQuery(filterId).parent().hasClass('has-error')) {
+        mQuery(filterId).parent().find('div.help-block').hide();
+        mQuery(filterId).parent().removeClass('has-error');
+    }
+
     var disabled = (operator == 'empty' || operator == '!empty') ? true : false;
     mQuery(filterId).prop('disabled', disabled);
 
@@ -226,8 +240,9 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     if (mQuery(filterId).is('select')) {
-        var isMultiple = mQuery(filterId).attr('multiple');
-        var multiple   = (operator == 'in' || operator == '!in') ? true : false;
+        var isMultiple  = mQuery(filterId).attr('multiple');
+        var multiple    = (operator == 'in' || operator == '!in') ? true : false;
+        var placeholder = mQuery(filterId).attr('data-placeholder');
 
         if (multiple && !isMultiple) {
             mQuery(filterId).attr('multiple', 'multiple');
@@ -236,11 +251,7 @@ Mautic.convertLeadFilterInput = function(el) {
             var newName =  mQuery(filterId).attr('name') + '[]';
             mQuery(filterId).attr('name', newName);
 
-            // Destroy the chosen and recreate
-            mQuery(filterId).chosen('destroy');
-            mQuery(filterId).chosen({
-                width: "100%"
-            });
+            placeholder = mauticLang['chosenChooseMore'];
         } else if (!multiple && isMultiple) {
             mQuery(filterId).removeAttr('multiple');
 
@@ -248,21 +259,34 @@ Mautic.convertLeadFilterInput = function(el) {
             var newName =  mQuery(filterId).attr('name').replace(/[\[\]']+/g,'')
             mQuery(filterId).attr('name', newName);
 
-            // Destroy the chosen and recreate
-            mQuery(filterId).chosen('destroy');
-            mQuery(filterId).chosen({
-                width: "100%",
-                allow_single_deselect: true
-            });
+            placeholder = mauticLang['chosenChooseOne'];
         }
 
-        mQuery(filterId).trigger('chosen:updated');
+        if (multiple) {
+            // Remove empty option
+            mQuery(filterId).find('option[value=""]').remove();
+
+            // Make sure none are selected
+            mQuery(filterId + ' option:selected').removeAttr('selected');
+        } else {
+            // Add empty option
+            mQuery(filterId).prepend("<option value='' selected></option>");
+        }
+
+        // Destroy the chosen and recreate
+        if (mQuery(filterId + '_chosen').length) {
+            mQuery(filterId).chosen('destroy');
+        }
+
+        mQuery(filterId).attr('data-placeholder', placeholder);
+
+        Mautic.activateChosenSelect(mQuery(filterId));
     }
 };
 
 Mautic.addLeadListFilter = function (elId) {
     var filterId = '#available_' + elId;
-    var label    = mQuery(filterId + ' span.leadlist-filter-name').text();
+    var label    = mQuery(filterId).text();
 
     //create a new filter
 
@@ -324,14 +348,9 @@ Mautic.addLeadListFilter = function (elId) {
             var fieldOptions = mQuery(filterId).data("field-list");
 
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(val).text(val).appendTo(filterEl);
+                mQuery('<option>').val(index).text(val).appendTo(filterEl);
             });
         }
-        mQuery(filter).attr('data-placeholder', label);
-        mQuery(filter).chosen({
-            width: "100%",
-            allow_single_deselect: true
-        });
     } else if (fieldType == 'lookup') {
         var fieldCallback = mQuery(filterId).data("field-callback");
         if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
@@ -473,10 +492,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-/**
- *
- * @param label
- */
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
         mQuery(el).val()
@@ -897,4 +912,59 @@ Mautic.leadBatchSubmit = function() {
     mQuery('#MauticSharedModal').modal('hide');
 
     return false;
+};
+
+Mautic.updateLeadFieldValues = function (field) {
+    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
+
+    field = mQuery(field);
+    var fieldAlias = field.val();
+    Mautic.ajaxActionRequest('lead:updateLeadFieldValues', {'alias': fieldAlias}, function(response) {
+        if (typeof response.options != 'undefined') {
+            var valueField = mQuery('#campaignevent_properties_value');
+            var valueFieldAttrs = {
+                'class': valueField.attr('class'),
+                'id': valueField.attr('id'),
+                'name': valueField.attr('name'),
+                'autocomplete': valueField.attr('autocomplete'),
+                'value': valueField.attr('value')
+            };
+
+            if (!mQuery.isEmptyObject(response.options)) {
+                var newValueField = mQuery('<select/>')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                mQuery.each(response.options, function(optionKey, optionVal) {
+                    var option = mQuery("<option/>")
+                        .attr('value', optionKey)
+                        .text(optionVal);
+                    newValueField.append(option);
+                });
+                valueField.replaceWith(newValueField);
+            } else {
+                var newValueField = mQuery('<input/>')
+                    .attr('type', 'text')
+                    .attr('class', valueFieldAttrs['class'])
+                    .attr('id', valueFieldAttrs['id'])
+                    .attr('name', valueFieldAttrs['name'])
+                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                    .attr('value', valueFieldAttrs['value']);
+                valueField.replaceWith(newValueField);
+            }
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.toggleTimelineMoreVisiblity = function(el) {
+    if (mQuery(el).is(':visible')) {
+        mQuery(el).slideUp('fast');
+        mQuery(el).next().text(mauticLang['showMore']);
+    } else {
+        mQuery(el).slideDown('fast');
+        mQuery(el).next().text(mauticLang['hideMore']);
+    }
 };

@@ -119,10 +119,10 @@ class LeadRepository extends CommonRepository
         }
 
         $q = $this->_em->getConnection()->createQueryBuilder()
-        ->select('l.id')
-        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-        ->where("$col = :search")
-        ->setParameter("search", $value);
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where("$col = :search")
+            ->setParameter("search", $value);
 
         if ($ignoreId) {
             $q->andWhere('l.id != :ignoreId')
@@ -143,8 +143,8 @@ class LeadRepository extends CommonRepository
             $q->where(
                 $q->expr()->in('l.id', ':ids')
             )
-            ->setParameter('ids', $ids)
-            ->orderBy('l.dateAdded', 'DESC');
+                ->setParameter('ids', $ids)
+                ->orderBy('l.dateAdded', 'DESC');
             $results = $q->getQuery()->getResult();
 
             /** @var Lead $lead */
@@ -489,18 +489,9 @@ class LeadRepository extends CommonRepository
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(l.id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
         $this->buildWhereClause($dq, $args);
 
-         // Why is this here?
-        $dq->andWhere(
-            $dq->expr()->orX(
-                $dq->expr()->isNull('ll.manually_removed'),
-                $dq->expr()->eq('ll.manually_removed', ':false')
-            )
-        )
-            ->setParameter('false', false, 'boolean');
         //get a total count
         $result = $dq->execute()->fetchAll();
         $total  = $result[0]['count'];
@@ -516,6 +507,7 @@ class LeadRepository extends CommonRepository
         //loop over results to put fields in something that can be assigned to the entities
         $fieldValues = array();
         $groups      = array('core', 'social', 'personal', 'professional');
+
         foreach ($results as $result) {
             $leadId = $result['id'];
             //unset all the columns that are not fields
@@ -535,6 +527,7 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
+
         unset($results, $fields);
 
         //get an array of IDs for ORM query
@@ -741,12 +734,39 @@ class LeadRepository extends CommonRepository
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
                 //obtain the list details
                 $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($string);
+
                 if (!empty($list)) {
-                    $expr = $q->expr()->eq('ll.leadlist_id', (int) $list->getId());
+                    $listId = (int) $list->getId();
                 } else {
                     //force a bad expression as the list doesn't exist
-                    $expr = $q->expr()->eq('ll.leadlist_id', 0);
+                    $listId = 0;
                 }
+
+                $sq = $this->_em->getConnection()->createQueryBuilder()
+                    ->select('ll.lead_id')
+                    ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
+
+                $sq->where(
+                    $sq->expr()->andX(
+                        $sq->expr()->eq('ll.leadlist_id', $listId),
+                        $sq->expr()->orX(
+                            $sq->expr()->isNull('ll.manually_removed'),
+                            $sq->expr()->eq('ll.manually_removed', ':false')
+                        )
+                    )
+                )
+                    ->setParameter('false', false, 'boolean');
+                $results = $sq->execute()->fetchAll();
+
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                if (!count($leadIds)) {
+                    $leadIds[] = 0;
+                }
+                $expr = $q->expr()->in('l.id', $leadIds);
+
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ip'):
                 // search by IP
@@ -795,7 +815,9 @@ class LeadRepository extends CommonRepository
                 $expr = $q->expr()->$likeFunc('LOWER(l.company)', ":$unique");
                 break;
             default:
-                $expr = $q->expr()->$likeFunc('LOWER(l.' . $command .')', ":$unique");
+                if (in_array($command, $this->availableSearchFields)) {
+                    $expr = $q->expr()->$likeFunc('LOWER(l.'.$command.')', ":$unique");
+                }
                 break;
         }
 
@@ -842,9 +864,9 @@ class LeadRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-       return array(
-           array('l.last_active', 'DESC')
-       );
+        return array(
+            array('l.last_active', 'DESC')
+        );
     }
 
     /**
@@ -858,29 +880,6 @@ class LeadRepository extends CommonRepository
         $fields = array('last_active' => $dt->toUtcString());
 
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $leadId));
-    }
-
-    /**
-     * Grabs a random lead
-     */
-    public function getRandomLead()
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('*')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->neq('l.firstname', $q->expr()->literal('')),
-                    $q->expr()->neq('l.lastname', $q->expr()->literal('')),
-                    $q->expr()->neq('l.email', $q->expr()->literal(''))
-                )
-            )
-            ->orderBy('l.last_active');
-        $q->setMaxResults(1);
-
-        $result = $q->execute()->fetchAll();
-
-        return (count($result)) ? $result[0] : null;
     }
 
     /**

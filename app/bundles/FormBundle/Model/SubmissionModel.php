@@ -343,6 +343,7 @@ class SubmissionModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model      = $this->factory->getModel('lead');
         $em         = $this->factory->getEntityManager();
+        $logger     = $this->factory->getLogger();
 
         //set the mapped data
         $leadFields = $this->factory->getModel('lead.field')->getRepository()->getAliases(null, true, false);
@@ -353,6 +354,8 @@ class SubmissionModel extends CommonFormModel
             $lead          = $model->getCurrentLead();
             $leadId        = $lead->getId();
             $currentFields = $model->flattenFields($lead->getFields());
+
+            $logger->debug('FORM: Not in kiosk mode so using current lead ID #' . $lead->getId());
         } else {
             // Default to a new lead in kiosk mode
             $lead = new Lead();
@@ -360,6 +363,8 @@ class SubmissionModel extends CommonFormModel
             $currentFields = $leadFieldMatches;
 
             $leadId = null;
+
+            $logger->debug('FORM: In kiosk mode so assuming a new lead');
         }
 
         $uniqueLeadFields = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
@@ -386,16 +391,26 @@ class SubmissionModel extends CommonFormModel
 
         // Closure to help search for a conflict
         $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
-            // Find conflicts
-            $diff = array_diff($fieldSet1, $fieldSet2);
-            // Remove empty values
-            $diff = array_filter($diff);
+            // Find fields in both sets
+            $potentialConflicts = array_keys(
+                array_diff_key($fieldSet1, $fieldSet2)
+            );
 
-            return (count($diff));
+            $conflicts = array();
+            foreach ($potentialConflicts as $field) {
+                if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
+                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
+                        $conflicts[] = $field;
+                    }
+                }
+            }
+
+            return array(count($conflicts), $conflicts);
         };
 
         // Get data for the form submission
         list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        $logger->debug('FORM: Unique fields submitted include ' . implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
@@ -403,20 +418,33 @@ class SubmissionModel extends CommonFormModel
 
         $uniqueFieldsCurrent = $getData($currentFields, true);
         if (count($leads)) {
+            $logger->debug(count($leads) . ' found based on unique identifiers');
+
             /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
             $foundLead = $leads[0];
+
+            $logger->debug('FORM: Testing lead ID# ' . $foundLead->getId() . ' for conflicts');
 
             // Check for a conflict with the currently tracked lead
             $foundLeadFields =  $model->flattenFields($foundLead->getFields());
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound = $getData($foundLeadFields, true);
-            $hasConflict       = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
                 $lead = $foundLead;
+
+                if ($hasConflict) {
+                    $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' so not merging');
+                } else {
+                    $logger->debug('FORM: In kiosk mode so not merging');
+                }
+
             } else {
+                $logger->debug('FORM: Merging leads ' . $lead->getId() . ' and ' . $foundLead->getId());
+
                 // Merge the found lead with currently tracked lead
                 $lead = $model->mergeLeads($lead, $foundLead);
             }
@@ -428,11 +456,16 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Check for conflicts with the submitted data and the currently tracked lead
-            $hasConflict = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+
+            $logger->debug('FORM: Current unique lead fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
+
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);
+
+                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked lead and submitted data so assuming a new lead');
             }
         }
 
@@ -443,15 +476,15 @@ class SubmissionModel extends CommonFormModel
         if ($lead->isNewlyCreated()) {
             if (!$inKioskMode) {
                 $lead->addIpAddress($ipAddress);
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
             }
-
-            // last active time
-            $lead->setLastActive(new \DateTime());
 
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
+
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
             }
         }
 
@@ -462,6 +495,9 @@ class SubmissionModel extends CommonFormModel
             $event->setIpAddress($ipAddress);
             $lead->addPointsChangeLog($event);
         }
+
+        // last active time
+        $lead->setLastActive(new \DateTime());
 
         //create a new lead
         $model->saveEntity($lead, false);
@@ -518,7 +554,7 @@ class SubmissionModel extends CommonFormModel
                         $translator->trans('mautic.form.result.thead.referrer')
                     );
                     foreach ($fields as $f) {
-                        if (in_array($f->getType(), array('button', 'freetext')))
+                        if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
                             continue;
                         $header[] = $f->getLabel();
                     }
@@ -589,7 +625,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.referrer')
                         );
                         foreach ($fields as $f) {
-                            if (in_array($f->getType(), array('button', 'freetext')))
+                            if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
                                 continue;
                             $header[] = $f->getLabel();
                         }

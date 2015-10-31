@@ -19,7 +19,9 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -203,7 +205,7 @@ class Email extends FormEntity
     }
 
     /**
-     *
+     * Clear stats
      */
     public function clearStats()
     {
@@ -211,7 +213,7 @@ class Email extends FormEntity
     }
 
     /**
-     *
+     * Clear variants
      */
     public function clearVariants()
     {
@@ -361,8 +363,7 @@ class Email extends FormEntity
             'name',
             new NotBlank(
                 array(
-                    'message' => 'mautic.core.name.required',
-                    'groups'  => array('General')
+                    'message' => 'mautic.core.name.required'
                 )
             )
         );
@@ -371,8 +372,7 @@ class Email extends FormEntity
             'fromAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required',
-                    'groups'  => array('General')
+                    'message' => 'mautic.core.email.required'
                 )
             )
         );
@@ -381,8 +381,7 @@ class Email extends FormEntity
             'replyToAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required',
-                    'groups'  => array('General')
+                    'message' => 'mautic.core.email.required'
                 )
             )
         );
@@ -391,41 +390,41 @@ class Email extends FormEntity
             'bccAddress',
             new \Symfony\Component\Validator\Constraints\Email(
                 array(
-                    'message' => 'mautic.core.email.required',
-                    'groups'  => array('General')
+                    'message' => 'mautic.core.email.required'
                 )
             )
         );
 
-        $metadata->addPropertyConstraint(
-            'lists',
-            new LeadListAccess(
-                array(
-                    'message' => 'mautic.lead.lists.required',
-                    'groups'  => array('List')
-                )
-            )
-        );
+        $metadata->addConstraint(new Callback(array(
+            'callback' => function ($email, ExecutionContextInterface $context) {
+                $type = $email->getEmailType();
+                if ($type == 'list') {
+                    $validator  = $context->getValidator();
+                    $violations = $validator->validate(
+                        $email->getLists(),
+                        array(
+                            new LeadListAccess(
+                                array(
+                                    'message' => 'mautic.lead.lists.required'
+                                )
+                            ),
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.lead.lists.required'
+                                )
+                            )
+                        )
+                    );
 
-        $metadata->addPropertyConstraint(
-            'lists',
-            new NotBlank(
-                array(
-                    'message' => 'mautic.lead.lists.required',
-                    'groups'  => array('List')
-                )
-            )
-        );
-    }
-
-    /**
-     * @param \Symfony\Component\Form\Form $form
-     *
-     * @return array
-     */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
-    {
-        return ($form->getData()->getEmailType() == 'list') ? array('General', 'List') : array('General');
+                    if (count($violations) > 0) {
+                        $string = (string) $violations;
+                        $context->buildViolation($string)
+                            ->atPath('lists')
+                            ->addViolation();
+                    }
+                }
+            }
+        )));
     }
 
     /**
@@ -1063,30 +1062,6 @@ class Email extends FormEntity
     }
 
     /**
-     * Increase sent counts by one
-     */
-    public function upSentCounts ()
-    {
-        $this->sentCount++;
-        if (!empty($this->variantStartDate)) {
-            $this->variantSentCount++;
-        }
-    }
-
-    /**
-     * Decrease sent counts by one
-     */
-    public function downSentCounts ()
-    {
-        if ($this->sentCount) {
-            $this->sentCount--;
-            if (!empty($this->variantStartDate) && $this->variantSentCount) {
-                $this->variantSentCount--;
-            }
-        }
-    }
-
-    /**
      * @return mixed
      */
     public function getVariantReadCount ()
@@ -1188,7 +1163,6 @@ class Email extends FormEntity
         return $this;
     }
 
-
     /**
      * Add asset
      *
@@ -1222,5 +1196,4 @@ class Email extends FormEntity
     {
         return $this->assetAttachments;
     }
-
 }

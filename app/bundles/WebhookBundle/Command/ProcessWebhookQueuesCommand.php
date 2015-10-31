@@ -33,9 +33,19 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:webhooks:process')
-            ->setDescription('Process queued webhook payloads');
-
-
+            ->setAliases(
+                array(
+                    'mautic:process:webhooks'
+                )
+            )
+            ->setDescription('Process queued webhook payloads')
+            ->addOption(
+                '--webhook-id',
+                '-i',
+                InputOption::VALUE_OPTIONAL,
+                'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
+                null
+            );
     }
 
     /**
@@ -49,29 +59,34 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 
         // check to make sure we are in queue mode
         if ($queueMode != 'command_process') {
-            $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change the command mode.');
+            $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
             return 0;
         }
 
-        $options = $input->getOptions();
+        $id = $input->getOption('webhook-id');
 
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model = $this->factory->getModel('webhook.webhook');
+        $model = $this->factory->getModel('webhook');
 
-        // make sure we only get published webhook entities
-        $webhooks = $model->getEntities(
-            array(
-                'filter' => array(
-                  'force' => array(
-                    array(
-                        'column' => 'e.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => 1
+        if ($id) {
+            $webhook  = $model->getEntity($id);
+            $webhooks = ($webhook !== null && $webhook->isPublished()) ? array($id => $webhook) : array();
+        } else {
+            // make sure we only get published webhook entities
+            $webhooks = $model->getEntities(
+                array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'e.isPublished',
+                                'expr'   => 'eq',
+                                'value'  => 1
+                            )
+                        )
                     )
                 )
-              )
-            )
-        );
+            );
+        }
 
         if (!count ($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');

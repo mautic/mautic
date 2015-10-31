@@ -348,8 +348,9 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param array                      $filter
+     * @param      $q
+     * @param      $filter
+     * @param null $parameterName
      *
      * @return array
      */
@@ -398,6 +399,17 @@ class CommonRepository extends EntityRepository
                 $expr = $q->expr()->{$func}($filter['column']);
             } elseif (in_array($func, array('in', 'notIn'))) {
                 $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
+            } elseif (in_array($func, array('like', 'notLike'))) {
+                if (isset($filter['strict']) && !$filter['strict']) {
+                    if (is_numeric($filter['value'])) {
+                        // Postgres doesn't like using "LIKE" with numbers
+                        $func = ($func == 'like') ? 'eq' : 'neq';
+                    } else {
+                        $filter['value'] = "%{$filter['value']}%";
+                    }
+                }
+                $expr      = $q->expr()->{$func}($filter['column'], ':'.$unique);
+                $parameter = array($unique => $filter['value']);
             } else {
                 if (isset($filter['strict']) && !$filter['strict']) {
                     $filter['value'] = "%{$filter['value']}%";

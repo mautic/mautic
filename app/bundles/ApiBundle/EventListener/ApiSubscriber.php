@@ -13,6 +13,9 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\ApiBundle\Event as Events;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Class ApiSubscriber
@@ -26,9 +29,41 @@ class ApiSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
+            KernelEvents::REQUEST                 => array('onKernelRequest', 0),
+            ApiEvents::CLIENT_POST_SAVE           => array('onClientPostSave', 0),
+            ApiEvents::CLIENT_POST_DELETE         => array('onClientDelete', 0)
         );
+    }
+
+    /**
+     * Check for API requests and throw denied access if API is disabled
+     *
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
+        $apiEnabled = $this->factory->getParameter('api_enabled');
+        $request    = $event->getRequest();
+        $requestUrl = $request->getRequestUri();
+
+        // Check if /oauth or /api
+        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
+
+        if ($isApiRequest && !$apiEnabled) {
+
+            throw new AccessDeniedHttpException(
+                $this->factory->getTranslator()->trans(
+                    'mautic.core.url.error.401',
+                    array(
+                        '%url%' => $request->getRequestUri()
+                    )
+                )
+            );
+        }
     }
 
     /**

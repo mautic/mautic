@@ -1186,10 +1186,11 @@ class CampaignController extends FormController
     private function setSessionSources($id, $sources)
     {
         $session = $this->factory->getSession();
-
         foreach ($sources as $type => &$typeSources) {
-            $typeSources = array_keys($typeSources);
-            $typeSources = array_combine($typeSources, $typeSources);
+            if (!empty($typeSources)) {
+                $typeSources = array_keys($typeSources);
+                $typeSources = array_combine($typeSources, $typeSources);
+            }
         }
 
         $session->set('mautic.campaign.'.$id.'.leadsources.current', $sources);

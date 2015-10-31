@@ -252,7 +252,7 @@ class AssetRepository extends CommonRepository
             ->where('id = ' . (int) $id);
 
         if ($unique) {
-            $q->set('unique_download_count', 'unique_download_count + ' + (int) $increaseBy);
+            $q->set('unique_download_count', 'unique_download_count + ' . (int) $increaseBy);
         }
 
         $q->execute();

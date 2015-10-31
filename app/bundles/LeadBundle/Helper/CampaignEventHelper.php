@@ -147,4 +147,28 @@ class CampaignEventHelper
 
         return true;
     }
+
+    /**
+     * Determine if this campaign applies
+     *
+     * @param $eventDetails
+     * @param $event
+     *
+     * @return bool
+     */
+    public static function validateFormValue(MauticFactory $factory, $event, Lead $lead)
+    {
+        if (!$lead || !$lead->getId()) {
+            return false;
+        }
+
+        $operators = $factory->getModel('lead')->getFilterExpressionFunctions();
+
+        return $factory->getModel('lead.field')->getRepository()->compareValue(
+            $lead->getId(),
+            $event['properties']['field'],
+            $event['properties']['value'],
+            $operators[$event['properties']['operator']]['expr']
+        );
+    }
 }
