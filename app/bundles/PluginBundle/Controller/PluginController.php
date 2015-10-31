@@ -463,7 +463,7 @@ class PluginController extends FormController
         }
 
         // Alert the user to the number of additions
-        $this->addFlash(
+        $this->addTranslatedFlash(
             'mautic.plugin.notice.reloaded',
             array(
                 '%added%'    => $added,

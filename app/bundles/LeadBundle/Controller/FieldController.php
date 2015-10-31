@@ -152,7 +152,7 @@ class FieldController extends FormController
                             //form is valid so process the data
                             $model->saveEntity($field);
 
-                            $this->addFlash('mautic.core.notice.created', array(
+                            $this->addTranslatedFlash('mautic.core.notice.created', array(
                                 '%name%'      => $field->getLabel(),
                                 '%menu_link%' => 'mautic_leadfield_index',
                                 '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
@@ -265,7 +265,7 @@ class FieldController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
 
-                        $this->addFlash('mautic.core.notice.updated',  array(
+                        $this->addTranslatedFlash('mautic.core.notice.updated',  array(
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_leadfield_index',
                             '%url%'       => $this->generateUrl('mautic_leadfield_action', array(

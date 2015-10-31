@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0fc2d12807f7d94b91d89968547ccba4",
-    "content-hash": "607c6aa015b6c9804ffa0546f036c94e",
+    "hash": "c3c2078adae0fa156b4f1eb6b0f18c12",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -882,7 +881,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/d196ddc229f50c66c5a015c158adb78a2dfb4351",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/68cc7bf629a7c1fc0696e583cc8ed46f897d0afb",
                 "reference": "65978aa4e9ffca3bb632225ad8c6320077d80d85",
                 "shasum": ""
             },
@@ -1613,7 +1612,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/46bb11dd95e3546e048d2d5a083cb427cb289b87",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/a63cd330588eff18f6deb0251fd142d2c1fe30b6",
                 "reference": "c49628cfc8b8ce7404665b4e6528487d780e7d68",
                 "shasum": ""
             },
@@ -1969,7 +1968,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/f8c6b24a846e3713899f02e72604a78d80bb1b37",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/a07920b10a3b888abe7c47c7aecf56f69553f707",
                 "reference": "2a2e1295c8f39f39875343934af159957bcdcc06",
                 "shasum": ""
             },
@@ -3129,34 +3128,34 @@
         },
         {
             "name": "symfony/framework-bundle",
-            "version": "v2.5.10",
+            "version": "v2.6.11",
             "target-dir": "Symfony/Bundle/FrameworkBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/framework-bundle.git",
-                "reference": "e5f241acd9b89840552461a492dafd8708cf2f39"
+                "reference": "df5462c60ada7f967b0696382236ded914f4a17f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/e5f241acd9b89840552461a492dafd8708cf2f39",
-                "reference": "e5f241acd9b89840552461a492dafd8708cf2f39",
+                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/df5462c60ada7f967b0696382236ded914f4a17f",
+                "reference": "df5462c60ada7f967b0696382236ded914f4a17f",
                 "shasum": ""
             },
             "require": {
                 "doctrine/annotations": "~1.0",
                 "php": ">=5.3.3",
                 "symfony/config": "~2.4",
-                "symfony/dependency-injection": "~2.3,>=2.3.3",
+                "symfony/dependency-injection": "~2.6,>=2.6.2",
                 "symfony/event-dispatcher": "~2.5",
                 "symfony/filesystem": "~2.3",
                 "symfony/http-foundation": "~2.4.9|~2.5,>=2.5.4",
-                "symfony/http-kernel": "~2.5,>=2.5.7",
-                "symfony/routing": "~2.2",
-                "symfony/security-core": "~2.4",
-                "symfony/security-csrf": "~2.4",
+                "symfony/http-kernel": "~2.6",
+                "symfony/routing": "~2.3.26|~2.6,>=2.6.5",
+                "symfony/security-core": "~2.6",
+                "symfony/security-csrf": "~2.6",
                 "symfony/stopwatch": "~2.3",
                 "symfony/templating": "~2.1",
-                "symfony/translation": "~2.3,>=2.3.19"
+                "symfony/translation": "~2.6"
             },
             "require-dev": {
                 "symfony/browser-kit": "~2.4",
@@ -3164,12 +3163,13 @@
                 "symfony/console": "~2.5,>=2.5.2",
                 "symfony/css-selector": "~2.0,>=2.0.5",
                 "symfony/dom-crawler": "~2.0,>=2.0.5",
-                "symfony/expression-language": "~2.4",
+                "symfony/expression-language": "~2.6",
                 "symfony/finder": "~2.0,>=2.0.5",
-                "symfony/form": "2.5.*",
+                "symfony/form": "~2.6,>=2.6.10",
                 "symfony/intl": "~2.3",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/process": "~2.0,>=2.0.5",
-                "symfony/security": "~2.4",
+                "symfony/security": "~2.6",
                 "symfony/validator": "~2.5",
                 "symfony/yaml": "~2.0,>=2.0.5"
             },
@@ -3179,12 +3179,12 @@
                 "symfony/finder": "For using the translation loader and cache warmer",
                 "symfony/form": "For using forms",
                 "symfony/validator": "For using validation",
-                "symfony/yaml": "For using the config:debug and yaml:lint commands"
+                "symfony/yaml": "For using the debug:config and yaml:lint commands"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -3198,17 +3198,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony FrameworkBundle",
-            "homepage": "http://symfony.com",
-            "time": "2015-02-01 09:36:16"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-22 10:08:40"
         },
         {
             "name": "symfony/http-foundation",
@@ -4515,7 +4515,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/4d9114d49796b23b599d4b7cb63f8d8a918a6d44",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/a824aeda55a370ba21740a6464eed38c93f06dd0",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },
@@ -4858,17 +4858,17 @@
         },
         {
             "name": "symfony/web-profiler-bundle",
-            "version": "v2.5.10",
+            "version": "v2.6.11",
             "target-dir": "Symfony/Bundle/WebProfilerBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/web-profiler-bundle.git",
-                "reference": "cc2c3c38c26f69b25c0ce8ca8ba2ebf8e231a210"
+                "reference": "efb04b45aacd1dd39fb814065870074784043758"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/cc2c3c38c26f69b25c0ce8ca8ba2ebf8e231a210",
-                "reference": "cc2c3c38c26f69b25c0ce8ca8ba2ebf8e231a210",
+                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/efb04b45aacd1dd39fb814065870074784043758",
+                "reference": "efb04b45aacd1dd39fb814065870074784043758",
                 "shasum": ""
             },
             "require": {
@@ -4881,12 +4881,13 @@
                 "symfony/config": "~2.2",
                 "symfony/console": "~2.3",
                 "symfony/dependency-injection": "~2.2",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/stopwatch": "~2.2"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -4900,17 +4901,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony WebProfilerBundle",
-            "homepage": "http://symfony.com",
-            "time": "2015-01-06 17:40:45"
+            "homepage": "https://symfony.com",
+            "time": "2015-06-01 09:10:59"
         },
         {
             "name": "twig/twig",

@@ -168,11 +168,11 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $this->addTranslatedFlash('mautic.core.could.not.set.language');
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.created',  array(
+                    $this->addTranslatedFlash('mautic.core.notice.created', array(
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', array(
@@ -289,11 +289,11 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $this->addTranslatedFlash('mautic.core.could.not.set.language');
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.updated',  array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated',  array(
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', array(
@@ -472,7 +472,7 @@ class UserController extends FormController
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
-                    $this->addFlash('mautic.user.user.notice.messagesent', array('%name%' => $user->getName()));
+                    $this->addTranslatedFlash('mautic.user.user.notice.messagesent', array('%name%' => $user->getName()));
                 }
             }
             if ($cancelled || $valid) {

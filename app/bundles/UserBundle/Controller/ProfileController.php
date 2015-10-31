@@ -154,7 +154,7 @@ class ProfileController extends FormController
                         if ($fetchLanguage['error']) {
                             $me->setLocale(null);
                             $model->saveEntity($me);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $this->addTranslatedFlash('mautic.core.could.not.set.language');
                         }
                     }
 

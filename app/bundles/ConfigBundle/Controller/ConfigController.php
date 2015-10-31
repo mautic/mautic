@@ -98,7 +98,7 @@ class ConfigController extends FormController
 
                         $configurator->write();
 
-                        $this->addFlash('mautic.config.config.notice.updated');
+                        $this->addTranslatedFlash('mautic.config.config.notice.updated');
 
                         // We must clear the application cache for the updated values to take effect
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
@@ -106,7 +106,7 @@ class ConfigController extends FormController
                         $cacheHelper->clearContainerFile();
 
                     } catch (\RuntimeException $exception) {
-                        $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
+                        $this->addTranslatedFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(new FormError(

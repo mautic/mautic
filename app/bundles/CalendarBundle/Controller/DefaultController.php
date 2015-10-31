@@ -114,7 +114,7 @@ class DefaultController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->addFlash('mautic.core.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_' . $source . '_index',
                         '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(

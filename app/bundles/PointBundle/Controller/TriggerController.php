@@ -228,7 +228,7 @@ class TriggerController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($entity);
 
-                        $this->addFlash('mautic.core.notice.created', array(
+                        $this->addTranslatedFlash('mautic.core.notice.created', array(
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
@@ -382,7 +382,7 @@ class TriggerController extends FormController
                         //delete entities
                         $this->factory->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
 
-                        $this->addFlash('mautic.core.notice.updated', array(
+                        $this->addTranslatedFlash('mautic.core.notice.updated', array(
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(

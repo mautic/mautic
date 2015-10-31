@@ -327,7 +327,7 @@ class ReportController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_report_index',
                         '%url%'       => $this->generateUrl('mautic_report_action', array(
@@ -345,7 +345,7 @@ class ReportController extends FormController
                     //reset old columns
                     $entity->setColumns($oldColumns);
                     $entity->setGraphs($oldGraphs);
-                    $this->addFlash('mautic.core.error.not.valid', array(), 'error');
+                    $this->addTranslatedFlash('mautic.core.error.not.valid', array(), 'error');
                 }
             } else {
                 //unlock the entity
@@ -430,7 +430,7 @@ class ReportController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', array(
+                    $this->addTranslatedFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_report_index',
                         '%url%'       => $this->generateUrl('mautic_report_action', array(

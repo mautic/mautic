@@ -492,7 +492,7 @@ class EmailController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.core.notice.created',
                         array(
                             '%name%'      => $entity->getName(),
@@ -692,7 +692,7 @@ class EmailController extends FormController
                     //clear the session
                     $session->remove($contentName);
 
-                    $this->addFlash(
+                    $this->addTranslatedFlash(
                         'mautic.core.notice.updated',
                         array(
                             '%name%'      => $entity->getName(),
@@ -1238,7 +1238,7 @@ class EmailController extends FormController
         // Send to current user
         $model->sendEmailToUser($entity, $users, $fields, array(), array(), false);
 
-        $this->addFlash('mautic.email.notice.test_sent.success');
+        $this->addTranslatedFlash('mautic.email.notice.test_sent.success');
 
         return $this->viewAction($objectId);
     }

@@ -156,7 +156,7 @@ class CommonController extends Controller implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->addFlash(
+                $this->addTranslatedFlash(
                     $flash['msg'],
                     !empty($flash['msgVars']) ? $flash['msgVars'] : array(),
                     !empty($flash['type']) ? $flash['type'] : 'notice',
@@ -504,13 +504,50 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param        $message
+     * Adds a flash message to the current session for type.
+     *
+     * This method acts as a proxy to support the previous method signature which is now used in the addTranslatedFlash method
+     *
+     * @param string $type    The type
+     * @param string $message The message
+     *
+     * @throws \LogicException
+     */
+    protected function addFlash($type, $message)
+    {
+        // For the legacy signature, $message will be an array
+        if (is_array($message)) {
+            $args = func_get_args();
+
+            switch (count($args)) {
+                case 2:
+                    $this->addTranslatedFlash($args[0], $args[1]);
+                    break;
+                case 3:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2]);
+                    break;
+                case 4:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2], $args[3]);
+                    break;
+                case 5:
+                    $this->addTranslatedFlash($args[0], $args[1], $args[2], $args[3], $args[4]);
+                    break;
+            }
+
+            return;
+        }
+
+        parent::addFlash($type, $message);
+    }
+
+    /**
+     * @param string $message
      * @param array  $messageVars
      * @param string $type
      * @param string $domain
      * @param bool   $addNotification
      */
-    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    public function addTranslatedFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
     {
         if ($domain == null) {
             $domain = 'flashes';
@@ -527,7 +564,7 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+        $this->addFlash($type, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             switch ($type) {

@@ -43,7 +43,7 @@ class SecurityController extends CommonController
             } else {
                 $msg = $error->getMessage();
             }
-            $this->addFlash($msg, array(), 'error', null, false);
+            $this->addTranslatedFlash($msg, array(), 'error', null, false);
         }
 
         if ($session->has('_security.target_path')) {

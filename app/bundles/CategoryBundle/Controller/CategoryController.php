@@ -206,7 +206,7 @@ class CategoryController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.category.notice.created', array(
+                    $this->addTranslatedFlash('mautic.category.notice.created', array(
                         '%name%' => $entity->getName()
                     ));
                 }
@@ -308,7 +308,7 @@ class CategoryController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.category.notice.updated', array(
+                    $this->addTranslatedFlash('mautic.category.notice.updated', array(
                         '%name%' => $entity->getName()
                     ));
                 }

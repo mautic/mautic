@@ -37,7 +37,7 @@ class AjaxController extends CommonAjaxController
         $model  = $this->factory->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
 
-        // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then. 
+        // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then.
         $response = new Response;
         $response->setContent(json_encode($events));
         $response->headers->set('Content-Type', 'application/json');
@@ -69,11 +69,11 @@ class AjaxController extends CommonAjaxController
 
         //not found
         if ($entity === null) {
-            $this->addFlash('mautic.core.error.notfound', 'error');
+            $this->addTranslatedFlash('mautic.core.error.notfound', array(), 'error');
         } elseif (!$event->hasAccess()) {
-            $this->addFlash('mautic.core.error.accessdenied', 'error');
+            $this->addTranslatedFlash('mautic.core.error.accessdenied', array(), 'error');
         } elseif ($model->isLocked($entity)) {
-            $this->addFlash('mautic.core.error.locked', array(
+            $this->addTranslatedFlash('mautic.core.error.locked', array(
                 '%name%'      => $entity->getTitle(),
                 '%menu_link%' => 'mautic_' . $source . '_index',
                 '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
@@ -86,7 +86,7 @@ class AjaxController extends CommonAjaxController
             $model->saveEntity($entity);
             $response['success'] = true;
 
-            $this->addFlash('mautic.core.notice.updated', array(
+            $this->addTranslatedFlash('mautic.core.notice.updated', array(
                 '%name%'      => $entity->getTitle(),
                 '%menu_link%' => 'mautic_' . $source . '_index',
                 '%url%'       => $this->generateUrl('mautic_' . $source . '_action', array(
