@@ -123,7 +123,7 @@ class AuthenticationEvent extends Event
     public function setUser(User $user, $saveUser = true, $createIfNotExists = true)
     {
         if ($saveUser) {
-            $this->userProvider->saveUser($user, $createIfNotExists);
+            $user = $this->userProvider->saveUser($user, $createIfNotExists);
         }
 
         $this->user = $user;

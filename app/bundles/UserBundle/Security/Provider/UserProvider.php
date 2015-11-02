@@ -90,10 +90,17 @@ class UserProvider implements UserProviderInterface
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->where('u.username = :username OR u.email = :username')
-            ->setParameter('username', $username)
-            ->getQuery();
+            ->setParameter('username', $username);
 
-        $user = $q->getOneOrNullResult();
+        if (func_num_args() > 1 && $email = func_get_arg(1)) {
+            // Checking email from an auth plugin
+            $q->orWhere(
+                'u.email = :email'
+            )
+                ->setParameter('email', $email);
+        }
+
+        $user = $q->getQuery()->getOneOrNullResult();
 
         if (empty($user)) {
             $message = sprintf(
@@ -148,6 +155,8 @@ class UserProvider implements UserProviderInterface
      *
      * @param User      $user
      * @param bool|true $createIfNotExists
+     *
+     * @return User
      */
     public function saveUser(User $user, $createIfNotExists = true)
     {
@@ -156,7 +165,7 @@ class UserProvider implements UserProviderInterface
         if ($isNew) {
             // Check if user exists and create one if applicable
             try {
-                $user = $this->loadUserByUsername($user->getUsername());
+                $user = $this->loadUserByUsername($user->getUsername(), $user->getEmail());
             } catch (UsernameNotFoundException $exception) {
                 if (!$createIfNotExists) {
                     throw new BadCredentialsException();
@@ -164,9 +173,25 @@ class UserProvider implements UserProviderInterface
             }
         }
 
-        if (!$role = $user->getRole()) {
+        // Validation for User objects returned by a plugin
+        if (!$user->getRole()) {
 
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
+        }
+
+        if (!$user->getUsername()) {
+
+            throw new AuthenticationException('mautic.integration.sso.error.no_username');
+        }
+
+        if (!$user->getEmail()) {
+
+            throw new AuthenticationException('mautic.integration.sso.error.no_email');
+        }
+
+        if (!$user->getFirstName() || !$user->getLastName()) {
+
+            throw new AuthenticationException('mautic.integration.sso.error.no_name');
         }
 
         // Check for plain password
@@ -194,5 +219,7 @@ class UserProvider implements UserProviderInterface
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
             $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
         }
+
+        return $user;
     }
 }
