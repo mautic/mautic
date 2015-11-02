@@ -2371,7 +2371,7 @@ var Mautic = {
         else
             searchId = '#' + searchId;
 
-        if (string) {
+        if (string || string === '') {
             var current = string;
         } else {
             var filter  = mQuery(el).val();
