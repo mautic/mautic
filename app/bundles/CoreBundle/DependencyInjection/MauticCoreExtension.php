@@ -37,6 +37,10 @@ class MauticCoreExtension extends Extension
         $bundles = array_merge($core, $plugins);
         unset($core, $plugins);
 
+        // Store menu renderer options to create unique renderering classes per menu
+        // since KNP menus doesn't seem to support a Renderer factory
+        $menus = array();
+
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
@@ -51,6 +55,9 @@ class MauticCoreExtension extends Extension
                         case 'helpers':
                             $defaultTag = 'templating.helper';
                             break;
+                        case 'menus':
+                            $defaultTag = 'knp_menu.menu';
+                            break;
                         default:
                             $defaultTag = false;
                             break;
@@ -61,6 +68,20 @@ class MauticCoreExtension extends Extension
                             // Set parameter
                             $container->setParameter($name, $details);
                             continue;
+                        }
+
+                        // Setup default menu details
+                        if ($type == 'menus') {
+                            $details = array_merge(
+                                array(
+                                    'class'          => 'Knp\Menu\MenuItem',
+                                    'factoryService' => 'mautic.menu.builder',
+                                    'factoryMethod'  => $details['alias'] . 'Menu'
+                                ),
+                                $details
+                            );
+
+                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] :array();
                         }
 
                         // Set service alias
@@ -183,6 +204,23 @@ class MauticCoreExtension extends Extension
                     }
                 }
             }
+        }
+
+        foreach ($menus as $alias => $options) {
+            $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
+                'Mautic\CoreBundle\Menu\MenuRenderer',
+                array(
+                    new Reference('knp_menu.matcher'),
+                    new Reference('mautic.factory'),
+                    '%kernel.charset%',
+                    $options
+                )
+            ))
+                ->addTag('knp_menu.renderer',
+                    array(
+                        'alias' => $alias
+                    )
+                );
         }
 
         unset($bundles);

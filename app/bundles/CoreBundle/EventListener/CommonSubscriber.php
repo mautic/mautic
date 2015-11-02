@@ -106,7 +106,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($allItems[$name])) {
             $bundles = $this->factory->getMauticBundles(true);
-
+            $menuItems = array();
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu'][$name])) {
                     $menu        = $bundle['config']['menu'][$name];
@@ -154,7 +154,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($icons)) {
             $bundles    = $this->factory->getMauticBundles(true);
-            $menuHelper = $this->factory->getHelper('menu');
+            $menuHelper = $this->factory->getHelper('template.menu');
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu']['main'])) {
                     $items = (!isset($bundle['config']['menu']['main']['items']) ? $bundle['config']['menu']['main'] : $bundle['config']['menu']['main']['items']);

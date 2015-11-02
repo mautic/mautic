@@ -8,6 +8,8 @@
  */
 
 /** @var \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables $app */
+
+$inline = $view['menu']->render('profile');
 ?>
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -26,5 +28,10 @@
                 <i class="fa fa-sign-out fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.auth.logout"); ?></span>
             </a>
         </li>
+
+        <?php if (!empty($inline)): ?>
+        <li role="separator" class="divider"></li>
+        <?php echo $inline; ?>
+        <?php endif; ?>
     </ul>
 </li>

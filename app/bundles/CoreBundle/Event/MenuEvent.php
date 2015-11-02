@@ -9,12 +9,8 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
+use Mautic\CoreBundle\Templating\Helper\MenuHelper;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class MenuEvent
@@ -33,7 +29,8 @@ class MenuEvent extends Event
     protected $type;
 
     /**
-     * @param CorePermissions $security
+     * @param MenuHelper $menuHelper
+     * @param string     $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
@@ -58,10 +55,9 @@ class MenuEvent extends Event
      */
     public function addMenuItems(array $items)
     {
-        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
-        if (!$isRoot) {
-            $this->helper->createMenuStructure($items);
-        }
+        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $this->type == $items['name']);
+
+        $this->helper->createMenuStructure($items, 0, $isRoot);
 
         if ($isRoot) {
             //make sure the root does not override the children
