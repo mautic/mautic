@@ -82,6 +82,7 @@ class SecurityController extends CommonController
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
+
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
@@ -95,8 +96,16 @@ class SecurityController extends CommonController
         }
         $this->request->query->set('tmpl', 'login');
 
+        // Get a list of SSO integrations
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('sso'), true, null, true);
+
         return $this->delegateView(array(
-            'viewParameters'  => array('last_username' => $session->get(SecurityContext::LAST_USERNAME)),
+            'viewParameters'  => array(
+                'last_username' => $session->get(SecurityContext::LAST_USERNAME),
+                'integrations'  => $integrations
+            ),
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
             'passthroughVars' => array(
                 'route'          => $this->generateUrl('login'),
@@ -104,5 +113,40 @@ class SecurityController extends CommonController
                 'sessionExpired' => true
             )
         ));
+    }
+
+    /**
+     * Do nothing
+     */
+    public function loginCheckAction()
+    {
+
+    }
+
+    /**
+     * The plugin should be handling this in it's listener
+     *
+     * @param $integration
+     *
+     * @return RedirectResponse
+     */
+    public function ssoLoginAction($integration)
+    {
+
+        return new RedirectResponse($this->generateUrl('login'));
+    }
+
+    /**
+     * The plugin should be handling this in it's listener
+     *
+     * @param $integration
+     *
+     * @return RedirectResponse
+     */
+    public function ssoLoginCheckAction($integration)
+    {
+        // The plugin should be handling this in it's listener
+
+        return new RedirectResponse($this->generateUrl('login'));
     }
 }

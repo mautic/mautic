@@ -9,7 +9,6 @@
 
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
-use OpenCloud\Common\Exceptions\RebuildError;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -31,13 +30,13 @@ class PluginFactory implements SecurityFactoryInterface
     {
         $providerId = 'security.authentication.provider.mautic.'.$id;
         $container->setDefinition($providerId, new DefinitionDecorator('mautic.user.preauth_authenticator'))
-            ->replaceArgument(1, new Reference($userProvider))
-            ->replaceArgument(2, $id);
+            ->replaceArgument(3, new Reference($userProvider))
+            ->replaceArgument(4, $id);
 
 
         $listenerId = 'security.authentication.listener.mautic.'.$id;
         $container->setDefinition($listenerId, new DefinitionDecorator('mautic.security.authentication_listener'))
-            ->replaceArgument(2, $id);
+            ->replaceArgument(5, $id);
 
         return array($providerId, $listenerId, $defaultEntryPoint);
     }
@@ -55,7 +54,7 @@ class PluginFactory implements SecurityFactoryInterface
      */
     public function getKey()
     {
-        return 'mautic-plugin';
+        return 'mautic_plugin_auth';
     }
 
     /**

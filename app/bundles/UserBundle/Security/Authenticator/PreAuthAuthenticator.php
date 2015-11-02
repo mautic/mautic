@@ -9,18 +9,18 @@
 
 namespace Mautic\UserBundle\Security\Authenticator;
 
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
-use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class PreAuthAuthenticator implements AuthenticationProviderInterface
@@ -28,60 +28,103 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     /**
      * @var EventDispatcherInterface
      */
-    private $dispatcher;
+    protected $dispatcher;
 
     /**
      * @var
      */
-    private $providerKey;
+    protected $providerKey;
 
     /**
      * @var UserProviderInterface
      */
-    private $userProvider;
+    protected $userProvider;
 
     /**
-     * @param EventDispatcherInterface     $dispatcher
-     * @param UserProviderInterface        $userProvider
-     * @param                              $providerKey
+     * @var IntegrationHelper
      */
-    public function __construct(EventDispatcherInterface $dispatcher, UserProviderInterface $userProvider, $providerKey)
-    {
-        $this->dispatcher   = $dispatcher;
-        $this->providerKey  = $providerKey;
-        $this->userProvider = $userProvider;
+    protected $integrationHelper;
+
+    /**
+     * @var null|Request
+     */
+    protected $request;
+
+    /**
+     * @param IntegrationHelper        $integrationHelper
+     * @param EventDispatcherInterface $dispatcher
+     * @param RequestStack             $requestStack
+     * @param UserProviderInterface    $userProvider
+     * @param                          $providerKey
+     */
+    public function __construct(
+        IntegrationHelper $integrationHelper,
+        EventDispatcherInterface $dispatcher,
+        RequestStack $requestStack,
+        UserProviderInterface $userProvider,
+        $providerKey
+    ) {
+        $this->dispatcher        = $dispatcher;
+        $this->providerKey       = $providerKey;
+        $this->userProvider      = $userProvider;
+        $this->integrationHelper = $integrationHelper;
+        $this->request           = $requestStack->getCurrentRequest();
     }
 
     /**
-     * @param TokenInterface        $token
+     * @param TokenInterface $token
      *
-     * @return UsernamePasswordToken
+     * @return Response|PluginToken
      */
     public function authenticate(TokenInterface $token)
     {
-        $authenticated = false;
+        if (!$this->supports($token)) {
 
-        // Try authenticating with a plugin
-        if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION)) {
-            $authEvent = new AuthenticationEvent(null, $token, $this->userProvider);
-            $this->dispatcher->dispatch(UserEvents::USER_AUTHENTICATION, $authEvent);
+            return null;
+        }
 
-            if ($authenticated = $authEvent->isAuthenticated()) {
-                $user = $authEvent->getUser();
+        $user                  = $token->getUser();
+        $authenticatingService = $token->getAuthenticatingService();
+
+        if (!$user instanceof User) {
+            $authenticated = false;
+            // Try authenticating with a plugin
+            if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
+                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso'), false, null, true, $authenticatingService);
+
+                $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
+                $authEvent  = new AuthenticationEvent(null, $token, $this->userProvider, $this->request, $loginCheck, $authenticatingService, $integrations);
+                $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
+
+                if ($response = $authEvent->getResponse()) {
+
+                    return new PluginToken(
+                        $this->providerKey,
+                        $authenticatingService,
+                        $user,
+                        null,
+                        array(),
+                        $response
+                    );
+                } elseif ($authenticated = $authEvent->isAuthenticated()) {
+                    $user                  = $authEvent->getUser();
+                    $authenticatingService = $authEvent->getAuthenticatingService();
+                }
+            }
+
+            if (!$authenticated) {
+
+                throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
         }
 
-        if ($authenticated) {
-
-            return new UsernamePasswordToken(
-                $user,
-                $user->getPassword(),
-                $this->providerKey,
-                $user->getRoles()
-            );
-        }
-die('test');
-        throw new AuthenticationException('Invalid username or password');
+        return new PluginToken(
+            $this->providerKey,
+            $authenticatingService,
+            $user,
+            $user->getPassword(),
+            $user->getRoles()
+        );
     }
 
     /**
@@ -92,18 +135,5 @@ die('test');
     public function supports(TokenInterface $token)
     {
         return $token instanceof PluginToken && $token->getProviderKey() === $this->providerKey;
-    }
-
-    /**
-     * @param Request $request
-     * @param         $username
-     * @param         $password
-     * @param         $providerKey
-     *
-     * @return UsernamePasswordToken
-     */
-    public function createToken(Request $request, $username, $password, $providerKey)
-    {
-        return new UsernamePasswordToken($username, $password, $providerKey);
     }
 }

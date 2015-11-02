@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
@@ -18,20 +18,34 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 class PluginToken extends AbstractToken
 {
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * @var
      */
     protected $providerKey;
 
     /**
-     * @param array|\Symfony\Component\Security\Core\Role\RoleInterface[] $providerKey
-     * @param array                                                       $roles
+     * @var string
      */
-    public function __construct($providerKey, array $roles = array())
+    protected $credentials;
+
+    /**
+     * @var
+     */
+    protected $authenticatingService;
+
+    /**
+     * @var Response
+     */
+    protected $response;
+
+    /**
+     * @param array|\Symfony\Component\Security\Core\Role\RoleInterface[] $providerKey
+     * @param null                                                        $authenticatingService
+     * @param string                                                      $user
+     * @param string                                                      $credentials
+     * @param array                                                       $roles
+     * @param Response                                                    $response
+     */
+    public function __construct($providerKey, $authenticatingService = null, $user = '', $credentials = '', array $roles = array(), Response $response =  null)
     {
         parent::__construct($roles);
 
@@ -39,24 +53,13 @@ class PluginToken extends AbstractToken
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->providerKey = $providerKey;
+        $this->setUser($user);
+        $this->authenticatingService = $authenticatingService;
+        $this->credentials           = $credentials;
+        $this->providerKey           = $providerKey;
+        $this->response              = $response;
 
         parent::setAuthenticated(count($roles) > 0);
-    }
-    /**
-     * @return mixed
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
     }
 
     /**
@@ -64,7 +67,7 @@ class PluginToken extends AbstractToken
      */
     public function getCredentials()
     {
-        return '';
+        return $this->credentials;
     }
 
     /**
@@ -73,5 +76,38 @@ class PluginToken extends AbstractToken
     public function getProviderKey()
     {
         return $this->providerKey;
+    }
+
+    /**
+     * @return null
+     */
+    public function getAuthenticatingService()
+    {
+        return $this->authenticatingService;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array($this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
+        parent::unserialize($parentStr);
     }
 }

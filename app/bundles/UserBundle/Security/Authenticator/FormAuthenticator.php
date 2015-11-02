@@ -9,15 +9,19 @@
 
 namespace Mautic\UserBundle\Security\Authenticator;
 
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -26,21 +30,36 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     /**
      * @var UserPasswordEncoderInterface
      */
-    private $encoder;
+    protected $encoder;
 
     /**
      * @var EventDispatcherInterface
      */
-    private $dispatcher;
+    protected $dispatcher;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    protected $request;
+
+    /**
+     * @param IntegrationHelper            $integrationHelper
      * @param UserPasswordEncoderInterface $encoder
      * @param EventDispatcherInterface     $dispatcher
+     * @param RequestStack                 $requestStack
      */
-    public function __construct(UserPasswordEncoderInterface $encoder, EventDispatcherInterface $dispatcher)
-    {
-        $this->encoder     = $encoder;
-        $this->dispatcher  = $dispatcher;
+    public function __construct(
+        IntegrationHelper $integrationHelper,
+        UserPasswordEncoderInterface $encoder,
+        EventDispatcherInterface $dispatcher,
+        RequestStack $requestStack
+    ) {
+        $this->encoder           = $encoder;
+        $this->dispatcher        = $dispatcher;
+        $this->integrationHelper = $integrationHelper;
+        $this->request           = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -52,40 +71,46 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey)
     {
-        $authenticated = false;
-        $user          = null;
+        $authenticated         = true;
+        $authenticationService = null;
+        $user                  = $token->getUser();
+        $authenticatingService = ($token instanceof PluginToken) ? $token->getAuthenticatingService() : null;
+        if (!$user instanceof User) {
+            $authenticated = false;
 
-        try {
-            $user = $userProvider->loadUserByUsername($token->getUsername());
-            if ($token instanceof UsernamePasswordToken) {
+            try {
+                $user          = $userProvider->loadUserByUsername($token->getUsername());
                 $authenticated = $this->encoder->isPasswordValid($user, $token->getCredentials());
+            } catch (UsernameNotFoundException $e) {
             }
-        } catch (UsernameNotFoundException $e) {
-        }
 
-        if (!$authenticated) {
-            // Try authenticating with a plugin
-            if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION)) {
-                $authEvent = new AuthenticationEvent($user, $token, $userProvider);
-                $this->dispatcher->dispatch(UserEvents::USER_AUTHENTICATION, $authEvent);
+            if (!$authenticated) {
+                // Try authenticating with a plugin
+                if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
+                    $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso'), false, null, true);
+                    $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
+                    $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
 
-                if ($authenticated = $authEvent->isAuthenticated()) {
-                    $user = $authEvent->getUser();
+                    if ($authenticated = $authEvent->isAuthenticated()) {
+                        $user                  = $authEvent->getUser();
+                        $authenticatingService = $authEvent->getAuthenticatingService();
+                    }
                 }
             }
         }
 
         if ($authenticated) {
 
-            return new UsernamePasswordToken(
+            return new PluginToken(
+                $providerKey,
+                $authenticatingService,
                 $user,
                 $user->getPassword(),
-                $providerKey,
                 $user->getRoles()
             );
         }
 
-        throw new AuthenticationException('Invalid username or password');
+        throw new BadCredentialsException();
     }
 
     /**
@@ -96,7 +121,8 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function supportsToken(TokenInterface $token, $providerKey)
     {
-        return ($token instanceof UsernamePasswordToken) && $token->getProviderKey() === $providerKey;
+
+        return ($token instanceof PluginToken || $token instanceof UsernamePasswordToken) && $token->getProviderKey() === $providerKey;
     }
 
     /**
@@ -109,6 +135,12 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function createToken(Request $request, $username, $password, $providerKey)
     {
-        return new UsernamePasswordToken($username, $password, $providerKey);
+
+        return new PluginToken(
+            $providerKey,
+            null,
+            $username,
+            $password
+        );
     }
 }

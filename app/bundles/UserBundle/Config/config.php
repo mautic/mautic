@@ -30,10 +30,19 @@ return array(
                 'controller' => 'MauticUserBundle:Security:login',
             ),
             'mautic_user_logincheck'    => array(
-                'path' => '/login_check'
+                'path' => '/login_check',
+                'controller' => 'MauticUserBundle:Security:loginCheck',
             ),
             'mautic_user_logout'        => array(
                 'path' => '/logout'
+            ),
+            'mautic_sso_login'    => array(
+                'path'       => '/sso_login/{integration}',
+                'controller' => 'MauticUserBundle:Security:ssoLogin',
+            ),
+            'mautic_sso_login_check'    => array(
+                'path'       => '/sso_login_check/{integration}',
+                'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
             ),
             'mautic_user_index'         => array(
                 'path'       => '/users/{page}',
@@ -130,6 +139,11 @@ return array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'user_list'
+            ),
+            'mautic.form.type.role_list'      => array(
+                'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'role_list'
             )
         ),
         'other'  => array(
@@ -161,14 +175,18 @@ return array(
             'mautic.user.form_authenticator' => array(
                 'class'  => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
                 'arguments' => array(
+                    'mautic.helper.integration',
                     'security.password_encoder',
-                    'event_dispatcher'
+                    'event_dispatcher',
+                    'request_stack'
                 )
             ),
             'mautic.user.preauth_authenticator' => array(
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator',
                 'arguments' => array(
+                    'mautic.helper.integration',
                     'event_dispatcher',
+                    'request_stack',
                     '', // providerKey
                     '' // User provider
                 ),
@@ -187,8 +205,11 @@ return array(
             'mautic.security.authentication_listener' => array(
                 'class' => 'Mautic\UserBundle\Security\Firewall\AuthenticationListener',
                 'arguments' => array(
+                    'mautic.security.authentication_handler',
                     'security.token_storage',
                     'security.authentication.manager',
+                    'monolog.logger',
+                    'event_dispatcher',
                     '' // providerKey
                 ),
                 'public' => false

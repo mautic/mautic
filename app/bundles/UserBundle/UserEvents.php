@@ -109,13 +109,23 @@ final class UserEvents
     const USER_LOGIN = 'mautic.user_login';
 
     /**
-     * The mautic.user_authentication event is dispatched when a user logs in so that listeners can authenticate a user, i.e. via a 3rd party service
+     * The mautic.user_form_authentication event is dispatched when a user logs in so that listeners can authenticate a user, i.e. via a 3rd party service
      *
      * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
      *
      * @var string
      */
-    const USER_AUTHENTICATION = 'mautic.user_authentication';
+    const USER_FORM_AUTHENTICATION = 'mautic.user_form_authentication';
+
+    /**
+     * The mautic.user_pre_authentication event is dispatched when a user browses a page under /s/ except for /login. This allows support for
+     * 3rd party authentication providers outside the login form
+     *
+     * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
+     *
+     * @var string
+     */
+    const USER_PRE_AUTHENTICATION = 'mautic.user_pre_authentication';
 
     /**
      * The mautic.user_status_change event is dispatched when a user's online status is changed

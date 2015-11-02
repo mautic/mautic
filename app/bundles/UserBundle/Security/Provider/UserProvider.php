@@ -19,6 +19,8 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -76,7 +78,10 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $username
+     *
+     * @return User
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
     {
@@ -139,21 +144,31 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * @param User $user
+     * Create/update user from authentication plugins
+     *
+     * @param User      $user
+     * @param bool|true $createIfNotExists
      */
-    public function createUserIfNotExists(User $user)
+    public function saveUser(User $user, $createIfNotExists = true)
     {
-        if (!$user->getId()) {
-            $this->updateUser($user, true);
-        }
-    }
+        $isNew = !$user->getId();
 
-    /**
-     * @param User       $user
-     * @param bool|false $isNew
-     */
-    public function updateUser(User $user, $isNew = false)
-    {
+        if ($isNew) {
+            // Check if user exists and create one if applicable
+            try {
+                $user = $this->loadUserByUsername($user->getUsername());
+            } catch (UsernameNotFoundException $exception) {
+                if (!$createIfNotExists) {
+                    throw new BadCredentialsException();
+                }
+            }
+        }
+
+        if (!$role = $user->getRole()) {
+
+            throw new AuthenticationException('mautic.integration.sso.error.no_role');
+        }
+
         // Check for plain password
         $plainPassword = $user->getPlainPassword();
         if ($plainPassword) {

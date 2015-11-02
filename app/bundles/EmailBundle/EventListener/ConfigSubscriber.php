@@ -73,8 +73,26 @@ class ConfigSubscriber extends CommonSubscriber
                     }
                 }
             }
-
-            $event->setConfig($data, 'emailconfig');
         }
+
+        // Ensure that percent signs are decoded in the unsubscribe/webview settings
+        $decode = array(
+            'unsubscribe_text',
+            'webview_text',
+            'unsubscribe_message',
+            'resubscribe_message'
+        );
+        foreach ($decode as $key) {
+            if (strpos($data[$key], '%') !== false) {
+                $data[$key] = urldecode($data[$key]);
+
+                if (preg_match('/%(.*?)%/i', $data[$key])) {
+                    // Encode any left over to prevent Symfony from crashing
+                    $data[$key] = str_replace('%', '%%', $data[$key]);
+                }
+            }
+        }
+
+        $event->setConfig($data, 'emailconfig');
     }
 }
