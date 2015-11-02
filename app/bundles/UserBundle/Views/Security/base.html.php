@@ -53,10 +53,6 @@
         </div>
     </div>
 </section>
-<script>
-    //clear typeahead caches
-    window.localStorage.clear();
-</script>
 
 </body>
 </html>
