@@ -9,19 +9,20 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
+ * Used by SSO auth plugins that use OAuth2, etc means of logins
+ *
  * Class AbstractSsoIntegration
  */
-abstract class AbstractSsoIntegration extends AbstractIntegration
+abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 {
     /**
      * Called after the user is authenticated with the 3rd party service to obtain the users
      * details
      *
-     * @param $response Response from request to authenticating service
+     * @param $response mixed Typically the response from request to authenticating service
      *
      * @return mixed
      */
@@ -120,7 +121,7 @@ abstract class AbstractSsoIntegration extends AbstractIntegration
     public function getSupportedFeatures()
     {
         return array(
-            'sso'
+            'sso_service'
         );
     }
 

@@ -10,7 +10,6 @@
 namespace Mautic\UserBundle\Security\Firewall;
 
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
-use Mautic\UserBundle\Security\Authentication\Token\MauticUserToken;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

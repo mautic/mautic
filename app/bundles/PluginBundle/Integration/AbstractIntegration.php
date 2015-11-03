@@ -129,11 +129,12 @@ abstract class AbstractIntegration
      * Get a list of supported features for this integration
      *
      * Options are:
-     *  cloud_storage
-     *  public_profile
-     *  public_activity
-     *  share_button
-     *  sso
+     *  cloud_storage - Asset remote storage
+     *  public_profile - Lead social profile
+     *  public_activity - Lead social activity
+     *  share_button - Landing page share button
+     *  sso_service - SSO using 3rd party service via sso_login and sso_login_check routes
+     *  sso_form - SSO using submitted credentials through the login form
      *
      * @return array
      */

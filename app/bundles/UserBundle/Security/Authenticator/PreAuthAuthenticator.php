@@ -90,7 +90,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
             $authenticated = false;
             // Try authenticating with a plugin
             if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
-                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso'), false, null, true, $authenticatingService);
+                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_service'), false, null, true, $authenticatingService);
 
                 $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
                 $authEvent  = new AuthenticationEvent(null, $token, $this->userProvider, $this->request, $loginCheck, $authenticatingService, $integrations);

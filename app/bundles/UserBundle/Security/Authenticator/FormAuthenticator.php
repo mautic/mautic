@@ -87,7 +87,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
             if (!$authenticated) {
                 // Try authenticating with a plugin
                 if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
-                    $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso'), false, null, true);
+                    $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_form'), false, null, true);
                     $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
                     $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
 
