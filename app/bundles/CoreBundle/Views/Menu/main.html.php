@@ -46,7 +46,10 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
             //Submenu item
             $url = $child->getUri();
             $url = (empty($url)) ? 'javascript:void(0);' : $url;
-            echo "<a href=\"$url\" data-toggle=\"ajax\"{$view['menu']->parseAttributes($linkAttributes)}>";
+            if (empty($linkAttributes['target'])) {
+                $linkAttributes['data-toggle'] = 'ajax';
+            }
+            echo "<a href=\"$url\"{$view['menu']->parseAttributes($linkAttributes)}>";
         }
 
         if (!empty($extras["iconClass"])) {
