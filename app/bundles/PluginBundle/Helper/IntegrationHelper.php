@@ -186,7 +186,7 @@ class IntegrationHelper
 
         // Build the classes if not already
         foreach ($filteredIntegrations as $integrationName) {
-            if ($publishedOnly && !$available[$integrationName]['settings']->isPublished()) {
+            if (!isset($available[$integrationName]) || ($publishedOnly && !$available[$integrationName]['settings']->isPublished())) {
                 continue;
             }
 
@@ -235,12 +235,13 @@ class IntegrationHelper
      *
      * @param $name
      *
-     * @return mixed
+     * @return AbstractIntegration|bool
      */
     public function getIntegrationObject($name)
     {
         $integrationObjects = $this->getIntegrationObjects($name);
-        return $integrationObjects[$name];
+
+        return ((isset($integrationObjects[$name]))) ?  $integrationObjects[$name] : false;
     }
 
     /**
