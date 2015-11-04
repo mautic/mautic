@@ -152,16 +152,10 @@ return array(
             )
         ),
         'helpers' => array(
-            'mautic.helper.template.menu'               => array(
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
-                'arguments' => array(
-                    'knp_menu.helper',
-                    'mautic.security',
-                    'security.token_storage',
-                    'request_stack',
-                    '%mautic.parameters%'
-                ),
-                'alias'     => 'menu'
+            'mautic.helper.menu'               => array(
+                'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'menu_helper'
             ),
             'mautic.helper.template.date'      => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
@@ -345,6 +339,20 @@ return array(
                     'knp_menu.matcher',
                     'mautic.factory'
                 )
+            ),
+            'mautic.menu.main'                   => array(
+                'class'          => 'Knp\Menu\MenuItem',
+                'factoryService' => 'mautic.menu.builder',
+                'factoryMethod'  => 'mainMenu',
+                'tag'            => 'knp_menu.menu',
+                'alias'          => 'main'
+            ),
+            'mautic.menu.admin'                  => array(
+                'class'          => 'Knp\Menu\MenuItem',
+                'factoryService' => 'mautic.menu.builder',
+                'factoryMethod'  => 'adminMenu',
+                'tag'            => 'knp_menu.menu',
+                'alias'          => 'admin'
             ),
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
