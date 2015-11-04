@@ -38,7 +38,7 @@ return array(
             ),
             'mautic_sso_login'    => array(
                 'path'       => '/sso_login/{integration}',
-                'controller' => 'MauticUserBundle:Security:ssoLogin',
+                'controller' => 'MauticUserBundle:Security:ssoLogin'
             ),
             'mautic_sso_login_check'    => array(
                 'path'       => '/sso_login_check/{integration}',

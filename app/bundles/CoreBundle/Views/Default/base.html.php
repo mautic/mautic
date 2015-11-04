@@ -77,5 +77,6 @@
             'id'            => 'MauticSharedModal',
             'footerButtons' => true
         )); ?>
+        <?php echo $view['security']->getAuthenticationContent(); ?>
     </body>
 </html>

@@ -10,76 +10,64 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class CorePermissions
  */
 class CorePermissions
 {
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    protected $factory;
+    private $em;
 
     /**
-     * @param MauticFactory $factory
+     * @var TokenStorageInterface
      */
-    public function __construct(MauticFactory $factory)
+    private $tokenStorage;
+
+    /**
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @var array
+     */
+    private $bundles;
+
+    /**
+     * @var array
+     */
+    private $pluginBundles;
+
+    /**
+     * CorePermissions constructor.
+     *
+     * @param Translator            $translator
+     * @param EntityManager         $em
+     * @param TokenStorageInterface $tokenStorage
+     * @param array                 $parameters
+     * @param                       $bundles
+     * @param                       $pluginBundles
+     */
+    public function __construct(Translator $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
     {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    protected function getTranslator()
-    {
-        return $this->factory->getTranslator();
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEm()
-    {
-        return $this->factory->getEntityManager();
-    }
-
-    /**
-     * @return bool|mixed
-     */
-    protected function getBundles()
-    {
-        return $this->factory->getParameter('bundles');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getPluginBundles()
-    {
-        return $this->factory->getPluginBundles();
-    }
-
-    /**
-     * @return SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->factory->getSecurityContext();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getParams()
-    {
-        return $this->factory->getSystemParameters();
+        $this->translator   = $translator;
+        $this->em           = $em;
+        $this->tokenStorage = $tokenStorage;
+        $this->params       = $parameters;
+        $this->bundles      = $bundles;
+        $this->pluginBundles = $pluginBundles;
     }
 
     /**
@@ -455,14 +443,13 @@ class CorePermissions
     /**
      * @return User|mixed
      */
-    private function getUser()
+    public function getUser()
     {
-        if ($token = $this->getSecurityContext()->getToken()) {
-            $this->user = $token->getUser();
-        } else {
-            $this->user = new User();
+        $user = new User();
+        if ($token = $this->getTokenStorage()->getToken()) {
+            $user = $token->getUser();
         }
-        return $this->user;
+        return $user;
     }
 
     /**
@@ -472,5 +459,63 @@ class CorePermissions
     {
         $userEntity = $this->getUser();
         return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
+    }
+
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
+    protected function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEm()
+    {
+        return $this->em;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getBundles()
+    {
+        return $this->bundles;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPluginBundles()
+    {
+        return $this->pluginBundles;
+    }
+
+    /**
+     * @deprecated 1.2.3; to be removed in 2.0
+     *
+     * @return TokenStorageInterface
+     */
+    protected function getSecurityContext()
+    {
+        return $this->getTokenStorage();
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getTokenStorage()
+    {
+        return $this->tokenStorage;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getParams()
+    {
+        return $this->params;
     }
 }

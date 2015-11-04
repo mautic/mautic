@@ -88,9 +88,11 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
 
         if (!$user instanceof User) {
             $authenticated = false;
+
             // Try authenticating with a plugin
             if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
-                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_service'), false, null, true, $authenticatingService);
+                $integrationFilter = ($authenticatingService == 'precheck') ? null : $authenticatingService;
+                $integrations      = $this->integrationHelper->getIntegrationObjects($integrationFilter, array('sso_service'), false, null, true);
 
                 $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
                 $authEvent  = new AuthenticationEvent(null, $token, $this->userProvider, $this->request, $loginCheck, $authenticatingService, $integrations);
@@ -112,10 +114,25 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                 }
             }
 
-            if (!$authenticated) {
+            if (!$authenticated && $authenticatingService != 'precheck') {
 
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
+        }
+
+        $response = null;
+        if ($authenticatingService == 'precheck') {
+            // Set a response to stop the iframe from looping
+            $response = new Response('hi');
+
+            return new PluginToken(
+                $this->providerKey,
+                $authenticatingService,
+                $user,
+                null,
+                array(),
+                $response
+            );
         }
 
         return new PluginToken(

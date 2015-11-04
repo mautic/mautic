@@ -128,6 +128,16 @@ final class UserEvents
     const USER_PRE_AUTHENTICATION = 'mautic.user_pre_authentication';
 
     /**
+     * The mautic.user_authentication_content event is dispatched to collect HTML from plugins to be injected into the UI to assist with
+     * authentication
+     *
+     * The event listener receives a Mautic\UserBundle\Event\AuthenticationContentEvent instance.
+     *
+     * @var string
+     */
+    const USER_AUTHENTICATION_CONTENT = 'mautic.user_authentication_content';
+
+    /**
      * The mautic.user_status_change event is dispatched when a user's online status is changed
      *
      * The event listener receives a Mautic\UserBundle\Event\StatusChangeEvent instance.

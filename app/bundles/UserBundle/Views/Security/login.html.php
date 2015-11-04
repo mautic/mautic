@@ -15,7 +15,6 @@ else:
     $view->extend('MauticUserBundle:Security:ajax.html.php');
 endif;
 ?>
-
 <form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
     <div class="input-group mb-md">
 

@@ -88,11 +88,16 @@ class MauticCoreExtension extends Extension
                             } elseif (is_array($argument) || is_object($argument)) {
                                 foreach ($argument as $k => &$v) {
                                     if (strpos($v, '%') === 0) {
+                                        $v = str_replace('%%', '%', $v);
                                         $v = $container->getParameter(substr($v, 1, -1));
                                     }
                                 }
                                 $definitionArguments[] = $argument;
-                            } elseif (is_bool($argument) || strpos($argument, '%') === 0 || strpos($argument, '\\') !== false) {
+                            } elseif (strpos($argument, '%') === 0 ) {
+                                // Parameter
+                                $argument              = str_replace('%%', '%', $argument);
+                                $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
+                            } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
                                 // Parameter or Class
                                 $definitionArguments[] = $argument;
                             } elseif (strpos($argument, '"') === 0) {
@@ -169,11 +174,16 @@ class MauticCoreExtension extends Extension
                                     } elseif (is_array($argument) || is_object($argument)) {
                                         foreach ($argument as $k => &$v) {
                                             if (strpos($v, '%') === 0) {
+                                                $v = str_replace('%%', '%', $v);
                                                 $v = $container->getParameter(substr($v, 1, -1));
                                             }
                                         }
                                         $methodCallArguments[] = $argument;
-                                    } elseif (is_bool($argument) || strpos($argument, '%') === 0 || strpos($argument, '\\') !== false) {
+                                    } elseif (strpos($argument, '%') === 0 ) {
+                                        // Parameter
+                                        $argument              = str_replace('%%', '%', $argument);
+                                        $methodCallArguments[] = $container->getParameter(substr($argument, 1, -1));
+                                    } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
                                         // Parameter or Class
                                         $methodCallArguments[] = $argument;
                                     } elseif (strpos($argument, '"') === 0) {

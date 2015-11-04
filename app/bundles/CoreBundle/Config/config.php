@@ -88,6 +88,20 @@ return array(
                 'name'     => 'admin',
                 'children' => array()
             )
+        ),
+        'extra' => array(
+            'priority' => -1000,
+            'items'    => array(
+                'name'     => 'extra',
+                'children' => array()
+            )
+        ),
+        'profile' => array(
+            'priority' => -1000,
+            'items'    => array(
+                'name'     => 'profile',
+                'children' => array()
+            )
         )
     ),
     'services'   => array(
@@ -152,10 +166,16 @@ return array(
             )
         ),
         'helpers' => array(
-            'mautic.helper.menu'               => array(
-                'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'menu_helper'
+            'mautic.helper.template.menu'               => array(
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
+                'arguments' => array(
+                    'knp_menu.helper',
+                    'mautic.security',
+                    'security.token_storage',
+                    'request_stack',
+                    '%mautic.parameters%'
+                ),
+                'alias'     => 'menu'
             ),
             'mautic.helper.template.date'      => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
@@ -198,9 +218,36 @@ return array(
             ),
             'mautic.helper.template.security'  => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => array(
+                    'mautic.security',
+                    'request_stack',
+                    'event_dispatcher'
+                ),
                 'alias'     => 'security'
             ),
+        ),
+        'menus' => array(
+            'mautic.menu.main' => array(
+                'alias' => 'main'
+            ),
+            'mautic.menu.admin' => array(
+                'alias' => 'admin',
+                'options' => array(
+                    'template' => 'MauticCoreBundle:Menu:admin.html.php'
+                )
+            ),
+            'mautic.menu.extra' => array(
+                'alias' => 'extra',
+                'options' => array(
+                    'template' => 'MauticCoreBundle:Menu:extra.html.php'
+                )
+            ),
+            'mautic.menu.profile' => array(
+                'alias' => 'profile',
+                'options' => array(
+                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.php'
+                )
+            )
         ),
         'other'   => array(
             // Error handler
@@ -237,7 +284,14 @@ return array(
             ),
             'mautic.security'                    => array(
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
-                'arguments' => 'mautic.factory'
+                'arguments' => array(
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'security.token_storage',
+                    '%mautic.parameters%',
+                    '%mautic.bundles%',
+                    '%mautic.plugin.bundles%'
+                )
             ),
             'mautic.translation.loader'          => array(
                 'class'     => 'Mautic\CoreBundle\Loader\TranslationLoader',
@@ -278,7 +332,13 @@ return array(
             ),
             'mautic.helper.cookie'               => array(
                 'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
-                'arguments' => 'mautic.factory'
+                'arguments' => array(
+                    '%mautic.cookie_path%',
+                    '%mautic.cookie_domain%',
+                    '%mautic.cookie_secure%',
+                    '%mautic.cookie_httponly%',
+                    'request_stack'
+                )
             ),
             'mautic.helper.update'               => array(
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
@@ -301,6 +361,10 @@ return array(
                 'arguments' => 'mautic.factory'
             ),
             // Menu
+            'mautic.helper.update'               => array(
+                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
+                'arguments' => 'mautic.factory'
+            ),
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => array(
@@ -318,20 +382,6 @@ return array(
                     'knp_menu.matcher',
                     'mautic.factory'
                 )
-            ),
-            'mautic.menu.main'                   => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'mainMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'main'
-            ),
-            'mautic.menu.admin'                  => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'adminMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'admin'
             ),
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',

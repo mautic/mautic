@@ -49,6 +49,9 @@ class LogoutHandler implements LogoutHandlerInterface
         }
 
         // Clear session
-        $this->factory->getSession()->clear();
+        $request->getSession()->clear();
+
+        // Note that a logout occurred
+        $request->getSession()->set('post_logout', true);
     }
 }

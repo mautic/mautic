@@ -29,6 +29,12 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
 
+        // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
+        array_walk_recursive($config, function(&$v, $k) {
+            $v = str_replace('%', '%%', $v);
+        });
+
+
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
             $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
@@ -83,7 +89,7 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
     return false;
 };
 
-// Seperate out Mautic's bundles from other Symfony bundles
+// Separate out Mautic's bundles from other Symfony bundles
 $symfonyBundles = $container->getParameter('kernel.bundles');
 $mauticBundles  = array_filter(
     array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
