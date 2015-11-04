@@ -11,12 +11,10 @@ namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * CLI Command to update the application
@@ -78,18 +76,13 @@ EOT
         }
 
         if (!$force) {
-            $dialog  = $this->getHelperSet()->get('dialog');
-            $confirm = $dialog->select(
-                $output,
-                $translator->trans('mautic.core.update.confirm_application_update'),
-                array(
-                    $translator->trans('mautic.core.form.no'),
-                    $translator->trans('mautic.core.form.yes'),
-                ),
-                0
-            );
+            /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
+            $helper   = $this->getHelperSet()->get('question');
+            $question = new ConfirmationQuestion($translator->trans('mautic.core.update.confirm_application_update'), false);
 
-            if (!$confirm) {
+            if (!$helper->ask($input, $output, $question)) {
+                $output->writeln($translator->trans('mautic.core.update.aborted'));
+
                 return 0;
             }
         }
@@ -154,7 +147,7 @@ EOT
         }
 
         // Extract the archive file now in place
-        $output->writeln('<info>Extracting zip...</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.update.step.extracting.package').'</info>');
 
         if (!$zipper->extractTo($appRoot)) {
             $output->writeln(
@@ -170,7 +163,7 @@ EOT
         $zipper->close();
 
         // Clear the dev and prod cache instances to reset the system
-        $output->writeln('<info>Clearing the cache...</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.update.clear.cache').'</info>');
         $command = $this->getApplication()->find('cache:clear');
         $input = new ArrayInput(array(
             'command'          => 'cache:clear',
@@ -185,7 +178,7 @@ EOT
 
         // Make sure we have a deleted_files list otherwise we can't process this step
         if (file_exists(__DIR__.'/deleted_files.txt')) {
-            $output->writeln('<info>Remove deleted files...</info>');
+            $output->writeln('<info>'.$translator->trans('mautic.core.update.remove.deleted.files').'</info>');
             $deletedFiles = json_decode(file_get_contents(__DIR__.'/deleted_files.txt'), true);
             $errorLog     = array();
 
@@ -202,10 +195,7 @@ EOT
                     // Failed to delete, reset the permissions to 644 for safety
                     @chmod($path, 0644);
 
-                    $errorLog[] = sprintf(
-                        'Failed removing the file at %s.  As this is a deleted file, you can manually remove this file.',
-                        $file
-                    );
+                    $errorLog[] = $translator->trans('mautic.core.update.error.removing.file', array('%path%' => $file));
                 }
             }
 
@@ -256,7 +246,7 @@ EOT
         }
 
         // Migrate the database to the current version if migrations exist
-        $output->writeln('<info>Migrate database schema...</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.update.migrating.database.schema').'</info>');
         $iterator = new \FilesystemIterator($this->getContainer()->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
@@ -273,7 +263,7 @@ EOT
             }
         }
 
-        $output->writeln('<info>Cleaning up...</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.core.update.step.finalizing').'</info>');
         // Clear the cached update data and the download package now that we've updated
         if (empty($package)) {
             @unlink($zipFile);
