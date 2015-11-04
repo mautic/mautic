@@ -62,11 +62,11 @@ class CorePermissions
      */
     public function __construct(Translator $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
     {
-        $this->translator   = $translator;
-        $this->em           = $em;
-        $this->tokenStorage = $tokenStorage;
-        $this->params       = $parameters;
-        $this->bundles      = $bundles;
+        $this->translator    = $translator;
+        $this->em            = $em;
+        $this->tokenStorage  = $tokenStorage;
+        $this->params        = $parameters;
+        $this->bundles       = $bundles;
         $this->pluginBundles = $pluginBundles;
     }
 
