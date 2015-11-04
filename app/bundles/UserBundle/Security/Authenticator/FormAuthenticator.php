@@ -71,32 +71,35 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey)
     {
-        $authenticated         = true;
+        $authenticated         = false;
         $authenticationService = null;
         $user                  = $token->getUser();
         $authenticatingService = ($token instanceof PluginToken) ? $token->getAuthenticatingService() : null;
         if (!$user instanceof User) {
-            $authenticated = false;
-
             try {
-                $user          = $userProvider->loadUserByUsername($token->getUsername());
-                $authenticated = $this->encoder->isPasswordValid($user, $token->getCredentials());
+                $user = $userProvider->loadUserByUsername($token->getUsername());
             } catch (UsernameNotFoundException $e) {
             }
 
-            if (!$authenticated) {
-                // Try authenticating with a plugin
-                if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
-                    $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_form'), false, null, true);
-                    $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
-                    $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
+            // Try authenticating with a plugin first
+            if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
+                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_form'), false, null, true);
+                $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
+                $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
 
-                    if ($authenticated = $authEvent->isAuthenticated()) {
-                        $user                  = $authEvent->getUser();
-                        $authenticatingService = $authEvent->getAuthenticatingService();
-                    }
+                if ($authenticated = $authEvent->isAuthenticated()) {
+                    $user                  = $authEvent->getUser();
+                    $authenticatingService = $authEvent->getAuthenticatingService();
                 }
             }
+
+            if (!$authenticated) {
+                // Try authenticating with local password
+                $authenticated = $this->encoder->isPasswordValid($user, $token->getCredentials());
+            }
+        } else {
+            // Assume the user is authenticated although the token will tell for sure
+            $authenticated = true;
         }
 
         if ($authenticated) {

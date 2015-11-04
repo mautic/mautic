@@ -38,7 +38,7 @@ class MauticCoreExtension extends Extension
         unset($core, $plugins);
 
         foreach ($bundles as $bundle) {
-            if (!empty($bundle['config']['services'])) {
+            if (!empty($bundle['config']['services'])) {;
                 $config = $bundle['config']['services'];
                 foreach ($config as $type => $services) {
                     switch ($type) {

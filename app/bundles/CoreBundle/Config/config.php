@@ -88,20 +88,6 @@ return array(
                 'name'     => 'admin',
                 'children' => array()
             )
-        ),
-        'extra' => array(
-            'priority' => -1000,
-            'items'    => array(
-                'name'     => 'extra',
-                'children' => array()
-            )
-        ),
-        'profile' => array(
-            'priority' => -1000,
-            'items'    => array(
-                'name'     => 'profile',
-                'children' => array()
-            )
         )
     ),
     'services'   => array(
@@ -225,29 +211,6 @@ return array(
                 ),
                 'alias'     => 'security'
             ),
-        ),
-        'menus' => array(
-            'mautic.menu.main' => array(
-                'alias' => 'main'
-            ),
-            'mautic.menu.admin' => array(
-                'alias' => 'admin',
-                'options' => array(
-                    'template' => 'MauticCoreBundle:Menu:admin.html.php'
-                )
-            ),
-            'mautic.menu.extra' => array(
-                'alias' => 'extra',
-                'options' => array(
-                    'template' => 'MauticCoreBundle:Menu:extra.html.php'
-                )
-            ),
-            'mautic.menu.profile' => array(
-                'alias' => 'profile',
-                'options' => array(
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.php'
-                )
-            )
         ),
         'other'   => array(
             // Error handler
