@@ -44,14 +44,21 @@ class LogoutHandler implements LogoutHandlerInterface
 
         $dispatcher = $this->factory->getDispatcher();
         if ($dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
-            $event = new LogoutEvent($this->factory->getUser());
+            $event = new LogoutEvent($this->factory->getUser(), $request);
             $dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
         }
 
         // Clear session
-        $request->getSession()->clear();
+        $session = $request->getSession();
+        $session->clear();
 
+        if (isset($event)) {
+            $sessionItems = $event->getPostSessionItems();
+            foreach ($sessionItems as $key => $value) {
+                $session->set($key, $value);
+            }
+        }
         // Note that a logout occurred
-        $request->getSession()->set('post_logout', true);
+        $session->set('post_logout', true);
     }
 }
