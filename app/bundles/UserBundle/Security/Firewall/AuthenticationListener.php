@@ -102,9 +102,8 @@ class AuthenticationListener implements ListenerInterface
                 if ($authToken->isAuthenticated()) {
                     $this->tokenStorage->setToken($authToken);
 
-                    if (!$response) {
-                        $response = $this->onSuccess($request, $authToken);
-                    }
+                    $response = $this->onSuccess($request, $authToken, $response);
+
                 } elseif (empty($response)) {
                     throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
                 }
@@ -141,10 +140,11 @@ class AuthenticationListener implements ListenerInterface
     /**
      * @param Request        $request
      * @param TokenInterface $token
+     * @param Response|null  $response
      *
      * @return Response
      */
-    private function onSuccess(Request $request, TokenInterface $token)
+    private function onSuccess(Request $request, TokenInterface $token, Response $response = null)
     {
         if (null !== $this->logger) {
             $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
@@ -158,10 +158,12 @@ class AuthenticationListener implements ListenerInterface
             $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
         }
 
-        $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
+        if (null === $response) {
+            $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
 
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Success Handler did not return a Response.');
+            if (!$response instanceof Response) {
+                throw new \RuntimeException('Authentication Success Handler did not return a Response.');
+            }
         }
 
         return $response;

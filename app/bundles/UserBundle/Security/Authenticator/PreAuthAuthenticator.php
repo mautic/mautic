@@ -85,62 +85,40 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
 
         $user                  = $token->getUser();
         $authenticatingService = $token->getAuthenticatingService();
+        $response              = null;
 
         if (!$user instanceof User) {
             $authenticated = false;
 
             // Try authenticating with a plugin
             if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
-                $integrationFilter = ($authenticatingService == 'precheck') ? null : $authenticatingService;
-                $integrations      = $this->integrationHelper->getIntegrationObjects($integrationFilter, array('sso_service'), false, null, true);
+                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_service'), false, null, true);
 
                 $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
                 $authEvent  = new AuthenticationEvent(null, $token, $this->userProvider, $this->request, $loginCheck, $authenticatingService, $integrations);
                 $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
 
-                if ($response = $authEvent->getResponse()) {
-
-                    return new PluginToken(
-                        $this->providerKey,
-                        $authenticatingService,
-                        $user,
-                        null,
-                        array(),
-                        $response
-                    );
-                } elseif ($authenticated = $authEvent->isAuthenticated()) {
+                if ($authenticated = $authEvent->isAuthenticated()) {
                     $user                  = $authEvent->getUser();
                     $authenticatingService = $authEvent->getAuthenticatingService();
                 }
+
+                $response = $authEvent->getResponse();
             }
 
-            if (!$authenticated && $authenticatingService != 'precheck') {
+            if (!$authenticated) {
 
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
-        }
-
-        $response = null;
-        if ($authenticatingService == 'precheck') {
-            // Set a response to stop the iframe from looping
-            $response = new Response('hi');
-
-            return new PluginToken(
-                $this->providerKey,
-                $authenticatingService,
-                $user,
-                null,
-                array(),
-                $response
-            );
         }
 
         return new PluginToken(
             $this->providerKey,
             $authenticatingService,
             $user,
-            $user->getPassword(),
-            $user->getRoles()
+            ($user instanceof User) ? $user->getPassword() : '',
+            ($user instanceof User) ? $user->getRoles() : array(),
+            $response
         );
     }
 
