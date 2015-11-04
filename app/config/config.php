@@ -30,10 +30,14 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
 
         // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
-        array_walk_recursive($config, function(&$v, $k) {
-            $v = str_replace('%', '%%', $v);
-        });
-
+        if (isset($config['services'])) {
+            array_walk_recursive(
+                $config['services'],
+                function (&$v, $k) {
+                    $v = str_replace('%', '%%', $v);
+                }
+            );
+        }
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
