@@ -655,7 +655,13 @@ class MauticFactory
 
             // Ensure the do not track list is inserted
             $doNotTrack  = $this->getParameter('do_not_track_ips', array());
+            if (!is_array($doNotTrack)) {
+                $doNotTrack = array();
+            }
             $internalIps = $this->getParameter('do_not_track_internal_ips', array());
+            if (!is_array($internalIps)) {
+                $internalIps = array();
+            }
             $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
             $ipAddress->setDoNotTrackList($doNotTrack);
 

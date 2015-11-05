@@ -411,6 +411,6 @@ return array(
         'cookie_domain'                  => '',
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
-        'do_not_track_ips'               => null,
+        'do_not_track_ips'               => array(),
     )
 );
