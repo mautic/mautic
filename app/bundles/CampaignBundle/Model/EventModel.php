@@ -170,7 +170,7 @@ class EventModel extends CommonFormModel
         $leadModel = $this->factory->getModel('lead');
         $lead      = $leadModel->getCurrentLead();
         $leadId    = $lead->getId();
-        $logger->debug('CAMPAIGN: Current Lead ID: '.$leadId);
+        $logger->debug('CAMPAIGN: Current Lead ID# '.$leadId);
 
         //get the lead's campaigns so we have when the lead was added
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
@@ -227,7 +227,7 @@ class EventModel extends CommonFormModel
                 //has this event already been examined via a parent's children?
                 //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
                 if (in_array($event['id'], $examinedEvents[$leadId])) {
-                    $logger->debug('CAMPAIGN: ID# '.$event['id'].' already processed this round');
+                    $logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' already processed this round');
                     continue;
                 }
                 $examinedEvents[$leadId][] = $event['id'];
@@ -512,13 +512,20 @@ class EventModel extends CommonFormModel
 
         $continue = true;
 
-        $sleepBatchCount = 0;
+        $sleepBatchCount   = 0;
+        $batchDebugCounter = 1;
+
+        $logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
+
         while ($continue && $eventCount < $maxCount) {
+            $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+
             // Get list of all campaign leads
             $campaignLeads = ($leadId) ? array($leadId) : $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
 
             if (empty($campaignLeads)) {
                 // No leads found
+                $logger->debug('CAMPAIGN: No campaign leads found.');
 
                 break;
             }
@@ -539,19 +546,24 @@ class EventModel extends CommonFormModel
                 )
             );
 
+            $logger->debug('CAMPAIGN: Processing the following leads: '.implode(', ', array_keys($leads)));
+
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
+                $logger->debug('CAMPAIGN: No lead entities found.');
 
                 break;
             }
 
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+            $leadDebugCounter = 1;
             foreach ($leads as $lead) {
-                $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
+                $logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                 if ($eventCount >= $maxCount || ($max && ($eventCount + $rootEventCount) >= $max)) {
                     // Hit the max or will hit the max mid-progress for a lead
                     $continue = false;
+                    $logger->debug('CAMPAIGN: Hit max so aborting.');
 
                     break;
                 }
@@ -577,7 +589,7 @@ class EventModel extends CommonFormModel
                             'name' => $campaign->getName(),
                         );
 
-                        $decisionEvent = array(
+                        $decisionEvent        = array(
                             $campaignId => array(
                                 array_merge(
                                     $event,
@@ -591,10 +603,27 @@ class EventModel extends CommonFormModel
                             $decisionTriggerEvent
                         );
                         if ($decisionTriggerEvent->wasDecisionTriggered()) {
+                            $logger->debug(
+                                'CAMPAIGN: Decision ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                                .' noted as completed by event listener thus executing children.'
+                            );
+
                             // Decision has already been triggered by the lead so process the associated events
                             $decisionLogged = false;
                             foreach ($decisionEvent['children'] as $childEvent) {
-                                if ($this->executeEvent($childEvent, $campaign, $lead, $eventSettings, false, null, null, $processedCount, $totalEventCount) && !$decisionLogged) {
+                                if ($this->executeEvent(
+                                        $childEvent,
+                                        $campaign,
+                                        $lead,
+                                        $eventSettings,
+                                        false,
+                                        null,
+                                        null,
+                                        $processedCount,
+                                        $totalEventCount
+                                    )
+                                    && !$decisionLogged
+                                ) {
                                     // Log the decision
                                     $log = $this->getLogEntity($decisionEvent['id'], $campaign, $lead, null, true);
                                     $log->setDateTriggered(new \DateTime());
@@ -623,6 +652,8 @@ class EventModel extends CommonFormModel
                 if ($output && $eventCount < $maxCount) {
                     $progress->setProgress($eventCount);
                 }
+
+                $leadDebugCounter++;
             }
 
             $start += $limit;
@@ -634,6 +665,8 @@ class EventModel extends CommonFormModel
 
             // Free some memory
             gc_collect_cycles();
+
+            $batchDebugCounter++;
         }
 
         if ($output) {
@@ -718,7 +751,7 @@ class EventModel extends CommonFormModel
             unset($triggerDate);
         }
 
-        $logger->debug('CAMPAIGN: Event ID# '.$event['id']);
+        $logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID#'.$lead->getId());
 
         if ($eventTriggerDate == null) {
             $eventTriggerDate = $this->checkEventTiming($event, $parentTriggeredDate, $allowNegative);
@@ -730,7 +763,8 @@ class EventModel extends CommonFormModel
 
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $logger->debug(
-                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' timing is not appropriate and thus scheduled for '
+                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                .' has timing that is not appropriate and thus scheduled for '
                 .$eventTriggerDate->format('Y-m-d H:m:i T').''
             );
 
@@ -771,7 +805,10 @@ class EventModel extends CommonFormModel
                 // Something failed so remove the log
                 $repo->deleteEntity($log);
 
-                $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
+                $logger->debug(
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId().' failed with a response of '
+                    .print_r($response, true)
+                );
             } else {
                 $processedCount++;
 
@@ -780,14 +817,20 @@ class EventModel extends CommonFormModel
                     $repo->saveEntity($log);
                 }
 
-                $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+                $logger->debug(
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                    .' successfully executed and logged with a response of '.print_r($response, true)
+                );
             }
 
             $this->handleCondition($response, $eventSettings, $event, $campaign, $lead, $processedCount, $totalEventCount);
         } else {
             //else do nothing
             $result = false;
-            $logger->debug('CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).')');
+            $logger->debug(
+                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for . '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '
+                .$lead->getId()
+            );
         }
 
         $totalEventCount++;
@@ -840,9 +883,6 @@ class EventModel extends CommonFormModel
             }
         }
 
-        // Log condition
-
-
         return $childExecuted;
     }
 
@@ -876,6 +916,7 @@ class EventModel extends CommonFormModel
 
         // Get a count
         $totalScheduledCount = $repo->getScheduledEvents($campaignId, true);
+        $logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 
         if ($output) {
             $output->writeln(
@@ -912,8 +953,11 @@ class EventModel extends CommonFormModel
             }
         }
 
-        $sleepBatchCount = 0;
+        $sleepBatchCount   = 0;
+        $batchDebugCounter = 1;
         while ($eventCount < $totalScheduledCount) {
+            $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
 
@@ -941,24 +985,30 @@ class EventModel extends CommonFormModel
 
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
+                $logger->debug('CAMPAIGN: No leads entities found');
 
                 break;
             }
 
+            $logger->debug('CAMPAIGN: Processing the following leads '.implode(', ', array_keys($events)));
+            $leadDebugCounter = 1;
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
+                    $logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
                     continue;
                 }
 
                 /** @var \Mautic\LeadBundle\Entity\Lead $lead */
                 $lead = $leads[$leadId];
 
-                $logger->debug('CAMPAIGN: Current Lead ID: '.$lead->getId());
+                $logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                 // Set lead in case this is triggered by the system
                 $leadModel->setSystemCurrentLead($lead);
 
                 $persist = array();
+
+                $logger->debug('CAMPAIGN: Processing the following events for lead ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
 
                 foreach ($leadEvents as $log) {
                     if ($sleepBatchCount == $limit) {
@@ -994,7 +1044,10 @@ class EventModel extends CommonFormModel
                     if ($response !== false || $event['eventType'] == 'condition') {
                         $processedEvents++;
 
-                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' successfully executed and logged.');
+                        $logger->debug(
+                            'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$leadId
+                            .' successfully executed and logged with a response of '.print_r($response, true)
+                        );
 
                         try {
                             $log = $this->em->getReference('MauticCampaignBundle:LeadEventLog', array('lead' => $leadId, 'event' => $event['id']));
@@ -1012,9 +1065,16 @@ class EventModel extends CommonFormModel
                             $this->handleCondition($response, $eventSettings, $event, $campaign, $lead);
                         } catch (EntityNotFoundException $exception) {
                             // The lead has been likely removed from this lead/list
+                            $logger->debug(
+                                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$leadId.' failed with a response of '
+                                .$exception->getMessage()
+                            );
                         }
                     } else {
-                        $logger->debug('CAMPAIGN: ID# '.$event['id'].' execution failed.');
+                        $logger->debug(
+                            'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$leadId.' failed with a response of '
+                            .print_r($response, true)
+                        );
                     }
 
                     $eventCount++;
@@ -1033,8 +1093,13 @@ class EventModel extends CommonFormModel
                             $output->writeln('');
                         }
 
+                        $logger->debug('CAMPAIGN: Max count hit so aborting.');
+
                         // Hit the max, bye bye
                         return $eventCount;
+                    } elseif ($output) {
+                        $currentCount = ($max) ? $totalEventCount : $eventCount;
+                        $progress->setProgress($currentCount);
                     }
                 }
 
@@ -1047,6 +1112,8 @@ class EventModel extends CommonFormModel
                 }
 
                 unset($persist);
+
+                $leadDebugCounter++;
             }
 
             // Free RAM
@@ -1054,13 +1121,10 @@ class EventModel extends CommonFormModel
             $this->em->clear('MauticUserBundle:User');
             unset($events, $leads);
 
-            $currentCount = ($max) ? $totalEventCount : $eventCount;
-            if ($output && $currentCount < $maxCount) {
-                $progress->setProgress($currentCount);
-            }
-
             // Free some memory
             gc_collect_cycles();
+
+            $batchDebugCounter++;
         }
 
         if ($output) {
@@ -1117,6 +1181,8 @@ class EventModel extends CommonFormModel
             }
         }
 
+        $logger->debug('CAMPAIGN: Processing the children of the following events: '.implode(', ', array_keys($nonActionEvents)));
+
         if (empty($nonActionEvents)) {
             // No non-action events associated with this campaign
             unset($campaignEvents);
@@ -1154,9 +1220,11 @@ class EventModel extends CommonFormModel
                 }
             }
 
-            $sleepBatchCount = 0;
-
+            $sleepBatchCount   = 0;
+            $batchDebugCounter = 1;
             while ($start <= $leadCount) {
+                $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+
                 // Get batched campaign ids
                 $campaignLeads = $campaignRepo->getCampaignLeads($campaignId, $start, $limit, array(), array('cl.lead_id, cl.date_added'));
 
@@ -1169,10 +1237,12 @@ class EventModel extends CommonFormModel
 
                 unset($campaignLeads);
 
+                $logger->debug('CAMPAIGN: Processing the following leads: '.implode(', ', $campaignLeadIds));
+
                 foreach ($nonActionEvents as $parentId => $events) {
                     // Just a check to ensure this is an appropriate action
-                    if ($campaignEvents[$parentId]['eventType'] != 'decision') {
-                        $logger->debug('CAMPAIGN: Parent event ID #'.$parentId.' is not a decision.');
+                    if ($campaignEvents[$parentId]['eventType'] == 'action') {
+                        $logger->debug('CAMPAIGN: Parent event ID #'.$parentId.' is an action.');
 
                         continue;
                     }
@@ -1192,7 +1262,11 @@ class EventModel extends CommonFormModel
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the events in the root level
-                        $havingEvents      = (isset($actionEvents[$parentId])) ? array_merge($actionEvents[$parentId], array_keys($events)) : array_keys($events);
+                        $havingEvents      = (isset($actionEvents[$parentId]))
+                            ? array_merge($actionEvents[$parentId], array_keys($events))
+                            : array_keys(
+                                $events
+                            );
                         $leadLog           = $repo->getEventLog($campaignId, $campaignLeadIds, $havingEvents);
                         $unapplicableLeads = array_keys($leadLog);
 
@@ -1229,18 +1303,20 @@ class EventModel extends CommonFormModel
 
                     if (!count($leads)) {
                         // Just a precaution in case non-existent leads are lingering in the campaign leads table
+                        $logger->debug('CAMPAIGN: No lead entities found.');
 
                         continue;
                     }
 
                     // Loop over the non-actions and determine if it has been processed for this lead
 
+                    $leadDebugCounter = 1;
                     /** @var \Mautic\LeadBundle\Entity\Lead $lead */
                     foreach ($leads as $lead) {
                         // Set lead for listeners
                         $leadModel->setSystemCurrentLead($lead);
 
-                        $logger->debug('CAMPAIGN: Lead ID #'.$lead->getId());
+                        $logger->debug('CAMPAIGN: Lead ID #'.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                         // Prevent path if lead has already gone down this path
                         if (!isset($leadLog[$lead->getId()]) || !array_key_exists($parentId, $leadLog[$lead->getId()])) {
@@ -1307,6 +1383,10 @@ class EventModel extends CommonFormModel
                             $decisionLogged = false;
 
                             // Execute or schedule events
+                            $logger->debug(
+                                'CAMPAIGN: Processing the following events for lead ID# '.$lead->getId().': '.implode(', ', array_keys($eventTiming))
+                            );
+
                             foreach ($eventTiming as $id => $eventTriggerDate) {
                                 // Set event
                                 $event             = $events[$id];
@@ -1355,11 +1435,14 @@ class EventModel extends CommonFormModel
                         if ($output && $currentCount < $maxCount) {
                             $progress->setProgress($currentCount);
                         }
-                    }
 
-                    // Save RAM
-                    $this->em->detach($lead);
-                    unset($lead);
+
+                        $leadDebugCounter++;
+
+                        // Save RAM
+                        $this->em->detach($lead);
+                        unset($lead);
+                    }
                 }
 
                 // Next batch
@@ -1380,6 +1463,8 @@ class EventModel extends CommonFormModel
 
                 // Free some memory
                 gc_collect_cycles();
+
+                $batchDebugCounter++;
             }
 
             if ($output) {
@@ -1534,7 +1619,9 @@ class EventModel extends CommonFormModel
 
                 if ($negate) {
                     $logger->debug(
-                        'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('.$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue': 'not past due'));
+                        'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        .$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue' : 'not past due')
+                    );
 
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
@@ -1547,7 +1634,8 @@ class EventModel extends CommonFormModel
                 } elseif (!$pastDue) {
 
                     $logger->debug(
-                        'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('.$now->format('Y-m-d H:i:s T').') and is thus not past due'
+                        'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        .$now->format('Y-m-d H:i:s T').') and is thus not past due'
                     );
 
                     //schedule the event
