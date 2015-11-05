@@ -20,14 +20,22 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
     {
         $this
             ->setName('mautic:campaigns:update')
-            ->setAliases(array(
-                'mautic:update:campaigns',
-                'mautic:rebuild:campaigns',
-                'mautic:campaigns:rebuild',
-            ))
+            ->setAliases(
+                array(
+                    'mautic:update:campaigns',
+                    'mautic:rebuild:campaigns',
+                    'mautic:campaigns:rebuild',
+                )
+            )
             ->setDescription('Rebuild campaigns based on lead lists.')
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
-            ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per campaign for this script execution. Defaults to all.', false)
+            ->addOption(
+                '--max-leads',
+                '-m',
+                InputOption::VALUE_OPTIONAL,
+                'Set max number of leads to process per campaign for this script execution. Defaults to all.',
+                false
+            )
             ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
     }
@@ -38,9 +46,6 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
         $factory    = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
         $em         = $factory->getEntityManager();
-
-        // Set SQL logging to null or else will hit memory limits in dev for sure
-        $em->getConnection()->getConfiguration()->setSQLLogger(null);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $factory->getModel('campaign');
@@ -87,11 +92,13 @@ class UpdateLeadCampaignsCommand extends ContainerAwareCommand
         if ($id) {
             $campaign = $campaignModel->getEntity($id);
             if ($campaign !== null) {
-                $output->writeln('<info>' . $translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)) . '</info>');
+                $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
-                $output->writeln('<comment>' . $translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)) . '</comment>' . "\n");
+                $output->writeln(
+                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
+                );
             } else {
-                $output->writeln('<error>' . $translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)) . '</error>');
+                $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)).'</error>');
             }
         } else {
             $campaigns = $campaignModel->getEntities(
