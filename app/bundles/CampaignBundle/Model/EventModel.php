@@ -785,7 +785,6 @@ class EventModel extends CommonFormModel
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
                     .' failed with DB error: '.$exception->getMessage()
                 );
-                error_log($exception);
 
                 return false;
             }
@@ -797,16 +796,14 @@ class EventModel extends CommonFormModel
                 $result = false;
 
                 // Something failed
-                if (!$logExists) {
-                    if ($wasScheduled) {
-                        // Reschedule
-                        $log->setIsScheduled(true);
-                        $log->setTriggerDate(new \DateTime());
-                        $log->setDateTriggered(null);
-                    } else {
-                        // Remove
-                        $repo->deleteEntity($log);
-                    }
+                if ($wasScheduled) {
+                    // Reschedule
+                    $log->setIsScheduled(true);
+                    $log->setTriggerDate(new \DateTime());
+                    $log->setDateTriggered(null);
+                } else {
+                    // Remove
+                    $repo->deleteEntity($log);
                 }
 
                 $logger->debug(
@@ -1148,9 +1145,11 @@ class EventModel extends CommonFormModel
             );
         }
 
-        $start         = $eventCount = $leadProcessedCount = $lastRoundPercentage = $processedCount = 0;
+        $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = $processedCount = 0;
+
         $eventSettings = $campaignModel->getEvents();
-        $maxCount      = ($max) ? $max : ($leadCount * count($nonActionEvents));
+
+        $maxCount = ($max) ? $max : ($leadCount * count($nonActionEvents));
 
         // Try to save some memory
         gc_enable();
@@ -1164,7 +1163,7 @@ class EventModel extends CommonFormModel
                 }
             }
 
-            $sleepBatchCount   = 0;
+            $sleepBatchCount = 0;
             $batchDebugCounter = 1;
             while ($start <= $leadCount) {
                 $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
@@ -1206,11 +1205,7 @@ class EventModel extends CommonFormModel
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the events in the root level
-                        $havingEvents      = (isset($actionEvents[$parentId]))
-                            ? array_merge($actionEvents[$parentId], array_keys($events))
-                            : array_keys(
-                                $events
-                            );
+                        $havingEvents      = (isset($actionEvents[$parentId])) ? array_merge($actionEvents[$parentId], array_keys($events)) : array_keys($events);
                         $leadLog           = $repo->getEventLog($campaignId, $campaignLeadIds, $havingEvents);
                         $unapplicableLeads = array_keys($leadLog);
 
