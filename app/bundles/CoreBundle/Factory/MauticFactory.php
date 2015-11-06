@@ -615,7 +615,13 @@ class MauticFactory
                     $ip = end($ips);
                 }
 
-                return trim($ip);
+                $ip = trim($ip);
+
+                // Validate IP
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+
+                    return $ip;
+                }
             }
         }
 
