@@ -70,7 +70,9 @@ abstract class AbstractMaxmindIpLookup extends AbstractIpLookup
 
         if ($data && empty($data->error)) {
             $this->city      = $data->city->names->en;
-            $this->region    = $data->subdivisions->names->en;
+            if (isset($data->subdivisions[0])) {
+                $this->region = $data->subdivisions[0]->names->en;
+            }
             $this->country   = $data->country->names->en;
             $this->latitude  = $data->location->latitude;
             $this->longitude = $data->location->longitude;
