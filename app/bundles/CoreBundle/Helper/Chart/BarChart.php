@@ -24,10 +24,15 @@ class BarChart extends AbstractChart implements ChartInterface
     protected $order;
 
     /**
-     * Render chart data
+     * Defines the basic chart values, generates the time axe labels from it
+     *
+     * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param integer $limit the number of loaded items
+     * @param string  $start date
+     * @param string  $order (DESC|ASC) 
      */
     public function __construct($unit = 'm', $limit = 12, $start = null, $order = 'DESC') {
-        $this->unit = $unit;
+        $this->unit  = $unit;
         $this->limit = $limit;
         $this->start = $start;
         $this->order = $order;
