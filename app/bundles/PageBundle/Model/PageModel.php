@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
  * Class PageModel
@@ -868,8 +869,6 @@ class PageModel extends FormModel
      * @param array   $filter
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getHitsBarChartData($amount, $unit, $filter = array())
     {
@@ -877,5 +876,23 @@ class PageModel extends FormModel
         $chartData = $barChart->fetchTimeData($this->factory->getEntityManager()->getConnection(), 'page_hits', 'date_hit', $filter);
         $barChart->setDataset('Hit Count', $chartData);
         return $barChart->render();
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param array  $filter
+     *
+     * @return array
+     */
+    public function getNewVsReturningPieChartData($filter = array())
+    {
+        $chart           = new PieChart($unit, $amount);
+        $allVisits       = $chart->count($this->factory->getEntityManager()->getConnection(), 'page_hits', 'lead_id', $filter);
+        $uniqueVisits    = $chart->count($this->factory->getEntityManager()->getConnection(), 'page_hits', 'lead_id', $filter, array('getUnique' => true));
+        $returningVisits = $allVisits - $uniqueVisits;
+        $chart->setDataset('Unique', $uniqueVisits);
+        $chart->setDataset('Returning', $returningVisits);
+        return $chart->render();
     }
 }

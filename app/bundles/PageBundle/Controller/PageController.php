@@ -295,6 +295,7 @@ class PageController extends FormController
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
                     ),
+                    'newVsReturning' => $model->getNewVsReturningPieChartData(array('page_id' => $objectId)),
                     'dwellTime' => $model->getDwellTimeStats($activePage)
                 ),
                 'abTestResults' => $abTestResults,

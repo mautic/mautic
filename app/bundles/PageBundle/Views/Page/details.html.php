@@ -113,8 +113,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             <div class="text-center">
                                 <canvas id="returning-rate" width="110" height="110"></canvas>
                                 <div id="returning-data" class="hide">
-                                <?php if (isset($stats['dwellTime']['newVsReturning'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime']['newVsReturning']); ?>
+                                <?php if (isset($stats['newVsReturning'])) : ?>
+                                    <?php echo json_encode($stats['newVsReturning']); ?>
                                 <?php else : ?>
                                     []
                                 <?php endif; ?>
