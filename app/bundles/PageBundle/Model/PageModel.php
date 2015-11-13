@@ -21,6 +21,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 
 /**
  * Class PageModel
@@ -857,5 +858,24 @@ class PageModel extends FormModel
         $this->getRepository()->nullParents($ids);
 
         return parent::deleteEntities($ids);
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param array   $filter
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getHitsBarChartData($amount, $unit, $filter = array())
+    {
+        $barChart = new BarChart($unit, $amount);
+        $chartData = $barChart->fetchTimeData($this->factory->getEntityManager()->getConnection(), 'page_hits', 'date_hit', $filter);
+        $barChart->setDataset('Hit Count', $chartData);
+        return $barChart->render();
     }
 }
