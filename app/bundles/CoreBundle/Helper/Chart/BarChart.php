@@ -29,7 +29,7 @@ class BarChart extends AbstractChart implements ChartInterface
      * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param integer $limit the number of loaded items
      * @param string  $start date
-     * @param string  $order (DESC|ASC) 
+     * @param string  $order (DESC|ASC)
      */
     public function __construct($unit = 'm', $limit = 12, $start = null, $order = 'DESC') {
         $this->unit  = $unit;
@@ -76,7 +76,7 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @param  Connection $connection
      * @param  string     $table without prefix
-     * @param  string     $dateColumn name. The column must by type of datetime
+     * @param  string     $dateColumn name. The column must be type of datetime
      * @param  array      $filters will be added to where claues
      */
     public function fetchTimeData(Connection $connection, $table, $dateColumn, $filters = array()) {
