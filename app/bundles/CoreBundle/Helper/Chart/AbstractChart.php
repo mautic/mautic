@@ -103,49 +103,41 @@ abstract class AbstractChart
      */
     public $colors = array(
         array(
-            'color' => '#4E5D9D',
             'fillColor' => 'rgba(78, 93, 157, 0.5)',
             'strokeColor' => 'rgba(78, 93, 157, 0.8)',
             'highlightFill' => 'rgba(78, 93, 157, 0.75)',
             'highlightStroke' => 'rgba(78, 93, 157, 1)'),
         array(
-            'color' => '#00b49c',
             'fillColor' => 'rgba(0, 180, 156, 0.5)',
             'strokeColor' => 'rgba(0, 180, 156, 0.8)',
             'highlightFill' => 'rgba(0, 180, 156, 0.75)',
             'highlightStroke' => 'rgba(0, 180, 156, 1)'),
         array(
-            'color' => '#fd9572',
             'fillColor' => 'rgba(253, 149, 114, 0.5)',
             'strokeColor' => 'rgba(253, 149, 114, 0.8)',
             'highlightFill' => 'rgba(253, 149, 114, 0.75)',
             'highlightStroke' => 'rgba(253, 149, 114, 1)'),
         array(
-            'color' => '#fdb933',
             'fillColor' => 'rgba(253, 185, 51, 0.5)',
             'strokeColor' => 'rgba(253, 185, 51, 0.8)',
             'highlightFill' => 'rgba(253, 185, 51, 0.75)',
             'highlightStroke' => 'rgba(253, 185, 51, 1)'),
         array(
-            'color' => '#757575',
             'fillColor' => 'rgba(117, 117, 117, 0.5)',
             'strokeColor' => 'rgba(117, 117, 117, 0.8)',
             'highlightFill' => 'rgba(117, 117, 117, 0.75)',
             'highlightStroke' => 'rgba(117, 117, 117, 1)'),
         array(
-            'color' => '#9C4E5C',
             'fillColor' => 'rgba(156, 78, 92, 0.5)',
             'strokeColor' => 'rgba(156, 78, 92, 0.8)',
             'highlightFill' => 'rgba(156, 78, 92, 0.75)',
             'highlightStroke' => 'rgba(156, 78, 92, 1)'),
         array(
-            'color' => '#694535',
             'fillColor' => 'rgba(105, 69, 53, 0.5)',
             'strokeColor' => 'rgba(105, 69, 53, 0.8)',
             'highlightFill' => 'rgba(105, 69, 53, 0.75)',
             'highlightStroke' => 'rgba(105, 69, 53, 1)'),
         array(
-            'color' => '#596935',
             'fillColor' => 'rgba(89, 105, 53, 0.5)',
             'strokeColor' => 'rgba(89, 105, 53, 0.8)',
             'highlightFill' => 'rgba(89, 105, 53, 0.75)',

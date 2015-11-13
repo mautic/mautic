@@ -52,7 +52,7 @@ class PieChart extends AbstractChart implements ChartInterface
         $this->datasets[] = array(
             'label'     => $label,
             'value'     => $value,
-            'color'     => $this->colors[$datasetId]['color'],
+            'color'     => $this->colors[$datasetId]['highlightFill'],
             'highlight' => $this->colors[$datasetId]['highlightStroke']
         );
 
