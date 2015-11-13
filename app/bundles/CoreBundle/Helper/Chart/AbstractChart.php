@@ -153,24 +153,6 @@ abstract class AbstractChart
     );
 
     /**
-     * Define a dataset by name and data. Method will add the rest.
-     *
-     * @param  string $label
-     * @param  array  $data
-     *
-     * @return $this
-     */
-    public function setDataset($label = null, array $data)
-    {
-        $this->datasets[] = array(
-            'label' => $label,
-            'data'  => $data
-        );
-
-        return $this;
-    }
-
-    /**
      * Generate array of labels from the form data
      *
      * @param  string  $unit
