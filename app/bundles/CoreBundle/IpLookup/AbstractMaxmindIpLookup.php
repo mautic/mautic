@@ -15,11 +15,34 @@ namespace Mautic\CoreBundle\IpLookup;
 abstract class AbstractMaxmindIpLookup extends AbstractIpLookup
 {
     /**
+     * Fetches the data for the given IP address
+     *
+     * @return $this
+     */
+    public function getData()
+    {
+        $url = $this->getUrl();
+
+        try {
+            $headers = array(
+                'Authorization' => 'Basic ' . base64_encode($this->auth),
+            );
+            $response = $this->connector->{$this->method}($url, $headers);
+
+            $this->parseData($response->body);
+        } catch (\Exception $exception) {
+            if ($this->logger) {
+                $this->logger->warning('IP LOOKUP: ' . $exception->getMessage());
+            }
+        }
+    }
+
+    /**
      * @return string
      */
     protected function getUrl()
     {
-        $url = "https://{$this->auth}@geoip.maxmind.com/geoip/v2.1/";
+        $url = "https://geoip.maxmind.com/geoip/v2.1/";
 
         switch ($this->getName()) {
             case 'maxmind_country':

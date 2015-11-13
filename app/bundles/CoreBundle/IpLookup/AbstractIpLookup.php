@@ -78,6 +78,7 @@ abstract class AbstractIpLookup
         $this->ip        = $ip;
         $this->connector = HttpFactory::getHttp();
         $this->logger    = $logger;
+        $this->auth      = $auth;
     }
 
     /**
