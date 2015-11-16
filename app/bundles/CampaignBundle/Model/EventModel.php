@@ -220,9 +220,9 @@ class EventModel extends CommonFormModel
         //get campaign list
         $campaigns = $campaignModel->getEntities(
             array(
-                'force' => array(
+                'force'            => array(
                     'filter' => array(
-                        array (
+                        array(
                             'column' => 'c.id',
                             'expr'   => 'in',
                             'value'  => array_keys($events)
@@ -369,7 +369,7 @@ class EventModel extends CommonFormModel
      * @param bool            $max
      * @param OutputInterface $output
      * @param int|null        $leadId
-     * @param bool|false      $returnTotalCounts
+     * @param bool|false      $returnCounts If true, returns array of counters
      *
      * @return int
      */
@@ -380,7 +380,7 @@ class EventModel extends CommonFormModel
         $max = false,
         OutputInterface $output = null,
         $leadId = null,
-        $returnTotalCounts = false
+        $returnCounts = false
     ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -417,8 +417,13 @@ class EventModel extends CommonFormModel
 
         if (empty($rootEventCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
-
-            return 0;
+            return ($returnCounts) ? array(
+                'events'         => 0,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0
+            ) : 0;
         }
 
         // Event settings
@@ -431,20 +436,26 @@ class EventModel extends CommonFormModel
         if ($leadId && in_array($leadId, $ignoreLeads)) {
             $logger->debug('CAMPAIGN: Lead ID '.$leadId.' has already started the campaign');
 
-            return 0;
+            return ($returnCounts) ? array(
+                'events'         => $rootEventCount,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0
+            ) : 0;
         }
 
         // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
         $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $ignoreLeads, $leadId);
 
         // Get a total number of events that will be processed
-        $totalEvents = $leadCount * $rootEventCount;
+        $totalStartingEvents = $leadCount * $rootEventCount;
 
         if ($output) {
             $output->writeln(
                 $this->translator->trans(
                     'mautic.campaign.trigger.event_count',
-                    array('%events%' => $totalEvents, '%batch%' => $limit)
+                    array('%events%' => $totalStartingEvents, '%batch%' => $limit)
                 )
             );
         }
@@ -454,15 +465,21 @@ class EventModel extends CommonFormModel
 
             unset($events);
 
-            return 0;
+            return ($returnCounts) ? array(
+                'events'         => $totalEventCount,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0
+            ) : 0;
         }
 
-        $start = $eventCount = $processedCount = 0;
+        $start = $evaluatedEventCount = $executedEventCount = $rootEvaluatedCount = $rootExecutedCount = 0;
 
         // Try to save some memory
         gc_enable();
 
-        $maxCount = ($max) ? $max : $totalEvents;
+        $maxCount = ($max) ? $max : $totalStartingEvents;
 
         if ($output) {
             $progress = new ProgressBar($output, $maxCount);
@@ -471,12 +488,12 @@ class EventModel extends CommonFormModel
 
         $continue = true;
 
-        $sleepBatchCount = 0;
+        $sleepBatchCount   = 0;
         $batchDebugCounter = 1;
 
         $logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
 
-        while ($continue && $eventCount < $maxCount) {
+        while ($continue) {
             $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
 
             // Get list of all campaign leads
@@ -519,7 +536,7 @@ class EventModel extends CommonFormModel
             foreach ($leads as $lead) {
                 $logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
-                if ($eventCount >= $maxCount || ($max && ($eventCount + $rootEventCount) >= $max)) {
+                if ($rootEvaluatedCount >= $maxCount || ($max && ($rootEvaluatedCount + $rootEventCount) >= $max)) {
                     // Hit the max or will hit the max mid-progress for a lead
                     $continue = false;
                     $logger->debug('CAMPAIGN: Hit max so aborting.');
@@ -531,6 +548,7 @@ class EventModel extends CommonFormModel
                 $leadModel->setSystemCurrentLead($lead);
 
                 foreach ($events as $event) {
+                    $rootEvaluatedCount++;
 
                     if ($sleepBatchCount == $limit) {
                         // Keep CPU down
@@ -540,15 +558,16 @@ class EventModel extends CommonFormModel
                         $sleepBatchCount++;
                     }
 
-                    $eventCount++;
-
                     if ($event['eventType'] == 'decision') {
+                        $evaluatedEventCount++;
+                        $totalEventCount++;
+
                         $event['campaign'] = array(
                             'id'   => $campaign->getId(),
                             'name' => $campaign->getName(),
                         );
 
-                        $decisionEvent = array(
+                        $decisionEvent        = array(
                             $campaignId => array(
                                 array_merge(
                                     $event,
@@ -562,6 +581,9 @@ class EventModel extends CommonFormModel
                             $decisionTriggerEvent
                         );
                         if ($decisionTriggerEvent->wasDecisionTriggered()) {
+                            $executedEventCount++;
+                            $rootExecutedCount++;
+
                             $logger->debug(
                                 'CAMPAIGN: Decision ID# '.$event['id'].' for lead ID# '.$lead->getId()
                                 .' noted as completed by event listener thus executing children.'
@@ -578,7 +600,8 @@ class EventModel extends CommonFormModel
                                         false,
                                         null,
                                         null,
-                                        $processedCount,
+                                        $evaluatedEventCount,
+                                        $executedEventCount,
                                         $totalEventCount
                                     )
                                     && !$decisionLogged
@@ -598,19 +621,33 @@ class EventModel extends CommonFormModel
 
                         unset($decisionEvent);
                     } else {
-                        $this->executeEvent($event, $campaign, $lead, $eventSettings, false, null, null, $processedCount, $totalEventCount);
+                        if ($this->executeEvent(
+                            $event,
+                            $campaign,
+                            $lead,
+                            $eventSettings,
+                            false,
+                            null,
+                            null,
+                            false,
+                            $evaluatedEventCount,
+                            $executedEventCount,
+                            $totalEventCount
+                        )) {
+                            $rootExecutedCount++;
+                        }
                     }
 
                     unset($event);
+
+                    if ($output && $rootEvaluatedCount < $maxCount) {
+                        $progress->setProgress($rootEvaluatedCount);
+                    }
                 }
 
                 // Free some RAM
                 $this->em->detach($lead);
                 unset($lead);
-
-                if ($output && $eventCount < $maxCount) {
-                    $progress->setProgress($eventCount);
-                }
 
                 $leadDebugCounter++;
             }
@@ -633,7 +670,16 @@ class EventModel extends CommonFormModel
             $output->writeln('');
         }
 
-        return ($returnTotalCounts) ? array($totalEventCount, $totalEvents) : $processedCount;
+        $counts = array(
+            'events'         => $totalStartingEvents,
+            'evaluated'      => $rootEvaluatedCount,
+            'executed'       => $rootExecutedCount,
+            'totalEvaluated' => $evaluatedEventCount,
+            'totalExecuted'  => $executedEventCount
+        );
+        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+        return ($returnCounts) ? $counts : $executedEventCount;
     }
 
     /**
@@ -647,8 +693,9 @@ class EventModel extends CommonFormModel
      * @param  \DateTime      $parentTriggeredDate
      * @param  \DateTime|bool $eventTriggerDate
      * @param  bool           $logExists
-     * @param  integer        $processedCount
-     * @param  integer        $totalEventCount
+     * @param  integer        $evaluatedEventCount The number of events evaluated for the current method (kickoff, negative/inaction, scheduled)
+     * @param  integer        $executedEventCount  The number of events successfully executed for the current method
+     * @param  integer        $totalEventCount     The total number of events across all methods
      *
      * @return bool
      */
@@ -661,9 +708,13 @@ class EventModel extends CommonFormModel
         \DateTime $parentTriggeredDate = null,
         $eventTriggerDate = null,
         $logExists = false,
-        &$processedCount = 0,
+        &$evaluatedEventCount = 0,
+        &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
+        $evaluatedEventCount++;
+        $totalEventCount++;
+
         // Get event settings if applicable
         if ($eventSettings === null) {
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
@@ -721,7 +772,7 @@ class EventModel extends CommonFormModel
         $result = true;
 
         // Create/get log entry
-        if ($logExists)  {
+        if ($logExists) {
             $log = $this->em->getReference(
                 'MauticCampaignBundle:LeadEventLog',
                 array(
@@ -735,7 +786,7 @@ class EventModel extends CommonFormModel
         }
 
         if ($eventTriggerDate instanceof \DateTime) {
-            $processedCount++;
+            $executedEventCount++;
 
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $logger->debug(
@@ -811,7 +862,7 @@ class EventModel extends CommonFormModel
                     .print_r($response, true)
                 );
             } else {
-                $processedCount++;
+                $executedEventCount++;
 
                 if ($response !== true) {
                     if ($this->triggeredResponses !== false) {
@@ -831,7 +882,7 @@ class EventModel extends CommonFormModel
                 );
             }
 
-            $this->handleCondition($response, $eventSettings, $event, $campaign, $lead, $processedCount, $totalEventCount);
+            $this->handleCondition($response, $eventSettings, $event, $campaign, $lead, $evaluatedEventCount, $executedEventCount, $totalEventCount);
         } else {
             //else do nothing
             $result = false;
@@ -840,8 +891,6 @@ class EventModel extends CommonFormModel
                 .$lead->getId()
             );
         }
-
-        $totalEventCount++;
 
         if (!empty($log)) {
             // Detach log
@@ -862,13 +911,22 @@ class EventModel extends CommonFormModel
      * @param  array    $event
      * @param  Campaign $campaign
      * @param  Lead     $lead
-     * @param  integer  $processedCount
-     * @param  integer  $totalEventCount
+     * @param  integer  $evaluatedEventCount The number of events evaluated for the current method (kickoff, negative/inaction, scheduled)
+     * @param  integer  $executedEventCount  The number of events successfully executed for the current method
+     * @param  integer  $totalEventCount     The total number of events across all methods
      *
      * @return bool     True if an event was executed
      */
-    public function handleCondition($response, $eventSettings, $event, $campaign, $lead, &$processedCount = 0, &$totalEventCount = 0)
-    {
+    public function handleCondition(
+        $response,
+        $eventSettings,
+        $event,
+        $campaign,
+        $lead,
+        &$evaluatedEventCount = 0,
+        &$executedEventCount = 0,
+        &$totalEventCount = 0
+    ) {
         if (empty($event['eventType']) || $event['eventType'] != 'condition') {
 
             return false;
@@ -886,7 +944,20 @@ class EventModel extends CommonFormModel
         $childExecuted = false;
         foreach ($childEvents as $childEvent) {
             // Trigger child event recursively
-            if ($this->executeEvent($childEvent, $campaign, $lead, $eventSettings, true, null, null, false, $processedCount, $totalEventCount)) {
+            if ($this->executeEvent(
+                $childEvent,
+                $campaign,
+                $lead,
+                $eventSettings,
+                true,
+                null,
+                null,
+                false,
+                $evaluatedEventCount,
+                $executedEventCount,
+                $totalEventCount
+            )
+            ) {
                 $childExecuted = true;
             }
         }
@@ -900,12 +971,19 @@ class EventModel extends CommonFormModel
      * @param int             $limit
      * @param bool            $max
      * @param OutputInterface $output
+     * @param bool|false      $returnCounts If true, returns array of counters
      *
      * @return int
      * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerScheduledEvents($campaign, &$totalEventCount, $limit = 100, $max = false, OutputInterface $output = null)
-    {
+    public function triggerScheduledEvents(
+        $campaign,
+        &$totalEventCount,
+        $limit = 100,
+        $max = false,
+        OutputInterface $output = null,
+        $returnCounts = false
+    ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $campaignId   = $campaign->getId();
@@ -938,7 +1016,13 @@ class EventModel extends CommonFormModel
         if (empty($totalScheduledCount)) {
             $logger->debug('CAMPAIGN: No events to trigger');
 
-            return 0;
+            return ($returnCounts) ? array(
+                'events'         => 0,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0
+            ) : 0;
         }
 
         // Get events to avoid joins
@@ -947,8 +1031,8 @@ class EventModel extends CommonFormModel
         // Event settings
         $eventSettings = $campaignModel->getEvents();
 
-        $eventCount = $processedEvents = 0;
-        $maxCount   = ($max) ? $max : $totalScheduledCount;
+        $evaluatedEventCount = $executedEventCount = $scheduledEvaluatedCount = $scheduledExecutedCount = 0;
+        $maxCount            = ($max) ? $max : $totalScheduledCount;
 
         // Try to save some memory
         gc_enable();
@@ -961,9 +1045,9 @@ class EventModel extends CommonFormModel
             }
         }
 
-        $sleepBatchCount = 0;
+        $sleepBatchCount   = 0;
         $batchDebugCounter = 1;
-        while ($eventCount < $totalScheduledCount) {
+        while ($scheduledEvaluatedCount < $totalScheduledCount) {
             $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
 
             // Get a count
@@ -972,7 +1056,16 @@ class EventModel extends CommonFormModel
             if (empty($events)) {
                 unset($campaignEvents, $event, $leads, $eventSettings);
 
-                return $eventCount;
+                $counts = array(
+                    'events'         => $totalScheduledCount,
+                    'evaluated'      => $scheduledEvaluatedCount,
+                    'executed'       => $scheduledExecutedCount,
+                    'totalEvaluated' => $evaluatedEventCount,
+                    'totalExecuted'  => $executedEventCount
+                );
+                $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+                return ($returnCounts) ? $counts : $executedEventCount;
             }
 
             $leads = $leadModel->getEntities(
@@ -1003,6 +1096,7 @@ class EventModel extends CommonFormModel
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
                     $logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
+
                     continue;
                 }
 
@@ -1017,6 +1111,8 @@ class EventModel extends CommonFormModel
                 $logger->debug('CAMPAIGN: Processing the following events for lead ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
 
                 foreach ($leadEvents as $log) {
+                    $scheduledEvaluatedCount++;
+
                     if ($sleepBatchCount == $limit) {
                         // Keep CPU down
                         $this->batchSleep();
@@ -1034,9 +1130,21 @@ class EventModel extends CommonFormModel
                     );
 
                     // Execute event
-                    $this->executeEvent($event, $campaign, $lead, $eventSettings, false, null, true, true, $processedEvents, $totalEventCount);
-
-                    $eventCount++;
+                    if ($this->executeEvent(
+                        $event,
+                        $campaign,
+                        $lead,
+                        $eventSettings,
+                        false,
+                        null,
+                        true,
+                        true,
+                        $evaluatedEventCount,
+                        $executedEventCount,
+                        $totalEventCount
+                    )) {
+                        $scheduledExecutedCount++;
+                    }
 
                     if ($max && $totalEventCount >= $max) {
                         unset($campaignEvents, $event, $leads, $eventSettings);
@@ -1049,9 +1157,20 @@ class EventModel extends CommonFormModel
                         $logger->debug('CAMPAIGN: Max count hit so aborting.');
 
                         // Hit the max, bye bye
-                        return $eventCount;
+
+                        $counts = array(
+                            'events'         => $totalScheduledCount,
+                            'evaluated'      => $scheduledEvaluatedCount,
+                            'executed'       => $scheduledExecutedCount,
+                            'totalEvaluated' => $evaluatedEventCount,
+                            'totalExecuted'  => $executedEventCount
+                        );
+                        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+                        return ($returnCounts) ? $counts : $executedEventCount;
+
                     } elseif ($output) {
-                        $currentCount = ($max) ? $totalEventCount : $eventCount;
+                        $currentCount = ($max) ? $totalEventCount : $evaluatedEventCount;
                         $progress->setProgress($currentCount);
                     }
                 }
@@ -1075,7 +1194,16 @@ class EventModel extends CommonFormModel
             $output->writeln('');
         }
 
-        return $processedEvents;
+        $counts = array(
+            'events'         => $totalScheduledCount,
+            'evaluated'      => $scheduledEvaluatedCount,
+            'executed'       => $scheduledExecutedCount,
+            'totalEvaluated' => $evaluatedEventCount,
+            'totalExecuted'  => $executedEventCount
+        );
+        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+        return ($returnCounts) ? $counts : $executedEventCount;
     }
 
     /**
@@ -1086,11 +1214,18 @@ class EventModel extends CommonFormModel
      * @param int             $limit
      * @param bool            $max
      * @param OutputInterface $output
+     * @param bool|false      $returnCounts If true, returns array of counters
      *
      * @return int
      */
-    public function triggerNegativeEvents($campaign, &$totalEventCount = 0, $limit = 100, $max = false, OutputInterface $output = null)
-    {
+    public function triggerNegativeEvents(
+        $campaign,
+        &$totalEventCount = 0,
+        $limit = 100,
+        $max = false,
+        OutputInterface $output = null,
+        $returnCounts = false
+    ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $logger = $this->factory->getLogger();
@@ -1145,11 +1280,10 @@ class EventModel extends CommonFormModel
             );
         }
 
-        $start = $eventCount = $leadProcessedCount = $lastRoundPercentage = $processedCount = 0;
-
-        $eventSettings = $campaignModel->getEvents();
-
-        $maxCount = ($max) ? $max : ($leadCount * count($nonActionEvents));
+        $start               = $leadProcessedCount = $lastRoundPercentage = $executedEventCount = $evaluatedEventCount = $negativeExecutedCount = $negativeEvaluatedCount = 0;
+        $nonActionEventCount = $leadCount * count($nonActionEvents);
+        $eventSettings       = $campaignModel->getEvents();
+        $maxCount            = ($max) ? $max : $nonActionEventCount;
 
         // Try to save some memory
         gc_enable();
@@ -1163,7 +1297,7 @@ class EventModel extends CommonFormModel
                 }
             }
 
-            $sleepBatchCount = 0;
+            $sleepBatchCount   = 0;
             $batchDebugCounter = 1;
             while ($start <= $leadCount) {
                 $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
@@ -1205,7 +1339,11 @@ class EventModel extends CommonFormModel
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the events in the root level
-                        $havingEvents      = (isset($actionEvents[$parentId])) ? array_merge($actionEvents[$parentId], array_keys($events)) : array_keys($events);
+                        $havingEvents      = (isset($actionEvents[$parentId]))
+                            ? array_merge($actionEvents[$parentId], array_keys($events))
+                            : array_keys(
+                                $events
+                            );
                         $leadLog           = $repo->getEventLog($campaignId, $campaignLeadIds, $havingEvents);
                         $unapplicableLeads = array_keys($leadLog);
 
@@ -1252,6 +1390,8 @@ class EventModel extends CommonFormModel
                     $leadDebugCounter = 1;
                     /** @var \Mautic\LeadBundle\Entity\Lead $lead */
                     foreach ($leads as $lead) {
+                        $negativeEvaluatedCount++;
+
                         // Set lead for listeners
                         $leadModel->setSystemCurrentLead($lead);
 
@@ -1282,6 +1422,7 @@ class EventModel extends CommonFormModel
                                 if (isset($leadLog[$lead->getId()]) && array_key_exists($id, $leadLog[$lead->getId()])) {
                                     $logger->debug('CAMPAIGN: Event (ID #'.$id.') has already been executed');
                                     unset($e);
+
                                     continue;
                                 }
 
@@ -1303,12 +1444,15 @@ class EventModel extends CommonFormModel
                             }
 
                             if (!$executeAction) {
+                                $negativeEvaluatedCount += count($nonActionEvents);
+
                                 // Timing is not appropriate so move on to next lead
                                 unset($eventTiming);
+
                                 continue;
                             }
 
-                            if ($max && ($totalEventCount + count($eventTiming)) >= $max) {
+                            if ($max && ($totalEventCount + count($nonActionEvents)) >= $max) {
 
                                 // Hit the max or will hit the max while mid-process for the lead
                                 if ($output) {
@@ -1316,7 +1460,16 @@ class EventModel extends CommonFormModel
                                     $output->writeln('');
                                 }
 
-                                return $eventCount;
+                                $counts = array(
+                                    'events'         => $nonActionEventCount,
+                                    'evaluated'      => $negativeEvaluatedCount,
+                                    'executed'       => $negativeExecutedCount,
+                                    'totalEvaluated' => $evaluatedEventCount,
+                                    'totalExecuted'  => $executedEventCount
+                                );
+                                $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+                                return ($returnCounts) ? $counts : $executedEventCount;
                             }
 
                             $decisionLogged = false;
@@ -1338,32 +1491,33 @@ class EventModel extends CommonFormModel
                                 $leadModel->setSystemCurrentLead($lead);
 
                                 if ($this->executeEvent(
-                                        $event,
-                                        $campaign,
-                                        $lead,
-                                        $eventSettings,
-                                        false,
-                                        null,
-                                        $eventTriggerDate,
-                                        false,
-                                        $processedCount,
-                                        $totalEventCount
-                                    )
-                                    && !$decisionLogged
+                                    $event,
+                                    $campaign,
+                                    $lead,
+                                    $eventSettings,
+                                    false,
+                                    null,
+                                    $eventTriggerDate,
+                                    false,
+                                    $evaluatedEventCount,
+                                    $executedEventCount,
+                                    $totalEventCount
+                                )
                                 ) {
-                                    // Log the decision
-                                    $log = $this->getLogEntity($parentId, $campaign, $lead, null, true);
-                                    $log->setDateTriggered(new \DateTime());
-                                    $log->setNonActionPathTaken(true);
-                                    $repo->saveEntity($log);
-                                    $this->em->detach($log);
-                                    unset($log);
+                                    if (!$decisionLogged) {
+                                        // Log the decision
+                                        $log = $this->getLogEntity($parentId, $campaign, $lead, null, true);
+                                        $log->setDateTriggered(new \DateTime());
+                                        $log->setNonActionPathTaken(true);
+                                        $repo->saveEntity($log);
+                                        $this->em->detach($log);
+                                        unset($log);
 
-                                    $decisionLogged = true;
+                                        $decisionLogged = true;
+                                    }
+
+                                    $negativeExecutedCount++;
                                 }
-
-                                $eventCount++;
-                                $totalEventCount++;
 
                                 unset($utcDateString, $grandParentDate);
                             }
@@ -1371,7 +1525,7 @@ class EventModel extends CommonFormModel
                             $logger->debug('CAMPAIGN: Decision has already been executed.');
                         }
 
-                        $currentCount = ($max) ? $totalEventCount : $leadProcessedCount;
+                        $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
                         if ($output && $currentCount < $maxCount) {
                             $progress->setProgress($currentCount);
                         }
@@ -1387,15 +1541,13 @@ class EventModel extends CommonFormModel
                 // Next batch
                 $start += $limit;
 
-                $leadProcessedCount += count($campaignLeadIds);
-
                 // Save RAM
                 $this->em->clear('MauticLeadBundle:Lead');
                 $this->em->clear('MauticUserBundle:User');
 
                 unset($leads, $campaignLeadIds, $leadLog);
 
-                $currentCount = ($max) ? $eventCount : $leadProcessedCount;
+                $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
                 if ($output && $currentCount < $maxCount) {
                     $progress->setProgress($currentCount);
                 }
@@ -1413,7 +1565,16 @@ class EventModel extends CommonFormModel
 
         }
 
-        return $processedCount;
+        $counts = array(
+            'events'         => $nonActionEventCount,
+            'evaluated'      => $negativeEvaluatedCount,
+            'executed'       => $negativeExecutedCount,
+            'totalEvaluated' => $evaluatedEventCount,
+            'totalExecuted'  => $executedEventCount
+        );
+        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+
+        return ($returnCounts) ? $counts : $executedEventCount;
     }
 
     /**
@@ -1558,7 +1719,9 @@ class EventModel extends CommonFormModel
 
                 if ($negate) {
                     $logger->debug(
-                        'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('.$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue': 'not past due'));
+                        'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        .$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue' : 'not past due')
+                    );
 
                     //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
                     //the event otherwise false to do nothing
@@ -1571,7 +1734,8 @@ class EventModel extends CommonFormModel
                 } elseif (!$pastDue) {
 
                     $logger->debug(
-                        'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('.$now->format('Y-m-d H:i:s T').') and is thus not past due'
+                        'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        .$now->format('Y-m-d H:i:s T').') and is thus not past due'
                     );
 
                     //schedule the event
