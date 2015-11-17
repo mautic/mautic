@@ -437,7 +437,7 @@ class EventModel extends CommonFormModel
             $logger->debug('CAMPAIGN: Lead ID '.$leadId.' has already started the campaign');
 
             return ($returnCounts) ? array(
-                'events'         => $rootEventCount,
+                'events'         => 0,
                 'evaluated'      => 0,
                 'executed'       => 0,
                 'totalEvaluated' => 0,
@@ -466,7 +466,7 @@ class EventModel extends CommonFormModel
             unset($events);
 
             return ($returnCounts) ? array(
-                'events'         => $totalEventCount,
+                'events'         => 0,
                 'evaluated'      => 0,
                 'executed'       => 0,
                 'totalEvaluated' => 0,
