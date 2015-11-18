@@ -483,6 +483,10 @@ class LeadModel extends FormModel
     {
         if (!$returnTracking && $this->systemCurrentLead) {
             // Just return the system set lead
+            if (null === $this->systemCurrentLead) {
+                $this->systemCurrentLead = new Lead();
+            }
+
             return $this->systemCurrentLead;
         }
 
