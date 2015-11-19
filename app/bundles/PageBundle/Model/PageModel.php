@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
  * Class PageModel
@@ -888,8 +889,9 @@ class PageModel extends FormModel
     public function getNewVsReturningPieChartData($filter = array())
     {
         $chart           = new PieChart($unit, $amount);
-        $allVisits       = $chart->count($this->factory->getEntityManager()->getConnection(), 'page_hits', 'lead_id', $filter);
-        $uniqueVisits    = $chart->count($this->factory->getEntityManager()->getConnection(), 'page_hits', 'lead_id', $filter, array('getUnique' => true));
+        $query           = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $allVisits       = $query->count('page_hits', 'lead_id', $filter);
+        $uniqueVisits    = $query->count('page_hits', 'lead_id', $filter, array('getUnique' => true));
         $returningVisits = $allVisits - $uniqueVisits;
         $chart->setDataset('Unique', $uniqueVisits);
         $chart->setDataset('Returning', $returningVisits);
