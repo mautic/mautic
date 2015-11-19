@@ -28,20 +28,25 @@ class KeysType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $object = $options['integration_object'];
+        $object     = $options['integration_object'];
         $secretKeys = $object->getSecretKeys();
+
         foreach ($options['integration_keys'] as $key => $label) {
             $type = (in_array($key, $secretKeys)) ? 'password' : 'text';
-            $builder->add($key, $type, array(
-                'label'        => $label,
-                'label_attr'   => array('class' => 'control-label'),
-                'attr'         => array(
-                    'class'       => 'form-control',
-                    'placeholder' => ($type == 'password') ? '**************' : ''
-                ),
-                'required'     => false,
-                'error_bubbling' => false
-            ));
+            $builder->add(
+                $key,
+                $type,
+                array(
+                    'label'          => $label,
+                    'label_attr'     => array('class' => 'control-label'),
+                    'attr'           => array(
+                        'class'       => 'form-control',
+                        'placeholder' => ($type == 'password') ? '**************' : ''
+                    ),
+                    'required'       => false,
+                    'error_bubbling' => false
+                )
+            );
         }
         $object->appendToForm($builder, $options['data'], 'keys');
     }
