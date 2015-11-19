@@ -213,6 +213,10 @@ class LeadModel extends FormModel
             if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
                 $entity->addUpdatedField('country', $details['country']);
             }
+
+            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
+                $entity->addUpdatedField('zipcode', $details['zipcode']);
+            }
         }
 
         parent::saveEntity($entity, $unlock);

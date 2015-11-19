@@ -69,6 +69,9 @@ abstract class AbstractMaxmindIpLookup extends AbstractIpLookup
         $data = json_decode($response);
 
         if ($data && empty($data->error)) {
+            if (isset($data->postal)) {
+                $this->zipcode = $data->postal->code;
+            }
             $this->city      = $data->city->names->en;
             if (isset($data->subdivisions[0])) {
                 $this->region = $data->subdivisions[0]->names->en;

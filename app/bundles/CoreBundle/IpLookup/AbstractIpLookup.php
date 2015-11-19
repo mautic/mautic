@@ -18,6 +18,7 @@ abstract class AbstractIpLookup
 {
     public $city = '';
     public $region = '';
+    public $zipcode = '';
     public $country = '';
     public $latitude = '';
     public $longitude = '';
