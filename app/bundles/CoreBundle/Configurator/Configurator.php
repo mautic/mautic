@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\InstallBundle\Configurator\Step\StepInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -180,7 +180,8 @@ class Configurator
     public function getRequirements()
     {
         $majors = array();
-        foreach ($this->steps as $step) {
+
+        foreach ($this->getSteps() as $step) {
             foreach ($step->checkRequirements() as $major) {
                 $majors[] = $major;
             }
@@ -197,7 +198,8 @@ class Configurator
     public function getOptionalSettings()
     {
         $minors = array();
-        foreach ($this->steps as $step) {
+
+        foreach ($this->getSteps() as $step) {
             foreach ($step->checkOptionalSettings() as $minor) {
                 $minors[] = $minor;
             }
