@@ -9,49 +9,14 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
-use Symfony\Component\Form\FormTypeInterface;
+use Mautic\CoreBundle\Configurator\Step\StepInterface as BaseStepInterface;
 
 /**
  * StepInterface.
  *
- * @author Marc Weistroff <marc.weistroff@sensio.com>
+ * @author      Marc Weistroff <marc.weistroff@sensio.com>
+ * @deprecated  To be removed in 2.0, implement Mautic\CoreBundle\Configurator\Step\StepInterface instead
  */
-interface StepInterface
+interface StepInterface extends BaseStepInterface
 {
-    /**
-     * Returns the form used for configuration.
-     *
-     * @return FormTypeInterface
-     */
-    public function getFormType();
-
-    /**
-     * Checks for requirements.
-     *
-     * @return array
-     */
-    public function checkRequirements();
-
-    /**
-     * Checks for optional settings.
-     *
-     * @return array
-     */
-    public function checkOptionalSettings();
-
-    /**
-     * Returns the template to be rendered for this step.
-     *
-     * @return string
-     */
-    public function getTemplate();
-
-    /**
-     * Updates form data parameters.
-     *
-     * @param StepInterface $data
-     *
-     * @return array
-     */
-    public function update(StepInterface $data);
 }
