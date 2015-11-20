@@ -324,13 +324,14 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * @param       $id
      * @param array $lists
+     * @param array $args
      *
      * @return array|int
      */
     public function getCampaignLeadsFromLists($id, array $lists, $args = array())
     {
-        $newOnly       = (!array_key_exists('newOnly', $args)) ? false : $args['newOnly'];
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         $filterOutIds  = (!array_key_exists('filterOutIds', $args)) ? false : $args['filterOutIds'];
@@ -341,25 +342,26 @@ class CampaignRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as lead_count')
+            $q->select('max(ll.lead_id) as max_id, count(ll.lead_id) as lead_count')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
         } else {
-            $q->select('distinct(ll.lead_id) as id')
+            $q->select('ll.lead_id as id')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
                 ->orderBy('ll.lead_id', 'ASC');
-
         }
+        $q->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'll.lead_id = cl.lead_id and cl.campaign_id = ' . (int) $id);
 
         $expr = $q->expr()->andX();
-
 
         $expr->addMultiple(
             array(
                 $q->expr()->in('ll.leadlist_id', $lists),
-                $q->expr()->eq('ll.manually_removed', ':false')
+                // Exclude leads manually removed from the lists
+                $q->expr()->eq('ll.manually_removed', ':false'),
+                // Exclude leads that are already have campaign entries
+                $q->expr()->isNull('cl.campaign_id')
             )
         );
-
         $q->setParameter('false', false, 'boolean');
 
         // Set batch limiters to ensure the same group is used
@@ -399,13 +401,6 @@ class CampaignRepository extends CommonRepository
         $expr = $dq->expr()->andX(
             $dq->expr()->eq('cl.campaign_id', (int) $id)
         );
-
-        if (!$newOnly) {
-            $expr->add(
-                $dq->expr()->eq('cl.manually_removed', ':true')
-            );
-            $q->setParameter('true', true, 'boolean');
-        }
 
         $dq->where($expr);
 
@@ -450,20 +445,23 @@ class CampaignRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('max(cl.lead_id) as max_id, count(distinct(cl.lead_id)) as lead_count')
+            $q->select('max(cl.lead_id) as max_id, count(cl.lead_id) as lead_count')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
         } else {
-            $q->select('distinct(cl.lead_id) as id')
+            $q->select('cl.lead_id as id')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+                ->groupBy('cl.lead_id')
                 ->orderBy('cl.lead_id', 'ASC');
         }
 
         $expr = $q->expr()->andX();
 
-        $expr->add(
-            $q->expr()->eq('cl.campaign_id', (int) $id),
-            $q->expr()->eq('cl.manually_removed', ':false'),
-            $q->expr()->eq('cl.manually_added', ':false')
+        $expr->addMultiple(
+            array(
+                $q->expr()->eq('cl.campaign_id', (int) $id),
+                $q->expr()->eq('cl.manually_removed', ':false'),
+                $q->expr()->eq('cl.manually_added', ':false')
+            )
         );
 
         $q->setParameter('false', false, 'boolean')
@@ -513,7 +511,7 @@ class CampaignRepository extends CommonRepository
         $q->andWhere('cl.lead_id NOT IN ' . sprintf('(%s)', $dq->getSQL()));
 
         $results = $q->execute()->fetchAll();
-
+die(var_dump($q->getSQL(), $results));
         foreach ($results as $r) {
             if ($countOnly) {
                 $leads = array(
