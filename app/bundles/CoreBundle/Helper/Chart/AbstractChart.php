@@ -31,72 +31,6 @@ abstract class AbstractChart
     protected $labels = array();
 
     /**
-     * Match date/time unit to a humanly readable label
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @var array
-     */
-    protected $labelFormats = array(
-        's' => 'H:i:s',
-        'i' => 'H:i',
-        'H' => 'l ga',
-        'd' => 'jS F',
-        'W' => 'W',
-        'M' => 'F y',
-        'Y' => 'Y',
-    );
-
-    /**
-     * Match date/time unit to a SQL datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @var array
-     */
-    protected $sqlFormats = array(
-        's' => 'Y-m-d H:i:s',
-        'i' => 'Y-m-d H:i:00',
-        'H' => 'Y-m-d H:00:00',
-        'd' => 'Y-m-d 00:00:00',
-        'W' => 'Y-m-d 00:00:00',
-        'M' => 'Y-m-00 00:00:00',
-        'Y' => 'Y-00-00 00:00:00',
-    );
-
-    /**
-     * Match date/time unit to a PostgreSQL datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link www.postgresql.org/docs/9.1/static/functions-datetime.html}
-     *
-     * @var array
-     */
-    protected $postgresTimeUnits = array(
-        's' => 'second',
-        'i' => 'minute',
-        'H' => 'hour',
-        'd' => 'day',
-        'W' => 'week',
-        'm' => 'month',
-        'Y' => 'year'
-    );
-
-    /**
-     * Match date/time unit to a MySql datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}
-     *
-     * @var array
-     */
-    protected $mysqlTimeUnits = array(
-        's' => '%Y-%m-%d %H:%i:%s',
-        'i' => '%Y-%m-%d %H:%i',
-        'H' => '%Y-%m-%d %H',
-        'd' => '%Y-%m-%d',
-        'W' => '%Y-%U',
-        'm' => '%Y-%m',
-        'Y' => '%Y'
-    );
-
-    /**
      * Colors which can be used in graphs
      *
      * @var array
@@ -145,35 +79,7 @@ abstract class AbstractChart
     );
 
     /**
-     * Generate array of labels from the form data
-     *
-     * @param  string  $unit
-     * @param  integer $limit
-     * @param  string  $startDate
-     * @param  string  $order
-     */
-    public function generateTimeLabels($unit, $limit, $startDate = null, $order = 'DESC')
-    {
-        if (!isset($this->labelFormats[$unit])) {
-            throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
-        }
-
-        $date    = new \DateTime($startDate);
-        $oneUnit = $this->getUnitObject($unit);
-
-        for ($i = 0; $i < $limit; $i++) {
-            $this->labels[] = $date->format($this->labelFormats[$unit]);
-            if ($order == 'DESC') {
-                $date->sub($oneUnit);
-            } else {
-                $date->add($oneUnit);
-            }
-        }
-        $this->labels = array_reverse($this->labels);
-    }
-
-    /**
-     * Generate array of labels from the form data
+     * Create a DateInterval time unit
      *
      * @param  string  $unit
      *
@@ -183,59 +89,6 @@ abstract class AbstractChart
     {
         $isTime  = in_array($unit, array('H', 'i', 's')) ? 'T' : '';
         return new \DateInterval('P' . $isTime . '1' . strtoupper($unit));
-    }
-
-    /**
-     * Check if the DB connection is to PostgreSQL database
-     *
-     * @param  Connection $connection
-     *
-     * @return boolean
-     */
-    public function isPostgres(Connection $connection)
-    {
-        $platform = $connection->getDatabasePlatform();
-        return $platform instanceof \doctrine\DBAL\Platforms\PostgreSqlPlatform;
-    }
-
-    /**
-     * Check if the DB connection is to MySql database
-     *
-     * @param  Connection $connection
-     *
-     * @return boolean
-     */
-    public function isMysql(Connection $connection)
-    {
-        $platform = $connection->getDatabasePlatform();
-        return $platform instanceof \doctrine\DBAL\Platforms\MySqlPlatform;
-    }
-
-    /**
-     * Get the right unit for current database platform
-     *
-     * @param  Connection $connection
-     * @param  string     $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @return string
-     */
-    public function translateTimeUnit(Connection $connection, $unit)
-    {
-        if ($this->isPostgres($connection)) {
-            if (!isset($this->postgresTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for Postgres.');
-            }
-
-            return $this->postgresTimeUnits[$unit];
-        } elseif ($this->isMySql($connection)) {
-            if (!isset($this->mysqlTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for MySql.');
-            }
-
-            return $this->mysqlTimeUnits[$unit];
-        }
-
-        return $unit;
     }
 
     /**

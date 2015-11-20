@@ -873,8 +873,9 @@ class PageModel extends FormModel
      */
     public function getHitsBarChartData($amount, $unit, $filter = array())
     {
-        $barChart = new BarChart($unit, $amount);
-        $chartData = $barChart->fetchTimeData($this->factory->getEntityManager()->getConnection(), 'page_hits', 'date_hit', $filter);
+        $barChart  = new BarChart($unit, $amount);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $filter);
         $barChart->setDataset('Hit Count', $chartData);
         return $barChart->render();
     }
@@ -888,13 +889,13 @@ class PageModel extends FormModel
      */
     public function getNewVsReturningPieChartData($filter = array())
     {
-        $chart           = new PieChart($unit, $amount);
-        $query           = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $allVisits       = $query->count('page_hits', 'lead_id', $filter);
-        $uniqueVisits    = $query->count('page_hits', 'lead_id', $filter, array('getUnique' => true));
-        $returningVisits = $allVisits - $uniqueVisits;
-        $chart->setDataset('Unique', $uniqueVisits);
-        $chart->setDataset('Returning', $returningVisits);
+        $chart     = new PieChart($unit, $amount);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $all       = $query->count('page_hits', 'lead_id', $filter);
+        $unique    = $query->count('page_hits', 'lead_id', $filter, array('getUnique' => true));
+        $returning = $all - $unique;
+        $chart->setDataset('Unique', $unique);
+        $chart->setDataset('Returning', $returning);
         return $chart->render();
     }
 }

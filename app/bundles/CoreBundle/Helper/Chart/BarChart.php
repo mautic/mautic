@@ -18,10 +18,50 @@ use Doctrine\DBAL\Connection;
  */
 class BarChart extends AbstractChart implements ChartInterface
 {
+    /**
+     * Date/time unit
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     *
+     * @var string
+     */
     protected $unit;
+
+    /**
+     * Limit of items
+     *
+     * @var integer
+     */
     protected $limit;
+
+    /**
+     * Date and time to start. Now (null) is default.
+     *
+     * @var integer
+     */
     protected $start;
+
+    /**
+     * Order
+     *
+     * @var string (ASC|DESC)
+     */
     protected $order;
+
+    /**
+     * Match date/time unit to a humanly readable label
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     *
+     * @var array
+     */
+    protected $labelFormats = array(
+        's' => 'H:i:s',
+        'i' => 'H:i',
+        'H' => 'l ga',
+        'd' => 'jS F',
+        'W' => 'W',
+        'M' => 'F y',
+        'Y' => 'Y',
+    );
 
     /**
      * Defines the basic chart values, generates the time axe labels from it
@@ -31,7 +71,8 @@ class BarChart extends AbstractChart implements ChartInterface
      * @param string  $start date
      * @param string  $order (DESC|ASC)
      */
-    public function __construct($unit = 'm', $limit = 12, $start = null, $order = 'DESC') {
+    public function __construct($unit = 'm', $limit = 12, $start = null, $order = 'DESC')
+    {
         $this->unit  = $unit;
         $this->limit = $limit;
         $this->start = $start;
@@ -72,100 +113,30 @@ class BarChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Fetch data for a time related dataset
+     * Generate array of labels from the form data
      *
-     * @param  Connection $connection
-     * @param  string     $table without prefix
-     * @param  string     $dateColumn name. The column must be type of datetime
-     * @param  array      $filters will be added to where claues
+     * @param  string  $unit
+     * @param  integer $limit
+     * @param  string  $startDate
+     * @param  string  $order
      */
-    public function fetchTimeData(Connection $connection, $table, $dateColumn, $filters = array()) {
-        // Convert time unitst to the right form for current database platform
-        $dbUnit = $this->translateTimeUnit($connection, $this->unit);
-        $query = $connection->createQueryBuilder();
-
-        // Postgres and MySql are handeling date/time SQL funciton differently
-        if ($this->isPostgres($connection)) {
-            $query->select('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $dateColumn . ') AS date, COUNT(t) AS count')
-                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
-                ->groupBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $dateColumn . ')')
-                ->orderBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $dateColumn . ')', $this->order);
-        } elseif ($this->isMysql($connection)) {
-            $query->select('DATE_FORMAT(t.' . $dateColumn . ', \'' . $dbUnit . '\') AS date, COUNT(t) AS count')
-                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
-                ->groupBy('DATE_FORMAT(t.' . $dateColumn . ', \'' . $dbUnit . '\')')
-                ->orderBy('DATE_FORMAT(t.' . $dateColumn . ', \'' . $dbUnit . '\'', $this->order);
-        } else {
-            throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
+    public function generateTimeLabels($unit, $limit, $startDate = null, $order = 'DESC')
+    {
+        if (!isset($this->labelFormats[$unit])) {
+            throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
         }
 
-        // Apply start date/time if set
-        if ($this->start) {
-            $query->andWhere('t.' . $dateColumn . ' <= :startdate');
-            $query->setParameter('startdate', $this->start);
-        }
+        $date    = new \DateTime($startDate);
+        $oneUnit = $this->getUnitObject($unit);
 
-        // Apply filters
-        foreach ($filters as $column => $value) {
-            $valId = $column . '_val';
-            if (is_array($value)) {
-                $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
-                $query->setParameter($valId, implode(',', $value));
-            } else {
-                $query->andWhere('t.' . $column . ' = :' . $valId);
-                $query->setParameter($valId, $value);
-            }
-        }
-
-        $query->setMaxResults($this->limit);
-
-        // Fetch the data
-        $rawData = $query->execute()->fetchAll();
-
-        $data    = array();
-        $date    = new \DateTime((new \DateTime($this->start))->format($this->sqlFormats[$this->unit]));
-        $oneUnit = $this->getUnitObject($this->unit);
-
-        // Convert data from DB to the chart.js format
-        for ($i = 0; $i < $this->limit; $i++) {
-
-            $nextDate = clone $date;
-            if ($this->order == 'DESC') {
-                $nextDate->sub($oneUnit);
-            } else {
-                $nextDate->add($oneUnit);
-            }
-
-            foreach ($rawData as $key => $item) {
-                $itemDate = new \DateTime($item['date']);
-
-                // The right value is between the time unit and time unit +1 for ASC ordering
-                if ($this->order == 'ASC' && $itemDate >= $date && $itemDate < $nextDate) {
-                    $data[$i] = $item['count'];
-                    unset($rawData[$key]);
-                    continue;
-                }
-
-                // The right value is between the time unit and time unit -1 for DESC ordering
-                if ($this->order == 'DESC' && $itemDate <= $date && $itemDate > $nextDate) {
-                    $data[$i] = $item['count'];
-                    unset($rawData[$key]);
-                    continue;
-                }
-            }
-
-            // Chart.js requires the 0 for empty data, but the array slot has to exist
-            if (!isset($data[$i])) {
-                $data[$i] = 0;
-            }
-
-            if ($this->order == 'DESC') {
+        for ($i = 0; $i < $limit; $i++) {
+            $this->labels[] = $date->format($this->labelFormats[$unit]);
+            if ($order == 'DESC') {
                 $date->sub($oneUnit);
             } else {
                 $date->add($oneUnit);
             }
         }
-
-        return  array_reverse($data);
+        $this->labels = array_reverse($this->labels);
     }
 }

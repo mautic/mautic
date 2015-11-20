@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Mautic\CoreBundle\Helper\Chart\AbstactChart;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -16,12 +17,218 @@ use Doctrine\DBAL\Connection;
  * 
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
  */
-class ChartQuery
+class ChartQuery extends AbstractChart
 {
+    /**
+     * Doctrine's Connetion object
+     *
+     * @var  Connection $connection
+     */
     protected $connection;
 
-    public function __construct(Connection $connection) {
+    /**
+     * Match date/time unit to a SQL datetime format
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     *
+     * @var array
+     */
+    protected $sqlFormats = array(
+        's' => 'Y-m-d H:i:s',
+        'i' => 'Y-m-d H:i:00',
+        'H' => 'Y-m-d H:00:00',
+        'd' => 'Y-m-d 00:00:00',
+        'W' => 'Y-m-d 00:00:00',
+        'M' => 'Y-m-00 00:00:00',
+        'Y' => 'Y-00-00 00:00:00',
+    );
+
+    /**
+     * Match date/time unit to a PostgreSQL datetime format
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * {@link www.postgresql.org/docs/9.1/static/functions-datetime.html}
+     *
+     * @var array
+     */
+    protected $postgresTimeUnits = array(
+        's' => 'second',
+        'i' => 'minute',
+        'H' => 'hour',
+        'd' => 'day',
+        'W' => 'week',
+        'm' => 'month',
+        'Y' => 'year'
+    );
+
+    /**
+     * Match date/time unit to a MySql datetime format
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}
+     *
+     * @var array
+     */
+    protected $mysqlTimeUnits = array(
+        's' => '%Y-%m-%d %H:%i:%s',
+        'i' => '%Y-%m-%d %H:%i',
+        'H' => '%Y-%m-%d %H',
+        'd' => '%Y-%m-%d',
+        'W' => '%Y-%U',
+        'm' => '%Y-%m',
+        'Y' => '%Y'
+    )
+;
+    /**
+     * Construct a new ChartQuery object
+     *
+     * @param  Connection $connection
+     */
+    public function __construct(Connection $connection)
+    {
         $this->connection = $connection;
+    }
+
+    /**
+     * Check if the DB connection is to PostgreSQL database
+     *
+     * @return boolean
+     */
+    public function isPostgres()
+    {
+        $platform = $this->connection->getDatabasePlatform();
+        return $platform instanceof \doctrine\DBAL\Platforms\PostgreSqlPlatform;
+    }
+
+    /**
+     * Check if the DB connection is to MySql database
+     *
+     * @return boolean
+     */
+    public function isMysql()
+    {
+        $platform = $this->connection->getDatabasePlatform();
+        return $platform instanceof \doctrine\DBAL\Platforms\MySqlPlatform;
+    }
+
+    /**
+     * Get the right unit for current database platform
+     *
+     * @param  string     $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     *
+     * @return string
+     */
+    public function translateTimeUnit($unit)
+    {
+        if ($this->isPostgres()) {
+            if (!isset($this->postgresTimeUnits[$unit])) {
+                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for Postgres.');
+            }
+
+            return $this->postgresTimeUnits[$unit];
+        } elseif ($this->isMySql()) {
+            if (!isset($this->mysqlTimeUnits[$unit])) {
+                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for MySql.');
+            }
+
+            return $this->mysqlTimeUnits[$unit];
+        }
+
+        return $unit;
+    }
+
+    /**
+     * Fetch data for a time related dataset
+     *
+     * @param  string     $table without prefix
+     * @param  string     $column name. The column must be type of datetime
+     * @param  array      $filters will be added to where claues
+     */
+    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $filters = array(), $start = null, $order = 'DESC') {
+        // Convert time unitst to the right form for current database platform
+        $dbUnit = $this->translateTimeUnit($unit);
+        $query = $this->connection->createQueryBuilder();
+
+        // Postgres and MySql are handeling date/time SQL funciton differently
+        if ($this->isPostgres()) {
+            $query->select('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ') AS date, COUNT(t) AS count')
+                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
+                ->groupBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')')
+                ->orderBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')', $order);
+        } elseif ($this->isMysql()) {
+            $query->select('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\') AS date, COUNT(t) AS count')
+                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
+                ->groupBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')')
+                ->orderBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\'', $order);
+        } else {
+            throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
+        }
+
+        // Apply start date/time if set
+        if ($start) {
+            $query->andWhere('t.' . $column . ' <= :startdate');
+            $query->setParameter('startdate', $start);
+        }
+
+        // Apply filters
+        foreach ($filters as $column => $value) {
+            $valId = $column . '_val';
+            if (is_array($value)) {
+                $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
+                $query->setParameter($valId, implode(',', $value));
+            } else {
+                $query->andWhere('t.' . $column . ' = :' . $valId);
+                $query->setParameter($valId, $value);
+            }
+        }
+
+        $query->setMaxResults($limit);
+
+        // Fetch the data
+        $rawData = $query->execute()->fetchAll();
+
+        $data    = array();
+        $date    = new \DateTime((new \DateTime($start))->format($this->sqlFormats[$unit]));
+        $oneUnit = $this->getUnitObject($unit);
+
+        // Convert data from DB to the chart.js format
+        for ($i = 0; $i < $limit; $i++) {
+
+            $nextDate = clone $date;
+            if ($order == 'DESC') {
+                $nextDate->sub($oneUnit);
+            } else {
+                $nextDate->add($oneUnit);
+            }
+
+            foreach ($rawData as $key => $item) {
+                $itemDate = new \DateTime($item['date']);
+
+                // The right value is between the time unit and time unit +1 for ASC ordering
+                if ($order == 'ASC' && $itemDate >= $date && $itemDate < $nextDate) {
+                    $data[$i] = $item['count'];
+                    unset($rawData[$key]);
+                    continue;
+                }
+
+                // The right value is between the time unit and time unit -1 for DESC ordering
+                if ($order == 'DESC' && $itemDate <= $date && $itemDate > $nextDate) {
+                    $data[$i] = $item['count'];
+                    unset($rawData[$key]);
+                    continue;
+                }
+            }
+
+            // Chart.js requires the 0 for empty data, but the array slot has to exist
+            if (!isset($data[$i])) {
+                $data[$i] = 0;
+            }
+
+            if ($order == 'DESC') {
+                $date->sub($oneUnit);
+            } else {
+                $date->add($oneUnit);
+            }
+        }
+
+        return array_reverse($data);
     }
 
     /**
