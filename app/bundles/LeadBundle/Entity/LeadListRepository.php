@@ -301,11 +301,6 @@ class LeadListRepository extends CommonRepository
                 $q->select($select)
                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                // Join with the lead_lists_leads table; nonMembersOnly query will use an exists/subquery
-                if (!$nonMembersOnly) {
-                    $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
-                }
-
                 // Only leads that existed at the time of count
                 if ($batchLimiters && !empty($batchLimiters['maxId'])) {
                     $expr->add(
@@ -314,46 +309,47 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    // Leads that do not have any record in the lead_lists_leads table
+                    // Only leads that have no record at all that match filters
+                    $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id and ll.leadlist_id = '.$id);
+
+                    // Leads that do not have any record in the lead_lists_leads table for this lead list
                     $expr->add(
                         $q->expr()->isNull('ll.lead_id')
                     );
 
                     $q->where($expr);
                 } elseif ($nonMembersOnly) {
+                    // Only leads that are part of the list that no longer match filters and have not been manually removed
+                    $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+
+                    $mainExpr = $q->expr()->andX();
                     if ($batchLimiters && !empty($batchLimiters['dateTime'])) {
                         // Only leads in the list at the time of count
-                        $expr->add(
+                        $mainExpr->add(
                             $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
                         );
                     }
 
-                    // Ignore those that are already manually removed
-                    $expr->add(
-                        $q->expr()->neq('ll.manually_removed', ':false')
+                    // Ignore those that have been manually added
+                    $mainExpr->addMultiple(
+                        array(
+                            $q->expr()->eq('ll.manually_added', ':false'),
+                            $q->expr()->eq('ll.leadlist_id', (int) $id)
+                        )
                     );
                     $q->setParameter('false', false, 'boolean');
 
                     // Use an exists statement for better performance?? - https://dev.mysql.com/doc/refman/5.5/en/subquery-optimization-with-exists.html
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('1')
-                        ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+                        ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                         ->where('l.id = ll.lead_id')
                         ->andWhere($expr);
 
                     $q->where(
                         sprintf('NOT EXISTS (%s)', $sq->getSQL())
-                    );
-                } elseif ($batchLimiters && !empty($batchLimiters['dateTime'])) {
-                    $expr->add(
-                        // Only leads in the list at the time of count or is not already accounted for
-                        $q->expr()->orX(
-                            $q->expr()->isNull('ll.lead_id'),
-                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                        )
-                    );
-
-                    $q->where($expr);
+                    )
+                    ->andWhere($mainExpr);
                 }
 
                 // Set limits if applied
