@@ -249,7 +249,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return Lead
      */
     public function getLead()
     {

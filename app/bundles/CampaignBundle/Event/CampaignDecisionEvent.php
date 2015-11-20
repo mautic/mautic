@@ -23,6 +23,7 @@ class CampaignDecisionEvent extends Event
     protected $decisionType;
     protected $decisionEventDetails;
     protected $eventSettings;
+    protected $logEntities;
     protected $isRootLevel;
     protected $decisionTriggered = false;
 
@@ -32,15 +33,17 @@ class CampaignDecisionEvent extends Event
      * @param $decisionEventDetails
      * @param $events
      * @param $eventSettings
+     * @param $logEntities
      * @param $isRootLevel
      */
-    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false)
+    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $logEntities = null, $isRootLevel = false)
     {
         $this->lead                 = $lead;
         $this->decisionType         = $decisionType;
         $this->decisionEventDetails = $decisionEventDetails;
         $this->events               = $events;
         $this->eventSettings        = $eventSettings;
+        $this->logEntities          = $logEntities;
         $this->isRootLevel          = $isRootLevel;
     }
 
@@ -93,6 +96,14 @@ class CampaignDecisionEvent extends Event
         }
 
         return $this->eventSettings;
+    }
+
+    /**
+     * @return null|array
+     */
+    public function getLogEntities()
+    {
+        return $this->logEntities;
     }
 
     /**

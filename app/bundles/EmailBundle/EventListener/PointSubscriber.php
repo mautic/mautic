@@ -96,12 +96,6 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        if ($leadArray = $event->getLead()) {
-            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $leadArray['id']);
-        } else {
-
-            return;
-        }
-        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail(), null, $lead);
+        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail());
     }
 }

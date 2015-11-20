@@ -10,7 +10,6 @@
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
@@ -143,11 +142,10 @@ class PointModel extends CommonFormModel
      * @param $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
      * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
      *
      * @return void
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
+    public function triggerAction($type, $eventDetails = null, $typeId = null)
     {
         //only trigger actions for anonymous users
         if (!$this->security->isAnonymous()) {
@@ -169,17 +167,9 @@ class PointModel extends CommonFormModel
         /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
         $repo         = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel    = $this->factory->getModel('lead');
+        $lead         = $leadModel->getCurrentLead();
         $ipAddress    = $this->factory->getIpAddress();
-        if (null === $lead) {
-            $lead = $leadModel->getCurrentLead();
-
-            if (null === $lead || !$lead->getId()) {
-
-                return;
-            }
-        }
 
         //get available actions
         $availableActions = $this->getPointActions();

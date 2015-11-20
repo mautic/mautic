@@ -70,12 +70,16 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $campaignModel = $factory->getModel('campaign');
         $translator    = $factory->getTranslator();
         $em            = $factory->getEntityManager();
-        $id            = $input->getOption('campaign-id');
-        $scheduleOnly  = $input->getOption('scheduled-only');
-        $negativeOnly  = $input->getOption('negative-only');
-        $batch         = $input->getOption('batch-limit');
-        $max           = $input->getOption('max-events');
-        $force         = $input->getOption('force');
+
+        // Set SQL logging to null or else will hit memory limits in dev for sure
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        $id           = $input->getOption('campaign-id');
+        $scheduleOnly = $input->getOption('scheduled-only');
+        $negativeOnly = $input->getOption('negative-only');
+        $batch        = $input->getOption('batch-limit');
+        $max          = $input->getOption('max-events');
+        $force        = $input->getOption('force');
 
         // Prevent script overlap
         $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
@@ -170,8 +174,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                         $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
-                            ."\n"
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                         );
                     }
 
@@ -185,8 +188,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
                         $processed = $model->triggerScheduledEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
-                            ."\n"
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                         );
                     }
 
@@ -200,8 +202,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.negative').'</comment>');
                         $processed = $model->triggerNegativeEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
-                            ."\n"
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
                         );
                     }
                 }
