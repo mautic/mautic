@@ -810,23 +810,12 @@ class CampaignModel extends CommonFormModel
 
         $repo = $this->getRepository();
 
-        // Get a list of leads for all lists associated with the campaign
-        $lists = $this->getCampaignListIds($campaign->getId());
-
-        if (empty($lists)) {
-            if ($output) {
-                $output->writeln($this->translator->trans('mautic.campaign.rebuild.no_lists'));
-            }
-
-            return 0;
-        }
-
         $batchLimiters = array(
             'dateTime' => $this->factory->getDate()->toUtcString()
         );
 
         // Get a count of new leads
-        $newLeadsCount = $repo->getCampaignLeadsFromLists($campaign->getId(), $lists,
+        $newLeadsCount = $repo->getCampaignLeadsFromLists($campaign->getId(),
             array(
                 'countOnly' => true,
                 'batchLimiters' => $batchLimiters
@@ -864,7 +853,6 @@ class CampaignModel extends CommonFormModel
                 // Get a count of new leads
                 $newLeadList = $repo->getCampaignLeadsFromLists(
                     $campaign->getId(),
-                    $lists,
                     array(
                         'limit'         => $limit,
                         'batchLimiters' => $batchLimiters
@@ -906,7 +894,7 @@ class CampaignModel extends CommonFormModel
         }
 
         // Get a count of leads to be removed
-        $removeLeadCount = $repo->getCampaignOrphanLeads($campaign->getId(), $lists,
+        $removeLeadCount = $repo->getCampaignOrphanLeads($campaign->getId(),
             array(
                 'notInLists'    => true,
                 'countOnly'     => true,
@@ -937,7 +925,6 @@ class CampaignModel extends CommonFormModel
 
                 $removeLeadList = $repo->getCampaignOrphanLeads(
                     $campaign->getId(),
-                    $lists,
                     array(
                         'limit'         => $limit,
                         'batchLimiters' => $batchLimiters

@@ -325,16 +325,14 @@ class CampaignRepository extends CommonRepository
 
     /**
      * @param       $id
-     * @param array $lists
      * @param array $args
      *
      * @return array|int
      */
-    public function getCampaignLeadsFromLists($id, array $lists, $args = array())
+    public function getCampaignLeadsFromLists($id, $args = array())
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
-        $filterOutIds  = (!array_key_exists('filterOutIds', $args)) ? false : $args['filterOutIds'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
@@ -342,69 +340,56 @@ class CampaignRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('max(ll.lead_id) as max_id, count(ll.lead_id) as lead_count')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
+            $q->select('max(list_leads.lead_id) as max_id, count(list_leads.lead_id) as lead_count');
         } else {
-            $q->select('ll.lead_id as id')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-                ->orderBy('ll.lead_id', 'ASC');
+            $q->select('list_leads.lead_id as id')
+                ->orderBy('list_leads.lead_id', 'ASC');
         }
-        $q->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'll.lead_id = cl.lead_id and cl.campaign_id = ' . (int) $id);
 
-        $expr = $q->expr()->andX();
-
-        $expr->addMultiple(
-            array(
-                $q->expr()->in('ll.leadlist_id', $lists),
-                // Exclude leads manually removed from the lists
-                $q->expr()->eq('ll.manually_removed', ':false'),
-                // Exclude leads that are already have campaign entries
-                $q->expr()->isNull('cl.campaign_id')
-            )
+        $joinExpr = $q->expr()->andX(
+            $q->expr()->eq('list_leads.leadlist_id', 'campaign_lists.leadlist_id'),
+            $q->expr()->eq('list_leads.manually_removed', ':false'),
+            $q->expr()->eq('campaign_lists.campaign_id', (int) $id)
         );
-        $q->setParameter('false', false, 'boolean');
 
-        // Set batch limiters to ensure the same group is used
         if ($batchLimiters) {
-            $expr->add(
-            // Only leads in the list at the time of count
-                $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+            $joinExpr->add(
+                // Only leads in the list at the time of count
+                $q->expr()->lte('list_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 
             if (!empty($batchLimiters['maxId'])) {
                 // Only leads that existed at the time of count
-                $expr->add(
-                    $q->expr()->lte('ll.lead_id', $batchLimiters['maxId'])
+                $joinExpr->add(
+                    $q->expr()->lte('list_leads.lead_id', $batchLimiters['maxId'])
                 );
             }
         }
+
+        $q->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list_leads')
+            ->join('list_leads', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'campaign_lists', $joinExpr)
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('list_leads.lead_id');
+
+        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+                ->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('campaign_leads.lead_id', 'list_leads.lead_id'),
+                        $q->expr()->eq('campaign_leads.manually_removed', ':false')
+                    )
+                );
+
+        $q->andWhere(
+            sprintf('NOT EXISTS (%s)', $subq->getSQL())
+        );
 
         // Set limits if applied
         if (!empty($limit)) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }
-
-        if ($filterOutIds) {
-            $expr->add(
-                $q->expr()->notIn('ll.lead_id', $filterOutIds)
-            );
-        }
-
-        $q->where($expr);
-
-        // Exclude those that have been manually removed from the campagin
-        $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('cl.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
-
-        $expr = $dq->expr()->andX(
-            $dq->expr()->eq('cl.campaign_id', (int) $id)
-        );
-
-        $dq->where($expr);
-
-        $q->andWhere('ll.lead_id NOT IN '.sprintf('(%s)', $dq->getSQL()));
 
         $results = $q->execute()->fetchAll();
 
@@ -428,16 +413,14 @@ class CampaignRepository extends CommonRepository
      * Get leads that do not belong based on lead lists
      *
      * @param       $id
-     * @param array $lists
      * @param array $args
      *
      * @return array|int
      */
-    public function getCampaignOrphanLeads($id, array $lists, $args = array())
+    public function getCampaignOrphanLeads($id, $args = array())
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
-        $filterOutIds  = (!array_key_exists('filterOutIds', $args)) ? false : $args['filterOutIds'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
@@ -445,42 +428,54 @@ class CampaignRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('max(cl.lead_id) as max_id, count(cl.lead_id) as lead_count')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
+            $q->select('max(campaign_leads.lead_id) as max_id, count(campaign_leads.lead_id) as lead_count');
         } else {
-            $q->select('cl.lead_id as id')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-                ->groupBy('cl.lead_id')
-                ->orderBy('cl.lead_id', 'ASC');
+            $q->select('campaign_leads.lead_id as id')
+                ->orderBy('campaign_leads.lead_id', 'ASC');
         }
 
-        $expr = $q->expr()->andX();
+        /*
+         get all leads in campaign_leads that are now (NOT in lead_lists_leads OR list_leads.manually_added = false)
+            AND campaign_leads.manually_added = false
+            AND list_leads.leadlist_id not in campaign_leadlist_xref
 
-        $expr->addMultiple(
-            array(
-                $q->expr()->eq('cl.campaign_id', (int) $id),
-                $q->expr()->eq('cl.manually_removed', ':false'),
-                $q->expr()->eq('cl.manually_added', ':false')
-            )
+        $joinExpr = $q->expr()->andX(
+            $q->expr()->eq('list_leads.leadlist_id', 'campaign_lists.leadlist_id'),
+            $q->expr()->eq('list_leads.manually_removed', ':false'),
+            $q->expr()->eq('campaign_lists.campaign_id', (int) $id)
         );
 
-        $q->setParameter('false', false, 'boolean')
-            ->setParameter('true', true, 'boolean');
-
-        // Set batch limiters to ensure the same group is used
         if ($batchLimiters) {
-            $expr->add(
+            $joinExpr->add(
             // Only leads in the list at the time of count
-                $q->expr()->lte('cl.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                $q->expr()->lte('list_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 
             if (!empty($batchLimiters['maxId'])) {
                 // Only leads that existed at the time of count
-                $expr->add(
-                    $q->expr()->lte('cl.lead_id', $batchLimiters['maxId'])
+                $joinExpr->add(
+                    $q->expr()->lte('list_leads.lead_id', $batchLimiters['maxId'])
                 );
             }
         }
+
+        $q->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('campaign_leads.lead_id');
+
+        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('campaign_leads.lead_id', 'list_leads.lead_id'),
+                    $q->expr()->eq('campaign_leads.manually_removed', ':false')
+                )
+            );
+
+        $q->andWhere(
+            sprintf('NOT EXISTS (%s)', $subq->getSQL())
+        );
 
         // Set limits if applied
         if (!empty($limit)) {
@@ -488,29 +483,8 @@ class CampaignRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        if ($filterOutIds) {
-            $expr->add(
-                $q->expr()->notIn('cl.lead_id', $filterOutIds)
-            );
-        }
-
-        $q->where($expr);
-
-        // Find those that no longer belong to the campaign's lists
-        $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('ll.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll');
-
-        $dq->where(
-            $dq->expr()->andX(
-                $dq->expr()->in('ll.leadlist_id', $lists),
-                $dq->expr()->eq('ll.manually_removed', ':false')
-            )
-        );
-
-        $q->andWhere('cl.lead_id NOT IN ' . sprintf('(%s)', $dq->getSQL()));
-
         $results = $q->execute()->fetchAll();
+
 die(var_dump($q->getSQL(), $results));
         foreach ($results as $r) {
             if ($countOnly) {
