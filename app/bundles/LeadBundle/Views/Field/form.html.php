@@ -120,6 +120,16 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                     <?php echo $view['form']->row($form['isPubliclyUpdatable']); ?>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isUniqueIdentifer']); ?>
+                </div>
+                <div class="unique-identifier-warning col-md-6" style="<?php if (!$form['isUniqueIdentifer']->vars['data']) echo "display:none;" ; ?>">
+                    <div class="alert alert-danger">
+                        <?php echo $view['translator']->trans('mautic.lead.field.form.isuniqueidentifer.warning'); ?>
+                    </div>
+                </div>
+            </div>
             <?php echo $view['form']->rest($form); ?>
         </div>
     </div>

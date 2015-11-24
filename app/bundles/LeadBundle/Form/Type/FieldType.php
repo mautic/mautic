@@ -321,9 +321,9 @@ class FieldType extends AbstractType
             array(
                 'label'    => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'     => array(
-                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip'
-                ),
-                'disabled' => ($options['data']->getId()) ? true : false
+                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
+                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)'
+                )
             )
         );
 
