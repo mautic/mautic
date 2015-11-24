@@ -315,6 +315,7 @@ class FieldType extends AbstractType
             )
         );
 
+        $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
             'yesno_button_group',
@@ -323,7 +324,8 @@ class FieldType extends AbstractType
                 'attr'     => array(
                     'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
                     'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)'
-                )
+                ),
+                'data'     => (!empty($data))
             )
         );
 
