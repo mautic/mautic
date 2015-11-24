@@ -15,9 +15,9 @@ if ($tmpl == 'index') {
     <?php if (count($items)) : ?>
     <div class="list-group">
         <?php foreach ($items as $i) : ?>
-            <a href="#" class="list-group-item" data-token='<a href="%url={assetlink=<?php echo $i->getId(); ?>}%">%text=<?php echo $i->getName(); ?>%</a>' data-drop="showBuilderLinkModal">
+            <a href="#" class="list-group-item" data-token='<a href="%url={assetlink=<?php echo $i->getId(); ?>}%">%text=<?php echo $view->escape($i->getName()); ?>%</a>' data-drop="showBuilderLinkModal">
                 <div>
-                    <span><i class="fa fa-fw fa-file-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
+                    <span><i class="fa fa-fw fa-file-o"></i><?php echo $view->escape($i->getName()) . ' (' . $i->getLanguage() . ')'; ?></span>
                 </div>
             </a>
         <?php endforeach; ?>
