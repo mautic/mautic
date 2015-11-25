@@ -141,8 +141,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     height="110">
                                 </canvas>
                                 <div id="times-on-site-data" class="hide">
-                                <?php if (isset($stats['dwellTime']['timesOnSite'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime']['timesOnSite']); ?>
+                                <?php if (isset($stats['dwellTime'])) : ?>
+                                    <?php echo json_encode($stats['dwellTime']); ?>
                                 <?php else : ?>
                                     []
                                 <?php endif; ?>

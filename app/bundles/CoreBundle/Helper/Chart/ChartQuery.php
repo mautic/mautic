@@ -109,6 +109,25 @@ class ChartQuery extends AbstractChart
     }
 
     /**
+     * Apply where filters to the query
+     *
+     * @param  string
+     */
+    public function applyFilters(&$query, $filters)
+    {
+        foreach ($filters as $column => $value) {
+            $valId = $column . '_val';
+            if (is_array($value)) {
+                $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
+                $query->setParameter($valId, implode(',', $value));
+            } else {
+                $query->andWhere('t.' . $column . ' = :' . $valId);
+                $query->setParameter($valId, $value);
+            }
+        }
+    }
+
+    /**
      * Get the right unit for current database platform
      *
      * @param  string     $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
@@ -167,17 +186,7 @@ class ChartQuery extends AbstractChart
             $query->setParameter('startdate', $start);
         }
 
-        // Apply filters
-        foreach ($filters as $column => $value) {
-            $valId = $column . '_val';
-            if (is_array($value)) {
-                $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
-                $query->setParameter($valId, implode(',', $value));
-            } else {
-                $query->andWhere('t.' . $column . ' = :' . $valId);
-                $query->setParameter($valId, $value);
-            }
-        }
+        $this->applyFilters($query, $filters);
 
         $query->setMaxResults($limit);
 
@@ -245,17 +254,7 @@ class ChartQuery extends AbstractChart
         $query->select('COUNT(t.' . $column . ') AS count')
             ->from(MAUTIC_TABLE_PREFIX . $table, 't');
 
-        // Apply filters
-        foreach ($filters as $whereColumn => $value) {
-            $valId = $whereColumn . '_val';
-            if (is_array($value)) {
-                $query->andWhere('t.' . $whereColumn . ' IN(:' . $valId . ')');
-                $query->setParameter($valId, implode(',', $value));
-            } else {
-                $query->andWhere('t.' . $whereColumn . ' = :' . $valId);
-                $query->setParameter($valId, $value);
-            }
-        }
+        $this->applyFilters($query, $filters);
 
         // Count only unique values
         if (!empty($options['getUnique'])) {
@@ -277,6 +276,42 @@ class ChartQuery extends AbstractChart
         }
 
         // Fetch the count
+        $data = $query->execute()->fetch();
+
+        return $data['count'];
+    }
+
+    /**
+     * Count how many rows is between a range of date diff in seconds
+     *
+     * @param  string     $table without prefix
+     * @param  string     $dateColumn1
+     * @param  string     $dateColumn2
+     * @param  integer    $startSecond
+     * @param  integer    $endSecond
+     * @param  array      $filters will be added to where claues
+     */
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array()) {
+        $query = $this->connection->createQueryBuilder();
+
+        $query->select('count(t.' . $dateColumn1 . ') AS count')
+            ->from(MAUTIC_TABLE_PREFIX . $table, 't');
+
+        if ($this->isPostgres()) {
+            $query->where('extract(epoch from(t.' . $dateColumn2 . '::timestamp - t.' . $dateColumn1 . '::timestamp)) >= :startSecond');
+            $query->andWhere('extract(epoch from(t.' . $dateColumn2 . '::timestamp - t.' . $dateColumn1 . '::timestamp)) < :endSecond');
+        }
+
+        if ($this->isMysql()) {
+            $query->where('TIMESTAMPDIFF(SECOND, t.' . $dateColumn2 . ', t.' . $dateColumn1 . ') >= :startSecond');
+            $query->andWhere('TIMESTAMPDIFF(SECOND, t.' . $dateColumn2 . ', t.' . $dateColumn1 . ') < :endSecond');
+        }
+
+        $query->setParameter('startSecond', $startSecond);
+        $query->setParameter('endSecond', $endSecond);
+
+        $this->applyFilters($query, $filters);
+
         $data = $query->execute()->fetch();
 
         return $data['count'];
