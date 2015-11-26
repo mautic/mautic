@@ -383,7 +383,7 @@ abstract class AbstractIntegration
     public function getRequiredKeyFields ()
     {
         switch ($this->getAuthenticationType()) {
-            case 'oauth2':
+            case 'oauth1a':
                 return array(
                     'consumer_id'      => 'mautic.integration.keyfield.consumerid',
                     'consumer_secret'  => 'mautic.integration.keyfield.consumersecret'
