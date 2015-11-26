@@ -29,9 +29,9 @@ class EmailListType extends AbstractType
      */
     public function __construct(MauticFactory $factory) {
         $this->viewOther = $factory->getSecurity()->isGranted('email:emails:viewother');
-	$this->repo      = $factory->getModel('email')->getRepository();
+        $this->repo      = $factory->getModel('email')->getRepository();
 
-	$this->repo->setCurrentUser($factory->getUser());
+        $this->repo->setCurrentUser($factory->getUser());
     }
 
     /**
