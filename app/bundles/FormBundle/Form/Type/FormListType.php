@@ -28,9 +28,9 @@ class FormListType extends AbstractType
      */
     public function __construct(MauticFactory $factory) {
         $this->viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-	$this->repo      = $factory->getModel('form')->getRepository();
+        $this->repo      = $factory->getModel('form')->getRepository();
 
-	$this->repo->setCurrentUser($factory->getUser());
+        $this->repo->setCurrentUser($factory->getUser());
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
