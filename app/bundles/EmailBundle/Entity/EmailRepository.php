@@ -180,8 +180,14 @@ class EmailRepository extends CommonRepository
                 ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
-            ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
+            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll',
+                $q->expr()->andX(
+                    $q->expr()->eq('l.id', 'll.lead_id'),
+                    $q->expr()->eq('ll.manually_removed', ':false')
+                )
+            )
+            ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id')
+            ->setParameter('false', false, 'boolean');
 
         $q->where($q->expr()->eq('el.email_id', $emailId))
             ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()))
