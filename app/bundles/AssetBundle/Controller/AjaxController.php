@@ -34,9 +34,10 @@ class AjaxController extends CommonAjaxController
         $amount    = InputHelper::int($request->request->get('amount'));
         $unit      = InputHelper::clean($request->request->get('unit'));
         $dataArray = array('success' => 0);
+        $model     = $this->factory->getModel('asset.asset');
 
         // Download stats per time period
-        $dataArray['stats'] = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($assetId, $amount, $unit);
+        $dataArray['stats'] = $model->getDownloadsLineChartData($amount, $unit, array('asset_id' => $assetId));
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
