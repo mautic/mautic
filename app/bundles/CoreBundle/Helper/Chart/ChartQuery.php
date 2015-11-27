@@ -36,10 +36,10 @@ class ChartQuery extends AbstractChart
         's' => 'Y-m-d H:i:s',
         'i' => 'Y-m-d H:i:00',
         'H' => 'Y-m-d H:00:00',
-        'd' => 'Y-m-d 00:00:00',
+        'd' => 'Y-m-d 00:00:00', 'D' => 'Y-m-d 00:00:00', // ('D' is BC. Can be removed when all charts use this class)
         'W' => 'Y-m-d 00:00:00',
-        'M' => 'Y-m-00 00:00:00',
-        'Y' => 'Y-00-00 00:00:00',
+        'm' => 'Y-m-01 00:00:00', 'M' => 'Y-m-00 00:00:00', // ('M' is BC. Can be removed when all charts use this class)
+        'Y' => 'Y-01-01 00:00:00',
     );
 
     /**
@@ -53,9 +53,9 @@ class ChartQuery extends AbstractChart
         's' => 'second',
         'i' => 'minute',
         'H' => 'hour',
-        'd' => 'day',
+        'd' => 'day', 'D' => 'day', // ('D' is BC. Can be removed when all charts use this class)
         'W' => 'week',
-        'm' => 'month',
+        'm' => 'month', 'M' => 'month', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'year'
     );
 
@@ -70,9 +70,9 @@ class ChartQuery extends AbstractChart
         's' => '%Y-%m-%d %H:%i:%s',
         'i' => '%Y-%m-%d %H:%i',
         'H' => '%Y-%m-%d %H',
-        'd' => '%Y-%m-%d',
+        'd' => '%Y-%m-%d', 'D' => '%Y-%m-%d', // ('D' is BC. Can be removed when all charts use this class)
         'W' => '%Y-%U',
-        'm' => '%Y-%m',
+        'm' => '%Y-%m', 'M' => '%Y-%m', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => '%Y'
     )
 ;
