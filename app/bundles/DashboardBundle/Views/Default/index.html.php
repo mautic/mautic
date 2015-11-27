@@ -107,6 +107,20 @@ $colspan = 12/$cols;
             <!-- #email-stats-container -->
             <div class="tab-pane active fade in bdr-w-0" id="email-stats-container">
                 <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default bdr-t-wdh-0">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.created.leads'); ?>
+                                </h3>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                <canvas class="chart line-chart" height="300"><?php echo json_encode($leadLineChart); ?></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <?php if ($popularPages) : ?>
                         <div class="col-md-<?php echo $colspan; ?>">
                             <div class="panel panel-default bdr-t-wdh-0">

@@ -24,6 +24,9 @@ use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -1173,5 +1176,23 @@ class LeadModel extends FormModel
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getLeadsLineChartData($amount, $unit, $filter = array())
+    {
+        $barChart  = new LineChart($unit, $amount);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $filter);
+        $barChart->setDataset('All leads', $chartData);
+        return $barChart->render();
     }
 }

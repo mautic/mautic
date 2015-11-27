@@ -165,6 +165,7 @@ class DefaultController extends CommonController
                 'logs'              => $logs,
                 'icons'             => $icons,
                 'upcomingEmails'    => $upcomingEmails,
+                'leadLineChart'     => $leadModel->getLeadsLineChartData(30, 'd'),
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
