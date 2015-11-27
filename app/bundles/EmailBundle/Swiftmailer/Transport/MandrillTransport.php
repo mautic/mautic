@@ -351,31 +351,41 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     {
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
-        $bounces        = array(
-            'hashIds' => array(),
-            'emails'  => array()
+        $rows           = array(
+            'bounced' => array(
+                'hashIds' => array(),
+                'emails'  => array()
+            ),
+            'unsubscribed' => array(
+                'hashIds' => array(),
+                'emails'  => array()
+            )
         );
 
         if (is_array($mandrillEvents)) {
             foreach ($mandrillEvents as $event) {
-                if (in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject'))) {
+                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam'));
+                $isUnsubscribe = ('unsub' === $event['event']);
+                if ($isBounce || $isUnsubscribe) {
+                    $type = ($isBounce) ? 'bounced' : 'unsubscribed';
+
                     if (!empty($event['msg']['diag'])) {
                         $reason = $event['msg']['diag'];
                     } elseif (!empty($event['msg']['bounce_description'])) {
                         $reason = $event['msg']['bounce_description'];
                     } else {
-                        $reason = $event['event'];
+                        $reason = ($isUnsubscribe) ? 'unsubscribed' : $event['event'];
                     }
 
                     if (isset($event['msg']['metadata']['hashId'])) {
-                        $bounces['hashIds'][$event['msg']['metadata']['hashId']] = $reason;
+                        $rows[$type]['hashIds'][$event['msg']['metadata']['hashId']] = $reason;
                     } else {
-                        $bounces['emails'][$event['msg']['email']] = $reason;
+                        $rows[$type]['emails'][$event['msg']['email']] = $reason;
                     }
                 }
             }
         }
 
-        return array('bounces' => $bounces);
+        return $rows;
     }
 }
