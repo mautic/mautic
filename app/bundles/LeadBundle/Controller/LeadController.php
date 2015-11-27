@@ -1944,7 +1944,7 @@ class LeadController extends FormController
                 foreach ($entities as $lead) {
                     if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
 
-                        if ($model->setDoNotContact($lead, null, $data['reason'], false, true)) {
+                        if ($model->unsubscribeLead($lead, $data['reason'], false, true)) {
                             $persistEntities[] = $lead;
                         }
                     }
