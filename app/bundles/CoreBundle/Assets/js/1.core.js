@@ -609,6 +609,9 @@ var Mautic = {
             }
         }
 
+        Mautic.chartObjects = [];
+        Mautic.renderCharts();
+
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
 
@@ -897,6 +900,11 @@ var Mautic = {
             if (typeof (Mautic.loadedContent[contentSpecific])) {
                 delete Mautic.loadedContent[contentSpecific];
             }
+        }
+
+        // trash created chart objects to save some memory
+        if (typeof Mautic.chartObjects !== 'undefined') {
+            delete Mautic.chartObjects;
         }
     },
 
@@ -2959,5 +2967,21 @@ var Mautic = {
         Mautic.loadContent(url);
 
         mQuery('body').removeClass('noscroll');
+    },
+
+    renderCharts: function() {
+        mQuery('canvas.chart').each(function(index, canvas) {
+            canvas = mQuery(canvas);
+            if (canvas.hasClass('line-chart')) {
+                Mautic.renderLineChart(canvas)
+            }
+        });
+    },
+
+    renderLineChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        var options = {}
+        Mautic.chartObjects.push(new Chart(ctx).Line(data, options));
     }
 };
