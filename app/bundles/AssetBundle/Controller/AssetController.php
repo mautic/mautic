@@ -174,9 +174,6 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        // Download stats per time period
-        $timeStats = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($activeAsset->getId());
-
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
@@ -203,7 +200,7 @@ class AssetController extends FormController
                     'downloads' => array(
                         'total'     => $activeAsset->getDownloadCount(),
                         'unique'    => $activeAsset->getUniqueDownloadCount(),
-                        'timeStats' => $timeStats
+                        'timeStats' => $model->getDownloadsLineChartData(30, 'd', array('asset_id' => $activeAsset->getId()))
                     )
                 ),
                 'security'         => $security,

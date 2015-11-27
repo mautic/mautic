@@ -19,6 +19,8 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -419,5 +421,23 @@ class AssetModel extends FormModel
         }
 
         return $size;
+    }
+
+    /**
+     * Get line chart data of downloads
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getDownloadsLineChartData($amount, $unit, $filter = array())
+    {
+        $barChart  = new LineChart($unit, $amount);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $amount, $filter);
+        $barChart->setDataset('Download Count', $chartData);
+        return $barChart->render();
     }
 }
