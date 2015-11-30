@@ -13,6 +13,8 @@ use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,14 +28,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ModuleType extends AbstractType
 {
 
-    private $translator;
+    private $factory;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
     {
-        $this->translator = $factory->getTranslator();
+        $this->factory = $factory;
     }
 
     /**
@@ -48,16 +50,13 @@ class ModuleType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        // @todo: Make this configurable by other bundles through an event
-        $types = array(
-            'lead.timeline',
-            'page.times_on_site',
-            'email.open_rate'
-        );
+        $dispatcher = $this->factory->getDispatcher();
+        $event      = new ModuleTypeListEvent();
+        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
         $builder->add('type', 'choice', array(
             'label'      => 'mautic.dashboard.module.form.type',
-            'choices'    => $types,
+            'choices'    => $event->getTypes(),
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));

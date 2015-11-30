@@ -180,8 +180,11 @@ return array(
             'mautic.lead.search.subscriber'         => array(
                 'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.webhook.subscriber'                => array(
+            'mautic.webhook.subscriber'             => array(
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
+            ),
+            'mautic.dashboard.subscriber'             => array(
+                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
             ),
         ),
         'forms'   => array(
