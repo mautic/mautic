@@ -10,6 +10,24 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.dashboard.header.index'));
 $view['slots']->set('mauticContent', 'dashboard');
 
+$buttons[] = array(
+    'attr'      => array(
+        'class'       => 'btn btn-default btn-nospin',
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
+        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'new')),
+        'data-header' => $view['translator']->trans('mautic.dashboard.module.add'),
+    ),
+    'iconClass' => 'fa fa-plus',
+    'btnText'   => 'mautic.dashboard.module.add'
+);
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'routeBase' => 'dashboard',
+    'langVar'   => 'dashboard',
+    'customButtons' => $buttons
+)));
+
 $cols = 0;
 if ( $popularPages )     $cols++;
 if ( $popularAssets )    $cols++;
@@ -18,6 +36,11 @@ if ($cols == 0) $cols = 1;
 $colspan = 12/$cols;
 
 ?>
+<div class="box-layout">
+    <div class="bg-auto bg-dark-xs">
+        <?php echo $view->render('MauticDashboardBundle:Module:list.html.php', array('modules' => $modules)); ?>
+    </div>
+</div>
 <div class="box-layout">
     <div class="np col-md-9 height-auto bg-white">
     	<div class="bg-auto bg-dark-xs">
@@ -281,7 +304,7 @@ $colspan = 12/$cols;
     <div class="col-md-3 bg-white bdr-l height-auto">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticDashboardBundle:Default:recentactivity.html.php', array('logs' => $logs, 'icons' => $icons)); ?>
+        <?php echo $view->render('MauticDashboardBundle:Dashboard:recentactivity.html.php', array('logs' => $logs, 'icons' => $icons)); ?>
 
     </div>
 </div>
