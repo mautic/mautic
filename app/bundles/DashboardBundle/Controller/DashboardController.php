@@ -9,15 +9,17 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\DashboardBundle\Entity\Module;
 
 /**
- * Class DefaultController
+ * Class DashboardController
  */
-class DefaultController extends CommonController
+class DashboardController extends FormController
 {
 
     /**
@@ -148,6 +150,23 @@ class DefaultController extends CommonController
             $email['lead'] = $leadModel->getEntity($email['lead_id']);
         }
 
+        $force = array(
+            array(
+                'column' => 'm.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->factory->getUser()->getId()
+            )
+        );
+
+        /** @var \Mautic\DashBundle\Model\DashboardModel $pageModel */
+        $model = $this->factory->getModel('dashboard');
+
+        $modules = $model->getEntities(array(
+            'filter' => array(
+                'force' => $force
+            )
+        ));
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -166,14 +185,158 @@ class DefaultController extends CommonController
                 'icons'             => $icons,
                 'upcomingEmails'    => $upcomingEmails,
                 'leadLineChart'     => $leadModel->getLeadsLineChartData(30, 'd'),
-                'security'          => $this->factory->getSecurity()
+                'security'          => $this->factory->getSecurity(),
+                'modules'           => $modules
             ),
-            'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
+            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_dashboard_index',
                 'mauticContent'  => 'dashboard',
                 'route'          => $this->generateUrl('mautic_dashboard_index')
             )
         ));
+    }
+
+    /**
+     * Generate's new dashboard module and processes post data
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newAction()
+    {
+
+        //retrieve the entity
+        $module = new Module();
+
+        $model  = $this->factory->getModel('dashboard');
+        $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'new'));
+
+        //get the user form factory
+        $form       = $model->createForm($module, $this->get('form.factory'), $action);
+        $closeModal = false;
+        $valid      = false;
+        ///Check for a submitted form and process it
+        if ($this->request->getMethod() == 'POST') {
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $closeModal = true;
+
+                    //form is valid so process the data
+                    $model->saveEntity($module);
+                }
+            } else {
+                $closeModal = true;
+            }
+        }
+
+        // @todo: build permissions
+        // $security    = $this->factory->getSecurity();
+        // $permissions = array(
+        //     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
+        //     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
+        // );
+
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars = array(
+                'closeModal'    => 1,
+                'mauticContent' => 'module'
+            );
+
+            if ($valid && !$cancelled) {
+                $passthroughVars['upModuleCount'] = 1;
+                $passthroughVars['moduleHtml'] = $this->renderView('MauticDashboardBundle:Module:module.html.php', array(
+                    'module'      => $module,
+                    // 'permissions' => $permissions,
+                ));
+                $passthroughVars['moduleId'] = $module->getId();
+            }
+
+
+            $response = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'form'        => $form->createView(),
+                    // 'permissions' => $permissions
+                ),
+                'contentTemplate' => 'MauticDashboardBundle:Module:form.html.php'
+            ));
+        }
+    }
+
+    /**
+     * edit module and processes post data
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction($objectId)
+    {
+        $model  = $this->factory->getModel('dashboard');
+        $module = $model->getEntity($objectId);
+        $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+
+        //get the user form factory
+        $form       = $model->createForm($module, $this->get('form.factory'), $action);
+        $closeModal = false;
+        $valid      = false;
+        ///Check for a submitted form and process it
+        if ($this->request->getMethod() == 'POST') {
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $closeModal = true;
+
+                    //form is valid so process the data
+                    $model->saveEntity($module);
+                }
+            } else {
+                $closeModal = true;
+            }
+        }
+
+        // @todo: build permissions
+        // $security    = $this->factory->getSecurity();
+        // $permissions = array(
+        //     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
+        //     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
+        // );
+
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars = array(
+                'closeModal'    => 1,
+                'mauticContent' => 'module'
+            );
+
+            if ($valid && !$cancelled) {
+                $passthroughVars['upModuleCount'] = 1;
+                $passthroughVars['moduleHtml'] = $this->renderView('MauticDashboardBundle:Module:module.html.php', array(
+                    'module'      => $module,
+                    // 'permissions' => $permissions,
+                ));
+                $passthroughVars['moduleId'] = $module->getId();
+            }
+
+
+            $response = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'form'        => $form->createView(),
+                    // 'permissions' => $permissions
+                ),
+                'contentTemplate' => 'MauticDashboardBundle:Module:form.html.php'
+            ));
+        }
     }
 }
