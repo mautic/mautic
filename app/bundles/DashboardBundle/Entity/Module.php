@@ -33,6 +33,11 @@ class Module extends FormEntity
     private $name;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @var integer
      */
     private $width;
@@ -45,7 +50,7 @@ class Module extends FormEntity
     /**
      * @var integer
      */
-    private $order;
+    private $ordering;
 
     /**
      * @var string
@@ -79,7 +84,7 @@ class Module extends FormEntity
         $builder->addField('type', 'string');
         $builder->addField('width', 'integer');
         $builder->addField('height', 'integer');
-        $builder->addField('order', 'integer');
+        $builder->addField('ordering', 'integer');
 
         $builder->createField('params', 'array')
             ->nullable()
@@ -93,18 +98,6 @@ class Module extends FormEntity
     {
         $metadata->addPropertyConstraint('name', new NotBlank(array(
             'message' => 'mautic.core.name.required'
-        )));
-
-        $metadata->addPropertyConstraint('type', new NotBlank(array(
-            'type' => 'mautic.core.type.required'
-        )));
-
-        $metadata->addPropertyConstraint('width', new NotBlank(array(
-            'width' => 'mautic.core.width.required'
-        )));
-
-        $metadata->addPropertyConstraint('height', new NotBlank(array(
-            'height' => 'mautic.core.height.required'
         )));
     }
 
@@ -219,28 +212,28 @@ class Module extends FormEntity
     }
 
     /**
-     * Set order
+     * Set ordering
      *
-     * @param integer $order
+     * @param integer $ordering
      *
      * @return Report
      */
-    public function setOrder($order)
+    public function setOrdering($ordering)
     {
-        $this->isChanged('order', $order);
-        $this->order = $order;
+        $this->isChanged('ordering', $ordering);
+        $this->ordering = $ordering;
 
         return $this;
     }
 
     /**
-     * Get order
+     * Get ordering
      *
      * @return integer
      */
-    public function getOrder()
+    public function getOrdering()
     {
-        return $this->order;
+        return $this->ordering;
     }
 
     /**

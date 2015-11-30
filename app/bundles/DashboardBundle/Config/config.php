@@ -12,7 +12,11 @@ return array(
         'main' => array(
             'mautic_dashboard_index' => array(
                 'path' => '/dashboard',
-                'controller' => 'MauticDashboardBundle:Default:index'
+                'controller' => 'MauticDashboardBundle:Dashboard:index'
+            ),
+            'mautic_dashboard_action'       => array(
+                'path'         => '/dashboard/{objectAction}/{objectId}',
+                'controller'   => 'MauticDashboardBundle:Dashboard:execute'
             )
         )
     ),
@@ -25,6 +29,20 @@ return array(
                     'route'     => 'mautic_dashboard_index',
                     'iconClass' => 'fa-th-large'
                 )
+            )
+        )
+    ),
+    'services' => array(
+        'events'  => array(
+            // 'mautic.lead.subscriber' => array(
+            //     'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
+            // ),
+        ),
+        'forms'   => array(
+            'mautic.form.type.module' => array(
+                'class'     => 'Mautic\DashboardBundle\Form\Type\ModuleType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'module'
             )
         )
     )

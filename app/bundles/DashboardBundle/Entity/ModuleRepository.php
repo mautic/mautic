@@ -23,7 +23,7 @@ class ModuleRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('m.order', 'ASC')
+            array('m.ordering', 'ASC')
         );
     }
 
