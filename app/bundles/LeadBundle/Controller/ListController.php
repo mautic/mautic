@@ -49,15 +49,14 @@ class ListController extends FormController
 
         $filter           = array();
         $filter['string'] = $this->request->get('search', $this->factory->getSession()->get('mautic.leadlist.filter', ''));
-        $this->factory->getSession()->set('mautic.leadlist.filter', $filter['string']);
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         if (!$permissions['lead:lists:viewother']) {
-            $translator      = $this->get('translator');
-            $mine            = $translator->trans('mautic.core.searchcommand.ismine');
-            $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-            $filter["force"] = " ($mine or $global)";
+            $filter['force'][] =
+                array('column' => 'l.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
+
+        $this->factory->getSession()->set('mautic.leadlist.filter', $filter['string']);
+        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $items = $model->getEntities(
             array(
