@@ -30,6 +30,7 @@
 /upgrade_errors.txt
 /translations
 /media/images/*
+!/media/images/homerefill-logo.png
 !/media/images/flags
 !/media/images/apple-touch-icon.png
 !/media/images/avatar.png
