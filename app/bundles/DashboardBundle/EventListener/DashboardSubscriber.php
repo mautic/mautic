@@ -43,7 +43,7 @@ class DashboardSubscriber extends CommonSubscriber
     public function onModuleListGenerate(ModuleTypeListEvent $event)
     {
         foreach ($this->types as $type) {
-            $event->addEvents($type, $bundle);
+            $event->addType($type, $this->bundle);
         }
     }
 }

@@ -24,13 +24,15 @@ class ModuleTypeListEvent extends CommonEvent
     /**
      * Adds new module type to the module types list
      */
-    public function setType($moduleType, $bundle = 'others')
+    public function addType($moduleType, $bundle = 'others')
     {
+        $bundle = 'mautic.' . $bundle . '.dashboard.modules';
+
         if (!isset($this->moduleTypes[$bundle])) {
             $this->moduleTypes[$bundle] = array();
         }
 
-        $this->moduleTypes[$bundle][] = $moduleType;
+        $this->moduleTypes[$bundle][$moduleType] = $bundle . '.' . $moduleType;
     }
 
     /**

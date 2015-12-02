@@ -34,9 +34,9 @@ return array(
     ),
     'services' => array(
         'events'  => array(
-            'mautic.dashboard.subscriber' => array(
-                'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
-            ),
+            // 'mautic.dashboard.subscriber' => array(
+            //     'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
+            // ),
         ),
         'forms'   => array(
             'mautic.form.type.module' => array(

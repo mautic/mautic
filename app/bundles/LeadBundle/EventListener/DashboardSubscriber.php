@@ -9,7 +9,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\ModuleListEvent;
+use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -20,8 +20,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
-    protected $bundle = 'lead'
-    protected $types = array();
+    protected $bundle = 'lead';
+    protected $types = array('created.leads.in.time');
 
     /**
      * @return array

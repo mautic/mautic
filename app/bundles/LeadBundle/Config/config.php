@@ -183,7 +183,7 @@ return array(
             'mautic.webhook.subscriber'             => array(
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
             ),
-            'mautic.dashboard.subscriber'             => array(
+            'mautic.dashboard.subscriber'           => array(
                 'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
             ),
         ),
