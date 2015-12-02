@@ -26,4 +26,14 @@ final class DashboardEvents
      * @var string
      */
     const DASHBOARD_ON_MODULE_LIST_GENERATE = 'mautic.dashboard_on_module_list_generate';
+
+    /**
+     * The mautic.dashboard_on_module_form_generate event is dispatched when generating the form of a module type
+     *
+     * The event listener receives a
+     * Mautic\DashbardBundle\Event\ModuleListEvent instance.
+     *
+     * @var string
+     */
+    const DASHBOARD_ON_MODULE_FORM_GENERATE = 'mautic.dashboard_on_module_form_generate';
 }

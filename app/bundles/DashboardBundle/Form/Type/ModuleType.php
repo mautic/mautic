@@ -15,10 +15,13 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
+use Mautic\DashboardBundle\Event\ModuleFormEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * Class ModuleType
@@ -55,10 +58,15 @@ class ModuleType extends AbstractType
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
         $builder->add('type', 'choice', array(
-            'label'      => 'mautic.dashboard.module.form.type',
-            'choices'    => $event->getTypes(),
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'label'       => 'mautic.dashboard.module.form.type',
+            'choices'     => $event->getTypes(),
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array('class' => 'form-control'),
+            'empty_value' => 'mautic.core.select',
+            'attr'        => array(
+                'class'     => 'form-control',
+                'onchange'  => 'Mautic.updateModuleForm(this)'
+            )
         ));
 
         $builder->add('width', 'choice', array(
@@ -101,25 +109,65 @@ class ModuleType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('buttons', 'form_buttons', array(
-            'apply_text' => false,
-            'save_text'  => 'mautic.core.form.save'
-        ));
+        $ff = $builder->getFormFactory();
+
+        // function to add a form for specific module type dynamically
+        $func = function (FormEvent $e) use ($ff, $dispatcher) {
+            $data    = $e->getData();
+            $form    = $e->getForm();
+            $event   = new ModuleFormEvent();
+
+            // $data is object on load, array on save (??)
+            $type    = is_array($data) ? $data['type'] : $data->getType();
+
+            // Send the whole data array/object to the module custom form
+            $params  = is_array($data) ? $data : $data->getParams();
+
+            $event->setType($type);
+            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
+            $moduleForm = $event->getForm();
+
+            if (isset($moduleForm['formAlias']))
+            $form->add('params', $moduleForm['formAlias'], array(
+                'label' => false,
+                'data'  => $params
+            ));
+        };
+
+        $builder->add('id', 'hidden');
+
+
+        if ($options['show_buttons']) {
+            $builder->add('buttons', 'form_buttons', array(
+                'apply_text' => false,
+                'save_text'  => 'mautic.core.form.save'
+            ));
+        } else {
+            $builder->add('buttons', 'form_buttons', array(
+                'apply_text' => false,
+                'save_text' => false,
+                'cancel_text' => false,
+            ));
+        }
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
+
+        // Register the function above as EventListener on PreSet and PreBind
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
+        $builder->addEventListener(FormEvents::PRE_BIND, $func);
     }
 
     /**
      * @param OptionsResolverInterface $resolver
      */
-    // public function setDefaultOptions (OptionsResolverInterface $resolver)
-    // {
-    //     $resolver->setDefaults(array(
-    //         'data_class' => 'Mautic\LeadBundle\Entity\LeadNote'
-    //     ));
-    // }
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'show_buttons' => true
+        ));
+    }
 
     /**
      * @return string

@@ -10,6 +10,7 @@ namespace Mautic\DashboardBundle\EventListener;
 
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
+use Mautic\DashboardBundle\Event\ModuleFormEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -42,8 +43,24 @@ class DashboardSubscriber extends CommonSubscriber
      */
     public function onModuleListGenerate(ModuleTypeListEvent $event)
     {
-        foreach ($this->types as $type) {
+        $moduleTypes = array_keys($this->types);
+
+        foreach ($moduleTypes as $type) {
             $event->addType($type, $this->bundle);
+        }
+    }
+
+    /**
+     * Set a module edit form when needed 
+     *
+     * @param ModuleFormEvent $event
+     *
+     * @return void
+     */
+    public function onModuleFormGenerate(ModuleFormEvent $event)
+    {
+        if (isset($this->types[$event->getType()])) {
+            $event->setForm($this->types[$event->getType()]);
         }
     }
 }

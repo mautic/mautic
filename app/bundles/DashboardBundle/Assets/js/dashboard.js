@@ -154,3 +154,16 @@ Mautic.updateActiveVisitorCount = function () {
         }
     });
 }
+
+Mautic.updateModuleForm = function (element) {
+    Mautic.activateLabelLoadingIndicator('module_type');
+    var formWrapper = mQuery(element).closest('form');
+    var ModuleFormValues = formWrapper.serializeArray();
+    Mautic.ajaxActionRequest('dashboard:updateModuleForm', ModuleFormValues, function(response) {
+        if (response.formHtml) {
+            var formHtml = mQuery(response.formHtml).children();
+            formWrapper.html(formHtml);
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};

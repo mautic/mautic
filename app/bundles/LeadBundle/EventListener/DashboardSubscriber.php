@@ -21,7 +21,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     protected $bundle = 'lead';
-    protected $types = array('created.leads.in.time');
+    protected $types = array(
+        'created.leads.in.time' => array('formAlias' => 'lead_dashboard_leads_in_time_module')
+    );
 
     /**
      * @return array
@@ -29,7 +31,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onModuleListGenerate', 0)
+            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onModuleListGenerate', 0),
+            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE => array('onModuleFormGenerate', 0),
         );
     }
 }

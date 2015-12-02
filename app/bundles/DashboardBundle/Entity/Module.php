@@ -102,11 +102,24 @@ class Module extends FormEntity
     }
 
     /**
+     * Set id
+     *
+     * @param integer $id
+     */
+    public function setId($id)
+    {
+        $this->isChanged('id', $id);
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -118,7 +131,7 @@ class Module extends FormEntity
      *
      * @return Report
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -131,7 +144,7 @@ class Module extends FormEntity
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }

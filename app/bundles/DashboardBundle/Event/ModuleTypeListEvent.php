@@ -22,7 +22,10 @@ class ModuleTypeListEvent extends CommonEvent
     protected $moduleTypes = array();
 
     /**
-     * Adds new module type to the module types list
+     * Adds a new module type to the module types list
+     *
+     * @param  string $moduleType
+     * @param  string $bundle name (module category)
      */
     public function addType($moduleType, $bundle = 'others')
     {
@@ -38,7 +41,7 @@ class ModuleTypeListEvent extends CommonEvent
     /**
      * Returns the array of module types
      *
-     * @param array $list
+     * @return array $moduleTypes
      */
     public function getTypes()
     {
