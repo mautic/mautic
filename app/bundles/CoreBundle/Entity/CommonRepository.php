@@ -171,9 +171,9 @@ class CommonRepository extends EntityRepository
      */
     public function saveEntity($entity, $flush = true)
     {
-        $this->_em->persist($entity);
+        $this->getEntityManager()->persist($entity);
         if ($flush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush($entity);
         }
     }
 
@@ -192,10 +192,10 @@ class CommonRepository extends EntityRepository
             $this->saveEntity($entity, false);
 
             if ((($k + 1) % $batchSize) === 0) {
-                $this->_em->flush();
+                $this->getEntityManager()->flush();
             }
         }
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
     /**
