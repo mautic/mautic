@@ -41,6 +41,8 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * Returns HTML of a new module based on its values.
+     *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -62,6 +64,22 @@ class AjaxController extends CommonAjaxController
 
         $dataArray['formHtml'] = $formHtml;
         $dataArray['success']  = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Saves the new ordering of dashboard modules.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateModuleOrderingAction(Request $request)
+    {
+        $data = $request->request->get('ordering');
+        $repo = $this->factory->getModel('dashboard')->getRepository();
+        $repo->updateOrdering(array_flip($data), $this->factory->getUser()->getId());
+        $dataArray = array('success' => 1);
 
         return $this->sendJsonResponse($dataArray);
     }

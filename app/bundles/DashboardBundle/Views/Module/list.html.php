@@ -9,12 +9,13 @@
 
 ?>
 
-<div class="row" id="dashboard-modules">
+<div id="dashboard-modules">
 <?php foreach ($modules as $module): ?>
-    <div class="pt-md col-md-<?php echo !empty($module->getWidth()) ? $module->getWidth() : 12 ?>">
+    <div class="module pt-md col-md-<?php echo !empty($module->getWidth()) ? $module->getWidth() : 12 ?>" data-module-id="<?php echo $module->getId(); ?>">
         <?php echo $view->render('MauticDashboardBundle:Module:module.html.php', array(
             'module' => $module
         )); ?>
     </div>
 <?php endforeach; ?>
+<div class="clearfix"></div>
 </div>

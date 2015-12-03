@@ -18,6 +18,33 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class ModuleRepository extends CommonRepository
 {
     /**
+     * Update ordering
+     *
+     * @param  array   $ordering
+     * @param  integer $userId
+     *
+     * @return string
+     */
+    public function updateOrdering($ordering, $userId)
+    {
+        $modules = $this->getEntities(
+            array(
+                'filter' => array(
+                    'createdBy' => $userId
+                )
+            )
+        );
+
+        foreach ($modules as &$module) {
+            if (isset($ordering[$module->getId()])) {
+                $module->setOrdering((int) $ordering[$module->getId()]);
+            }
+        }
+
+        $this->_em->flush();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getDefaultOrder()

@@ -97,18 +97,6 @@ class ModuleType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        // @todo load list of modules here
-        $insertBefore = array(
-            0 => 'mautic.dashboard.module.ordering.last'
-        );
-
-        $builder->add('ordering', 'choice', array(
-            'label'      => 'mautic.dashboard.module.form.ordering',
-            'choices'    => $insertBefore,
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
-
         $ff = $builder->getFormFactory();
 
         // function to add a form for specific module type dynamically

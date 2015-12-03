@@ -35,3 +35,11 @@
     height:100%;
     width:100%;
 }
+.sortable-placeholder {
+    background-color: #fff;
+    border: 1px dashed #4e5d9d;
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+

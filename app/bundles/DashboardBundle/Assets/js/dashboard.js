@@ -4,6 +4,7 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.renderReturnRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
+    Mautic.initModuleSorting();
 
     // Refresh page visits every 5 sec
     Mautic.setModeratedInterval('ActiveVisitorsLoop', 'updateActiveVisitorCount', 5000);
@@ -21,6 +22,29 @@ Mautic.dashboardOnUnload = function(id) {
     }
     Mautic.clearModeratedInterval('ActiveVisitorsLoop');
 };
+
+Mautic.initModuleSorting = function () {
+    var modulesWrapper = mQuery('#dashboard-modules');
+    modulesWrapper.sortable({
+        handle: '.panel-heading',
+        placeholder: 'sortable-placeholder',
+        items: '.module',
+        opacity: 0.9,
+        stop: function() {
+            var modules = modulesWrapper.children();
+            var ordering = [];
+            modules.each(function(index, value) { 
+                ordering.push(mQuery(this).attr('data-module-id')); 
+            });
+            Mautic.ajaxActionRequest('dashboard:updateModuleOrdering', {'ordering': ordering}, function(response) {
+                console.log(response);
+            });
+        },
+        start: function( event, ui ) {
+            // @todo: resize placeholder
+        }
+    }).disableSelection();
+}
 
 Mautic.renderDashboardMap = function () {
     // Initilize map only for first time
@@ -163,7 +187,6 @@ Mautic.updateModuleForm = function (element) {
         if (response.formHtml) {
             var formHtml = mQuery(response.formHtml);
             formHtml.find('#module_buttons').addClass('hide hidden');
-            console.log(formHtml.find('#module_buttons'));
             formWrapper.html(formHtml.children());
         }
         Mautic.removeLabelLoadingIndicator();

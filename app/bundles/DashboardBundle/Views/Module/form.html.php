@@ -17,7 +17,7 @@ if (!empty($userId)) {
 ?>
 <?php echo $view['form']->start($form); ?>
 
-<div class="row">
+<div class="row form-group">
     <div class="col-xs-6">
         <?php echo $view['form']->label($form['name']); ?>
         <?php echo $view['form']->widget($form['name']); ?>
@@ -27,18 +27,14 @@ if (!empty($userId)) {
         <?php echo $view['form']->widget($form['type']); ?>
     </div>
 </div>
-<div class="row mt-lg">
-    <div class="col-xs-4">
+<div class="row form-group">
+    <div class="col-xs-6">
         <?php echo $view['form']->label($form['width']); ?>
         <?php echo $view['form']->widget($form['width']); ?>
     </div>
-    <div class="col-xs-4">
+    <div class="col-xs-6">
         <?php echo $view['form']->label($form['height']); ?>
         <?php echo $view['form']->widget($form['height']); ?>
-    </div>
-    <div class="col-xs-4">
-        <?php echo $view['form']->label($form['ordering']); ?>
-        <?php echo $view['form']->widget($form['ordering']); ?>
     </div>
 </div>
 

@@ -14,7 +14,7 @@
             href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $module->getId())); ?>" 
             data-toggle="ajaxmodal" 
             data-target="#MauticSharedModal" 
-            data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>">
+            data-header="<?php echo $view['translator']->trans('mautic.dashboard.module.header.edit'); ?>">
             <i class="fa fa-pencil"></i>
         </a>
     </h3>
