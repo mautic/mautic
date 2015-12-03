@@ -72,14 +72,23 @@ abstract class AbstractMaxmindIpLookup extends AbstractIpLookup
             if (isset($data->postal)) {
                 $this->zipcode = $data->postal->code;
             }
-            $this->city      = $data->city->names->en;
-            if (isset($data->subdivisions[0])) {
-                $this->region = $data->subdivisions[0]->names->en;
-            }
             $this->country   = $data->country->names->en;
+            $this->city      = $data->city->names->en;
+
+            if (isset($data->subdivisions[0])) {
+                if (count($data->subdivisions) > 1) {
+                    // Use the first listed as the country and second as state
+                    // UK -> England -> Winchester
+                    $this->country = $data->subdivisions[0]->names->en;
+                    $this->region  = $data->subdivisions[1]->names->en;
+                } else {
+                    $this->region = $data->subdivisions[0]->names->en;
+                }
+            }
+
             $this->latitude  = $data->location->latitude;
             $this->longitude = $data->location->longitude;
-            $this->timezone = $data->location->time_zone;
+            $this->timezone  = $data->location->time_zone;
 
             if (isset($data->traits->isp)) {
                 $this->isp = $data->traits->isp;
