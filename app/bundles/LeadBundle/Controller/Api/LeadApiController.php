@@ -330,7 +330,7 @@ class LeadApiController extends CommonApiController
         //pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
             $data = $f->getData();
-            if (is_string($f->getData)) {
+            if (is_string($data)) {
                 $data = htmlspecialchars_decode($data);
             }
             $parameters[$f->getName()] = $data;
