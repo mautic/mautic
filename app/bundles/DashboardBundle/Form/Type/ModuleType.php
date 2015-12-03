@@ -136,19 +136,10 @@ class ModuleType extends AbstractType
 
         $builder->add('id', 'hidden');
 
-
-        if ($options['show_buttons']) {
-            $builder->add('buttons', 'form_buttons', array(
-                'apply_text' => false,
-                'save_text'  => 'mautic.core.form.save'
-            ));
-        } else {
-            $builder->add('buttons', 'form_buttons', array(
-                'apply_text' => false,
-                'save_text' => false,
-                'cancel_text' => false,
-            ));
-        }
+        $builder->add('buttons', 'form_buttons', array(
+            'apply_text' => false,
+            'save_text'  => 'mautic.core.form.save'
+        ));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -157,16 +148,6 @@ class ModuleType extends AbstractType
         // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
         $builder->addEventListener(FormEvents::PRE_BIND, $func);
-    }
-
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions (OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'show_buttons' => true
-        ));
     }
 
     /**

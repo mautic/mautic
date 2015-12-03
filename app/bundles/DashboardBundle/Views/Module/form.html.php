@@ -10,9 +10,9 @@
 $view['slots']->set('mauticContent', 'module');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
-    $header = $view['translator']->trans('mautic.lead.note.header.edit');
+    $header = $view['translator']->trans('mautic.dashboard.module.header.edit');
 } else {
-    $header = $view['translator']->trans('mautic.lead.note.header.new');
+    $header = $view['translator']->trans('mautic.dashboard.module.header.new');
 }
 ?>
 <?php echo $view['form']->start($form); ?>

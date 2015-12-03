@@ -55,7 +55,7 @@ class AjaxController extends CommonAjaxController
         }
 
         $module = new Module();
-        $form = $this->get('form.factory')->create('module', $module, array('show_buttons' => false));
+        $form = $this->get('form.factory')->create('module', $module);
         $formHtml = $this->render("MauticDashboardBundle::Module\\form.html.php",
             array('form' => $form->bind($data)->createView())
         )->getContent();

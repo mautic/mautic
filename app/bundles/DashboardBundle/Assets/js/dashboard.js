@@ -161,8 +161,10 @@ Mautic.updateModuleForm = function (element) {
     var ModuleFormValues = formWrapper.serializeArray();
     Mautic.ajaxActionRequest('dashboard:updateModuleForm', ModuleFormValues, function(response) {
         if (response.formHtml) {
-            var formHtml = mQuery(response.formHtml).children();
-            formWrapper.html(formHtml);
+            var formHtml = mQuery(response.formHtml);
+            formHtml.find('#module_buttons').addClass('hide hidden');
+            console.log(formHtml.find('#module_buttons'));
+            formWrapper.html(formHtml.children());
         }
         Mautic.removeLabelLoadingIndicator();
     });
