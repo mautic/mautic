@@ -42,4 +42,9 @@
     height: 100px;
     float: left;
 }
+.module .panel-heading {
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab;
+}
 
