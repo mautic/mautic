@@ -54,10 +54,12 @@ class EmailType extends AbstractType
         );
 
         $user    = $this->factory->getUser();
-        
-         $default = (empty($options['data']['fromname'])) ? $user->getFirstName() . ' ' . $user->getLastName() : $options['data']['fromname'];
+ 
+        $default = (empty($options['data']['fromname'])) ? $user->getFirstName() . ' ' . $user->getLastName() : $options['data']['fromname'];
         $builder->add(
-                'fromname', 'text', array(
+            'fromname',
+            'text', 
+            array(
             'label' => 'mautic.lead.email.from_name',
             'label_attr' => array('class' => 'control-label'),
             'attr' => array('class' => 'form-control'),
@@ -65,7 +67,7 @@ class EmailType extends AbstractType
             'data' => $default
                 )
         );
-        
+
         $default = (empty($options['data']['from'])) ? $user->getEmail() : $options['data']['from'];
         $builder->add(
             'from',
