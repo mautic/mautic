@@ -1581,8 +1581,7 @@ class LeadController extends FormController
                         $user = $this->factory->getUser();
 
                         $mailer->setFrom(
-                        $email['from'],
-                        (strtolower($user->getEmail()) !== strtolower($email['from']) && empty($email['fromname')==false) ? $email['fromname'] : $user->getFirstName().' '.$user->getLastName()
+                                $email['from'], (strtolower($user->getEmail()) !== strtolower($email['from']) && empty($email['fromname']) == false ) ? $email['fromname'] : $user->getFirstName() . ' ' . $user->getLastName()
                         );
 
                         // Set Content
