@@ -11,6 +11,7 @@ namespace Mautic\DashboardBundle\EventListener;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
 use Mautic\DashboardBundle\Event\ModuleFormEvent;
+use Mautic\DashboardBundle\Event\ModuleDetailEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -30,7 +31,9 @@ class DashboardSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onModuleListGenerate', 0)
+            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onModuleListGenerate', 0),
+            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE => array('onModuleFormGenerate', 0),
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => array('onModuleDetailGenerate', 0),
         );
     }
 
@@ -62,5 +65,16 @@ class DashboardSubscriber extends CommonSubscriber
         if (isset($this->types[$event->getType()])) {
             $event->setForm($this->types[$event->getType()]);
         }
+    }
+
+    /**
+     * Set a module detail when needed 
+     *
+     * @param ModuleDetailEvent $event
+     *
+     * @return void
+     */
+    public function onModuleDetailGenerate(ModuleDetailEvent $event)
+    {
     }
 }

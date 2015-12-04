@@ -21,7 +21,7 @@ final class DashboardEvents
      * The mautic.dashboard_on_module_list_generate event is dispatched when generating a list of available module types
      *
      * The event listener receives a
-     * Mautic\DashbardBundle\Event\ModuleListEvent instance.
+     * Mautic\DashbardBundle\Event\ModuleTypeListEvent instance.
      *
      * @var string
      */
@@ -31,9 +31,19 @@ final class DashboardEvents
      * The mautic.dashboard_on_module_form_generate event is dispatched when generating the form of a module type
      *
      * The event listener receives a
-     * Mautic\DashbardBundle\Event\ModuleListEvent instance.
+     * Mautic\DashbardBundle\Event\ModuleFormEvent instance.
      *
      * @var string
      */
     const DASHBOARD_ON_MODULE_FORM_GENERATE = 'mautic.dashboard_on_module_form_generate';
+
+    /**
+     * The mautic.dashboard_on_module_detail_generate event is dispatched when generating the detail of a module type
+     *
+     * The event listener receives a
+     * Mautic\DashbardBundle\Event\ModuleDetailEvent instance.
+     *
+     * @var string
+     */
+    const DASHBOARD_ON_MODULE_DETAIL_GENERATE = 'mautic.dashboard_on_module_detail_generate';
 }

@@ -9,7 +9,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
+use Mautic\DashboardBundle\Event\ModuleDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -20,19 +20,38 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
+    /**
+     * Define the name of the bundle/category of the module(s)
+     *
+     * @var string
+     */
     protected $bundle = 'lead';
+
+    /**
+     * Define the module(s)
+     *
+     * @var string
+     */
     protected $types = array(
-        'created.leads.in.time' => array('formAlias' => 'lead_dashboard_leads_in_time_module')
+        'created.leads.in.time' => array(
+            'formAlias' => 'lead_dashboard_leads_in_time_module',
+            'template' => 'MauticDashboardBundle:Module:module.html.php',
+            'callback' => array(
+                'model' => 'lead',
+                'method' => 'getLeadsLineChartData'
+            )
+        )
     );
 
     /**
-     * @return array
+     * Set a module detail when needed 
+     *
+     * @param ModuleDetailEvent $event
+     *
+     * @return void
      */
-    static public function getSubscribedEvents()
+    public function onModuleDetailGenerate(ModuleDetailEvent $event)
     {
-        return array(
-            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onModuleListGenerate', 0),
-            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE => array('onModuleFormGenerate', 0),
-        );
+
     }
 }
