@@ -609,7 +609,6 @@ var Mautic = {
             }
         }
 
-        Mautic.chartObjects = [];
         Mautic.renderCharts();
 
         //instantiate sparkline plugin
@@ -2969,8 +2968,22 @@ var Mautic = {
         mQuery('body').removeClass('noscroll');
     },
 
-    renderCharts: function() {
-        mQuery('canvas.chart').each(function(index, canvas) {
+    /**
+     * Render the chart.js charts
+     *
+     * @param mQuery element scope
+     */
+    renderCharts: function(scope) {
+        var charts = [];
+        if (!Mautic.chartObjects) Mautic.chartObjects = [];
+
+        if (scope) {
+            charts = scope.find('canvas.chart');
+        } else {
+            charts = mQuery('canvas.chart');
+        }
+
+        charts.each(function(index, canvas) {
             canvas = mQuery(canvas);
             if (canvas.hasClass('line-chart')) {
                 Mautic.renderLineChart(canvas)
@@ -2978,6 +2991,11 @@ var Mautic = {
         });
     },
 
+    /**
+     * Render the chart.js line chart
+     *
+     * @param mQuery element canvas
+     */
     renderLineChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());

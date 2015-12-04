@@ -75,17 +75,27 @@ class DashboardModel extends FormModel
         ));
 
         foreach ($modules as &$module) {
-            $dispatcher = $this->factory->getDispatcher();
-            $event      = new ModuleDetailEvent();
-            $event->setType($module->getType());
-            $event->setModule($module);
-            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
-            $module->setErrorMessage($event->getErrorMessage());
-            $module->setTemplate($event->getTemplate());
-            $module->setTemplateData($event->getTemplateData());
+            $this->populateModuleContent($module);
         }
 
         return $modules;
+    }
+
+    /**
+     * Load module content from the onModuleDetailGenerate event
+     *
+     * @return array
+     */
+    public function populateModuleContent(Module &$module)
+    {
+        $dispatcher = $this->factory->getDispatcher();
+        $event      = new ModuleDetailEvent();
+        $event->setType($module->getType());
+        $event->setModule($module);
+        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+        $module->setErrorMessage($event->getErrorMessage());
+        $module->setTemplate($event->getTemplate());
+        $module->setTemplateData($event->getTemplateData());
     }
 
     /**

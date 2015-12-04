@@ -229,6 +229,8 @@ class DashboardController extends FormController
                 'mauticContent' => 'module'
             );
 
+            $model->populateModuleContent($module);
+
             if ($valid && !$cancelled) {
                 $passthroughVars['upModuleCount'] = 1;
                 $passthroughVars['moduleHtml'] = $this->renderView('MauticDashboardBundle:Module:module.html.php', array(
@@ -299,6 +301,8 @@ class DashboardController extends FormController
                 'closeModal'    => 1,
                 'mauticContent' => 'module'
             );
+
+            $model->populateModuleContent($module);
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upModuleCount'] = 1;

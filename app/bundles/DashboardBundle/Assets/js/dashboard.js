@@ -23,6 +23,21 @@ Mautic.dashboardOnUnload = function(id) {
     Mautic.clearModeratedInterval('ActiveVisitorsLoop');
 };
 
+Mautic.moduleOnLoad = function(container, response) {
+    if (!response.moduleId) return;
+    var module = mQuery('[data-module-id=' + response.moduleId + ']');
+    var moduleHtml = mQuery(response.moduleHtml);
+
+    // initialize edit button modal again
+    moduleHtml.find("*[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        event.preventDefault();
+        Mautic.ajaxifyModal(this, event);
+    });
+
+    module.html(moduleHtml);
+    Mautic.renderCharts(moduleHtml);
+}
+
 Mautic.initModuleSorting = function () {
     var modulesWrapper = mQuery('#dashboard-modules');
     modulesWrapper.sortable({
