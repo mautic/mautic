@@ -52,6 +52,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onModuleDetailGenerate(ModuleDetailEvent $event)
     {
-
+        
     }
 }

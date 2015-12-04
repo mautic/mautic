@@ -12,6 +12,8 @@ namespace Mautic\DashboardBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\DashboardBundle\Entity\Module;
+use Mautic\DashboardBundle\Event\ModuleDetailEvent;
+use Mautic\DashboardBundle\DashboardEvents;
 
 /**
  * Class DashboardModel
@@ -53,6 +55,33 @@ class DashboardModel extends FormModel
         $entity = parent::getEntity($id);
 
         return $entity;
+    }
+
+    /**
+     * Load modules for the current user from database and dispatch the trigger
+     *
+     * @return array
+     */
+    public function getModules()
+    {
+        $modules = $this->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    'column' => 'm.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->factory->getUser()->getId()
+                )
+            )
+        ));
+
+        foreach ($modules as $module) {
+            $dispatcher = $this->factory->getDispatcher();
+            $event      = new ModuleDetailEvent();
+            $event->setType($module->getType());
+            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+        }
+
+        return $modules;
     }
 
     /**

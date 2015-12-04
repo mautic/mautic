@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\DashboardBundle\Entity\Module;
-use Mautic\DashboardBundle\Event\ModuleDetailEvent;
-use Mautic\DashboardBundle\DashboardEvents;
 
 /**
  * Class DashboardController
@@ -155,23 +153,6 @@ class DashboardController extends FormController
         /** @var \Mautic\DashBundle\Model\DashboardModel $pageModel */
         $model = $this->factory->getModel('dashboard');
 
-        $modules = $model->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    'column' => 'm.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
-                )
-            )
-        ));
-
-        foreach ($modules as $module) {
-            $dispatcher = $this->factory->getDispatcher();
-            $event      = new ModuleDetailEvent();
-            $event->setType($module->getType());
-            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
-        }
-
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -191,7 +172,7 @@ class DashboardController extends FormController
                 'upcomingEmails'    => $upcomingEmails,
                 'leadLineChart'     => $leadModel->getLeadsLineChartData(30, 'd'),
                 'security'          => $this->factory->getSecurity(),
-                'modules'           => $modules
+                'modules'           => $model->getModules()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
