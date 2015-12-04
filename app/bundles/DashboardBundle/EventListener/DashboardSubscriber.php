@@ -64,6 +64,7 @@ class DashboardSubscriber extends CommonSubscriber
     {
         if (isset($this->types[$event->getType()])) {
             $event->setForm($this->types[$event->getType()]);
+            $event->stopPropagation();
         }
     }
 
