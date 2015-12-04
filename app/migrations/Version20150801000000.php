@@ -26,7 +26,6 @@ class Version20150801000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-
         if ($schema->hasTable($this->prefix . 'plugins')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
@@ -62,12 +61,10 @@ class Version20150801000000 extends AbstractMauticMigration
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings RENAME COLUMN addon_id TO plugin_id');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . ' FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . ' FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
 
         $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addons_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addon_integration_settings_id_seq CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings DROP CONSTRAINT FK_5CEDE447EC942BCF');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT FK_5CEDE447EC942BCF FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugin_integration_settings_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugins_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
     }

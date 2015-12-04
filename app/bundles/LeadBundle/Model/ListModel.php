@@ -9,8 +9,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -36,21 +34,6 @@ class ListModel extends FormModel
      * @var array
      */
     private $leadChangeLists = array();
-
-    /**
-     * @var
-     */
-    private $batchSleepTime;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        parent::__construct($factory);
-
-        $this->batchSleepTime = $factory->getParameter('batch_sleep_time', 1);
-    }
 
     /**
      * {@inheritdoc}
@@ -479,7 +462,7 @@ class ListModel extends FormModel
             // Add leads
             while ($start < $leadCount) {
                 // Keep CPU down for large lists; sleep per $limit batch
-                sleep($this->batchSleepTime);
+                $this->batchSleep();
 
                 $newLeadList = $this->getLeadsByList(
                     $list,
@@ -506,7 +489,7 @@ class ListModel extends FormModel
 
                     $leadsProcessed++;
                     if ($output && $leadsProcessed < $maxCount) {
-                        $progress->setCurrent($leadsProcessed);
+                        $progress->setProgress($leadsProcessed);
                     }
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
@@ -588,7 +571,7 @@ class ListModel extends FormModel
             // Remove leads
             while ($start < $leadCount) {
                 // Keep CPU down for large lists; sleep per $limit batch
-                sleep($this->batchSleepTime);
+                $this->batchSleep();
 
                 $removeLeadList = $this->getLeadsByList(
                     $list,
@@ -612,7 +595,7 @@ class ListModel extends FormModel
 
                     $leadsProcessed++;
                     if ($output && $leadsProcessed < $maxCount) {
-                        $progress->setCurrent($leadsProcessed);
+                        $progress->setProgress($leadsProcessed);
                     }
 
                     if ($maxLeads && $leadsProcessed >= $maxLeads) {
@@ -924,5 +907,27 @@ class ListModel extends FormModel
         $args['idOnly'] = $idOnly;
 
         return $this->getRepository()->getLeadsByList($lists, $args);
+    }
+
+    /**
+     * Batch sleep according to settings
+     */
+    protected function batchSleep()
+    {
+        $leadSleepTime = $this->factory->getParameter('batch_lead_sleep_time', false);
+        if ($leadSleepTime === false) {
+            $leadSleepTime = $this->factory->getParameter('batch_sleep_time', 1);
+        }
+
+        if (empty($leadSleepTime)) {
+
+            return;
+        }
+
+        if ($leadSleepTime < 1) {
+            usleep($leadSleepTime * 1000);
+        } else {
+            sleep($leadSleepTime);
+        }
     }
 }
