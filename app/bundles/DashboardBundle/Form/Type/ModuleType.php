@@ -109,7 +109,7 @@ class ModuleType extends AbstractType
             $type    = is_array($data) ? $data['type'] : $data->getType();
 
             // Send the whole data array/object to the module custom form
-            $params  = is_array($data) ? $data : $data->getParams();
+            $params  = is_array($data) ? $data['params'] : $data->getParams();
 
             $event->setType($type);
             $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
