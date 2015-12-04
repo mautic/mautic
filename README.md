@@ -176,7 +176,7 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 
 ### Requirements
 
-1. Mautic use Git as a version control system. Download and install git for your OS from https://git-scm.com/.
+1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
 2. Install a server, PHP and MySql/Posgres to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
 3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
 
