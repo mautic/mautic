@@ -87,11 +87,11 @@ class ModuleType extends AbstractType
             'label'      => 'mautic.dashboard.module.form.height',
             'choices'    => array(
                 '100' => '100px',
-                '200' => '200px',
-                '300' => '300px',
-                '400' => '400px',
-                '500' => '500px',
-                '600' => '600px',
+                '215' => '215px',
+                '330' => '330px',
+                '445' => '445px',
+                '560' => '560px',
+                '675' => '675px',
             ),
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
