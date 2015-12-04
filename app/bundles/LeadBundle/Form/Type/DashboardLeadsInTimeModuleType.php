@@ -29,10 +29,11 @@ class DashboardLeadsInTimeModuleType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('amount', 'text', array(
+        $builder->add('amount', 'integer', array(
                 'label'      => 'mautic.core.number',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'empty_data' => 30
             )
         );
 
@@ -48,7 +49,8 @@ class DashboardLeadsInTimeModuleType extends AbstractType
                     'Y' => 'mautic.core.time.years'
                 ),
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'empty_data' => 'd'
             )
         );
     }
