@@ -37,11 +37,12 @@ Mautic.initModuleSorting = function () {
                 ordering.push(mQuery(this).attr('data-module-id')); 
             });
             Mautic.ajaxActionRequest('dashboard:updateModuleOrdering', {'ordering': ordering}, function(response) {
-                console.log(response);
+                // @todo handle errors
             });
         },
         start: function( event, ui ) {
-            // @todo: resize placeholder
+            // Adjust placeholder's size according to dragging element size
+            ui.placeholder.css(ui.item.css(['width', 'height', 'margin', 'padding']));
         }
     }).disableSelection();
 }
