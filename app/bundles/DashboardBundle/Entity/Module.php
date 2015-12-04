@@ -62,6 +62,21 @@ class Module extends FormEntity
      */
     private $params = array();
 
+    /**
+     * @var string
+     */
+    private $template;
+
+    /**
+     * @var string
+     */
+    private $errorMessage;
+
+    /**
+     * @var array
+     */
+    private $templateData = array();
+
     public function __clone()
     {
         $this->id = null;
@@ -129,7 +144,7 @@ class Module extends FormEntity
      *
      * @param string $name
      *
-     * @return Report
+     * @return Module
      */
     public function setName($name)
     {
@@ -154,7 +169,7 @@ class Module extends FormEntity
      *
      * @param string $type
      *
-     * @return Report
+     * @return Module
      */
     public function setType($type)
     {
@@ -167,7 +182,7 @@ class Module extends FormEntity
     /**
      * Get type
      *
-     * @return integer
+     * @return string
      */
     public function getType()
     {
@@ -179,7 +194,7 @@ class Module extends FormEntity
      *
      * @param integer $width
      *
-     * @return Report
+     * @return Module
      */
     public function setWidth($width)
     {
@@ -204,7 +219,7 @@ class Module extends FormEntity
      *
      * @param integer $height
      *
-     * @return Report
+     * @return Module
      */
     public function setHeight($height)
     {
@@ -229,7 +244,7 @@ class Module extends FormEntity
      *
      * @param integer $ordering
      *
-     * @return Report
+     * @return Module
      */
     public function setOrdering($ordering)
     {
@@ -264,7 +279,7 @@ class Module extends FormEntity
      *
      * @param array $params
      *
-     * @return Report
+     * @return Module
      */
     public function setParams(array $params)
     {
@@ -272,5 +287,79 @@ class Module extends FormEntity
         $this->params = $params;
 
         return $this;
+    }
+
+    /**
+     * Set template
+     *
+     * @param string $template
+     *
+     * @return Module
+     */
+    public function setTemplate($template)
+    {
+        $this->isChanged('template', $template);
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * Get template
+     *
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * Get template data
+     *
+     * @return array $templateData
+     */
+    public function getTemplateData()
+    {
+        return $this->templateData;
+    }
+
+    /**
+     * Set template data
+     *
+     * @param array $templateData
+     *
+     * @return Module
+     */
+    public function setTemplateData(array $templateData)
+    {
+        $this->isChanged('templateData', $templateData);
+        $this->templateData = $templateData;
+
+        return $this;
+    }
+
+    /**
+     * Set errorMessage
+     *
+     * @param string $errorMessage
+     *
+     * @return Module
+     */
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+
+        return $this;
+    }
+
+    /**
+     * Get errorMessage
+     *
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
     }
 }

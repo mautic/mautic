@@ -18,4 +18,13 @@
             <i class="fa fa-pencil"></i>
         </a>
     </h3>
+    <div class="panel-body">
+        <?php if ($module->getErrorMessage()) : ?>
+            <div class="alert alert-danger" role="alert">
+                <?php echo $module->getErrorMessage(); ?>
+            </div>
+        <?php elseif ($module->getTemplate()) : ?>
+            <?php echo $view->render($module->getTemplate(), $module->getTemplateData()); ?>
+        <?php endif; ?>
+    </div>
 </div>

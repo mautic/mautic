@@ -19,8 +19,11 @@ use Mautic\DashboardBundle\Entity\Module;
  */
 class ModuleDetailEvent extends CommonEvent
 {
-    protected $config;
+    protected $module;
     protected $type;
+    protected $template;
+    protected $templateData = array();
+    protected $errorMessage;
 
     /**
      * Set the module type
@@ -43,22 +46,82 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the module config
+     * Set the module entity
      *
-     * @param array $config
+     * @param Module $module
      */
-    public function setConfig(array $form)
+    public function setModule(Module $module)
     {
-        $this->config = $config;
+        $this->module = $module;
     }
 
     /**
-     * Returns the module detail configuration
+     * Returns the module entity
      *
-     * @param array $config
+     * @param Module $module
      */
-    public function getConfig()
+    public function getModule()
     {
-        return $this->config;
+        return $this->module;
+    }
+
+    /**
+     * Set the module template
+     *
+     * @param string $template
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+    }
+
+    /**
+     * Get the module template
+     *
+     * @return string $template
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * Set the module template data
+     *
+     * @param array  $templateData
+     */
+    public function setTemplateData(array $templateData)
+    {
+        $this->templateData = $templateData;
+    }
+
+    /**
+     * Get the module template data
+     *
+     * @return string $templateData
+     */
+    public function getTemplateData()
+    {
+        return $this->templateData;
+    }
+
+    /**
+     * Set en error message
+     *
+     * @param array  $errorMessage
+     */
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
+    /**
+     * Get an error message
+     *
+     * @return string $errorMessage
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
     }
 }

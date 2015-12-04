@@ -58,7 +58,7 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Load modules for the current user from database and dispatch the trigger
+     * Load modules for the current user from database and dispatch the onModuleDetailGenerate trigger
      *
      * @return array
      */
@@ -74,11 +74,15 @@ class DashboardModel extends FormModel
             )
         ));
 
-        foreach ($modules as $module) {
+        foreach ($modules as &$module) {
             $dispatcher = $this->factory->getDispatcher();
             $event      = new ModuleDetailEvent();
             $event->setType($module->getType());
+            $event->setModule($module);
             $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+            $module->setErrorMessage($event->getErrorMessage());
+            $module->setTemplate($event->getTemplate());
+            $module->setTemplateData($event->getTemplateData());
         }
 
         return $modules;

@@ -34,12 +34,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = array(
         'created.leads.in.time' => array(
-            'formAlias' => 'lead_dashboard_leads_in_time_module',
-            'template' => 'MauticDashboardBundle:Module:module.html.php',
-            'callback' => array(
-                'model' => 'lead',
-                'method' => 'getLeadsLineChartData'
-            )
+            'formAlias' => 'lead_dashboard_leads_in_time_module'
         )
     );
 
@@ -52,6 +47,26 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onModuleDetailGenerate(ModuleDetailEvent $event)
     {
-        
+        if ($event->getType() == 'created.leads.in.time') {
+            $model = $this->factory->getModel('lead');
+            $module = $event->getModule();
+            $params = $module->getParams();
+
+            // Make sure the params exist
+            if (empty($params['amount']) || empty($params['timeUnit'])) {
+                $event->setErrorMessage('mautic.core.configuration.value.not.set');
+            } else {
+                $data = array(
+                    'chartType'   => 'line',
+                    'chartHeight' => $module->getHeight() - 50,
+                    'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'])
+                );
+
+                $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+                $event->setTemplateData($data);
+            }
+            
+            $event->stopPropagation();
+        }
     }
 }
