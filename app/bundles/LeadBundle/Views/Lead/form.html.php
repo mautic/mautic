@@ -186,4 +186,3 @@ $img = $view['lead_avatar']->getAvatar($lead);
 </div>
 <?php echo $view['form']->end($form); ?>
 <!--/ end: box layout -->
-
