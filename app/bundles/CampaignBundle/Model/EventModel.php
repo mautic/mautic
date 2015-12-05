@@ -841,9 +841,19 @@ class EventModel extends CommonFormModel
             }
 
             //trigger the action
-            $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true);
+            $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true, $log);
 
-            if ($response === false && $event['eventType'] == 'action') {
+            if ($response instanceof LeadEventLog) {
+                // Listener handled the event and returned a log entry
+                $repo->saveEntity($response);
+                $this->em->detach($response);
+
+                $executedEventCount++;
+
+                $logger->debug(
+                    'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                );
+            } elseif ($response === false && $event['eventType'] == 'action') {
                 $result = false;
 
                 // Something failed
@@ -852,6 +862,8 @@ class EventModel extends CommonFormModel
                     $log->setIsScheduled(true);
                     $log->setTriggerDate(new \DateTime());
                     $log->setDateTriggered(null);
+
+                    $repo->saveEntity($log);
                 } else {
                     // Remove
                     $repo->deleteEntity($log);
@@ -1108,8 +1120,6 @@ class EventModel extends CommonFormModel
                 // Set lead in case this is triggered by the system
                 $leadModel->setSystemCurrentLead($lead);
 
-                $persist = array();
-
                 $logger->debug('CAMPAIGN: Processing the following events for lead ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
 
                 foreach ($leadEvents as $log) {
@@ -1149,11 +1159,6 @@ class EventModel extends CommonFormModel
                     }
 
                     if ($max && $totalEventCount >= $max) {
-                        // Persist then detach
-                        if (!empty($persist)) {
-                            $repo->saveEntities($persist);
-                        }
-
                         unset($campaignEvents, $event, $leads, $eventSettings);
 
                         if ($output) {
@@ -1181,16 +1186,6 @@ class EventModel extends CommonFormModel
                         $progress->setProgress($currentCount);
                     }
                 }
-
-                // Persist then detach
-                if (!empty($persist)) {
-                    $repo->saveEntities($persist);
-
-                    // Free RAM
-                    $this->em->clear('MauticCampaignBundle:LeadEventLog');
-                }
-
-                unset($persist);
 
                 $leadDebugCounter++;
             }
@@ -1267,7 +1262,7 @@ class EventModel extends CommonFormModel
         $nonActionEvents = array();
         $actionEvents    = array();
         foreach ($campaignEvents as $id => $e) {
-            if (!empty($e['decisionPath']) && $campaignEvents[$e['parent_id']]['eventType'] != 'condition') {
+            if (!empty($e['decisionPath']) && !empty($e['parent_id']) && $campaignEvents[$e['parent_id']]['eventType'] != 'condition') {
                 if ($e['decisionPath'] == 'no') {
                     $nonActionEvents[$e['parent_id']][$id] = $e;
                 } elseif ($e['decisionPath'] == 'yes') {
@@ -1602,10 +1597,11 @@ class EventModel extends CommonFormModel
      * @param null $lead
      * @param null $eventDetails
      * @param bool $systemTriggered
+     * @param LeadEventLog $log
      *
      * @return bool|mixed
      */
-    public function invokeEventCallback($event, $settings, $lead = null, $eventDetails = null, $systemTriggered = false)
+    public function invokeEventCallback($event, $settings, $lead = null, $eventDetails = null, $systemTriggered = false, LeadEventLog $log = null)
     {
         $args = array(
             'eventSettings'   => $settings,
@@ -1638,11 +1634,15 @@ class EventModel extends CommonFormModel
 
             $result = $reflection->invokeArgs($this, $pass);
 
-            if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
-                $this->dispatcher->dispatch(
+            if ('decision' != $event['eventType'] && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
+                $executionEvent = $this->dispatcher->dispatch(
                     CampaignEvents::ON_EVENT_EXECUTION,
-                    new CampaignExecutionEvent($args, $result)
+                    new CampaignExecutionEvent($args, $result, $log)
                 );
+
+                if ($executionEvent->wasLogUpdatedByListener()) {
+                    $result = $executionEvent->getLogEntry();
+                }
             }
         } else {
             $result = true;
