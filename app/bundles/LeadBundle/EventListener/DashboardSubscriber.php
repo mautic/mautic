@@ -61,7 +61,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             } else {
                 $data = array(
                     'chartType'   => 'line',
-                    'chartHeight' => $module->getHeight() - 80,
+                    'chartHeight' => $module->getHeight() - 70,
                     'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'])
                 );
 
@@ -79,7 +79,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $data = array(
                 'chartType'   => 'pie',
-                'chartHeight' => $module->getHeight() - 80,
+                'chartHeight' => $module->getHeight() - 70,
                 'chartData'   => $model->getAnonymousVsIdentifiedPieChartData()
             );
 

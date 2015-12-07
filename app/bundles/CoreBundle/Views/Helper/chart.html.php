@@ -8,6 +8,6 @@
  */
 ?>
 
-<div>
-    <canvas class="chart <?php echo $chartType; ?>-chart" height="<?php echo $chartHeight; ?>"><?php echo json_encode($chartData); ?></canvas>
+<div style="height:<?php echo $chartHeight; ?>px">
+    <canvas class="chart <?php echo $chartType; ?>-chart"><?php echo json_encode($chartData); ?></canvas>
 </div>
