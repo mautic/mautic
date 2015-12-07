@@ -72,14 +72,12 @@ class ModuleType extends AbstractType
         $builder->add('width', 'choice', array(
             'label'       => 'mautic.dashboard.module.form.width',
             'choices'     => array(
-                '3' => '25%',
-                '4' => '33%',
-                '6' => '50%',
-                '8' => '67%',
-                '9' => '75%',
-                '12' => '100%',
+                '25' => '25%',
+                '50' => '50%',
+                '75' => '75%',
+                '100' => '100%',
             ),
-            'empty_data'  => '12',
+            'empty_data'  => '100',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array('class' => 'form-control'),
             'required'    => false
@@ -127,12 +125,14 @@ class ModuleType extends AbstractType
             $event->setType($type);
             $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
             $moduleForm = $event->getForm();
+            $form->setData($params);
 
-            if (isset($moduleForm['formAlias']))
-            $form->add('params', $moduleForm['formAlias'], array(
-                'label' => false,
-                'data'  => $params
-            ));
+            if (isset($moduleForm['formAlias'])) {
+                $form->add('params', $moduleForm['formAlias'], array(
+                    'label' => false
+                ));
+            }
+            
         };
 
         $builder->add('id', 'hidden');

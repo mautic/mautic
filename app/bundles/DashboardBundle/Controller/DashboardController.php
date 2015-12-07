@@ -238,6 +238,8 @@ class DashboardController extends FormController
                     // 'permissions' => $permissions,
                 ));
                 $passthroughVars['moduleId'] = $module->getId();
+                $passthroughVars['moduleWidth'] = $module->getWidth();
+                $passthroughVars['moduleHeight'] = $module->getHeight();
             }
 
 
@@ -311,6 +313,8 @@ class DashboardController extends FormController
                     // 'permissions' => $permissions,
                 ));
                 $passthroughVars['moduleId'] = $module->getId();
+                $passthroughVars['moduleWidth'] = $module->getWidth();
+                $passthroughVars['moduleHeight'] = $module->getHeight();
             }
 
 

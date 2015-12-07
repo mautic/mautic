@@ -34,8 +34,19 @@ Mautic.moduleOnLoad = function(container, response) {
         Mautic.ajaxifyModal(this, event);
     });
 
-    module.html(moduleHtml);
+    // Create the new module wrapper and add it to the 0 position if doesn't exist (probably a new one)
+    if (!module.length) {
+        module = mQuery('<div/>')
+            .addClass('module')
+            .attr('data-module-id', response.moduleId);
+        mQuery('#dashboard-modules').prepend(module);
+    }
+
+    module.html(moduleHtml)
+        .css('width', response.moduleWidth + '%')
+        .css('height', response.moduleHeight + '%');
     Mautic.renderCharts(moduleHtml);
+    Mautic.saveModuleSorting();
 }
 
 Mautic.initModuleSorting = function () {
@@ -46,20 +57,26 @@ Mautic.initModuleSorting = function () {
         items: '.module',
         opacity: 0.9,
         stop: function() {
-            var modules = modulesWrapper.children();
-            var ordering = [];
-            modules.each(function(index, value) { 
-                ordering.push(mQuery(this).attr('data-module-id')); 
-            });
-            Mautic.ajaxActionRequest('dashboard:updateModuleOrdering', {'ordering': ordering}, function(response) {
-                // @todo handle errors
-            });
+            Mautic.saveModuleSorting();
         },
         start: function( event, ui ) {
+            console.log(ui.item);
             // Adjust placeholder's size according to dragging element size
-            ui.placeholder.css(ui.item.css(['width', 'height', 'margin', 'padding']));
+            ui.placeholder.css(ui.item.children().css(['width', 'height']));
         }
     }).disableSelection();
+}
+
+Mautic.saveModuleSorting = function () {
+    var modulesWrapper = mQuery('#dashboard-modules');
+    var modules = modulesWrapper.children();
+    var ordering = [];
+    modules.each(function(index, value) { 
+        ordering.push(mQuery(this).attr('data-module-id')); 
+    });
+    Mautic.ajaxActionRequest('dashboard:updateModuleOrdering', {'ordering': ordering}, function(response) {
+        // @todo handle errors
+    });
 }
 
 Mautic.renderDashboardMap = function () {

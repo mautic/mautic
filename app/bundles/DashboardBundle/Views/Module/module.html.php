@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="panel panel-default mb-0" style="height: <?php echo !empty($module->getHeight()) ? $module->getHeight() . 'px' : '300px' ?>">
+<div class="panel panel-default">
     <h3 class="panel-heading">
         <?php echo $module->getName(); ?>
         <a class="pull-right btn-xs" 

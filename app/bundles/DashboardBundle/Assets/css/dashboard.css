@@ -38,13 +38,22 @@
 .sortable-placeholder {
     background-color: #fff;
     border: 1px dashed #4e5d9d;
-    width: 100px;
-    height: 100px;
-    float: left;
+    flex-grow: 0;
+}
+#dashboard-modules {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 5px;
+}
+.module {
+    flex-grow: 0;
+}
+.module .panel {
+    margin: 5px;
 }
 .module .panel-heading {
     cursor: -moz-grab;
     cursor: -webkit-grab;
     cursor: grab;
 }
-
