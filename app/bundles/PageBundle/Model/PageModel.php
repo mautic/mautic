@@ -929,14 +929,14 @@ class PageModel extends FormModel
                 'till' => 999999),
         );
 
-        $barChart  = new PieChart();
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chart = new PieChart();
+        $query = new ChartQuery($this->factory->getEntityManager()->getConnection());
 
         foreach ($timesOnSite as $time) {
             $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
-            $barChart->setDataset($time['label'], $chartData);
+            $chart->setDataset($time['label'], $chartData);
         }
 
-        return $barChart->render();
+        return $chart->render();
     }
 }
