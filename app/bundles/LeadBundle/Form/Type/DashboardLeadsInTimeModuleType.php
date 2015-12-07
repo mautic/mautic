@@ -33,7 +33,7 @@ class DashboardLeadsInTimeModuleType extends AbstractType
                 'label'      => 'mautic.core.number',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'empty_data' => 30
+                'empty_data' => '30'
             )
         );
 
@@ -50,7 +50,8 @@ class DashboardLeadsInTimeModuleType extends AbstractType
                 ),
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'empty_data' => 'd'
+                'empty_data' => 'd',
+                'required'   => false
             )
         );
     }

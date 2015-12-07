@@ -21,10 +21,12 @@ if (!empty($userId)) {
     <div class="col-xs-6">
         <?php echo $view['form']->label($form['name']); ?>
         <?php echo $view['form']->widget($form['name']); ?>
+        <div class="has-error"><?php echo $view['form']->errors($form['name']); ?></div>
     </div>
     <div class="col-xs-6">
         <?php echo $view['form']->label($form['type']); ?>
         <?php echo $view['form']->widget($form['type']); ?>
+        <div class="has-error"><?php echo $view['form']->errors($form['type']); ?></div>
     </div>
 </div>
 <div class="row form-group">

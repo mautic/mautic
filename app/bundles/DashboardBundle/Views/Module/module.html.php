@@ -21,7 +21,7 @@
     <div class="panel-body">
         <?php if ($module->getErrorMessage()) : ?>
             <div class="alert alert-danger" role="alert">
-                <?php echo $module->getErrorMessage(); ?>
+                <?php echo $view['translator']->trans($module->getErrorMessage()); ?>
             </div>
         <?php elseif ($module->getTemplate()) : ?>
             <?php echo $view->render($module->getTemplate(), $module->getTemplateData()); ?>

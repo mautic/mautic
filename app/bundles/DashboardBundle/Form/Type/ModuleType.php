@@ -70,8 +70,8 @@ class ModuleType extends AbstractType
         ));
 
         $builder->add('width', 'choice', array(
-            'label'      => 'mautic.dashboard.module.form.width',
-            'choices'    => array(
+            'label'       => 'mautic.dashboard.module.form.width',
+            'choices'     => array(
                 '3' => '25%',
                 '4' => '33%',
                 '6' => '50%',
@@ -79,13 +79,15 @@ class ModuleType extends AbstractType
                 '9' => '75%',
                 '12' => '100%',
             ),
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'empty_data'  => '12',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array('class' => 'form-control'),
+            'required'    => false
         ));
 
         $builder->add('height', 'choice', array(
-            'label'      => 'mautic.dashboard.module.form.height',
-            'choices'    => array(
+            'label'       => 'mautic.dashboard.module.form.height',
+            'choices'     => array(
                 '100' => '100px',
                 '215' => '215px',
                 '330' => '330px',
@@ -93,8 +95,10 @@ class ModuleType extends AbstractType
                 '560' => '560px',
                 '675' => '675px',
             ),
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'empty_data'  => '330',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array('class' => 'form-control'),
+            'required'    => false
         ));
 
         $ff = $builder->getFormFactory();
