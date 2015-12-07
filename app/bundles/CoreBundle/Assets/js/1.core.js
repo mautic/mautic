@@ -2987,6 +2987,8 @@ var Mautic = {
             canvas = mQuery(canvas);
             if (canvas.hasClass('line-chart')) {
                 Mautic.renderLineChart(canvas)
+            } else if (canvas.hasClass('pie-chart')) {
+                Mautic.renderPieChart(canvas)
             }
         });
     },
@@ -3001,5 +3003,17 @@ var Mautic = {
         var data = mQuery.parseJSON(canvas.text());
         var options = {}
         Mautic.chartObjects.push(new Chart(ctx).Line(data, options));
+    },
+
+    /**
+     * Render the chart.js line chart
+     *
+     * @param mQuery element canvas
+     */
+    renderPieChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        var options = {}
+        Mautic.chartObjects.push(new Chart(ctx).Pie(data, options));
     }
 };
