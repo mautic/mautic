@@ -265,12 +265,8 @@ class CampaignController extends FormController
         $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true);
 
         foreach ($events as &$event) {
-            $event['logCount'] = 0;
-            $event['percent']  = 0;
-            if (isset($campaignLogCounts[$event['id']])) {
-                $event['logCount'] = $campaignLogCounts[$event['id']];
-            }
-            $event['percent'] = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
+            $event['logCount'] = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
+            $event['percent']  = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
         }
 
         // Audit Log
