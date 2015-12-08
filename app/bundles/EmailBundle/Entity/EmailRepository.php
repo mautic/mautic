@@ -144,33 +144,18 @@ class EmailRepository extends CommonRepository
      */
     public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
-        if (null === $listIds) {
-            // Get a list of lists
-            $q = $this->_em->getConnection()->createQueryBuilder();
-            $q->select('el.leadlist_id')
-                ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
-                ->where('el.email_id = ' . (int) $emailId);
-
-            $results  = $q->execute()->fetchAll();
-            $listIds = array();
-
-            foreach ($results as $row) {
-                $listIds[] = $row['leadlist_id'];
-            }
-        }
-
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('null')
+        $sq->select('dne.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
             ->where(
-                $sq->expr()->eq('dne.lead_id', 'l.id')
+                $sq->expr()->isNotNull('dne.lead_id')
             );
 
         $sq2 = $this->_em->getConnection()->createQueryBuilder();
         $sqExpr = $sq2->expr()->andX(
-            $sq2->expr()->eq('stat.lead_id', 'l.id')
+            $sq2->expr()->isNotNull('stat.lead_id')
         );
 
         if ($variantIds) {
@@ -184,7 +169,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $sq2->select('null')
+        $sq2->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
             ->where($sqExpr);
 
@@ -196,8 +181,11 @@ class EmailRepository extends CommonRepository
         }
         $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
-            ->andWhere(sprintf("NOT EXISTS (%s)",$sq->getSQL()))
-            ->andWhere(sprintf("NOT EXISTS (%s)",$sq2->getSQL()));
+            ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
+
+        $q->where($q->expr()->eq('el.email_id', $emailId))
+            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()))
+            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq2->getSQL()));
 
         if ($listIds != null) {
             if (!is_array($listIds)) {
