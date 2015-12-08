@@ -260,21 +260,17 @@ class CampaignController extends FormController
         $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
         $eventLogRepo     = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
         $events           = $model->getEventRepository()->getCampaignEvents($entity->getId());
+        $leadCount        = $model->getRepository()->getCampaignLeadCount($entity->getId());
 
-        $campaignLeads = $model->getRepository()->getCampaignLeadIds($entity->getId());
-
-        $leadCount     = count($campaignLeads);
-        $campaignLogs  = $eventLogRepo->getCampaignLogCounts($entity->getId(), $campaignLeads, true);
+        $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true);
 
         foreach ($events as &$event) {
             $event['logCount'] = 0;
             $event['percent']  = 0;
-            if (isset($campaignLogs[$event['id']])) {
-                $event['logCount'] = $campaignLogs[$event['id']];
+            if (isset($campaignLogCounts[$event['id']])) {
+                $event['logCount'] = $campaignLogCounts[$event['id']];
             }
-            if ($leadCount) {
-                $event['percent'] = round($event['logCount'] / $leadCount * 100);
-            }
+            $event['percent'] = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
         }
 
         // Audit Log
@@ -296,8 +292,6 @@ class CampaignController extends FormController
         // Lead count stats
         $leadStats = $campaignLeadRepo->getLeadStats(30, 'D', array('campaign_id' => $entity->getId()));
 
-        $leadPage = $this->factory->getSession()->get('mautic.campaign.lead.page', 1);
-
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
@@ -313,7 +307,7 @@ class CampaignController extends FormController
                         'MauticCampaignBundle:Campaign:leads',
                         array(
                             'objectId'   => $entity->getId(),
-                            'page'       => $leadPage,
+                            'page'       => $this->factory->getSession()->get('mautic.campaign.lead.page', 1),
                             'ignoreAjax' => true
                         )
                     )->getContent()
@@ -361,8 +355,8 @@ class CampaignController extends FormController
         $this->factory->getSession()->set('mautic.campaign.lead.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.campaign.lead.orderby', 'l.date_added');
-        $orderByDir = $this->factory->getSession()->get('mautic.campaign.lead.orderbydir', 'ASC');
+        $orderBy    = $this->factory->getSession()->get('mautic.campaign.lead.orderby', 'l.id');
+        $orderByDir = $this->factory->getSession()->get('mautic.campaign.lead.orderbydir', 'DESC');
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */

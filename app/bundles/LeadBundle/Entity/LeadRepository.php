@@ -210,7 +210,7 @@ class LeadRepository extends CommonRepository
         return $results;
     }
 
-    /*
+    /**
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by

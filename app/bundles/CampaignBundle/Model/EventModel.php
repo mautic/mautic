@@ -429,24 +429,8 @@ class EventModel extends CommonFormModel
         // Event settings
         $eventSettings = $campaignModel->getEvents();
 
-        // Get a list of leads who have already had the events executed
-        // (going to assume if one event of this level has fired for the event, all were fired)
-        $ignoreLeads = $repo->getEventLogLeads(array_keys($events), $leadId);
-
-        if ($leadId && in_array($leadId, $ignoreLeads)) {
-            $logger->debug('CAMPAIGN: Lead ID '.$leadId.' has already started the campaign');
-
-            return ($returnCounts) ? array(
-                'events'         => 0,
-                'evaluated'      => 0,
-                'executed'       => 0,
-                'totalEvaluated' => 0,
-                'totalExecuted'  => 0
-            ) : 0;
-        }
-
         // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
-        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $ignoreLeads, $leadId);
+        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, $events);
 
         // Get a total number of events that will be processed
         $totalStartingEvents = $leadCount * $rootEventCount;
@@ -497,7 +481,7 @@ class EventModel extends CommonFormModel
             $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
 
             // Get list of all campaign leads
-            $campaignLeads = ($leadId) ? array($leadId) : $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, $ignoreLeads);
+            $campaignLeads = ($leadId) ? array($leadId) : $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, true);
 
             if (empty($campaignLeads)) {
                 // No leads found

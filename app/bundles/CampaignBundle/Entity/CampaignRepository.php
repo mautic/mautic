@@ -515,12 +515,12 @@ class CampaignRepository extends CommonRepository
      * Get a count of leads that belong to the campaign
      *
      * @param       $campaignId
-     * @param array $ignoreLeads
-     * @param int   $leadId       Optional lead ID to check if lead is part of campaign
+     * @param int   $leadId         Optional lead ID to check if lead is part of campaign
+     * @param array $pendingEvents  List of specific events to rule out
      *
      * @return mixed
      */
-    public function getCampaignLeadCount($campaignId, $ignoreLeads = array(), $leadId = null)
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = array())
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -534,15 +534,26 @@ class CampaignRepository extends CommonRepository
             )
             ->setParameter('false', false, 'boolean');
 
-        if (!empty($ignoreLeads)) {
-            $q->andWhere(
-                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
-            );
-        }
-
         if ($leadId) {
             $q->andWhere(
                 $q->expr()->eq('cl.lead_id', (int) $leadId)
+            );
+        }
+
+        if (count($pendingEvents) > 0) {
+            $sq = $this->_em->getConnection()->createQueryBuilder();
+
+            $sq->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+                ->where(
+                    $sq->expr()->andX(
+                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
+                        $sq->expr()->in('e.event_id', $pendingEvents)
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $sq->getSQL())
             );
         }
 
@@ -556,12 +567,12 @@ class CampaignRepository extends CommonRepository
      *
      * @param       $campaignId
      * @param int   $start
-     * @param bool  $limit
-     * @param array $ignoreLeads
+     * @param bool|false  $limit
+     * @param bool|false  getCampaignLeadIds
      *
      * @return array
      */
-    public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $ignoreLeads = array())
+    public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $pendingOnly = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -576,9 +587,18 @@ class CampaignRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->orderBy('cl.lead_id', 'ASC');
 
-        if (!empty($ignoreLeads)) {
+        if ($pendingOnly) {
+            // Only leads that have not started the campaign
+            $sq = $this->_em->getConnection()->createQueryBuilder();
+
+            $sq->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+                ->where(
+                    $sq->expr()->eq('cl.lead_id', 'e.lead_id')
+                );
+
             $q->andWhere(
-                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
+                sprintf('NOT EXISTS (%s)', $sq->getSQL())
             );
         }
 
