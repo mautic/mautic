@@ -31,63 +31,73 @@ class PublicController extends CommonFormController
             $model->hitEmail($stat, $this->request, true);
 
             // Check for stored copy
-            $content = $stat->getCopy();
+            $copy = $stat->getStoredCopy();
+            if (null === $copy) {
+                /**
+                 * @deprecated - to be removed in 2.0
+                 */
+                $subject = '';
+                $content = $stat->getCopy();
 
-            if (!empty($content)) {
-                // Copy stored in stats
-                $tokens = $stat->getTokens();
-                if (!empty($tokens)) {
+                if (!empty($content)) {
+                    // Copy stored in stats
+                    $tokens = $stat->getTokens();
+                    if (!empty($tokens)) {
+                        // Override tracking_pixel so as to not cause a double hit
+                        $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
+
+                        $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                    }
+                } else {
+                    // Old way where stats didn't store content
+
+                    //the lead needs to have fields populated
+                    $statLead = $stat->getLead();
+                    $lead     = $this->factory->getModel('lead')->getLead($statLead->getId());
+                    $template = $entity->getTemplate();
+                    if (!empty($template)) {
+                        $slots = $this->factory->getTheme($template)->getSlots('email');
+
+                        $response = $this->render(
+                            'MauticEmailBundle::public.html.php',
+                            array(
+                                'inBrowser' => true,
+                                'slots'     => $slots,
+                                'content'   => $entity->getContent(),
+                                'email'     => $entity,
+                                'lead'      => $lead,
+                                'template'  => $template
+                            )
+                        );
+
+                        //replace tokens
+                        $content = $response->getContent();
+                    } else {
+                        $content = $entity->getCustomHtml();
+                    }
+                    $content = EmojiHelper::toEmoji($content, 'short');
+
+                    $tokens = $stat->getTokens();
+
                     // Override tracking_pixel so as to not cause a double hit
                     $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
-                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                }
-            } else {
-                // Old way where stats didn't store content
-
-                //the lead needs to have fields populated
-                $statLead = $stat->getLead();
-                $lead     = $this->factory->getModel('lead')->getLead($statLead->getId());
-                $template = $entity->getTemplate();
-                if (!empty($template)) {
-                    $slots = $this->factory->getTheme($template)->getSlots('email');
-
-                    $response = $this->render(
-                        'MauticEmailBundle::public.html.php',
+                    $event = new EmailSendEvent(
+                        null,
                         array(
-                            'inBrowser' => true,
-                            'slots'     => $slots,
-                            'content'   => $entity->getContent(),
-                            'email'     => $entity,
-                            'lead'      => $lead,
-                            'template'  => $template
+                            'content' => $content,
+                            'lead'    => $lead,
+                            'email'   => $entity,
+                            'idHash'  => $idHash,
+                            'tokens'  => $tokens
                         )
                     );
-
-                    //replace tokens
-                    $content = $response->getContent();
-                } else {
-                    $content = $entity->getCustomHtml();
+                    $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+                    $content = $event->getContent(true);
                 }
-                $content = EmojiHelper::toEmoji($content, 'short');
-
-                $tokens = $stat->getTokens();
-
-                // Override tracking_pixel so as to not cause a double hit
-                $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
-
-                $event = new EmailSendEvent(
-                    null,
-                    array(
-                        'content' => $content,
-                        'lead'    => $lead,
-                        'email'   => $entity,
-                        'idHash'  => $idHash,
-                        'tokens'  => $tokens
-                    )
-                );
-                $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-                $content = $event->getContent(true);
+            } else {
+                $subject = $copy->getSubject();
+                $content = $copy->getBody();
             }
 
             $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
@@ -99,6 +109,14 @@ class PublicController extends CommonFormController
                 $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
             } elseif (!empty($analytics)) {
                 $content = str_replace('</head>', $analytics."\n</head>", $content);
+            }
+
+            if (!empty($subject)) {
+                if (strpos($content, '<title></title>') !== false) {
+                    $content = str_replace('<title></title>', "<title>$subject</title>", $content);
+                } elseif (strpos($content, '<title>') === false) {
+                    $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
+                }
             }
 
             return new Response($content);
@@ -130,8 +148,7 @@ class PublicController extends CommonFormController
      */
     public function unsubscribeAction($idHash)
     {
-        //find the email
-
+        // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model      = $this->factory->getModel('email');
         $translator = $this->get('translator');

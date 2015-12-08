@@ -106,8 +106,15 @@ class Stat
 
     /**
      * @var string
+     *
+     * @deprecated 1.2.3 - to be removed in 2.0
      */
     private $copy;
+
+    /**
+     * @var Copy
+     */
+    private $storedCopy;
 
     /**
      * @var int
@@ -202,7 +209,14 @@ class Stat
             ->nullable()
             ->build();
 
+        /**
+         * @deprecated 1.2.3 - to be removed in 2.0
+         */
         $builder->addNullableField('copy', 'text');
+
+        $builder->createManyToOne('storedCopy', 'Mautic\EmailBundle\Entity\Copy')
+            ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
+            ->build();
 
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
@@ -515,6 +529,8 @@ class Stat
     }
 
     /**
+     * @deprecated 1.2.3 - to be removed in 2.0
+     *
      * @return mixed
      */
     public function getCopy()
@@ -523,6 +539,8 @@ class Stat
     }
 
     /**
+     * @deprecated 1.2.3 - to be removed in 2.0
+     *
      * @param mixed $copy
      *
      * @return Stat
@@ -616,6 +634,26 @@ class Stat
     public function setOpenDetails($openDetails)
     {
         $this->openDetails = $openDetails;
+
+        return $this;
+    }
+
+    /**
+     * @return Copy
+     */
+    public function getStoredCopy()
+    {
+        return $this->storedCopy;
+    }
+
+    /**
+     * @param Copy $storedCopy
+     *
+     * @return Stat
+     */
+    public function setStoredCopy(Copy $storedCopy)
+    {
+        $this->storedCopy = $storedCopy;
 
         return $this;
     }

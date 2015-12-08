@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxedException;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -1460,32 +1461,94 @@ class MailHelper
     }
 
     /**
-     * Create an email stat
+     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
      */
     public function createLeadEmailStat()
     {
-        if (!$this->lead) {
-            return;
-        }
+        $this->createEmailStat();
+    }
+
+    /**
+     * Create an email stat
+     *
+     * @param bool|true   $persist
+     * @param string|null $emailAddress
+     * @param null        $listId
+     *
+     * @return Stat|void
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    {
+        static $copies = array();
 
         //create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($this->email);
-        $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
 
-        $stat->setEmailAddress($this->lead['email']);
+        // Note if a lead
+        if (null !== $this->lead) {
+            $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+            $emailAddress = $this->lead['email'];
+        }
+
+        // Find email if applicable
+        if (null === $emailAddress) {
+            // Use the last address set
+            $emailAddresses = $this->message->getTo();
+
+            if (count($emailAddresses)) {
+                end($emailAddresses);
+                $emailAddress = key($emailAddresses);
+            }
+        }
+        $stat->setEmailAddress($emailAddress);
+
+        // Note if sent from a lead list
+        if (null !== $listId) {
+            $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+        }
+
         $stat->setTrackingHash($this->idHash);
         if (!empty($this->source)) {
             $stat->setSource($this->source[0]);
             $stat->setSourceId($this->source[1]);
         }
-        $stat->setCopy($this->getBody());
+
         $stat->setTokens($this->getTokens());
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
-        $emailModel->getStatRepository()->saveEntity($stat);
+
+        // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
+        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
+        if (!isset($copies[$id])) {
+            $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
+
+            $copy = $emailModel->getCopyRepository()->findByHash($hash);
+            if (null === $copy) {
+                // Create a copy entry
+                $copy = new Copy();
+                $copy->setId($hash)
+                    ->setBody($this->body['content'])
+                    ->setSubject($this->subject)
+                    ->setDateCreated(new \DateTime())
+                    ->setEmail($this->email);
+
+                $emailModel->getCopyRepository()->saveEntity($copy);
+            }
+
+            $copies[$id] = $copy;
+        }
+
+        $stat->setStoredCopy($copies[$id]);
+
+        if ($persist) {
+            $emailModel->getStatRepository()->saveEntity($stat);
+        }
+
+        return $stat;
     }
 
     /**
