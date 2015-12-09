@@ -318,10 +318,6 @@ return array(
                 'arguments' => 'mautic.factory'
             ),
             // Menu
-            'mautic.helper.update'               => array(
-                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
-                'arguments' => 'mautic.factory'
-            ),
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => array(
