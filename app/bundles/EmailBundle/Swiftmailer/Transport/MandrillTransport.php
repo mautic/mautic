@@ -278,7 +278,18 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
             $parsedResponse = $response;
         }
 
-        $return = array();
+        $return     = array();
+        $hasBounces = false;
+        $bounces    = array(
+            'bounced'      => array(
+                'emails' => array()
+            ),
+            'unsubscribed' => array(
+                'emails' => array()
+            )
+        );
+        $metadata   = $this->getMetadata();
+
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
                 $parsedResponse = $response['message'];
@@ -288,6 +299,23 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                     if (in_array($stat['status'], array('rejected', 'invalid'))) {
                         $return[]       = $stat['email'];
                         $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
+
+                        if ('invalid' == $stat['status']) {
+                            $stat['reject_reason'] = 'invalid';
+                        }
+
+                        // Extract lead ID from metadata if applicable
+                        $leadId = (!empty($metadata[$stat['email']]['leadId'])) ? $metadata[$stat['email']]['leadId'] : null;
+
+                        if (in_array($stat['reject_reason'], array('hard-bounce', 'soft-bounce', 'reject', 'spam', 'invalid', 'unsub'))) {
+                            $hasBounces = true;
+                            $type       = ('unsub' == $stat['reject_reason']) ? 'unsubscribed' : 'bounced';
+
+                            $bounces[$type]['emails'][$stat['email']] = array(
+                                'leadId' => $leadId,
+                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason'])
+                            );
+                        }
                     }
                 }
             }
@@ -295,6 +323,13 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
             $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
+        }
+
+        // Parse bounces if applicable
+        if ($hasBounces) {
+            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+            $emailModel = $this->factory->getModel('email');
+            $emailModel->processMailerCallback($bounces);
         }
 
         if ($response === false) {
@@ -364,7 +399,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         if (is_array($mandrillEvents)) {
             foreach ($mandrillEvents as $event) {
-                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam'));
+                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid'));
                 $isUnsubscribe = ('unsub' === $event['event']);
                 if ($isBounce || $isUnsubscribe) {
                     $type = ($isBounce) ? 'bounced' : 'unsubscribed';

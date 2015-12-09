@@ -1281,15 +1281,29 @@ class EmailModel extends FormModel
      * @param string    $tag
      * @param string    $reason
      * @param bool|true $flush
+     * @param int|null  $leadId
      */
-    public function setEmailDoNotContact($email, $tag = 'bounced', $reason = '', $flush = true)
+    public function setEmailDoNotContact($email, $tag = 'bounced', $reason = '', $flush = true, $leadId = null)
     {
         $repo = $this->getRepository();
 
         if (!$repo->checkDoNotEmail($email)) {
+            if (null == $leadId) {
+                // Check to see if a lead exists with this email
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leadRepo  = $leadModel->getRepository();
+                $foundLead = $leadRepo->getLeadByEmail($email);
+                $lead      = (null !== $foundLead) ? $this->em->getReference('MauticLeadBundle:Lead', $foundLead['id']) : null;
+            } else {
+                $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            }
+
             $dnc = new DoNotEmail();
             $dnc->setEmailAddress($email);
+            $dnc->setLead($lead);
             $dnc->setDateAdded(new \DateTime());
+
             $method = 'set'.ucfirst($tag);
             if (method_exists($dnc, $method)) {
                 $method = 'setBounced';
@@ -1382,11 +1396,18 @@ class EmailModel extends FormModel
                     }
                     $emails[] = $email;
 
+                    $leadId = null;
+                    if (is_array($reason)) {
+                        // Includes a lead ID
+                        $leadId = $reason['leadId'];
+                        $reason = $reason['reason'];
+                    }
+
                     if ($this->translator->hasId('mautic.email.bounce.reason.'.$reason)) {
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setEmailDoNotContact($email, $type, $reason, ($count === $batch));
+                    $this->setEmailDoNotContact($email, $type, $reason, ($count === $batch), $leadId);
 
                     if ($count === $batch) {
                         $count = 0;
