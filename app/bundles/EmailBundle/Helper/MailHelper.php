@@ -261,14 +261,29 @@ class MailHelper
             }
 
             if (!$isQueueFlush) {
-                // Replace token content
-                $tokens = $this->getTokens();
-                if (!empty($tokens)) {
-                    // Replace tokens
-                    $search  = array_keys($tokens);
-                    $replace = $tokens;
+                // Set metadata if applicable
+                if (method_exists($this->message, 'addMetadata')) {
+                    foreach ($this->queuedRecipients as $email => $name) {
+                        $this->message->addMetadata($email,
+                            array(
+                                'leadId'   => (!empty($this->lead)) ? $this->lead['id'] : null,
+                                'emailId'  => (!empty($this->email)) ? $this->email->getId() : null,
+                                'hashId'   => $this->idHash,
+                                'source'   => $this->source,
+                                'tokens'   => $this->getTokens()
+                            )
+                        );
+                    }
+                } else {
+                    // Replace token content
+                    $tokens = $this->getTokens();
+                    if (!empty($tokens)) {
+                        // Replace tokens
+                        $search  = array_keys($tokens);
+                        $replace = $tokens;
 
-                    self::searchReplaceTokens($search, $replace, $this->message);
+                        self::searchReplaceTokens($search, $replace, $this->message);
+                    }
                 }
             }
 
