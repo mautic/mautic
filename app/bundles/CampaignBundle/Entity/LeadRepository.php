@@ -9,7 +9,6 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
@@ -173,10 +172,8 @@ class LeadRepository extends CommonRepository
         // Load points for selected period
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $formatter  = AbstractFormatter::createFormatter($this->getEntityManager()->getConnection());
-
         $q->select(
-            sprintf('count(*) as count, %s as date_added', $formatter->toDate('cl.date_added'))
+            sprintf('count(*) as count, DATE(cl.date_added) as date_added')
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
 
@@ -191,8 +188,8 @@ class LeadRepository extends CommonRepository
         )
             ->setParameter('date', $graphData['fromDate']->format('Y-m-d H:i:s'))
             ->setParameter('false', false, 'boolean')
-            ->groupBy('cl.date_added')
-            ->orderBy('cl.date_added', 'ASC');
+            ->groupBy('DATE(cl.date_added)')
+            ->orderBy('date_added', 'ASC');
 
         if (isset($options['campaign_id'])) {
             $q->andwhere($q->expr()->gte('cl.campaign_id', (int) $options['campaign_id']));
