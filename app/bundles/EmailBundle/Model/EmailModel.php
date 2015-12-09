@@ -1286,8 +1286,9 @@ class EmailModel extends FormModel
     public function setEmailDoNotContact($email, $tag = 'bounced', $reason = '', $flush = true, $leadId = null)
     {
         $repo = $this->getRepository();
+        $dnc  = $repo->checkDoNotEmail($email);
 
-        if (!$repo->checkDoNotEmail($email)) {
+        if (false === $dnc) {
             if (null == $leadId) {
                 // Check to see if a lead exists with this email
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
@@ -1311,11 +1312,35 @@ class EmailModel extends FormModel
             $dnc->$method();
             $dnc->setComments($reason);
 
-            $em = $this->factory->getEntityManager();
-            $em->persist($dnc);
+            $this->em->persist($dnc);
 
             if ($flush) {
-                $em->flush();
+                $this->em->flush($dnc);
+            }
+        } elseif ($dnc['bounced']) {
+            // Update the entry
+            /** @var \Mautic\EmailBundle\Entity\DoNotEmail $dncEntity */
+            $dncEntity = $this->em->getReference('MauticEmailBundle:DoNotEmail', $dnc['id']);
+
+            if ('unsubscribed' == $tag) {
+                // Unsubscribe user so they cannot be contacted
+                $dncEntity->setBounced(false);
+                $dncEntity->setUnsubscribed(true);
+            }
+
+            if (null !== $leadId) {
+                $dncEntity->setLead(
+                    $this->em->getReference('MauticLeadBundle:Lead', $leadId)
+                );
+            }
+
+            $dncEntity->setDateAdded(new \DateTime());
+            $dncEntity->setComments($reason);
+
+            $this->em->persist($dncEntity);
+
+            if ($flush) {
+                $this->em->flush($dncEntity);
             }
         }
     }
