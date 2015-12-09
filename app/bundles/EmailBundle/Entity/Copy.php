@@ -10,12 +10,9 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+
 /**
  * Class Copy
  *
@@ -145,6 +142,9 @@ class Copy
      */
     public function setBody($body)
     {
+        // Ensure it's clean of emoji
+        $body = EmojiHelper::toShort($body);
+
         $this->body = $body;
 
         return $this;
@@ -165,6 +165,9 @@ class Copy
      */
     public function setSubject($subject)
     {
+        // Ensure it's clean of emoji
+        $subject = EmojiHelper::toShort($subject);
+
         $this->subject = $subject;
 
         return $this;
