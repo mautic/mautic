@@ -26,12 +26,12 @@ class CleanCampaignCommand extends ContainerAwareCommand
     {
         $this
             ->setName('mautic:campaigns:clean')
-            ->setDescription('Clean event cache for one or all campaigns.')
+            ->setDescription('Clear event log for campaigns that have an especific category.')
             ->addOption(
-                '--campaign-id',
+                '--category-id',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Clear event log for a specific campaign. Otherwise, all campaigns will be cleaned.'
+                'The category ID'
             );
     }
 
@@ -43,12 +43,20 @@ class CleanCampaignCommand extends ContainerAwareCommand
         $container      = $this->getContainer();
         $factory        = $container->get('mautic.factory');
         $entityManager  = $factory->getEntityManager();
-        $campaignId     = $input->getOption('campaign-id');
-        $criteria       = ['campaign_id' => (int)$campaignId];
+        $connection     = $entityManager->getConnection();
+        $categoryId     = $input->getOption('category-id');
+        $category       = $entityManager->find('MauticCategoryBundle:Category', $categoryId);
 
-        $conn = $entityManager->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', $criteria);
+        if (!$category) {
+            throw new Exception('Category not found.');
+        }        
 
-        return 0;
+        $campaigns = $entityManager->getRepository('MauticCampaignBundle:Campaign')->findByCategory($category);
+
+        foreach ($campaigns as $campaign) {
+            $criteria = ['campaign_id' => $campaign->getId()];
+
+            $connection->delete(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', $criteria);
+        }
     }
 }
