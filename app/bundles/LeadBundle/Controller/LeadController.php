@@ -1553,6 +1553,11 @@ class LeadController extends FormController
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
 
+        // Check if lead has a bounce status
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+        $dnc        =  $emailModel->getRepository()->checkDoNotEmail($leadEmail);
+
         $inList = ($this->request->getMethod() == 'GET')
             ? $this->request->get('list', 0)
             : $this->request->request->get(
@@ -1609,6 +1614,8 @@ class LeadController extends FormController
                             );
                         } else {
                             $errors = $mailer->getErrors();
+                            unset($errors['failures']);
+
                             $form->addError(
                                 new FormError(
                                     $this->factory->getTranslator()->trans(
@@ -1669,7 +1676,8 @@ class LeadController extends FormController
             array(
                 'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
                 'viewParameters'  => array(
-                    'form' => $form->createView()
+                    'form' => $form->createView(),
+                    'dnc'  => $dnc
                 ),
                 'passthroughVars' => array(
                     'mauticContent' => 'leadEmail',
