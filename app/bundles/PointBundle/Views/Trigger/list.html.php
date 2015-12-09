@@ -95,7 +95,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                 <td><?php echo $item->getPoints(); ?></td>
                 <?php
                 $color = $item->getColor();
-                $colorStyle = ($color) ? ' style="background-color: ' . $color . '"' : '';
+                $colorStyle = ($color) ? ' style="background-color: #' . $color . '"' : '';
                 ?>
                 <td<?php echo $colorStyle; ?>></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
