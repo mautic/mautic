@@ -87,6 +87,7 @@ class AuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
+
             return;
         }
 
@@ -105,6 +106,7 @@ class AuthenticationListener implements ListenerInterface
                     $response = $this->onSuccess($request, $authToken, $response);
 
                 } elseif (empty($response)) {
+
                     throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
                 }
 

@@ -73,6 +73,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     {
         $authenticated         = false;
         $authenticationService = null;
+        $response              = null;
         $user                  = $token->getUser();
         $authenticatingService = ($token instanceof PluginToken) ? $token->getAuthenticatingService() : null;
         if (!$user instanceof User) {
@@ -80,6 +81,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $user = $userProvider->loadUserByUsername($token->getUsername());
             } catch (UsernameNotFoundException $e) {
             }
+
+            // Will try with the given password unless the plugin explicitly failed authentication
+            $tryWithPassword = true;
 
             // Try authenticating with a plugin first
             if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
@@ -90,10 +94,14 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 if ($authenticated = $authEvent->isAuthenticated()) {
                     $user                  = $authEvent->getUser();
                     $authenticatingService = $authEvent->getAuthenticatingService();
+                } elseif ($authEvent->isFailed()) {
+                    $tryWithPassword = false;
                 }
+
+                $response = $authEvent->getResponse();
             }
 
-            if (!$authenticated) {
+            if (!$authenticated && $tryWithPassword) {
                 // Try authenticating with local password
                 $authenticated = $this->encoder->isPasswordValid($user, $token->getCredentials());
             }
@@ -109,7 +117,18 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $authenticatingService,
                 $user,
                 $user->getPassword(),
-                $user->getRoles()
+                $user->getRoles(),
+                $response
+            );
+        } elseif ($response) {
+
+            return new PluginToken(
+                $providerKey,
+                $authenticatingService,
+                $user,
+                '',
+                array(),
+                $response
             );
         }
 

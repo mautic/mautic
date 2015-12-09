@@ -46,6 +46,11 @@ class AuthenticationEvent extends Event
     protected $isAuthenticated = false;
 
     /**
+     * @var bool
+     */
+    protected $forceFailedAuthentication = false;
+
+    /**
      * @var UserProvider
      */
     protected $userProvider;
@@ -187,6 +192,28 @@ class AuthenticationEvent extends Event
     public function isAuthenticated()
     {
         return $this->isAuthenticated;
+    }
+
+    /**
+     * Prevent any other authentication method from authorizing the user.
+     * Mainly used to prevent a form login from trying to auth with the given password for a local user (think two-factor requirements)
+     */
+    public function setIsFailedAuthentication()
+    {
+        $this->forceFailedAuthentication = true;
+
+        // Authenticated so stop propagation
+        $this->stopPropagation();
+    }
+
+    /**
+     * Returns true if a plugin has forcefully failed authentication
+     *
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->forceFailedAuthentication;
     }
 
     /**

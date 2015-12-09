@@ -112,11 +112,7 @@ class UserProvider implements UserProviderInterface
 
         //load permissions
         if ($user->getId()) {
-            $permissions = $this->session->get('mautic.user.permissions', false);
-            if ($permissions === false) {
-                $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
-                $this->session->set('mautic.user.permissions', $permissions);
-            }
+            $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
             $user->setActivePermissions($permissions);
         }
 
