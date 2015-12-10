@@ -403,6 +403,11 @@ class CheckStep implements StepInterface
      */
     public function toBytes($val) {
         $val = trim($val);
+
+        if ($val == -1) {
+            return PHP_INT_MAX;
+        }
+
         $last = strtolower($val[strlen($val)-1]);
         switch($last) {
             // The 'G' modifier is available since PHP 5.1.0
