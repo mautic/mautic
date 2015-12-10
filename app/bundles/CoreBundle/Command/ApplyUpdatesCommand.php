@@ -105,7 +105,7 @@ EOT
             $update       = $updateHelper->fetchData();
 
             if (!isset($update['package'])) {
-                $output->writeln('<error>'.$translator->trans('mautic.core.update.no_cache_data').'</error>');
+                $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.no_cache_data').'</error>');
 
                 return 1;
             }
@@ -117,7 +117,7 @@ EOT
             $package = $updateHelper->fetchPackage($update['package']);
 
             if ($package['error']) {
-                $output->writeln('<error>'.$translator->trans($package['message']).'</error>');
+                $output->writeln("\n\n<error>".$translator->trans($package['message']).'</error>');
 
                 return 1;
             }
@@ -157,7 +157,7 @@ EOT
                     break;
             }
 
-            $output->writeln('<error>'.$translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($error))).'</error>');
+            $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.error', array('%error%' => $translator->trans($error))).'</error>');
 
             return 1;
         }
@@ -168,7 +168,7 @@ EOT
 
         if (!$zipper->extractTo($appRoot)) {
             $output->writeln(
-                '<error>'.$translator->trans(
+                "\n\n<error>".$translator->trans(
                     'mautic.core.update.error',
                     array('%error%' => $translator->trans('mautic.core.update.error_extracting_package'))
                 ).'</error>'
@@ -186,14 +186,20 @@ EOT
         $command = $this->getApplication()->find('cache:clear');
         $input = new ArrayInput(array(
             'command' => 'cache:clear',
-            '--env'   => 'prod'
+            '--env'   => 'prod',
+            '--quiet' => true
         ));
         $command->run($input, $output);
-        $input = new ArrayInput(array(
-            'command' => 'cache:clear',
-            '--env'   => 'dev'
-        ));
-        $command->run($input, $output);
+
+        // Only clear dev cache if run in dev env
+        if ($options['env'] == 'dev') {
+            $input = new ArrayInput(array(
+                'command' => 'cache:clear',
+                '--env'   => 'dev',
+                '--quiet' => true
+            ));
+            $command->run($input, $output);
+        }
 
         // Make sure we have a deleted_files list otherwise we can't process this step
         if (file_exists(__DIR__.'/deleted_files.txt')) {
@@ -262,7 +268,7 @@ EOT
 
                     if ($extractResult['error']) {
                         $output->writeln(
-                            '<error>'.$translator->trans('mautic.core.update.error_updating_language', array('%language%' => $name)).'</error>'
+                            "\n\n<error>".$translator->trans('mautic.core.update.error_updating_language', array('%language%' => $name)).'</error>'
                         );
                     }
                 }
@@ -277,13 +283,10 @@ EOT
         $input = new ArrayInput(array(
             'command'          => 'doctrine:migrations:migrate',
             '--env'            => $options['env'],
-            '--no-interaction' => true
+            '--no-interaction' => true,
+            '--quiet'          => true
         ));
         $exitCode = $command->run($input, $output);
-
-        if ($exitCode !== 0) {
-            $output->writeln('<error>'.$translator->trans('mautic.core.update.error_performing_migration').'</error>');
-        }
 
         $progressBar->setMessage($translator->trans('mautic.core.update.step.finalizing'));
         $progressBar->advance();
@@ -300,6 +303,11 @@ EOT
         // Update successful
         $progressBar->setMessage($translator->trans('mautic.core.update.update_successful', array('%version%' => $version)));
         $progressBar->finish();
+
+        // Ouptput the error (if exists) from the migrate command after we've finished the progress bar
+        if ($exitCode !== 0) {
+            $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.error_performing_migration').'</error>');
+        }
 
         return 0;
     }
