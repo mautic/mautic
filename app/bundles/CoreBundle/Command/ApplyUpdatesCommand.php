@@ -14,6 +14,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -183,22 +184,24 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache'));
         $progressBar->advance();
 
-        $cacheClearCommand = $this->getApplication()->find('cache:clear');
-        $cacheClearProdInput = new ArrayInput(array(
-            'command' => 'cache:clear',
-            '--env'   => 'prod',
-            '--quiet' => true
-        ));
-        $cacheClearCommand->run($cacheClearProdInput, $output);
+        $cacheClearCommand   = $this->getApplication()->find('cache:clear');
+        $cacheClearProdInput = new ArrayInput(
+            array(
+                'command' => 'cache:clear',
+                '--env'   => 'prod',
+            )
+        );
+        $cacheClearCommand->run($cacheClearProdInput, new NullOutput());
 
         // Only clear dev cache if run in dev env
         if ($options['env'] == 'dev') {
-            $cacheClearDevInput = new ArrayInput(array(
-                'command' => 'cache:clear',
-                '--env'   => 'dev',
-                '--quiet' => true
-            ));
-            $cacheClearCommand->run($cacheClearDevInput, $output);
+            $cacheClearDevInput = new ArrayInput(
+                array(
+                    'command' => 'cache:clear',
+                    '--env'   => 'dev',
+                )
+            );
+            $cacheClearCommand->run($cacheClearDevInput, new NullOutput());
         }
 
         // Make sure we have a deleted_files list otherwise we can't process this step
@@ -280,13 +283,17 @@ EOT
         $progressBar->advance();
 
         $migrateCommand = $this->getApplication()->find('doctrine:migrations:migrate');
-        $migrateInput = new ArrayInput(array(
-            'command'          => 'doctrine:migrations:migrate',
-            '--env'            => $options['env'],
-            '--no-interaction' => true,
-            '--quiet'          => true
-        ));
-        $migrateExitCode = $migrateCommand->run($migrateInput, $output);
+        $migrateInput = new ArrayInput(
+            array(
+                'command' => 'doctrine:migrations:migrate',
+                '--env'   => $options['env']
+            )
+        );
+
+        // The `--no-interaction` flag isn't being respected, so manually force it
+        $migrateInput->setInteractive(false);
+
+        $migrateExitCode = $migrateCommand->run($migrateInput, new NullOutput());
 
         $progressBar->setMessage($translator->trans('mautic.core.update.step.finalizing'));
         $progressBar->advance();
