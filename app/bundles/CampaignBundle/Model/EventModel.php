@@ -295,8 +295,8 @@ class EventModel extends CommonFormModel
                 }
 
                 //check the callback function for the event to make sure it even applies based on its settings
-                if (!$this->invokeEventCallback($event, $decisionEventSettings, $lead, $eventDetails, $systemTriggered)) {
-                    $logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' callback check failed');
+                if (!$response = $this->invokeEventCallback($event, $decisionEventSettings, $lead, $eventDetails, $systemTriggered)) {
+                    $logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' callback check failed with a response of '.var_export($response,true));
 
                     continue;
                 }
@@ -661,7 +661,7 @@ class EventModel extends CommonFormModel
             'totalEvaluated' => $evaluatedEventCount,
             'totalExecuted'  => $executedEventCount
         );
-        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+        $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
         return ($returnCounts) ? $counts : $executedEventCount;
     }
@@ -855,7 +855,7 @@ class EventModel extends CommonFormModel
 
                 $logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId().' failed with a response of '
-                    .print_r($response, true)
+                    .var_export($response, true)
                 );
             } else {
                 $executedEventCount++;
@@ -874,7 +874,7 @@ class EventModel extends CommonFormModel
 
                 $logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
-                    .' successfully executed and logged with a response of '.print_r($response, true)
+                    .' successfully executed and logged with a response of '.var_export($response, true)
                 );
             }
 
@@ -883,7 +883,7 @@ class EventModel extends CommonFormModel
             //else do nothing
             $result = false;
             $logger->debug(
-                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for . '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '
+                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '
                 .$lead->getId()
             );
         }
@@ -1059,7 +1059,7 @@ class EventModel extends CommonFormModel
                     'totalEvaluated' => $evaluatedEventCount,
                     'totalExecuted'  => $executedEventCount
                 );
-                $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+                $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
                 return ($returnCounts) ? $counts : $executedEventCount;
             }
@@ -1161,7 +1161,7 @@ class EventModel extends CommonFormModel
                             'totalEvaluated' => $evaluatedEventCount,
                             'totalExecuted'  => $executedEventCount
                         );
-                        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+                        $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
                         return ($returnCounts) ? $counts : $executedEventCount;
 
@@ -1197,7 +1197,7 @@ class EventModel extends CommonFormModel
             'totalEvaluated' => $evaluatedEventCount,
             'totalExecuted'  => $executedEventCount
         );
-        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+        $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
         return ($returnCounts) ? $counts : $executedEventCount;
     }
@@ -1299,7 +1299,7 @@ class EventModel extends CommonFormModel
                 $logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
 
                 // Get batched campaign ids
-                $campaignLeads = $campaignRepo->getCampaignLeads($campaignId, $start, $limit, array(), array('cl.lead_id, cl.date_added'));
+                $campaignLeads = $campaignRepo->getCampaignLeads($campaignId, $start, $limit, array('cl.lead_id, cl.date_added'));
 
                 $campaignLeadIds   = array();
                 $campaignLeadDates = array();
@@ -1463,7 +1463,7 @@ class EventModel extends CommonFormModel
                                     'totalEvaluated' => $evaluatedEventCount,
                                     'totalExecuted'  => $executedEventCount
                                 );
-                                $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+                                $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
                                 return ($returnCounts) ? $counts : $executedEventCount;
                             }
@@ -1568,7 +1568,7 @@ class EventModel extends CommonFormModel
             'totalEvaluated' => $evaluatedEventCount,
             'totalExecuted'  => $executedEventCount
         );
-        $logger->debug('CAMPAIGN: Counts - '.print_r($counts, true));
+        $logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
         return ($returnCounts) ? $counts : $executedEventCount;
     }
@@ -1666,7 +1666,7 @@ class EventModel extends CommonFormModel
             $negate = ($action['decisionPath'] == 'no' && $allowNegative);
 
             if ($action['triggerMode'] == 'interval') {
-                $triggerOn = $negate ? $parentTriggeredDate : new \DateTime();
+                $triggerOn = $negate ? clone $parentTriggeredDate : new \DateTime();
 
                 if ($triggerOn == null) {
                     $triggerOn = new \DateTime();
