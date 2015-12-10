@@ -183,22 +183,22 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache'));
         $progressBar->advance();
 
-        $command = $this->getApplication()->find('cache:clear');
-        $input = new ArrayInput(array(
+        $cacheClearCommand = $this->getApplication()->find('cache:clear');
+        $cacheClearProdInput = new ArrayInput(array(
             'command' => 'cache:clear',
             '--env'   => 'prod',
             '--quiet' => true
         ));
-        $command->run($input, $output);
+        $cacheClearCommand->run($cacheClearProdInput, $output);
 
         // Only clear dev cache if run in dev env
         if ($options['env'] == 'dev') {
-            $input = new ArrayInput(array(
+            $cacheClearDevInput = new ArrayInput(array(
                 'command' => 'cache:clear',
                 '--env'   => 'dev',
                 '--quiet' => true
             ));
-            $command->run($input, $output);
+            $cacheClearCommand->run($cacheClearDevInput, $output);
         }
 
         // Make sure we have a deleted_files list otherwise we can't process this step
@@ -279,14 +279,14 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.migrating.database.schema'));
         $progressBar->advance();
 
-        $command = $this->getApplication()->find('doctrine:migrations:migrate');
-        $input = new ArrayInput(array(
+        $migrateCommand = $this->getApplication()->find('doctrine:migrations:migrate');
+        $migrateInput = new ArrayInput(array(
             'command'          => 'doctrine:migrations:migrate',
             '--env'            => $options['env'],
             '--no-interaction' => true,
             '--quiet'          => true
         ));
-        $exitCode = $command->run($input, $output);
+        $migrateExitCode = $migrateCommand->run($migrateInput, $output);
 
         $progressBar->setMessage($translator->trans('mautic.core.update.step.finalizing'));
         $progressBar->advance();
@@ -305,7 +305,7 @@ EOT
         $progressBar->finish();
 
         // Ouptput the error (if exists) from the migrate command after we've finished the progress bar
-        if ($exitCode !== 0) {
+        if ($migrateExitCode !== 0) {
             $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.error_performing_migration').'</error>');
         }
 
