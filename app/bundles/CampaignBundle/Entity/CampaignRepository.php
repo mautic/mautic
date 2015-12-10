@@ -622,14 +622,14 @@ class CampaignRepository extends CommonRepository
     /**
      * Get lead data of a campaign
      *
-     * @param       $campaignId
-     * @param int   $start
-     * @param bool  $limit
-     * @param array $ignoreLeads
+     * @param            $campaignId
+     * @param int        $start
+     * @param bool|false $limit
+     * @param array      $select
      *
-     * @return array
+     * @return mixed
      */
-    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $ignoreLeads = array(), $select = array('cl.lead_id'))
+    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = array('cl.lead_id'))
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -643,12 +643,6 @@ class CampaignRepository extends CommonRepository
             )
             ->setParameter('false', false, 'boolean')
             ->orderBy('cl.lead_id', 'ASC');
-
-        if (!empty($ignoreLeads)) {
-            $q->andWhere(
-                $q->expr()->notIn('cl.lead_id', $ignoreLeads)
-            );
-        }
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
