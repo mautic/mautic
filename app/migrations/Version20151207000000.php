@@ -42,6 +42,9 @@ class Version20151207000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD copy_id VARCHAR(32) DEFAULT NULL');
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', array('copy_id')).' FOREIGN KEY (copy_id) REFERENCES '.$this->prefix.'email_copies (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX '.$this->generatePropertyName('email_stats', 'idx', array('copy_id')).' ON '.$this->prefix.'email_stats (copy_id)');
+
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_stats DROP FOREIGN KEY '.$this->findPropertyName('email_stats', 'fk', 'A832C1C9'));
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', array('email_id')).' FOREIGN KEY (email_id) REFERENCES '.$this->prefix.'emails (id) ON DELETE SET NULL');
     }
 
     /**
@@ -53,5 +56,8 @@ class Version20151207000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD copy_id VARCHAR(32) DEFAULT NULL');
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', array('copy_id')).' FOREIGN KEY (copy_id) REFERENCES '.$this->prefix.'email_copies (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE INDEX '.$this->generatePropertyName('email_stats', 'idx', array('copy_id')).' ON '.$this->prefix.'email_stats (copy_id)');
+
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats DROP CONSTRAINT ' . $this->findPropertyName('email_stats', 'fk', 'A832C1C9'));
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', array('email_id')).' FOREIGN KEY (email_id) REFERENCES '.$this->prefix.'emails (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 }

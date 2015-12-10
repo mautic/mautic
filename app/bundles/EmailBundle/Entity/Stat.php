@@ -150,7 +150,7 @@ class Stat
 
         $builder->createManyToOne('email', 'Email')
             ->inversedBy('stats')
-            ->addJoinColumn('email_id', 'id', true, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addLead(true, 'SET NULL');
