@@ -430,7 +430,7 @@ class EventModel extends CommonFormModel
         $eventSettings = $campaignModel->getEvents();
 
         // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
-        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, $events);
+        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, array_keys($events));
 
         // Get a total number of events that will be processed
         $totalStartingEvents = $leadCount * $rootEventCount;
