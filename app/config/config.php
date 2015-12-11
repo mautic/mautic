@@ -304,3 +304,7 @@ $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
 );
+
+// Monolog formatter
+$container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
+    ->addMethodCall('includeStacktraces', array(true));
