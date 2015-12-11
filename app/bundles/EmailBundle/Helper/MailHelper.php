@@ -550,8 +550,8 @@ class MailHelper
 
                 $bodyReplaced = str_ireplace($search, $replace, $childBody);
                 if ($childBody != $bodyReplaced) {
-                    $child->setBody($bodyReplaced);
-                    $childBody = $bodyReplaced;
+                    $childBody = strip_tags($bodyReplaced);
+                    $child->setBody($childBody);
                 }
             }
 
