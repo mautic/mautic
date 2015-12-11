@@ -145,6 +145,11 @@ class MailHelper
     protected $plainText = '';
 
     /**
+     * @var bool
+     */
+    protected $plainTextSet = false;
+
+    /**
      * @var array
      */
     protected $assets = array();
@@ -208,7 +213,7 @@ class MailHelper
             $this->transport->setMauticFactory($factory);
         }
 
-        $this->message    = $this->getMessageInstance();
+        $this->message = $this->getMessageInstance();
     }
 
     /**
@@ -256,8 +261,10 @@ class MailHelper
             $this->message->setSubject($this->subject);
             $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
 
-            if (!empty($this->plainText)) {
+            if (!$this->plainTextSet && !empty($this->plainText)) {
                 $this->message->addPart($this->plainText, 'text/plain');
+
+                $this->plainTextSet = true;
             }
 
             if (!$isQueueFlush) {
@@ -469,7 +476,7 @@ class MailHelper
 
             unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
 
-            $this->headers = $this->source  = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
+            $this->headers = $this->source = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
             $this->email   = null;
             $this->subject = $this->plainText = '';
             $this->body    = array(
@@ -479,6 +486,7 @@ class MailHelper
             );
 
             $this->tokenizationEnabled = false;
+            $this->plainTextSet        = false;
 
             $this->message = $this->getMessageInstance();
         }
@@ -550,8 +558,8 @@ class MailHelper
 
                 $bodyReplaced = str_ireplace($search, $replace, $childBody);
                 if ($childBody != $bodyReplaced) {
-                    $child->setBody($bodyReplaced);
-                    $childBody = $bodyReplaced;
+                    $childBody = strip_tags($bodyReplaced);
+                    $child->setBody($childBody);
                 }
             }
 
@@ -689,6 +697,7 @@ class MailHelper
         unset($vars);
 
         if ($returnContent) {
+
             return $content;
         }
 
@@ -721,7 +730,8 @@ class MailHelper
      */
     public function setPlainText($content)
     {
-        $this->plainText = $content;
+        $this->plainText    = $content;
+        $this->plainTextSet = false;
     }
 
     /**

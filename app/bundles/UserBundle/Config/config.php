@@ -135,28 +135,24 @@ return array(
         'other'  => array(
             // Authentication
             'mautic.user.manager'                    => array(
-                'class'          => 'Doctrine\ORM\EntityManager',
-                'arguments'      => 'Mautic\UserBundle\Entity\User',
-                'factoryService' => 'doctrine',
-                'factoryMethod'  => 'getManagerForClass'
+                'class'     => 'Doctrine\ORM\EntityManager',
+                'arguments' => 'Mautic\UserBundle\Entity\User',
+                'factory'   => array('@doctrine', 'getManagerForClass')
             ),
             'mautic.user.repository'                 => array(
-                'class'          => 'Mautic\UserBundle\Entity\UserRepository',
-                'arguments'      => 'Mautic\UserBundle\Entity\User',
-                'factoryService' => 'mautic.user.manager',
-                'factoryMethod'  => 'getRepository'
+                'class'     => 'Mautic\UserBundle\Entity\UserRepository',
+                'arguments' => 'Mautic\UserBundle\Entity\User',
+                'factory'   => array('@mautic.user.manager', 'getRepository')
             ),
             'mautic.permission.manager'              => array(
-                'class'          => 'Doctrine\ORM\EntityManager',
-                'arguments'      => 'Mautic\UserBundle\Entity\Permission',
-                'factoryService' => 'doctrine',
-                'factoryMethod'  => 'getManagerForClass'
+                'class'     => 'Doctrine\ORM\EntityManager',
+                'arguments' => 'Mautic\UserBundle\Entity\Permission',
+                'factory'   => array('@doctrine', 'getManagerForClass')
             ),
             'mautic.permission.repository'           => array(
-                'class'          => 'Mautic\UserBundle\Entity\PermissionRepository',
-                'arguments'      => 'Mautic\UserBundle\Entity\Permission',
-                'factoryService' => 'mautic.permission.manager',
-                'factoryMethod'  => 'getRepository'
+                'class'     => 'Mautic\UserBundle\Entity\PermissionRepository',
+                'arguments' => 'Mautic\UserBundle\Entity\Permission',
+                'factory'   => array('@mautic.permission.manager', 'getRepository')
             ),
             'mautic.user.provider'                   => array(
                 'class'     => 'Mautic\UserBundle\Security\Provider\UserProvider',

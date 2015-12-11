@@ -303,6 +303,13 @@ class CheckStep implements StepInterface
             }
         }
 
+        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $suggestedLimit = 128 * 1024 * 1024;
+
+        if ($memoryLimit < $suggestedLimit) {
+            $messages[] = 'mautic.install.memory.limit';
+        }
+
         if (!class_exists('\\Locale')) {
             $messages[] = 'mautic.install.module.intl';
         }
@@ -385,5 +392,33 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * Takes the memory limit string form php.ini and returns numeric value in bytes.
+     *
+     * @param string $val
+     *
+     * @return integer
+     */
+    public function toBytes($val) {
+        $val = trim($val);
+
+        if ($val == -1) {
+            return PHP_INT_MAX;
+        }
+
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
     }
 }

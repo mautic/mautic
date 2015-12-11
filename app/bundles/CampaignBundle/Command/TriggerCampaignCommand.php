@@ -9,7 +9,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class TriggerCampaignCommand
  */
-class TriggerCampaignCommand extends ContainerAwareCommand
+class TriggerCampaignCommand extends ModeratedCommand
 {
     /**
      * {@inheritdoc}
@@ -52,6 +52,8 @@ class TriggerCampaignCommand extends ContainerAwareCommand
                 0
             )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+
+        parent::configure();
     }
 
     /**
@@ -75,43 +77,11 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $negativeOnly  = $input->getOption('negative-only');
         $batch         = $input->getOption('batch-limit');
         $max           = $input->getOption('max-events');
-        $force         = $input->getOption('force');
 
-        // Prevent script overlap
-        $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
-        $command        = 'mautic:campaign:trigger';
-        $key            = ($id) ? $id : 'all';
-        $executionTimes = array();
+        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 
-        if (file_exists($checkFile)) {
-            // Get the time in the file
-            $executionTimes = json_decode(file_get_contents($checkFile), true);
-            if (!is_array($executionTimes)) {
-                $executionTimes = array();
-            }
-
-            if ($force || empty($executionTimes['in_progress'][$command][$key])) {
-                // Just started
-                $executionTimes['in_progress'][$command][$key] = time();
-            } else {
-                // In progress
-                $check = $executionTimes['in_progress'][$command][$key];
-
-                if ($check + 1800 <= time()) {
-                    // Has been 30 minutes so override
-                    $executionTimes['in_progress'][$command][$key] = time();
-                } else {
-                    $output->writeln('<error>Script in progress. Use -f or --force to force execution.</error>');
-
-                    return 0;
-                }
-            }
-        } else {
-            // Just started
-            $executionTimes['in_progress'][$command][$key] = time();
+            return 0;
         }
-
-        file_put_contents($checkFile, json_encode($executionTimes));
 
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
@@ -213,8 +183,7 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             unset($campaigns);
         }
 
-        unset($executionTimes['in_progress'][$command][$key]);
-        file_put_contents($checkFile, json_encode($executionTimes));
+        $this->completeRun();
 
         return 0;
     }

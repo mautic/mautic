@@ -295,7 +295,7 @@ var Mautic = {
                     var order = 0;
                     mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
                         var name = mQuery(this).attr('name');
-                        name = name.replace(/\[list\]\[(.+)\]$/g, '') + '[list][' + order + ']';
+                        name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
                         mQuery(this).attr('name', name);
                         order++;
                     });
@@ -2371,7 +2371,7 @@ var Mautic = {
         else
             searchId = '#' + searchId;
 
-        if (string) {
+        if (string || string === '') {
             var current = string;
         } else {
             var filter  = mQuery(el).val();
