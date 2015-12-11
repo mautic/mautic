@@ -451,9 +451,7 @@ class EmailModel extends FormModel
                 'email' => (int) $emailId,
                 'lead'  => (int) $leadId
             ),
-            array(
-                array('dateSent', 'DESC')
-            )
+            array('dateSent' => 'DESC')
         );
     }
 
