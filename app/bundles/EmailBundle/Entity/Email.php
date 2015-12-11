@@ -191,7 +191,14 @@ class Email extends FormEntity
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id               = null;
+        $this->stats            = new ArrayCollection();
+        $this->sentCount        = 0;
+        $this->readCount        = 0;
+        $this->revision         = 0;
+        $this->variantSentCount = 0;
+        $this->variantStartDate = null;
+        $this->emailType        = null;
 
         parent::__clone();
     }
