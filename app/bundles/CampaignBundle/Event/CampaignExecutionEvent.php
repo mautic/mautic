@@ -12,31 +12,64 @@ namespace Mautic\CampaignBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignEvent
- *
- * @package Mautic\CampaignBundle\Event
+ * Class CampaignExecutionEvent
  */
 class CampaignExecutionEvent extends Event
 {
+    /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     protected $lead;
+
+    /**
+     * @var array
+     */
     protected $event;
+
+    /**
+     * @var array
+     */
     protected $config;
+
+    /**
+     * @var array
+     */
     protected $eventDetails;
+
+    /**
+     * @var bool
+     */
     protected $systemTriggered;
+
+    /**
+     * @var bool
+     */
     protected $result;
 
+    /**
+     * @var array
+     */
+    protected $eventSettings;
+
+    /**
+     * Construct
+     *
+     * @param $args
+     * @param $result
+     */
     public function __construct($args, $result)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
-        $this->config          = $args['config'];
+        $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
+        $this->eventSettings   = $args['eventSettings'];
         $this->result          = $result;
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
@@ -44,7 +77,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getEvent()
     {
@@ -52,7 +85,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getConfig()
     {
@@ -60,7 +93,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getEventDetails()
     {
@@ -68,7 +101,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getSystemTriggered()
     {
@@ -76,10 +109,18 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventSettings()
+    {
+        return $this->eventSettings;
     }
 }

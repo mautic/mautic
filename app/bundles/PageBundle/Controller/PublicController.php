@@ -321,14 +321,12 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        $response = TrackingPixelHelper::getResponse($this->request);
-
         //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page');
         $model->hitPage(null, $this->request);
 
-        return $response;
+        return TrackingPixelHelper::getResponse($this->request);
     }
 
     /**
@@ -350,6 +348,9 @@ class PublicController extends CommonFormController
         $this->factory->getModel('page')->hitPage($redirect, $this->request);
 
         $url = $redirect->getUrl();
+
+        // Ensure the URL does not have encoded ampersands
+        $url = str_replace('&amp;', '&', $url);
 
         // Get query string
         $query = $this->request->query->all();

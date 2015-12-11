@@ -170,6 +170,7 @@ class Lead extends FormEntity
             ->build();
 
         $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+            ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
             ->fetchExtraLazy()
@@ -286,7 +287,6 @@ class Lead extends FormEntity
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
-
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -677,6 +677,14 @@ class Lead extends FormEntity
      */
     public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
     {
+        if ($doNotEmail->getBounced()) {
+            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
+        } elseif ($doNotEmail->getUnsubscribed()) {
+            $type = 'unsubscribed';
+        }
+
+        $this->changes['dnc_status'] = array($type, $doNotEmail->getComments());
+
         $this->doNotEmail[] = $doNotEmail;
 
         return $this;
@@ -687,6 +695,14 @@ class Lead extends FormEntity
      */
     public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
     {
+        if ($doNotEmail->getBounced()) {
+            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
+        } elseif ($doNotEmail->getUnsubscribed()) {
+            $type = 'unsubscribed';
+        }
+
+        $this->changes['dnc_status'] = array('removed', $type);
+
         $this->doNotEmail->removeElement($doNotEmail);
     }
 
@@ -935,7 +951,8 @@ class Lead extends FormEntity
      */
     public function setLastActive($lastActive)
     {
-        $this->lastActive = $lastActive;
+        $this->changes['dateLastActive'] = array($this->lastActive, $lastActive);
+        $this->lastActive                = $lastActive;
     }
 
     /**

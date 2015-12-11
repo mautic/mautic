@@ -235,6 +235,17 @@ class MauticFactory
      */
     public function getTranslator()
     {
+        if (defined('IN_MAUTIC_CONSOLE')) {
+            /** @var \Mautic\CoreBundle\Translation\Translator $translator */
+            $translator = $this->container->get('translator');
+
+            $translator->setLocale(
+                $this->getParameter('locale')
+            );
+
+            return $translator;
+        }
+
         return $this->container->get('translator');
     }
 
@@ -597,10 +608,22 @@ class MauticFactory
                 if (strpos($ip, ',') !== false) {
                     // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
                     $ips = explode(',', $ip);
-                    $ip  = end($ips);
+                    array_walk($ips, create_function('&$val', '$val = trim($val);'));
+
+                    if ($internalIps = $this->getParameter('do_not_track_internal_ips')) {
+                        $ips = array_diff($ips, $internalIps);
+                    }
+
+                    $ip = end($ips);
                 }
 
-                return trim($ip);
+                $ip = trim($ip);
+
+                // Validate IP
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+
+                    return $ip;
+                }
             }
         }
 
@@ -631,17 +654,64 @@ class MauticFactory
         if (empty($ipAddress[$ip])) {
             $repo      = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
+            $saveIp    = ($ipAddress === null);
 
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress($ip, $this->getSystemParameters());
-                $repo->saveEntity($ipAddress);
+                $ipAddress->setIpAddress($ip);
             }
 
             // Ensure the do not track list is inserted
-            $doNotTrack = $this->getParameter('do_not_track_ips');
-            if (!empty($doNotTrack)) {
-                $ipAddress->setDoNotTrackList($doNotTrack);
+            $doNotTrack  = $this->getParameter('do_not_track_ips', array());
+            if (!is_array($doNotTrack)) {
+                $doNotTrack = array();
+            }
+            $internalIps = $this->getParameter('do_not_track_internal_ips', array());
+            if (!is_array($internalIps)) {
+                $internalIps = array();
+            }
+            $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
+            $ipAddress->setDoNotTrackList($doNotTrack);
+
+            $details = $ipAddress->getIpDetails();
+            if ($ipAddress->isTrackable() && empty($details['city']))  {
+                // Get the IP lookup service
+                if ($ipService = $this->getParameter('ip_lookup_service')) {
+                    // Find the service class
+                    $bundles = $this->getMauticBundles(true);
+
+                    foreach ($bundles as $bundle) {
+                        if (!empty($bundle['config']['ip_lookup_services'][$ipService])) {
+                            $class = $bundle['config']['ip_lookup_services'][$ipService]['class'];
+                            if (substr($class, 0, 1) !== '\\') {
+                                $class = '\\' . $class;
+                            }
+
+                            /** @var \Mautic\CoreBundle\IpLookup\AbstractIpLookup $lookupClass */
+                            $lookupClass = new $class($ip, $this->getParameter('ip_lookup_auth'), $this->getLogger());
+
+                            // Fetch the data
+                            $lookupClass->getData();
+
+                            // Get and set the details
+                            $details = get_object_vars($lookupClass);
+                            $ipAddress->setIpDetails($details);
+
+                            // Save new details
+                            $saveIp = true;
+
+                            unset($lookupClass);
+
+                            break;
+                        }
+                    }
+
+                    unset($bundles);
+                }
+            }
+
+            if ($saveIp) {
+                $repo->saveEntity($ipAddress);
             }
 
             $ipAddresses[$ip] = $ipAddress;

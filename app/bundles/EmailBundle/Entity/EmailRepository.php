@@ -411,4 +411,27 @@ class EmailRepository extends CommonRepository
             )
             ->execute();
     }
+
+    /**
+     * Up the read/sent counts
+     *
+     * @param            $id
+     * @param string     $type
+     * @param int        $increaseBy
+     * @param bool|false $variant
+     */
+    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'emails')
+            ->set($type . '_count', $type . '_count + ' . (int) $increaseBy)
+            ->where('id = ' . (int) $id);
+
+        if ($variant) {
+            $q->set('variant_' . $type . '_count', 'variant_' . $type . '_count + ' . (int) $increaseBy);
+        }
+
+        $q->execute();
+    }
 }

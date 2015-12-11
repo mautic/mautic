@@ -13,6 +13,10 @@ return array(
             'mautic_config_action' => array(
                 'path' => '/config/{objectAction}',
                 'controller' => 'MauticConfigBundle:Config:execute'
+            ),
+            'mautic_sysinfo_index' => array(
+                'path' => '/sysinfo',
+                'controller' => 'MauticConfigBundle:Sysinfo:index'
             )
         )
     ),
@@ -25,6 +29,17 @@ return array(
                 'iconClass'       => 'fa-cogs',
                 'id'              => 'mautic_config_index',
                 'access'          => 'admin'
+            ),
+            'mautic.sysinfo.menu.index' => array(
+                'route'           => 'mautic_sysinfo_index',
+                'iconClass'       => 'fa-life-ring',
+                'id'              => 'mautic_sysinfo_index',
+                'access'          => 'admin',
+                'checks'    => array(
+                   'parameters' => array(
+                       'sysinfo_disabled' => false
+                   )
+                )
             )
         )
     ),

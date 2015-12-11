@@ -173,7 +173,11 @@ class FieldType extends AbstractType
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
             if ($type == 'select' || $type == 'lookup') {
-                $properties = $data->getProperties();
+                if (is_array($data) && isset($data['properties'])) {
+                    $properties = $data['properties'];
+                } else {
+                    $properties = $data->getProperties();
+                }
 
                 if (isset($properties['list']) && is_string($properties['list'])) {
                     $properties['list'] = array_map('trim', explode('|', $properties['list']));
@@ -311,15 +315,17 @@ class FieldType extends AbstractType
             )
         );
 
+        $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
             'yesno_button_group',
             array(
                 'label'    => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'     => array(
-                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip'
+                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
+                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)'
                 ),
-                'disabled' => ($options['data']->getId()) ? true : false
+                'data'     => (!empty($data))
             )
         );
 

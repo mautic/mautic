@@ -176,6 +176,12 @@ $dbalSettings = array(
     'types'    => array(
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
+    ),
+    // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
+    'mapping_types' => array(
+        'enum'  => 'string',
+        'point' => 'string',
+        'bit'   => 'string',
     )
 );
 
@@ -256,30 +262,26 @@ $container->loadFromExtension('oneup_uploader', array(
     )
 ));
 
-if ($container->getParameter('mautic.api_enabled')) {
-    //FOS Rest
-    $container->loadFromExtension('fos_rest', array(
-        'routing_loader' => array(
-            'default_format' => 'json',
-            'include_format' => false
+//FOS Rest for API
+$container->loadFromExtension('fos_rest', array(
+    'routing_loader' => array(
+        'default_format' => 'json',
+        'include_format' => false
+    ),
+    'view'           => array(
+        'formats' => array(
+            'json' => true,
+            'xml'  => false,
+            'html' => false
         ),
-        'view'           => array(
-            'formats' => array(
-                'json' => true,
-                'xml'  => false,
-                'html' => false
-            ),
-            'templating_formats' => array(
-                'html' => false
-            )
-        ),
-        'disable_csrf_role' => 'ROLE_API'
-    ));
-}
+        'templating_formats' => array(
+            'html' => false
+        )
+    ),
+    'disable_csrf_role' => 'ROLE_API'
+));
 
-// load the serializer
-
-//JMS Serializer
+//JMS Serializer for API and Webhooks
 $container->loadFromExtension('jms_serializer', array(
     'handlers' => array(
         'datetime' => array(

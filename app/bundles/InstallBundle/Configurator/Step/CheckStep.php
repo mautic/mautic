@@ -268,6 +268,10 @@ class CheckStep implements StepInterface
             }
         }
 
+        if (!extension_loaded('zip')) {
+            $messages[] = 'mautic.install.extension.zip';
+        }
+
         // We set a default timezone in the app bootstrap, but advise the user if their PHP config is missing it
         if (!ini_get('date.timezone')) {
             $messages[] = 'mautic.install.date.timezone.not.set';
@@ -289,7 +293,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.xml';
         }
 
-        if (function_exists('imap_open')) {
+        if (!function_exists('imap_open')) {
             $messages[] = 'mautic.install.extension.imap';
         }
 
@@ -297,6 +301,13 @@ class CheckStep implements StepInterface
             if (!function_exists('posix_isatty')) {
                 $messages[] = 'mautic.install.function.posix';
             }
+        }
+
+        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $suggestedLimit = 128 * 1024 * 1024;
+
+        if ($memoryLimit < $suggestedLimit) {
+            $messages[] = 'mautic.install.memory.limit';
         }
 
         if (!class_exists('\\Locale')) {
@@ -381,5 +392,33 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * Takes the memory limit string form php.ini and returns numeric value in bytes.
+     *
+     * @param string $val
+     *
+     * @return integer
+     */
+    public function toBytes($val) {
+        $val = trim($val);
+
+        if ($val == -1) {
+            return PHP_INT_MAX;
+        }
+
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
     }
 }

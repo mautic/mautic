@@ -229,7 +229,7 @@ class FormModel extends CommonFormModel
         $isNew = ($entity->getId()) ? false : true;
 
         if ($isNew) {
-            $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
+            $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }
 
@@ -247,16 +247,24 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the cached HTML of a form and generates it if missing
      *
-     * @param Form $form
+     * @param Form      $form
+     * @param bool|true $withScript
+     * @param bool|true $useCache
      *
      * @return string
      */
-    public function getContent(Form $form)
+    public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        $cachedHtml = $form->getCachedHtml();
+        if ($useCache) {
+            $cachedHtml = $form->getCachedHtml();
+        }
 
         if (empty($cachedHtml)) {
-            $cachedHtml = $this->generateHtml($form);
+            $cachedHtml = $this->generateHtml($form, $useCache);
+        }
+
+        if ($withScript) {
+            $cachedHtml = $this->getFormScript($form) . "\n\n" . $cachedHtml;
         }
 
         return $cachedHtml;
@@ -438,28 +446,149 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * @param Form $form
+     *
+     * @return string
+     */
+    public function getFormScript(Form $form)
+    {
+        $templating = $this->factory->getTemplating();
+        $theme      = $form->getTemplate();
+
+        if (!empty($theme)) {
+            $theme .= '|';
+        }
+
+        $script = $templating->render(
+            $theme.'MauticFormBundle:Builder:script.html.php',
+            array(
+                'form'  => $form,
+                'theme' => $theme,
+            )
+        );
+
+        return $script;
+    }
+
+    /**
      * Writes in form values from get parameters
      *
      * @param $form
      * @param $formHtml
      */
-    public function populateValuesWithGetParameters($form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $request = $this->factory->getRequest();
-        $formName = strtolower(\Mautic\CoreBundle\Helper\InputHelper::alphanum($form->getName()));
+        $request  = $this->factory->getRequest();
+        $formName = $form->generateFormName();
 
         $fields = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
             if ($request->query->has($alias)) {
-                preg_match('/<input id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match);
-                if (!empty($match)) {
+                $value = $request->query->get($alias);
 
-                    //replace value with GET
-                    $replace = '<input id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[1] . 'value="' . urldecode($request->query->get($alias)) . '"' . $match[3] . '/>';
-                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                switch ($f->getType()) {
+                    case 'text':
+                        if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
+                            $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
+                    case 'textarea':
+                        if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                            $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
+                    case 'checkboxgrp':
+                        if (!is_array($value)) {
+                            $value = array($value);
+                        }
+                        foreach ($value as $val) {
+                            $val = urldecode($val);
+                            if (preg_match(
+                                '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
+                                $formHtml,
+                                $match
+                            )) {
+                                $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                                    .$match[4].' checked />';
+                                $formHtml = str_replace($match[0], $replace, $formHtml);
+                            }
+                        }
+                        break;
+                    case 'radiogrp':
+                        $value = urldecode($value);
+                        if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
+                            $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
+                                .' checked />';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                        }
+                        break;
                 }
             }
         }
+    }
+
+    /**
+     * @param null $operator
+     *
+     * @return array
+     */
+    public function getFilterExpressionFunctions($operator = null)
+    {
+        $operatorOptions = array(
+            '='          =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.equals',
+                    'expr'        => 'eq',
+                    'negate_expr' => 'neq'
+                ),
+            '!='         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.notequals',
+                    'expr'        => 'neq',
+                    'negate_expr' => 'eq'
+                ),
+            'gt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                    'expr'        => 'gt',
+                    'negate_expr' => 'lt'
+                ),
+            'gte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                    'expr'        => 'gte',
+                    'negate_expr' => 'lt'
+                ),
+            'lt'         =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthan',
+                    'expr'        => 'lt',
+                    'negate_expr' => 'gt'
+                ),
+            'lte'        =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                    'expr'        => 'lte',
+                    'negate_expr' => 'gt'
+                ),
+            'like'       =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.islike',
+                    'expr'        => 'like',
+                    'negate_expr' => 'notLike'
+                ),
+            '!like'      =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                    'expr'        => 'notLike',
+                    'negate_expr' => 'like'
+                ),
+        );
+
+        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 }
