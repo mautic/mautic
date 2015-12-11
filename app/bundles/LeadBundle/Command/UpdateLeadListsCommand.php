@@ -9,12 +9,12 @@
 
 namespace Mautic\LeadBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateLeadListsCommand extends ContainerAwareCommand
+class UpdateLeadListsCommand extends ModeratedCommand
 {
     protected function configure()
     {
@@ -32,8 +32,9 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
             ->setDescription('Update leads in smart lists based on new lead data.')
             ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
             ->addOption('--max-leads', '-m', InputOption::VALUE_OPTIONAL, 'Set max number of leads to process per list for this script execution. Defaults to all.', false)
-            ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+            ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -51,40 +52,10 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
         $id    = $input->getOption('list-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-leads');
-        $force = $input->getOption('force');
 
-        // Prevent script overlap
-        $checkFile      = $checkFile = $container->getParameter('kernel.cache_dir').'/../script_executions.json';
-        $command        = 'mautic:leadlist:update';
-        $key            = ($id) ? $id : 'all';
-        $executionTimes = array();
+        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 
-        if (file_exists($checkFile)) {
-            // Get the time in the file
-            $executionTimes = json_decode(file_get_contents($checkFile), true);
-            if (!is_array($executionTimes)) {
-                $executionTimes = array();
-            }
-
-            if ($force || empty($executionTimes['in_progress'][$command][$key])) {
-                // Just started
-                $executionTimes['in_progress'][$command][$key] = time();
-            } else {
-                // In progress
-                $check = $executionTimes['in_progress'][$command][$key];
-
-                if ($check + 1800 <= time()) {
-                    // Has been 30 minutes so override
-                    $executionTimes['in_progress'][$command][$key] = time();
-                } else {
-                    $output->writeln('<error>Script in progress. Use -f or --force to force execution.</error>');
-
-                    return 0;
-                }
-            }
-        } else {
-            // Just started
-            $executionTimes['in_progress'][$command][$key] = time();
+            return 0;
         }
 
         if ($id) {
@@ -118,8 +89,7 @@ class UpdateLeadListsCommand extends ContainerAwareCommand
             unset($lists);
         }
 
-        unset($executionTimes['in_progress'][$command][$key]);
-        file_put_contents($checkFile, json_encode($executionTimes));
+        $this->completeRun();
 
         return 0;
     }
