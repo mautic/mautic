@@ -35,6 +35,7 @@ class ListType extends AbstractType
     private $countryChoices;
     private $regionChoices;
     private $listChoices;
+    private $emailChoices;
     private $tagChoices;
 
     /**
@@ -55,6 +56,12 @@ class ListType extends AbstractType
         $this->listChoices     = array();
         foreach ($lists as $list) {
             $this->listChoices[$list['id']] = $list['name'];
+        }
+
+        $emails                = $listModel->getUserEmails();
+        $this->emailChoices     = array();
+        foreach ($emails as $email) {
+            $this->emailChoices[$email['id']] = $email['subject'];
         }
 
         $leadModel = $factory->getModel('lead');
@@ -133,6 +140,7 @@ class ListType extends AbstractType
                         'regions'   => $this->regionChoices,
                         'fields'    => $this->fieldChoices,
                         'lists'     => $this->listChoices,
+                        'emails'    => $this->emailChoices,
                         'tags'      => $this->tagChoices
                     ),
                     'error_bubbling' => false,
@@ -173,6 +181,7 @@ class ListType extends AbstractType
         $view->vars['regions']   = $this->regionChoices;
         $view->vars['timezones'] = $this->timezoneChoices;
         $view->vars['lists']     = $this->listChoices;
+        $view->vars['emails']     = $this->emailChoices;
         $view->vars['tags']      = $this->tagChoices;
     }
 
