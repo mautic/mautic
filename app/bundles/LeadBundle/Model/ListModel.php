@@ -287,6 +287,18 @@ class ListModel extends FormModel
                     )
                 )
             ),
+            'lead_email_received'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
+                'properties' => array(
+                    'type' => 'lead_email_received'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        'in',
+                        '!in'
+                    )
+                )
+            ),
             'tags'       => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => array(
@@ -383,6 +395,17 @@ class ListModel extends FormModel
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias, '', $withLeads);
 
         return $lists;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getUserEmails()
+    {
+        $emails = $this->em->getRepository('MauticEmailBundle:Email')->getEmailList('', 10, 0, true, false, null);
+
+        return $emails;
     }
 
     /**

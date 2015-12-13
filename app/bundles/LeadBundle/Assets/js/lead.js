@@ -295,7 +295,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
