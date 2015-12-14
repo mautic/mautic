@@ -17,7 +17,7 @@ class TelizeIpLookup extends AbstractIpLookup
      */
     protected function getUrl()
     {
-        return "http://www.telize.com/geoip/{$this->ip}";
+        return "https://telize-v1.p.mashape.com/geoip/{$this->ip}";
     }
 
     /**
