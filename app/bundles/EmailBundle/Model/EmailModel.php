@@ -48,6 +48,14 @@ class EmailModel extends FormModel
     }
 
     /**
+     * @return \Mautic\EmailBundle\Entity\CopyRepository
+     */
+    public function getCopyRepository ()
+    {
+        return $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Copy');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPermissionBase ()
@@ -1077,24 +1085,7 @@ class EmailModel extends FormModel
             }
 
             //create a stat
-            $stat = new Stat();
-            $stat->setDateSent(new \DateTime());
-
-            $stat->setEmail($useEmail['entity']);
-            $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
-            if ($listId) {
-                $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
-            }
-            $stat->setEmailAddress($lead['email']);
-            $stat->setTrackingHash($idHash);
-            if (!empty($source)) {
-                $stat->setSource($source[0]);
-                $stat->setSourceId($source[1]);
-            }
-            $stat->setCopy($mailer->getBody());
-            $stat->setTokens($mailer->getTokens());
-
-            $saveEntities[$lead['email']] = $stat;
+            $saveEntities[$lead['email']] = $mailer->createEmailStat(false, null, $listId);
 
             // Up sent counts
             $emailId = $useEmail['entity']->getId();
@@ -1102,9 +1093,6 @@ class EmailModel extends FormModel
                 $emailSentCounts[$emailId] = 0;
             }
             $emailSentCounts[$emailId]++;
-
-            // Save RAM
-            unset($stat);
 
             $batchCount++;
             if ($batchCount >= $useEmail['limit']) {
@@ -1208,19 +1196,7 @@ class EmailModel extends FormModel
             $mailer->queue(true);
 
             if ($saveStat) {
-                //create a stat
-                $stat = new Stat();
-                $stat->setDateSent(new \DateTime());
-                $stat->setEmailAddress($user['email']);
-                $stat->setTrackingHash($idHash);
-                if (!empty($source)) {
-                    $stat->setSource($source[0]);
-                    $stat->setSourceId($source[1]);
-                }
-                $stat->setCopy($mailer->getBody());
-                $stat->setTokens($mailer->getTokens());
-
-                $saveEntities[] = $stat;
+                $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
             }
         }
 
