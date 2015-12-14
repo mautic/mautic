@@ -28,10 +28,26 @@ class KeysType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $object = $options['integration_object'];
-        $secretKeys = $object->getSecretKeys();
+        $object       = $options['integration_object'];
+        $secretKeys   = $object->getSecretKeys();
+        $requiredKeys = $object->getRequiredKeyFields();
+
         foreach ($options['integration_keys'] as $key => $label) {
-            $type = (in_array($key, $secretKeys)) ? 'password' : 'text';
+            $isSecret    = in_array($key, $secretKeys);
+            $required    = (isset($requiredKeys[$key]));
+            // Password fields are going to be blank even if a value exists so only require if a password is not already saved
+            if ($isSecret && !empty($options['data'][$key])) {
+                $required = false;
+            }
+
+            $constraints = ($required) ? array(
+                new NotBlank(
+                    array(
+                        'message' => 'mautic.core.value.required'
+                    )
+                )
+            ) : array();
+            $type = ($isSecret) ? 'password' : 'text';
             $builder->add($key, $type, array(
                 'label'        => $label,
                 'label_attr'   => array('class' => 'control-label'),
@@ -39,7 +55,8 @@ class KeysType extends AbstractType
                     'class'       => 'form-control',
                     'placeholder' => ($type == 'password') ? '**************' : ''
                 ),
-                'required'     => false,
+                'required'       => $required,
+                'constraints'    => $constraints,
                 'error_bubbling' => false
             ));
         }
