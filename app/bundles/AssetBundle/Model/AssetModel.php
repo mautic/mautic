@@ -77,7 +77,7 @@ class AssetModel extends FormModel
      */
     public function trackDownload($asset, $request = null, $code = '200', $systemEntry = array())
     {
-        //don't skew results with in-house downloads
+        // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->factory->getSecurity()->isAnonymous()) {
             return;
         }
@@ -104,7 +104,7 @@ class AssetModel extends FormModel
                     $lead = $leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
                         $leadModel->setLeadCookie($clickthrough['lead']);
-                        list($trackingId, $generated) = $leadModel->getTrackingCookie();
+                        list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
                         $leadClickthrough = true;
 
                         $leadModel->setCurrentLead($lead);
@@ -122,7 +122,7 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+                list($lead, $trackingId, $trackingNewlyGenerated) = $leadModel->getCurrentLead(true);
             }
 
             $download->setLead($lead);
@@ -155,12 +155,22 @@ class AssetModel extends FormModel
             }
 
             if (isset($systemEntry['tracking_id'])) {
-                $trackingId = $systemEntry['tracking_id'];
+                $trackingId             = $systemEntry['tracking_id'];
+                $trackingNewlyGenerated = false;
             } elseif ($this->factory->getSecurity()->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                list($trackingId, $generated) = $leadModel->getTrackingCookie();
+                list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
             }
+        }
+
+        $isUnique = true;
+        if (!empty($trackingNewlyGenerated)) {
+            // Cookie was just generated so this is definitely a unique download
+            $isUnique = $trackingNewlyGenerated;
+        } elseif (!empty($trackingId)) {
+            // Determine if this is a unique download
+            $isUnique = $this->getDownloadRepository()->isUniqueDownload($asset->getId(), $trackingId);
         }
 
         $download->setTrackingId($trackingId);
@@ -168,10 +178,7 @@ class AssetModel extends FormModel
         if (!empty($asset) && empty($systemEntry)) {
             $download->setAsset($asset);
 
-            //check for a download count from tracking id
-            $countById = $this->getDownloadRepository()->getDownloadCountForTrackingId($asset->getId(), $trackingId);
-
-            $this->getRepository()->upDownloadCount($asset->getId(), 1, empty($countById));
+            $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
         //check for existing IP
@@ -184,9 +191,13 @@ class AssetModel extends FormModel
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($download);
-            $this->em->flush();
+            $this->em->flush($download);
         } catch (\Exception $e) {
-            error_log($e);
+            if ($this->factory->getEnvironment() == 'dev') {
+                throw $e;
+            } else {
+                error_log($e);
+            }
         }
 
         $this->em->detach($download);
