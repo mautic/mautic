@@ -147,7 +147,6 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
 <?php
     echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
-    echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
         'selectTemplate' => $selectTemplate
     ));
