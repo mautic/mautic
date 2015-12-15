@@ -21,32 +21,43 @@ class HitRepository extends CommonRepository
 {
 
     /**
-     * Get a count of unique hits for the current tracking ID
+     * Determine if the page hit is a unique
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
      *
-     * @return int
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return bool
      */
-    public function getHitCountForTrackingId($page, $trackingId)
+    public function isUniquePageHit($page, $trackingId)
     {
-        $q = $this->createQueryBuilder('h')
-            ->select('count(h.id) as num');
+        $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q2->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
+
+        $expr = $q2->expr()->andX(
+            $q2->expr()->eq('h.tracking_id', ':id')
+        );
 
         if ($page instanceof Page) {
-            $q->where('IDENTITY(h.page) = ' .$page->getId());
+            $expr->add(
+                $q2->expr()->eq('h.page_id', $page->getId())
+            );
         } elseif ($page instanceof Redirect) {
-            $q->where('IDENTITY(h.redirect) = ' .$page->getId());
+            $expr->add(
+                $q2->expr()->eq('h.redirect_id', $page->getId())
+            );
         }
 
-        $q->andWhere('h.trackingId = :id')
-        ->setParameter('id', $trackingId);
+        $q2->where($expr);
 
-        $count = $q->getQuery()->getSingleResult();
+        $q->select('u.is_unique')
+            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u'
+        )
+            ->setParameter('id', $trackingId);
 
-        return (int) $count['num'];
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
