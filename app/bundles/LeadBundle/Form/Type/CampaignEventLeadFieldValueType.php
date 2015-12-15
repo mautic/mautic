@@ -66,11 +66,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $form    = $e->getForm();
 
             $fieldValues = null;
+            $fieldType = null;
+            $choiceTypes = array('boolean', 'country', 'region', 'lookup', 'timezone', 'select', 'radio');
 
             if (isset($data['field'])) {
                 $field = $fieldModel->getRepository()->findOneBy(array('alias' => $data['field']));
                 if ($field) {
                     $properties = $field->getProperties();
+                    $fieldType = $field->getType();
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = explode('|', $properties['list']);
@@ -82,21 +85,21 @@ class CampaignEventLeadFieldValueType extends AbstractType
             }
 
             // Display selectbox for a field with choices, textbox for others
-            if (empty($fieldValues)) {
-                $form->add('value', 'text', array(
-                    'label'      => 'mautic.form.field.form.value',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class'   => 'form-control'
-                    )
-                ));
-            } else {
+            if (!empty($fieldValues) && in_array($fieldType, $choiceTypes)) {
                 $form->add('value', 'choice', array(
                     'choices'    => $fieldValues,
                     'label'      => 'mautic.form.field.form.value',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
                         'class'   => 'form-control not-chosen'
+                    )
+                ));
+            } else {
+                $form->add('value', 'text', array(
+                    'label'      => 'mautic.form.field.form.value',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control'
                     )
                 ));
             }
