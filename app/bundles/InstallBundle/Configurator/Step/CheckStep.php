@@ -9,7 +9,9 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Check Step.
@@ -62,14 +64,17 @@ class CheckStep implements StepInterface
     /**
      * Constructor
      *
-     * @param boolean $configIsWritable Flag if the configuration file is writable
-     * @param string  $kernelRoot       Kernel root path
+     * @param Configurator $configurator Configurator service
+     * @param string       $kernelRoot   Kernel root path
+     * @param RequestStack $requestStack Request stack
      */
-    public function __construct($configIsWritable, $kernelRoot, $baseUrl)
+    public function __construct(Configurator $configurator, $kernelRoot, RequestStack $requestStack)
     {
-        $this->configIsWritable = $configIsWritable;
+        $request = $requestStack->getCurrentRequest();
+
+        $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
-        $this->site_url         = $baseUrl;
+        $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
     }
 
     /**
