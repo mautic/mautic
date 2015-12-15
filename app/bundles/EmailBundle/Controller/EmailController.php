@@ -592,7 +592,7 @@ class EmailController extends FormController
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
-
+        $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.email.page', 1);
@@ -655,10 +655,24 @@ class EmailController extends FormController
 
         //Create the form
         $action = $this->generateUrl('mautic_email_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        // ThaoPV added: RMM 24
+        $updateSelect = ($method == 'POST')
+            ? $this->request->request->get('emailform[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+
+        if ($updateSelect) {
+            // Force type to template
+            $entity->setEmailType('template');
+        }
+
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -715,19 +729,38 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
+            // ThaoPV added: RMM 24
+            $passthrough = array(
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email'
+            );
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $passthrough = array_merge(
+                    $passthrough,
+                    array(
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'emailId'      => $entity->getId(),
+                        'emailSubject' => $entity->getSubject(),
+                        'emailName'    => $entity->getName(),
+                        'emailLang'    => $entity->getLanguage()
+                    )
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = array(
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId()
                 );
-
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticEmailBundle:Email:view'
+                            'contentTemplate' => 'MauticEmailBundle:Email:view',
+                            'passthroughVars' => $passthrough
                         )
                     )
                 );
@@ -767,6 +800,7 @@ class EmailController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_email_action',
                         array(

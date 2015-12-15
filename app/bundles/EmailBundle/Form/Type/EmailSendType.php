@@ -51,7 +51,7 @@ class EmailSendType extends AbstractType
                 )
             )
         ));
-
+        // file_put_contents('C:\log.txt', (string) $options['update_select']);
         if (!empty($options['update_select'])) {
             $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
                 'objectAction' => 'new',
@@ -59,7 +59,7 @@ class EmailSendType extends AbstractType
                 'updateSelect' => $options['update_select']
             ));
 
-            $builder->add('newEmailButton', 'standalone_button', array(
+            $builder->add('newEmailButton', 'button', array(
                 'attr'  => array(
                     'class'   => 'btn btn-primary',
                     'onclick' => 'Mautic.loadNewEmailWindow({
@@ -68,6 +68,35 @@ class EmailSendType extends AbstractType
                     'icon'    => 'fa fa-plus'
                 ),
                 'label' => 'mautic.email.send.new.email'
+            ));
+
+            // create button edit email
+            $windowUrlEdit = $this->factory->getRouter()->generate('mautic_email_action', array(
+                'objectAction' => 'edit',
+                'objectId'     => 'emailId',
+                'contentOnly'  => 1,
+                'updateSelect' => $options['update_select']
+            ));
+
+            $builder->add('editEmailButton', 'button', array(
+                'attr'  => array(
+                    'class'   => 'btn btn-primary',
+                    'onclick' => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
+                    'icon'    => 'fa fa-edit'
+                ),
+                'label' => 'mautic.email.send.edit.email'
+            ));
+
+            // create button preview email
+            $windowUrlPreview = $this->factory->getRouter()->generate('mautic_email_preview', array('objectId' => 'emailId'));
+
+            $builder->add('previewEmailButton', 'button', array(
+                'attr'  => array(
+                    'class'   => 'btn btn-primary',
+                    'onclick' => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlPreview . '"}))',
+                    'icon'    => 'fa fa-external-link'
+                ),
+                'label' => 'mautic.email.send.preview.email'
             ));
         }
     }
