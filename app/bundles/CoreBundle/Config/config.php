@@ -320,18 +320,16 @@ return array(
                 )
             ),
             'mautic.menu.main'                   => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'mainMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'main'
+                'class'   => 'Knp\Menu\MenuItem',
+                'factory' => array('@mautic.menu.builder', 'mainMenu'),
+                'tag'     => 'knp_menu.menu',
+                'alias'   => 'main',
             ),
             'mautic.menu.admin'                  => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'adminMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'admin'
+                'class'   => 'Knp\Menu\MenuItem',
+                'factory' => array('@mautic.menu.builder', 'adminMenu'),
+                'tag'     => 'knp_menu.menu',
+                'alias'   => 'admin',
             ),
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
@@ -411,6 +409,6 @@ return array(
         'cookie_domain'                  => '',
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
-        'do_not_track_ips'               => null,
+        'do_not_track_ips'               => array(),
     )
 );

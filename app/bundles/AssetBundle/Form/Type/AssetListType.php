@@ -32,8 +32,10 @@ class AssetListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $viewOther = $factory->getSecurity()->isGranted('asset:assets:viewother');
-        $choices = $factory->getModel('asset')->getRepository()
-            ->getAssetList('', 0, 0, $viewOther);
+        $repo = $factory->getModel('asset')->getRepository();
+        $repo->setCurrentUser($factory->getUser());
+        $choices = $repo->getAssetList('', 0, 0, $viewOther);
+ 
         foreach ($choices as $asset) {
             $this->choices[$asset['language']][$asset['id']] = $asset['title'];
         }

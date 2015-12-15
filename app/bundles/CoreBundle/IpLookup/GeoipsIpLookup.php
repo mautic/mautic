@@ -17,7 +17,7 @@ class GeoipsIpLookup extends AbstractIpLookup
      */
     protected function getUrl()
     {
-        return "http://api.geoips.com/ip/{$this->ip}/key/ec9e4bbc7ac82d809c20c51c9ad2441f/output/json";
+        return "http://api.geoips.com/ip/{$this->ip}/key/{$this->auth}/output/json";
     }
 
     /**
