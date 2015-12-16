@@ -485,8 +485,12 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if (!$returnTracking && $this->systemCurrentLead) {
+        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
             // Just return the system set lead
+            if (null === $this->systemCurrentLead) {
+                $this->systemCurrentLead = new Lead();
+            }
+
             return $this->systemCurrentLead;
         }
 
@@ -562,7 +566,7 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
-        if ($this->systemCurrentLead) {
+        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             // Overwrite system current lead
             $this->systemCurrentLead = $lead;
 

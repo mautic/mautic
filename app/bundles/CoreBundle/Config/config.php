@@ -227,6 +227,14 @@ return array(
                 'tag' => 'kernel.event_subscriber'
             ),
 
+            // Configurator (used in installer and managing global config)
+            'mautic.configurator' => array(
+                'class'     => 'Mautic\InstallBundle\Configurator\Configurator', // In 2.0 change this to reference the CoreBundle
+                'arguments' => array(
+                    'mautic.factory'
+                )
+            ),
+
             // Template helper overrides
             'templating.helper.assets.class'     => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
             'templating.helper.slots.class'      => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',

@@ -216,7 +216,6 @@ class CommonRepository extends EntityRepository
         }
     }
 
-
     /**
      * Delete an array of entities
      *
@@ -947,6 +946,62 @@ class CommonRepository extends EntityRepository
         }
 
         return $q->execute()->fetchAll();
+    }
+
+    /**
+     * @param      $alias
+     * @param null $catAlias
+     * @param null $lang
+     *
+     * @return null
+     */
+    public function findOneBySlugs($alias, $catAlias = null, $lang = null)
+    {
+        try {
+            $q = $this->createQueryBuilder($this->getTableAlias())
+                ->setParameter(':alias', $alias);
+
+            $expr = $q->expr()->andX(
+                $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
+            );
+
+            $metadata = $this->getClassMetadata();
+
+            if (null !== $catAlias) {
+                if (isset($metadata->associationMappings['category'])) {
+                    $q->leftJoin($this->getTableAlias().'.category', 'category')
+                        ->setParameter('catAlias', $catAlias);
+
+                    $expr->add(
+                        $q->expr()->eq('category.alias', ':catAlias')
+                    );
+                } else {
+                    // This entity does not have a category mapping so return null
+
+                    return null;
+                }
+            }
+
+            if (isset($metadata->fieldMappings['language'])) {
+                $q->setParameter('lang', $lang);
+
+                $expr->add(
+                    $q->expr()->eq($this->getTableAlias().'.language', ':lang')
+                );
+            } elseif (null !== $lang) {
+                // This entity does not have a language mapping so return null
+
+                return null;
+            }
+
+            $q->where($expr);
+
+            $entity = $q->getQuery()->getSingleResult();
+        } catch (\Exception $exception) {
+            $entity = null;
+        }
+
+        return $entity;
     }
 }
 

@@ -58,10 +58,10 @@ class InstallController extends CommonController
         $configurator = $this->container->get('mautic.configurator');
         $params       = $configurator->getParameters();
         $step         = $configurator->getStep($index);
+        $step         = $step[0];
         $action       = $this->generateUrl('mautic_installer_step', array('index' => $index));
 
-        /** @var \Symfony\Component\Form\Form $form */
-        $form = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
+        $form = $this->createForm($step->getFormType(), $step, array('action' => $action));
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         // Always pass the requirements into the templates
@@ -238,9 +238,10 @@ class InstallController extends CommonController
 
                     if ($index < $configurator->getStepCount()) {
                         $nextStep = $configurator->getStep($index);
+                        $nextStep = $nextStep[0];
                         $action   = $this->generateUrl('mautic_installer_step', array('index' => $index));
 
-                        $form = $this->container->get('form.factory')->create($nextStep->getFormType(), $nextStep, array('action' => $action));
+                        $form = $this->createForm($nextStep->getFormType(), $nextStep, array('action' => $action));
 
                         return $this->postActionRedirect(array(
                             'viewParameters'    => array(
@@ -884,8 +885,8 @@ class InstallController extends CommonController
         if (empty($entityManager)) {
             if (empty($dbParams)) {
                 $configurator = $this->container->get('mautic.configurator');
-                $dbStep       = new DoctrineStep($configurator->getParameters());
-                $dbParams     = (array)$dbStep;
+                $dbStep       = new DoctrineStep($configurator);
+                $dbParams     = (array) $dbStep;
 
                 $dbParams['dbname'] = $dbParams['name'];
                 unset($dbParams['name']);

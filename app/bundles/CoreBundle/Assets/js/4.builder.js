@@ -438,7 +438,7 @@ Mautic.insertBuilderLink = function () {
         if (!text) {
             text = url;
         }
-        token = token.replace(/%url(.*?)%/, url).replace(/%text(.*?)%/, text);
+        token = token.replace(/%url(.*?)%/g, url).replace(/%text(.*?)%/g, text);
         Mautic.insertBuilderEditorToken(editorId, token);
     }
 
