@@ -1609,6 +1609,12 @@ class LeadController extends FormController
                             );
                         } else {
                             $errors = $mailer->getErrors();
+
+                            if (isset($errors['failures'])) {
+                                $errors[] = $this->get('translator')->trans('mautic.lead.for.email', array('%emails%' => implode('<br />', $errors['failures'])));
+                                unset($errors['failures']);
+                            }
+
                             $form->addError(
                                 new FormError(
                                     $this->factory->getTranslator()->trans(
