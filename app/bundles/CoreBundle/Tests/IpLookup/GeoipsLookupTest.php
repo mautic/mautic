@@ -15,24 +15,37 @@ use Mautic\CoreBundle\IpLookup\GeoipsLookup;
 /**
  * Class GeoipsLookupTest
  *
- * Requires an API key so can't test an actual lookup
  */
-class GeoipsLookupTest extends IpLookup
+class GeoipsLookupTest extends \PHPUnit_Framework_TestCase
 {
-    public function testResponseHasNotAuthorized()
+    public function testIpLookupSuccessful()
     {
-        $url       = "http://api.geoips.com/ip/192.30.252.131/key/xxxx/output/json";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get($url);
+        // Mock http connector
+        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->assertContains('Not Authorized', $response->body);
-    }
+        // Mock a successful response
+        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
+            ->getMock();
+        $mockResponse->code = 200;
+        $mockResponse->body = '{"response": {"status": "Propper Request","message": "Success","notes": "The following results has been returned","code": "200_1","location": {"ip": "8.8.8.8","owner": "LEVEL 3 COMMUNICATIONS INC","continent_name": "NORTH AMERICA","continent_code": "NA","country_name": "UNITED STATES","country_code": "US","region_name": "CALIFORNIA","region_code": "CA","county_name": "SANTA CLARA","city_name": "MOUNTAIN VIEW","latitude": "37.3801","longitude": "-122.0865","timezone": "PST"},"languages": {"language": [{"alpha2_code": "EN","alpha3_code": "ENG","language_name": "ENGLISH","native_name": "ENGLISH"}]},"currencies": {"currency": [{"alpha_code": "USD","numeric_code": "840","currency_name": "US DOLLAR","currency_symbol": "$","fractional_unit": "CENT"}]},"unit_test": {"elapsed_time": "0.0609","memory_usage": "0.76MB"}}}';
 
-    public function testServiceInstantiated()
-    {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('geoips', 'xxxx');
+        $mockHttp->expects($this->once())
+            ->method('get')
+            ->willReturn($mockResponse);
 
-        $this->assertTrue($service instanceof GeoipsLookup);
+        $ipService = new GeoipsLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+
+        $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
+
+        $this->assertEquals('MOUNTAIN VIEW', $details['city']);
+        $this->assertEquals('CALIFORNIA', $details['region']);
+        $this->assertEquals('UNITED STATES', $details['country']);
+        $this->assertEquals('', $details['zipcode']);
+        $this->assertEquals('37.3801', $details['latitude']);
+        $this->assertEquals('-122.0865', $details['longitude']);
+        $this->assertEquals('PST', $details['timezone']);
+        $this->assertEquals('LEVEL 3 COMMUNICATIONS INC', $details['isp']);
     }
 }

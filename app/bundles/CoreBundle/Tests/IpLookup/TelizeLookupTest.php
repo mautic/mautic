@@ -9,36 +9,41 @@
 
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
-use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\IpLookup\TelizeLookup;
 
 /**
  * Class TelizeLookupTest
- *
- * Requires an API key restricted by IP so cannot test actual lookup
  */
-class TelizeLookupTest extends IpLookup
+class TelizeLookupTest extends \PHPUnit_Framework_TestCase
 {
-    public function testResponseHasInvalidMashapeKey()
+    public function testIpLookupSuccessful()
     {
-        $url       = "https://telize-v1.p.mashape.com/geoip/192.30.252.131";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get(
-            $url,
-            array(
-                "X-Mashape-Key" => 'xxxx',
-                "Accept"        => "application/json"
-            )
-        );
+        // Mock http connector
+        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->assertContains('Invalid Mashape Key', $response->body);
-    }
+        // Mock a successful response
+        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
+            ->getMock();
+        $mockResponse->code = 200;
+        $mockResponse->body = '{"offset": "-4","longitude": -77.4875,"city": "Ashburn","timezone": "America/New_York","latitude": 39.0437,"area_code": "0","region": "Virginia","dma_code": "0","organization": "AS14618 Amazon.com, Inc.","country": "United States","ip": "54.86.225.32","country_code3": "USA","postal_code": "20147","continent_code": "NA","country_code": "US","region_code": "VA"}';
 
-    public function testServiceInstantiated()
-    {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('telize', 'xxxx');
+        $mockHttp->expects($this->once())
+            ->method('get')
+            ->willReturn($mockResponse);
 
-        $this->assertTrue($service instanceof TelizeLookup);
+        $ipService = new TelizeLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+
+        $details = $ipService->setIpAddress('54.86.225.32')->getDetails();
+
+        $this->assertEquals('Ashburn', $details['city']);
+        $this->assertEquals('Virginia', $details['region']);
+        $this->assertEquals('United States', $details['country']);
+        $this->assertEquals('20147', $details['zipcode']);
+        $this->assertEquals('39.0437', $details['latitude']);
+        $this->assertEquals('-77.4875', $details['longitude']);
+        $this->assertEquals('America/New_York', $details['timezone']);
+        $this->assertEquals('AS14618 Amazon.com, Inc.', $details['organization']);
     }
 }

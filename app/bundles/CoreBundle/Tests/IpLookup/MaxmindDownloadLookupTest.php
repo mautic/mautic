@@ -9,24 +9,36 @@
 
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
+use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
+
 /**
  * Class MaxmindDownloadTest
  */
-class MaxmindDownloadLookupTest extends IpLookup
+class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
 {
     public function testDownloadDataStore()
     {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
+        // Keep the file contained to cache/test
+        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../cache/test');
 
-        /** @var \Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup $service */
-        $service = $ipFactory->getService('maxmind_download');
-        $result  = $service->downloadRemoteDataStore();
+        $result  = $ipService->downloadRemoteDataStore();
 
         $this->assertTrue($result);
     }
 
     public function testIpLookupSuccessful()
     {
-        $this->isIpLookupSuccessful('maxmind_download');
+        // Keep the file contained to cache/test
+        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../cache/test');
+
+        $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
+
+        $this->assertEquals('San Francisco', $details['city']);
+        $this->assertEquals('California', $details['region']);
+        $this->assertEquals('United States', $details['country']);
+        $this->assertEquals('', $details['zipcode']);
+        $this->assertEquals('37.7697', $details['latitude']);
+        $this->assertEquals('-122.3933', $details['longitude']);
+        $this->assertEquals('America/Los_Angeles', $details['timezone']);
     }
 }

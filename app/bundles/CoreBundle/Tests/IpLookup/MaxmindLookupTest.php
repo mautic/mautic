@@ -20,56 +20,185 @@ use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated
  */
-class MaxmindLookupTest extends IpLookup
+class MaxmindLookupTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCountryGetsResponseCode401()
-    {
-        $url       = "https://geoip.maxmind.com/geoip/v2.1/country/192.30.252.131";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get($url, array('Authorization' => 'Basic '.base64_encode('xxxx:xxxx')));
+    protected $mockHttp;
 
-        $this->assertEquals(401, $response->code);
+    public function setUp()
+    {
+        // Mock http connector
+        $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Mock a successful response
+        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
+            ->getMock();
+        $mockResponse->code = 200;
+        $mockResponse->body = <<<RESPONSE
+{
+  "city":  {
+      "confidence":  25,
+      "geoname_id": 54321,
+      "names":  {
+          "de":    "Los Angeles",
+          "en":    "Los Angeles",
+          "es":    "Los Ángeles",
+          "fr":    "Los Angeles",
+          "ja":    "ロサンゼルス市",
+          "pt-BR":  "Los Angeles",
+          "ru":    "Лос-Анджелес",
+          "zh-CN": "洛杉矶"
+      }
+  },
+  "continent":  {
+      "code":       "NA",
+      "geoname_id": 123456,
+      "names":  {
+          "de":    "Nordamerika",
+          "en":    "North America",
+          "es":    "América del Norte",
+          "fr":    "Amérique du Nord",
+          "ja":    "北アメリカ",
+          "pt-BR": "América do Norte",
+          "ru":    "Северная Америка",
+          "zh-CN": "北美洲"
+
+      }
+  },
+  "country":  {
+      "confidence":  75,
+      "geoname_id":  6252001,
+      "iso_code":    "US",
+      "names":  {
+          "de":     "USA",
+          "en":     "United States",
+          "es":     "Estados Unidos",
+          "fr":     "États-Unis",
+          "ja":     "アメリカ合衆国",
+          "pt-BR":  "Estados Unidos",
+          "ru":     "США",
+          "zh-CN":  "美国"
+      }
+  },
+  "location":  {
+      "accuracy_radius":     20,
+      "average_income":      128321,
+      "latitude":            37.6293,
+      "longitude":           -122.1163,
+      "metro_code":          807,
+      "population_density":  7122,
+      "time_zone":           "America/Los_Angeles"
+  },
+  "postal": {
+      "code":       "90001",
+      "confidence": 10
+  },
+  "registered_country":  {
+      "geoname_id":  6252001,
+      "iso_code":    "US",
+      "names":  {
+          "de":     "USA",
+          "en":     "United States",
+          "es":     "Estados Unidos",
+          "fr":     "États-Unis",
+          "ja":     "アメリカ合衆国",
+          "pt-BR":  "Estados Unidos",
+          "ru":     "США",
+          "zh-CN":  "美国"
+      }
+  },
+  "represented_country":  {
+      "geoname_id":  6252001,
+      "iso_code":    "US",
+      "names":  {
+          "de":     "USA",
+          "en":     "United States",
+          "es":     "Estados Unidos",
+          "fr":     "États-Unis",
+          "ja":     "アメリカ合衆国",
+          "pt-BR":  "Estados Unidos",
+          "ru":     "США",
+          "zh-CN":  "美国"
+      },
+      "type": "military"
+  },
+  "subdivisions":  [
+      {
+          "confidence":  50,
+          "geoname_id":  5332921,
+          "iso_code":    "CA",
+          "names":  {
+              "de":    "Kalifornien",
+              "en":    "California",
+              "es":    "California",
+              "fr":    "Californie",
+              "ja":    "カリフォルニア",
+              "ru":    "Калифорния",
+              "zh-CN": "加州"
+          }
+      }
+  ],
+  "traits": {
+      "autonomous_system_number":      1239,
+      "autonomous_system_organization": "Linkem IR WiMax Network",
+      "domain":                        "example.com",
+      "is_anonymous_proxy":            true,
+      "is_satellite_provider":         true,
+      "isp":                           "Linkem spa",
+      "ip_address":                    "1.2.3.4",
+      "organization":                  "Linkem IR WiMax Network",
+      "user_type":                     "traveler"
+  },
+  "maxmind": {
+      "queries_remaining":            54321
+  }
+}
+RESPONSE;
+
+        $this->mockHttp->expects($this->once())
+            ->method('get')
+            ->willReturn($mockResponse);
+
     }
 
-    public function testCountryServiceInstantiated()
+    public function testCountryIpLookupSuccessful()
     {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('maxmind_country', 'xxxx:xxxx');
+        $ipService = new MaxmindCountryLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
 
-        $this->assertTrue($service instanceof MaxmindCountryLookup);
+        $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
+
+        $this->checkDetails($details);
     }
 
-    public function testPrecisionGetsResponseCode401()
+    public function testOmniIpLookupSuccessful()
     {
-        $url       = "https://geoip.maxmind.com/geoip/v2.1/city/192.30.252.131";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get($url, array('Authorization' => 'Basic '.base64_encode('xxxx:xxxx')));
+        $ipService = new MaxmindOmniLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
 
-        $this->assertEquals(401, $response->code);
+        $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
+
+        $this->checkDetails($details);
     }
 
-    public function testPrecisionServiceInstantiated()
+    public function testPrecisionIpLookupSuccessful()
     {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('maxmind_precision', 'xxxx:xxxx');
+        $ipService = new MaxmindPrecisionLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
 
-        $this->assertTrue($service instanceof MaxmindPrecisionLookup);
+        $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
+
+        $this->checkDetails($details);
     }
 
-    public function testOmniGetsResponseCode401()
+    private function checkDetails($details)
     {
-        $url       = "https://geoip.maxmind.com/geoip/v2.1/insights/192.30.252.131";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get($url, array('Authorization' => 'Basic '.base64_encode('xxxx:xxxx')));
-
-        $this->assertEquals(401, $response->code);
-    }
-
-    public function testOmniServiceInstantiated()
-    {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('maxmind_omni', 'xxxx:xxxx');
-
-        $this->assertTrue($service instanceof MaxmindOmniLookup);
+        $this->assertEquals('Los Angeles', $details['city']);
+        $this->assertEquals('California', $details['region']);
+        $this->assertEquals('United States', $details['country']);
+        $this->assertEquals('90001', $details['zipcode']);
+        $this->assertEquals('37.6293', $details['latitude']);
+        $this->assertEquals('-122.1163', $details['longitude']);
+        $this->assertEquals('America/Los_Angeles', $details['timezone']);
+        $this->assertEquals('Linkem spa', $details['isp']);
+        $this->assertEquals('Linkem IR WiMax Network', $details['organization']);
     }
 }

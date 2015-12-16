@@ -9,30 +9,40 @@
 
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
-use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\IpLookup\IpinfodbLookup;
 
 /**
  * Class IpinfodbLookupTest
- *
- * Requires an API key restricted by IP so cannot test actual lookup
  */
-class IpinfodbLookupTest extends IpLookup
+class IpinfodbLookupTest extends \PHPUnit_Framework_TestCase
 {
-    public function testResponseHasInvalidApiKey()
+    public function testIpLookupSuccessful()
     {
-        $url       = "http://api.ipinfodb.com/v3/ip-city/?key=xxxx&format=json&ip=192.30.252.131";
-        $connector = HttpFactory::getHttp();
-        $response  = $connector->get($url);
+        // Mock http connector
+        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->assertContains('Invalid API key', $response->body);
-    }
+        // Mock a successful response
+        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
+            ->getMock();
+        $mockResponse->code = 200;
+        $mockResponse->body = '{"statusCode" : "OK","statusMessage" : "","ipAddress" : "192.30.252.131","countryCode" : "US","countryName" : "United States","regionName" : "California","cityName" : "San Francisco","zipCode" : "94107","latitude" : "37.7757","longitude" : "-122.395","timeZone" : "-08:00"}';
 
-    public function testServiceInstantiated()
-    {
-        $ipFactory = $this->container->get('mautic.ip_lookup.factory');
-        $service   = $ipFactory->getService('ipinfodb', 'xxxx');
+        $mockHttp->expects($this->once())
+            ->method('get')
+            ->willReturn($mockResponse);
 
-        $this->assertTrue($service instanceof IpinfodbLookup);
+        $ipService = new IpinfodbLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+
+        $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
+
+        $this->assertEquals('San Francisco', $details['city']);
+        $this->assertEquals('California', $details['region']);
+        $this->assertEquals('United States', $details['country']);
+        $this->assertEquals('94107', $details['zipcode']);
+        $this->assertEquals('37.7757', $details['latitude']);
+        $this->assertEquals('-122.395', $details['longitude']);
+        $this->assertEquals('-08:00', $details['timezone']);
     }
 }
