@@ -94,6 +94,8 @@ abstract class AbstractIpLookup
     public function setIpAddress($ip)
     {
         $this->ip = $ip;
+
+        return $this;
     }
 
     /**
