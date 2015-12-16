@@ -7,8 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\IpLookup;
+namespace Mautic\CoreBundle\Tests\IpLookup\BC;
 
+use Mautic\CoreBundle\IpLookup\AbstractIpLookup;
 
 class FreegeoipIpLookup extends AbstractIpLookup
 {
