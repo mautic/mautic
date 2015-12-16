@@ -651,7 +651,6 @@ class MauticFactory
             $ip = '127.0.0.1';
         }
 
-        $ip = '98.195.100.176';
         if (empty($ipAddress[$ip])) {
             $repo      = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
