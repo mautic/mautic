@@ -44,6 +44,12 @@ class FreegeoipLookup extends AbstractRemoteDataLookup
                     case 'country_name':
                         $key = 'country';
                         break;
+                    case 'zip_code':
+                        $key = 'zipcode';
+                        break;
+                    case 'time_zone':
+                        $key = 'timezone';
+                        break;
                 }
 
                 $this->$key = $value;

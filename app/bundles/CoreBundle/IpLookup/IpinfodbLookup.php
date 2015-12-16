@@ -47,6 +47,12 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
                     case 'countryName':
                         $key = 'country';
                         break;
+                    case 'zipCode':
+                        $key = 'zipcode';
+                        break;
+                    case 'timeZone':
+                        $key = 'timezone';
+                        break;
                 }
 
                 $this->$key = ucfirst($value);
