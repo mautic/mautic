@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4390caeda9a487703e78a37b245e3b63",
+    "hash": "f9417ec51fb77dd27d494cbf568726c8",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2834,17 +2834,17 @@
         },
         {
             "name": "symfony/doctrine-bridge",
-            "version": "v2.5.10",
+            "version": "v2.6.11",
             "target-dir": "Symfony/Bridge/Doctrine",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-bridge.git",
-                "reference": "d6a2d571b8521ec5036fa77b815c864e16b99752"
+                "reference": "7eba724851776d766e085019ff72cbaf665ebbed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/d6a2d571b8521ec5036fa77b815c864e16b99752",
-                "reference": "d6a2d571b8521ec5036fa77b815c864e16b99752",
+                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/7eba724851776d766e085019ff72cbaf665ebbed",
+                "reference": "7eba724851776d766e085019ff72cbaf665ebbed",
                 "shasum": ""
             },
             "require": {
@@ -2859,6 +2859,7 @@
                 "symfony/expression-language": "~2.2",
                 "symfony/form": "~2.3,>=2.3.8",
                 "symfony/http-kernel": "~2.2",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/property-access": "~2.3",
                 "symfony/security": "~2.2",
                 "symfony/stopwatch": "~2.2",
@@ -2875,7 +2876,7 @@
             "type": "symfony-bridge",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -2889,17 +2890,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Doctrine Bridge",
-            "homepage": "http://symfony.com",
-            "time": "2015-02-01 09:36:16"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-09 16:02:48"
         },
         {
             "name": "symfony/event-dispatcher",
