@@ -142,8 +142,22 @@ return array(
             ),
             'mautic.form.type.coreconfig'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => array(
+                    'translator',
+                    'mautic.helper.language',
+                    'mautic.ip_lookup',
+                    '%mautic.supported_languages%',
+                    '%mautic.ip_lookup_services%'
+                ),
                 'alias'     => 'coreconfig'
+            ),
+            'mautic.form.type.coreconfig.iplookup_download_data_store_button' => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType',
+                'alias'     => 'iplookup_download_data_store_button',
+                'arguments' => array(
+                    'mautic.helper.template.date',
+                    'translator'
+                )
             ),
             'mautic.form.type.theme_list'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
@@ -331,6 +345,25 @@ return array(
                 'tag'     => 'knp_menu.menu',
                 'alias'   => 'admin',
             ),
+            // IP Lookup
+            'mautic.ip_lookup.factory' => array(
+                'class'     => 'Mautic\CoreBundle\Factory\IpLookupFactory',
+                'arguments' => array(
+                    '%mautic.ip_lookup_services%',
+                    'monolog.logger.mautic',
+                    '%kernel.cache_dir%'
+                )
+            ),
+            'mautic.ip_lookup' => array(
+                'class'     => 'Mautic\CoreBundle\IpLookup\AbstractLookup', // bogus just to make cache compilation happy
+                'factory'   => array('@mautic.ip_lookup.factory', 'getService'),
+                'arguments' => array(
+                    '%mautic.ip_lookup_service%',
+                    '%mautic.ip_lookup_auth%',
+                    '%mautic.ip_lookup_config%',
+                )
+            ),
+            // Other
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
         )
@@ -338,36 +371,40 @@ return array(
 
     'ip_lookup_services' => array(
         'freegeoip' => array(
-            'display_name' => 'freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipIpLookup'
+            'display_name' => 'Freegeoip.net',
+            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup'
         ),
         'geobytes' => array(
             'display_name' => 'Geobytes',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesLookup'
         ),
         'geoips' => array(
             'display_name' => 'GeoIPs',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsLookup'
         ),
         'ipinfodb' => array(
             'display_name' => 'IPInfoDB',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbLookup'
         ),
         'maxmind_country' => array(
             'display_name' => 'MaxMind - Country Geolocation',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryLookup'
         ),
         'maxmind_omni' => array(
             'display_name' => 'MaxMind - Insights (formerly Omni)',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniLookup'
         ),
         'maxmind_precision' => array(
             'display_name' => 'MaxMind - GeoIP2 Precision',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup'
+        ),
+        'maxmind_download' => array(
+            'display_name' => 'MaxMind - GeoIP2 City Download',
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup'
         ),
         'telize' => array(
             'display_name' => 'Telize',
-            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup'
         )
     ),
 
@@ -400,8 +437,9 @@ return array(
         'date_format_short'              => 'D, M d',
         'date_format_dateonly'           => 'F j, Y',
         'date_format_timeonly'           => 'g:i a',
-        'ip_lookup_service'              => 'telize',
+        'ip_lookup_service'              => 'maxmind_download',
         'ip_lookup_auth'                 => '',
+        'ip_lookup_config'               => array(),
         'transifex_username'             => '',
         'transifex_password'             => '',
         'update_stability'               => 'stable',
