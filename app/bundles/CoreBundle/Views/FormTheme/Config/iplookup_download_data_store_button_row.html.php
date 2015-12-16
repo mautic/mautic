@@ -17,4 +17,3 @@
         <div class="col-md-9 help-block"></div>
     </div>
 </div>
-<?php echo $view['form']->row($form['test']); ?>
