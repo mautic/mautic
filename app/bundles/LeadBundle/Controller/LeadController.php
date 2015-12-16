@@ -1614,7 +1614,6 @@ class LeadController extends FormController
                             );
                         } else {
                             $errors = $mailer->getErrors();
-                            unset($errors['failures']);
 
                             $form->addError(
                                 new FormError(
