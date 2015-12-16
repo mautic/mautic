@@ -183,11 +183,11 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 ### Install the latest GitHub version
 
 1. Open a Terminal/Console window.
-2. Change directory (`cd`) to the server root.
-3. Clone the repository (`git@github.com:mautic/mautic.git`)
-4. The **mautic** directory should appear in the server root. Change directory to mautic directory.
+2. Change directory to the server root (i.e. `cd /var/www` if your local server root is at /var/www).
+3. Clone the repository (`git clone https://github.com/mautic/mautic.git`)
+4. The **mautic** directory should appear in the server root. Change directory to mautic directory (`cd mautic`).
 5. Install dependencies (`composer install`).
-6. Visit Mautic in a browser (probably in http//localhost/mautic) and follow installation steps.
+6. Visit Mautic in a browser (probably at http//localhost/mautic) and follow installation steps.
 
 ### Test a pull request (PR)
 
