@@ -10,8 +10,16 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 
-class GeoipsIpLookup extends AbstractIpLookup
+class GeoipsLookup extends AbstractRemoteDataLookup
 {
+    /**
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return '<a href="http://www.geoips.com/" target="_blank">GeoIPs</a> offers tiered subscriptions for lookups.';
+    }
+
     /**
      * @return string
      */
@@ -23,7 +31,7 @@ class GeoipsIpLookup extends AbstractIpLookup
     /**
      * @param $response
      */
-    public function parseData($response)
+    protected function parseResponse($response)
     {
         $data = json_decode($response);
 
