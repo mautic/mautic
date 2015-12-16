@@ -377,7 +377,7 @@ return array(
             // Other
             'mautic.http.connector' => array(
                 'class'   => 'Joomla\Http\Http',
-                'factory' => array("@joomla.http.factory", 'getHttp')
+                'factory' => array('Joomla\Http\HttpFactory', 'getHttp')
             ),
 
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
