@@ -104,6 +104,7 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>', array('ipLookupAttribution' => $ipLookupAttribution)); ?>
         </div>
 
         <?php if (isset($fields['transifex_username'])): ?>

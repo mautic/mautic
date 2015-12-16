@@ -18,18 +18,19 @@ use Symfony\Component\Form\FormView;
  */
 class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper
 {
-
     /**
      * Render widget if it exists
      *
-     * @param array|FormView $form
-     * @param                $key
+     * @param       $form
+     * @param       $key
+     * @param null  $template
+     * @param array $variables
      *
-     * @return string
+     * @return mixed|string
      */
-    public function widgetIfExists ($form, $key, $template = null)
+    public function widgetIfExists ($form, $key, $template = null, $variables = array())
     {
-        $content = (isset($form[$key])) ? $this->widget($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->widget($form[$key], $variables) : '';
 
         if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);
@@ -41,14 +42,16 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Render row if it exists
      *
-     * @param array|FormView $form
-     * @param                $key
+     * @param       $form
+     * @param       $key
+     * @param null  $template
+     * @param array $variables
      *
-     * @return string
+     * @return mixed|string
      */
-    public function rowIfExists ($form, $key, $template = null)
+    public function rowIfExists ($form, $key, $template = null, $variables = array())
     {
-        $content = (isset($form[$key])) ? $this->row($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->row($form[$key], $variables) : '';
 
         if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);
@@ -60,14 +63,16 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Render label if it exists
      *
-     * @param array|FormView $form
-     * @param                $key
+     * @param       $form
+     * @param       $key
+     * @param null  $template
+     * @param array $variables
      *
-     * @return string
+     * @return mixed|string
      */
-    public function labelIfExists ($form, $key, $template = null)
+    public function labelIfExists ($form, $key, $template = null, $variables = array())
     {
-        $content = (isset($form[$key])) ? $this->label($form[$key]) : '';
+        $content = (isset($form[$key])) ? $this->label($form[$key], null, $variables) : '';
 
         if ($content && !empty($template)) {
             $content = str_replace('{content}', $content, $template);

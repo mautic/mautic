@@ -12,10 +12,15 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,15 +30,60 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ConfigType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
-     * @var MauticFactory
+     * @var LanguageHelper
      */
-    private $factory;
+    private $langHelper;
 
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    /**
+     * @var array
+     */
+    private $ipLookupChoices;
+
+    /**
+     * @var array
+     */
+    private $supportedLanguages;
+
+    /**
+     * @var AbstractLookup
+     */
+    private $ipLookup;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param LanguageHelper      $langHelper
+     * @param AbstractLookup    $ipLookup
+     * @param array               $supportedLanguages
+     * @param array               $ipLookupServices
+     */
+    public function __construct(
+        TranslatorInterface $translator,
+        LanguageHelper $langHelper,
+        AbstractLookup $ipLookup,
+        array $supportedLanguages,
+        array $ipLookupServices
+    ) {
+        $this->translator         = $translator;
+        $this->langHelper         = $langHelper;
+        $this->ipLookup           = $ipLookup;
+        $this->supportedLanguages = $supportedLanguages;
+
+        $choices = array();
+        foreach ($ipLookupServices as $name => $service) {
+            $choices[$name] = $service['display_name'];
+        }
+
+        natcasesort($choices);
+
+        $this->ipLookupChoices = $choices;
     }
 
     /**
@@ -71,7 +121,7 @@ class ConfigType extends AbstractType
                 'attr'        => array(
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.webroot.tooltip',
-                    'data-placeholder' => $this->factory->getTranslator()->trans('mautic.core.config.form.webroot.dashboard')
+                    'data-placeholder' => $this->translator->trans('mautic.core.config.form.webroot.dashboard')
                 ),
                 'multiple'    => false,
                 'empty_value' => '',
@@ -152,16 +202,14 @@ class ConfigType extends AbstractType
         );
 
         // Get the list of available languages
-        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-        $languageHelper = $this->factory->getHelper('language');
-        $languages      = $languageHelper->fetchLanguages(false, false);
-        $langChoices    = array();
+        $languages   = $this->langHelper->fetchLanguages(false, false);
+        $langChoices = array();
 
         foreach ($languages as $code => $langData) {
             $langChoices[$code] = $langData['name'];
         }
 
-        $langChoices = array_merge($langChoices, $this->factory->getParameter('supported_languages'));
+        $langChoices = array_merge($langChoices, $this->supportedLanguages);
 
         // Alpha sort the languages by name
         asort($langChoices);
@@ -428,25 +476,11 @@ class ConfigType extends AbstractType
             )
         );
 
-        // Search for IP Services
-        $bundles = $this->factory->getMauticBundles(true);
-        $choices = array();
-
-        foreach ($bundles as $bundle) {
-            if (isset($bundle['config']['ip_lookup_services'])) {
-                foreach ($bundle['config']['ip_lookup_services'] as $service => $details) {
-                    $choices[$service] = $details['display_name'];
-                }
-            }
-        }
-
-        natcasesort($choices);
-
         $builder->add(
             'ip_lookup_service',
             'choice',
             array(
-                'choices'    => $choices,
+                'choices'    => $this->ipLookupChoices,
                 'label'      => 'mautic.core.config.form.ip.lookup.service',
                 'label_attr' => array(
                     'class' => 'control-label'
@@ -472,6 +506,17 @@ class ConfigType extends AbstractType
                 'required'   => false
             )
         );
+
+        if ($this->ipLookup instanceof IpLookupFormInterface && $formType = $this->ipLookup->getConfigFormService()) {
+            $builder->add(
+                'ip_lookup_config',
+                $formType,
+                array(
+                    'label'             => false,
+                    'ip_lookup_service' => $this->ipLookup
+                )
+            );
+        }
 
         $builder->add(
             'transifex_username',
@@ -583,6 +628,14 @@ class ConfigType extends AbstractType
                 )
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
     /**
