@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Joomla\Http\Http;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Psr\Log\LoggerInterface;
 
@@ -30,17 +31,24 @@ class IpLookupFactory
     protected $lookupServices;
 
     /**
+     * @var Http|null
+     */
+    protected $httpConnector;
+
+    /**
      * IpLookupFactory constructor.
      *
      * @param array                $lookupServices
      * @param LoggerInterface|null $logger
+     * @param Http|null            $httpConnector
      * @param null                 $cacheDir
      */
-    public function __construct(array $lookupServices, LoggerInterface $logger = null, $cacheDir = null)
+    public function __construct(array $lookupServices, LoggerInterface $logger = null, Http $httpConnector = null, $cacheDir = null)
     {
         $this->lookupServices = $lookupServices;
         $this->logger         = $logger;
         $this->cacheDir       = $cacheDir;
+        $this->httpConnector  = $httpConnector;
     }
 
     /**
@@ -77,7 +85,8 @@ class IpLookupFactory
                     $auth,
                     $ipLookupConfig,
                     $this->cacheDir,
-                    $this->logger
+                    $this->logger,
+                    $this->httpConnector
                 );
             }
         }

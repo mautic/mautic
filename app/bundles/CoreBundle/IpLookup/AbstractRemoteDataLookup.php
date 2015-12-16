@@ -18,13 +18,6 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
     /**
-     * Connector to obtain data from IP service
-     *
-     * @var Http
-     */
-    protected $connector;
-
-    /**
      * Method to use when communicating with the service
      *
      * @var string
@@ -44,21 +37,6 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
      * @return mixed
      */
     abstract protected function parseResponse($response);
-
-    /**
-     * AbstractRemoteDataLookup constructor.
-     *
-     * @param null                 $auth
-     * @param null                 $ipLookupConfig
-     * @param null                 $cacheDir
-     * @param LoggerInterface|null $logger
-     */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null)
-    {
-        $this->connector = HttpFactory::getHttp();
-
-        parent::__construct($auth, $ipLookupConfig, $cacheDir, $logger);
-    }
 
     /**
      * @return array

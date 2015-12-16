@@ -360,6 +360,7 @@ return array(
                 'arguments' => array(
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
+                    'mautic.http.connector',
                     '%kernel.cache_dir%'
                 )
             ),
@@ -370,9 +371,15 @@ return array(
                     '%mautic.ip_lookup_service%',
                     '%mautic.ip_lookup_auth%',
                     '%mautic.ip_lookup_config%',
+                    'mautic.http.connector'
                 )
             ),
             // Other
+            'mautic.http.connector' => array(
+                'class'   => 'Joomla\Http\Http',
+                'factory' => array("@joomla.http.factory", 'getHttp')
+            ),
+
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
         )

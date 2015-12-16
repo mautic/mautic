@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use Joomla\Http\Http;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
@@ -70,13 +71,15 @@ abstract class AbstractLookup
      * @param null                 $ipLookupConfig
      * @param null                 $cacheDir
      * @param LoggerInterface|null $logger
+     * @param Http|null            $httpConnector
      */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null)
+    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null)
     {
         $this->cacheDir  = $cacheDir;
         $this->logger    = $logger;
         $this->auth      = $auth;
         $this->config    = $ipLookupConfig;
+        $this->connector = $httpConnector;
     }
 
     /**
