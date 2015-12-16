@@ -145,6 +145,7 @@ return array(
                 'arguments' => array(
                     'translator',
                     'mautic.helper.language',
+                    'mautic.ip_lookup.factory',
                     'mautic.ip_lookup',
                     '%mautic.supported_languages%',
                     '%mautic.ip_lookup_services%'

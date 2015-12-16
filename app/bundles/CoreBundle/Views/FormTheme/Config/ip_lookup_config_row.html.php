@@ -7,10 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="row">
-<?php foreach ($form as $child): ?>
-    <div class="col-sm-6">
-        <?php echo $view['form']->row($child); ?>
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="form-group col-xs-12 ">
+            <?php echo $view['form']->row($form); ?>
+        </div>
     </div>
-<?php endforeach; ?>
 </div>

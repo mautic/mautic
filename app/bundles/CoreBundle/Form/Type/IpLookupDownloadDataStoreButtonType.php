@@ -41,7 +41,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         $localDataExists = file_exists($localFilePath);
         $attr = array(
             'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
-            'onclick' => 'Mautic.FetchIpDataStore()',
+            'onclick' => 'Mautic.downloadIpLookupDataStore()',
         );
         if ($localDataExists && $lastModifiedTimestamp = filemtime($localFilePath)) {
             $lastModified         = $this->dateHelper->toText($lastModifiedTimestamp, 'UTC', 'U');
