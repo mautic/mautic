@@ -651,6 +651,7 @@ class MauticFactory
             $ip = '127.0.0.1';
         }
 
+        $ip = '98.195.100.176';
         if (empty($ipAddress[$ip])) {
             $repo      = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
@@ -676,37 +677,19 @@ class MauticFactory
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && empty($details['city']))  {
                 // Get the IP lookup service
-                if ($ipService = $this->getParameter('ip_lookup_service')) {
-                    // Find the service class
-                    $bundles = $this->getMauticBundles(true);
 
-                    foreach ($bundles as $bundle) {
-                        if (!empty($bundle['config']['ip_lookup_services'][$ipService])) {
-                            $class = $bundle['config']['ip_lookup_services'][$ipService]['class'];
-                            if (substr($class, 0, 1) !== '\\') {
-                                $class = '\\' . $class;
-                            }
+                // Fetch the data
+                /** @var \Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup */
+                $ipLookup = $this->container->get('mautic.ip_lookup');
 
-                            /** @var \Mautic\CoreBundle\IpLookup\AbstractIpLookup $lookupClass */
-                            $lookupClass = new $class($ip, $this->getParameter('ip_lookup_auth'), $this->getLogger());
+                if ($ipLookup) {
+                    $details = $ipLookup->setIpAddress($ip)
+                        ->getDetails();
 
-                            // Fetch the data
-                            $lookupClass->getData();
+                    $ipAddress->setIpDetails($details);
 
-                            // Get and set the details
-                            $details = get_object_vars($lookupClass);
-                            $ipAddress->setIpDetails($details);
-
-                            // Save new details
-                            $saveIp = true;
-
-                            unset($lookupClass);
-
-                            break;
-                        }
-                    }
-
-                    unset($bundles);
+                    // Save new details
+                    $saveIp = true;
                 }
             }
 
