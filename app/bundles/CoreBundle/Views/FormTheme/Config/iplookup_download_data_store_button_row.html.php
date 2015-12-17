@@ -13,6 +13,9 @@
         <div id="iplookup_fetch_button_container">
             <?php echo $view['form']->widget($form['fetch_button']); ?>
             <span class="fa fa-spinner fa-spin hide"></span>
+            <?php if (isset($ipDataStoreLastDownloaded)): ?>
+            <div class="small text-muted"><?php echo $ipDataStoreLastDownloaded; ?></div>
+            <?php endif; ?>
         </div>
         <div class="col-md-9 help-block"></div>
     </div>

@@ -8,10 +8,13 @@
  */
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
@@ -37,24 +40,17 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $localFilePath   = $options['ip_lookup_service']->getLocalDataStoreFilepath();
-        $localDataExists = file_exists($localFilePath);
-        $attr = array(
-            'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
-            'onclick' => 'Mautic.downloadIpLookupDataStore()',
-        );
-        if ($localDataExists && $lastModifiedTimestamp = filemtime($localFilePath)) {
-            $lastModified         = $this->dateHelper->toText($lastModifiedTimestamp, 'UTC', 'U');
-            $attr['title']        = $this->translator->trans('mautic.core.ip_lookup.last_updated', array ('%date%' => $lastModified));
-            $attr['data-toggle']  = 'tooltip';
-        }
+        $localDataExists = file_exists($options['ip_lookup_service']->getLocalDataStoreFilepath());
 
         $builder->add(
             'fetch_button',
             'button',
             array(
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
-                'attr' => $attr
+                'attr' => array(
+                    'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
+                    'onclick' => 'Mautic.downloadIpLookupDataStore()',
+                )
             )
         );
     }
@@ -67,6 +63,25 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         $resolver->setDefaults(array(
             'ip_lookup_service' => null
         ));
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        if (null !== $options['ip_lookup_service'] && $options['ip_lookup_service'] instanceof AbstractLocalDataLookup) {
+            $localFilePath   = $options['ip_lookup_service']->getLocalDataStoreFilepath();
+            $localDataExists = file_exists($localFilePath);
+            if ($localDataExists && $lastModifiedTimestamp = filemtime($localFilePath)) {
+                $lastModified                            = $this->dateHelper->toText($lastModifiedTimestamp, 'UTC', 'U');
+                $view->vars['ipDataStoreLastDownloaded'] = $this->translator->trans(
+                    'mautic.core.ip_lookup.last_updated',
+                    array('%date%' => $lastModified)
+                );
+            }
+        }
     }
 
     public function getName()
