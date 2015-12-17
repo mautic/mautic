@@ -805,9 +805,10 @@ class EmailModel extends FormModel
         if (empty($emailSettings[$email->getId()])) {
 
             //used to house slots so they don't have to be fetched over and over for same template
-            $slots            = array();
-            $template         = $email->getTemplate();
-            $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+            $slots = array();
+            if ($template = $email->getTemplate()) {
+                $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+            }
 
             //store the settings of all the variants in order to properly disperse the emails
             //set the parent's settings
@@ -831,12 +832,14 @@ class EmailModel extends FormModel
 
                     foreach ($childrenVariant as $id => $child) {
                         if ($child->isPublished()) {
-                            $template = $child->getTemplate();
-                            if (isset($slots[$template])) {
-                                $useSlots = $slots[$template];
-                            } else {
-                                $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
-                                $useSlots         = $slots[$template];
+                            $useSlots = array();
+                            if ($template = $child->getTemplate()) {
+                                if (isset($slots[$template])) {
+                                    $useSlots = $slots[$template];
+                                } else {
+                                    $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+                                    $useSlots         = $slots[$template];
+                                }
                             }
                             $variantSettings = $child->getVariantSettings();
 
