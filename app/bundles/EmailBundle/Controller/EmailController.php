@@ -656,7 +656,6 @@ class EmailController extends FormController
         //Create the form
         $action = $this->generateUrl('mautic_email_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
-        // ThaoPV added: RMM 24
         $updateSelect = ($method == 'POST')
             ? $this->request->request->get('emailform[updateSelect]', false, true)
             : $this->request->get(
@@ -729,7 +728,6 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            // ThaoPV added: RMM 24
             $passthrough = array(
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email'

@@ -51,7 +51,7 @@ class EmailSendType extends AbstractType
                 )
             )
         ));
-        // file_put_contents('C:\log.txt', (string) $options['update_select']);
+
         if (!empty($options['update_select'])) {
             $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
                 'objectAction' => 'new',
