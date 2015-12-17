@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f9417ec51fb77dd27d494cbf568726c8",
+    "hash": "be81e6f8a105f6055d92d9c56681c3ed",
+    "content-hash": "373ec25828ad5d4eb58a20d331b54bda",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -881,7 +882,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/68cc7bf629a7c1fc0696e583cc8ed46f897d0afb",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/a2004df429fa23410cb186b51295d9af14c8f3bf",
                 "reference": "65978aa4e9ffca3bb632225ad8c6320077d80d85",
                 "shasum": ""
             },
@@ -1612,7 +1613,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/a63cd330588eff18f6deb0251fd142d2c1fe30b6",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/3e396c980545350c2efb65a50041d2a9f9d6562e",
                 "reference": "c49628cfc8b8ce7404665b4e6528487d780e7d68",
                 "shasum": ""
             },
@@ -1724,16 +1725,16 @@
         },
         {
             "name": "joomla/http",
-            "version": "1.1.7",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/http.git",
-                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1"
+                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
-                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/3b667b4dea6b022fedb296c4e88be3de38fd0327",
+                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327",
                 "shasum": ""
             },
             "require": {
@@ -1771,7 +1772,7 @@
                 "http",
                 "joomla"
             ],
-            "time": "2015-05-03 16:09:17"
+            "time": "2015-12-17 22:53:23"
         },
         {
             "name": "joomla/uri",
@@ -1904,7 +1905,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenu/zipball/c6ad49933babd06a27b2f962a3469601ec9038b8",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenu/zipball/18253a4467d60614735321387f250b0bc7b0ecad",
                 "reference": "c40075bea26f63dd5b81ca5b3cdd2b54d38e811f",
                 "shasum": ""
             },
@@ -1968,7 +1969,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/a07920b10a3b888abe7c47c7aecf56f69553f707",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/ff3434782588fa371adf8361f5d2e9fd162d5508",
                 "reference": "2a2e1295c8f39f39875343934af159957bcdcc06",
                 "shasum": ""
             },
@@ -3067,12 +3068,12 @@
             "target-dir": "Symfony/Component/Form",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Form.git",
+                "url": "https://github.com/symfony/form.git",
                 "reference": "acb7cfad1be8fac877eb54d77a65bd20eabd3e21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Form/zipball/acb7cfad1be8fac877eb54d77a65bd20eabd3e21",
+                "url": "https://api.github.com/repos/symfony/form/zipball/acb7cfad1be8fac877eb54d77a65bd20eabd3e21",
                 "reference": "acb7cfad1be8fac877eb54d77a65bd20eabd3e21",
                 "shasum": ""
             },
@@ -4516,7 +4517,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/a824aeda55a370ba21740a6464eed38c93f06dd0",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/16b482be089256f31dbb25feea8d6cfa043ad3b2",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },
