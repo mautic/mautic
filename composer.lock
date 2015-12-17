@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8a5f389c4f311cfd19aa9ab33de012fe",
-    "content-hash": "e11f5b56c64f21b044fb36e0557b536e",
+    "hash": "e139f3f93a03bd0241fad2c2c1c9ee0b",
+    "content-hash": "1b02979d056dd304e14ae6503fc3530b",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -882,7 +882,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/57e50714fcb34235cf055edc409e169b8d7af690",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/80792f4e496659bb0f93488a2b4b7a8935b721cb",
                 "reference": "65978aa4e9ffca3bb632225ad8c6320077d80d85",
                 "shasum": ""
             },
@@ -4712,7 +4712,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/366d1f45aa4273f961f94e16ab51fff78304cf9e",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/16b482be089256f31dbb25feea8d6cfa043ad3b2",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },
