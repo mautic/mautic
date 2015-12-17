@@ -285,7 +285,11 @@ class LeadListRepository extends CommonRepository
                 $parameters = array();
                 $expr       = $this->getListFilterExpr($filters, $parameters, $q, false);
                 foreach ($parameters as $k => $v) {
-                    $q->setParameter($k, $v);
+                    if (is_bool($v)) {
+                        $q->setParameter($k, $v, 'boolean');
+                    } else {
+                        $q->setParameter($k, $v);
+                    }
                 }
 
                 if ($countOnly) {
