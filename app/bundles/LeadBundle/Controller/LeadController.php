@@ -1608,6 +1608,12 @@ class LeadController extends FormController
                             );
                         } else {
                             $errors = $mailer->getErrors();
+
+                            // Unset the array of failed email addresses
+                            if (isset($errors['failures'])) {
+                                unset($errors['failures']);
+                            }
+
                             $form->addError(
                                 new FormError(
                                     $this->factory->getTranslator()->trans(
