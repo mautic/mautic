@@ -213,6 +213,10 @@ class LeadModel extends FormModel
             if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
                 $entity->addUpdatedField('country', $details['country']);
             }
+
+            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
+                $entity->addUpdatedField('zipcode', $details['zipcode']);
+            }
         }
 
         parent::saveEntity($entity, $unlock);
@@ -481,8 +485,12 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if (!$returnTracking && $this->systemCurrentLead) {
+        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
             // Just return the system set lead
+            if (null === $this->systemCurrentLead) {
+                $this->systemCurrentLead = new Lead();
+            }
+
             return $this->systemCurrentLead;
         }
 
@@ -558,7 +566,7 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
-        if ($this->systemCurrentLead) {
+        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             // Overwrite system current lead
             $this->systemCurrentLead = $lead;
 
@@ -1092,10 +1100,18 @@ class LeadModel extends FormModel
         }
 
         if ($removeTags !== null) {
+
+            $logger->debug('LEAD: Removing ' . implode(', ', $removeTags) . ' for lead ID# ' . $lead->getId());
+
+            array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+            // See which tags really exist
+            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+
             foreach ($removeTags as $tag) {
                 // Tag to be removed
-                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
-                    $lead->removeTag($foundTags[$tag]);
+                if (array_key_exists($tag, $foundRemoveTags) && $leadTags->contains($foundRemoveTags[$tag])) {
+                    $lead->removeTag($foundRemoveTags[$tag]);
                     $logger->debug('LEAD: Removed ' . $tag);
                 }
             }

@@ -24,7 +24,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class BuilderSubscriber extends CommonSubscriber
 {
     private $pageTokenRegex = '{pagelink=(.*?)}';
-    private $externalTokenRegex = '{externallink=(.*?)}';
     private $trackedTokenRegex = '{trackedlink=(.*?)}';
     private $langBarRegex = '{langbar}';
     private $shareButtonsRegex = '{sharebuttons}';
@@ -303,7 +302,7 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected function generateUrlTokens($content, $clickthrough, $emailId = null, Email $email = null, EmailSendEvent $event = null)
     {
-        $tokens                    = array();
+        $tokens = array();
 
         // check we have a complete event property before trying to use it's methods
         if ($event !== null) {
@@ -363,12 +362,11 @@ class BuilderSubscriber extends CommonSubscriber
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $pagelinkRegex = '/'.$this->pageTokenRegex.'/';
-        preg_match_all($pagelinkRegex, $content, $matches);
+        preg_match_all('/({|%7B)pagelink=(.*?)(}|%7D)/', $content, $matches);
 
-        if (!empty($matches[1])) {
+        if (!empty($matches[2])) {
             $foundTokens = array();
-            foreach ($matches[1] as $key => $pageId) {
+            foreach ($matches[2] as $key => $pageId) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
                     continue;
@@ -427,12 +425,11 @@ class BuilderSubscriber extends CommonSubscriber
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $externalLinkRegex = '/'.$this->externalTokenRegex.'/';
-        preg_match_all($externalLinkRegex, $content, $matches);
+        preg_match_all('/({|%7B)externallink=(.*?)(}|%7D)/', $content, $matches);
 
-        if (!empty($matches[1])) {
+        if (!empty($matches[2])) {
             $foundTokens = array();
-            foreach ($matches[1] as $key => $match) {
+            foreach ($matches[2] as $key => $match) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
                     continue;

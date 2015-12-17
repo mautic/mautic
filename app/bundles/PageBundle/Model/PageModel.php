@@ -565,24 +565,24 @@ class PageModel extends FormModel
         unset($query['d']);
         $hit->setQuery($query);
 
-        list($trackingId, $generated) = $leadModel->getTrackingCookie();
+        list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
-        if (!$generated) {
+        $isUnique = $trackingNewlyGenerated;
+        if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
                 //this is not a new session so update the last hit if applicable with the date/time the user left
                 $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
+
+            // Check if this is a unique page hit
+            $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId);
         }
 
         if (!empty($page)) {
-            //check for a hit from tracking id
-            $countById = $hitRepo->getHitCountForTrackingId($page, $trackingId);
-            $isUnique  = empty($countById);
-
             if ($page instanceof Page) {
                 $hit->setPage($page);
                 $hit->setPageLanguage($page->getLanguage());
@@ -638,12 +638,16 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
-        $this->em->persist($hit);
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
-            $this->em->flush();
+            $this->em->persist($hit);
+            $this->em->flush($hit);
         } catch (\Exception $e) {
-            error_log($e);
+            if ($this->factory->getEnvironment() == 'dev') {
+                throw $e;
+            } else {
+                error_log($e);
+            }
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {

@@ -16,7 +16,12 @@ if (!empty($inBrowser)) {
 }
 
 //Set the slots
-foreach ($slots as $slot) {
+foreach ($slots as $slot => $slotConfig) {
+    if (is_numeric($slot)) {
+        $slot = $slotConfig;
+        $slotConfig = array();
+    }
+
     $value = isset($content[$slot]) ? $content[$slot] : "";
     $view['slots']->set($slot, $value);
 }

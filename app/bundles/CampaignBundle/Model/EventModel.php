@@ -958,8 +958,6 @@ class EventModel extends CommonFormModel
                 // Set lead in case this is triggered by the system
                 $leadModel->setSystemCurrentLead($lead);
 
-                $persist = array();
-
                 foreach ($leadEvents as $log) {
                     if ($sleepBatchCount == $limit) {
                         // Keep CPU down
@@ -1006,7 +1004,8 @@ class EventModel extends CommonFormModel
                                 $log->setMetadata($response);
                             }
 
-                            $persist[] = $log;
+                            $repo->saveEntity($log);
+                            $this->em->detach($log);
                             unset($log);
 
                             $this->handleCondition($response, $eventSettings, $event, $campaign, $lead);
@@ -1021,11 +1020,6 @@ class EventModel extends CommonFormModel
                     $totalEventCount++;
 
                     if ($max && $totalEventCount >= $max) {
-                        // Persist then detach
-                        if (!empty($persist)) {
-                            $repo->saveEntities($persist);
-                        }
-
                         unset($campaignEvents, $event, $leads, $eventSettings);
 
                         if ($output) {
@@ -1037,16 +1031,6 @@ class EventModel extends CommonFormModel
                         return $eventCount;
                     }
                 }
-
-                // Persist then detach
-                if (!empty($persist)) {
-                    $repo->saveEntities($persist);
-
-                    // Free RAM
-                    $this->em->clear('MauticCampaignBundle:LeadEventLog');
-                }
-
-                unset($persist);
             }
 
             // Free RAM
@@ -1108,7 +1092,7 @@ class EventModel extends CommonFormModel
         $nonActionEvents = array();
         $actionEvents    = array();
         foreach ($campaignEvents as $id => $e) {
-            if (!empty($e['decisionPath']) && $campaignEvents[$e['parent_id']]['eventType'] != 'condition') {
+            if (!empty($e['decisionPath']) && $e['parent_id'] && $campaignEvents[$e['parent_id']]['eventType'] != 'condition') {
                 if ($e['decisionPath'] == 'no') {
                     $nonActionEvents[$e['parent_id']][$id] = $e;
                 } elseif ($e['decisionPath'] == 'yes') {
