@@ -13,7 +13,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateType;
 use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\IntegerType;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\TimeType;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
@@ -285,11 +284,24 @@ class LeadListRepository extends CommonRepository
                 $parameters = array();
                 $expr       = $this->getListFilterExpr($filters, $parameters, $q, false);
                 foreach ($parameters as $k => $v) {
-                    if (is_bool($v)) {
-                        $q->setParameter($k, $v, 'boolean');
-                    } else {
-                        $q->setParameter($k, $v);
+                    switch (true) {
+                        case is_bool($v):
+                            $paramType = 'boolean';
+                            break;
+
+                        case is_int($v):
+                            $paramType = 'integer';
+                            break;
+
+                        case is_float($v):
+                            $paramType = 'float';
+                            break;
+
+                        default:
+                            $paramType = null;
+                            break;
                     }
+                    $q->setParameter($k, $v, $paramType);
                 }
 
                 if ($countOnly) {
@@ -370,7 +382,6 @@ class LeadListRepository extends CommonRepository
                 }
 
                 $results = $q->execute()->fetchAll();
-
                 foreach ($results as $r) {
                     if ($countOnly) {
                         $leads = array(
@@ -869,6 +880,18 @@ class LeadListRepository extends CommonRepository
             }
 
             if (!$ignoreAutoFilter) {
+                if (!is_array($details['filter'])) {
+                    switch ($details['type']) {
+                        case 'number':
+                            $details['filter'] = (float) $details['filter'];
+                            break;
+
+                        case 'boolean':
+                            $details['filter'] = (bool) $details['filter'];
+                            break;
+                    }
+                }
+
                 $parameters[$parameter] = $details['filter'];
             }
         }
