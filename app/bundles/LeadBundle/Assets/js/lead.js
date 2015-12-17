@@ -868,7 +868,7 @@ Mautic.updateLeadTags = function () {
     });
 };
 
-Mautic.createLeadTag = function(el) {
+Mautic.createLeadTag = function (el) {
     var newFound = false;
     mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
         if (!mQuery.isNumeric(mQuery(selected).val())) {
@@ -959,12 +959,20 @@ Mautic.updateLeadFieldValues = function (field) {
     });
 };
 
-Mautic.toggleTimelineMoreVisiblity = function(el) {
+Mautic.toggleTimelineMoreVisiblity = function (el) {
     if (mQuery(el).is(':visible')) {
         mQuery(el).slideUp('fast');
         mQuery(el).next().text(mauticLang['showMore']);
     } else {
         mQuery(el).slideDown('fast');
         mQuery(el).next().text(mauticLang['hideMore']);
+    }
+};
+
+Mautic.displayUniqueIdentifierWarning = function (el) {
+    if (mQuery(el).val() === "0") {
+        mQuery('.unique-identifier-warning').fadeOut('fast');
+    } else {
+        mQuery('.unique-identifier-warning').fadeIn('fast');
     }
 };

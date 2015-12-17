@@ -176,6 +176,12 @@ $dbalSettings = array(
     'types'    => array(
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
+    ),
+    // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
+    'mapping_types' => array(
+        'enum'  => 'string',
+        'point' => 'string',
+        'bit'   => 'string',
     )
 );
 
@@ -298,3 +304,7 @@ $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
 );
+
+// Monolog formatter
+$container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
+    ->addMethodCall('includeStacktraces', array(true));

@@ -39,8 +39,8 @@
         "symfony/security-bundle": "2.6.*",
         "symfony/swiftmailer-bundle": "~2.3",
 
-        "symfony/doctrine-bridge": "2.5.*",
-        "symfony/monolog-bridge": "2.5.*",
+        "symfony/doctrine-bridge": "2.6.*",
+        "symfony/monolog-bridge": "2.6.*",
 
         "sensio/distribution-bundle": "~2.3",
 

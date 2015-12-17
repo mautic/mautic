@@ -95,6 +95,7 @@ class TriggerType extends AbstractType
         );
 
         $color = $options['data']->getColor();
+
         $builder->add(
             'color',
             'text',
@@ -107,7 +108,7 @@ class TriggerType extends AbstractType
                     'tooltip'     => 'mautic.point.trigger.form.color_descr'
                 ),
                 'required'   => false,
-                'data'       => (empty($color)) ? $color : 'a0acb8',
+                'data'       => (!empty($color)) ? $color : 'a0acb8',
                 'empty_data' => 'a0acb8'
             )
         );

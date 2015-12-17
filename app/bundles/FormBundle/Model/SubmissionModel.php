@@ -390,11 +390,13 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
+        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) use ($logger) {
             // Find fields in both sets
             $potentialConflicts = array_keys(
-                array_diff_key($fieldSet1, $fieldSet2)
+                array_intersect_key($fieldSet1, $fieldSet2)
             );
+
+            $logger->debug('FORM: Potential conflicts ' . implode(', ', array_keys($potentialConflicts)) . ' = ' . implode(', ', $potentialConflicts));
 
             $conflicts = array();
             foreach ($potentialConflicts as $field) {
@@ -460,6 +462,7 @@ class SubmissionModel extends CommonFormModel
 
             $logger->debug('FORM: Current unique lead fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
 
+            $logger->debug('FORM: Submitted unique lead fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();

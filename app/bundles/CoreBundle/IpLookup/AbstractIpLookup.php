@@ -18,6 +18,7 @@ abstract class AbstractIpLookup
 {
     public $city = '';
     public $region = '';
+    public $zipcode = '';
     public $country = '';
     public $latitude = '';
     public $longitude = '';
@@ -78,6 +79,7 @@ abstract class AbstractIpLookup
         $this->ip        = $ip;
         $this->connector = HttpFactory::getHttp();
         $this->logger    = $logger;
+        $this->auth      = $auth;
     }
 
     /**

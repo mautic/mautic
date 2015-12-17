@@ -224,7 +224,7 @@ class Hit
             ->nullable()
             ->build();
 
-        $builder->createField('userAgent', 'string')
+        $builder->createField('userAgent', 'text')
             ->columnName('user_agent')
             ->nullable()
             ->build();

@@ -258,7 +258,6 @@ class TriggerModel extends CommonFormModel
         return $groups;
     }
 
-
     /**
      * Triggers a specific event
      *
@@ -368,6 +367,9 @@ class TriggerModel extends CommonFormModel
 
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
+
+                $this->em->clear('Mautic\PointBundle\Entity\LeadTriggerLog');
+                $this->em->clear('Mautic\PointBundle\Entity\TriggerEvent');
             }
         }
     }

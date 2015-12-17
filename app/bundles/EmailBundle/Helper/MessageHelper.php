@@ -155,7 +155,7 @@ class MessageHelper
             if (count($results)) {
                 $stat      = $results[0];
                 $leadId    = $stat['lead_id'];
-                $leadEmail = $stat['address'];
+                $leadEmail = $stat['email_address'];
                 $emailId   = $stat['email_id'];
 
                 $this->logger->debug('Stat found with ID# '.$stat['id']);

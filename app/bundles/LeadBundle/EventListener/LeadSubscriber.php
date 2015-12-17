@@ -54,8 +54,16 @@ class LeadSubscriber extends CommonSubscriber
         //needs to be prevented
         static $preventLoop = array();
 
-        $lead = $event->getLead();
+        $lead  = $event->getLead();
+
         if ($details = $event->getChanges()) {
+            // Unset dateLastActive to prevent un-necessary audit log entries
+            unset($details['dateLastActive']);
+            if (empty($details)) {
+
+                return;
+            }
+
             $check = base64_encode($lead->getId() . serialize($details));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
@@ -89,13 +97,13 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 //add if an ip was added
-                if (isset($details['ipAddresses'])) {
+                if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
                     $log = array(
                         "bundle"    => "lead",
                         "object"    => "lead",
                         "objectId"  => $lead->getId(),
                         "action"    => "ipadded",
-                        "details"   => $details['ipAddresses'][1],
+                        "details"   => $details['ipAddresses'],
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
@@ -155,7 +163,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * Add a field delete entry to the audit log
      *
-     * @param Events\LeadEvent $event
+     * @param Events\LeadFieldEvent $event
      */
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
@@ -241,7 +249,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param Events\LeadMergeEvent $event
      */
     public function onLeadMerge(Events\LeadMergeEvent $event)
     {

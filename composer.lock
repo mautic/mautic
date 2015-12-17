@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0fc2d12807f7d94b91d89968547ccba4",
-    "content-hash": "607c6aa015b6c9804ffa0546f036c94e",
+    "hash": "f9417ec51fb77dd27d494cbf568726c8",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -645,7 +644,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineFixturesBundle/zipball/817c2d233fde0fe85cb7e4d25d43fbfcd028aef8",
+                "url": "https://api.github.com/repos/doctrine/DoctrineFixturesBundle/zipball/0f1a2f91b349e10f5c343f75ab71d23aace5b029",
                 "reference": "c5ff0542772102ddd4e2fbe173e9ad40ad67c22f",
                 "shasum": ""
             },
@@ -882,7 +881,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/d196ddc229f50c66c5a015c158adb78a2dfb4351",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/68cc7bf629a7c1fc0696e583cc8ed46f897d0afb",
                 "reference": "65978aa4e9ffca3bb632225ad8c6320077d80d85",
                 "shasum": ""
             },
@@ -1613,7 +1612,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/46bb11dd95e3546e048d2d5a083cb427cb289b87",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/a63cd330588eff18f6deb0251fd142d2c1fe30b6",
                 "reference": "c49628cfc8b8ce7404665b4e6528487d780e7d68",
                 "shasum": ""
             },
@@ -1969,7 +1968,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/f8c6b24a846e3713899f02e72604a78d80bb1b37",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/a07920b10a3b888abe7c47c7aecf56f69553f707",
                 "reference": "2a2e1295c8f39f39875343934af159957bcdcc06",
                 "shasum": ""
             },
@@ -2835,17 +2834,17 @@
         },
         {
             "name": "symfony/doctrine-bridge",
-            "version": "v2.5.10",
+            "version": "v2.6.11",
             "target-dir": "Symfony/Bridge/Doctrine",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-bridge.git",
-                "reference": "d6a2d571b8521ec5036fa77b815c864e16b99752"
+                "reference": "7eba724851776d766e085019ff72cbaf665ebbed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/d6a2d571b8521ec5036fa77b815c864e16b99752",
-                "reference": "d6a2d571b8521ec5036fa77b815c864e16b99752",
+                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/7eba724851776d766e085019ff72cbaf665ebbed",
+                "reference": "7eba724851776d766e085019ff72cbaf665ebbed",
                 "shasum": ""
             },
             "require": {
@@ -2860,6 +2859,7 @@
                 "symfony/expression-language": "~2.2",
                 "symfony/form": "~2.3,>=2.3.8",
                 "symfony/http-kernel": "~2.2",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/property-access": "~2.3",
                 "symfony/security": "~2.2",
                 "symfony/stopwatch": "~2.2",
@@ -2876,7 +2876,7 @@
             "type": "symfony-bridge",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -2890,17 +2890,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Doctrine Bridge",
-            "homepage": "http://symfony.com",
-            "time": "2015-02-01 09:36:16"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-09 16:02:48"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -3420,27 +3420,28 @@
         },
         {
             "name": "symfony/monolog-bridge",
-            "version": "v2.5.10",
+            "version": "v2.6.11",
             "target-dir": "Symfony/Bridge/Monolog",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bridge.git",
-                "reference": "e6fab2da01f1eec137a837cb77a461cc382bae50"
+                "reference": "ba66eeabaa004e3ab70764cab59b056b182aa535"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/e6fab2da01f1eec137a837cb77a461cc382bae50",
-                "reference": "e6fab2da01f1eec137a837cb77a461cc382bae50",
+                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/ba66eeabaa004e3ab70764cab59b056b182aa535",
+                "reference": "ba66eeabaa004e3ab70764cab59b056b182aa535",
                 "shasum": ""
             },
             "require": {
-                "monolog/monolog": "~1.3",
+                "monolog/monolog": "~1.11",
                 "php": ">=5.3.3"
             },
             "require-dev": {
                 "symfony/console": "~2.4",
                 "symfony/event-dispatcher": "~2.2",
-                "symfony/http-kernel": "~2.4"
+                "symfony/http-kernel": "~2.4",
+                "symfony/phpunit-bridge": "~2.7"
             },
             "suggest": {
                 "symfony/console": "For the possibility to show log messages in console commands depending on verbosity settings. You need version ~2.3 of the console for it.",
@@ -3450,7 +3451,7 @@
             "type": "symfony-bridge",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -3464,17 +3465,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Monolog Bridge",
-            "homepage": "http://symfony.com",
-            "time": "2015-01-03 08:01:13"
+            "homepage": "https://symfony.com",
+            "time": "2015-06-25 11:21:15"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -3772,17 +3773,17 @@
         },
         {
             "name": "symfony/security",
-            "version": "v2.6.11",
+            "version": "v2.6.12",
             "target-dir": "Symfony/Component/Security",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Security.git",
-                "reference": "cdad268d48b2943690fa59fe8274285010547340"
+                "url": "https://github.com/symfony/security.git",
+                "reference": "6993b7e82c836228e078a80c37c79ef247ee9ff8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Security/zipball/cdad268d48b2943690fa59fe8274285010547340",
-                "reference": "cdad268d48b2943690fa59fe8274285010547340",
+                "url": "https://api.github.com/repos/symfony/security/zipball/6993b7e82c836228e078a80c37c79ef247ee9ff8",
+                "reference": "6993b7e82c836228e078a80c37c79ef247ee9ff8",
                 "shasum": ""
             },
             "require": {
@@ -3845,7 +3846,7 @@
             ],
             "description": "Symfony Security Component",
             "homepage": "https://symfony.com",
-            "time": "2015-07-26 09:08:40"
+            "time": "2015-11-23 10:29:01"
         },
         {
             "name": "symfony/security-bundle",
@@ -4515,7 +4516,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/4d9114d49796b23b599d4b7cb63f8d8a918a6d44",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/a824aeda55a370ba21740a6464eed38c93f06dd0",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },

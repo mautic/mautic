@@ -1586,8 +1586,7 @@ class LeadController extends FormController
                         $user = $this->factory->getUser();
 
                         $mailer->setFrom(
-                            $email['from'],
-                            (strtolower($user->getEmail()) !== strtolower($email['from'])) ? null : $user->getFirstName().' '.$user->getLastName()
+                            $email['from'], empty($email['fromname']) ? '' : $email['fromname']
                         );
 
                         // Set Content
@@ -1614,6 +1613,11 @@ class LeadController extends FormController
                             );
                         } else {
                             $errors = $mailer->getErrors();
+
+                            // Unset the array of failed email addresses
+                            if (isset($errors['failures'])) {
+                                unset($errors['failures']);
+                            }
 
                             $form->addError(
                                 new FormError(

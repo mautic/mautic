@@ -57,7 +57,7 @@ class AssetRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(a.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('a.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

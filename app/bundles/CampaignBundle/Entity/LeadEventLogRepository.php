@@ -141,25 +141,18 @@ class LeadEventLogRepository extends EntityRepository
 
     /**
      * @param      $campaignId
-     * @param      $leadIds
      * @param bool $excludeScheduled
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $leadIds, $excludeScheduled = false)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('o.event_id, count(o.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
-        if (empty($leadIds)) {
-            // Just force nothing
-            $leadIds = array(0);
-        }
-
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId),
-            $q->expr()->in('o.lead_id', $leadIds),
             $q->expr()->orX(
                 $q->expr()->isNull('o.non_action_path_taken'),
                 $q->expr()->eq('o.non_action_path_taken', ':false')

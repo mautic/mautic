@@ -65,6 +65,8 @@ class AuditLogModel extends CommonModel
         $log->setUserName($userName);
 
         $this->em->getRepository("MauticCoreBundle:AuditLog")->saveEntity($log);
+
+        $this->em->detach($log);
     }
 
     /**

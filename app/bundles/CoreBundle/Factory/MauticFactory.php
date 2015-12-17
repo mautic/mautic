@@ -235,16 +235,18 @@ class MauticFactory
      */
     public function getTranslator()
     {
-        /** @var \Mautic\CoreBundle\Translation\Translator $translator */
-        $translator = $this->container->get('translator');
+        if (defined('IN_MAUTIC_CONSOLE')) {
+            /** @var \Mautic\CoreBundle\Translation\Translator $translator */
+            $translator = $this->container->get('translator');
 
-        if ($translator->getLocale() === null) {
             $translator->setLocale(
                 $this->getParameter('locale')
             );
+
+            return $translator;
         }
 
-        return $translator;
+        return $this->container->get('translator');
     }
 
     /**
@@ -615,7 +617,13 @@ class MauticFactory
                     $ip = end($ips);
                 }
 
-                return trim($ip);
+                $ip = trim($ip);
+
+                // Validate IP
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+
+                    return $ip;
+                }
             }
         }
 
@@ -655,7 +663,13 @@ class MauticFactory
 
             // Ensure the do not track list is inserted
             $doNotTrack  = $this->getParameter('do_not_track_ips', array());
+            if (!is_array($doNotTrack)) {
+                $doNotTrack = array();
+            }
             $internalIps = $this->getParameter('do_not_track_internal_ips', array());
+            if (!is_array($internalIps)) {
+                $internalIps = array();
+            }
             $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
             $ipAddress->setDoNotTrackList($doNotTrack);
 

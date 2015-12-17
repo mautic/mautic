@@ -34,10 +34,11 @@ $container->loadFromExtension("monolog", array(
     ),
     "handlers" => array(
         "main"    => array(
-            "type"  => "rotating_file",
-            "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
-            "level" => "debug",
-            "channels" => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/%kernel.environment%.php",
+            "level"     => "debug",
+            "channels"  => array(
                 "!mautic"
             ),
             "max_files" => 7
@@ -47,10 +48,11 @@ $container->loadFromExtension("monolog", array(
             "bubble" => false
         ),
         "mautic"    => array(
-            "type"  => "rotating_file",
-            "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
-            "level" => "debug",
-            'channels' => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level"     => "debug",
+            'channels'  => array(
                 'mautic',
             ),
             "max_files" => 7
