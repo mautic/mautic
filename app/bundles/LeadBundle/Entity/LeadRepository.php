@@ -326,7 +326,7 @@ class LeadRepository extends CommonRepository
         $this->_em->persist($entity);
 
         if ($flush)
-            $this->_em->flush();
+            $this->_em->flush($entity);
 
         $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {

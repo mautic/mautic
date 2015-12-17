@@ -627,8 +627,8 @@ class EventModel extends CommonFormModel
 
             $start += $limit;
 
-            $this->em->clear('MauticLeadBundle:Lead');
-            $this->em->clear('MauticUserBundle:User');
+            $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+            $this->em->clear('Mautic\UserBundle\Entity\User');
 
             unset($leads, $campaignLeads);
 
@@ -1034,8 +1034,8 @@ class EventModel extends CommonFormModel
             }
 
             // Free RAM
-            $this->em->clear('MauticLeadBundle:Lead');
-            $this->em->clear('MauticUserBundle:User');
+            $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+            $this->em->clear('Mautic\UserBundle\Entity\User');
             unset($events, $leads);
 
             $currentCount = ($max) ? $totalEventCount : $eventCount;
@@ -1352,8 +1352,8 @@ class EventModel extends CommonFormModel
                 $leadProcessedCount += count($campaignLeadIds);
 
                 // Save RAM
-                $this->em->clear('MauticLeadBundle:Lead');
-                $this->em->clear('MauticUserBundle:User');
+                $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+                $this->em->clear('Mautic\UserBundle\Entity\User');
 
                 unset($leads, $campaignLeadIds, $leadLog);
 

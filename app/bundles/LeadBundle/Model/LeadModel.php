@@ -700,7 +700,9 @@ class LeadModel extends FormModel
      */
     public function addToLists($lead, $lists, $manuallyAdded = true)
     {
-        $this->factory->getModel('lead.list')->addLead($lead, $lists, $manuallyAdded);
+        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+        $listModel = $this->factory->getModel('lead.list');
+        $listModel->addLead($lead, $lists, $manuallyAdded);
     }
 
     /**
