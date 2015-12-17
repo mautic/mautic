@@ -1610,8 +1610,8 @@ class LeadController extends FormController
                         } else {
                             $errors = $mailer->getErrors();
 
+                            // Unset the array of failed email addresses
                             if (isset($errors['failures'])) {
-                                $errors[] = $this->get('translator')->trans('mautic.lead.for.email', array('%emails%' => implode('<br />', $errors['failures'])));
                                 unset($errors['failures']);
                             }
 
