@@ -311,7 +311,14 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.update_successful', array('%version%' => $version)));
         $progressBar->finish();
 
-        // Ouptput the error (if exists) from the migrate command after we've finished the progress bar
+        // Check for a post install message
+        if ($postMessage = $this->getContainer()->get('session')->get('post_upgrade_message', false)) {
+            $postMessage = strip_tags($postMessage);
+            $this->getContainer()->get('session')->remove('post_upgrade_message');
+            $output->writeln("\n\n<info>$postMessage</info>");
+        }
+
+        // Output the error (if exists) from the migrate command after we've finished the progress bar
         if ($migrateExitCode !== 0) {
             $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.error_performing_migration').'</error>');
         }

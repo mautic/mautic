@@ -12,6 +12,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use OpenCloud\Queues\Resource\Message;
 
 /**
  * Class Version20151207000000
@@ -59,5 +60,25 @@ class Version20151207000000 extends AbstractMauticMigration
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats DROP CONSTRAINT ' . $this->findPropertyName('email_stats', 'fk', 'A832C1C9'));
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', array('email_id')).' FOREIGN KEY (email_id) REFERENCES '.$this->prefix.'emails (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+    }
+
+    /**
+     * Inject notice into session regarding Telize
+     *
+     * @param Schema $schema
+     */
+    public function postUp(Schema $schema)
+    {
+        if ('telize' == $this->factory->getParameter('ip_lookup_service')) {
+            $session = $this->container->get('session');
+            $router  = $this->container->get('router');
+
+            $configUrl = $router->generate('mautic_config_action', array('objectAction' => 'edit'));
+            $message = <<<MESSAGE
+Recently Telize discontinued their free IP lookup service; continued use of this service now requires a subscription and an API key. Alternatively you can change the provider through the <a href="$configUrl" data-toggle="ajax">Configuration</a>: System Settings. ​<strong>MaxMind GeoIP2 City Download</strong>​ is the recommended alternative. This service uses a free IP database you can download within Mautic.
+MESSAGE;
+
+            $session->set('post_upgrade_message', $message);
+        }
     }
 }
