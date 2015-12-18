@@ -293,8 +293,10 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
 
                         try {
+                            $unlockEntity = $form->get('buttons')->get('save')->isClicked() && !$entity->isStandalone();
+
                             //save the form first so that new fields are available to actions
-                            $model->saveEntity($entity);
+                            $model->saveEntity($entity, $unlockEntity);
 
                             if ($entity->isStandalone()) {
                                 //only save actions that are not to be deleted
@@ -302,6 +304,7 @@ class FormController extends CommonFormController
 
                                 //now set the actions
                                 $model->setActions($entity, $actions, $fields);
+                                $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                             }
 
                             $this->addFlash('mautic.core.notice.created', array(
@@ -506,8 +509,10 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
                         $model->deleteFields($entity, $deletedFields);
 
+                        $unlockEntity = $form->get('buttons')->get('save')->isClicked() && !$entity->isStandalone();
+
                         //save the form first so that new fields are available to actions
-                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                        $model->saveEntity($entity, $unlockEntity);
 
                         // Reset objectId to entity ID (can be session ID in case of cloned entity)
                         $objectId = $entity->getId();
@@ -518,6 +523,8 @@ class FormController extends CommonFormController
 
                             // Delete deleted actions
                             $this->factory->getModel('form.action')->deleteEntities($deletedActions);
+
+                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                         } else {
                             // Clear the actions
                             $entity->clearActions();
