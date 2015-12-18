@@ -114,18 +114,20 @@ $template = '<div class="col-md-6">{content}</div>';
             </div>
         </div>
 
+        <?php if (isset($fields['do_not_track_ips'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+        </div>
+        <?php endif; ?>
+
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
-
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
-        </div>
     </div>
 </div>
 <?php endif; ?>
