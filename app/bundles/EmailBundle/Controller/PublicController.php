@@ -334,10 +334,12 @@ class PublicController extends CommonFormController
 
         if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
             $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
-            if (!empty($response['bounces'])) {
+
+            if (is_array($response)) {
                 /** @var \Mautic\EmailBundle\Model\EmailModel $model */
                 $model = $this->factory->getModel('email');
-                $model->updateBouncedStats($response['bounces']);
+
+                $model->processMailerCallback($response);
             }
 
             return new Response('success');

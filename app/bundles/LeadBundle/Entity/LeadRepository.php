@@ -218,7 +218,7 @@ class LeadRepository extends CommonRepository
         return $results;
     }
 
-    /*
+    /**
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by
@@ -326,7 +326,7 @@ class LeadRepository extends CommonRepository
         $this->_em->persist($entity);
 
         if ($flush)
-            $this->_em->flush();
+            $this->_em->flush($entity);
 
         $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {
