@@ -14,6 +14,12 @@ use Joomla\Http\Http;
 use Joomla\Http\HttpFactory;
 use Monolog\Logger;
 
+/**
+ * Class AbstractIpLookup
+ *
+ * @deprecated 1.2.3 - to be removed in 2.0
+ *             extend IpLookup instead
+ */
 abstract class AbstractIpLookup
 {
     public $city = '';
@@ -80,6 +86,34 @@ abstract class AbstractIpLookup
         $this->connector = HttpFactory::getHttp();
         $this->logger    = $logger;
         $this->auth      = $auth;
+    }
+
+    /**
+     * @param $ip
+     */
+    public function setIpAddress($ip)
+    {
+        $this->ip = $ip;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDetails()
+    {
+        $this->getData();
+
+        return call_user_func('get_object_vars', $this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return '';
     }
 
     /**

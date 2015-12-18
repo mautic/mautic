@@ -7,17 +7,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\IpLookup;
+namespace Mautic\CoreBundle\Tests\IpLookup\BC;
 
+use Mautic\CoreBundle\IpLookup\AbstractIpLookup;
 
-class TelizeIpLookup extends AbstractIpLookup
+class BcIpLookup extends AbstractIpLookup
 {
     /**
      * @return string
      */
     protected function getUrl()
     {
-        return "http://www.telize.com/geoip/{$this->ip}";
+        return "http://localhost/json/{$this->ip}";
     }
 
     /**
@@ -25,12 +26,6 @@ class TelizeIpLookup extends AbstractIpLookup
      */
     public function parseData($response)
     {
-        $data = json_decode($response);
-
-        if ($data) {
-            foreach ($data as $key => $value) {
-                $this->$key = $value;
-            }
-        }
+        $this->city = 'San Francisco';
     }
 }

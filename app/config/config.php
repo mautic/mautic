@@ -1,10 +1,12 @@
 <?php
 include __DIR__ . '/paths_helper.php';
 
-$ormMappings = $serializerMappings = array();
+$ormMappings =
+$serializerMappings =
+$ipLookupServices = array();
 
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings) {
+$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
     $isPlugin = $isMautic = false;
 
     if (strpos($namespace, 'MauticPlugin\\') !== false) {
@@ -28,6 +30,11 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
+
+        // Register IP lookup services
+        if (isset($config['ip_lookup_services'])) {
+            $ipLookupServices = array_merge($ipLookupServices, $config['ip_lookup_services']);
+        }
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
@@ -109,6 +116,9 @@ $setBundles = array_merge(array('MauticCoreBundle' => $coreBundle), $setBundles)
 $container->setParameter('mautic.bundles', $setBundles);
 $container->setParameter('mautic.plugin.bundles', $setPluginBundles);
 unset($setBundles, $setPluginBundles);
+
+// Set IP lookup services
+$container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
 $loader->import('parameters.php');
