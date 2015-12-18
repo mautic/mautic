@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -792,23 +793,25 @@ class AjaxController extends CommonController
             $ipServiceFactory = $this->container->get('mautic.ip_lookup.factory');
             $ipService        = $ipServiceFactory->getService($serviceName);
 
-            $dataArray['attribution'] = $ipService->getAttribution();
-            if ($ipService instanceof IpLookupFormInterface) {
-                if ($formType = $ipService->getConfigFormService()) {
-                    $themes   = $ipService->getConfigFormThemes();
-                    $themes[] = 'MauticCoreBundle:FormTheme\Config';
+            if ($ipService instanceof AbstractLookup) {
+                $dataArray['attribution'] = $ipService->getAttribution();
+                if ($ipService instanceof IpLookupFormInterface) {
+                    if ($formType = $ipService->getConfigFormService()) {
+                        $themes   = $ipService->getConfigFormThemes();
+                        $themes[] = 'MauticCoreBundle:FormTheme\Config';
 
-                    $form   = $this->get('form.factory')->create($formType, array(), array('ip_lookup_service' => $ipService));
-                    $html   = $this->renderView(
-                        'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
-                        array(
-                            'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes)
-                        )
-                    );
+                        $form = $this->get('form.factory')->create($formType, array(), array('ip_lookup_service' => $ipService));
+                        $html = $this->renderView(
+                            'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
+                            array(
+                                'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes)
+                            )
+                        );
 
-                    $html              = str_replace($formType.'_', 'config_coreconfig_ip_lookup_config_', $html);
-                    $html              = str_replace($formType, 'config[coreconfig][ip_lookup_config]', $html);
-                    $dataArray['html'] = $html;
+                        $html              = str_replace($formType.'_', 'config_coreconfig_ip_lookup_config_', $html);
+                        $html              = str_replace($formType, 'config[coreconfig][ip_lookup_config]', $html);
+                        $dataArray['html'] = $html;
+                    }
                 }
             }
         }
