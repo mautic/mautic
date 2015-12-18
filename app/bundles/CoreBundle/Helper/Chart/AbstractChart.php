@@ -88,6 +88,12 @@ abstract class AbstractChart
     public function getUnitObject($unit)
     {
         $isTime  = in_array($unit, array('H', 'i', 's')) ? 'T' : '';
+        $toUpper = array('d', 'i');
+
+        if ($unit == 'i') {
+            $unit = 'M';
+        }
+
         return new \DateInterval('P' . $isTime . '1' . strtoupper($unit));
     }
 

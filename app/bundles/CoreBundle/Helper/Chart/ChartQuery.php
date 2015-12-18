@@ -37,7 +37,7 @@ class ChartQuery extends AbstractChart
         'i' => 'Y-m-d H:i:00',
         'H' => 'Y-m-d H:00:00',
         'd' => 'Y-m-d 00:00:00', 'D' => 'Y-m-d 00:00:00', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'Y-m-d 00:00:00',
+        'W' => 'Y W',
         'm' => 'Y-m-01 00:00:00', 'M' => 'Y-m-00 00:00:00', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'Y-01-01 00:00:00',
     );
@@ -69,13 +69,13 @@ class ChartQuery extends AbstractChart
     protected $mysqlTimeUnits = array(
         's' => '%Y-%m-%d %H:%i:%s',
         'i' => '%Y-%m-%d %H:%i',
-        'H' => '%Y-%m-%d %H',
+        'H' => '%Y-%m-%d %H:00',
         'd' => '%Y-%m-%d', 'D' => '%Y-%m-%d', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => '%Y-%U',
+        'W' => '%Y %U',
         'm' => '%Y-%m', 'M' => '%Y-%m', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => '%Y'
-    )
-;
+    );
+
     /**
      * Construct a new ChartQuery object
      *
@@ -172,10 +172,10 @@ class ChartQuery extends AbstractChart
                 ->groupBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')')
                 ->orderBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')', $order);
         } elseif ($this->isMysql()) {
-            $query->select('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\') AS date, COUNT(t) AS count')
+            $query->select('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\') AS date, COUNT(*) AS count')
                 ->from(MAUTIC_TABLE_PREFIX . $table, 't')
                 ->groupBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')')
-                ->orderBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\'', $order);
+                ->orderBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')', $order);
         } else {
             throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
         }
@@ -259,7 +259,7 @@ class ChartQuery extends AbstractChart
         // Count only unique values
         if (!empty($options['getUnique'])) {
             // Modify the previous query
-            $query->select('t.' . $column . '');
+            $query->select('t.' . $column);
             $query->having('COUNT(*) = 1')
                 ->groupBy('t.' . $column);
 
@@ -294,7 +294,7 @@ class ChartQuery extends AbstractChart
     public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array()) {
         $query = $this->connection->createQueryBuilder();
 
-        $query->select('count(t.' . $dateColumn1 . ') AS count')
+        $query->select('COUNT(t.' . $dateColumn1 . ') AS count')
             ->from(MAUTIC_TABLE_PREFIX . $table, 't');
 
         if ($this->isPostgres()) {
