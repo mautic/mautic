@@ -614,6 +614,19 @@ class AjaxController extends CommonController
         $dataArray['success'] = 1;
         $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
 
+        // Check for a post install message
+        if ($postMessage = $this->container->get('session')->get('post_upgrade_message', false)) {
+            $this->container->get('session')->remove('post_upgrade_message');
+            $postMessage = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
+            if ('1.2.3' == $this->container->get('kernel')->getVersion()) {
+                // @TODO - remove in 2.0
+                $dataArray['message']    .= $postMessage;
+                $dataArray['postmessage'] = false;
+            } else {
+                $dataArray['postmessage'] = $postMessage;
+            }
+        }
+
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
