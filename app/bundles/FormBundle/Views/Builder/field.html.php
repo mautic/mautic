@@ -108,6 +108,11 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                         <?php echo $view['form']->row($form['leadField']); ?>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['autoFillData']); ?>
+                    </div>
+                </div>
             </div>
             <?php endif; ?>
 

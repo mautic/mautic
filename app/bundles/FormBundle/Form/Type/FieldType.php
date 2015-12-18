@@ -351,6 +351,19 @@ class FieldType extends AbstractType
                     'data'       => $data
                 )
             );
+
+            $builder->add(
+                'autoFillData',
+                'yesno_button_group',
+                array(
+                    'label'     => 'mautic.form.field.form.auto_fill',
+                    'data'      => false,
+                    'attr'      => array(
+                        'class'   => 'auto-fill-data',
+                        'tooltip' => 'mautic.form.field.help.auto_fill'
+                    )
+                )
+            );
         }
 
         $builder->add('type', 'hidden');
