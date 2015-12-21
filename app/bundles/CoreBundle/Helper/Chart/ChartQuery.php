@@ -37,7 +37,7 @@ class ChartQuery extends AbstractChart
         'i' => 'Y-m-d H:i:00',
         'H' => 'Y-m-d H:00:00',
         'd' => 'Y-m-d 00:00:00', 'D' => 'Y-m-d 00:00:00', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'Y W',
+        'W' => 'Y-m-d 00:00:00',
         'm' => 'Y-m-01 00:00:00', 'M' => 'Y-m-00 00:00:00', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'Y-01-01 00:00:00',
     );
@@ -194,13 +194,15 @@ class ChartQuery extends AbstractChart
         $rawData = $query->execute()->fetchAll();
 
         $data    = array();
-        $date    = new \DateTime((new \DateTime($start))->format($this->sqlFormats[$unit]));
         $oneUnit = $this->getUnitObject($unit);
+        $date    = new \DateTime($start);
+        $date->format($this->sqlFormats[$unit]);
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
 
             $nextDate = clone $date;
+
             if ($order == 'DESC') {
                 $nextDate->sub($oneUnit);
             } else {
