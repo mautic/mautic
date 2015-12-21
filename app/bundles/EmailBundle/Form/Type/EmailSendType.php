@@ -42,7 +42,8 @@ class EmailSendType extends AbstractType
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.email.choose.emails_descr'
+                'tooltip' => 'mautic.email.choose.emails_descr',
+                'onchange'=> 'Mautic.disabledEmailAction()'
             ),
             'multiple'    => false,
             'constraints' => array(
@@ -51,7 +52,7 @@ class EmailSendType extends AbstractType
                 )
             )
         ));
-        // file_put_contents('C:\log.txt', (string) $options['update_select']);
+
         if (!empty($options['update_select'])) {
             $windowUrl = $this->factory->getRouter()->generate('mautic_email_action', array(
                 'objectAction' => 'new',
@@ -70,6 +71,8 @@ class EmailSendType extends AbstractType
                 'label' => 'mautic.email.send.new.email'
             ));
 
+            $email = $options['data']['email'];
+
             // create button edit email
             $windowUrlEdit = $this->factory->getRouter()->generate('mautic_email_action', array(
                 'objectAction' => 'edit',
@@ -80,9 +83,10 @@ class EmailSendType extends AbstractType
 
             $builder->add('editEmailButton', 'button', array(
                 'attr'  => array(
-                    'class'   => 'btn btn-primary',
-                    'onclick' => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
-                    'icon'    => 'fa fa-edit'
+                    'class'     => 'btn btn-primary',
+                    'onclick'   => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
+                    'disabled'  => !isset($email),
+                    'icon'      => 'fa fa-edit'
                 ),
                 'label' => 'mautic.email.send.edit.email'
             ));
@@ -92,9 +96,10 @@ class EmailSendType extends AbstractType
 
             $builder->add('previewEmailButton', 'button', array(
                 'attr'  => array(
-                    'class'   => 'btn btn-primary',
-                    'onclick' => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlPreview . '"}))',
-                    'icon'    => 'fa fa-external-link'
+                    'class'     => 'btn btn-primary',
+                    'onclick'   => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlPreview . '"}))',
+                    'disabled'  => !isset($email),
+                    'icon'      => 'fa fa-external-link'
                 ),
                 'label' => 'mautic.email.send.preview.email'
             ));

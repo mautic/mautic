@@ -703,13 +703,13 @@ Mautic.renderCampaignViewsBarChart = function (container) {
     }
     var ctx = document.getElementById("campaign-views-chart").getContext("2d");
     var options = {
-         scaleShowGridLines : false,
-         barShowStroke : false,
-         barValueSpacing : 1,
-         showScale: false,
-         tooltipFontSize: 10,
-         tooltipCaretSize: 0
-    }
+        scaleShowGridLines : false,
+        barShowStroke : false,
+        barValueSpacing : 1,
+        showScale: false,
+        tooltipFontSize: 10,
+        tooltipCaretSize: 0
+    };
     if (typeof Mautic.campaignViewsBarChart === 'undefined') {
         Mautic.campaignViewsBarChart = new Chart(ctx).Bar(chartData, options);
     }
@@ -725,13 +725,13 @@ Mautic.renderCampaignLeadsBarChart = function (container) {
     }
     var ctx = document.getElementById("campaign-leads-chart").getContext("2d");
     var options = {
-         scaleShowGridLines : false,
-         barShowStroke : false,
-         barValueSpacing : 1,
-         showScale: false,
-         tooltipFontSize: 10,
-         tooltipCaretSize: 0
-    }
+        scaleShowGridLines : false,
+        barShowStroke : false,
+        barValueSpacing : 1,
+        showScale: false,
+        tooltipFontSize: 10,
+        tooltipCaretSize: 0
+    };
     if (typeof Mautic.campaignLeadsBarChart === 'undefined') {
         Mautic.campaignLeadsBarChart = new Chart(ctx).Bar(chartData, options);
     }
@@ -773,4 +773,13 @@ Mautic.standardEmailUrl = function(options) {
     }
 
     return options;
-}
+};
+
+Mautic.disabledEmailAction = function() {
+    var email = mQuery('#campaignevent_properties_email').val();
+
+    var disabled = email === '' || email === null;
+
+    mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
+    mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+};
