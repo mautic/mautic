@@ -187,6 +187,11 @@ class EmailRepository extends CommonRepository
             foreach ($lists as $list) {
                 $listIds[] = $list['leadlist_id'];
             }
+
+            if (empty($listIds)) {
+                // Prevent fatal error
+                $listIds[] = 0;
+            }
         } elseif (!is_array($listIds)) {
             $listIds = array($listIds);
         }
