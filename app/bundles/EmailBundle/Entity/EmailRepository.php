@@ -190,7 +190,7 @@ class EmailRepository extends CommonRepository
 
             if (empty($listIds)) {
                 // Prevent fatal error
-                $listIds[] = 0;
+                return ($countOnly) ? 0 : array();
             }
         } elseif (!is_array($listIds)) {
             $listIds = array($listIds);
