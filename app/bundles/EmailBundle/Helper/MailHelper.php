@@ -234,13 +234,10 @@ class MailHelper
         }
 
         // Set system return path if applicable
-        $returnPath = $this->message->getReturnPath();
-        if (empty($returnPath)) {
-            if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
-                $this->message->setReturnPath($bounceEmail);
-            } elseif (!empty($this->returnPath)) {
-                $this->message->setReturnPath($this->returnPath);
-            }
+        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+            $this->message->setReturnPath($bounceEmail);
+        } elseif (!empty($this->returnPath)) {
+            $this->message->setReturnPath($this->returnPath);
         }
 
         if (empty($this->errors)) {
