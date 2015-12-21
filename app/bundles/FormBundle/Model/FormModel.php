@@ -228,7 +228,7 @@ class FormModel extends CommonFormModel
     {
         $isNew = ($entity->getId()) ? false : true;
 
-        if ($isNew) {
+        if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }

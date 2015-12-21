@@ -293,19 +293,22 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
 
                         try {
-                            $unlockEntity = $form->get('buttons')->get('save')->isClicked() && !$entity->isStandalone();
-
-                            //save the form first so that new fields are available to actions
-                            $model->saveEntity($entity, $unlockEntity);
+                            $alias = $model->cleanAlias($entity->getName(), '', 10);
+                            $entity->setAlias($alias);
 
                             if ($entity->isStandalone()) {
+                                // save the form first so that new fields are available to actions
+                                // use the repository function to not trigger the listeners twice
+                                $model->getRepository()->saveEntity($entity);
+
                                 //only save actions that are not to be deleted
                                 $actions  = array_diff_key($modifiedActions, array_flip($deletedActions));
 
                                 //now set the actions
                                 $model->setActions($entity, $actions, $fields);
-                                $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                             }
+
+                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                             $this->addFlash('mautic.core.notice.created', array(
                                 '%name%'      => $entity->getName(),
@@ -330,6 +333,10 @@ class FormController extends CommonFormController
                         } catch (\Exception $e) {
                             $form['name']->addError(new FormError($this->get('translator')->trans('mautic.form.schema.failed', array(), 'validators')));
                             $valid = false;
+
+                            if ('dev' == $this->container->getParameter('kernel.environment')) {
+                                throw $e;
+                            }
                         }
                     }
                 }
@@ -509,22 +516,16 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
                         $model->deleteFields($entity, $deletedFields);
 
-                        $unlockEntity = $form->get('buttons')->get('save')->isClicked() && !$entity->isStandalone();
-
-                        //save the form first so that new fields are available to actions
-                        $model->saveEntity($entity, $unlockEntity);
-
-                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
-                        $objectId = $entity->getId();
-
                         if ($entity->isStandalone()) {
+                            // save the form first so that new fields are available to actions
+                            // use the repository method to not trigger listeners twice
+                            $model->getRepository()->saveEntity($entity);
+
                             //now set the actions
                             $model->setActions($entity, $actions, $fields);
 
                             // Delete deleted actions
                             $this->factory->getModel('form.action')->deleteEntities($deletedActions);
-
-                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                         } else {
                             // Clear the actions
                             $entity->clearActions();
@@ -532,6 +533,11 @@ class FormController extends CommonFormController
                             // Delete all actions
                             $this->factory->getModel('form.action')->deleteEntities(array_keys($modifiedActions));
                         }
+
+                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
+                        $objectId = $entity->getId();
 
                         // Delete fields
                         $this->factory->getModel('form.field')->deleteEntities($deletedFields);
