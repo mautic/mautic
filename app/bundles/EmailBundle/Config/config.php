@@ -90,7 +90,7 @@ return array(
             'mautic.emailbuilder.subscriber'         => array(
                 'class' => 'Mautic\EmailBundle\EventListener\BuilderSubscriber'
             ),
-            'mautic.emailtoken_subscriber'     => array(
+            'mautic.emailtoken.subscriber'     => array(
                 'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber'
             ),
             'mautic.email.campaignbundle.subscriber' => array(
