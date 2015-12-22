@@ -89,7 +89,7 @@ return array(
             'mautic.pagebuilder.subscriber'         => array(
                 'class' => 'Mautic\PageBundle\EventListener\BuilderSubscriber'
             ),
-            'mautic.pagetoken_subscriber'           => array(
+            'mautic.pagetoken.subscriber'           => array(
                 'class' => 'Mautic\PageBundle\EventListener\TokenSubscriber'
             ),
             'mautic.page.pointbundle.subscriber'    => array(
