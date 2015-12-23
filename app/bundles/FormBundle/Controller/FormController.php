@@ -293,10 +293,10 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
 
                         try {
-                            $alias = $model->cleanAlias($entity->getName(), '', 10);
-                            $entity->setAlias($alias);
-
                             if ($entity->isStandalone()) {
+                                $alias = $model->cleanAlias($entity->getName(), '', 10);
+                                $entity->setAlias($alias);
+
                                 // save the form first so that new fields are available to actions
                                 // use the repository function to not trigger the listeners twice
                                 $model->getRepository()->saveEntity($entity);
@@ -517,6 +517,11 @@ class FormController extends CommonFormController
                         $model->deleteFields($entity, $deletedFields);
 
                         if ($entity->isStandalone()) {
+                            if (!$alias = $entity->getAlias()) {
+                                $alias = $model->cleanAlias($entity->getName(), '', 10);
+                                $entity->setAlias($alias);
+                            }
+
                             // save the form first so that new fields are available to actions
                             // use the repository method to not trigger listeners twice
                             $model->getRepository()->saveEntity($entity);
