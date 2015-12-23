@@ -234,13 +234,10 @@ class MailHelper
         }
 
         // Set system return path if applicable
-        $returnPath = $this->message->getReturnPath();
-        if (empty($returnPath)) {
-            if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
-                $this->message->setReturnPath($bounceEmail);
-            } elseif (!empty($this->returnPath)) {
-                $this->message->setReturnPath($this->returnPath);
-            }
+        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+            $this->message->setReturnPath($bounceEmail);
+        } elseif (!empty($this->returnPath)) {
+            $this->message->setReturnPath($this->returnPath);
         }
 
         if (empty($this->errors)) {
@@ -261,12 +258,7 @@ class MailHelper
 
             $this->message->setSubject($this->subject);
             $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
-
-            if (!$this->plainTextSet && !empty($this->plainText)) {
-                $this->message->addPart($this->plainText, 'text/plain');
-
-                $this->plainTextSet = true;
-            }
+            $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
                 // Set metadata if applicable
@@ -516,7 +508,7 @@ class MailHelper
      * @param array          $replace
      * @param \Swift_Message $message
      */
-    static function searchReplaceTokens($search, $replace, \Swift_Message &$message)
+    static public function searchReplaceTokens($search, $replace, \Swift_Message &$message)
     {
         // Body
         $body         = $message->getBody();
@@ -746,8 +738,7 @@ class MailHelper
      */
     public function setPlainText($content)
     {
-        $this->plainText    = $content;
-        $this->plainTextSet = false;
+        $this->plainText = $content;
     }
 
     /**
@@ -756,6 +747,38 @@ class MailHelper
     public function getPlainText()
     {
         return $this->plainText;
+    }
+
+    /**
+     * Set plain text for $this->message, replacing if necessary
+     *
+     * @return null|string
+     */
+    protected function setMessagePlainText()
+    {
+        if ($this->tokenizationEnabled && $this->plainTextSet) {
+            // No need to find and replace since tokenization happens at the transport level
+
+            return;
+        }
+
+        if ($this->plainTextSet) {
+            $children = (array) $this->message->getChildren();
+
+            /** @var \Swift_Mime_MimeEntity $child */
+            foreach ($children as $child) {
+                $childType = $child->getContentType();
+                if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
+
+                    $child->setBody($this->plainText);
+
+                    break;
+                }
+            }
+        } else {
+            $this->message->addPart($this->plainText, 'text/plain');
+            $this->plainTextSet = true;
+        }
     }
 
     /**

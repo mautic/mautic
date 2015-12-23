@@ -60,44 +60,6 @@ $container->loadFromExtension("monolog", array(
     )
 ));
 
-//Register command line logging
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-$container->setParameter(
-    'console_exception_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleExceptionListener'
-);
-$definitionConsoleExceptionListener = new Definition(
-    '%console_exception_listener.class%',
-    array(new Reference('logger'))
-);
-$definitionConsoleExceptionListener->addTag(
-    'kernel.event_listener',
-    array('event' => 'console.exception')
-);
-$container->setDefinition(
-    'mautic.kernel.listener.command_exception',
-    $definitionConsoleExceptionListener
-);
-
-$container->setParameter(
-    'console_terminate_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleTerminateListener'
-);
-$definitionConsoleExceptionListener = new Definition(
-    '%console_terminate_listener.class%',
-    array(new Reference('logger'))
-);
-$definitionConsoleExceptionListener->addTag(
-    'kernel.event_listener',
-    array('event' => 'console.terminate')
-);
-$container->setDefinition(
-    'mautic.kernel.listener.command_terminate',
-    $definitionConsoleExceptionListener
-);
-
 // Allow overriding config without a requiring a full bundle or hacks
 if (file_exists(__DIR__ . '/config_override.php')) {
     $loader->import("config_override.php");
