@@ -37,7 +37,6 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->factory->getModel('page.page');
         $security   = $this->factory->getSecurity();
-        $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
