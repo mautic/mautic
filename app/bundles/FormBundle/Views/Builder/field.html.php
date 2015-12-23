@@ -110,7 +110,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['autoFillData']); ?>
+                        <?php echo $view['form']->row($form['isAutoFill']); ?>
                     </div>
                 </div>
             </div>

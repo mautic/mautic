@@ -352,12 +352,13 @@ class FieldType extends AbstractType
                 )
             );
 
+            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? true : (boolean) $options['data']['isAutoFill'];
             $builder->add(
-                'autoFillData',
+                'isAutoFill',
                 'yesno_button_group',
                 array(
                     'label'     => 'mautic.form.field.form.auto_fill',
-                    'data'      => false,
+                    'data'      => $isAutoFillValue,
                     'attr'      => array(
                         'class'   => 'auto-fill-data',
                         'tooltip' => 'mautic.form.field.help.auto_fill'

@@ -117,6 +117,11 @@ class Field
     private $saveResult = true;
 
     /**
+     * @var bool
+     */
+    private $isAutoFill = false;
+
+    /**
      * @var array
      */
     private $changes;
@@ -201,6 +206,10 @@ class Field
         $builder->addNullableField('leadField', 'string', 'lead_field');
 
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
+        
+        $builder->createField('isAutoFill', 'boolean')
+            ->columnName('is_auto_fill')
+            ->build();
     }
 
     /**
@@ -228,7 +237,8 @@ class Field
                     'inputAttributes',
                     'containerAttributes',
                     'leadField',
-                    'saveResult'
+                    'saveResult',
+                    'isAutoFill'
                 )
             )
             ->build();
