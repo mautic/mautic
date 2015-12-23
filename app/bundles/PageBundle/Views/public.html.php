@@ -23,7 +23,7 @@ foreach ($slots as $slot => $slotConfig) {
         $slotConfig = array();
     }
 
-    if ($slotConfig['type'] == 'slideshow') {
+    if (isset($slotConfig['type']) && $slotConfig['type'] == 'slideshow') {
         if (isset($content[$slot])) {
             $options = json_decode($content[$slot], true);
         } else {
@@ -66,7 +66,7 @@ foreach ($slots as $slot => $slotConfig) {
         $options['public'] = true;
 
         $view['slots']->set($slot, $view->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
-    } elseif ($slotConfig['type'] == 'textarea') {
+    } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
         $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
         $view['slots']->set($slot, $value);
     } else {
