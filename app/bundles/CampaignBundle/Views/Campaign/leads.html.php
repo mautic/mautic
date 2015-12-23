@@ -46,8 +46,8 @@
                                                 echo $item['firstname'];
                                             elseif (!empty($item['email'])):
                                                 echo $item['email'];
-                                            elseif (!empty($item['ip_address'])):
-                                                echo $item['ip_address'];
+                                            else:
+                                                echo $view['translator']->trans('mautic.lead.lead.anonymous');
                                             endif;
                                             ?>
                                         </span>

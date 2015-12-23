@@ -163,12 +163,17 @@ class PluginController extends FormController
                     $em          = $this->factory->getEntityManager();
                     $integration = $entity->getName();
 
-                    //merge keys
+                    // Merge keys
                     $keys = $form['apiKeys']->getData();
 
-                    //restore original keys then merge the new ones to keep the form from wiping out empty secrets
-                    $mergedKeys = $integrationObject->mergeApiKeys($keys, $currentKeys, true);
-                    $integrationObject->encryptAndSetApiKeys($mergedKeys, $entity);
+                    // Prevent merged keys
+                    $secretKeys = $integrationObject->getSecretKeys();
+                    foreach ($secretKeys as $secretKey) {
+                        if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
+                            $keys[$secretKey] = $currentKeys[$secretKey];
+                        }
+                    }
+                    $integrationObject->encryptAndSetApiKeys($keys, $entity);
 
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();

@@ -31,13 +31,48 @@ return array(
 
     'services' => array(
         'other' => array(
-            'mautic.configurator' => array(
-                'class'     => 'Mautic\InstallBundle\Configurator\Configurator',
-                'arguments' => array(
+            'mautic.install.configurator.step.check'    => array(
+                'class'        => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'arguments'    => array(
+                    'mautic.configurator',
                     '%kernel.root_dir%',
-                    'mautic.factory'
-                )
-            )
+                    'request_stack',
+                ),
+                'tag'          => 'mautic.configurator.step',
+                'tagArguments' => array(
+                    'priority' => 0,
+                ),
+            ),
+            'mautic.install.configurator.step.doctrine' => array(
+                'class'        => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'arguments'    => array(
+                    'mautic.configurator',
+                ),
+                'tag'          => 'mautic.configurator.step',
+                'tagArguments' => array(
+                    'priority' => 1,
+                ),
+            ),
+            'mautic.install.configurator.step.email'    => array(
+                'class'        => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'arguments'    => array(
+                    'session',
+                ),
+                'tag'          => 'mautic.configurator.step',
+                'tagArguments' => array(
+                    'priority' => 3,
+                ),
+            ),
+            'mautic.install.configurator.step.user'     => array(
+                'class'        => 'Mautic\InstallBundle\Configurator\Step\UserStep',
+                'arguments'    => array(
+                    'session',
+                ),
+                'tag'          => 'mautic.configurator.step',
+                'tagArguments' => array(
+                    'priority' => 2,
+                ),
+            ),
         )
     )
 );

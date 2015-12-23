@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxedException;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -145,6 +146,11 @@ class MailHelper
     protected $plainText = '';
 
     /**
+     * @var bool
+     */
+    protected $plainTextSet = false;
+
+    /**
      * @var array
      */
     protected $assets = array();
@@ -208,7 +214,7 @@ class MailHelper
             $this->transport->setMauticFactory($factory);
         }
 
-        $this->message    = $this->getMessageInstance();
+        $this->message = $this->getMessageInstance();
     }
 
     /**
@@ -228,13 +234,10 @@ class MailHelper
         }
 
         // Set system return path if applicable
-        $returnPath = $this->message->getReturnPath();
-        if (empty($returnPath)) {
-            if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
-                $this->message->setReturnPath($bounceEmail);
-            } elseif (!empty($this->returnPath)) {
-                $this->message->setReturnPath($this->returnPath);
-            }
+        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+            $this->message->setReturnPath($bounceEmail);
+        } elseif (!empty($this->returnPath)) {
+            $this->message->setReturnPath($this->returnPath);
         }
 
         if (empty($this->errors)) {
@@ -255,20 +258,32 @@ class MailHelper
 
             $this->message->setSubject($this->subject);
             $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
-
-            if (!empty($this->plainText)) {
-                $this->message->addPart($this->plainText, 'text/plain');
-            }
+            $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
-                // Replace token content
-                $tokens = $this->getTokens();
-                if (!empty($tokens)) {
-                    // Replace tokens
-                    $search  = array_keys($tokens);
-                    $replace = $tokens;
+                // Set metadata if applicable
+                if (method_exists($this->message, 'addMetadata')) {
+                    foreach ($this->queuedRecipients as $email => $name) {
+                        $this->message->addMetadata($email,
+                            array(
+                                'leadId'   => (!empty($this->lead)) ? $this->lead['id'] : null,
+                                'emailId'  => (!empty($this->email)) ? $this->email->getId() : null,
+                                'hashId'   => $this->idHash,
+                                'source'   => $this->source,
+                                'tokens'   => $this->getTokens()
+                            )
+                        );
+                    }
+                } else {
+                    // Replace token content
+                    $tokens = $this->getTokens();
+                    if (!empty($tokens)) {
+                        // Replace tokens
+                        $search  = array_keys($tokens);
+                        $replace = $tokens;
 
-                    self::searchReplaceTokens($search, $replace, $this->message);
+                        self::searchReplaceTokens($search, $replace, $this->message);
+                    }
                 }
             }
 
@@ -469,7 +484,7 @@ class MailHelper
 
             unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
 
-            $this->headers = $this->source  = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
+            $this->headers = $this->source = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = array();
             $this->email   = null;
             $this->subject = $this->plainText = '';
             $this->body    = array(
@@ -479,6 +494,7 @@ class MailHelper
             );
 
             $this->tokenizationEnabled = false;
+            $this->plainTextSet        = false;
 
             $this->message = $this->getMessageInstance();
         }
@@ -492,7 +508,7 @@ class MailHelper
      * @param array          $replace
      * @param \Swift_Message $message
      */
-    static function searchReplaceTokens($search, $replace, \Swift_Message &$message)
+    static public function searchReplaceTokens($search, $replace, \Swift_Message &$message)
     {
         // Body
         $body         = $message->getBody();
@@ -550,8 +566,8 @@ class MailHelper
 
                 $bodyReplaced = str_ireplace($search, $replace, $childBody);
                 if ($childBody != $bodyReplaced) {
-                    $child->setBody($bodyReplaced);
-                    $childBody = $bodyReplaced;
+                    $childBody = strip_tags($bodyReplaced);
+                    $child->setBody($childBody);
                 }
             }
 
@@ -689,6 +705,7 @@ class MailHelper
         unset($vars);
 
         if ($returnContent) {
+
             return $content;
         }
 
@@ -730,6 +747,38 @@ class MailHelper
     public function getPlainText()
     {
         return $this->plainText;
+    }
+
+    /**
+     * Set plain text for $this->message, replacing if necessary
+     *
+     * @return null|string
+     */
+    protected function setMessagePlainText()
+    {
+        if ($this->tokenizationEnabled && $this->plainTextSet) {
+            // No need to find and replace since tokenization happens at the transport level
+
+            return;
+        }
+
+        if ($this->plainTextSet) {
+            $children = (array) $this->message->getChildren();
+
+            /** @var \Swift_Mime_MimeEntity $child */
+            foreach ($children as $child) {
+                $childType = $child->getContentType();
+                if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
+
+                    $child->setBody($this->plainText);
+
+                    break;
+                }
+            }
+        } else {
+            $this->message->addPart($this->plainText, 'text/plain');
+            $this->plainTextSet = true;
+        }
     }
 
     /**
@@ -1460,32 +1509,94 @@ class MailHelper
     }
 
     /**
-     * Create an email stat
+     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
      */
     public function createLeadEmailStat()
     {
-        if (!$this->lead) {
-            return;
-        }
+        $this->createEmailStat();
+    }
+
+    /**
+     * Create an email stat
+     *
+     * @param bool|true   $persist
+     * @param string|null $emailAddress
+     * @param null        $listId
+     *
+     * @return Stat|void
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    {
+        static $copies = array();
 
         //create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($this->email);
-        $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
 
-        $stat->setEmailAddress($this->lead['email']);
+        // Note if a lead
+        if (null !== $this->lead) {
+            $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+            $emailAddress = $this->lead['email'];
+        }
+
+        // Find email if applicable
+        if (null === $emailAddress) {
+            // Use the last address set
+            $emailAddresses = $this->message->getTo();
+
+            if (count($emailAddresses)) {
+                end($emailAddresses);
+                $emailAddress = key($emailAddresses);
+            }
+        }
+        $stat->setEmailAddress($emailAddress);
+
+        // Note if sent from a lead list
+        if (null !== $listId) {
+            $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+        }
+
         $stat->setTrackingHash($this->idHash);
         if (!empty($this->source)) {
             $stat->setSource($this->source[0]);
             $stat->setSourceId($this->source[1]);
         }
-        $stat->setCopy($this->getBody());
+
         $stat->setTokens($this->getTokens());
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
-        $emailModel->getStatRepository()->saveEntity($stat);
+
+        // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
+        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
+        if (!isset($copies[$id])) {
+            $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
+
+            $copy = $emailModel->getCopyRepository()->findByHash($hash);
+            if (null === $copy) {
+                // Create a copy entry
+                $copy = new Copy();
+                $copy->setId($hash)
+                    ->setBody($this->body['content'])
+                    ->setSubject($this->subject)
+                    ->setDateCreated(new \DateTime())
+                    ->setEmail($this->email);
+
+                $emailModel->getCopyRepository()->saveEntity($copy);
+            }
+
+            $copies[$id] = $copy;
+        }
+
+        $stat->setStoredCopy($copies[$id]);
+
+        if ($persist) {
+            $emailModel->getStatRepository()->saveEntity($stat);
+        }
+
+        return $stat;
     }
 
     /**

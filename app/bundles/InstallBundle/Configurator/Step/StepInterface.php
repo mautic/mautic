@@ -14,7 +14,8 @@ use Symfony\Component\Form\FormTypeInterface;
 /**
  * StepInterface.
  *
- * @author Marc Weistroff <marc.weistroff@sensio.com>
+ * @author      Marc Weistroff <marc.weistroff@sensio.com>
+ * @deprecated  To be removed in 2.0, implement Mautic\CoreBundle\Configurator\Step\StepInterface instead
  */
 interface StepInterface
 {

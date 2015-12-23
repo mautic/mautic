@@ -9,6 +9,7 @@
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -51,13 +52,22 @@ class CampaignExecutionEvent extends Event
      */
     protected $eventSettings;
 
+    /** @var LeadEventLog */
+    protected $log;
+
     /**
-     * Construct
-     *
-     * @param $args
-     * @param $result
+     * @var bool
      */
-    public function __construct($args, $result)
+    protected $logUpdatedByListener = false;
+
+    /**
+     * CampaignExecutionEvent constructor.
+     *
+     * @param                   $args
+     * @param                   $result
+     * @param LeadEventLog|null $log
+     */
+    public function __construct($args, $result, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
@@ -66,6 +76,7 @@ class CampaignExecutionEvent extends Event
         $this->systemTriggered = $args['systemTriggered'];
         $this->eventSettings   = $args['eventSettings'];
         $this->result          = $result;
+        $this->log             = $log;
     }
 
     /**
@@ -122,5 +133,34 @@ class CampaignExecutionEvent extends Event
     public function getEventSettings()
     {
         return $this->eventSettings;
+    }
+
+    /**
+     * Set a custom log entry to override auto-handling of the log entry
+     *
+     * @param LeadEventLog $log
+     */
+    public function setLogEntry(LeadEventLog $log)
+    {
+        $this->logUpdatedByListener = true;
+        $this->log                  = $log;
+    }
+
+    /**
+     * @return LeadEventLog
+     */
+    public function getLogEntry()
+    {
+        return $this->log;
+    }
+
+    /**
+     * Returns if a listener updated the log entry
+     *
+     * @return bool
+     */
+    public function wasLogUpdatedByListener()
+    {
+        return $this->logUpdatedByListener;
     }
 }
