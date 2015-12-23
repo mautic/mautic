@@ -752,4 +752,20 @@ class Field
     {
         $this->saveResult = $saveResult;
     }
+    
+    /**
+     * @return bool
+     */
+    public function getIsAutoFill()
+    {
+        return $this->isAutoFill;
+    }
+
+    /**
+     * @param mixed $isAutoFill
+     */
+    public function setIsAutoFill($isAutoFill)
+    {
+        $this->isAutoFill = $isAutoFill;
+    }
 }
