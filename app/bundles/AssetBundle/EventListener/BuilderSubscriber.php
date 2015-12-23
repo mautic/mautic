@@ -111,7 +111,7 @@ class BuilderSubscriber extends CommonSubscriber
         $model = $this->factory->getModel('asset');
 
         $clickthrough = array();
-        if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && !$event->isInternalSend())) {
+        if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = array('source' => $source);
 
             if ($leadId !== null) {
@@ -125,9 +125,9 @@ class BuilderSubscriber extends CommonSubscriber
 
         $tokens = array();
 
-        preg_match_all('/({|%7B)assetlink=(.*?)(}|%7D)/', $content, $matches);
-        if (!empty($matches[2])) {
-            foreach ($matches[2] as $key => $assetId) {
+        preg_match_all('/'.$this->assetToken.'/', $content, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $key => $assetId) {
                 $token = $matches[0][$key];
 
                 if (isset($tokens[$token])) {
