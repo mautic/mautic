@@ -2,11 +2,9 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\LeadBundle\Entity\ListLead;
 
 /**
  * Schema update for Version 1.0.0-rc4 to 1.0.0
@@ -19,11 +17,16 @@ class Version20150310000000 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
+     *
+     * @throws SkipMigrationException
      */
     public function preUp(Schema $schema)
     {
-        $this->connection->delete(MAUTIC_TABLE_PREFIX . 'addons', array('bundle' => 'MauticChatBundle'));
+        if ($schema->hasTable($this->prefix . 'plugins')) {
+            throw new SkipMigrationException('Schema includes this migration');
+        }
 
+        $this->connection->delete(MAUTIC_TABLE_PREFIX . 'addons', array('bundle' => 'MauticChatBundle'));
 
         $qb = $this->connection->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'lead_fields')

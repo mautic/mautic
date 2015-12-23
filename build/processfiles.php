@@ -18,6 +18,7 @@ system('rm app/phpunit.*');
 system('rm app/tests.bootstrap*');
 system('rm -rf app/bundles/*/Tests');
 system('rm -rf app/bundles/CoreBundle/Test');
+system('rm -rf app/bundles/CoreBundle/Tests');
 system('rm -rf app/cache');
 system('rm -rf media/files/*');
 system('rm app/config/config_dev.php');

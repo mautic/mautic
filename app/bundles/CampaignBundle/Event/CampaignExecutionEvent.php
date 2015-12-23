@@ -9,34 +9,78 @@
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignEvent
- *
- * @package Mautic\CampaignBundle\Event
+ * Class CampaignExecutionEvent
  */
 class CampaignExecutionEvent extends Event
 {
+    /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     protected $lead;
+
+    /**
+     * @var array
+     */
     protected $event;
+
+    /**
+     * @var array
+     */
     protected $config;
+
+    /**
+     * @var array
+     */
     protected $eventDetails;
+
+    /**
+     * @var bool
+     */
     protected $systemTriggered;
+
+    /**
+     * @var bool
+     */
     protected $result;
 
-    public function __construct($args, $result)
+    /**
+     * @var array
+     */
+    protected $eventSettings;
+
+    /** @var LeadEventLog */
+    protected $log;
+
+    /**
+     * @var bool
+     */
+    protected $logUpdatedByListener = false;
+
+    /**
+     * CampaignExecutionEvent constructor.
+     *
+     * @param                   $args
+     * @param                   $result
+     * @param LeadEventLog|null $log
+     */
+    public function __construct($args, $result, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
-        $this->config          = $args['config'];
+        $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
+        $this->eventSettings   = $args['eventSettings'];
         $this->result          = $result;
+        $this->log             = $log;
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
@@ -44,7 +88,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getEvent()
     {
@@ -52,7 +96,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getConfig()
     {
@@ -60,7 +104,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getEventDetails()
     {
@@ -68,7 +112,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getSystemTriggered()
     {
@@ -76,10 +120,47 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventSettings()
+    {
+        return $this->eventSettings;
+    }
+
+    /**
+     * Set a custom log entry to override auto-handling of the log entry
+     *
+     * @param LeadEventLog $log
+     */
+    public function setLogEntry(LeadEventLog $log)
+    {
+        $this->logUpdatedByListener = true;
+        $this->log                  = $log;
+    }
+
+    /**
+     * @return LeadEventLog
+     */
+    public function getLogEntry()
+    {
+        return $this->log;
+    }
+
+    /**
+     * Returns if a listener updated the log entry
+     *
+     * @return bool
+     */
+    public function wasLogUpdatedByListener()
+    {
+        return $this->logUpdatedByListener;
     }
 }

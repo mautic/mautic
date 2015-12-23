@@ -40,6 +40,12 @@ class Version20150724000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
+        // Check that render_style was not added by migration 20150521
+        $table = $schema->getTable($this->prefix . 'forms');
+        if (!$table->hasColumn('render_style')) {
+            $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
+        }
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers CHANGE consumerKey consumer_key VARCHAR(255) NOT NULL, CHANGE consumerSecret consumer_secret VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens DROP FOREIGN KEY ' . $this->findPropertyName('oauth1_access_tokens', 'fk', '37FDBD6D'));
         $this->addSql('DROP INDEX ' . $this->findPropertyName('oauth1_access_tokens', 'idx', '37FDBD6D') . ' ON ' . $this->prefix . 'oauth1_access_tokens');
@@ -78,9 +84,10 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats CHANGE retry_count retry_count INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions CHANGE name name VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields DROP FOREIGN KEY ' . $this->findPropertyName('form_fields', 'fk', '5FF69B7D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields CHANGE form_id form_id INT NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD CONSTRAINT ' . $this->generatePropertyName('form_fields', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP FOREIGN KEY ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref ADD CONSTRAINT ' . $this->generatePropertyName('lead_ips_xref', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes DROP FOREIGN KEY ' . $this->findPropertyName('lead_notes', 'fk', '1755458D'));
@@ -124,6 +131,12 @@ class Version20150724000000 extends AbstractMauticMigration
      */
     public function postgresqlUp(Schema $schema)
     {
+        // Check that render_style was not added by migration 20150521
+        $table = $schema->getTable($this->prefix . 'forms');
+        if (!$table->hasColumn('render_style')) {
+            $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
+        }
+
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers RENAME COLUMN consumerkey TO consumer_key');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers ALTER consumer_key SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers RENAME COLUMN consumersecret TO consumer_secret');
@@ -164,10 +177,11 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count DROP DEFAULT');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count TYPE integer USING (trim(retry_count)::integer)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name SET NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name TYPE VARCHAR(255)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields DROP CONSTRAINT ' . $this->findPropertyName('form_fields', 'fk', '5FF69B7D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER form_id SET NOT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD CONSTRAINT ' . $this->generatePropertyName('form_fields', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP CONSTRAINT ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref ADD CONSTRAINT ' . $this->generatePropertyName('lead_ips_xref', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes ALTER lead_id SET NOT NULL');

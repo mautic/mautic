@@ -40,7 +40,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 4;
 
     /**
      * Extra version identifier
@@ -482,13 +482,16 @@ class AppKernel extends Kernel
         $class = $this->getContainerClass();
 
         $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
-        $fresh = true;
+
+        $fresh = file_exists($this->getCacheDir().'/classes.php');
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
-            $fresh = false;
+            if ($this->debug) {
+                $fresh = false;
+            }
         }
 
         require_once $cache;
@@ -496,6 +499,7 @@ class AppKernel extends Kernel
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
+        // Warm up the cache if classes.php is missing or in dev mode
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
@@ -504,7 +508,7 @@ class AppKernel extends Kernel
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
+     * @return \Symfony\Component\DependencyInjection\ContainerBuilder The compiled service container
      *
      * @throws \RuntimeException
      */
@@ -529,7 +533,7 @@ class AppKernel extends Kernel
         }
 
         // Only rebuild the classes if it doesn't exist or if the kernel is booted through the console meaning likely cache:clear is used
-        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.map')) {
+        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.php')) {
             $container->addCompilerPass(new DependencyInjection\AddClassesToCachePass($this));
         }
 

@@ -9,7 +9,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -214,6 +213,10 @@ class LeadModel extends FormModel
             if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
                 $entity->addUpdatedField('country', $details['country']);
             }
+
+            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
+                $entity->addUpdatedField('zipcode', $details['zipcode']);
+            }
         }
 
         parent::saveEntity($entity, $unlock);
@@ -282,7 +285,7 @@ class LeadModel extends FormModel
                     $curValue = $field['value'];
                     $newValue = $data[$alias];
 
-                    if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -482,8 +485,12 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if (!$returnTracking && $this->systemCurrentLead) {
+        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
             // Just return the system set lead
+            if (null === $this->systemCurrentLead) {
+                $this->systemCurrentLead = new Lead();
+            }
+
             return $this->systemCurrentLead;
         }
 
@@ -559,7 +566,7 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
-        if ($this->systemCurrentLead) {
+        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             // Overwrite system current lead
             $this->systemCurrentLead = $lead;
 
@@ -693,7 +700,9 @@ class LeadModel extends FormModel
      */
     public function addToLists($lead, $lists, $manuallyAdded = true)
     {
-        $this->factory->getModel('lead.list')->addLead($lead, $lists, $manuallyAdded);
+        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+        $listModel = $this->factory->getModel('lead.list');
+        $listModel->addLead($lead, $lists, $manuallyAdded);
     }
 
     /**
@@ -773,7 +782,7 @@ class LeadModel extends FormModel
         $oldOwner = $mergeWith->getOwner();
         $newOwner = $mergeFrom->getOwner();
 
-        if ($oldOwner === null) {
+        if ($oldOwner === null && $newOwner !== null) {
             $mergeWith->setOwner($newOwner);
 
             $logger->debug('LEAD: New owner is ' . $newOwner->getId());
@@ -816,15 +825,33 @@ class LeadModel extends FormModel
      *
      * @return DoNotEmail|bool
      * @throws \Doctrine\DBAL\DBALException
+     *
+     * @deprecated Use unsubscribeLead() instead. To be removed in 2.0.
      */
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
-        if (empty($emailAddress)) {
-            $emailAddress = $lead->getEmail();
+        return $this->unsubscribeLead($lead, $reason, $persist, $manual);
+    }
 
-            if (empty($emailAddress)) {
-                return false;
-            }
+    /**
+     * @param Lead       $lead
+     * @param string     $reason
+     * @param bool|true  $persist
+     * @param bool|false $manual
+     *
+     * @return bool|DoNotEmail
+     */
+    public function unsubscribeLead(Lead $lead, $reason = null, $persist = true, $manual = false)
+    {
+        $emailAddress = $lead->getEmail();
+
+        if (empty($emailAddress)) {
+
+            return false;
+        }
+
+        if (null === $reason) {
+            $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.unsubscribed');
         }
 
         $em   = $this->factory->getEntityManager();
@@ -949,18 +976,6 @@ class LeadModel extends FormModel
         }
         unset($fields['points']);
 
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
-                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
-                    "%user%" => $this->factory->getUser()->getUsername()
-                ));
-
-                $this->setDoNotContact($lead, $data[$fields['email']], $reason, false);
-            }
-        }
-        unset($fields['doNotEmail']);
-
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -969,12 +984,26 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
+        // Set profile data
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
                 $lead->addUpdatedField($leadField, $data[$importField]);
             }
         }
+
+        // Set unsubscribe status
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
+            if ($doNotEmail) {
+                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
+                    "%user%" => $this->factory->getUser()->getUsername()
+                ));
+
+                $this->unsubscribeLead($lead, $reason, false);
+            }
+        }
+        unset($fields['doNotEmail']);
 
         $lead->imported = true;
 
@@ -1093,10 +1122,18 @@ class LeadModel extends FormModel
         }
 
         if ($removeTags !== null) {
+
+            $logger->debug('LEAD: Removing ' . implode(', ', $removeTags) . ' for lead ID# ' . $lead->getId());
+
+            array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+
+            // See which tags really exist
+            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+
             foreach ($removeTags as $tag) {
                 // Tag to be removed
-                if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
-                    $lead->removeTag($foundTags[$tag]);
+                if (array_key_exists($tag, $foundRemoveTags) && $leadTags->contains($foundRemoveTags[$tag])) {
+                    $lead->removeTag($foundRemoveTags[$tag]);
                     $logger->debug('LEAD: Removed ' . $tag);
                 }
             }

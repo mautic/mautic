@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\DependencyInjection;
 use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Finder\Finder;
@@ -32,10 +33,7 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $core    = $container->getParameter('mautic.bundles');
-        $plugins  = $container->getParameter('mautic.plugin.bundles');
-        $bundles = array_merge($core, $plugins);
-        unset($core, $plugins);
+        $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
@@ -134,21 +132,84 @@ class MauticCoreExtension extends Extension
                             }
                         }
 
-                        // Set scope
+                        // Set public service
+                        if (!empty($details['public'])) {
+                            $definition->setPublic($details['public']);
+                        }
+
+                        // Set lazy service
+                        if (!empty($details['lazy'])) {
+                            $definition->setLazy($details['lazy']);
+                        }
+
+                        // Set synthetic service
+                        if (!empty($details['synthetic'])) {
+                            $definition->setSynthetic($details['synthetic']);
+                        }
+
+                        // Set abstract service
+                        if (!empty($details['abstract'])) {
+                            $definition->setAbstract($details['abstract']);
+                        }
+
+                        // Set include file
+                        if (!empty($details['file'])) {
+                            $definition->setFile($details['file']);
+                        }
+
+                        // Set service configurator
+                        if (!empty($details['configurator'])) {
+                            $definition->setConfigurator($details['configurator']);
+                        }
+
+                        // Set scope - Deprecated as of Symfony 2.8 and removed in 3.0
                         if (!empty($details['scope'])) {
                             $definition->setScope($details['scope']);
                         } elseif ($type == 'templating') {
                             $definition->setScope('request');
                         }
 
-                        // Set factory service
+                        // Set factory service - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
                         if (!empty($details['factoryService'])) {
                             $definition->setFactoryService($details['factoryService']);
                         }
 
-                        // Set factory method
+                        // Set factory class - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
+                        if (!empty($details['factoryClass'])) {
+                            $definition->setFactoryClass($details['factoryClass']);
+                        }
+
+                        // Set factory method - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
                         if (!empty($details['factoryMethod'])) {
                             $definition->setFactoryMethod($details['factoryMethod']);
+                        }
+
+                        // Set factory - Preferred API since Symfony 2.6
+                        if (!empty($details['factory'])) {
+                            $factory = $details['factory'];
+
+                            /*
+                             * Standardize to an array then convert a service to a Reference if needed
+                             *
+                             * This supports three syntaxes:
+                             *
+                             * 1) @service::method or Class::method
+                             * 2) array('@service', 'method') or array('Class', 'method')
+                             * 3) "Unknown" - Just pass it to the definition
+                             *
+                             * Services must always be prefaced with an @ symbol (similar to "normal" config files)
+                             */
+                            if (is_string($factory) && strpos($factory, '::') !== false) {
+                                $factory = explode('::', $factory, 2);
+                            }
+
+                            // Check if the first item in the factory array is a service and if so fetch its reference
+                            if (is_array($factory) && strpos($factory[0], '@') === 0) {
+                                // Exclude the leading @ character in the service ID
+                                $factory[0] = new Reference(substr($factory[0], 1));
+                            }
+
+                            $definition->setFactory($factory);
                         }
 
                         // Set method calls
@@ -177,6 +238,19 @@ class MauticCoreExtension extends Extension
 
                                 $definition->addMethodCall($method, $methodCallArguments);
                             }
+                        }
+
+                        // Set deprecated service
+                        if (!empty($details['decoratedService'])) {
+                            // This should be an array and the first parameter cannot be empty
+                            if (!is_array($details['decoratedService'])) {
+                                throw new InvalidArgumentException('The "decoratedService" definition must be an array.');
+                            }
+
+                            // The second parameter of setDecoratedService is optional, check if there is a second key in the array
+                            $secondParam = !empty($details['decoratedService'][1]) ? $details['decoratedService'][1] : null;
+
+                            $definition->setDecoratedService($details['decoratedService'][0], $secondParam);
                         }
 
                         unset($definition);
