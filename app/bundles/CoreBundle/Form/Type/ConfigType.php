@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Symfony\Component\Form\AbstractType;
@@ -68,17 +67,17 @@ class ConfigType extends AbstractType
      * @param TranslatorInterface $translator
      * @param LanguageHelper      $langHelper
      * @param IpLookupFactory     $ipLookupFactory
-     * @param AbstractLookup      $ipLookup
      * @param array               $supportedLanguages
      * @param array               $ipLookupServices
+     * @param AbstractLookup      $ipLookup
      */
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        AbstractLookup $ipLookup,
         array $supportedLanguages,
-        array $ipLookupServices
+        array $ipLookupServices,
+        AbstractLookup $ipLookup = null
     ) {
         $this->translator         = $translator;
         $this->langHelper         = $langHelper;

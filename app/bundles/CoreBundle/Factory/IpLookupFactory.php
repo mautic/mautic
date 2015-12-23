@@ -56,11 +56,16 @@ class IpLookupFactory
      * @param null  $auth
      * @param array $ipLookupConfig
      *
-     * @return AbstractLookup
+     * @return null|AbstractLookup
      */
     public function getService($service, $auth = null, array $ipLookupConfig = array())
     {
         static $services = array();
+
+        if (empty($service)) {
+
+            return null;
+        }
 
         if (!isset($services[$service]) || (null !== $auth || null !== $ipLookupConfig)) {
             if (!isset($this->lookupServices[$service])) {
