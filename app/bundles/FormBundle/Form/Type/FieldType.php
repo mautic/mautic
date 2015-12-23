@@ -352,7 +352,7 @@ class FieldType extends AbstractType
                 )
             );
 
-            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? true : (boolean) $options['data']['isAutoFill'];
+            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (boolean) $options['data']['isAutoFill'];
             $builder->add(
                 'isAutoFill',
                 'yesno_button_group',
