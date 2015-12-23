@@ -238,11 +238,9 @@ class CommonModel
             $category = null;
         }
 
-        if (null === $lang) {
-            // Default to en
-            $lang = 'en';
-        } elseif (!isset($locales[$lang])) {
+        if ($lang && !isset($locales[$lang])) {
             // Language doesn't exist so return false
+
             return false;
         }
 
