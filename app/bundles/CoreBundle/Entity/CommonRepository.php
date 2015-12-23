@@ -982,16 +982,12 @@ class CommonRepository extends EntityRepository
                 }
             }
 
-            if (isset($metadata->fieldMappings['language'])) {
+            if ($lang && isset($metadata->fieldMappings['language'])) {
                 $q->setParameter('lang', $lang);
 
                 $expr->add(
                     $q->expr()->eq($this->getTableAlias().'.language', ':lang')
                 );
-            } elseif (null !== $lang) {
-                // This entity does not have a language mapping so return null
-
-                return null;
             }
 
             // Check for variants and return parent only
