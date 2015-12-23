@@ -994,6 +994,13 @@ class CommonRepository extends EntityRepository
                 return null;
             }
 
+            // Check for variants and return parent only
+            if (isset($metadata->associationMappings['variantParent'])) {
+                $expr->add(
+                    $q->expr()->isNull($this->getTableAlias().'.variantParent')
+                );
+            }
+
             $q->where($expr);
 
             $entity = $q->getQuery()->getSingleResult();
