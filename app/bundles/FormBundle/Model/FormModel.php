@@ -476,18 +476,33 @@ class FormModel extends CommonFormModel
      * @param $form
      * @param $formHtml
      */
+    // todo: change name method. Because this method use query parameters and lead fields
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $request  = $this->factory->getRequest();
         $formName = $form->generateFormName();
 
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $lead = $this->factory->getModel('lead')->getCurrentLead();
+
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
+            $leadField = $f->getLeadField();
+            $isAutoFill = $f->getIsAutoFill();
+            $allowPopulate = true;
+
+            /** get data to populate from url or field matched with lead field and allow auto fill **/
             if ($request->query->has($alias)) {
                 $value = $request->query->get($alias);
+            } else if (isset($leadField) && $isAutoFill) {
+                $value = $lead->getFieldValue($leadField);
+            } else {
+                $allowPopulate = false;
+            }
 
+            if ($allowPopulate) {
                 switch ($f->getType()) {
                     case 'text':
                         if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
