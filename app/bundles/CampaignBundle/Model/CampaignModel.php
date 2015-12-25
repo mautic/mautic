@@ -174,11 +174,12 @@ class CampaignModel extends CommonFormModel
      *
      * @return array
      */
-    public function setEvents (Campaign &$entity, $sessionEvents, $sessionConnections, $deletedEvents)
+    public function setEvents (Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
         $existingEvents = $entity->getEvents();
-
-        $events = $hierarchy = $parentUpdated = array();
+        $events =
+        $hierarchy =
+        $parentUpdated = array();
 
         //set the events from session
         foreach ($sessionEvents as $id => $properties) {
@@ -285,6 +286,11 @@ class CampaignModel extends CommonFormModel
             return ($aOrder < $bOrder) ? -1 : 1;
         });
 
+        // Persist events if campaign is being edited
+        if ($entity->getId()) {
+            $this->getEventRepository()->saveEntities($events);
+        }
+
         return $events;
     }
 
@@ -366,7 +372,7 @@ class CampaignModel extends CommonFormModel
      * @param string   $root
      * @param int      $order
      */
-    private function buildOrder ($hierarchy, &$events, &$entity, $root = 'null', $order = 1)
+    private function buildOrder ($hierarchy, &$events, $entity, $root = 'null', $order = 1)
     {
         $count = count($hierarchy);
 
@@ -374,7 +380,6 @@ class CampaignModel extends CommonFormModel
             if ($parent == $root || $count === 1) {
                 $events[$eventId]->setOrder($order);
                 $entity->addEvent($eventId, $events[$eventId]);
-
                 unset($hierarchy[$eventId]);
                 if (count($hierarchy)) {
                     $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
