@@ -21,8 +21,15 @@ require_once __DIR__ . '/../../../../../../../../../bootstrap.php.cache';
 require_once __DIR__ . '/../../../../../../../../../AppKernel.php';
 $kernel = new AppKernel('prod', false);
 $kernel->boot();
-$session = $kernel->getContainer()->get('session');
-$userId  = $session->get('mautic.user', false);
+
+// Handle a request so that authentication is setup
+$request  = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+$response = $kernel->handle($request);
+
+$session       = $kernel->getContainer()->get('session');
+$securityToken = $kernel->getContainer()->get('security.token_storage');
+$token         = $securityToken->getToken();
+$authenticated = count($token->getRoles());
 
 /**
  *	Check if user is authorized
@@ -31,11 +38,11 @@ $userId  = $session->get('mautic.user', false);
  *	@return boolean true if access granted, false if no access
  */
 function auth() {
-    global $userId;
+    global $authenticated;
     // You can insert your own code over here to check if the user is authorized.
     // If you use a session variable, you've got to start the session first (session_start())
 
-    return (false !== $userId);
+    return $authenticated;
 }
 
 // @todo Work on plugins registration
@@ -51,7 +58,7 @@ function auth() {
 
 $fm = new Filemanager();
 
-if (false !== $userId) {
+if ($authenticated) {
     $userDir = $session->get('mautic.imagepath', false);
     $baseDir = $session->get('mautic.basepath', false);
     $docRoot = $session->get('mautic.docroot', false);
