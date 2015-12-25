@@ -35,7 +35,7 @@ function auth() {
     // You can insert your own code over here to check if the user is authorized.
     // If you use a session variable, you've got to start the session first (session_start())
 
-    return (!empty($userId));
+    return (false !== $userId);
 }
 
 // @todo Work on plugins registration
@@ -51,7 +51,7 @@ function auth() {
 
 $fm = new Filemanager();
 
-if ($userId) {
+if (false !== $userId) {
     $userDir = $session->get('mautic.imagepath', false);
     $baseDir = $session->get('mautic.basepath', false);
     $docRoot = $session->get('mautic.docroot', false);
