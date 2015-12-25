@@ -155,6 +155,13 @@ class FormModel extends CommonFormModel
             $order++;
             $entity->addField($properties['id'], $field);
         }
+
+        // Persist if the entity is known
+        if ($entity->getId()) {
+            /** @var \Mautic\FormBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->factory->getModel('form.field');
+            $fieldModel->saveEntities($entity->getFields());
+        }
     }
 
     /**
@@ -164,13 +171,22 @@ class FormModel extends CommonFormModel
     public function deleteFields(Form $entity, $sessionFields)
     {
         if (empty($sessionFields)) {
+
             return;
         }
+
         $existingFields = $entity->getFields();
+        $deleteFields   = array();
         foreach ($sessionFields as $fieldId) {
             if (isset($existingFields[$fieldId])) {
                 $entity->removeField($fieldId, $existingFields[$fieldId]);
+                $deleteFields[] = $existingFields[$fieldId];
             }
+        }
+
+        // Delete fields from db
+        if (count($deleteFields)) {
+            $this->factory->getModel('form.field')->deleteEntities($deleteFields);
         }
     }
 
@@ -218,6 +234,13 @@ class FormModel extends CommonFormModel
             $action->setOrder($order);
             $order++;
             $entity->addAction($properties['id'], $action);
+        }
+
+        // Persist if form is being edited
+        if ($entity->getId()) {
+            /** @var \Mautic\FormBundle\Model\ActionModel $actionModel */
+            $actionModel = $this->factory->getModel('form.action');
+            $actionModel->saveEntities($entity->getActions());
         }
     }
 
