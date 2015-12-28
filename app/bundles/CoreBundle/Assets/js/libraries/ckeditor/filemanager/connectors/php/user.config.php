@@ -16,18 +16,26 @@
  *	@copyright	Authors
  */
 
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelEvents;
+
 // Boot Symfony
 require_once __DIR__ . '/../../../../../../../../../bootstrap.php.cache';
 require_once __DIR__ . '/../../../../../../../../../AppKernel.php';
 $kernel = new AppKernel('prod', false);
 $kernel->boot();
+$container  = $kernel->getContainer();
 
-// Handle a request so that authentication is setup
-$request  = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-$response = $kernel->handle($request);
+// Dispatch REQUEST event to setup authentication
+$request    = Request::createFromGlobals();
+$httpKernel = $container->get('http_kernel');
+$event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
+$container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
 
-$session       = $kernel->getContainer()->get('session');
-$securityToken = $kernel->getContainer()->get('security.token_storage');
+$session       = $container->get('session');
+$securityToken = $container->get('security.token_storage');
 $token         = $securityToken->getToken();
 $authenticated = count($token->getRoles());
 
